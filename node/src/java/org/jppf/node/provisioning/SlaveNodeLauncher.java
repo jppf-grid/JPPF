@@ -89,7 +89,6 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    */
   @Override
   public void run() {
-    boolean end = false;
     Thread hookThread = null;
     try {
       hookThread = createShutdownHook();
@@ -111,7 +110,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
       setStarted(false);
       try {
         if (hookThread != null) Runtime.getRuntime().removeShutdownHook(hookThread);
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
     }
   }

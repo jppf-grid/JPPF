@@ -63,7 +63,7 @@ class X11IdleTimeDetector implements IdleTimeDetector {
     public NativeLong event_mask;
 
     @Override
-    protected List getFieldOrder() {
+    protected List<String> getFieldOrder() {
       return Arrays.asList("window", "state", "kind", "til_or_since", "idle", "event_mask");
     }
   }

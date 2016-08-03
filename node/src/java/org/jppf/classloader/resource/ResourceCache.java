@@ -58,7 +58,7 @@ public class ResourceCache {
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
-  private CollectionMap<String, Location> cache = new VectorHashtable<>();
+  private CollectionMap<String, Location<?>> cache = new VectorHashtable<>();
   /**
    * List of temp folders used by this cache.
    */
@@ -98,8 +98,8 @@ public class ResourceCache {
    * @return a list of file paths, or null if the resource is not found in the cache.
    */
   @SuppressWarnings("unchecked")
-  public synchronized List<Location> getResourcesLocations(final String name) {
-    return enabled ? (List<Location>) cache.getValues(name) : null;
+  public synchronized List<Location<?>> getResourcesLocations(final String name) {
+    return enabled ? (List<Location<?>>) cache.getValues(name) : null;
   }
 
   /**
@@ -107,8 +107,8 @@ public class ResourceCache {
    * @param name the name of the resource to lookup.
    * @return a file path, or null if the resource is not found in the cache.
    */
-  private synchronized Location getResourceLocation(final String name) {
-    Collection<Location> locations = cache.getValues(name);
+  private synchronized Location<?> getResourceLocation(final String name) {
+    Collection<Location<?>> locations = cache.getValues(name);
     if ((locations == null) || locations.isEmpty()) return null;
     return locations.iterator().next();
   }
@@ -118,7 +118,7 @@ public class ResourceCache {
    * @param name the name of the resource to lookup.
    * @param locations a list of file paths.
    */
-  private synchronized void setResourcesLocations(final String name, final List<Location> locations) {
+  private synchronized void setResourcesLocations(final String name, final List<Location<?>> locations) {
     cache.addValues(name, locations);
   }
 
@@ -129,11 +129,11 @@ public class ResourceCache {
    */
   public synchronized List<URL> getResourcesURLs(final String name) {
     if (!enabled) return null;
-    Collection<Location> resources = getResourcesLocations(name);
+    Collection<Location<?>> resources = getResourcesLocations(name);
     if (resources == null) return null;
     List<URL> urls = new ArrayList<>(resources.size());
     int count = 0;
-    for (Location res : resources) {
+    for (Location<?> res : resources) {
       URL url = getResourceURL(name, res, count++);
       if (url != null) urls.add(url);
     }
@@ -156,7 +156,7 @@ public class ResourceCache {
    * @param id the position of the url to fetch.
    * @return resource location expressed as a URL.
    */
-  private synchronized URL getResourceURL(final String name, final Location res, final int id) {
+  private synchronized URL getResourceURL(final String name, final Location<?> res, final int id) {
     if (res instanceof FileLocation) {
       String path = ((FileLocation) res).getPath();
       if (path == null) return null;
@@ -165,7 +165,7 @@ public class ResourceCache {
       String s = "jppfres://" + uuid + '/' + name + "?id=" + id;
       try {
         return new URL(s);
-      } catch (Exception e) {
+      } catch (@SuppressWarnings("unused") Exception e) {
         return null;
       }
     } else if (res instanceof URLLocation) return ((URLLocation) res).getPath();
@@ -180,7 +180,7 @@ public class ResourceCache {
   public synchronized void registerResources(final String name, final List<byte[]> definitions) {
     if (!enabled) return;
     if (isAbsolutePath(name)) return;
-    List<Location> locations = new LinkedList<>();
+    List<Location<?>> locations = new LinkedList<>();
     for (byte[] def : definitions) {
       try {
         locations.add(saveToTempFile(name, def));
@@ -198,7 +198,7 @@ public class ResourceCache {
    * @param name the name of the resource to register.
    * @param location a Location object holding or pointing to the resource defintion.
    */
-  public synchronized void registerResource(final String name, final Location location) {
+  public synchronized void registerResource(final String name, final Location<?> location) {
     if (enabled) cache.putValue(name, location);
   }
 
@@ -209,9 +209,9 @@ public class ResourceCache {
    * @return the path to the created file.
    * @throws Exception if any I/O error occurs.
    */
-  private Location saveToTempFile(final String name, final byte[] definition) throws Exception {
+  private Location<?> saveToTempFile(final String name, final byte[] definition) throws Exception {
     SaveResourceAction action = new SaveResourceAction(tempFolders, name, definition);
-    Location file = AccessController.doPrivileged(action);
+    Location<?> file = AccessController.doPrivileged(action);
     if (action.getException() != null) throw action.getException();
     if (traceEnabled) log.trace("saved resource [" + name + "] to file " + file);
     return file;

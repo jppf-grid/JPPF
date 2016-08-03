@@ -200,7 +200,7 @@ public abstract class AbstractNodeIO implements NodeIO {
     bundle.setNodeExecutionTime(elapsed);
     Set<Integer> resubmitSet = new HashSet<>();
     for (Task<?> task: tasks) {
-      if ((task instanceof AbstractTask) && ((AbstractTask) task).isResubmit()) resubmitSet.add(task.getPosition());
+      if ((task instanceof AbstractTask) && ((AbstractTask<?>) task).isResubmit()) resubmitSet.add(task.getPosition());
     }
     if (!resubmitSet.isEmpty()) {
       if (debugEnabled) log.debug("positions of task resubmit requests: {}", resubmitSet);
@@ -259,8 +259,7 @@ public abstract class AbstractNodeIO implements NodeIO {
     @Override
     public DataLocation call() {
       DataLocation dl = null;
-      int p = (object instanceof Task) ? ((Task) object).getPosition() : -1;
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      int p = (object instanceof Task) ? ((Task<?>) object).getPosition() : -1;
       try {
         Thread.currentThread().setContextClassLoader(contextCL);
         if (traceEnabled) log.trace("before serialization of object at position " + p);

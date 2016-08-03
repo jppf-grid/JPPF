@@ -166,13 +166,13 @@ public class ClassLoaderRequestHandler
           {
             for (JPPFResourceWrapper rw: response.getResources())
             {
-              ResourceFuture f = (ResourceFuture) futureMap.remove(rw);
+              ResourceFuture<JPPFResourceWrapper> f = (ResourceFuture<JPPFResourceWrapper>) futureMap.remove(rw);
               if (f != null) f.setDone(rw);
             }
           }
           for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry: futureMap.entrySet())
           {
-            ResourceFuture future = (ResourceFuture) entry.getValue();
+            ResourceFuture<JPPFResourceWrapper> future = (ResourceFuture<JPPFResourceWrapper>) entry.getValue();
             if (t != null) future.setThrowable(t);
             else future.setDone(null);
           }

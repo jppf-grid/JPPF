@@ -114,7 +114,6 @@ public class NodeRunner {
   public static void main(final String...args) {
     node = null;
     try {
-      TypedProperties config = JPPFConfiguration.getProperties();
       TypedProperties overrides = new ConfigurationOverridesHandler().load(true);
       if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
       if (!ANDROID) new JmxMessageNotifier(); // initialize the jmx logger
@@ -191,7 +190,7 @@ public class NodeRunner {
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     String className = JPPFConfiguration.get(JPPFProperties.NODE_CLASS);
     Class<?> clazz = getJPPFClassLoader().loadClass(className);
-    Constructor c = clazz.getConstructor(DriverConnectionInfo.class);
+    Constructor<?> c = clazz.getConstructor(DriverConnectionInfo.class);
     JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);
     if (debugEnabled) log.debug("Created new node instance: " + node);
     return node;
@@ -322,7 +321,7 @@ public class NodeRunner {
         public void run() {
           try {
             node.stopJmxServer();
-          } catch (Exception ignore) {
+          } catch (@SuppressWarnings("unused") Exception ignore) {
           }
         }
       };
@@ -330,9 +329,9 @@ public class NodeRunner {
       // we don't want to wait forever for the connection to close
       try {
         f.get(1000L, TimeUnit.MILLISECONDS);
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
-    } catch (Exception ignore) {
+    } catch (@SuppressWarnings("unused") Exception ignore) {
     }
   }
 
@@ -370,7 +369,7 @@ public class NodeRunner {
           stopJmxServer();
           try {
             Thread.sleep(500L);
-          } catch(Exception ignore) {
+          } catch(@SuppressWarnings("unused") Exception ignore) {
           }
           System.exit(restart ? 2 : 0);
           return null;

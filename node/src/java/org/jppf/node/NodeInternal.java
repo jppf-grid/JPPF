@@ -32,7 +32,7 @@ public interface NodeInternal extends Node
    * Get the connection used by this node.
    * @return a {@link NodeConnection} instance.
    */
-  NodeConnection getNodeConnection();
+  NodeConnection<?> getNodeConnection();
 
   /**
    * Stop this node and release the resources it is using.

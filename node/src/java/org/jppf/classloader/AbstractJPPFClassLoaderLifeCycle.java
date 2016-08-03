@@ -109,7 +109,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * @param uuidPath unique identifier for the submitting application.
    * @exclude
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
     super(StringUtils.ZERO_URL, parent);
     this.connection = connection;
     this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
@@ -270,7 +270,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
           results[index] = url;
           if (debugEnabled) log.debug(build(this, " resource [", name, "] found remotely as ", url));
         }
-        else if (resource != null && (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR)) notFoundCache.add(name);
+        else if (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR) notFoundCache.add(name);
       }
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -324,7 +324,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * @return a {@link ClassLoaderConnection} instance.
    * @exclude
    */
-  public ClassLoaderConnection getConnection() {
+  public ClassLoaderConnection<?> getConnection() {
     return connection;
   }
 

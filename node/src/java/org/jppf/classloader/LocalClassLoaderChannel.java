@@ -25,13 +25,13 @@ import org.jppf.nio.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFResourceWrapper, AbstractNioContext>
+public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFResourceWrapper, AbstractNioContext<?>>
 {
   /**
    * Initialize this I/O handler with the specified context.
    * @param context the context used as communication channel.
    */
-  public LocalClassLoaderChannel(final AbstractNioContext context)
+  public LocalClassLoaderChannel(final AbstractNioContext<?> context)
   {
     super(context);
   }

@@ -36,7 +36,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent) {
+  public JPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent) {
     super(connection, parent);
     init();
   }
@@ -47,7 +47,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
+  public JPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
     super(connection, parent, uuidPath);
   }
 

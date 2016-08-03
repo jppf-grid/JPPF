@@ -85,7 +85,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Manager for the MBean defined through the service provider interface.
    */
-  private JPPFMBeanProviderManager providerManager = null;
+  private JPPFMBeanProviderManager<?> providerManager = null;
   /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    * @exclude

@@ -60,12 +60,10 @@ public class OutputRedirectHook implements InitializationHook {
       JPPFProperty<Boolean> appendProp = isOut ? JPPFProperties.REDIRECT_OUT_APPEND : JPPFProperties.REDIRECT_ERR_APPEND;
       boolean append = config.get(appendProp);
       OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
-      if (os != null) {
-        PrintStream pos = new PrintStream(os, true);
-        pos.println("********** " + new Date() + " **********");
-        if (isOut) System.setOut(pos);
-        else System.setErr(pos);
-      }
+      PrintStream pos = new PrintStream(os, true);
+      pos.println("********** " + new Date() + " **********");
+      if (isOut) System.setOut(pos);
+      else System.setErr(pos);
     } catch (Exception e) {
       String message = "error occurred while trying to redirect System." + (isOut ? "out" :  "err") + " : {}";
       if (debugEnabled) log.debug(message, ExceptionUtils.getStackTrace(e));

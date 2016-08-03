@@ -125,13 +125,13 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
       int port;
       try {
         port = Integer.valueOf(tokens[2]);
-      } catch(Exception e) {
+      } catch(@SuppressWarnings("unused") Exception e) {
         return null;
       }
       int recoveryPort;
       try {
         recoveryPort = Integer.valueOf(tokens[3]);
-      } catch(Exception e) {
+      } catch(@SuppressWarnings("unused") Exception e) {
         recoveryPort = -1;
       }
       return new JPPFDriverConnectionInfo(secure, host, port, recoveryPort);

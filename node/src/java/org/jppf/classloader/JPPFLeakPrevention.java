@@ -194,7 +194,7 @@ public final class JPPFLeakPrevention {
             clearTimerThread(thread);
           }  else if (preventThread) {
             try {
-              Class clazz = thread.getClass();
+              Class<?> clazz = thread.getClass();
               while(!Thread.class.equals(clazz)) clazz = clazz.getSuperclass();
               Field fieldTarget = getDeclaredAccessibleField(clazz, "target");
               Object target = fieldTarget.get(thread);
@@ -352,7 +352,7 @@ public final class JPPFLeakPrevention {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
     // we need to initialize all loaded classes
-    for (Class clazz : getLoadedClasses(classLoader))
+    for (Class<?> clazz : getLoadedClasses(classLoader))
     {
       try {
         for (Field field : clazz.getDeclaredFields()) {
@@ -361,11 +361,11 @@ public final class JPPFLeakPrevention {
             break;
           }
         }
-      } catch (Throwable ignore) {
+      } catch (@SuppressWarnings("unused") Throwable ignore) {
       }
     }
 
-    for (Class clazz : getLoadedClasses(classLoader)) {
+    for (Class<?> clazz : getLoadedClasses(classLoader)) {
       try {
         for (Field field : clazz.getDeclaredFields()) {
           if (field.getType().isPrimitive() || field.getName().contains("$")) continue;
@@ -451,7 +451,7 @@ public final class JPPFLeakPrevention {
    * @return a <code>Field</code> instance with accessible flag set to <code>true</code>.
    * @throws NoSuchFieldException if field doesn't exists.
    */
-  private static Field getDeclaredAccessibleField(final Class clazz, final String name) throws NoSuchFieldException {
+  private static Field getDeclaredAccessibleField(final Class<?> clazz, final String name) throws NoSuchFieldException {
     if (clazz == null) throw new IllegalArgumentException("clazz is null");
     if (name == null || name.isEmpty()) throw new IllegalArgumentException("name is blank");
 
@@ -492,7 +492,7 @@ public final class JPPFLeakPrevention {
    * @param clazz class to test.
    * @return true if class is loaded by this or child class loader.
    */
-  private static boolean isLoadedByClassLoader(final ClassLoader classLoader, final Class clazz)
+  private static boolean isLoadedByClassLoader(final ClassLoader classLoader, final Class<?> clazz)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
     if (clazz == null) throw new IllegalArgumentException("clazz is null");
@@ -512,7 +512,7 @@ public final class JPPFLeakPrevention {
    * @return collection of loaded classes by class loader.
    */
   @SuppressWarnings("unchecked")
-  private static Collection<Class> getLoadedClasses(final ClassLoader classLoader)
+  private static Collection<Class<?>> getLoadedClasses(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
@@ -521,7 +521,7 @@ public final class JPPFLeakPrevention {
     try {
       if (cls != null) {
         Field field = getDeclaredAccessibleField(cls, "classes");
-        return Collections.unmodifiableCollection(((Collection<Class>) field.get(classLoader)));
+        return Collections.unmodifiableCollection(((Collection<Class<?>>) field.get(classLoader)));
       }
     } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);

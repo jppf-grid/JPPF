@@ -119,7 +119,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
 
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
     resource = f.get();
-    Throwable t = ((ResourceFuture) f).getThrowable();
+    Throwable t = ((ResourceFuture<?>) f).getThrowable();
     if (t != null) {
       if (t instanceof Exception) throw (Exception) t;
       else if (t instanceof Error) throw (Error) t;

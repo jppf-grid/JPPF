@@ -68,8 +68,8 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
           }
           if (!validated) continue;
           URL url = null;
-          Location local = elt.getLocalLocation();
-          Location remote = elt.getRemoteLocation();
+          Location<?> local = elt.getLocalLocation();
+          Location<?> remote = elt.getRemoteLocation();
           try {
             if (remote != local) local.copyTo(remote);
             if (remote instanceof MemoryLocation) {

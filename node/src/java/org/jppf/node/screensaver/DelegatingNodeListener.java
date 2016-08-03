@@ -50,7 +50,7 @@ public class DelegatingNodeListener extends NodeLifeCycleListenerAdapter {
           delegate.setUiComponent(ssm.getScreenSaver());
         }
       }
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
   }
 

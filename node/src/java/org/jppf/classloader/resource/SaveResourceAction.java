@@ -29,7 +29,7 @@ import org.jppf.utils.configuration.JPPFProperties;
  * Privileged action wrapper for saving a resource definition to a temporary file.
  * @exclude
  */
-public class SaveResourceAction implements PrivilegedAction<Location>
+public class SaveResourceAction implements PrivilegedAction<Location<?>>
 {
   /**
    * Determines whether resources should be stored in memory.
@@ -66,9 +66,9 @@ public class SaveResourceAction implements PrivilegedAction<Location>
   }
 
   @Override
-  public Location run()
+  public Location<?> run()
   {
-    Location resource = null;
+    Location<?> resource = null;
     if (!IS_MEMORY_STORAGE) resource = saveToFileResource();
     if (resource == null) resource = saveToMemoryResource();
     return resource;
@@ -78,9 +78,9 @@ public class SaveResourceAction implements PrivilegedAction<Location>
    * Save the resource to a temporary file.
    * @return an instance of {@link FileResource}.
    */
-  private Location saveToFileResource()
+  private Location<?> saveToFileResource()
   {
-    Location resource = null;
+    Location<?> resource = null;
     File tmp = null;
     try
     {
@@ -124,9 +124,9 @@ public class SaveResourceAction implements PrivilegedAction<Location>
    * Save the resource to memory.
    * @return an instance of {@link MemoryResource}.
    */
-  private Location saveToMemoryResource()
+  private Location<?> saveToMemoryResource()
   {
-    Location resource = null;
+    Location<?> resource = null;
     try
     {
       resource = new MemoryLocation(definition);

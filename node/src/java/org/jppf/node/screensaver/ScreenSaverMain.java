@@ -96,7 +96,6 @@ public class ScreenSaverMain implements InitializationHook
     }
     boolean fullscreenRequested = config.get(SCREENSAVER_FULLSCREEN);
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsDevice[] devices = env.getScreenDevices();
     boolean fullscreenSupported = true;
     Rectangle2D result = new Rectangle2D.Double();
@@ -157,7 +156,7 @@ public class ScreenSaverMain implements InitializationHook
       String name = JPPFConfiguration.get(SCREENSAVER_CLASS);
       Class<?> clazz = Class.forName(name);
       screensaver = (JPPFScreenSaver) clazz.newInstance();
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       screensaver = new JPPFScreenSaverImpl();
     }
     return screensaver;

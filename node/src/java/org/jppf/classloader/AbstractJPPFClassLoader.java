@@ -62,7 +62,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent) {
+  public AbstractJPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent) {
     super(connection, parent, null);
   }
 
@@ -72,7 +72,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
+  public AbstractJPPFClassLoader(final ClassLoaderConnection<?> connection, final ClassLoader parent, final List<String> uuidPath) {
     super(connection, parent, uuidPath);
   }
 
@@ -175,7 +175,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @SuppressWarnings("unchecked")
   public <V> V computeCallable(final JPPFCallable<V> callable) throws Exception {
     Object returned = null;
-    Class clazz = loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+    Class<?> clazz = loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
     ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
     byte[] bytes = ser.serialize(callable).getBuffer();
     bytes = computeRemoteData(bytes);
@@ -252,7 +252,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         is = connection.getInputStream();
       }
       if (debugEnabled) log.debug(build(this, " lookup for '", name, "' = ", url, " for ", this));
-    } catch(IOException e) {
+    } catch(@SuppressWarnings("unused") IOException e) {
     }
     return is;
   }
@@ -348,7 +348,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if(cl != null) {
         try {
           c = cl.loadClass(name);
-        } catch (ClassNotFoundException ignore) {
+        } catch (@SuppressWarnings("unused") ClassNotFoundException ignore) {
         }
       }
     }
@@ -358,7 +358,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (!jppfCL) {
         try {
           c = p.loadClass(name);
-        } catch(ClassNotFoundException ignore) {
+        } catch(@SuppressWarnings("unused") ClassNotFoundException ignore) {
         }
       }
       else c = ((AbstractJPPFClassLoader) p).findClassInURLClasspath(name, false);
@@ -366,7 +366,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if ((c == null) && jppfCL) {
         try {
           c = ((AbstractJPPFClassLoader) p).findClass(name, false);
-        } catch(ClassNotFoundException ignore){
+        } catch(@SuppressWarnings("unused") ClassNotFoundException ignore){
         }
       }
       if (c == null) c = findClass(name, false);
@@ -409,7 +409,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (c == null) {
         try {
           c = super.findClass(name);
-        } catch(ClassNotFoundException ignore) {
+        } catch(@SuppressWarnings("unused") ClassNotFoundException ignore) {
         }
       }
     }
