@@ -129,10 +129,11 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
+    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
-    assertEquals(BaseSetup.nbNodes(), n.get());
+    assertTrue(n.get() >= BaseSetup.nbNodes());
   }
 
   /**
@@ -229,7 +230,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   }
 
   /**
-   * Test that a job is executed on the 2 nodes closest ot its desired node config spec after restart of these nodes.
+   * Test that a job is executed on the 2 nodes closest to its desired node config spec after restart of these nodes.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 15000)
@@ -256,8 +257,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       if (!actualNodes.contains(nodeUuid)) actualNodes.add(nodeUuid);
     }
     assertEquals(expectedNodes, actualNodes);
+    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertEquals(2, myNodeListener.map.size());
-    Set<String> set = myNodeListener.map.keySet();
+    final Set<String> set = myNodeListener.map.keySet();
     assertEquals(expectedNodes, set);
     int sum = 0;
     for (String uuid: set) {
@@ -266,7 +268,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertTrue(n.get() >= 1);
       sum += n.get();
     }
-    assertEquals(BaseSetup.nbNodes(), sum);
+    assertTrue(sum >= BaseSetup.nbNodes());
   }
 
   /**
@@ -322,6 +324,10 @@ public class TestJobReservation extends AbstractNonStandardSetup {
      * Map of node uuids to number of restarts.
      */
     final Map<String, AtomicInteger> map = new ConcurrentHashMap<>();
+    /**
+     * Total number of connection notifications.
+     */
+    final AtomicInteger total = new AtomicInteger(0);
 
     @Override
     public synchronized void handleNotification(final Notification notif, final Object handback) {
@@ -335,6 +341,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
             map.put(uuid, n);
           }
           n.incrementAndGet();
+          total.incrementAndGet();
           break;
 
         case JPPFNodeConnectionNotifierMBean.DISCONNECTED:
