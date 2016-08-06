@@ -105,6 +105,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     if ((jobNotificationListener != null) && !jobNotificationListener.isListenerRemoved()) jmx.getJobManager().removeNotificationListener(jobNotificationListener);
     jobNotificationListener = null;
     myNodeListener.map.clear();
+    myNodeListener.total.set(0);
   }
 
   /**
