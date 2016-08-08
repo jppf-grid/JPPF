@@ -181,13 +181,14 @@ public class TestGridPolicy extends Setup1D2N1C {
     job.getSLA().setGridExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(3*JOB_TIMEOUT)); // to avoid the job being stuck
     client.submitJob(job);
+    NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
     try {
       Thread.sleep(1000L);
       // a static node uuid is already assigned in the master's config file and must be overriden
       TypedProperties overrides = new TypedProperties();
       overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString() }$");
       // start 1 slave node for each master
-      jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 1, overrides);
+      jmx.getNodeForwarder().provisionSlaveNodes(selector, 1, overrides);
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
@@ -198,7 +199,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       }
     } finally {
       // terminate the slave nodes
-      jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
+      jmx.getNodeForwarder().provisionSlaveNodes(selector, 0);
     }
   }
 }
