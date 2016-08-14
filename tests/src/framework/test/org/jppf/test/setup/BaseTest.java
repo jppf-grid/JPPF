@@ -19,8 +19,11 @@
 package test.org.jppf.test.setup;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.jppf.location.*;
+import org.jppf.location.FileLocation;
+import org.jppf.utils.ExceptionUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -36,6 +39,8 @@ public class BaseTest {
    */
   private static Logger log = LoggerFactory.getLogger("TEST");
   /** */
+  private static PrintStream stdOut, stdErr;
+  /** */
   private static FileFilter logFileFilter = new FileFilter() {
     @Override
     public boolean accept(final File path) {
@@ -44,30 +49,9 @@ public class BaseTest {
       return (s != null) && s.endsWith(".log") && !s.startsWith("jppf-client");
     }
   };
-
   /** */
   @ClassRule
-  public static TestWatcher classWatcher = new TestWatcher() {
-    @Override
-    protected void starting(final Description description) {
-      print("***** start of class %s *****", description.getClassName());
-      // delete the drivers and nodes log files if they exist
-      File dir = new File(System.getProperty("user.dir"));
-      File[] logFiles = dir.listFiles(logFileFilter);
-      if (logFiles != null) {
-        for (File file: logFiles) {
-          if (file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
-        }
-      }
-    }
-
-    @Override
-    protected void finished(final Description description) {
-      print("***** finished class %s *****", description.getClassName());
-      zipLogs(description.getClassName());
-    }
-  };
-
+  public static TestWatcher classWatcher = new BaseTestClassWatcher();
   /** */
   @Rule
   public TestWatcher instanceWatcher = new TestWatcher() {
@@ -76,6 +60,10 @@ public class BaseTest {
       print("***** start of method %s() *****", description.getMethodName());
     }
   };
+  /**
+   * Used to format timestamps in the std and err outputs.
+   */
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss.SSS");
 
   /**
    * Zip the drivers and nodes log files into the file {@code logs/<className>.zip}.
@@ -116,7 +104,9 @@ public class BaseTest {
    */
   public static void print(final boolean decorate, final String format, final Object...params) {
     String message = String.format(format, params);
-    System.out.println(message);
+    synchronized(sdf) {
+      System.out.printf("[%s] %s%n", sdf.format(new Date()), message);
+    }
     String s = "";
     if (decorate) {
       StringBuilder sb = new StringBuilder("*****");
@@ -127,5 +117,41 @@ public class BaseTest {
     if (decorate) log.info(s);
     log.info(message);
     if (decorate) log.info(s);
+  }
+
+  /** */
+  public static class BaseTestClassWatcher extends TestWatcher {
+    @Override
+    protected void starting(final Description description) {
+      stdOut = System.out;
+      stdErr = System.err;
+      try {
+        System.setOut(new PrintStream("std_out.log"));
+        System.setErr(new PrintStream("std_err.log"));
+      } catch (Exception e) {
+        print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
+      }
+      print("***** start of class %s *****", description.getClassName());
+      // delete the drivers and nodes log files if they exist
+      File dir = new File(System.getProperty("user.dir"));
+      File[] logFiles = dir.listFiles(logFileFilter);
+      if (logFiles != null) {
+        for (File file: logFiles) {
+          if (!file.getName().startsWith("std_") && file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
+        }
+      }
+    }
+
+    @Override
+    protected void finished(final Description description) {
+      print("***** finished class %s *****", description.getClassName());
+      zipLogs(description.getClassName());
+      try {
+        if ((stdOut != null) && (stdOut != System.out)) System.setOut(stdOut);
+        if ((stdErr != null) && (stdErr != System.err)) System.setErr(stdErr);
+      } catch (Exception e) {
+        print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
+      }
+    }
   }
 }
