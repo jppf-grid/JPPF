@@ -43,9 +43,9 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @BeforeClass()
   public static void setup() throws Exception {
-    System.out.println("checking topology");
+    printOut("checking topology");
     client = BaseSetup.setup(2, 1, true, createConfig("p2p_orphan"));
-    System.out.println("topology checked OK");
+    printOut("topology checked OK");
   }
 
   /**
@@ -54,9 +54,9 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
-    System.out.println("before awaitPeersInitialized()");
+    printOut("before awaitPeersInitialized()");
     awaitPeersInitialized();
-    System.out.println("after awaitPeersInitialized()");
+    printOut("after awaitPeersInitialized()");
     int nbTasks = 20;
     String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);

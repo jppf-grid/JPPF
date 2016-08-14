@@ -88,12 +88,21 @@ public class BaseTest {
   }
 
   /**
+   * Print a formatted message to the shell output only.
+   * @param format the format.
+   * @param params the parameter values.
+   */
+  public static void printOut(final String format, final Object...params) {
+    print(false, false, format, params);
+  }
+
+  /**
    * Print a formatted message to the shell output and to the log file.
    * @param format the format.
    * @param params the parameter values.
    */
   public static void print(final String format, final Object...params) {
-    print(true, format, params);
+    print(false, true, format, params);
   }
 
   /**
@@ -103,20 +112,33 @@ public class BaseTest {
    * @param params the parameter values.
    */
   public static void print(final boolean decorate, final String format, final Object...params) {
+    print(false, decorate, format, params);
+  }
+
+  /**
+   * Print a formatted message to the shell output and to the log file.
+   * @param systemOutOnly whether to print to {@code System.out} only.
+   * @param decorate whether to add decorations around the message.
+   * @param format the format.
+   * @param params the parameter values.
+   */
+  public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
     String message = String.format(format, params);
     synchronized(sdf) {
       System.out.printf("[%s] %s%n", sdf.format(new Date()), message);
     }
-    String s = "";
-    if (decorate) {
-      StringBuilder sb = new StringBuilder("*****");
-      for (int i=0; i<message.length()-10; i++) sb.append('-');
-      sb.append("*****");
-      s = sb.toString();
+    if (!systemOutOnly) {
+      String s = "";
+      if (decorate) {
+        StringBuilder sb = new StringBuilder("*****");
+        for (int i=0; i<message.length()-10; i++) sb.append('-');
+        sb.append("*****");
+        s = sb.toString();
+      }
+      if (decorate) log.info(s);
+      log.info(message);
+      if (decorate) log.info(s);
     }
-    if (decorate) log.info(s);
-    log.info(message);
-    if (decorate) log.info(s);
   }
 
   /** */

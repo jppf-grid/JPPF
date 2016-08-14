@@ -68,7 +68,7 @@ public class TestJPPFUuid extends BaseTest {
       String uuid = future.get();
       Boolean prevValue = map.put(uuid, Boolean.TRUE);
       if (prevValue != null) {
-        System.out.println("uuid collision for " + uuid);
+        printOut("uuid collision for %s", uuid);
         count++;
       }
     }

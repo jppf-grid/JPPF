@@ -396,16 +396,16 @@ public class TestJPPFTask extends Setup1D1N1C {
     @SuppressWarnings("unchecked")
     public void run() {
       try {
-        System.out.println("this task's class loader = " + getClass().getClassLoader());
+        printOut("this task's class loader = %s", getClass().getClassLoader());
         if (callableClassName != null) {
           Class<?> clazz = Class.forName(callableClassName);
           JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
           String s = compute(callable);
-          System.out.println("result of MyCallable.call() = " + s);
+          printOut("result of MyCallable.call() = %s", s);
           setResult(s);
         } else {
           boolean b = isInNode();
-          System.out.println("isInNode() = " + b);
+          printOut("isInNode() = %b", b);
           setResult(b);
         }
       } catch (Exception e) {
@@ -420,7 +420,7 @@ public class TestJPPFTask extends Setup1D1N1C {
   public static class MyComputeCallable implements JPPFCallable<String> {
     @Override
     public String call() throws Exception {
-      System.out.println("result of MyCallable.call() = " + callableResult);
+      printOut("result of MyCallable.call() = %s", callableResult);
       return callableResult;
     }
   }

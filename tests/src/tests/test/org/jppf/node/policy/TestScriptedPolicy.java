@@ -121,7 +121,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   public void testComplexPolicyGroovy() throws Exception {
     String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.groovy");
     ScriptedPolicy p = new ScriptedPolicy("groovy", script);
-    System.out.println("the policy is: " + p);
+    printOut("the policy is: %s", p);
     JPPFStatistics stats = new JPPFStatistics();
     JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
     sn.addValues(10, 10);
@@ -141,7 +141,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   public void testComplexPolicyJavascript() throws Exception {
     String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.js");
     ScriptedPolicy p = new ScriptedPolicy("javascript", script);
-    System.out.println("the policy is: " + p);
+    printOut("the policy is: %s", p);
     JPPFStatistics stats = new JPPFStatistics();
     JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
     sn.addValues(10, 10);

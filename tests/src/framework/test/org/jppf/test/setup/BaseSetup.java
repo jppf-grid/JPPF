@@ -122,7 +122,7 @@ public class BaseSetup {
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes,
     final Configuration config, final ConnectionPoolListener... listeners) throws Exception {
-    System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (createClient ? " and 1 client" : ""));
+    BaseTest.printOut("performing setup with %d drivers, %d nodes %s", nbDrivers, nbNodes, (createClient ? " and 1 client" : ""));
     ConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();

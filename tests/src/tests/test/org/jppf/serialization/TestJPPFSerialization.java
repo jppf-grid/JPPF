@@ -34,7 +34,7 @@ public class TestJPPFSerialization extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    System.out.println("main class loader = " + TestJPPFSerialization.class.getClassLoader());
+    printOut("main class loader = %s", TestJPPFSerialization.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
     client = BaseSetup.setup(1, 1, true, createConfig("jppf_serialization"));
   }

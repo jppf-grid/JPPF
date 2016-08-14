@@ -48,7 +48,7 @@ public class TestJMXConnectionWrapper extends BaseTest {
           long start = System.nanoTime();
           jmx.connectAndWait(duration);
           long elapsed = (System.nanoTime() - start) / 1_000_000L;
-          System.out.println("[" + getName() + "] connectAndWait() actually waited " + elapsed + " ms");
+          printOut("[%s] connectAndWait() actually waited %,d ms", getName(), elapsed);
         }
       };
     }

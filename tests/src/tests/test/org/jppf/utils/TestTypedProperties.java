@@ -172,7 +172,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.4 = 4\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "4");
       checkProperty(props, "prop.3", "3.4");
       checkProperty(props, "prop.2", "2-3.4-4");
@@ -193,7 +193,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.4 = ${prop.1}-${prop.2}-${prop.3}-four\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "one-two-three-four");
       checkProperty(props, "prop.3", "three");
       checkProperty(props, "prop.2", "two");
@@ -214,7 +214,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.4 = ${  }+${prop.3}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "${  }+3");
       checkProperty(props, "prop.3", "3");
       checkProperty(props, "prop.2", "2-${}-3");
@@ -232,7 +232,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.1 = 1/${prop.2}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${prop.2}");
     }
   }
@@ -248,7 +248,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${prop.2}");
       checkProperty(props, "prop.2", "2-${prop.1}");
     }
@@ -266,7 +266,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + path);
       checkProperty(props, "prop.2", "2-1/" + path);
     }
@@ -283,7 +283,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}-${env.}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${env.  }");
       checkProperty(props, "prop.2", "2-1/${env.  }-${env.}");
     }
@@ -301,7 +301,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + undef);
       checkProperty(props, "prop.2", "2-1/" + undef);
     }
@@ -320,7 +320,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + value);
       checkProperty(props, "prop.2", "2-1/" + value);
     }
@@ -337,7 +337,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}-${sys.}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${sys.  }");
       checkProperty(props, "prop.2", "2-1/${sys.  }-${sys.}");
     }
@@ -355,7 +355,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + undef);
       checkProperty(props, "prop.2", "2-1/" + undef);
     }
@@ -378,7 +378,7 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.6 = hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
-      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "jppf.script.default.language", "groovy");
       checkProperty(props, "prop.0", "hello miscreant world");
       checkProperty(props, "prop.1", "hello 5.0 world");

@@ -45,9 +45,9 @@ public class TestJobPersistence extends Setup1D1N {
   //@Test(timeout = 100 * 1000)
   public void testInLoop() throws Exception {
     for (int i=1; i<=10; i++) {
-      System.out.println("testing job recovery iteration #" + i);
+      printOut("testing job recovery iteration #%d", i);
       testJobRecovery();
-      System.out.println("==> job recovery iteration #" + i + " done");
+      printOut("==> job recovery iteration #%d done", i);
     }
   }
 

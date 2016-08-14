@@ -261,7 +261,6 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
     public String call() throws Exception {
       if (duration > 0L) {
         Thread.sleep(duration);
-        //System.out.println("task executed");
         return BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
       }
       return JPPFConfiguration.getProperties().getString("jppf.node.uuid");

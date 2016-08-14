@@ -310,7 +310,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       try {
         JPPFConfiguration.reset();
         ((JPPFNode) NodeRunner.getNode()).triggerConfigChanged();
-        System.out.println("reset configuration on node " + NodeRunner.getUuid());
+        printOut("reset configuration on node %s", NodeRunner.getUuid());
       } catch (Exception e) {
         e.printStackTrace();
       }
