@@ -19,7 +19,7 @@
 <project name="JPPF-tests" basedir="." default="build">
 
   <!-- ========================================================================= -->
-  <!--                          Property definitions                             -->
+  <!-- Property definitions                                                      -->
   <!-- ========================================================================= -->
 
   <property name="build.sysclasspath" value="last"/>
@@ -47,7 +47,7 @@
   <property file="${jppf}/bin/build.number"/>
 
   <!-- ========================================================================= -->
-  <!--                           Classpath definitions                           -->
+  <!-- Classpath definitions                                                     -->
   <!-- ========================================================================= -->
 
   <path id="tests.classpath">
@@ -72,13 +72,13 @@
   </path>
 
   <!-- ========================================================================= -->
-  <!--                     Build and run the JUnit tests                         -->
+  <!-- Build and run the JUnit tests                                             -->
   <!-- ========================================================================= -->
 
   <target name="build" depends="compile, jar"/>
 
   <!-- ========================================================================= -->
-  <!--                           Compile the JUnit tests                         -->
+  <!--  Compile the JUnit tests                                                  -->
   <!-- ========================================================================= -->
 
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
@@ -122,7 +122,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                    Create the test framework jar file                     -->
+  <!-- Create the test framework jar file                                        -->
   <!-- ========================================================================= -->
 
   <target name="jar">
@@ -142,7 +142,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                     Generates the list of test classes                     -->
+  <!-- Generates the list of test classes                                        -->
   <!-- ========================================================================= -->
 
   <target name="generate.tests.list">
@@ -157,7 +157,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                           Run the JUnit tests                             -->
+  <!-- Run the JUnit tests                                                       -->
   <!-- ========================================================================= -->
 
   <target name="run"            depends="compile, generate.tests.list, runtests" description=""/>
@@ -177,7 +177,10 @@
     </java>
   </target>
 
-  <!-- Run all the tests with the Ant Junit runner -->
+  <!-- ========================================================================= -->
+  <!-- Run all the tests with the Ant Junit runner                               -->
+  <!-- ========================================================================= -->
+
   <target name="run.junit.tests">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
     <delete dir="${report}" quiet="true"/>
@@ -198,15 +201,17 @@
         </fileset>
       </batchtest>
     </junit>
+    <antcall target="zip.last.test.logs"/>
     <antcall target="junit.report"/>
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
   
   <!-- ========================================================================= -->
-  <!-- Run a the test classes whose name are specified as an include pattern in  -->
+  <!-- Run the test classes whose name are specified as an include pattern in    -->
   <!-- a system property Example: to run test.org.jppf.client.TestJPPFClient use -->
   <!-- the command 'ant test.pattern -Dpattern=**/TestJPPFClient.java'           -->
   <!-- ========================================================================= -->
+
   <target name="test.pattern">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
     <delete dir="${report}" quiet="true"/>
@@ -226,10 +231,29 @@
         </fileset>
       </batchtest>
     </junit>
+    <antcall target="zip.last.test.logs"/>
     <antcall target="junit.report"/>
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
   
+  <!-- ========================================================================= -->
+  <!-- Zip the log files remaining after the last test has run                   -->
+  <!-- ========================================================================= -->
+  
+  <target name="zip.last.test.logs">
+    <property name="last.zip" value="${basedir}/logs/z.last.test.zip"/>
+    <delete file="${last.zip}" quiet="true"/>
+    <zip destfile="${last.zip}">
+      <zipfileset dir="${basedir}">
+        <include name="*.log"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the JUnit HTML report                                            -->
+  <!-- ========================================================================= -->
+    
   <target name="junit.report">
     <junitreport todir="${report}">
       <fileset dir="${report}">
