@@ -24,6 +24,7 @@ import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.*;
+import org.jppf.discovery.*;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
@@ -76,6 +77,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * The list of listeners on the queue associated with this client.
    */
   private final List<ClientQueueListener> queueListeners = new CopyOnWriteArrayList<>();
+  /**
+   * Supports built-in and custom discovery mechanisms.
+   */
+  final DriverDiscoveryHandler<ClientConnectionPoolInfo> discoveryHandler = new DriverDiscoveryHandler(ClientDriverDiscovery.class);
+  /**
+   * Listens to new connection pool notifications from {@link DriverDiscovery} instances.
+   */
+  private final ClientDriverDiscoveryListener discoveryListener;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -87,6 +96,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     super(uuid);
     this.classLoaderRegistrationHandler = new ClassLoaderRegistrationHandler();
     if ((listeners != null) && (listeners.length > 0)) for (ConnectionPoolListener listener : listeners) addConnectionPoolListener(listener);
+    discoveryListener = new ClientDriverDiscoveryListener(this);
     init(configuration);
   }
 
@@ -147,6 +157,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     executor.allowCoreThreadTimeOut(true);
     if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) setLocalExecutionEnabled(true);
     if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) initRemotePools(config);
+    discoveryHandler.register(discoveryListener.open()).start();
   }
 
   /**
@@ -196,7 +207,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             boolean ssl = config.getBoolean(name + '.' + JPPFProperties.SSL_ENABLED.getName(), false);
             JPPFProperty<String> serverProp = JPPFProperties.SERVER_HOST;
             info.host = config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
-            //JPPFProperty<Integer> portProp = ssl ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT;
             JPPFProperty<Integer> portProp = JPPFProperties.SERVER_PORT;
             int port = config.getInt(name + '.' + portProp.getName(), portProp.getDefaultValue());
             if (!ssl) info.serverPorts = new int[] { port };
@@ -278,7 +288,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
-    //c.setStatus(JPPFClientConnectionStatus.NEW);
     executor.submit(new ConnectionInitializer(c));
     fireConnectionAdded(c);
     if (debugEnabled) log.debug("end of of newConnection({})", c.getName());
@@ -316,6 +325,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (closed.get()) return;
     if (debugEnabled) log.debug("closing JPPF client");
     closed.set(true);
+    if (debugEnabled) log.debug("closing discovery handler");
+    discoveryListener.close();
+    discoveryHandler.stop();
     if (debugEnabled) log.debug("closing broadcast receiver");
     if (receiverThread != null) {
       receiverThread.close();

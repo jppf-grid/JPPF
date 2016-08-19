@@ -106,7 +106,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testSimpleJob(final ExecutionPolicy policy) throws Exception {
-    System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection().loadBalancerInformation());
+    System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection(client).loadBalancerInformation());
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
@@ -126,7 +126,7 @@ public class AbstractNonStandardSetup extends BaseTest {
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
     }
-    System.out.println(name + " : map = " + CollectionUtils.prettyPrint(map));
+    BaseTest.printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
       String key = "n" + (i+1);

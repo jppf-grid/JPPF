@@ -25,6 +25,7 @@ import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
+import org.jppf.discovery.*;
 import org.jppf.job.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
@@ -492,5 +493,21 @@ public class JPPFDriver {
    */
   public JMXServer getJMXServer(final boolean secure) {
     return initializer.getJmxServer(secure);
+  }
+
+  /**
+   * Add a custom peer driver discovery mechanism to those already registered, if any.
+   * @param discovery the driver discovery to add.
+   */
+  public void addDriverDiscovery(final PeerDriverDiscovery discovery) {
+    initializer.discoveryHandler.addDiscovery(discovery);
+  }
+
+  /**
+   * Remove a custom peer driver discovery mechanism from those already registered.
+   * @param discovery the driver discovery to remove.
+   */
+  public void removeDriverDiscovery(final PeerDriverDiscovery discovery) {
+    initializer.discoveryHandler.removeDiscovery(discovery);
   }
 }

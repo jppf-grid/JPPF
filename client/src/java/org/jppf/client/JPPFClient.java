@@ -23,6 +23,7 @@ import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.discovery.ClientDriverDiscovery;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -146,7 +147,7 @@ public class JPPFClient extends AbstractGenericClient {
     if (log.isTraceEnabled()) {
       for (Task<?> task: job) {
         log.trace(String.format("task %s, position=%d, taskObject=%s, taskObject class=%s", task, task.getPosition(), task.getTaskObject(),
-            (task.getTaskObject() != null) ? task.getTaskObject().getClass() : null));
+          (task.getTaskObject() != null) ? task.getTaskObject().getClass() : null));
       }
     }
     getJobManager().submitJob(job);
@@ -360,5 +361,21 @@ public class JPPFClient extends AbstractGenericClient {
     ConnectionPoolListener[] clds = new ConnectionPoolListener[listeners.length];
     for (int i=0; i<listeners.length; i++) clds[i] = new ClientListenerDelegation(listeners[i]);
     return clds;
+  }
+
+  /**
+   * Add a custom driver discovery mechanism to those already registered, if any.
+   * @param discovery the driver discovery to add.
+   */
+  public void addDriverDiscovery(final ClientDriverDiscovery discovery) {
+    discoveryHandler.addDiscovery(discovery);
+  }
+
+  /**
+   * Remove a custom driver discovery mechanism from those already registered.
+   * @param discovery the driver discovery to remove.
+   */
+  public void removeDriverDiscovery(final ClientDriverDiscovery discovery) {
+    discoveryHandler.removeDiscovery(discovery);
   }
 }
