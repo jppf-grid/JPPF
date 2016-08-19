@@ -52,7 +52,7 @@
   <property name="docs"                  value="${basedir}/docs"/>
   <property name="home"                  value="${docs}/home"/>
   <property name="examples"              value="${basedir}/examples"/>
-  <property name="javadoc"               value="${home}/api-5"/>
+  <property name="javadoc"               value="${home}/javadoc/5.1"/>
   <property name="app.jar.file"          value="${ant.project.name}.jar"/>
   <property name="license.file"          value="LICENSE.txt"/>
   <property name="runtime"               value="${build}/runtime"/>

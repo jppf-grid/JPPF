@@ -47,7 +47,7 @@ public class DriverInitializer {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(JPPFDriver.class);
+  static Logger log = LoggerFactory.getLogger(DriverInitializer.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
