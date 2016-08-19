@@ -104,7 +104,7 @@ class ScriptRunnerImpl implements ScriptRunner {
   public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException {
     if (engine == null) return null;
     Bindings bindings = engine.createBindings();
-    bindings.putAll(variables);
+    if (variables != null) bindings.putAll(variables);
     CompiledScript cs = null;
     if ((scriptId != null) && (engine instanceof Compilable)) {
       String key = new StringBuilder().append(language).append(':').append(scriptId).toString();

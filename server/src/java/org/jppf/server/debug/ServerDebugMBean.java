@@ -20,6 +20,8 @@ package org.jppf.server.debug;
 
 import java.io.Serializable;
 
+import org.jppf.scripting.JPPFScriptingException;
+
 /**
  * 
  * @author Laurent Cohen
@@ -131,4 +133,13 @@ public interface ServerDebugMBean extends Serializable {
    * @param messages the messages ot print.
    */
   void log(String...messages);
+
+  /**
+   * Get information ont he peer driver this one is connected to.
+   * @param language the script language.
+   * @param script the script to execute.
+   * @return the value returned by the script.
+   * @throws JPPFScriptingException if an error occurs while evaluating the script. 
+   */
+  Object executeScript(String language, String script) throws JPPFScriptingException;
 }

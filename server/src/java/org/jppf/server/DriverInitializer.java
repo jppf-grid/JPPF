@@ -27,6 +27,7 @@ import javax.management.*;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
+import org.jppf.discovery.*;
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
@@ -103,6 +104,15 @@ public class DriverInitializer {
    * Holds the soft cache of classes downlaoded form the clients r from this driver's classpath.
    */
   private final ClassCache classCache = new ClassCache();
+  /**
+   * Supports built-in and custom discovery mechanisms.
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  final DriverDiscoveryHandler<DriverConnectionInfo> discoveryHandler = new DriverDiscoveryHandler(PeerDriverDiscovery.class);
+  /**
+   * Listens to new connection notifications from {@link PeerDriverDiscovery} instances.
+   */
+  private PeerDriverDiscoveryListener discoveryListener;
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -233,8 +243,10 @@ public class DriverInitializer {
         }
       }
     }
-
     if (peerDiscoveryThread != null) new Thread(peerDiscoveryThread, "PeerDiscovery").start();
+
+    discoveryListener = new PeerDriverDiscoveryListener(classServer);
+    discoveryHandler.register(discoveryListener.open()).start();
   }
 
   /**
@@ -416,5 +428,14 @@ public class DriverInitializer {
     int[] ports = new int[portsList.size()];
     for (int i=0; i<ports.length; i++) ports[i] = portsList.get(i);
     return ports;
+  }
+
+  /**
+   * Get the discovered peers connection information.
+   * @return a set of {@link DriverConnectionInfo} instances.
+   * @exclude
+   */
+  public Set<DriverConnectionInfo> getDiscoveredPeers() {
+    return discoveryListener.getDiscoveredPools();
   }
 }
