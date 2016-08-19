@@ -163,8 +163,8 @@
   </target>
 
   <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
-    <code.doc.tgz dir="javadoc" vname="5.2"/>
-    <code.doc.tgz dir="csdoc" vname="5.2"/>
+    <code.doc.tgz dir="javadoc" vname="6.0"/>
+    <code.doc.tgz dir="csdoc" vname="6.0"/>
   </target>
 
   <macrodef name="code.doc.tgz">

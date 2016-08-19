@@ -61,9 +61,9 @@ $template{name="about-page-header" title="Documentation"}$
       <div class="blockWithHighlightedTitle">
         $template{name="title-with-icon" img="/images/icons/development.png" title="Still being developed" heading="h3"}$
         <ul class="samplesList">
-          <li><a href="/doc/5.2">JPPF 5.2 User Guide</a></li>
-          <li><a href="/javadoc/5.2">JPPF 5.2 Javadoc</a></li>
-          <li><a href="/csdoc/5.2">JPPF 5.2 C-Sharp Doc</a></li>
+          <li><a href="/doc/6.0">JPPF 6.0 User Guide</a></li>
+          <li><a href="/javadoc/6.0">JPPF 6.0 Javadoc</a></li>
+          <li><a href="/csdoc/6.0">JPPF 6.0 C-Sharp Doc</a></li>
         </ul>
       <br></div>
     </div>

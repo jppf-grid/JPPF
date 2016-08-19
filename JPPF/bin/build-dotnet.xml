@@ -72,7 +72,7 @@
   <!-- build the .Net bridge -->
   <target name="dotnet.build" if="csc.present">
     <ant antfile="${dotnet-bridge}/build.xml" target="build" inheritall="false"/>
-    <property name="csdoc.dir" value="${home}/csdoc/5.2"/>
+    <property name="csdoc.dir" value="${home}/csdoc/6.0"/>
     <delete quiet="true" dir="${csdoc.dir}"/>
     <mkdir dir="${csdoc.dir}"/>
     <copy todir="${csdoc.dir}">
