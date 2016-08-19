@@ -1,0 +1,147 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2015 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-samples" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                         Generate the samples pack                         -->
+  <!-- ========================================================================= -->
+
+  <taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${lib}/java2html_50/java2html.jar"/>
+
+  <!-- Convert source files to HTML -->
+  <!--
+  <macrodef name="include.code">
+    <attribute name="sample"/>
+    <sequential>
+      <java2html srcdir="${samples-pack}/@{sample}" destdir="${samples-pack}/@{sample}" includes="**/*.java" excludes="**/package-info.java"
+        style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
+    </sequential>
+  </macrodef>
+  -->
+  
+  <scriptdef name="include.code" language="javascript" manager="javax" src="${basedir}/bin/HTMLSourceScript.js">
+    <attribute name="sample"/>
+  </scriptdef>
+  
+  <macrodef name="tohtml">
+    <attribute name="in"/>
+    <attribute name="lang" default="java"/>
+    <attribute name="title" default="JPPF Samples Pack"/>
+    <sequential>
+      <delete file="@{in}.html" quiet="true"/>
+      <local name="src.lang"/>
+      <property name="src.lang" value="@{lang}"/>
+      <copy file="${basedir}/bin/html_source_header.txt" toFile="${build}/header.txt" overwrite="true"/>
+      <replace file="${build}/header.txt" token="@lang@" value="@{lang}"/>
+      <replace file="${build}/header.txt" token="@title@" value="@{title}"/>
+      <copy file="@{in}" toFile="${build}/temp.java" overwrite="true"/>
+      <replace file="${build}/temp.java">
+        <replacetoken><![CDATA[<]]></replacetoken>
+        <replacevalue><![CDATA[&lt;]]></replacevalue>
+      </replace>
+      <concat destfile="@{in}.html">
+        <header file="${build}/header.txt"/>
+        <path location="${build}/temp.java"/>
+        <footer file="${basedir}/bin/html_source_footer.txt"/>
+      </concat>
+    </sequential>
+  </macrodef>
+
+  <target name="samples.pack" description="Generate the packaging for the samples pack" depends="init, build, samples.html.readme" if="samples.pack.present">
+    <!-- Copy the JPPF jars to the shared/lib directory -->
+    <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
+    <!-- Convert sources to HTML and include them in the designated samples -->
+    <include.code sample="AdaptiveGrid"/>
+    <include.code sample="AndroidDemo"/>
+    <include.code sample="ConcurrentJobs"/>
+    <include.code sample="CustomLoadBalancer"/>
+    <include.code sample="DataEncryption"/>
+    <include.code sample="ExtendedClassLoading"/>
+    <include.code sample="FTPServer"/>
+    <include.code sample="GPU"/>
+    <include.code sample="InitializationHook"/>
+    <include.code sample="JobRecovery"/>
+    <include.code sample="KryoSerializer"/>
+    <include.code sample="NodeLifeCycle"/>
+    <include.code sample="PluggableView"/>
+    <!-- Generate the samples pack zip file -->
+    <property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
+    <property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
+    <delete file="samples.pack.file" quiet="true"/>
+    <zip destfile="${samples.pack.file}">
+      <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
+        <exclude name="**/Readme.html"/>
+        <exclude name="**/*.log"/>
+        <exclude name="**/IdleSystem/**/*.*"/>
+        <exclude name="**/javadoc/**/*.*"/>
+        <exclude name="**/*.sh"/>
+      </zipfileset>
+      <zipfileset dir="${build}/samples-pack" prefix="${samples.pack.prefix}" includes="**/Readme.html"/>
+      <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}" includes="**/*.sh" filemode="755"/>
+      <zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">
+        <include name="jppf-node-src.jar"/>
+        <include name="jppf-common-src.jar"/>
+        <include name="jppf-client-src.jar"/>
+        <include name="jppf-admin-src.jar"/>
+        <include name="jppf-server-src.jar"/>
+      </zipfileset>
+    </zip>
+    <!-- Clean up and add the samples pack sources to the proper web site folder -->
+    <delete dir="${home}/samples-pack" quiet="true"/>
+    <mkdir dir="${home}/samples-pack"/>
+    <copy todir="${home}/samples-pack">
+      <fileset dir="${samples-pack}">
+        <include name="**/*.html"/>
+        <exclude name="**/package.html"/>
+        <exclude name="**/Readme.html"/>
+        <include name="AdaptiveGrid/**/jppf.properties"/>
+        <include name="ConcurrentJobs/images/*.*"/>
+        <include name="CustomLoadBalancer/**/*.properties"/>
+        <include name="InitializationHook/**/*.properties"/>
+        <include name="NodeLifeCycle/config/jppf-client.properties"/>
+        <exclude name="**/classes/**/*.*"/>
+        <include name="shared/images/*.*"/>
+        <include name="DataDependency/images/*.gif"/>
+        <include name="NodeTray/images/*.gif"/>
+        <include name="Nbody/images/*.gif"/>
+        <include name="GPU/**/*.c"/>
+        <include name="Fractals/src/icons/*.gif"/>
+        <include name="Fractals/src/icons/*.png"/>
+        <include name="PluggableView/**/*.gif"/>
+        <include name="PluggableView/**/*.png"/>
+      </fileset>
+    </copy>
+    <!-- remove HTML-converted files after the zip is created -->
+    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html"/></delete>
+    <delete file="${build}/header.txt" quiet="true"/>
+    <delete file="${build}/temp.java" quiet="true"/>
+    <delete dir="${build}/samples-pack" quiet="true"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Build the samples Readme.html files                                       -->
+  <!-- ========================================================================= -->
+  
+  <target name="samples.html.readme" depends="">
+    <delete dir="${build}/samples-pack" quiet="true"/>
+    <mkdir dir="${build}/samples-pack"/>
+    <doc.gen source="${samples-pack}" dest="${build}/samples-pack" templates="${home}/doc-source/templates-samples/"/>
+  </target>
+
+</project> 
