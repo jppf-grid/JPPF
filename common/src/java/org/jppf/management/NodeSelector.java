@@ -19,9 +19,6 @@
 package org.jppf.management;
 
 import java.io.Serializable;
-import java.util.Collection;
-
-import org.jppf.node.policy.ExecutionPolicy;
 
 /**
  * Marker interface for selecting nodes when using the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean JPPFNodeForwardingMBean} methods.
@@ -39,64 +36,4 @@ public interface NodeSelector extends Serializable {
    * @return {@code true} if the node is accepted, {@code false} otherwise.
    */
   boolean accepts(JPPFManagementInfo nodeInfo);
-
-  /**
-   * Selects all nodes.
-   * @deprecated use {@link org.jppf.management.AllNodesSelector} instead.
-   */
-  public static class AllNodesSelector extends org.jppf.management.AllNodesSelector {
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-  }
-
-  /**
-   * Selects nodes based on an {@link ExecutionPolicy}.
-   * @deprecated use {@link org.jppf.management.ExecutionPolicySelector} instead.
-   */
-  public static class ExecutionPolicySelector extends org.jppf.management.ExecutionPolicySelector {
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Initialize this selector with the specified execution policy.
-     * @param policy the execution policy to use to select the nodes.
-     * @deprecated use {@link org.jppf.management.ExecutionPolicySelector} instead.
-     */
-    public ExecutionPolicySelector(final ExecutionPolicy policy) {
-      super(policy);
-    }
-  }
-
-  /**
-   * Selects nodes based on their uuids.
-   * @deprecated use {@link org.jppf.management.UuidSelector} instead.
-   */
-  public static class UuidSelector extends org.jppf.management.UuidSelector {
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Initialize this selector with the specified list of node UUIDs.
-     * @param uuids the uuids of the nodes to select.
-     * @deprecated use {@link org.jppf.management.UuidSelector} instead.
-     */
-    public UuidSelector(final Collection<String> uuids) {
-      super(uuids);
-    }
-
-    /**
-     * Initialize this selector with the specified array of node UUIDs.
-     * @param uuids the uuids of the nodes to select.
-     * @deprecated use {@link org.jppf.management.UuidSelector} instead.
-     */
-    public UuidSelector(final String...uuids) {
-      super(uuids);
-    }
-  }
 }

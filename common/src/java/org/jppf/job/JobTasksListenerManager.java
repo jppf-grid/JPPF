@@ -24,7 +24,7 @@ package org.jppf.job;
  * @author Laurent Cohen
  */
 @SuppressWarnings("deprecation")
-public interface JobTasksListenerManager extends TaskReturnManager {
+public interface JobTasksListenerManager {
   /**
    * Add a listener to the list of job tasks listeners.
    * @param listener the listener to add to the list.

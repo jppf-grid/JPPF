@@ -23,13 +23,4 @@ package org.jppf.load.balancer;
  * @author Laurent Cohen
  */
 public class AbstractLoadBalancingProfile implements LoadBalancingProfile {
-  /**
-   * 
-   * @return {@code null}.
-   * @deprecated this method is not needed anymore, all bundler and profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
-   */
-  @Override
-  public LoadBalancingProfile copy() {
-    return null;
-  }
 }

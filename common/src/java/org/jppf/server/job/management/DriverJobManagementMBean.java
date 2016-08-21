@@ -30,8 +30,7 @@ import org.jppf.node.protocol.*;
  * This is the job management MBean interface.
  * @author Laurent Cohen
  */
-public interface DriverJobManagementMBean extends NotificationEmitter
-{
+public interface DriverJobManagementMBean extends NotificationEmitter {
   /**
    * The name under which this MBean is registered with the MBean server.
    */
@@ -100,14 +99,6 @@ public interface DriverJobManagementMBean extends NotificationEmitter
    * @since 5.1
    */
   void updateMaxNodes(JobSelector selector, Integer maxNodes) throws Exception;
-
-  /**
-   * Get the set of uuids for all the jobs currently queued or executing.
-   * @return an array of uuids as strings.
-   * @throws Exception if any error occurs.
-   * @deprecated use {@link #getAllJobUuids()} instead.
-   */
-  String[] getAllJobIds() throws Exception;
 
   /**
    * Get the set of uuids for all the jobs currently queued or executing.

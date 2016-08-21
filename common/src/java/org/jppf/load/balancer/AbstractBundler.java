@@ -132,13 +132,4 @@ public abstract class AbstractBundler<T extends LoadBalancingProfile> implements
   public void setJPPFContext(final JPPFContext context) {
     this.jppfContext = context;
   }
-
-  /**
-   * @return {@code null}.
-   * @deprecated this method is not needed anymore, all bundler and profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
-   */
-  @Override
-  public Bundler<?> copy() {
-    return null;
-  }
 }

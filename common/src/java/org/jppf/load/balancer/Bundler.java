@@ -49,14 +49,6 @@ public interface Bundler<T extends LoadBalancingProfile> {
   void feedback(final int nbTasks, final double totalTime);
 
   /**
-   * Make a copy of this bundler.
-   * Which parts are actually copied depends on the implementation.
-   * @return a new <code>Bundler</code> instance.
-   * @deprecated this method is not needed anymore, all Bundler instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
-   */
-  Bundler<?> copy();
-
-  /**
    * Get the timestamp at which this bundler was created.
    * This is used to enable node channels to know when the bundler settings have changed.
    * @return the timestamp as a long value.

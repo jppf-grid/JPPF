@@ -53,22 +53,6 @@ public enum Operator {
   },
   /**
    * The number of connections is strictly greater than the expected number.
-   * @deprecated use {@link #MORE_THAN} instead.
-   */
-  GREATER {
-    @Override
-    public boolean evaluate(final long actual, final long expected) { return MORE_THAN.evaluate(actual, expected); }
-  },
-  /**
-   * The number of connections is strictly less than the expected number.
-   * @deprecated use {@link #LESS_THAN} instead.
-   */
-  LESS {
-    @Override
-    public boolean evaluate(final long actual, final long expected) { return LESS_THAN.evaluate(actual, expected); }
-  },
-  /**
-   * The number of connections is strictly greater than the expected number.
    */
   MORE_THAN {
     @Override

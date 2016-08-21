@@ -18,23 +18,23 @@
 
 package org.jppf.load.balancer;
 
-import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.*;
 
 /**
  * Bundler implementations should implement this interface if they wish to have access to a job's information.
- * @deprecated use {@link JobAwarenessEx} instead.
  * @author Laurent Cohen
  */
 public interface JobAwareness {
   /**
-   * Get the current job's metadata.
-   * @return a {@link JobMetadata} instance.
+   * Get the current job for which load-balancing is being performed.
+   * @return a {@link JPPFDistributedJob} instance.
    */
-  JobMetadata getJobMetadata();
+  JPPFDistributedJob getJob();
 
   /**
-   * Set the current job's metadata.
-   * @param metadata a {@link JobMetadata} instance.
+   * Set the current job for which load-balancing is being performed.
+   * This method should never be called directly, as it is set automatically be the JPPF load balancing framework.
+   * @param job a {@link JPPFDistributedJob} instance.
    */
-  void setJobMetadata(JobMetadata metadata);
+  void setJob(JPPFDistributedJob job);
 }

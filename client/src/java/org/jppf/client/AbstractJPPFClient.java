@@ -103,17 +103,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   protected abstract void initPools(final TypedProperties config);
 
   /**
-   * Get all the client connections from all the connection pools handled by this client.
-   * @return a list of <code>JPPFClientConnection</code> instances.
-   * @deprecated use the connection pools API instead.
-   */
-  public List<JPPFClientConnection> getAllConnections() {
-    List<JPPFClientConnection> result = new ArrayList<>();
-    for (JPPFConnectionPool pool: pools) result.addAll(pool.getConnections());
-    return result;
-  }
-
-  /**
    * Get count of all client connections handled by this JPPFClient.
    * @return count of <code>JPPFClientConnection</code> instances.
    */
@@ -121,50 +110,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     int count = 0;
     for (JPPFConnectionPool pool: pools) count += pool.connectionCount();
     return count;
-  }
-
-  /**
-   * Get the names of all the client connections handled by this JPPFClient.
-   * @return a list of connection names as strings.
-   * @deprecated this method now returns {@code null}.
-   */
-  public List<String> getAllConnectionNames() {
-    return null;
-  }
-
-  /**
-   * Get a connection given its name.
-   * @param name the name of the connection to find.
-   * @return a <code>JPPFClientConnection</code> with the highest possible priority.
-   * @deprecated this method now returns {@code null}.
-   */
-  public JPPFClientConnection getClientConnection(final String name) {
-    return null;
-  }
-
-  /**
-   * Get an available connection, that is with the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status, with the highest possible priority.
-   * @return a {@link JPPFClientConnection} with the highest possible priority.
-   * @deprecated use the connection pools API instead.
-   */
-  public JPPFClientConnection getClientConnection() {
-    return getClientConnection(JPPFClientConnectionStatus.ACTIVE);
-  }
-
-  /**
-   * Get an available connection with the highest possible priority that matches one of the psecified statuses.
-   * @param statuses a set of statuses, one of which must match the status of the connection to find.
-   * @return a {@link JPPFClientConnection} with the highest possible priority.
-   * @deprecated use the connection pools API instead.
-   */
-  public JPPFClientConnection getClientConnection(final JPPFClientConnectionStatus...statuses) {
-    synchronized(pools) {
-      for (JPPFConnectionPool pool: pools) {
-        List<JPPFClientConnection> list = pool.getConnections(statuses);
-        if (!list.isEmpty()) return list.get(0);
-      }
-    }
-    return null;
   }
 
   /**
@@ -259,34 +204,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public void removeConnectionPoolListener(final ConnectionPoolListener listener) {
     connectionPoolListeners.remove(listener);
-  }
-
-  /**
-   * Add a listener to the list of listeners to this client.
-   * @param listener the listener to add.
-   * @deprecated use {@link #addConnectionPoolListener(ConnectionPoolListener)} instead.
-   */
-  public void addClientListener(final ClientListener listener) {
-    connectionPoolListeners.add(new ClientListenerDelegation(listener));
-  }
-
-  /**
-   * Remove a listener from the list of listeners to this client.
-   * @param listener the listener to remove.
-   * @deprecated use {@link #removeConnectionPoolListener(ConnectionPoolListener)} instead.
-   */
-  public void removeClientListener(final ClientListener listener) {
-    ClientListenerDelegation toRemove = null;
-    for (ConnectionPoolListener l: connectionPoolListeners) {
-      if (l instanceof ClientListenerDelegation) {
-        ClientListenerDelegation cld = (ClientListenerDelegation) l;
-        if (cld.getDelegate() == listener) {
-          toRemove = cld;
-          break;
-        }
-      }
-    }
-    if (toRemove != null) connectionPoolListeners.remove(toRemove);
   }
 
   /**

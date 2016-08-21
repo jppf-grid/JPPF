@@ -51,11 +51,6 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public String[] getAllJobIds() {
-    return (String[]) getAttribute("AllJobIds");
-  }
-
-  @Override
   public String[] getAllJobUuids() {
     return (String[]) getAttribute("AllJobUuids");
   }

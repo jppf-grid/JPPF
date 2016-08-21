@@ -167,7 +167,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
       if (this.bundler instanceof ChannelAwareness) ((ChannelAwareness) this.bundler).setChannelConfiguration(systemInfo);
-      else if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);
       return true;
     }
     return false;

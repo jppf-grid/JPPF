@@ -341,8 +341,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
   private void updateBundler(final TaskBundle taskBundle, final C context) {
     context.checkBundler(bundlerFactory, jppfContext);
     Bundler<?> ctxBundler = context.getBundler();
-    if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJobMetadata(taskBundle.getMetadata());
-    else if (ctxBundler instanceof JobAwarenessEx) ((JobAwarenessEx) ctxBundler).setJob(taskBundle);
+    if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJob(taskBundle);
   }
 
   /**

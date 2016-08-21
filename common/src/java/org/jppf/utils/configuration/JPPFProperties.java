@@ -360,7 +360,7 @@ public class JPPFProperties {
   public static final JPPFProperty<String> NODE_CLASS = new StringProperty("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
   /** Default script language for scripted property values */
   public static final JPPFProperty<String> SCRIPT_DEFAULT_LANGUAGE = new StringProperty("jppf.script.default.language", "javascript");
-  /** Fully qualified name of a class implementing {@link org.jppf.node.DriverDiscovery.DriverConnectionStrategy DriverConnectionStrategy} */
+  /** Fully qualified name of a class implementing {@link org.jppf.node.connection.DriverConnectionStrategy DriverConnectionStrategy} */
   public static final JPPFProperty<String> SERVER_CONNECTION_STRATEGY = new StringProperty("jppf.server.connection.strategy", null);
   /** @exclude */
   public static final JPPFProperty<String> SERIALIZATION_EXCEPTION_HOOK = new StringProperty("jppf.serialization.exception.hook", null);

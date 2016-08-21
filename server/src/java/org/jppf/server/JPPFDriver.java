@@ -345,16 +345,6 @@ public class JPPFDriver {
   /**
    * Get the object which manages the registration and unregistration of job
    * dispatch listeners and notifies these listeners of job dispatch events.
-   * @return an instance of {@link TaskReturnManager}.
-   * @deprecated use {@link #getJobTasksListenerManager()} instead.
-   */
-  public TaskReturnManager getTaskReturnManager() {
-    return jobManager;
-  }
-
-  /**
-   * Get the object which manages the registration and unregistration of job
-   * dispatch listeners and notifies these listeners of job dispatch events.
    * @return an instance of {@link JobTasksListenerManager}.
    */
   public JobTasksListenerManager getJobTasksListenerManager() {

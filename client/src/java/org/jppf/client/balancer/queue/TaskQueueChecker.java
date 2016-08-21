@@ -288,9 +288,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   private void updateBundler(final JPPFJob taskBundle, final ChannelWrapper context) {
     context.checkBundler(bundlerFactory, jppfContext);
     if (context.getBundler() instanceof JobAwareness) {
-      ((JobAwareness) context.getBundler()).setJobMetadata(taskBundle.getMetadata());
-    } else if (context.getBundler() instanceof JobAwarenessEx) {
-      ((JobAwarenessEx) context.getBundler()).setJob(taskBundle);
+      ((JobAwareness) context.getBundler()).setJob(taskBundle);
     }
   }
 

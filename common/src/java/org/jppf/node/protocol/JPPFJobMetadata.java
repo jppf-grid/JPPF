@@ -24,7 +24,6 @@ import org.jppf.utils.collections.MetadataImpl;
  * Instances of this class hold metadata about a job, that can be used from a load-balancer,
  * to adapt the load balancing to the computational weight of the job and/or the contained tasks.
  * It may be used in other places in future versions.
- * @see org.jppf.load.balancer.JobAwareness
  * @author Laurent Cohen
  * @exclude
  */

@@ -25,7 +25,7 @@ import org.slf4j.*;
 
 /**
  * This implementation of a load-balancing algorithm illustrates the use of
- * the {@link NodeAwareness} APIs, by sending to each node at most <code>m * n</code> tasks,
+ * the {@link ChannelAwareness} APIs, by sending to each node at most <code>m * n</code> tasks,
  * where <i>n</i> is the number of processing threads in the node, and <i>m</i> is a
  * user-defined parameter which defaults to one.
  * @author Laurent Cohen

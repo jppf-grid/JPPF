@@ -125,17 +125,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     serverJob.setMaxNodes(maxNodes);
   }
 
-  /**
-   * Get the set of ids for all the jobs currently queued or executing.
-   * @return a set of ids as strings.
-   * @throws Exception if any error occurs.
-   * @deprecated use {@link #getAllJobUuids()} instead.
-   */
-  @Override
-  public String[] getAllJobIds() throws Exception {
-    return getAllJobUuids();
-  }
-
   @Override
   public String[] getAllJobUuids() throws Exception {
     Set<String> ids = JPPFDriver.getInstance().getQueue().getAllJobIds();

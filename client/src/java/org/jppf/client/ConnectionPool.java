@@ -72,22 +72,6 @@ public interface ConnectionPool<E extends AutoCloseable> extends Iterable<E>, Au
   /**
    * Get the maximum size of this connection pool.
    * @return the max size as an int.
-   * @deprecated use {@link #getSize()} instead.
-   */
-  int getMaxSize();
-
-  /**
-   * Set the maximum size of this connection pool, starting or stopping connections as needed.
-   * <p>If any connection to be stopped is currently executing a job, then it will not be stopped.
-   * @param maxSize the max size as an int.
-   * @return the new maximum pool size.
-   * @deprecated use {@link #setSize(int)} instead.
-   */
-  int setMaxSize(int maxSize);
-
-  /**
-   * Get the maximum size of this connection pool.
-   * @return the max size as an int.
    */
   int getSize();
 

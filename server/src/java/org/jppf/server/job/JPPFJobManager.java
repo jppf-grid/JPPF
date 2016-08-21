@@ -269,26 +269,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Add a listener to the list of dispatch listeners.
    * @param listener the listener to add to the list.
-   * @deprecated use {@link #addJobTasksListener(JobTasksListener)} instead.
-   */
-  @Override
-  public void addTaskReturnListener(final TaskReturnListener listener) {
-    if (listener != null) taskReturnListeners.add(new DelegatingJobTasksListener(listener));
-  }
-
-  /**
-   * Remove a listener from the list of dispatch listeners.
-   * @param listener the listener to remove from the list.
-   * @deprecated use {@link #removeJobTasksListener(JobTasksListener)} instead.
-   */
-  @Override
-  public void removeTaskReturnListener(final TaskReturnListener listener) {
-    if (listener != null) taskReturnListeners.remove(new DelegatingJobTasksListener(listener));
-  }
-
-  /**
-   * Add a listener to the list of dispatch listeners.
-   * @param listener the listener to add to the list.
    */
   @Override
   public void addJobTasksListener(final JobTasksListener listener) {
@@ -340,8 +320,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   @SuppressWarnings("deprecation")
   public void loadTaskReturnListeners() {
-    List<TaskReturnListener> list = new ServiceFinder().findProviders(TaskReturnListener.class);
-    for (TaskReturnListener listener: list) addJobTasksListener(new DelegatingJobTasksListener(listener));
     List<JobTasksListener> list2 = new ServiceFinder().findProviders(JobTasksListener.class);
     for (JobTasksListener listener: list2) addJobTasksListener(listener);
   }
@@ -368,40 +346,5 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private void incNotifCount() {
     int n = notifCount.incrementAndGet();
     if (n > notifMax.get()) notifMax.set(n);
-  }
-
-  /**
-   * Delegates {@link JobTasksEvent} notifications to an old, deprecated {@link TaskReturnListener}.
-   */
-  @SuppressWarnings("deprecation")
-  private static class DelegatingJobTasksListener implements JobTasksListener {
-    /**
-     * The listener to delegate to.
-     */
-    private final TaskReturnListener delegate;
-
-    /**
-     * Initialize with a listener to delegate to.
-     * @param delegate the listener to delegate to.
-     */
-    DelegatingJobTasksListener(final TaskReturnListener delegate) {
-      if (delegate == null) throw new IllegalArgumentException("delegate can't be null");
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void tasksDispatched(final JobTasksEvent event) {
-    }
-
-    @Override
-    public void tasksReturned(final JobTasksEvent event) {
-      delegate.tasksReturned(event);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      if (!(obj instanceof DelegatingJobTasksListener)) return false;
-      return delegate.equals(((DelegatingJobTasksListener) obj).delegate);
-    }
   }
 }

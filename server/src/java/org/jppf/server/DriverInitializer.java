@@ -396,7 +396,6 @@ public class DriverInitializer {
            oldConfig.clear();
            oldConfig.putAll(nodeConfig);
            if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
-           else if (node.getBundler() instanceof NodeAwareness) ((NodeAwareness) node.getBundler()).setNodeConfiguration(node.getSystemInformation());
          }
        }
      };

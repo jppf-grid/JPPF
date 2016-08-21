@@ -130,24 +130,6 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
     return size;
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getSize()} instead.
-   */
-  @Override
-  public int getMaxSize() {
-    return getSize();
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #setSize(int)} instead.
-   */
-  @Override
-  public int setMaxSize(final int size) {
-    return setSize(size);
-  }
-
   @Override
   public synchronized void close() {
     List<E> connections = getConnections();

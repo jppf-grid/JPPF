@@ -44,7 +44,7 @@ public abstract class DriverDiscovery<E extends DriverConnectionInfo> {
    * @param info encapsulates the driver connection information and configuration,
    */
   protected void newConnection(final E info) {
-    for (DriverDiscoveryListener<E> listener: listeners) listener.onNewConnectionPool(info);
+    for (DriverDiscoveryListener<E> listener: listeners) listener.onNewConnection(info);
   }
 
   /**

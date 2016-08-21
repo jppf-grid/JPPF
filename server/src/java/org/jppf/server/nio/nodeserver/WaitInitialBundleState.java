@@ -93,7 +93,6 @@ class WaitInitialBundleState extends NodeServerState {
         systemInfo.getJppf().set(JPPFProperties.NODE_IDLE, true);
         context.setNodeInfo(systemInfo, false);
         if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
-        else if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
 
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());

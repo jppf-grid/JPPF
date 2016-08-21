@@ -66,39 +66,6 @@ public class JPPFClient extends AbstractGenericClient {
   /**
    * Initialize this client with an automatically generated application UUID.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
-   * @deprecated use {@link #JPPFClient(ConnectionPoolListener[])} instead.
-   */
-  public JPPFClient(final ClientListener... listeners) {
-    super(null, JPPFConfiguration.getProperties(), toDelegation(listeners));
-    Debug.register(this);
-  }
-
-  /**
-   * Initialize this client with the specified application UUID and new connection listeners.
-   * @param uuid the unique identifier for this local client.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
-   * @deprecated use {@link #JPPFClient(String, ConnectionPoolListener[])} instead.
-   */
-  public JPPFClient(final String uuid, final ClientListener... listeners) {
-    super(uuid, JPPFConfiguration.getProperties(), toDelegation(listeners));
-    Debug.register(this);
-  }
-
-  /**
-   * Initialize this client with the specified application UUID and new connection listeners.
-   * @param uuid the unique identifier for this local client.
-   * @param config the JPPF configuration to use for this client.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
-   * @deprecated use {@link #JPPFClient(String, TypedProperties, ConnectionPoolListener[])} instead.
-   */
-  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners) {
-    super(uuid, config, toDelegation(listeners));
-    Debug.register(this);
-  }
-
-  /**
-   * Initialize this client with an automatically generated application UUID.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
   public JPPFClient(final ConnectionPoolListener... listeners) {
     super(null, JPPFConfiguration.getProperties(), listeners);
@@ -348,19 +315,6 @@ public class JPPFClient extends AbstractGenericClient {
   public void close() {
     Debug.unregister(this);
     super.close();
-  }
-
-  /**
-   * Convert the specified client listeners into {@link ClientListenerDelegation} instances.
-   * @param listeners the array of listners to convert.
-   * @return an array of {@link ClientListenerDelegation} instances, possibly empty but never null.
-   */
-  @SuppressWarnings("deprecation")
-  private static ConnectionPoolListener[] toDelegation(final ClientListener[] listeners) {
-    if ((listeners == null) || (listeners.length <= 0)) return new ConnectionPoolListener[0];
-    ConnectionPoolListener[] clds = new ConnectionPoolListener[listeners.length];
-    for (int i=0; i<listeners.length; i++) clds[i] = new ClientListenerDelegation(listeners[i]);
-    return clds;
   }
 
   /**

@@ -144,8 +144,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   }
 
   /**
-   * {@inheritDoc}
    * This implementation does nothing.
+   * @param params not used.
    * @exclude
    */
   @Override

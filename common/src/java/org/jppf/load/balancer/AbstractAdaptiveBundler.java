@@ -28,7 +28,7 @@ import org.jppf.utils.configuration.*;
  * @param <T> the type of parameters profile used by this bundler.
  * @author Laurent Cohen
  */
-public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> extends AbstractBundler<T> implements BundlerEx<T>, ChannelAwareness, JobAwarenessEx {
+public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> extends AbstractBundler<T> implements BundlerEx<T>, ChannelAwareness, JobAwareness {
   /**
    * The current bundle size.
    */

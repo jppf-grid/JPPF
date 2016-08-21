@@ -18,7 +18,7 @@
 
 package org.jppf.job;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.management.JPPFManagementInfo;
 
@@ -28,7 +28,24 @@ import org.jppf.management.JPPFManagementInfo;
  * @since 5.1
  */
 @SuppressWarnings("deprecation")
-public class JobTasksEvent extends TaskReturnEvent {
+public class JobTasksEvent extends EventObject {
+  /**
+   * The name of the job whose tasks were dispatched.
+   */
+  private final String jobName;
+  /**
+   * The list of tasks that were disptached.
+   */
+  private final List<ServerTaskInformation> serverTasks;
+  /**
+   * The reason why the set of tasks wass returned by a node.
+   */
+  private final JobReturnReason returnReason;
+  /**
+   * Info on the node to which the job was dispatched.
+   */
+  private final JPPFManagementInfo nodeInfo;
+
   /**
    * Intialize this job dispatch event with the specified information.
    * @param jobUuid the uuid of the job whose tasks were dispatched.
@@ -39,34 +56,50 @@ public class JobTasksEvent extends TaskReturnEvent {
    * @exclude
    */
   public JobTasksEvent(final String jobUuid, final String jobName, final List<ServerTaskInformation> serverTasks, final JobReturnReason returnReason, final JPPFManagementInfo nodeInfo) {
-    super(jobUuid, jobName, serverTasks, returnReason, nodeInfo);
-  }
-
-  @Override
-  public String getJobUuid() {
-    return super.getJobUuid();
-  }
-
-  @Override
-  public String getJobName() {
-    return super.getJobName();
+    super(jobUuid);
+    this.jobName = jobName;
+    this.serverTasks = serverTasks;
+    this.returnReason = returnReason;
+    this.nodeInfo = nodeInfo;
   }
 
   /**
-   * Get the tasks dispatched to or received from the node. 
-   * @return a list of {@link ServerTaskInformation} objects.
+   * Get the uuid of the job to which the tasks belong.
+   * @return the uuid as a {@code String}.
    */
-  public List<ServerTaskInformation> getTasks() {
-    return super.getReturnedTasks();
+  public String getJobUuid() {
+    return (String) getSource();
   }
 
-  @Override
+  /**
+   * Get the name of the job to which the tasks belong.
+   * @return the name as a {@code String}.
+   */
+  public String getJobName() {
+    return jobName;
+  }
+
+  /**
+   * Get the list of tasks that were disptached.
+   * @return a {@code List} of {@code ServerTaskInformation} objects.
+   */
+  public List<ServerTaskInformation> getReturnedTasks() {
+    return serverTasks;
+  }
+
+  /**
+   * Get the reason why the set of tasks was returned by a node.
+   * @return the return reason as a {@code JobReturnReason} element.
+   */
   public JobReturnReason getReturnReason() {
-    return super.getReturnReason();
+    return returnReason;
   }
 
-  @Override
+  /**
+   * Get the information on the node to which the job was dispatched.
+   * @return a {@link JPPFManagementInfo} object.
+   */
   public JPPFManagementInfo getNodeInfo() {
-    return super.getNodeInfo();
+    return nodeInfo;
   }
 }

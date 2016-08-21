@@ -22,9 +22,7 @@ package org.jppf.node.protocol;
  * This class is kept for compatibility with existing user installations which make use of it,
  * as we understand there are quite a few that still do. When creating new task types,
  * {@link AbstractTask} should always be used instead as a superclass.
- * @deprecated use {@link AbstractTask} instead.
  * @author Laurent Cohen
  */
-@Deprecated
 public abstract class JPPFTask extends AbstractTask<Object> {
 }

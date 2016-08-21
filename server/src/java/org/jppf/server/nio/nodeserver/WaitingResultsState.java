@@ -154,7 +154,6 @@ class WaitingResultsState extends NodeServerState {
     if (systemInfo != null) {
       context.setNodeInfo(systemInfo, true);
       if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
-      else if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
     }
     return requeue;
   }

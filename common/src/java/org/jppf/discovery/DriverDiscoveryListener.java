@@ -31,5 +31,5 @@ public interface DriverDiscoveryListener<E extends DriverConnectionInfo> {
    * @return {@code true} if the new connection pool was accepted, {@code false} if an identical one was already submitted
    * or this listener is no longer accepting notifications.
    */
-  boolean onNewConnectionPool(E info);
+  boolean onNewConnection(E info);
 }
