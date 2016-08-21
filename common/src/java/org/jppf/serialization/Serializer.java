@@ -205,13 +205,13 @@ class Serializer {
       Object val = fd.field.get(obj);
       if (fd.type.primitive) {
         switch(fd.type.signature.charAt(0)) {
-          case 'B': out.write((Integer) val); break;
+          case 'B': out.write(((Byte) val).intValue()); break;
           case 'S': out.writeShort((Short) val); break;
           case 'I': writeInt((Integer) val); break;
           case 'J': writeLong((Long) val); break;
           case 'F': writeFloat((Float) val); break;
           case 'D': writeDouble((Double) val); break;
-          case 'C': out.writeChar((Integer) val); break;
+          case 'C': out.writeChar((Character) val); break;
           case 'Z': out.writeBoolean((Boolean) val); break;
         }
       }

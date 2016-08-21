@@ -43,6 +43,10 @@ public final class SerializationUtils {
    */
   private static final byte ASCII_BIT = 0x40;
   /**
+   * Bit mask for a value corresponding to {@code Integer.MIN_VALUE} or {@code Long.MIN_VALUE}.
+   */
+  private static final byte MIN_VALUE_BIT = -0x80;
+  /**
    * .
    */
   static final int[] INT_MAX_VALUES = { 128, 128 << 8, 128 << 16 };
@@ -280,6 +284,9 @@ public final class SerializationUtils {
     if (value == 0) {
       os.write(data[0] = ZERO_BIT);
       return 1;
+    } else if (value == Integer.MIN_VALUE) {
+      os.write(data[0] = MIN_VALUE_BIT);
+      return 1;
     }
     int absValue = (value > 0) ? value : -value;
     byte n = 4;
@@ -309,6 +316,9 @@ public final class SerializationUtils {
     if (value == 0) {
       os.write(data[0] = ZERO_BIT);
       return 1;
+    } else if (value == Long.MIN_VALUE) {
+      os.write(data[0] = MIN_VALUE_BIT);
+      return 1;
     }
     long absValue = (value > 0L) ? value : -value;
     byte n = 8;
@@ -336,6 +346,7 @@ public final class SerializationUtils {
   public static int readVarInt(final InputStream is, final byte[] buf) throws IOException {
     byte b = (byte) (is.read() & 0xFF);
     if (b == ZERO_BIT) return 0;
+    else if (b == MIN_VALUE_BIT) return Integer.MIN_VALUE;
     byte n = (byte) (b & 0x0F);
     int result = 0;
     readToBuf(is, buf, 0, n);
@@ -354,6 +365,7 @@ public final class SerializationUtils {
   public static long readVarLong(final InputStream is, final byte[] buf) throws IOException {
     byte b = (byte) (is.read() & 0xFF);
     if (b == ZERO_BIT) return 0L;
+    else if (b == MIN_VALUE_BIT) return Long.MIN_VALUE;
     byte n = (byte) (b & 0x0F);
     long result = 0L;
     readToBuf(is, buf, 0, n);
