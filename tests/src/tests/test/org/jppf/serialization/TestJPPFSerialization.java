@@ -18,15 +18,15 @@
 
 package test.org.jppf.serialization;
 
-import org.junit.*;
+import org.junit.BeforeClass;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup;
 
 /**
  * Unit tests for the JPPF serialization scheme.
  * @author Laurent Cohen
  */
-public class TestJPPFSerialization extends AbstractNonStandardSetup {
+public class TestJPPFSerialization extends AbstractTestSerialization {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
@@ -34,41 +34,8 @@ public class TestJPPFSerialization extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    printOut("main class loader = %s", TestJPPFSerialization.class.getClassLoader());
+    System.out.println("main class loader = " + TestJPPFSerialization.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
     client = BaseSetup.setup(1, 1, true, createConfig("jppf_serialization"));
-  }
-
-  /**
-   * Test a simple job.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout = 10000)
-  public void testSimpleJob() throws Exception {
-    super.testSimpleJob(null);
-  }
-
-  @Override
-  @Test(timeout = 15000)
-  public void testMultipleJobs() throws Exception {
-    super.testMultipleJobs();
-  }
-
-  @Override
-  @Test(timeout = 10000)
-  public void testCancelJob() throws Exception {
-    super.testCancelJob();
-  }
-
-  @Override
-  @Test(timeout = 5000)
-  public void testNotSerializableWorkingInNode() throws Exception {
-    super.testNotSerializableWorkingInNode();
-  }
-
-  @Override
-  @Test(timeout = 8000)
-  public void testForwardingMBean() throws Exception {
-    super.testForwardingMBean();
   }
 }
