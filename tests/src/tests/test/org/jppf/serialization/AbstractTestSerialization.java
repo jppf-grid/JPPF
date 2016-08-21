@@ -110,7 +110,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
   @Test(timeout = 5000)
   public void testChar() throws Exception {
     testObject(new Character('F'));
-    testObject(new Character('æ'));
+    testObject(new Character((char) 145));
     testObject(Character.MIN_CODE_POINT);
     testObject(Character.MAX_CODE_POINT);
     testObject(Character.MIN_HIGH_SURROGATE);
@@ -220,7 +220,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testCharArray() throws Exception {
-    char[] array1 = { 'F', 'æ', Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
+    char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
       Character.MIN_LOW_SURROGATE, Character.MAX_LOW_SURROGATE, Character.MIN_SURROGATE, Character.MAX_SURROGATE, Character.MIN_VALUE, Character.MAX_VALUE };
     char[] array2 = (char[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
