@@ -53,7 +53,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
   }
 
   @Override
-  public boolean onNewConnectionPool(final DriverConnectionInfo info) {
+  public boolean onNewConnection(final DriverConnectionInfo info) {
     if (closed.get()) return false;
     boolean hasPool = false;
     synchronized(discoveredPools) {

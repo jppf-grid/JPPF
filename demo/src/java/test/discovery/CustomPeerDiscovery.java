@@ -16,20 +16,29 @@
  * limitations under the License.
  */
 
-package org.jppf.discovery;
+package test.discovery;
+
+import org.jppf.discovery.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
- * Listener interface to receive notifications of new discovered driver connection pools.
- * @param <E> the type of notifications received by this listener.
+ * 
  * @author Laurent Cohen
- * @exclude
  */
-public interface DriverDiscoveryListener<E extends DriverConnectionInfo> {
+public class CustomPeerDiscovery extends PeerDriverDiscovery {
   /**
-   * Called when a new driver connection pool is discovered.
-   * @param info encapsulates the connection information about a remote driver.
-   * @return {@code true} if the new connection pool was accepted, {@code false} if an identical one was already submitted
-   * or this listener is no longer accepting notifications.
+   * 
    */
-  boolean onNewConnection(E info);
+  public CustomPeerDiscovery() {
+    System.out.printf("in %s() contructor%n", getClass().getSimpleName());
+  }
+
+  @Override
+  public void discover() {
+    int port = JPPFConfiguration.get(JPPFProperties.SERVER_PORT);
+    DriverConnectionInfo info = new DriverConnectionInfo("custom_discovery", "localhost", (port == 11111 ? 11112 : 11111));
+    System.out.printf("%s 'discovering' %s%n", getClass().getSimpleName(), info);
+    newConnection(info);
+  }
 }

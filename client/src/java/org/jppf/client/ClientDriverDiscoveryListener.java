@@ -51,11 +51,12 @@ class ClientDriverDiscoveryListener implements DriverDiscoveryListener<ClientCon
   }
 
   @Override
-  public boolean onNewConnectionPool(final ClientConnectionPoolInfo info) {
+  public boolean onNewConnection(final ClientConnectionPoolInfo info) {
     if (closed.get()) return false;
     boolean hasPool = false;
     synchronized(discoveredPools) {
-      if (!(hasPool = discoveredPools.contains(info))) discoveredPools.add(info);
+      hasPool = discoveredPools.contains(info);
+      if (!hasPool) discoveredPools.add(info);
     }
     if (!hasPool) {
       JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);

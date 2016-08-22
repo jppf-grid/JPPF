@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/jca-client/lib/commons-logging-1.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
