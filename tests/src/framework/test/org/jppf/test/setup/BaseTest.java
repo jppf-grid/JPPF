@@ -63,7 +63,7 @@ public class BaseTest {
   /**
    * Used to format timestamps in the std and err outputs.
    */
-  private static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss.SSS");
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss.SSS");
 
   /**
    * Zip the drivers and nodes log files into the file {@code logs/<className>.zip}.
@@ -93,7 +93,7 @@ public class BaseTest {
    * @param params the parameter values.
    */
   public static void printOut(final String format, final Object...params) {
-    print(false, false, format, params);
+    print(true, false, format, params);
   }
 
   /**
@@ -124,9 +124,7 @@ public class BaseTest {
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
     String message = String.format(format, params);
-    synchronized(sdf) {
-      System.out.printf("[%s] %s%n", sdf.format(new Date()), message);
-    }
+    System.out.printf("[%s] %s%n", getFormattedTimestamp(), message);
     if (!systemOutOnly) {
       String s = "";
       if (decorate) {
@@ -138,6 +136,17 @@ public class BaseTest {
       if (decorate) log.info(s);
       log.info(message);
       if (decorate) log.info(s);
+    }
+  }
+
+  /**
+   * Get the current timestamp as a formatted string.
+   * @return the timestamp formatted according to {@link #SDF}.
+   */
+  public static String getFormattedTimestamp() {
+    Date date = new Date();
+    synchronized(SDF) {
+      return SDF.format(date);
     }
   }
 
@@ -159,7 +168,7 @@ public class BaseTest {
       File[] logFiles = dir.listFiles(logFileFilter);
       if (logFiles != null) {
         for (File file: logFiles) {
-          if (!file.getName().startsWith("std_") && file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
+          if (!file.getName().startsWith("std_") && file.exists() && !file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
         }
       }
     }

@@ -31,7 +31,7 @@ import test.org.jppf.test.setup.BaseSetup.Configuration;
  * Unit tests for the Kryo serialization scheme.
  * @author Laurent Cohen
  */
-public class TestKryo extends AbstractTestSerialization {
+public class TestKryoWithZLIB extends AbstractTestSerialization {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
@@ -40,7 +40,7 @@ public class TestKryo extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = true;
-    Configuration config = createConfig("serialization/kryo");
+    Configuration config = createConfig("serialization/kryo_zlib");
     List<String> commonCP = new ArrayList<>();
     commonCP.add("../samples-pack/KryoSerializer/classes");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar");

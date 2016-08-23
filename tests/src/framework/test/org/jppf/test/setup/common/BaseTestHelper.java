@@ -28,6 +28,8 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
@@ -195,14 +197,15 @@ public class BaseTestHelper {
           try {
             jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
           } catch (Exception e) {
-            System.err.printf("error invoking remote logging on %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+            System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n", BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
           }
         }
         if (toNodes) {
           try {
             jmx.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, new String[] { String[].class.getName() });
           } catch (Exception e) {
-            System.err.printf("error invoking remote logging on the nodes of %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+            System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
+              BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
           }
         }
       }
