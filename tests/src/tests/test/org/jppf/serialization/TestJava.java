@@ -18,15 +18,17 @@
 
 package test.org.jppf.serialization;
 
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.BeforeClass;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup;
 
 /**
  * Unit tests for the JPPF serialization scheme.
  * @author Laurent Cohen
  */
-public class TestJPPFSerialization extends AbstractTestSerialization {
+public class TestJava extends AbstractTestSerialization {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
@@ -34,8 +36,10 @@ public class TestJPPFSerialization extends AbstractTestSerialization {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    System.out.println("main class loader = " + TestJPPFSerialization.class.getClassLoader());
+    allowsNonSerializable = false;
+    System.out.println("main class loader = " + TestJava.class.getClassLoader());
     //JPPFSerialization.Factory.reset();
-    client = BaseSetup.setup(1, 1, true, createConfig("jppf_serialization"));
+    client = BaseSetup.setup(1, 1, true, createConfig("serialization/java"));
+    printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
 }

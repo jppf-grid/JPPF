@@ -20,6 +20,7 @@ package test.org.jppf.serialization;
 
 import static org.junit.Assert.*;
 
+import java.io.NotSerializableException;
 import java.util.Arrays;
 
 import org.jppf.serialization.ObjectSerializer;
@@ -33,6 +34,11 @@ import test.org.jppf.test.setup.AbstractNonStandardSetup;
  * @author Laurent Cohen
  */
 public abstract class AbstractTestSerialization extends AbstractNonStandardSetup {
+  /**
+   * WHtehr the serialization scheme allows non-serializable classes.
+   */
+  static boolean allowsNonSerializable = true;
+
   /**
    * Test a simple job.
    * @throws Exception if any error occurs.
@@ -57,7 +63,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
   @Override
   @Test(timeout = 5000)
   public void testNotSerializableWorkingInNode() throws Exception {
-    super.testNotSerializableWorkingInNode();
+    if (allowsNonSerializable) super.testNotSerializableWorkingInNode();
   }
 
   @Override
@@ -72,16 +78,20 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testPrimitives() throws Exception {
-    PrimitiveStruct ps1 = new PrimitiveStruct();
-    PrimitiveStruct ps2 = (PrimitiveStruct) copyBySerialization(ps1);
-    assertTrue(ps1.b == ps2.b);
-    assertTrue(ps1.s == ps2.s);
-    assertTrue(ps1.i == ps2.i);
-    assertTrue(ps1.l == ps2.l);
-    assertTrue(ps1.f == ps2.f);
-    assertTrue(ps1.d == ps2.d);
-    assertTrue(ps1.c == ps2.c);
-    assertTrue(ps1.z == ps2.z);
+    try {
+      PrimitiveStruct ps1 = new PrimitiveStruct();
+      PrimitiveStruct ps2 = (PrimitiveStruct) copyBySerialization(ps1);
+      assertTrue(ps1.b == ps2.b);
+      assertTrue(ps1.s == ps2.s);
+      assertTrue(ps1.i == ps2.i);
+      assertTrue(ps1.l == ps2.l);
+      assertTrue(ps1.f == ps2.f);
+      assertTrue(ps1.d == ps2.d);
+      assertTrue(ps1.c == ps2.c);
+      assertTrue(ps1.z == ps2.z);
+    } catch(NotSerializableException e) {
+      if (allowsNonSerializable) throw e;
+    }
   }
 
   /**
@@ -90,16 +100,20 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testPrimitivesArrays() throws Exception {
-    PrimitiveArrayStruct ps1 = new PrimitiveArrayStruct();
-    PrimitiveArrayStruct ps2 = (PrimitiveArrayStruct) copyBySerialization(ps1);
-    assertTrue(Arrays.equals(ps1.b, ps2.b));
-    assertTrue(Arrays.equals(ps1.s, ps2.s));
-    assertTrue(Arrays.equals(ps1.i, ps2.i));
-    assertTrue(Arrays.equals(ps1.l, ps2.l));
-    assertTrue(Arrays.equals(ps1.f, ps2.f));
-    assertTrue(Arrays.equals(ps1.d, ps2.d));
-    assertTrue(Arrays.equals(ps1.c, ps2.c));
-    assertTrue(Arrays.equals(ps1.z, ps2.z));
+    try {
+      PrimitiveArrayStruct ps1 = new PrimitiveArrayStruct();
+      PrimitiveArrayStruct ps2 = (PrimitiveArrayStruct) copyBySerialization(ps1);
+      assertTrue(Arrays.equals(ps1.b, ps2.b));
+      assertTrue(Arrays.equals(ps1.s, ps2.s));
+      assertTrue(Arrays.equals(ps1.i, ps2.i));
+      assertTrue(Arrays.equals(ps1.l, ps2.l));
+      assertTrue(Arrays.equals(ps1.f, ps2.f));
+      assertTrue(Arrays.equals(ps1.d, ps2.d));
+      assertTrue(Arrays.equals(ps1.c, ps2.c));
+      assertTrue(Arrays.equals(ps1.z, ps2.z));
+    } catch(NotSerializableException e) {
+      if (allowsNonSerializable) throw e;
+    }
   }
 
   /**

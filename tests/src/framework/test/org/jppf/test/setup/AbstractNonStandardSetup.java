@@ -74,7 +74,7 @@ public class AbstractNonStandardSetup extends BaseTest {
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
-    String dir = (prefix == null) ? "classes/tests/config" : "classes/tests/config/" + prefix;
+    String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
     testConfig.driverJppf = dir + "/driver.properties";
     testConfig.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     testConfig.driverClasspath = driverCP;
