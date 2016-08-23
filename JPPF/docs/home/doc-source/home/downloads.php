@@ -5,7 +5,7 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.2";
+        $ver1 = "5.2.1";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -68,7 +68,7 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.1.4";
+        $ver1 = "5.1.5";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -123,7 +123,7 @@ $template{name="about-page-header" title="Downloads"}$
     <br>
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/emblem-what.png" title="Feeling curious or adventurous?" heading="h3"}$
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 beta 2</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha</a>.
       <br><br>
       <p align="center"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>

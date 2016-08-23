@@ -97,6 +97,7 @@
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "CI") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/ci.php" class="<?php echo $itemClass; ?>">&raquo; CI</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -108,7 +109,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.2";
+        $ver1 = "5.2.1";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -168,7 +169,7 @@
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.1.4";
+        $ver1 = "5.1.5";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -221,7 +222,7 @@
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3>&nbsp;<img src="images/icons/emblem-what.png" class="titleWithIcon"/>Feeling curious or adventurous?</h3>
 </div>
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 beta 2</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha</a>.
       <br><br>
       <p align="center"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>
