@@ -19,10 +19,9 @@
 package test;
 
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
-import test.org.jppf.server.peer.*;
-import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
+import test.org.jppf.server.protocol.TestJobReservation;
+import test.org.jppf.test.runner.RepeatingSuite;
 
 
 
@@ -30,7 +29,7 @@ import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
  * A suite of JUnit tests.
  * @author Laurent Cohen
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithOrphan.class, TestMultiServerWithSSL.class, TestJPPFJobClientSLA.class })
+@RunWith(RepeatingSuite.class)
+@RepeatingSuite.RepeatingSuiteClasses(repeat = 2, shuffle = false, classes = { TestJobReservation.class })
 public class JPPFSuite {
 }
