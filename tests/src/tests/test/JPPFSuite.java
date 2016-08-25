@@ -23,13 +23,11 @@ import org.junit.runner.RunWith;
 import test.org.jppf.server.protocol.TestJobReservation;
 import test.org.jppf.test.runner.RepeatingSuite;
 
-
-
 /**
  * A suite of JUnit tests.
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat = 2, shuffle = false, classes = { TestJobReservation.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=5, shuffle=false, classes={ TestJobReservation.class })
 public class JPPFSuite {
 }

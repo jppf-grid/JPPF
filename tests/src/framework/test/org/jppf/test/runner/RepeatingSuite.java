@@ -27,12 +27,14 @@ import org.junit.runners.model.*;
 
 /**
  * A suite that allows running the specified classes a specified number fof times,
- * and optioanlly allows a random shuffling of the test classes at each repetition.
+ * and optionally allows a random shuffling of the test classes at each repetition.
  * <p>Example usage:
  * <pre>
  * @RunWith(RepeatingSuite.class)
- * @RepeatingSuite.RepeatingSuiteClasses(repeat=2, shuffle=false, classes={ MyClass1.class, ..., MyClassN.class })
- * public class JPPFSuite {
+ * @RepeatingSuite.RepeatingSuiteClasses(repeat=2, shuffle=false,
+ *   classes={MyClass1.class, MyClass2.class,, MyClass3.class}
+ * )
+ * public class MySuite {
  * } 
  * </pre>
  * @author Laurent Cohen
@@ -41,74 +43,42 @@ public class RepeatingSuite extends Suite {
   /**
    * Called reflectively on classes annotated with <code>@RunWith(Suite.class)</code>.
    * @param klass the root class.
-   * @param builder builds runners for classes in the suite.
    * @throws InitializationError if any error occurs.
    */
-  public RepeatingSuite(final Class<?> klass, final RunnerBuilder builder) throws InitializationError {
-    super(klass, getRunners(klass, builder));
+  public RepeatingSuite(final Class<?> klass) throws InitializationError {
+    super(klass, getRunners(klass));
   }
 
   /**
    * Build the runners for the classes in the repeated suite.
-   * @param klass the root class.
-   * @param builder builds runners for classes in the suite.
+   * @param suiteClass the root class.
    * @return a list of runners.
    * @throws InitializationError if any error occurs.
    */
-  static List<Runner> getRunners(final Class<?> klass, final RunnerBuilder builder) throws InitializationError {
+  static List<Runner> getRunners(final Class<?> suiteClass) throws InitializationError {
     List<Runner> runners = new ArrayList<>();
-    RepeatingSuiteClasses annotation= klass.getAnnotation(RepeatingSuiteClasses.class);
-    if (annotation == null) throw new InitializationError(String.format("class '%s' must have a RepeatingSuiteClasses annotation", klass.getName()));
+    RepeatingSuiteClasses annotation = suiteClass.getAnnotation(RepeatingSuiteClasses.class);
+    if (annotation == null) throw new InitializationError(String.format("class '%s' must have a RepeatingSuiteClasses annotation", suiteClass.getName()));
     int repeat = annotation.repeat();
-    if (repeat <= 0) throw new InitializationError(String.format("class '%s' must have a repeat >= 1, currently has %d", klass.getName(), repeat));
+    if (repeat <= 0) throw new InitializationError(String.format("class '%s' must have a repeat >= 1, currently %d", suiteClass.getName(), repeat));
     List<Class<?>> classes = Arrays.asList(annotation.classes());
-    List<Class<?>> repeatedClasses = new ArrayList<>();
     for (int i=0; i<repeat; i++) {
-      List<Class<?>> tmp = new ArrayList<>(classes);
-      if (annotation.shuffle()) Collections.shuffle(tmp);
-      repeatedClasses.addAll(tmp);
-    }
-    for (int i=0; i<repeat; i++) {
-      int size = classes.size();
       final String suffix = String.format("[%d]", i);
-      for (int j=0; j<size; j++) {
-        Class<?> testClass = repeatedClasses.get(i * size + j);
-        runners.add(new SuffixedNamesRunner(testClass, suffix));
-      }
+      List<Class<?>> tmp = new ArrayList<>(classes);
+      if (annotation.shuffle() && !tmp.isEmpty()) Collections.shuffle(tmp);
+      for (final Class<?> testClass: tmp) runners.add(new BlockJUnit4ClassRunner(testClass) {
+        @Override
+        protected String getName() {
+          return super.getName() + suffix;
+        }
+
+        @Override
+        protected String testName(final FrameworkMethod method) {
+          return super.testName(method) + suffix;
+        }
+      });
     }
     return runners;
-  }
-
-  /**
-   * A {@code Runner} which appends a suffix to the names of the test class and methods.
-   */
-  public static class SuffixedNamesRunner extends BlockJUnit4ClassRunner {
-    /**
-     * The suffix to append to test class and methods names 
-     */
-    private final String suffix;
-
-    /**
-     * Initialize this runner with the specified class and suffix.
-     * @param clazz the class to run.
-     * @param suffix suffix tto append to class and method names.
-     * @throws InitializationError if any error occurs.
-     */
-    public SuffixedNamesRunner(final Class<?> clazz, final String suffix) throws InitializationError {
-      super(clazz);
-      this.suffix = suffix;
-
-    }
-
-    @Override
-    protected String getName() {
-      return super.getName() + suffix;
-    }
-
-    @Override
-    protected String testName(final FrameworkMethod method) {
-      return super.testName(method) + suffix;
-    }
   }
 
   /**
