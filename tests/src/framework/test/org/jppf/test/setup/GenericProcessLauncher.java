@@ -351,11 +351,13 @@ public class GenericProcessLauncher implements Runnable {
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        if (stdout != null) stdout.print(formatPrologue() + event.getContent());
+        //if (stdout != null) stdout.print(formatPrologue() + event.getContent());
+        System.out.print(formatPrologue() + event.getContent());
       }
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        if (stderr != null) stderr.print(formatPrologue() + event.getContent());
+        //if (stderr != null) stderr.print(formatPrologue() + event.getContent());
+        System.err.print(formatPrologue() + event.getContent());
       }
     });
     wrapper.setProcess(builder.start());

@@ -156,6 +156,7 @@ public class BaseTest {
     @Override
     protected void starting(final Description description) {
       // delete the drivers and nodes log files if they exist
+      org.apache.log4j.LogManager.resetConfiguration();
       File dir = new File(System.getProperty("user.dir"));
       File[] logFiles = dir.listFiles(logFileFilter);
       if (logFiles != null) {
@@ -166,6 +167,7 @@ public class BaseTest {
           }
         }
       }
+      org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       stdOut = System.out;
       stdErr = System.err;
       try {
