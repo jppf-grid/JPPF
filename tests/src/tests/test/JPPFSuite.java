@@ -20,14 +20,14 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.server.protocol.TestJobReservation;
 import test.org.jppf.test.runner.RepeatingSuite;
+import test.org.jppf.utils.stats.TestJPPFStatistics;
 
 /**
  * A suite of JUnit tests.
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=5, shuffle=false, classes={ TestJobReservation.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true, classes={ TestJPPFStatistics.class })
 public class JPPFSuite {
 }

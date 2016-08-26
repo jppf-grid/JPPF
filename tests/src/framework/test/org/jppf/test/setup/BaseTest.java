@@ -46,7 +46,8 @@ public class BaseTest {
     public boolean accept(final File path) {
       if (path.isDirectory()) return false;
       String s = path.getName();
-      return (s != null) && s.endsWith(".log") && !s.startsWith("jppf-client");
+      return (s != null) && s.endsWith(".log");
+      //return (s != null) && s.endsWith(".log") && !s.startsWith("jppf-client");
     }
   };
   /** */
@@ -154,6 +155,17 @@ public class BaseTest {
   public static class BaseTestClassWatcher extends TestWatcher {
     @Override
     protected void starting(final Description description) {
+      // delete the drivers and nodes log files if they exist
+      File dir = new File(System.getProperty("user.dir"));
+      File[] logFiles = dir.listFiles(logFileFilter);
+      if (logFiles != null) {
+        for (File file: logFiles) {
+          //if (!file.getName().startsWith("std_") && file.exists()) {
+          if (file.exists()) {
+            if (!file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
+          }
+        }
+      }
       stdOut = System.out;
       stdErr = System.err;
       try {
@@ -163,26 +175,26 @@ public class BaseTest {
         print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
       print("***** start of class %s *****", description.getClassName());
-      // delete the drivers and nodes log files if they exist
-      File dir = new File(System.getProperty("user.dir"));
-      File[] logFiles = dir.listFiles(logFileFilter);
-      if (logFiles != null) {
-        for (File file: logFiles) {
-          if (!file.getName().startsWith("std_") && file.exists() && !file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
-        }
-      }
     }
 
     @Override
     protected void finished(final Description description) {
       print("***** finished class %s *****", description.getClassName());
-      zipLogs(description.getClassName());
       try {
-        if ((stdOut != null) && (stdOut != System.out)) System.setOut(stdOut);
-        if ((stdErr != null) && (stdErr != System.err)) System.setErr(stdErr);
+        if ((stdOut != null) && (stdOut != System.out)) {
+          PrintStream tmp = System.out;
+          System.setOut(stdOut);
+          tmp.close();
+        }
+        if ((stdErr != null) && (stdErr != System.err)) {
+          PrintStream tmp = System.err;
+          System.setErr(stdErr);
+          tmp.close();
+        }
       } catch (Exception e) {
         print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
+      zipLogs(description.getClassName());
     }
   }
 }

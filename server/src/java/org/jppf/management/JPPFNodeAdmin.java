@@ -151,11 +151,12 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    * @param interrupt whether the operation should be performed immediately, or the node
    * should wait until it is not executing any task.
    * @param restart {@code true} to perform/request a restart, {@code false} for a shutdown.
+   * @throws Exception if any error occurs.
    * @since 5.0
    */
-  private void shutdownOrRestart(final boolean interrupt, final boolean restart) {
+  private void shutdownOrRestart(final boolean interrupt, final boolean restart) throws Exception {
     if (node.isLocal()) return;
-    String s = restart ? "restart" : "shutdown";
+    final String s = restart ? "restart" : "shutdown";
     String msg = String.format("%s node %s requested", (interrupt ? "immediate" : "deferred"), s);
     System.out.println(msg);
     log.info(msg);
@@ -164,7 +165,13 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
         Runnable r = new Runnable() {
           @Override
           public void run() {
-            node.shutdown(restart);
+            try {
+              node.shutdown(restart);
+            } catch (Exception|Error e) {
+              log.error(String.format("error trying to %s the node: %s", s, ExceptionUtils.getStackTrace(e)));
+              if (e instanceof Error) throw (Error) e;
+              if (e instanceof RuntimeException) throw (RuntimeException) e;
+            }
           }
         };
         new Thread(r, "Node " + s).start();

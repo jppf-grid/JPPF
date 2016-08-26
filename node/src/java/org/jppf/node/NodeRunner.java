@@ -364,14 +364,18 @@ public class NodeRunner {
       AccessController.doPrivileged(new PrivilegedAction<Object>() {
         @Override
         public Object run() {
+          if (debugEnabled) log.debug("stopping the node");
           node.stopNode();
           // close the JMX server connection to avoid request being sent again by the client.
+          if (debugEnabled) log.debug("stopping the JMX server");
           stopJmxServer();
           try {
             Thread.sleep(500L);
           } catch(@SuppressWarnings("unused") Exception ignore) {
           }
-          System.exit(restart ? 2 : 0);
+          int exitCode = restart ? 2 : 0;
+          log.info("exiting the node with exit code {}", exitCode);
+          System.exit(exitCode);
           return null;
         }
       });

@@ -50,14 +50,22 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testLatestQueueTaskCountUponNodeRestart() throws Exception {
     int nbTasks = 2;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+    BaseTest.print("trace 1");
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    BaseTest.print("trace 2");
     jmx.resetStatistics();
+    BaseTest.print("trace 3");
     client.submitJob(job);
+    BaseTest.print("trace 4");
     Thread.sleep(1000L);
+    BaseTest.print("trace 5");
     jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
+    BaseTest.print("trace 6");
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
+    BaseTest.print("trace 7");
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
+    BaseTest.print("trace 8");
   }
 
   /**
