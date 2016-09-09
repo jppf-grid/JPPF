@@ -41,6 +41,8 @@
   <property environment="env"/>
   <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
+  <property name="jmx.build.properties.file" value="${jmxremote}/build.properties"/>
+  <property file="${jmx.build.properties.file}"/>
   <property name="build.number.file"     value="${basedir}/bin/build.number"/>
   <property name="bin"                   value="${basedir}/bin"/>  
   <property name="installer"             value="${bin}/installer"/>
@@ -116,9 +118,6 @@
       <fileset dir="${build}">
         <include name="*.zip"/>
         <include name="*.apk"/>
-        <!--
-        <exclude name="*${app.ver}*.zip"/>
-        -->
       </fileset>
     </delete>
     <delete dir="${runtime}" quiet="true"/>
@@ -130,6 +129,11 @@
         <include name="jppf*.jar"/>
       </fileset>
     </delete>
+  </target>               
+
+  <target name="cleanup.after">
+    <delete dir="${build}/config" quiet="true"/>
+    <delete dir="${build}/maven" quiet="true"/>
   </target>               
 
   <!-- ========================================================================= -->
@@ -195,7 +199,7 @@
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc"
+  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
     description="deploy without building the javadoc nor the installer"/>
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>

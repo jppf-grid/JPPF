@@ -55,10 +55,13 @@
     <delete quiet="true" dir="${build}/temp"/>
     <mkdir dir="${build}/temp"/>
     <unzip src="${build}/${app.ver}-node.zip" dest="${build}/temp">
-      <patternset><exclude name="**/jppf-node.properties"/></patternset>
+      <patternset>
+        <exclude name="**/jppf-node.properties"/>
+        <exclude name="**/*.conf"/>
+      </patternset>
     </unzip>
     <copy todir="${build}/temp/${app.ver}-node/config" overwrite="true">
-      <fileset dir="${basedir}/config/dotnet-bridge/config/node" includes="*.properties,*.conf"/>
+      <fileset dir="${build}/config/dotnet-bridge/config/node" includes="*.properties,*.conf"/>
     </copy>
     <zip destfile="${dotnet.node.dist.file}">
       <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*,**/JPPFNode"/>

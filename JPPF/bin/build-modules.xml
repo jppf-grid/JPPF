@@ -22,7 +22,7 @@
   <!--                 Package the runtime components for deployment             -->
   <!-- ========================================================================= -->
 
-  <target name="runtime" depends="rebuild, runtime.driver, runtime.node, runtime.gui, application.template"/>
+  <target name="runtime" depends="rebuild, runtime.setup, runtime.driver, runtime.node, runtime.gui, application.template"/>
 
   <macrodef name="package-module">
     <attribute name="module"/>
@@ -37,8 +37,8 @@
       <delete file="${runtime.@{module}.file}" quiet="true"/>
       <zip destfile="${runtime.@{module}.file}">
         <zipfileset dir="${basedir}" prefix="${@{module}.prefix}" includes="${license.file}"/>
-        <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh,JPPFDriver,JPPFNode"/>
-        <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
+        <zipfileset dir="${build}/config/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh,JPPFDriver,JPPFNode" erroronmissingarchive="false"/>
+        <zipfileset dir="${build}/config/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755" erroronmissingarchive="false"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.2.jar"/>
@@ -50,6 +50,20 @@
       </zip>
     </sequential>
   </macrodef>
+
+  <!-- =========== Handle version numbers =========== -->
+
+  <target name="runtime.setup">
+    <delete dir="${build}/config" quiet="true"/>
+    <mkdir dir="${build}/config"/>
+    <copy todir="${build}/config">
+      <fileset dir="${config}"/>
+    </copy>
+    <replace dir="${build}/config" includes="**/*.conf">
+      <replacefilter token="@version@" value="${version.number}"/>
+      <replacefilter token="@jmx_version@" value="${jmx.version.number}"/>
+    </replace>
+  </target>
 
   <!-- =========== Application template packaging =========== -->
 

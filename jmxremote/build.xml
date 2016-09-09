@@ -30,7 +30,7 @@
   <property name="build"                 value="${basedir}/build"/>
   <property name="jppf"                  value="${basedir}/../JPPF"/>
   <property name="app"                   value="jppf-jmxremote_optional"/>
-  <property name="app.ver"               value="${app}-${version.number}"/>
+  <property name="app.ver"               value="${app}-${jmx.version.number}"/>
   <property name="build.sysclasspath"    value="last"/>
 
 	<!-- ========================================================================= -->
@@ -102,7 +102,7 @@
       <jar jarfile="${build}/${app.ver}@{type}.jar" index="true">
         <fileset dir="@{dir}"/>
         <manifest>
-          <attribute name="Version" value="${version.number}"/>
+          <attribute name="Version" value="${jmx.version.number}"/>
           <attribute name="BuildDate" value="${readable.now}"/>
         </manifest>
       </jar>
@@ -178,16 +178,16 @@
     <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
     <property name="pom.file" value="${maven.dist}/pom.xml"/>
     <condition property="maven.snapshot">
-      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
+      <contains string="${jmx.maven.version}" substring="SNAPSHOT" casesensitive="false"/>
     </condition>
   </target>
 
   <target name="maven.generate" depends="">
     <property name="artifactId" value="jppf-jmxremote_optional"/>
-    <property name="artifact.prefix" value="${artifactId}-${version.number}"/>
+    <property name="artifact.prefix" value="${artifactId}-${jmx.version.number}"/>
     <delete dir="${maven.dist}" quiet="true" excludes="**/*.jar"/>
     <copy file="${basedir}/pom.xml" toFile="${pom.file}"/>
-    <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
+    <replace file="${pom.file}" token="@version@" value="${jmx.maven.version}"/>
     <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
     <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
     <antcall target="maven.staging"> <param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
