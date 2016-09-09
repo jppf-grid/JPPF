@@ -111,7 +111,7 @@
   <!--                         Compile the application                      -->
   <!-- ==================================================================== -->
 
-  <taskdef resource="checkstyletask.properties" classpath="${lib.dir}/checkstyle-5.5-all.jar" />
+  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/../JPPF/lib/Checkstyle/checkstyle-6.19-all.jar" />
 
   <target name="compile" depends="init">
     <echo message="compiling the J2EE connector classes ..." />
