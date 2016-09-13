@@ -30,8 +30,7 @@ import org.slf4j.*;
  * qspecified in the deployment descriptor of the resource adapter.
  * @author Laurent Cohen
  */
-class JPPFConfigurationParser
-{
+class JPPFConfigurationParser {
   /**
    * The default configuration source.
    */
@@ -57,8 +56,7 @@ class JPPFConfigurationParser
    * Initialize this ocnfiguration parser.
    * @param configurationSource a string holding the client configuration.
    */
-  public JPPFConfigurationParser(final String configurationSource)
-  {
+  public JPPFConfigurationParser(final String configurationSource) {
     this.configurationSource = configurationSource;
   }
 
@@ -66,8 +64,7 @@ class JPPFConfigurationParser
    * Parse the ocnfiguration.
    * @return the config as a {@link TypedProperties} object.
    */
-  public TypedProperties parse()
-  {
+  public TypedProperties parse() {
     String src = configurationSource;
     if (src != null) src = src.trim();
     if ((src == null) || src.isEmpty()) src = DEFAULT_CONFIG_SOURCE;
@@ -79,32 +76,27 @@ class JPPFConfigurationParser
    * @param src defines how the configuration is to be located.
    * @return the config as a {@link TypedProperties} object.
    */
-  private TypedProperties parseFromSource(final String src)
-  {
+  private TypedProperties parseFromSource(final String src) {
     TypedProperties config = new TypedProperties();
     int idx = src.indexOf('|');
     if (idx <= 0) return config;
     String type = src.substring(0, idx).trim();
-    String path = src.substring(idx+1).trim();
+    String path = src.substring(idx + 1).trim();
     InputStream is = null;
     Reader reader = null;
-    try
-    {
+    try {
       if ("classpath".equalsIgnoreCase(type)) is = getClass().getClassLoader().getResourceAsStream(path);
       else if ("url".equalsIgnoreCase(type)) is = new URL(path).openStream();
       else if ("file".equalsIgnoreCase(type)) is = new BufferedInputStream(new FileInputStream(path));
       else if ("plugin".equalsIgnoreCase(type)) reader = JPPFConfiguration.getConfigurationSourceReader(path);
-      else throw new IllegalArgumentException("wrong type '"  + type + "' for confguration source, should be one of ['classpath', 'url', 'file']");
+      else throw new IllegalArgumentException("wrong type '" + type + "' for confguration source, should be one of ['classpath', 'url', 'file']");
       if ((is == null) && (reader == null)) throw new IllegalArgumentException("configuration source '" + src + "' does not point to a valid JPPF configuration");
-      if (is != null) config.load(is);
-      else if (reader != null) config.load(reader);
-    }
-    catch (Exception e)
-    {
+      if (is != null) reader = new InputStreamReader(is);
+      if (reader != null) config.loadAndResolve(reader);
+      log.info("read configuration from source '{}': {}", src, config);
+    } catch (Exception e) {
       log.error("Error while initializing the JPPF client configuration", e);
-    }
-    finally
-    {
+    } finally {
       if (is != null) StreamUtils.closeSilent(is);
     }
     return config;

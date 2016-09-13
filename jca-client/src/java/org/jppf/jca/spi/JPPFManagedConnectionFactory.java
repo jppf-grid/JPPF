@@ -32,13 +32,11 @@ import org.jppf.jca.work.JcaJobManager;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-
 /**
  * Implementation of the ManagedConnectionFactory interface.
  * @author Laurent Cohen
  */
-public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory
-{
+public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory {
   /**
    * Explicit serialVersionUID.
    */
@@ -65,29 +63,25 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   /**
    * Default constructor.
    */
-  public JPPFManagedConnectionFactory()
-  {
+  public JPPFManagedConnectionFactory() {
     if (debugEnabled) log.debug("instatiating JPPFManagedConnectionFactory");
   }
 
   @Override
-  public Object createConnectionFactory() throws ResourceException
-  {
+  public Object createConnectionFactory() throws ResourceException {
     if (debugEnabled) log.debug("creating connection factory with default connection manager");
     return createConnectionFactory(new JPPFConnectionManager());
   }
 
   @Override
-  public Object createConnectionFactory(final ConnectionManager manager) throws ResourceException
-  {
+  public Object createConnectionFactory(final ConnectionManager manager) throws ResourceException {
     if (debugEnabled) log.debug("creating connection factory with connection manager");
     JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
     return jcf;
   }
 
   @Override
-  public ManagedConnection createManagedConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
-  {
+  public ManagedConnection createManagedConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException {
     if (debugEnabled) log.debug("creating managed connection");
     JPPFManagedConnection conn = new JPPFManagedConnection(this);
     if (conn.retrieveJppfClient() == null) conn.assignJppfClient(jppfClient);
@@ -95,21 +89,18 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   }
 
   @Override
-  public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
-  {
+  public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri) throws ResourceException {
     if (!set.isEmpty()) return (ManagedConnection) set.iterator().next();
     return null;
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     return super.equals(obj);
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return super.hashCode();
   }
 
@@ -117,8 +108,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    * Get the property which defines how the configuration is to be located.
    * @return the property as a string.
    */
-  public String getConfigurationSource()
-  {
+  public String getConfigurationSource() {
     return configurationSource;
   }
 
@@ -126,11 +116,11 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    * Set the property which defines how the configuration is to be located.
    * @param configurationSource the property as a string.
    */
-  public void setConfigurationSource(final String configurationSource)
-  {
+  public void setConfigurationSource(final String configurationSource) {
     this.configurationSource = configurationSource;
     log.info("Starting JPPF managed connection factory");
     TypedProperties config = new JPPFConfigurationParser(configurationSource).parse();
+    syncConfig(config);
     if (debugEnabled) log.debug("Initializing JPPF client with config=" + config);
     jppfClient = new JPPFClient(null, config, (ConnectionPoolListener[]) null) {
       @Override
@@ -145,21 +135,33 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
       }
 
       @Override
-      protected String getSerializationHelperClassName(){
+      protected String getSerializationHelperClassName() {
         return AbstractJPPFClient.JCA_SERIALIZATION_HELPER;
       }
     };
     if (debugEnabled) log.debug("Starting JPPF resource adapter: jppf client=" + jppfClient);
-    log.info("JPPF connection factory started");
+    log.info("JPPF managed connection factory started");
   }
 
   /**
    * Reset the JPPF client.
    */
-  void resetClient()
-  {
+  void resetClient() {
     if (jppfClient == null) return;
     TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
+    syncConfig(config);
     ((JPPFClient) jppfClient).reset(config);
+  }
+
+  /**
+   * Synchronize the global JPPF config with the one read from the source specfied in the ra.xml.
+   * @param config the config to synch with.
+   */
+  private void syncConfig(final TypedProperties config) {
+    TypedProperties globalConfig = JPPFConfiguration.getProperties();
+    if (config != globalConfig) {
+      globalConfig.clear();
+      globalConfig.putAll(config);
+    }
   }
 }
