@@ -25,6 +25,8 @@ import org.jppf.client.monitoring.jobs.JobMonitor;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.monitoring.ConsoleLauncher;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to launch the JPPF admininstration console
@@ -34,11 +36,31 @@ import org.jppf.ui.monitoring.data.StatsHandler;
  */
 public class JPPFAdminConsole {
   /**
+   * Logger for this class.
+   */
+  static final Logger log = LoggerFactory.getLogger(JPPFAdminConsole.class);
+  /**
+   * Whether the charts library is present in the classpath.
+   * @exclude.
+   */
+  public static final boolean HAS_CHARTS = checkChartsPresent();
+  /**
+   * Path to the UI descriptor file when running with charts.
+   * @exclude.
+   */
+  public static final String CONSOLE_WITH_CHARTS = "org/jppf/ui/options/xml/JPPFAdminTool.xml";
+  /**
+   * Path to the UI descriptor file when running with charts.
+   * @exclude.
+   */
+  public static final String CONSOLE_WITHOUT_CHARTS = "org/jppf/ui/options/xml/JPPFAdminToolNoCharts.xml";
+
+  /**
    * Launch the JPPF administration console.
    * @param args the command-line arguments are not used.
    */
   public static void main(final String[] args) {
-    ConsoleLauncher.main("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file");
+    ConsoleLauncher.main(HAS_CHARTS ? CONSOLE_WITH_CHARTS : CONSOLE_WITHOUT_CHARTS, "file");
   }
 
   /**
@@ -78,5 +100,19 @@ public class JPPFAdminConsole {
   public static JobMonitor getJobMonitor() {
     StatsHandler handler = StatsHandler.getInstance();
     return (handler == null) ? null : handler.getJobMonitor();
+  }
+
+  /**
+   * Determines whether the charts library can be found in the class path.
+   * @return true if the charts library is found, false ortherwise.
+   */
+  private static boolean checkChartsPresent() {
+    try {
+      Class.forName("org.jfree.chart.JFreeChart", true, ReflectionHelper.getCurrentClassLoader());
+      return true;
+    } catch(Exception|LinkageError e) {
+      log.info("The charts library coud not be found in the classpath, starting the console without charts [error message: {}]", ExceptionUtils.getMessage(e));
+      return false;
+    }
   }
 }

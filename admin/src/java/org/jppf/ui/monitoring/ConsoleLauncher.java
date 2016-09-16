@@ -22,6 +22,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.jppf.ui.console.JPPFAdminConsole;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.docking.DockingManager;
@@ -115,7 +116,7 @@ public class ConsoleLauncher {
    */
   public static JComponent loadAdminConsole() {
     embedded = true;
-    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false, -1);
+    return loadUI(JPPFAdminConsole.HAS_CHARTS ? JPPFAdminConsole.CONSOLE_WITH_CHARTS : JPPFAdminConsole.CONSOLE_WITHOUT_CHARTS, "file", false, -1);
   }
 
   /**
@@ -138,7 +139,7 @@ public class ConsoleLauncher {
         consoleComponent = null;
       }
     }
-    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", !embedded, idx);
+    return loadUI(JPPFAdminConsole.HAS_CHARTS ? JPPFAdminConsole.CONSOLE_WITH_CHARTS : JPPFAdminConsole.CONSOLE_WITHOUT_CHARTS, "file", !embedded, idx);
   }
 
   /**

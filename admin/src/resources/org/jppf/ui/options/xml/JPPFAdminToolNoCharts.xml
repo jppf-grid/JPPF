@@ -1,62 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	JPPF.
-	 Copyright (C) 2005-2016 JPPF Team. 
-	http://www.jppf.org
+  JPPF.
+   Copyright (C) 2005-2016 JPPF Team. 
+  http://www.jppf.org
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-		 http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 
+<!--
+  Root XML descriptor for the JPPF administration console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
-	<property name="label" value="JPPF Monitoring and Administration Tool"/>
-	<property name="layoutConstraints" value="flowy, fill"/>
-	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
-	<initializer type="script">
-		<script language="groovy" source="org/jppf/ui/options/xml/jppfAdminTool.groovy"/>
-	</initializer>
+  <property name="label" value="JPPF Monitoring and Administration Tool"/>
+  <property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+  <initializer type="script">
+    <script language="groovy">
+      StatsHandler.getInstance()
+      def adminPanels = OptionsHandler.findOptionWithName(option,"/AdminPanels")
+      if (adminPanels != null) adminPanels.getUIComponent().setSelectedIndex(0)
+    </script>
+  </initializer>
+  <finalizer type="script">
+    <script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences());</script>
+  </finalizer>
 
-	<!-- ===================================================================== -->
-	<!--                    Server Chooser Panel                               -->
-	<!-- ===================================================================== -->
-	
-	<child name="Tabs" type="page">
-		<property name="tooltip" value="The list of drivers to connect to"/>
+  <!-- Server Chooser Panel -->
+  <import source="file" location="org/jppf/ui/options/xml/ServerChooser.xml" pluggableView="ServerChooser"/>
 
-		<child name="ServerChooser" type="ComboBox">
-			<property name="label" value="Server connection"/>
-			<property name="tooltip" value="The list of drivers to connect to"/>
-			<property name="value" value=""/>
-			<initializer type="script">
-				<script language="groovy">StatsHandler.getInstance().getClientHandler().setServerListOption(option)</script>
-			</initializer>
-			<listener type="script">
-				<script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentConnection(option.getValue())</script>
-			</listener>
-		</child>
-	
-		<child name="filler" type="page">
-			<property name="componentConstraints" value="growx, pushx"/>
-		</child>
+  <!-- Settings import / export -->
+  <!-- <import source="file" location="org/jppf/ui/options/xml/SettingActions.xml" pluggableView="Settings"/> -->
 
-	</child>
+  <!-- Main tabbed pane -->
+  <import source="file" location="org/jppf/ui/options/xml/MainTabbedPaneNoCharts.xml" pluggableView="Main"/>
 
-	<child name="AdminPanels" type="TabbedPane">
-		<property name="componentConstraints" value="grow"/>
-		<property name="layoutConstraints" value="fill"/>
-		<property name="tooltip" value="Perform the remote administration of the server"/>
-		<import source="plugin" location="jppf-plugins/jppf-ui-nocharts-plugin"/>
-	</child>
-
-	<import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml"/>
+  <!-- Status bar -->
+  <import source="file" location="org/jppf/ui/options/xml/StatusBar.xml" pluggableView="StatusBar"/>
 
 </opt:main>
