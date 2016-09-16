@@ -18,6 +18,8 @@
 
 package org.jppf.ui.treetable;
 
+import java.util.Locale;
+
 import javax.swing.tree.*;
 
 import org.jppf.utils.LocalizationUtils;
@@ -35,14 +37,28 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   /**
    * Base name for localization bundle lookups.
    */
-  protected String BASE = null;
+  protected transient String BASE = null;
+  /**
+   * The locale used to translate coumn headers and cell values.
+   */
+  protected transient Locale locale;
 
   /**
    * Initialize this model with the specified tree root.
    * @param root the root of the tree.
    */
   public AbstractJPPFTreeTableModel(final TreeNode root) {
+    this(root, Locale.getDefault());
+  }
+
+  /**
+   * Initialize this model with the specified tree root.
+   * @param root the root of the tree.
+   * @param locale the locale used to translate coumn headers and cell values.
+   */
+  public AbstractJPPFTreeTableModel(final TreeNode root, final Locale locale) {
     super(root);
+    this.locale = locale;
   }
 
   /**
@@ -89,7 +105,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    */
   @Override
   public int getChildCount(final Object parent) {
-    return ((TreeNode) parent).getChildCount();
+    return (parent == null) ? 0 : ((TreeNode) parent).getChildCount();
   }
 
   /**
@@ -140,7 +156,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a message in the current locale, or the default locale if the localization for the current locale is not found.
    */
   protected String localize(final String message) {
-    return LocalizationUtils.getLocalized(BASE, message);
+    return LocalizationUtils.getLocalized(BASE, message, locale);
   }
 
   @Override

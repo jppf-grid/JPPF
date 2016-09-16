@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.node;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.tree.*;
 
@@ -33,31 +34,31 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Column number for the node's url.
    */
-  static final int NODE_URL = 0;
+  public static final int NODE_URL = 0;
   /**
    * Column number for the node's thread pool size.
    */
-  static final int NODE_THREADS = 1;
+  public static final int NODE_THREADS = 1;
   /**
    * Column number for the node's last event.
    */
-  static final int NODE_STATUS = 2;
+  public static final int NODE_STATUS = 2;
   /**
    * Column number for the node's last event.
    */
-  static final int EXECUTION_STATUS = 3;
+  public static final int EXECUTION_STATUS = 3;
   /**
    * Column number for the node's number of tasks executed.
    */
-  static final int NB_TASKS = 4;
+  public static final int NB_TASKS = 4;
   /**
    * Column number for the node's number of provisioned slaves.
    */
-  static final int NB_SLAVES = 5;
+  public static final int NB_SLAVES = 5;
   /**
    * Column number for the node's number of provisioned slaves.
    */
-  static final int PENDING_ACTION = 6;
+  public static final int PENDING_ACTION = 6;
   /**
    *
    */
@@ -69,6 +70,16 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public NodeTreeTableModel(final TreeNode node) {
     super(node);
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
+  }
+
+  /**
+   * Initialize this model with the specified tree.
+   * @param node the root of the tree.
+   * @param locale the locale used to translate coumn headers and cell values.
+   */
+  public NodeTreeTableModel(final TreeNode node, final Locale locale) {
+    super(node, locale);
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
 
@@ -94,12 +105,13 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
+      Object userObject = defNode.getUserObject();
+      if (userObject instanceof AbstractTopologyComponent) {
         AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
         JPPFManagementInfo mgtInfo = info.getManagementInfo();
         boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
         if (info.isDriver()) {
-          return (column > 0) ? res : info.toString();
+          return (column > 0) ? res : info.getDisplayName();
         }
         JPPFNodeState state = ((TopologyNode) info).getNodeState();
         if (state == null) return res;
@@ -115,10 +127,10 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case NODE_STATUS:
-            if (isNode) res = state.getConnectionStatus();
+            if (isNode) res = state.getConnectionStatus().toString();
             break;
           case EXECUTION_STATUS:
-            if (isNode) res = state.getExecutionStatus();
+            if (isNode) res = state.getExecutionStatus().toString();
             break;
           case NB_TASKS:
             if (isNode) res = nf.format(state.getNbTasksExecuted());
@@ -132,18 +144,18 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case PENDING_ACTION:
-            if (isNode) res = ((TopologyNode) info).getPendingAction();
+            if (isNode) res = ((TopologyNode) info).getPendingAction().toString();
             break;
         }
       } else {
-        if (column == 0) res = defNode.getUserObject().toString();
+        if (column == 0) res = userObject.toString();
       }
     }
     return res;
   }
 
   @Override
-  protected String getBaseColumnName(final int column) {
+  public String getBaseColumnName(final int column) {
     switch (column) {
       case NODE_URL:
         return "column.node.url";

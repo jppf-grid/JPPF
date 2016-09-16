@@ -23,7 +23,9 @@ import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.treetable.AbstractTreeCellRenderer;
+import org.jppf.ui.treetable.*;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 
 /**
@@ -31,6 +33,15 @@ import org.jppf.ui.treetable.AbstractTreeCellRenderer;
  * @author Laurent Cohen
  */
 public final class TreeTableUtils {
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(TreeTableUtils.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * Find the position at which to insert a driver, using the sorted lexical order of driver names.
    * @param parent the parent tree node for the driver to insert.
@@ -91,5 +102,103 @@ public final class TreeTableUtils {
   public static String getNodeIconPath(final JPPFManagementInfo info) {
     if (info.isMasterNode()) return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_MASTER_DOTNET_ICON : AbstractTreeCellRenderer.NODE_MASTER_ICON;
     return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_DOTNET_ICON : AbstractTreeCellRenderer.NODE_ICON;
+  }
+
+  /**
+   * Add the specified driver to the treeTable.
+   * @param model the tree table model.
+   * @param driver the driver to add.
+   * @return the newly created {@link DefaultMutableTreeNode}, if any.
+   */
+  public static synchronized DefaultMutableTreeNode addDriver(final AbstractJPPFTreeTableModel model, final TopologyDriver driver) {
+    DefaultMutableTreeNode driverNode = null;
+    if (!driver.getConnection().getStatus().isWorkingStatus()) return null;
+    String uuid = driver.getUuid();
+    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
+    if (driverNode == null) {
+      int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
+      if (index >= 0) {
+        driverNode = new DefaultMutableTreeNode(driver);
+        if (debugEnabled) log.debug("adding driver: " + driver + " at index " + index);
+        model.insertNodeInto(driverNode, treeTableRoot, index);
+      }
+    }
+    return driverNode;
+  }
+
+  /**
+   * Remove the specified driver from the treeTable.
+   * @param model the tree table model.
+   * @param driverData the driver to add.
+   */
+  public static synchronized void removeDriver(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData) {
+    if (debugEnabled) log.debug("removing driver: " + driverData);
+    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    String uuid = driverData.getUuid();
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
+    if (driverNode == null) return;
+    model.removeNodeFromParent(driverNode);
+  }
+
+  /**
+   * Update the specified node.
+   * @param model the tree table model.
+   * @param driverData the driver to add to.
+   * @param nodeData the node to add.
+   */
+  public static synchronized void updateNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
+    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
+    if ((driverNode != null) && (nodeData != null)) {
+      final DefaultMutableTreeNode node = TreeTableUtils.findComponent(driverNode, nodeData.getUuid());
+      if (node != null) model.changeNode(node);
+    }
+  }
+
+  /**
+   * Add the specified node to the specified driver in the treeTable.
+   * @param model the tree table model.
+   * @param driverData the driver to add to.
+   * @param nodeData the node to add.
+   * @return the newly created {@link DefaultMutableTreeNode}, if any.
+   */
+  public static synchronized DefaultMutableTreeNode addNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
+    if ((driverData == null) || (nodeData == null)) return null;
+    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
+    if (driverNode == null) return null;
+    String nodeUuid = nodeData.getUuid();
+    if (TreeTableUtils.findComponent(driverNode, nodeUuid) != null) return null;
+    if (debugEnabled) log.debug("attempting to add node={} to driver={}", nodeData, driverData);
+    int index = TreeTableUtils.insertIndex(driverNode, nodeData);
+    if (index < 0) return null;
+    if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
+    DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
+    model.insertNodeInto(nodeNode, driverNode, index);
+    /*
+    if ((driverNode.getChildCount() == 1) && !driverData.isCollapsed()) treeTable.expand(driverNode);
+    */
+    return nodeNode;
+  }
+
+  /**
+   * Remove the specified node from the specified driver in the treeTable.
+   * @param model the tree table model.
+   * @param driverData the driver to add to.
+   * @param nodeData the node to add.
+   */
+  public static synchronized void removeNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
+    if ((driverData == null) || (nodeData == null)) return;
+    if (debugEnabled) log.debug("attempting to remove node=" + nodeData + " from driver=" + driverData);
+    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    DefaultMutableTreeNode driver = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
+    if (driver == null) return;
+    String nodeUuid = nodeData.getUuid();
+    final DefaultMutableTreeNode node = TreeTableUtils.findComponent(driver, nodeUuid);
+    if (node != null) {
+      if (debugEnabled) log.debug("removing node: " + nodeData);
+      model.removeNodeFromParent(node);
+    }
   }
 }

@@ -56,6 +56,8 @@
  */
 package org.jppf.ui.treetable;
 
+import java.io.Serializable;
+
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 
@@ -70,7 +72,7 @@ import org.slf4j.*;
  * @author Philip Milne
  */
 
-public abstract class AbstractTreeTableModel implements TreeTableModel {
+public abstract class AbstractTreeTableModel implements TreeTableModel, Serializable {
   /**
    * Logger for this class.
    */
@@ -82,7 +84,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
   /**
    * The tree root.
    */
-  protected Object root;
+  protected transient Object root;
 
   /**
    * The list of event listeners for this tree table model.
