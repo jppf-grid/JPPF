@@ -447,7 +447,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
    */
   synchronized NotificationBuffer getNotifBuffer() {
     //Notification buffer is lazily created when the first client connects
-    if (notifBuffer == null) notifBuffer = ArrayNotificationBuffer.getNotificationBuffer(getMBeanServer(), env);
+    if (notifBuffer == null) notifBuffer = ArrayNotificationBufferAux.getNotificationBuffer(getMBeanServer(), env);
     return notifBuffer;
   }
 }

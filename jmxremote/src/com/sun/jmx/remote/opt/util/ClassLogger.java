@@ -66,7 +66,7 @@ package com.sun.jmx.remote.opt.util;
 import java.util.logging.*;
 
 /**
- * 
+ *
  */
 public class ClassLogger {
   /** */
@@ -75,7 +75,7 @@ public class ClassLogger {
   private final Logger logger;
 
   /**
-   * 
+   *
    * @param subsystem .
    * @param className .
    */
@@ -85,7 +85,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean traceOn() {
@@ -93,7 +93,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean debugOn() {
@@ -101,7 +101,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean warningOn() {
@@ -109,7 +109,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean infoOn() {
@@ -117,7 +117,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean configOn() {
@@ -125,7 +125,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean fineOn() {
@@ -133,7 +133,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean finerOn() {
@@ -141,7 +141,7 @@ public class ClassLogger {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   public final boolean finestOn() {
@@ -149,282 +149,345 @@ public class ClassLogger {
   }
 
   /**
-   * 
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void debug(final String func, final String msg, final Object...params) {
+   finest(func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void debug(final String func, final Throwable t, final Object...params) {
+   finest(func, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void debug(final String func, final String msg, final Throwable t, final Object...params) {
+   finest(func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void trace(final String func, final String msg, final Object...params) {
+   finer(func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void trace(final String func, final Throwable t, final Object...params) {
+   finer(func, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void trace(final String func, final String msg, final Throwable t, final Object...params) {
+   finer(func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void error(final String func, final String msg, final Object...params) {
+   severe(func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void error(final String func, final Throwable t, final Object...params) {
+   severe(func, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void error(final String func, final String msg, final Throwable t, final Object...params) {
+   severe(func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void finest(final String func, final String msg, final Object...params) {
+   logp(Level.FINEST, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void finest(final String func, final Throwable t, final Object...params) {
+   logp(Level.FINEST, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void finest(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.FINEST, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void finer(final String func, final String msg, final Object...params) {
+   logp(Level.FINER, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void finer(final String func, final Throwable t, final Object...params) {
+   logp(Level.FINER, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void finer(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.FINER, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void fine(final String func, final String msg, final Object...params) {
+   logp(Level.FINE, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void fine(final String func, final Throwable t, final Object...params) {
+   logp(Level.FINE, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void fine(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.FINE, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void config(final String func, final String msg, final Object...params) {
+   logp(Level.CONFIG, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void config(final String func, final Throwable t, final Object...params) {
+   logp(Level.CONFIG, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void config(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.CONFIG, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void info(final String func, final String msg, final Object...params) {
+   logp(Level.INFO, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void info(final String func, final Throwable t, final Object...params) {
+   logp(Level.INFO, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void info(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.INFO, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void warning(final String func, final String msg, final Object...params) {
+   logp(Level.WARNING, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void warning(final String func, final Throwable t, final Object...params) {
+   logp(Level.WARNING, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void warning(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.WARNING, func, msg, t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param params the message parameters.
+  */
+ public final void severe(final String func, final String msg, final Object...params) {
+   logp(Level.SEVERE, func, msg, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void severe(final String func, final Throwable t, final Object...params) {
+   logp(Level.SEVERE, func, t.toString(), t, params);
+ }
+
+ /**
+  *
+  * @param func .
+  * @param msg .
+  * @param t .
+  * @param params the message parameters.
+  */
+ public final void severe(final String func, final String msg, final Throwable t, final Object...params) {
+   logp(Level.SEVERE, func, msg, t, params);
+ }
+
+  /**
+   *
+   * @param level .
    * @param func .
-   * @param msg .
+   * @param format .
+   * @param params the message parameters.
    */
-  public final void debug(final String func, final String msg) {
-    finest(func, msg);
+  public void logp(final Level level, final String func, final String format, final Object...params) {
+    logger.logp(level, className, func, getMsg(format, params));
   }
 
   /**
-   * 
+   *
+   * @param level .
    * @param func .
+   * @param format .
    * @param t .
+   * @param params the message parameters.
    */
-  public final void debug(final String func, final Throwable t) {
-    finest(func, t);
+  public void logp(final Level level, final String func, final String format, final Throwable t, final Object...params) {
+    logger.logp(level, className, func, getMsg(format, params), t);
   }
 
   /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
+   * Get a formatted message.
+   * @param format the format.
+   * @param params the format parameters, if any.
+   * @return the formatted message.
    */
-  public final void debug(final String func, final String msg, final Throwable t) {
-    finest(func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void trace(final String func, final String msg) {
-    finer(func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void trace(final String func, final Throwable t) {
-    finer(func, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void trace(final String func, final String msg, final Throwable t) {
-    finer(func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void error(final String func, final String msg) {
-    severe(func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void error(final String func, final Throwable t) {
-    severe(func, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void error(final String func, final String msg, final Throwable t) {
-    severe(func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void finest(final String func, final String msg) {
-    logger.logp(Level.FINEST, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void finest(final String func, final Throwable t) {
-    logger.logp(Level.FINEST, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void finest(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.FINEST, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void finer(final String func, final String msg) {
-    logger.logp(Level.FINER, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void finer(final String func, final Throwable t) {
-    logger.logp(Level.FINER, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void finer(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.FINER, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void fine(final String func, final String msg) {
-    logger.logp(Level.FINE, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void fine(final String func, final Throwable t) {
-    logger.logp(Level.FINE, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void fine(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.FINE, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void config(final String func, final String msg) {
-    logger.logp(Level.CONFIG, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void config(final String func, final Throwable t) {
-    logger.logp(Level.CONFIG, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void config(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.CONFIG, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void info(final String func, final String msg) {
-    logger.logp(Level.INFO, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void info(final String func, final Throwable t) {
-    logger.logp(Level.INFO, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void info(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.INFO, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void warning(final String func, final String msg) {
-    logger.logp(Level.WARNING, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void warning(final String func, final Throwable t) {
-    logger.logp(Level.WARNING, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void warning(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.WARNING, className, func, msg, t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   */
-  public final void severe(final String func, final String msg) {
-    logger.logp(Level.SEVERE, className, func, msg);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param t .
-   */
-  public final void severe(final String func, final Throwable t) {
-    logger.logp(Level.SEVERE, className, func, t.toString(), t);
-  }
-
-  /**
-   * 
-   * @param func .
-   * @param msg .
-   * @param t .
-   */
-  public final void severe(final String func, final String msg, final Throwable t) {
-    logger.logp(Level.SEVERE, className, func, msg, t);
+  private String getMsg(final String format, final Object...params) {
+    return ((params == null) || (params.length <= 0)) ? format : String.format(format, params);
   }
 }

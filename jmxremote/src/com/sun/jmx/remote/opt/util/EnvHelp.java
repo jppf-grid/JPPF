@@ -108,7 +108,6 @@ public class EnvHelp {
    * Name of the attribute that specifies the timeout to keep a server side connection after answering last client request. The default value is 120000 milliseconds.
    */
   public static final String SERVER_CONNECTION_TIMEOUT = "jmx.remote.x.server.connection.timeout";
-
   /**
    * Default list of attributes not to show. This list is copied directly from the spec, plus {@code java.naming.security.*}.
    * Most of the attributes here would have been eliminated from the map anyway because they are typically not serializable.

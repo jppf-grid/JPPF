@@ -64,18 +64,48 @@
 
 package com.sun.jmx.remote.opt.internal;
 
-import java.util.Set;
+import java.util.*;
 
 import javax.management.*;
 import javax.management.remote.NotificationResult;
 
-import com.sun.jmx.remote.opt.util.ClassLogger;
+import com.sun.jmx.remote.opt.util.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
-class ArrayNotificationBufferAux {
+public class ArrayNotificationBufferAux {
+  /** */
+  static final ClassLogger logger = new ClassLogger("com.sun.jmx.remote.opt.internal", "ArrayNotificationBufferAux");
+  /** */
+  static final String broadcasterClass = NotificationBroadcaster.class.getName();
+  /** */
+  static final QueryExp broadcasterQuery = new ArrayNotificationBufferAux.BroadcasterQuery();
+  /** */
+  static final NotificationFilter creationFilter;
+  /** */
+  static final ObjectName delegateName;
+  // FACTORY STUFF, INCLUDING SHARING
+  /** */
+  private static final HashMap<MBeanServer,ArrayNotificationBuffer> mbsToBuffer = new HashMap<>(1);
+  static {
+    NotificationFilterSupport nfs = new NotificationFilterSupport();
+    nfs.enableType(MBeanServerNotification.REGISTRATION_NOTIFICATION);
+    creationFilter = nfs;
+  }
+  static {
+    try {
+      delegateName = ObjectName.getInstance("JMImplementation:" + "type=MBeanServerDelegate");
+    } catch (MalformedObjectNameException e) {
+      RuntimeException re = new RuntimeException("Can't create delegate name: " + e);
+      EnvHelp.initCause(re, e);
+      logger.error("<init>", "Can't create delegate name: " + e);
+      logger.debug("<init>", e);
+      throw re;
+    }
+  }
+
 
   /**
    */
@@ -183,8 +213,29 @@ class ArrayNotificationBufferAux {
     @Override
     public boolean apply(final ObjectName name) {
       final MBeanServer mbs = QueryEval.getMBeanServer();
-      return ArrayNotificationBuffer.isInstanceOf(mbs, name, ArrayNotificationBuffer.broadcasterClass);
+      return NotificationUtils.isInstanceOf(mbs, name, broadcasterClass);
     }
   }
 
+  /**
+   * @param mbs .
+   * @param env .
+   * @return .
+   */
+  public static synchronized NotificationBuffer getNotificationBuffer(final MBeanServer mbs, final Map<String, ?> env) {
+    int queueSize = EnvHelp.getNotifBufferSize(env); //Find out queue size
+    ArrayNotificationBuffer buf = mbsToBuffer.get(mbs);
+    if (buf == null) {
+      buf = new ArrayNotificationBuffer(mbs, queueSize, env);
+      mbsToBuffer.put(mbs, buf);
+    }
+    return new ArrayNotificationBufferAux.ShareBuffer(buf, queueSize);
+  }
+
+  /**
+   * @param mbs .
+   */
+  public static synchronized void removeNotificationBuffer(final MBeanServer mbs) {
+    mbsToBuffer.remove(mbs);
+  }
 }

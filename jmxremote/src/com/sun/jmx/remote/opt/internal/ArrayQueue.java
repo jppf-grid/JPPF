@@ -135,21 +135,30 @@ public class ArrayQueue<E> extends AbstractList<E> {
 
   @Override
   public E remove(final int i) {
-    if (i != 0) throw new IllegalArgumentException("Can only remove head of queue");
+    //if (i != 0) throw new IllegalArgumentException("Can only remove head of queue");
     if (head == tail) throw new IndexOutOfBoundsException("Queue empty");
     E removed = queue[head];
-    queue[head] = null;
-    head = (head + 1) % capacity;
+    if (i != 0) {
+      if (i > tail) throw new IndexOutOfBoundsException(String.format("Queue empty, index=%d, queue size=%d", i, tail));
+      if (i == tail) {
+        tail--;
+        queue[i] = null;
+      } else {
+        int n = size();
+        queue[i] = null;
+        System.arraycopy(queue, i+1, queue, i, n - (i + 1));
+      }
+    } else {
+      queue[head] = null;
+      head = (head + 1) % capacity;
+    }
     return removed;
   }
 
   @Override
   public E get(final int i) {
     int size = size();
-    if (i < 0 || i >= size) {
-      final String msg = "Index " + i + ", queue size " + size;
-      throw new IndexOutOfBoundsException(msg);
-    }
+    if ((i < 0) || (i >= size)) throw new IndexOutOfBoundsException(String.format("Index %d, queue size %d", i, size));
     int index = (head + i) % capacity;
     return queue[index];
   }
