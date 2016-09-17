@@ -23,8 +23,7 @@ import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.ajax.*;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
 import org.apache.wicket.extensions.markup.html.repeater.tree.table.*;
@@ -88,12 +87,7 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
       session.setTopologySelectionHandler(selectionHandler);
     }
     Form<String> form = new Form<>("topology.tree.toolbar");
-    form.add(new AjaxLink<String>("topology.info", Model.of("Info")) {
-      @Override
-      public void onClick(final AjaxRequestTarget target) {
-        if (debugEnabled) log.debug("clicked on info!");
-      }
-    });
+    form.add(new SystemInfoLink());
     form.add(new ExpandAllLink());
     form.add(new CollapseAllLink());
     form.add(new SelectDriversLink());

@@ -439,17 +439,26 @@ th {
 
 .button_link {
   margin: 0px;
-  padding: 0px;
-  padding-right: 1px;
+  padding: 4px;
   vertical-align: middle;
+  border: 1px solid #6D78B6;
+  border-radius: 2px;
+  box-shadow: -1px -1px 2px #A5B0D0 inset;
 }
 
 a.button_link:hover {
-  padding-right: 0px;
+  box-shadow: inset 2px 2px 2px #888;
 }
 
 img {
   border: none;
   padding: 0px;
   margin: 0px;
+  vertical-align: middle;
+}
+
+.jppf_toolbar {
+  margin: 0;
+  padding: 10px;
+  vertical-align: middle;
 }

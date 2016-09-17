@@ -38,8 +38,8 @@ public class NodeContent extends Panel {
   public NodeContent(final String id, final DefaultMutableTreeNode treeNode, final TreeNodeRenderer renderer) {
     super(id);
     String iconPath = renderer.getIconPath(treeNode);
-    if (iconPath != null) add(new ContextImage("icon", iconPath));
+    add(new ContextImage("icon", (iconPath != null) ? iconPath : ""));
     String text = renderer.getText(treeNode);
-    if (text != null) add(new Label("text", text));
+    add(new Label("text", (text != null) ? text : ""));
   }
 }
