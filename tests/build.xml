@@ -44,6 +44,7 @@
   <property name="samples-pack"       value="${basedir}/../samples-pack"/>
 
   <property file="${jppf}/bin/build.properties"/>
+  <property file="${basedir}/../jmxremote/build.properties"/>
   <property file="${jppf}/bin/build.number"/>
 
   <!-- ========================================================================= -->
@@ -65,7 +66,7 @@
     <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
     <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
     <pathelement location="${lib}/JUnit/junit-4.10.jar"/>
-    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
+    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-${jmx.version.number}.jar"/>
     <pathelement location="${samples-pack}/KryoSerializer/classes"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-2.22-all.jar"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
