@@ -37,7 +37,7 @@ public class StatusReportGenerator {
    * <li>{@code args[0]} is the path to {@code .jenkins}</li>
    * <li>{@code args[1]} is a comma-separated list of project names, e.g. "JPPF trunk, JPPF 5.2" (including the quotes)</li>
    * <li>{@code args[2]} is the path to the output file</li>
-   * <li>{@code args[3]} is the path to tempalte file where the generated html is to be inserted</li>
+   * <li>{@code args[3]} is the path to template file where the generated html is to be inserted</li>
    * </ul>
    */
   public static void main(final String[] args) {
