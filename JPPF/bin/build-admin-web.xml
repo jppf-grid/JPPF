@@ -48,7 +48,7 @@
       </fileset>
       <fileset dir="${lib}/jmxremote" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       <fileset dir="${lib}/log4j" includes="*.jar"/>
-      <fileset dir="${lib}/lz4" includes="*.jar"/>
+      <fileset dir="${lib}/LZ4" includes="*.jar"/>
       <fileset dir="${lib}/slf4j" includes="slf4-api-*.jar, slf4-log4j12-*.jar"/>
     </copy>
     <copy todir="${admin-web}/lib" overwrite="true">
