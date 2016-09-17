@@ -25,6 +25,7 @@
   <!-- JPPF modules -->
   <property name="common"                value="${basedir}/../common"/>
   <property name="admin"                 value="${basedir}/../admin"/>
+  <property name="admin-web"             value="${basedir}/../admin-web"/>
   <property name="client"                value="${basedir}/../client"/>
   <property name="node"                  value="${basedir}/../node"/>
   <property name="node-android"          value="${basedir}/../node-android"/>
@@ -112,7 +113,7 @@
     <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
   </target>               
 
-  <target name="clean.deploy" description="clean.deploy">
+  <target name="clean.deploy">
     <echo message="app.ver = ${app.ver}"/>
     <delete quiet="true">
       <fileset dir="${build}">
@@ -199,7 +200,7 @@
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
+  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
     description="deploy without building the javadoc nor the installer"/>
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
@@ -208,6 +209,7 @@
   <import file="build-modules.xml"/>
   <import file="build-samples.xml"/>
   <import file="build-connectors.xml"/>
+  <import file="build-admin-web.xml"/>
   <import file="build-installer.xml"/>
   <import file="build-findbugs.xml"/>
   <import file="build-docs.xml"/>
@@ -221,7 +223,7 @@
   <!--              Package the all-in-one zip distribution                      -->
   <!-- ========================================================================= -->
 
-  <target name="all.zips" depends="" description="">
+  <target name="all.zips" depends="">
     <property name="all.zip.file" value="${build}/${app.ver}-all.zip"/>
     <delete file="${all.zip.file}" quiet="true"/>
     <zip destfile="${all.zip.file}" basedir="${build}" includes="${app.ver}-*.zip"/>

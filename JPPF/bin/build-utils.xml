@@ -24,6 +24,9 @@
   
   <target name="jmxremote" depends="" description="">
     <ant antfile="${jmxremote}/build.xml" target="build"/>
+    <delete quiet="true">
+      <fileset dir="${basedir}/lib/jmxremote" includes="*.jar"/>
+    </delete>
     <copy toDir="${basedir}/lib/jmxremote">
       <fileset dir="${jmxremote}/build" includes="*.jar"/>
     </copy>
@@ -33,7 +36,7 @@
   <!-- Build a separate and self-contained jar with common JPPF utility classes  -->
   <!-- ========================================================================= -->
 
-  <target name="utils" depends="build" description="">
+  <target name="utils" depends="build">
     <jar destfile="${build}/jppf-utils.jar">
       <fileset dir="${node}/classes">
         <include name="org/jppf/utils/ExceptionUtils.class"/>

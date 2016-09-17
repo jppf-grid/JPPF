@@ -1,0 +1,61 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2016 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-connectors" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--             Package the j2ee connector for deployment                     -->
+  <!-- ========================================================================= -->
+
+  <target name="admin.web" depends="build, admin.web.init" description="build the web admin console">
+    <ant antfile="${admin-web}/build.xml" target="build" inheritall="false"/>
+    <property name="admin-web.prefix" value="${app.ver}-admin-web"/>
+    <property name="admin-web.release.file" value="${build}/${admin-web.prefix}.zip"/>
+    <delete file="${admin-web.release.file}" quiet="true"/>
+    <zip destfile="${admin-web.release.file}">
+      <zipfileset dir="${admin-web}" prefix="${admin-web.prefix}" excludes=".*"/>
+      <zipfileset dir="${build}" prefix="${admin-web.prefix}/lib-src">
+        <include name="jppf-common-src-${version.number}.jar"/>
+        <include name="jppf-client-src-${version.number}.jar"/>
+        <include name="jppf-admin-src-${version.number}.jar"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <target name="admin.web.init">
+    <copy todir="${admin-web}/bin" file="${basedir}/CheckStyle_JPPF_config.xml" overwrite="true"/>
+    <delete><fileset dir="${admin-web}/lib" includes="jppf-*.jar"/></delete>
+    <copy todir="${admin-web}/lib" overwrite="true">
+      <fileset dir="${build}">
+        <include name="jppf-common-${version.number}.jar"/>
+        <include name="jppf-client-${version.number}.jar"/>
+        <include name="jppf-admin-${version.number}.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="${admin-web}/lib" overwrite="true">
+      <fileset dir="${lib}/jmxremote" excludes="*-javadoc.jar,*-sources.jar"/>
+    </copy>
+    <copy todir="${admin-web}/bin" overwrite="true">
+      <fileset dir="${bin}">
+        <include name="build.properties"/>
+        <include name="build.number"/>
+      </fileset>
+    </copy>
+  </target>
+
+</project> 

@@ -41,7 +41,7 @@
         <zipfileset dir="${build}/config/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755" erroronmissingarchive="false"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.2.jar"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="slf4j-api-*.jar,slf4j-${slf4j.bindings}-*.jar"/>
