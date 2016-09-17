@@ -33,7 +33,7 @@ public class TopologyNode extends AbstractTopologyComponent {
   /**
    * Object describing the current state of a node.
    */
-  private JPPFNodeState nodeState = null;
+  private transient JPPFNodeState nodeState = null;
   /**
    * The number of slaves for a master node.
    */

@@ -32,11 +32,11 @@ public abstract class AbstractTopologyComponent extends AbstractComponent<Abstra
   /**
    * Object describing the current health snapshot of a node or driver.
    */
-  protected HealthSnapshot healthSnapshot = new HealthSnapshot();
+  protected transient HealthSnapshot healthSnapshot = new HealthSnapshot();
   /**
    * The management informtation on this topology component.
    */
-  protected JPPFManagementInfo managementInfo;
+  protected transient JPPFManagementInfo managementInfo;
 
   /**
    * Initialize this component witht he specified uuid.

@@ -18,6 +18,7 @@
 
 package org.jppf.client.monitoring;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -28,15 +29,15 @@ import java.util.*;
  * @since 5.1
  */
 @SuppressWarnings("rawtypes")
-public abstract class AbstractComponent<E extends AbstractComponent> {
+public abstract class AbstractComponent<E extends AbstractComponent> implements Serializable {
   /**
    * The children of this component.
    */
-  protected final Map<String, E> children = new HashMap<>();
+  protected transient final Map<String, E> children = new HashMap<>();
   /**
    * The parent of this component.
    */
-  protected E parent;
+  protected transient E parent;
   /**
    * The uuid of this component.
    */

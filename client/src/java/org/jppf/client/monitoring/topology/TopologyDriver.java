@@ -39,7 +39,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
   /**
    * A driver connection.
    */
-  private final JPPFClientConnection connection;
+  private transient final JPPFClientConnection connection;
 
   /**
    * Initialize this topology data as a driver related object.

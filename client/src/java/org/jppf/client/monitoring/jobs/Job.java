@@ -31,7 +31,7 @@ public class Job extends AbstractJobComponent {
   /**
    * Information on the job.
    */
-  private JobInformation jobInfo;
+  private transient JobInformation jobInfo;
 
   /**
    * Initialize this job with the supplied information.

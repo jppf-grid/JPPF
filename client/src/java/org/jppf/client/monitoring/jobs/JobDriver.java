@@ -33,7 +33,7 @@ public class JobDriver extends AbstractJobComponent {
   /**
    * The associated driver from the topology monitor.
    */
-  private final TopologyDriver driver;
+  private transient final TopologyDriver driver;
 
   /**
    * Initialize this job driver with the specified topology driver.

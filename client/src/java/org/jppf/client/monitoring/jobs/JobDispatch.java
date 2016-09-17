@@ -30,11 +30,11 @@ public class JobDispatch extends AbstractJobComponent {
   /**
    * Information on the node.
    */
-  private final TopologyNode node;
+  private transient final TopologyNode node;
   /**
    * Information on the job.
    */
-  private final JobInformation jobInfo;
+  private transient final JobInformation jobInfo;
 
   /**
    * Initialize this job with the supplied information.
