@@ -49,10 +49,7 @@
       <fileset dir="${lib}/jmxremote" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       <fileset dir="${lib}/log4j" includes="*.jar"/>
       <fileset dir="${lib}/LZ4" includes="*.jar"/>
-      <fileset dir="${lib}/slf4j" includes="slf4-api-*.jar, slf4-log4j12-*.jar"/>
-    </copy>
-    <copy todir="${admin-web}/lib" overwrite="true">
-      <fileset dir="${lib}/jmxremote" excludes="*-javadoc.jar,*-sources.jar"/>
+      <fileset dir="${lib}/slf4j" includes="slf4j-api-*.jar, slf4j-log4j12-*.jar"/>
     </copy>
     <copy todir="${admin-web}/bin" overwrite="true">
       <fileset dir="${bin}">
