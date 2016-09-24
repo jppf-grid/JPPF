@@ -84,7 +84,7 @@ public class NodeThreadsBundler extends AbstractBundler<NodeThreadsProfile> impl
       // get the number of processing threads in the node
       TypedProperties jppf = getChannelConfiguration().getJppf();
       boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
-      JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+      JPPFProperty<Integer> prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
       int nbThreads = jppf.getInt(prop.getName(), -1);
       if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " nb threads from config = " + nbThreads);
       // if number of threads is not defined, we assume it is the number of available processors
