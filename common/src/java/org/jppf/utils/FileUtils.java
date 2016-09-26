@@ -541,7 +541,7 @@ public final class FileUtils {
       if (base == null) base = ".";
       if (!base.endsWith(File.separator)) base += File.separator;
       base += ".jppf";
-      baseDir = new File(base + File.separator);
+      baseDir = new File(base, File.separator);
       if (!baseDir.exists()) {
         FileUtils.mkdirs(baseDir);
       }
