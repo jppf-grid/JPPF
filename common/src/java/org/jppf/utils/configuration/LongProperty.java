@@ -49,7 +49,7 @@ public class LongProperty extends NumberProperty<Long> {
 
   @Override
   public Long valueOf(final String value) {
-    return validate(Long.valueOf(value));
+    return validate(Double.valueOf(value).longValue());
   }
 
   @Override

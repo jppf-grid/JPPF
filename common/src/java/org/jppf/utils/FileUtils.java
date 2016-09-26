@@ -21,13 +21,24 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
+import org.slf4j.*;
 
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files.
  * @author Laurent Cohen
  */
 public final class FileUtils {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(FileUtils.class);
+  /**
+   * The root folder for JPPF temporary files.
+   */
+  private static final File JPPF_TEMP_DIR = initJPPFTempDir();
+
   /**
    * Instantiation of this class is not permitted.
    */
@@ -228,15 +239,6 @@ public final class FileUtils {
       }
     }
     return filePaths;
-  }
-
-  /**
-   * Get the extension of a file.
-   * @param filePath the file from which to get the extension.
-   * @return the file extension, or null if it si not a file or does not have an extension.
-   */
-  public static String getFileExtension(final String filePath) {
-    return getFileExtension(new File(filePath));
   }
 
   /**
@@ -517,5 +519,36 @@ public final class FileUtils {
     } catch (@SuppressWarnings("unused") MalformedURLException|UnsupportedEncodingException ignore) {
       return null;
     }
+  }
+
+  /**
+   * @return the root folder for JPPF temporary files.
+   */
+  public static File getJPPFTempDir() {
+    return JPPF_TEMP_DIR;
+  }
+
+  /**
+   * @return the root folder for JPPF temporary files.
+   */
+  private static File initJPPFTempDir() {
+    File baseDir = null;
+    String base = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_DIR);
+    try {
+      if (base == null) base = System.getProperty("java.io.tmpdir");
+      if (base == null) base = System.getProperty("user.home");
+      if (base == null) base = System.getProperty("user.dir");
+      if (base == null) base = ".";
+      if (!base.endsWith(File.separator)) base += File.separator;
+      base += ".jppf";
+      baseDir = new File(base + File.separator);
+      if (!baseDir.exists()) {
+        FileUtils.mkdirs(baseDir);
+      }
+      log.info("JPPF temp folder " + base);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return baseDir;
   }
 }

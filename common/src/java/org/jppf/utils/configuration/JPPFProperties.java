@@ -352,6 +352,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> GC_ON_DISK_OVERFLOW = new BooleanProperty("jppf.gc.on.disk.overflow", true);
   /** Minimum heap size in MB below which disk overflow is systematically triggered, to avoid heap fragmentation and ensure there's enough memory to deserialize job headers */
   public static final JPPFProperty<Long> LOW_MEMORY_THRESHOLD = new LongProperty("jppf.low.memory.threshold", 32L);
+  /** Used heap in bytes above which notifications from task are offloaded to file. Defaults to 0.8 * maxHeapSize. */
+  public static final JPPFProperty<String> NOTIFICATION_OFFLOAD_MEMORY_THRESHOLD = new StringProperty("jppf.notification.offload.memory.threshold", "" + (long) (0.8d * Runtime.getRuntime().maxMemory()) + "b" );
   /** Determines the frequency at which the JVM's cpu load is recomputed, in ms */
   public static final JPPFProperty<Long> CPU_LOAD_COMPUTATION_INTERVAL = new LongProperty("jppf.cpu.load.computation.interval", 1000L);
   /** Type of thread pool to use in the node: either 'default' or 'org.jppf.server.node.fj.ThreadManagerForkJoin' */

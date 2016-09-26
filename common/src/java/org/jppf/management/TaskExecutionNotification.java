@@ -24,7 +24,7 @@ import javax.management.*;
  * Notification sent to provide information about a task that was executed in a node.
  * @author Laurent Cohen
  */
-public class TaskExecutionNotification extends Notification {
+public class TaskExecutionNotification extends OffloadableNotification {
   /**
    * Explicit serialVersionUID.
    */
@@ -68,5 +68,15 @@ public class TaskExecutionNotification extends Notification {
    */
   public boolean isUserNotification() {
     return userNotification;
+  }
+
+  @Override
+  public Object getUserData() {
+    return super.getUserData();
+  }
+
+  @Override
+  public void setUserData(final Object userData) {
+    super.setUserData(userData);
   }
 }

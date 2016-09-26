@@ -68,7 +68,7 @@ public final class IOHelper {
   /**
    * Default serilaizer to use when none is specified.
    */
-  private static final ObjectSerializer defaultSerializer = new ObjectSerializerImpl();
+  private static final ObjectSerializer DEFAULT_SERIALIZER = new ObjectSerializerImpl();
 
   /**
    * Instantiation of this class is not permitted.
@@ -133,7 +133,7 @@ public final class IOHelper {
    * @throws Exception if an IO error occurs.
    */
   public static File createTempFile(final int size) throws Exception {
-    File file = File.createTempFile("jppf", ".tmp");
+    File file = File.createTempFile("jppf", ".tmp", FileUtils.getJPPFTempDir());
     if (debugEnabled) log.debug("disk overflow: creating temp file '{}' with size={}", file.getCanonicalPath(), nf.format(size));
     file.deleteOnExit();
     return file;
@@ -199,7 +199,7 @@ public final class IOHelper {
    * @throws Exception if an error occurs while preparing the data.
    */
   public static Object unwrappedData(final DataLocation dl) throws Exception {
-    return unwrappedData(dl, defaultSerializer);
+    return unwrappedData(dl, DEFAULT_SERIALIZER);
   }
 
   /**
@@ -362,5 +362,12 @@ public final class IOHelper {
     }
     else dl = new FileDataLocation(file);
     return dl;
+  }
+
+  /**
+   * @return the default serilaizer to use when none is specified.
+   */
+  public static ObjectSerializer getDefaultserializer() {
+    return DEFAULT_SERIALIZER;
   }
 }

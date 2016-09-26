@@ -49,7 +49,7 @@ public class IntProperty extends NumberProperty<Integer> {
 
   @Override
   public Integer valueOf(final String value) {
-    return validate(Integer.valueOf(value));
+    return validate(Double.valueOf(value).intValue());
   }
 
   @Override
