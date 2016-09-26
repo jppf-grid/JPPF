@@ -74,10 +74,21 @@ public class BootstrapObjectSerializer implements ObjectSerializer {
    */
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
+    serialize(o, os, true);
+  }
+
+  /**
+   * Serialize an object into an output stream.
+   * @param o the object to Serialize.
+   * @param os the output stream to serialize to.
+   * @param closeStream whether to close the stream before returning.
+   * @throws Exception if the object can't be serialized.
+   */
+  public void serialize(final Object o, final OutputStream os, final boolean closeStream) throws Exception {
     try {
       serialization.serialize(o, os);
     } finally {
-      os.close();
+      if (closeStream) os.close();
     }
   }
 
@@ -124,10 +135,21 @@ public class BootstrapObjectSerializer implements ObjectSerializer {
    */
   @Override
   public Object deserialize(final InputStream is) throws Exception {
+    return deserialize(is, true);
+  }
+
+  /**
+   * Read an object from an input stream.
+   * @param is the input stream to deserialize from.
+   * @param closeStream whether to close the stream before returning.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+   */
+  public Object deserialize(final InputStream is, final boolean closeStream) throws Exception {
     try {
       return serialization.deserialize(is);
     } finally {
-      is.close();
+      if (closeStream) is.close();
     }
   }
 }

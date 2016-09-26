@@ -420,4 +420,20 @@ public final class SystemUtils {
         break;
     }
   }
+
+  /**
+   * @return the currently used heap memory.
+   */
+  public static long getUsedMemory() {
+    Runtime rt = Runtime.getRuntime();
+    return rt.totalMemory() - rt.freeMemory();
+  }
+
+  /**
+   * @return the currently used heap memory.
+   */
+  public static double getPctUsedMemory() {
+    Runtime rt = Runtime.getRuntime();
+    return (double) (rt.totalMemory() - rt.freeMemory()) / (double) rt.maxMemory();
+  }
 }

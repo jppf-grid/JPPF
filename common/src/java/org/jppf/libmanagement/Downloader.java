@@ -71,7 +71,7 @@ public class Downloader {
         return;
       }
       Location source = new URLLocation(sourceUrl);
-      tmp = File.createTempFile("jppf_", ".tmp");
+      tmp = File.createTempFile("jppf_", ".tmp", FileUtils.getJPPFTempDir());
       Location dest = new FileLocation(tmp);
       System.out.println("downloading " + source);
       LocationEventListener l = listener;

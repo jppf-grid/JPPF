@@ -26,7 +26,6 @@ import java.util.*;
 import org.jppf.location.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -51,10 +50,6 @@ public class ResourceCache {
    * A map of all resource caches to their uuid.
    */
   private static final Map<String, ResourceCache> cacheMap = new Hashtable<>();
-  /**
-   * Name of the resource cache root.
-   */
-  private static String ROOT_NAME = ".jppf";
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
@@ -222,23 +217,11 @@ public class ResourceCache {
    */
   private void initTempFolders() {
     try {
-      String base = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_DIR);
-      if (base == null) {
-        base = System.getProperty("java.io.tmpdir");
-        if (base == null) base = System.getProperty("user.home");
-        if (base == null) base = System.getProperty("user.dir");
-        if (base != null) {
-          if (!base.endsWith(File.separator)) base += File.separator;
-          base += ROOT_NAME;
-        }
-      }
-      if (base == null) base = "." + File.separator + ROOT_NAME;
-      if (traceEnabled) log.trace("base = " + base);
-      String s = base + File.separator + uuid;
-      File baseDir = new File(s + File.separator);
+      File tmpDir = FileUtils.getJPPFTempDir();
+      File baseDir = new File(tmpDir, uuid + File.separator);
       FileUtils.mkdirs(baseDir);
-      tempFolders.add(s);
-      if (traceEnabled) log.trace("added temp folder " + s);
+      tempFolders.add(baseDir.getPath());
+      if (traceEnabled) log.trace("added temp folder {}", baseDir);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

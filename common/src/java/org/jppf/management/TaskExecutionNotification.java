@@ -18,13 +18,13 @@
 
 package org.jppf.management;
 
-import javax.management.*;
+import javax.management.ObjectName;
 
 /**
  * Notification sent to provide information about a task that was executed in a node.
  * @author Laurent Cohen
  */
-public class TaskExecutionNotification extends Notification {
+public class TaskExecutionNotification extends OffloadableNotification {
   /**
    * Explicit serialVersionUID.
    */

@@ -24,6 +24,7 @@ import java.net.*;
 import java.util.*;
 
 import javax.management.remote.*;
+import javax.management.remote.generic.ObjectWrapping;
 
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -91,7 +92,7 @@ public class JMXMPServer extends AbstractJMXServer {
       // remove the "JMX server connection timeout Thread-*" threads. See bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
       env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(env);
-      env.put("jmx.remote.object.wrapping", new CustomWrapping());
+      env.put("jmx.remote.object.wrapping", newObjectWrapping());
       boolean found = false;
       JMXServiceURL url = null;
       InetAddress addr = InetAddress.getByName(managementHost);
@@ -200,5 +201,13 @@ public class JMXMPServer extends AbstractJMXServer {
   public void stop() throws Exception {
     super.stop();
     forwarder = null;
+  }
+
+  /**
+   * @return a new instance of an implementation of {@code ObjectWrapping}.
+   */
+  public static ObjectWrapping newObjectWrapping() {
+    //return new CustomWrapping();
+    return new CustomWrapping2();
   }
 }
