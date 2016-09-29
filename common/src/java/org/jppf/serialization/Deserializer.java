@@ -100,14 +100,18 @@ class Deserializer {
     if (traceEnabled) try { log.trace("read object header={}, handle={}", header, handle); } catch(@SuppressWarnings("unused") Exception e) {}
     Object obj = caches.handleToObjectMap.get(handle);
     if (obj != null) return obj;
-    //if (traceEnabled) try { log.trace("reading object handle = " + handle); } catch(Exception e) {}
+    if (traceEnabled) log.trace("reading object with handle = {}", handle);
     if (type == Serializer.STRING_HEADER) {
+      if (traceEnabled) log.trace("reading string");
       obj = readString();
       caches.handleToObjectMap.put(handle, obj);
+      if (traceEnabled) log.trace("read string = {}", obj);
       return obj;
     }
     readObject(handle);
-    return caches.handleToObjectMap.get(handle);
+    Object o = caches.handleToObjectMap.get(handle);
+    if (traceEnabled) log.trace(String.format("read object %s, header=%d, handle=%d", o, header, handle));
+    return o;
   }
 
   /**
@@ -117,12 +121,13 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   private void readObject(final int handle) throws Exception {
+    if (traceEnabled) log.trace("reading object with handle = {}", handle);
     String sig = readString();
     ClassDescriptor cd = caches.getDescriptor(sig, classloader);
     if (cd.array) readArray(handle, cd);
     else if (cd.enumType) {
       String name = readString();
-      //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
+      if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(@SuppressWarnings("unused") Exception e) {}
       @SuppressWarnings("rawtypes")
       Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
@@ -130,7 +135,7 @@ class Deserializer {
       Object obj = newInstance(cd);
       currentObject = obj;
       currentClassDescriptor = cd;
-      //if (traceEnabled) try { log.trace("reading handle={}, object={}", handle, StringUtils.toIdentityString(obj)); } catch(Exception e) {}
+      if (traceEnabled) try { log.trace("reading handle={}, object={}", handle, StringUtils.toIdentityString(obj)); } catch(@SuppressWarnings("unused") Exception e) {}
       caches.handleToObjectMap.put(handle, obj);
       readFields(cd, obj);
     }
@@ -190,11 +195,10 @@ class Deserializer {
   void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception {
     if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") Exception e) {}
     for (FieldDescriptor fd: cd.fields) {
-      //if (traceEnabled) try { log.trace("reading field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
+      //if (traceEnabled) try { log.trace("reading field '{}' of object {}", fd, obj); } catch(@SuppressWarnings("unused") Exception e) {}
       ClassDescriptor typeDesc = fd.type;
       if (fd.field == null) fd.field = cd.clazz.getDeclaredField(fd.name);
       Field field = fd.field;
-      //if (typeDesc == null) log.info(String.format("type null for fd=%s, cd=%s", fd, cd));
       if (typeDesc.primitive) {
         switch(typeDesc.signature.charAt(0)) {
           case 'B': field.setByte(obj, (byte) in.read()); break;
@@ -208,7 +212,7 @@ class Deserializer {
         }
       } else if (typeDesc.enumType) {
         String name = (String) readObject();
-        //if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(Exception e) {}
+        if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(@SuppressWarnings("unused") Exception e) {}
         @SuppressWarnings("rawtypes")
         Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) field.getType(), name);
         field.set(obj, val);
@@ -228,7 +232,7 @@ class Deserializer {
   @SuppressWarnings("unchecked")
   private void readArray(final int handle, final ClassDescriptor cd) throws Exception {
     int len = readInt();
-    //if (traceEnabled) try { log.trace("reading array with signature=" + cd.signature + ", length=" + len); } catch(Exception e) {}
+    if (traceEnabled) try { log.trace("reading array with signature=" + cd.signature + ", length=" + len); } catch(@SuppressWarnings("unused") Exception e) {}
     ClassDescriptor compCd = cd.componentType;
     if (compCd == null) {
       Class<?> compClass = cd.clazz.getComponentType();
@@ -256,7 +260,7 @@ class Deserializer {
       caches.handleToObjectMap.put(handle, obj);
       for (int i=0; i<len; i++) {
         String name = (String) readObject();
-        //if (traceEnabled) try { log.trace("writing enum[" + eltDesc.signature + "] : " + name); } catch(Exception e) {}
+        if (traceEnabled) try { log.trace("read enum name {}", name); } catch(@SuppressWarnings("unused") Exception e) {}
         @SuppressWarnings("rawtypes")
         Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) compCd.clazz, name);
         Array.set(obj, i, val);
@@ -429,6 +433,7 @@ class Deserializer {
     int len = result.first();
     if (len == 0) value = "";
     else if (result.second()) {
+      if (traceEnabled) log.trace("reading ASCII string for len={}", len);
       char[] chars = new char[len];
       for (int count=0; count<len;) {
         int n = Math.min(buf.length, len-count);
@@ -437,8 +442,14 @@ class Deserializer {
       }
       value = new String(chars);
     }
-    else if (len <= 65535/3) value = in.readUTF(); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
-    else value = new String(readCharArray(len));
+    else if (len <= 65535/3) {
+      if (traceEnabled) log.trace("calling readUTF() for len={}", len);
+      value = in.readUTF(); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
+    }
+    else {
+      if (traceEnabled) log.trace("reading normal string for len={}", len);
+      value = new String(readCharArray(len));
+    }
     return value;
   }
 

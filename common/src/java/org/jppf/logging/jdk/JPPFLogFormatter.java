@@ -25,14 +25,14 @@ import java.util.logging.*;
 import org.jppf.utils.*;
 
 /**
- * Formats log records in format [yyyy/MM/dd hh:mm:ss.SSS][LEVEL][package.ClassName.method()]: message.
+ * Formats log records in format yyyy-MM-dd hh:mm:ss.SSS [LEVEL][thread name][package.ClassName.method()]: message.
  * @author Laurent Cohen
  */
 public class JPPFLogFormatter extends Formatter {
   /**
    * Date format used in log entries.
    */
-  private final SimpleDateFormat sdf = new SimpleDateFormat("[yyyy/MM/dd hh:mm:ss.SSS]");
+  private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS ");
 
   /**
    * Format a log record.

@@ -358,14 +358,20 @@ class Serializer {
     SerializationUtils.writeStringLength(out, ascii, len, buf);
     if (len == 0) return;
     if (ascii) {
+      if (traceEnabled) log.trace("writing ASCII string for len={}", len);
       for (int count=0; count<len;) {
         int n = Math.min(buf.length, len - count);
         for (int i=0; i<n; i++) buf[i] = (byte) (chars[count++] & 0x7F);
         out.write(buf, 0, n);
       }
     }
-    else if (len <= 65535/3) out.writeUTF(s); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
-    else writeCharArray(chars);
+    else if (len <= 65535/3) {
+      if (traceEnabled) log.trace("calling writeUTF() for len={}", len);
+      out.writeUTF(s); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
+    } else {
+      if (traceEnabled) log.trace("writing normal string for len={}", len);
+      writeCharArray(chars);
+    }
   }
 
   /**
