@@ -18,26 +18,35 @@
 
 package org.jppf.serialization;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Vector;
+
+import org.slf4j.*;
 
 /**
- * A specfic serialization handler for {@link ConcurrentHashMap}.
+ * A specfic serialization handler for {@link Vector}.
  * @author Laurent Cohen
  */
-public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
+public class VectorHandler extends AbstractSerializationHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(Serializer.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+
   @Override
   public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
-    Map<?, ?> map = (Map<?, ?>) obj;
+    if (traceEnabled) log.trace("writing declared fields for cd={}", cd);
+    Vector<?>  vector = (Vector<?>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = serializer.currentClassDescriptor;
       serializer.currentClassDescriptor = cd;
-      serializer.writeInt(map.size());
-      for (Object o: map.entrySet()) {
-        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
-        serializer.writeObject(entry.getKey());
-        serializer.writeObject(entry.getValue());
+      synchronized(vector) {
+        serializer.writeInt(vector.size());
+        for (Object o: vector) serializer.writeObject(o);
       }
     } finally {
       serializer.currentClassDescriptor = tmpDesc;
@@ -46,18 +55,18 @@ public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
 
   @Override
   public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
+    if (traceEnabled) log.trace("reading declared fields for cd={}", cd);
     @SuppressWarnings("unchecked")
-    Map<? super Object, ? super Object> map = (Map<? super Object, ? super Object>) obj;
+    Vector<? super Object> vector = (Vector<? super Object>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
       deserializer.currentClassDescriptor = cd;
-      if (map instanceof ConcurrentHashMap) copyFields(new ConcurrentHashMap<>(), obj, cd);
+      copyFields(new Vector<>(), vector, cd);
       int size = deserializer.readInt();
       for (int i=0; i<size; i++) {
-        Object key = deserializer.readObject();
         Object value = deserializer.readObject();
-        map.put(key, value);
+        vector.add(value);
       }
     } finally {
       deserializer.currentClassDescriptor = tmpDesc;

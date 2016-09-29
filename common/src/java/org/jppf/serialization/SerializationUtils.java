@@ -382,7 +382,7 @@ public final class SerializationUtils {
    */
   public static boolean isASCII(final char[] chars) throws Exception {
     for (char c: chars) {
-      if (c > 127) return false;
+      if ((c & 0xFF80) != 0) return false;
     }
     return true;
   }

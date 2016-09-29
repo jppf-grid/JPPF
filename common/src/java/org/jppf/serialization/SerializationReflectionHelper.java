@@ -104,6 +104,7 @@ public final class SerializationReflectionHelper {
   private static final Map<Class<?>, SerializationHandler> handlerMap = new HashMap<>();
   static {
     handlerMap.put(ConcurrentHashMap.class, new ConcurrentHashMapHandler());
+    handlerMap.put(Vector.class, new VectorHandler());
   }
   /**
    * The field "private final char{] value" in String.
