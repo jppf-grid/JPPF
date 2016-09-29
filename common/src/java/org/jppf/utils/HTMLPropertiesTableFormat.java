@@ -25,11 +25,26 @@ package org.jppf.utils;
  */
 public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
   /**
+   * 
+   */
+  private final boolean fullHtml;
+
+  /**
    * Initialize this formatter with the specified title.
    * @param docTitle the title of the whole document.
    */
   public HTMLPropertiesTableFormat(final String docTitle) {
+    this(docTitle, true);
+  }
+
+  /**
+   * Initialize this formatter with the specified title.
+   * @param docTitle the title of the whole document.
+   * @param fullHtml .
+   */
+  public HTMLPropertiesTableFormat(final String docTitle, final boolean fullHtml) {
     super(docTitle);
+    this.fullHtml = fullHtml;
   }
 
   /**
@@ -37,7 +52,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
    */
   @Override
   public void start() {
-    sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
+    if (fullHtml) sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
     sb.append("<h1><font color=\"#2D3876\">").append(docTitle).append("</font></h1>");
   }
 
@@ -46,7 +61,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
    */
   @Override
   public void end() {
-    sb.append("</body></html>");
+    if (fullHtml) sb.append("</body></html>");
   }
 
   /**
@@ -56,7 +71,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
   @Override
   public void tableStart(final String title) {
     sb.append("<h2><font color=\"#2D3876\">").append(title).append("</font></h2>");
-    sb.append("<table cellspacing=\"0\" cellpadding=\"1\">");
+    sb.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: 0px\">");
   }
 
   /**
