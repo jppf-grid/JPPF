@@ -21,8 +21,7 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.server.peer.*;
-import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
+import test.org.jppf.serialization.TestJPPF;
 
 
 
@@ -31,6 +30,6 @@ import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithOrphan.class, TestMultiServerWithSSL.class, TestJPPFJobClientSLA.class })
+@Suite.SuiteClasses({ TestJPPF.class })
 public class JPPFSuite {
 }
