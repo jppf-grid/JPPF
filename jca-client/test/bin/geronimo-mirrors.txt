@@ -1,0 +1,8 @@
+http://wwwftp.ciril.fr/pub/apache/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://mir2.ovh.net/ftp.apache.org/dist/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://apache.crihan.fr/dist/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://mirrors.ircam.fr/pub/apache/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://apache.websitebeheerjd.nl/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://apache.opensourcemirror.com/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://mirrors.linsrv.net/apache/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz
+http://apache.mirrors.multidist.eu/geronimo/3.0.0/geronimo-tomcat7-javaee6-3.0.0-bin.tar.gz

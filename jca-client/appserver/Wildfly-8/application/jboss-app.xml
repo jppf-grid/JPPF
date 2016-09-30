@@ -1,0 +1,8 @@
+<jboss-app>
+   <!--
+   <loader-repository>
+      jppf.org:loader=jppf.ear
+      <loader-repository-config>java2ParentDelegation=false</loader-repository-config>
+   </loader-repository>
+   -->
+</jboss-app>
