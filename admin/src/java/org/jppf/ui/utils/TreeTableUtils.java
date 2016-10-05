@@ -17,14 +17,16 @@
  */
 package org.jppf.ui.utils;
 
+import java.util.Map;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 
@@ -62,7 +64,7 @@ public final class TreeTableUtils {
   }
 
   /**
-   * Find the tree node with the specified component uuid int he children of the specified parent.
+   * Find the tree node with the specified component uuid in the children of the specified parent.
    * @param parent the parent tree node for the component to find.
    * @param uuid uuid of the component to find.
    * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
@@ -200,5 +202,78 @@ public final class TreeTableUtils {
       if (debugEnabled) log.debug("removing node: " + nodeData);
       model.removeNodeFromParent(node);
     }
+  }
+
+  /**
+   * Retrieve the system information for the specified topology object.
+   * @param data the topology object for which to get the information.
+   * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
+   */
+  public static JPPFSystemInformation retrieveSystemInfo(final AbstractTopologyComponent data) {
+    JPPFSystemInformation info = null;
+    try {
+      if (data.isNode()) {
+        TopologyDriver parent = (TopologyDriver) data.getParent();
+        Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
+        Object o = result.get(data.getUuid());
+        if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
+      } else {
+        if (data.isPeer()) {
+          String uuid = ((TopologyPeer) data).getUuid();
+          if (uuid != null) {
+            TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
+            if (driver != null) info = driver.getJmx().systemInformation();
+          }
+        }
+        else info = ((TopologyDriver) data).getJmx().systemInformation();
+      }
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return info;
+  }
+
+  /**
+   * Print the specified system info to a string.
+   * @param info the information to print.
+   * @param format the formatter to use.
+   * @return a String with the formatted information.
+   */
+  public static String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format) {
+    format.start();
+    if (info == null) format.print("No information was found");
+    else {
+      format.formatTable(info.getUuid(), "UUID");
+      format.formatTable(info.getSystem(), "System Properties");
+      format.formatTable(info.getEnv(), "Environment Variables");
+      format.formatTable(info.getRuntime(), "Runtime Information");
+      format.formatTable(info.getJppf(), "JPPF configuration");
+      format.formatTable(info.getNetwork(), "Network configuration");
+      format.formatTable(info.getStorage(), "Storage Information");
+      format.formatTable(info.getOS(), "Operating System Information");
+      if (!info.getStats().isEmpty()) format.formatTable(info.getStats(), "Statistics");
+    }
+    format.end();
+    return format.getText();
+  }
+
+  /**
+   * Find the tree node with the specified component uuid in the children of the specified parent.
+   * @param root the parent tree node for the component to find.
+   * @param uuid uuid of the component to find.
+   * @param filter a filter that may reject a certain type of nodes, may be {@code null}.
+   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
+   */
+  public static DefaultMutableTreeNode findTreeNode(final DefaultMutableTreeNode root, final String uuid, final TreeNodeFilter filter) {
+    if (uuid == null) return null;
+    for (int i=0; i<root.getChildCount(); i++) {
+      DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+      AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
+      if (data == null) continue;
+      if (data.getUuid().equals(uuid) && ((filter == null) || filter.accepts(child))) return child;
+      DefaultMutableTreeNode result = findTreeNode(child, uuid, filter);
+      if (result != null) return result;
+    }
+    return null;
   }
 }

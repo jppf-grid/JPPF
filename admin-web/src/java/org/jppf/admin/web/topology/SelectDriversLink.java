@@ -21,8 +21,8 @@ package org.jppf.admin.web.topology;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.*;
-import org.jppf.admin.web.JPPFWebSession;
+import org.apache.wicket.model.Model;
+import org.jppf.admin.web.TableTreeData;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.AbstractComponent;
 
@@ -30,25 +30,23 @@ import org.jppf.client.monitoring.AbstractComponent;
  *
  * @author Laurent Cohen
  */
-public class SelectDriversLink extends AbstractActionLink {
+public class SelectDriversLink extends AbstractSelectionLink {
   /**
    *
    */
   public SelectDriversLink() {
-    super("topology.select_drivers", Model.of("Select drivers"));
+    super(TopologyTree.SELECT_DRIVERS_ACTION, Model.of("Select drivers"));
+    imageName = "select_drivers.gif";
   }
 
   @Override
-  public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = getSession(target);
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyModel().getRoot();
-    JPPFTableTree tableTree = session.getTopologyTableTree();
-    SelectionHandler handler = session.getTopologySelectionHandler();
-    handler.clear();
+  protected void onClick(final AjaxRequestTarget target, final TableTreeData data) {
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
+    SelectionHandler handler = data.getSelectionHandler();
+    handler.clearSelection();
     for (int i=0; i<root.getChildCount(); i++) {
       DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) root.getChildAt(i);
       handler.select(((AbstractComponent<?>) dmtn.getUserObject()).getUuid());
     }
-    target.add(tableTree);
   }
 }

@@ -18,36 +18,26 @@
 
 package org.jppf.admin.web.tabletree;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.jppf.ui.treetable.TreeNodeFilter;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public interface SelectionHandler extends Serializable {
-
-  /**
-   * A {@link DefaultMutableTreeNode} filter.
-   */
-  interface Filter {
-    /**
-     * Determine whether the specified node is accepted by this filter.
-     * @param node the node to check.
-     * @return {@code true} if the node is accepted, {@code false} otherwise.
-     */
-    boolean accepts(DefaultMutableTreeNode node);
-  }
-
+public interface SelectionHandler {
   /**
    * Handle a selection/deselction event for the specified tree node.
    * @param node the node to handle.
    * @param params optional additional parameters.
+   * @param target ajax target for the selection request.
    * @return {@code true} if the node is selected, {@code false} otherwise.
    */
-  boolean handle(DefaultMutableTreeNode node, Object... params);
+  boolean handle(final AjaxRequestTarget target, DefaultMutableTreeNode node, Object... params);
 
   /**
    * 
@@ -63,17 +53,17 @@ public interface SelectionHandler extends Serializable {
   boolean isSelected(String uuid);
 
   /**
-   * Get the table tree to which the selection applies.
-   * @return a {@link JPPFTableTree} instance.
+   * Get the filter for this selection handler.
+   * @return a {@link TreeNodeFilter} instance.
    */
-  JPPFTableTree getTableTree();
+  TreeNodeFilter getFilter();
 
   /**
    * Set the filter for this selection handler.
-   * @param filter a {@link SelectionHandler.Filter} instance.
+   * @param filter a {@link TreeNodeFilter} instance.
    * @return this selection handler, for method call chaining.
    */
-  SelectionHandler setFilter(final Filter filter);
+  SelectionHandler setFilter(final TreeNodeFilter filter);
 
   /**
    * Select the specified uuid.
@@ -90,5 +80,22 @@ public interface SelectionHandler extends Serializable {
   /**
    * Clear the selection.
    */
-  void clear();
+  void clearSelection();
+
+  /**
+   * Free resources.
+   */
+  void cleanup();
+
+  /**
+   * Add a selection listenr to this handler.
+   * @param listener the listener to add.
+   */
+  void addSelectionListener(SelectionListener listener);
+
+  /**
+   * Remove a selection listenr from this handler.
+   * @param listener the listener to remove.
+   */
+  void removeSelectionListener(SelectionListener listener);
 }

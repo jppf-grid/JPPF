@@ -30,6 +30,7 @@ public class TemplatePage extends WebPage {
    * 
    */
   public TemplatePage() {
+    setVersioned(false);
   }
 
   /**

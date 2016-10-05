@@ -21,7 +21,7 @@ package org.jppf.admin.web.topology;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.*;
+import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
 
@@ -34,15 +34,18 @@ public class CollapseAllLink extends AbstractActionLink {
    *
    */
   public CollapseAllLink() {
-    super("topology.collapse", Model.of("Collapse all"));
+    super(TopologyTree.COLLAPSE_ALL_ACTION, Model.of("Collapse all"));
+    imageName = "collapse.gif";
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
     JPPFWebSession session = getSession(target);
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyModel().getRoot();
-    JPPFTableTree tableTree = session.getTopologyTableTree();
-    for (int i=0; i<root.getChildCount(); i++) tableTree.collapse((DefaultMutableTreeNode) root.getChildAt(i));
-    target.add(tableTree);
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyData().getModel().getRoot();
+    if (target.getPage() instanceof TableTreeHolder) {
+      JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
+      for (int i=0; i<root.getChildCount(); i++) tableTree.collapse((DefaultMutableTreeNode) root.getChildAt(i));
+      target.add(tableTree);
+    }
   }
 }

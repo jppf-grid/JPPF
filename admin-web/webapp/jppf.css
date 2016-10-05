@@ -1,6 +1,6 @@
 /*
   JPPF
-  Copyright (C) 2005-2013 JPPF Team. 
+  Copyright (C) 2005-2016 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,19 @@
   limitations under the License.
 */
 
-body {
+body, textarea {
   font-size:10pt;
   font-family: Arial, Verdana, Sans-serif;
   background-color: #E2E4F0;
   margin-top: 20px
 }
 
+textarea {
+  background-color: white;
+}
+
 a { text-decoration: none; font-weight: normal; }
-a:hover { text-decoration: underline; color: red; }
+a:hover { text-decoration: none; color: red; }
 div { margin: 0px; padding; 0px; }
 
 .gwrapper { width: 900px; max-width: 900px; background: white; }
@@ -349,11 +353,21 @@ table {
   border-right: none;
 }
 
+table.modal_form {
+  border: none;
+  padding: 0px;
+  margin: 0px;
+}
+
 th {
   color: white;
   background-color: #6D78B6;
   font-weight: bold;
   text-align: left;
+}
+
+textarea {
+  margin-top: 5px;
 }
 
 .even {
@@ -415,6 +429,16 @@ th {
   background-color: midnightblue;
 }
 
+.tree_inactive {
+  color: black;
+  background: #FFD800;
+}
+
+.tree_inactive_selected {
+  color: white;
+  background: #D67FFF;
+}
+
 .main_border {
   border: 1px solid #6D78B6;
   border-top: 10px solid #6D78B6;
@@ -440,6 +464,7 @@ th {
 .button_link {
   margin: 0px;
   padding: 4px;
+  text-decoration: none;
   vertical-align: middle;
   border: 1px solid #6D78B6;
   border-radius: 2px;
@@ -448,6 +473,17 @@ th {
 
 a.button_link:hover {
   box-shadow: inset 2px 2px 2px #888;
+  text-decoration: none;
+}
+
+.button_link_disabled {
+  margin: 0px;
+  padding: 4px;
+  vertical-align: middle;
+  border: 1px solid #999;
+  border-radius: 2px;
+  box-shadow: -1px -1px 2px #999 inset;
+  background-color: #CCC;
 }
 
 img {
@@ -461,4 +497,8 @@ img {
   margin: 0;
   padding: 10px;
   vertical-align: middle;
+}
+
+.modal_form {
+  line-height: 1.5em;
 }

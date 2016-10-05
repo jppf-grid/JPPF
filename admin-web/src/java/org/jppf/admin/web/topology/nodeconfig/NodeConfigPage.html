@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title>Node configuration</title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body>
+	  <form wicket:id="node_config.form" class="modal_form">
+      <input type="checkbox" wicket:id="node_config.force_restart.field"/>
+      <span wicket:id="node_config.force_restart.label"></span><br/>
+
+      <input type="checkbox" wicket:id="node_config.interrupt.field"/>
+      <span wicket:id="node_config.interrupt.label"></span><br/>
+
+      <span wicket:id="node_config.config.label"></span><br/>
+	    <textarea wicket:id="node_config.config.field" rows="20" cols="80"></textarea><br/>
+
+      <p><a wicket:id="node_config.ok" class="button_link">OK</a>&nbsp;
+      <a wicket:id="node_config.cancel" class="button_link">Cancel</a>
+		</form>
+	</body>
+</html>

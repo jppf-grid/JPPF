@@ -84,9 +84,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
     CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
-    textArea.setValue(getPropertiesAsString());
-
     AbstractTopologyComponent data = dataArray[0];
+    textArea.setValue(getPropertiesAsString(data));
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("nodeConfigurationUpdatePanel.label") + " " + TreeTableUtils.getDisplayName(data), false);
@@ -143,12 +142,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
 
   /**
    * Obtain the JPPF configuration as a string, one property per line.
+   * @param data the topology data from which to get the config.
    * @return the properties as a string.
    */
-  private String getPropertiesAsString() {
+  public static String getPropertiesAsString(final AbstractTopologyComponent data) {
     StringBuilder sb = new StringBuilder();
     try {
-      AbstractTopologyComponent data = dataArray[0];
       TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
       Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
@@ -172,7 +171,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * @param source - the text from which to read the properties.
    * @return a map of string keys to string values.
    */
-  private static Map<Object, Object> getPropertiesAsMap(final String source) {
+  public static Map<Object, Object> getPropertiesAsMap(final String source) {
     try {
       Map<Object, Object> map = new HashMap<>();
       BufferedReader reader = new BufferedReader(new StringReader(source));

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title>Provisioning</title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body>
+	  <form wicket:id="provisioning.form" class="modal_form">
+      <span wicket:id="provisioning.nb_slaves.label"></span>&nbsp;
+	    <input type="text" wicket:id="provisioning.nb_slaves.field" value="0"/><br/>
+      <input type="checkbox" wicket:id="provisioning.interrupt.field"/>
+      <span wicket:id="provisioning.interrupt.label"></span><br/>
+      <input type="checkbox" wicket:id="provisioning.use_overrides.field"/>
+      <span wicket:id="provisioning.use_overrides.label"></span><br/>
+      <span wicket:id="provisioning.overrides.label"></span><br/>
+	    <textarea wicket:id="provisioning.overrides.field" rows="10" cols="80"></textarea><br/>
+      <p><a wicket:id="provisioning.ok" class="button_link">OK</a>&nbsp;
+      <a wicket:id="provisioning.cancel" class="button_link">Cancel</a>
+		</form>
+	</body>
+</html>

@@ -18,38 +18,33 @@
 
 package org.jppf.admin.web.tabletree;
 
+import java.util.*;
+
+import org.jppf.ui.treetable.TreeNodeFilter;
+
 /**
  *
  * @author Laurent Cohen
  */
 public abstract class AbstractSelectionHandler implements SelectionHandler {
   /**
-   * The table tree to which the selection applies.
-   */
-  protected JPPFTableTree tableTree;
-  /**
    * The filter to use.
    */
-  protected SelectionHandler.Filter filter;
+  protected transient TreeNodeFilter filter;
+  /**
+   * The listeners to this selection handler.
+   */
+  protected transient final List<SelectionListener> listeners = new ArrayList<>();
 
   @Override
-  public JPPFTableTree getTableTree() {
-    return null;
+  public TreeNodeFilter getFilter() {
+    return filter;
   }
 
   @Override
-  public SelectionHandler setFilter(final SelectionHandler.Filter filter) {
+  public SelectionHandler setFilter(final TreeNodeFilter filter) {
     this.filter = filter;
     return this;
-  }
-
-  /**
-   * Set the table tree to which the selection applies.
-   * @param tableTree a {@link JPPFTableTree} instance.
-   * @exclude
-   */
-  public void setTableTree(final JPPFTableTree tableTree) {
-    this.tableTree = tableTree;
   }
 
   @Override
@@ -58,5 +53,21 @@ public abstract class AbstractSelectionHandler implements SelectionHandler {
 
   @Override
   public void unselect(final String uuid) {
+  }
+
+  @Override
+  public void addSelectionListener(final SelectionListener listener) {
+    if (listener != null) listeners.add(listener);
+  }
+
+  @Override
+  public void removeSelectionListener(final SelectionListener listener) {
+    if (listener != null) listeners.remove(listener);
+  }
+
+  @Override
+  public void cleanup() {
+    clearSelection();
+    listeners.clear();
   }
 }

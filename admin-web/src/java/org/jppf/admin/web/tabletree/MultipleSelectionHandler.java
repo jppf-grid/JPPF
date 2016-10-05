@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.tree.AbstractTree.State;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.utils.*;
@@ -42,16 +43,17 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
   /**
    * Selected rows in the table by driver/node uuid.
    */
-  private final transient Set<String> selected = new HashSet<>();
+  private transient final Set<String> selected = new HashSet<>();
   /**
    * The uuid of the last selected row, if any.
    */
   private transient String lastSelected;
 
   @Override
-  public boolean handle(final DefaultMutableTreeNode node, final Object...params) {
+  public boolean handle(final AjaxRequestTarget target, final DefaultMutableTreeNode node, final Object...params) {
     if (debugEnabled) log.debug(String.format("handling %s with params %s", node, Arrays.asList(params)));
     if ((filter != null) && !filter.accepts(node)) return false;
+    if (debugEnabled) log.debug(String.format("node %s accepted", node));
     TypedProperties props = null;
     if ((params != null) && (params.length > 0)) {
       if (params[0] instanceof TypedProperties) props = (TypedProperties) params[0];
@@ -62,9 +64,10 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
     String uuid = data.getUuid();
     boolean sel = isSelected(uuid);
     int size = selected.size();
+    boolean selectionChanged = true;
     if (debugEnabled) log.debug(String.format("ctrl=%b, shift=%b, sel=%b, size=%d", ctrl, shift, sel, size));
     if (shift && (lastSelected != null)) {
-      blockSelect(node, uuid);
+      blockSelect(target, node, uuid);
       lastSelected = uuid;
     } else if (ctrl) {
       if (isSelected(uuid)) {
@@ -75,19 +78,24 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
         lastSelected = uuid;
       }
     } else {
+      if ((selected.size() == 1) && isSelected(uuid)) selectionChanged = false;
       selected.clear();
       selected.add(uuid);
       lastSelected = uuid;
     }
-    return true;
+    if (selectionChanged) {
+      for (SelectionListener listener: listeners) listener.selectionChanged(this);
+    }
+    return selectionChanged;
   }
 
   /**
    *
    * @param treeNode the node that was shift-clicked.
    * @param uuid the node's uuid.
+   * @param target ajax target for the selection request.
    */
-  private void blockSelect(final DefaultMutableTreeNode treeNode, final String uuid) {
+  private void blockSelect(final AjaxRequestTarget target, final DefaultMutableTreeNode treeNode, final String uuid) {
     Map<String, Integer> uuidToPos = new HashMap<>();
     SortedMap<Integer, String> posToUuid = new TreeMap<>();
     int pos = 0;
@@ -99,6 +107,7 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
       posToUuid.put(pos, driverUuid);
       uuidToPos.put(driverUuid, pos);
       pos++;
+      JPPFTableTree tableTree = (JPPFTableTree) target.getPage().get("table.tree");
       if (tableTree.getState(driver) == State.EXPANDED) {
         for (int j=0; j<driver.getChildCount(); j++) {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
@@ -142,7 +151,7 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
   }
 
   @Override
-  public void clear() {
+  public void clearSelection() {
     selected.clear();
   }
 }

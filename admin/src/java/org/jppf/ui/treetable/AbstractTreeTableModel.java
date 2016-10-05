@@ -89,7 +89,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
   /**
    * The list of event listeners for this tree table model.
    */
-  protected EventListenerList listenerList = new EventListenerList();
+  protected transient EventListenerList listenerList = new EventListenerList();
 
   /**
    * Initialize this model with the specified tree root.

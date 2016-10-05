@@ -20,8 +20,10 @@ package org.jppf.admin.web;
 
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.Request;
-import org.jppf.admin.web.tabletree.*;
-import org.jppf.ui.monitoring.node.NodeTreeTableModel;
+import org.jppf.admin.web.topology.TopologyTreeData;
+import org.jppf.ui.treetable.TreeViewType;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 /**
  *
@@ -29,78 +31,58 @@ import org.jppf.ui.monitoring.node.NodeTreeTableModel;
  */
 public class JPPFWebSession extends WebSession {
   /**
-   * The topology tree table model.
+   * Logger for this class.
    */
-  private transient NodeTreeTableModel topologyModel;
+  private static Logger log = LoggerFactory.getLogger(JPPFWebSession.class);
   /**
-   * Handles the selection of rows in the topology tree table.
+   * Determines whether debug log statements are enabled.
    */
-  private transient SelectionHandler topologySelectionHandler;
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The topology tree table component.
+   * The JPPF-internal id for this session data.
    */
-  private transient JPPFTableTree topologyTableTree;
+  private final long sessionDataId;
 
   /**
    * Initialize a new session.
    * @param request the request.
+   * @param sessionDataId the identifier for the non-persisted session data.
    */
-  public JPPFWebSession(final Request request) {
+  public JPPFWebSession(final Request request, final long sessionDataId) {
     super(request);
+    this.sessionDataId = sessionDataId;
+    if (debugEnabled) log.debug(String.format("new instance #%d, request=%s", sessionDataId, request));
   }
 
   @Override
   public void onInvalidate() {
     super.onInvalidate();
-    topologyModel = null;
-    topologySelectionHandler = null;
+    JPPFWebConsoleApplication.removeSessionData(sessionDataId);
   }
 
   /**
-   *
-   * @return the topology tree table model.
+   * @return the data elements for the grid topology.
    */
-  public NodeTreeTableModel getTopologyModel() {
-    return topologyModel;
+  public TopologyTreeData getTopologyData() {
+    return (TopologyTreeData) getSessionData().getData(TreeViewType.TOPOLOGY);
   }
 
   /**
-   *
-   * @param topologyModel the topology tree table model.
+   * @return the JPPF-internal id for this session.
    */
-  public void setTopologyModel(final NodeTreeTableModel topologyModel) {
-    this.topologyModel = topologyModel;
+  public long getSessionDataId() {
+    return sessionDataId;
   }
 
   /**
-   *
-   * @return the topology selection handler.
+   * @return the session data for this session.
    */
-  public SelectionHandler getTopologySelectionHandler() {
-    return topologySelectionHandler;
-  }
-
-  /**
-   *
-   * @param selectionHandler the topology selection handler.
-   */
-  public void setTopologySelectionHandler(final SelectionHandler selectionHandler) {
-    this.topologySelectionHandler = selectionHandler;
-  }
-
-  /**
-   *
-   * @return the topology tree table component.
-   */
-  public JPPFTableTree getTopologyTableTree() {
-    return topologyTableTree;
-  }
-
-  /**
-   *
-   * @param topologyTableTree the topology tree table component.
-   */
-  public void setTopologyTableTree(final JPPFTableTree topologyTableTree) {
-    this.topologyTableTree = topologyTableTree;
+  public SessionData getSessionData() {
+    SessionData data = JPPFWebConsoleApplication.getSessionData(sessionDataId);
+    if (data == null) {
+      data = new SessionData(sessionDataId);
+      JPPFWebConsoleApplication.setSessionData(sessionDataId, data);
+    }
+    return data;
   }
 }

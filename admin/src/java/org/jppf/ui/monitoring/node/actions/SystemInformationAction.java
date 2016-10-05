@@ -26,7 +26,6 @@ import javax.swing.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
-import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.TreeTableUtils;
 import org.jppf.utils.*;
@@ -108,59 +107,6 @@ public class SystemInformationAction extends AbstractTopologyAction {
   }
 
   /**
-   * Retrieve the system information for the specified topology object.
-   * @param data the topology object for which to get the information.
-   * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
-   */
-  private JPPFSystemInformation retrieveInfo(final AbstractTopologyComponent data) {
-    JPPFSystemInformation info = null;
-    try {
-      if (data.isNode()) {
-        TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
-        Object o = result.get(data.getUuid());
-        if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
-      } else {
-        if (data.isPeer()) {
-          String uuid = ((TopologyPeer) data).getUuid();
-          if (uuid != null) {
-            TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
-            if (driver != null) info = driver.getJmx().systemInformation();
-          }
-        }
-        else info = ((TopologyDriver) data).getJmx().systemInformation();
-      }
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-    }
-    return info;
-  }
-
-  /**
-   * Print the specified system info to a string.
-   * @param info the information to print.
-   * @param format the formatter to use.
-   * @return a String with the formatted information.
-   */
-  private String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format) {
-    format.start();
-    if (info == null) format.print("No information was found");
-    else {
-      format.formatTable(info.getUuid(), "UUID");
-      format.formatTable(info.getSystem(), "System Properties");
-      format.formatTable(info.getEnv(), "Environment Variables");
-      format.formatTable(info.getRuntime(), "Runtime Information");
-      format.formatTable(info.getJppf(), "JPPF configuration");
-      format.formatTable(info.getNetwork(), "Network configuration");
-      format.formatTable(info.getStorage(), "Storage Information");
-      format.formatTable(info.getOS(), "Operating System Information");
-      if (!info.getStats().isEmpty()) format.formatTable(info.getStats(), "Statistics");
-    }
-    format.end();
-    return format.getText();
-  }
-
-  /**
    * This class asynchronously retrieves the node or driver information and displays it int he dialog.
    */
   private class AsyncRunnable implements Runnable {
@@ -190,11 +136,11 @@ public class SystemInformationAction extends AbstractTopologyAction {
       final StringBuilder title = new StringBuilder("System information");
       try {
         AbstractTopologyComponent comp = dataArray[0];
-        JPPFSystemInformation info = retrieveInfo(comp);
+        JPPFSystemInformation info = TreeTableUtils.retrieveSystemInfo(comp);
         String name = TreeTableUtils.getDisplayName(comp);
         title.append(" for ").append(comp.isNode() ? "node " : "driver ").append(name);
-        html.append(formatProperties(info, new HTMLPropertiesTableFormat(title.toString())));
-        toClipboard.append(formatProperties(info, new TextPropertiesTableFormat(title.toString())));
+        html.append(TreeTableUtils.formatProperties(info, new HTMLPropertiesTableFormat(title.toString())));
+        toClipboard.append(TreeTableUtils.formatProperties(info, new TextPropertiesTableFormat(title.toString())));
       } catch(Exception e) {
         toClipboard.append(ExceptionUtils.getStackTrace(e));
         html.append(toClipboard.toString().replace("\n", "<br>"));

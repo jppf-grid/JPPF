@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="lib/wicket-native-websocket-jetty9-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-native-websocket-tomcat-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-objectsizeof-agent-7.4.0.jar"/>
-	<classpathentry kind="lib" path="lib/wicket-request-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-request-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-request/src/main/java"/>
 	<classpathentry kind="lib" path="lib/wicket-spring-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-util-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-velocity-7.4.0.jar"/>

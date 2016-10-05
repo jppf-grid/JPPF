@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title>Server stop/restart</title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body>
+	  <form wicket:id="server_stop_restart.form" class="modal_form">
+      <table class="modal_form">
+        <tr>
+          <td><span wicket:id="server_stop_restart.shutdown_delay.label"></span>&nbsp;</td>
+    	    <td><input type="text" wicket:id="server_stop_restart.shutdown_delay.field" value="0"/><br/></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="checkbox" wicket:id="server_stop_restart.restart.field"/>
+            <span wicket:id="server_stop_restart.restart.label"></span><br/>
+          </td>
+        </tr>
+        <tr>
+          <td><span wicket:id="server_stop_restart.restart_delay.label"></span>&nbsp;</td>
+          <td><input type="text" wicket:id="server_stop_restart.restart_delay.field" value="0"/><br/></td>
+        </tr>
+      </table>
+
+      <p><a wicket:id="server_stop_restart.ok" class="button_link">OK</a>&nbsp;
+      <a wicket:id="server_stop_restart.cancel" class="button_link">Cancel</a>
+    </form>
+	</body>
+</html>

@@ -2,16 +2,32 @@
   <body>
     <wicket:extend>
       <form wicket:id="topology.tree.toolbar" class="jppf_toolbar">
-        <a wicket:id="topology.info" class="button_link"><img src="images/toolbar/info.gif"/></a>
+        <a wicket:id="topology.server_stop_restart" class="button_link"></a><div wicket:id="topology.server_stop_restart.dialog"></div>
+        <a wicket:id="topology.server_reset_stats" class="button_link"></a>
         <img src="images/toolbar/separator10.gif"/>
-        <a wicket:id="topology.expand" class="button_link"><img src="images/toolbar/expand.gif"/></a>
-        <a wicket:id="topology.collapse" class="button_link"><img src="images/toolbar/collapse.gif"/></a>
+        <a wicket:id="topology.node_config" class="button_link"></a><div wicket:id="topology.node_config.dialog"></div>
+        <a wicket:id="topology.info" class="button_link"></a><div wicket:id="topology.info.dialog"></div>
         <img src="images/toolbar/separator10.gif"/>
-        <a wicket:id="topology.select_drivers" class="button_link"><img src="images/toolbar/select_drivers.gif"/></a>
-        <a wicket:id="topology.select_nodes" class="button_link"><img src="images/toolbar/select_nodes.gif"/></a>
-        <a wicket:id="topology.select_all" class="button_link"><img src="images/toolbar/select_all.gif"/></a>
+        <a wicket:id="topology.node_threads" class="button_link"></a><div wicket:id="topology.node_threads.dialog"></div>
+        <a wicket:id="topology.node_reset_tasks" class="button_link"></a>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="topology.node_stop" class="button_link"></a>
+        <a wicket:id="topology.node_restart" class="button_link"></a>
+        <a wicket:id="topology.node_stop_deferred" class="button_link"></a>
+        <a wicket:id="topology.node_restart_deferred" class="button_link"></a>
+        <a wicket:id="topology.cancel_pending_action" class="button_link"></a>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="topology.node_suspend" class="button_link"></a>
+        <a wicket:id="topology.provisioning" class="button_link"></a><div wicket:id="topology.provisioning.dialog"></div>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="topology.expand" class="button_link"></a>
+        <a wicket:id="topology.collapse" class="button_link"></a>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="topology.select_drivers" class="button_link"></a>
+        <a wicket:id="topology.select_nodes" class="button_link"></a>
+        <a wicket:id="topology.select_all" class="button_link"></a>
       </form>
-      <div wicket:id="topology_tree">[topology_tree]</div>
+      <div wicket:id="table.tree">[topology_tree]</div>
     </wicket:extend>
   </body>
 </html>

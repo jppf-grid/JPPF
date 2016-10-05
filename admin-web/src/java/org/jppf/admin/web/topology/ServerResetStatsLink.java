@@ -18,10 +18,13 @@
 
 package org.jppf.admin.web.topology;
 
+import java.util.List;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.JPPFWebSession;
+import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -30,35 +33,41 @@ import org.slf4j.*;
  *
  * @author Laurent Cohen
  */
-public class SystemInfoLink extends AbstractActionLink {
+public class ServerResetStatsLink extends AbstractActionLink {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(SystemInfoLink.class);
+  static Logger log = LoggerFactory.getLogger(ServerResetStatsLink.class);
   /**
    * Determines whether debug log statements are enabled.
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
-   *
+   * 
    */
-  public SystemInfoLink() {
-    super("topology.info", Model.of("System info"));
+  public ServerResetStatsLink() {
+    super(TopologyTree.SERVER_RESET_STATS_ACTION, Model.of("Reset statistics"), "server_reset_stats.gif");
     setEnabled(false);
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    if (debugEnabled) log.debug("clicked on System info");
+    if (debugEnabled) log.debug("clicked on server reset stats");
     JPPFWebSession session = getSession(target);
-    JPPFTableTree tableTree = session.getTopologyTableTree();
-    target.add(tableTree);
+    final TableTreeData data = session.getTopologyData();
+    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    if (!selectedNodes.isEmpty()) {
+    }
   }
 
-  @Override
-  protected void onComponentTag(final ComponentTag tag) {
-    super.onComponentTag(tag);
-    tag.getAttributes().put("style", "background-color: gray");
+  /**
+   * 
+   */
+  public static class Action extends AbstractUpdatableAction {
+    @Override
+    public void setEnabled(final List<DefaultMutableTreeNode> selected) {
+      enabled = isDriverSelected(selected);
+    }
   }
 }

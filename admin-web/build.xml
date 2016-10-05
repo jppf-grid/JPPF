@@ -73,6 +73,7 @@
 
   <target name="build" depends="war" />
   <target name="build.deploy.tomcat" depends="build, tomcat.deploy" description="generate and deploy the war file"/>
+  <target name="build.deploy.start.tomcat" depends="build, tomcat.deploy, tomcat.start" description="generate and deploy the war file and start tomcat"/>
 
   <!-- ==================================================================== -->
   <!-- Compile the application                                              -->
@@ -123,10 +124,16 @@
   <!-- Misc                                                                 -->
   <!-- =====================================================================-->
 
+  <property name="tomcat.dir" value="C:/Tools/Apache/apache-tomcat-7.0.70"/>
+
   <target name="tomcat.deploy" description="deploy to Tomcat">
-    <property name="tomcat.dir" value="C:/Tools/Apache/apache-tomcat-7.0.70"/>
     <property name="tomcat.deploy.dir" value="${tomcat.dir}/webapps"/>
     <copy todir="${tomcat.deploy.dir}" file="${build.dir}/JPPFWebAdmin.war" />
+  </target>
+
+  <target name="tomcat.start" description="start Tomcat">
+    <exec executable="${tomcat.dir}/bin/startup.bat" dir="${tomcat.dir}/bin" failonerror="true" searchpath="true">
+    </exec>
   </target>
 
 </project>

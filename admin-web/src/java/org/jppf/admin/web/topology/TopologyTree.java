@@ -35,8 +35,14 @@ import org.apache.wicket.model.*;
 import org.apache.wicket.util.time.Duration;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.topology.nodeconfig.NodeConfigLink;
+import org.jppf.admin.web.topology.nodethreads.NodeThreadsLink;
+import org.jppf.admin.web.topology.provisioning.ProvisioningLink;
+import org.jppf.admin.web.topology.serverstop.DriverStopRestartLink;
+import org.jppf.admin.web.topology.systeminfo.SystemInfoLink;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.monitoring.node.NodeTreeTableModel;
+import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -45,7 +51,7 @@ import org.slf4j.*;
  * This web page displays the topology tree.
  * @author Laurent Cohen
  */
-public class TopologyTree extends TemplatePage implements TopologyListener {
+public class TopologyTree extends TemplatePage implements TopologyListener, TableTreeHolder {
   /**
    * Logger for this class.
    */
@@ -59,44 +65,112 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
    */
   static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Server stop/restart action id.
+   */
+  public static String SERVER_STOP_RESTART_ACTION = "topology.server_stop_restart";
+  /**
+   * Server reset stats action id.
+   */
+  public static String SERVER_RESET_STATS_ACTION = "topology.server_reset_stats";
+  /**
+   * Node configuration update action id.
+   */
+  public static String NODE_CONFIG_ACTION = "topology.node_config";
+  /**
+   * System info action id.
+   */
+  public static String SYSTEM_INFO_ACTION = "topology.info";
+  /**
+   * Node thread pool config action id.
+   */
+  public static String NODE_THREADS_ACTION = "topology.node_threads";
+  /**
+   * Node reset task counter action id.
+   */
+  public static String NODE_RESET_TASKS_ACTION = "topology.node_reset_tasks";
+  /**
+   * Cancel pending action id.
+   */
+  public static String CANCEL_PENDING_ACTION = "topology.cancel_pending_action";
+  /**
+   * Stop node action id.
+   */
+  public static String NODE_STOP_ACTION = "topology.node_stop";
+  /**
+   * Restart node action id.
+   */
+  public static String NODE_RESTART_ACTION = "topology.node_restart";
+  /**
+   * Deferred stop node action id.
+   */
+  public static String NODE_STOP_DEFERRED_ACTION = "topology.node_stop_deferred";
+  /**
+   * Deferred restart node action id.
+   */
+  public static String NODE_RESTART_DEFERRED_ACTION = "topology.node_restart_deferred";
+  /**
+   * Deferred suspend node action id.
+   */
+  public static String NODE_SUSPEND_ACTION = "topology.node_suspend";
+  /**
+   * Provisioning action id.
+   */
+  public static String PROVISIONING_ACTION = "topology.provisioning";
+  /**
+   * Expand all action id.
+   */
+  public static String EXPAND_ALL_ACTION = "topology.expand";
+  /**
+   * Collapse action id.
+   */
+  public static String COLLAPSE_ALL_ACTION = "topology.collapse";
+  /**
+   * Select drivers action id.
+   */
+  public static String SELECT_DRIVERS_ACTION = "topology.select_drivers";
+  /**
+   * Select nodes action id.
+   */
+  public static String SELECT_NODES_ACTION = "topology.select_nodes";
+  /**
+   * Select all action id.
+   */
+  public static String SELECT_ALL_ACTION = "topology.select_all";
+  /**
    * The tree table component.
    */
   private transient JPPFTableTree tableTree;
   /**
    * The tree table model.
    */
-  private transient NodeTreeTableModel topologyModel;
+  private transient AbstractJPPFTreeTableModel topologyModel;
   /**
    * Handles the selection of rows in the tree table.
    */
   private transient SelectionHandler selectionHandler;
+  /**
+   * 
+   */
+  private transient Form<String> toolbar;
+  /**
+   * 
+   */
+  private final transient AjaxSelfUpdatingTimerBehavior refreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5));
 
   /**
    * Initialize this web page.
    */
   public TopologyTree() {
-    JPPFWebSession session = getJPPFSession();
-    selectionHandler = session.getTopologySelectionHandler();
-    if (selectionHandler == null) {
-      selectionHandler = new MultipleSelectionHandler().setFilter(new SelectionHandler.Filter() {
-        @Override
-        public boolean accepts(final DefaultMutableTreeNode node) {
-          return (node != null) && !((AbstractTopologyComponent) node.getUserObject()).isPeer();
-        }
-      });
-      session.setTopologySelectionHandler(selectionHandler);
-    }
-    Form<String> form = new Form<>("topology.tree.toolbar");
-    form.add(new SystemInfoLink());
-    form.add(new ExpandAllLink());
-    form.add(new CollapseAllLink());
-    form.add(new SelectDriversLink());
-    form.add(new SelectNodesLink());
-    form.add(new SelectAllLink());
-    add(form);
+    setVersioned(false);
+    createActions();
+    add(toolbar);
+    TableTreeData data = getJPPFSession().getTopologyData();
+    selectionHandler = data.getSelectionHandler();
     tableTree = createTableTree();
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
-    tableTree.add(new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5)));
+    tableTree.add(refreshTimer);
+    tableTree.addUpdateTarget(toolbar);
+    data.selectionChanged(selectionHandler);
     if (debugEnabled) log.debug("table tree created");
     add(tableTree);
     if (debugEnabled) log.debug("table tree added to page");
@@ -107,21 +181,16 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
    * @return a {@link JPPFTableTree} instance.
    */
   private JPPFTableTree createTableTree() {
-    JPPFWebSession session = getJPPFSession();
-    JPPFTableTree tree = session.getTopologyTableTree();
-    if (tree == null) {
-      if (debugEnabled) log.debug("creating topology model");
-      createTopologyModel();
-      if (debugEnabled) log.debug("topology model created");
-      tree = new JPPFTableTree("topology_tree", createColumns(), topologyModel, Integer.MAX_VALUE, selectionHandler, new TopologyNodeRenderer());
-      DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
-      HeadersToolbar<String> header = new HeadersToolbar<>(table, null);
-      table.addTopToolbar(header);
-      DefaultMutableTreeNode root = (DefaultMutableTreeNode) topologyModel.getRoot();
-      for (int i = 0; i < root.getChildCount(); i++) tree.expand((DefaultMutableTreeNode) root.getChildAt(i));
-      if (debugEnabled) log.debug("tree created");
-      session.setTopologyTableTree(tree);
-    }
+    if (debugEnabled) log.debug("creating topology model");
+    createTopologyModel();
+    if (debugEnabled) log.debug("topology model created");
+    JPPFTableTree tree = new JPPFTableTree(TreeViewType.TOPOLOGY, "table.tree", createColumns(), topologyModel, Integer.MAX_VALUE, selectionHandler, new TopologyNodeRenderer());
+    DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
+    HeadersToolbar<String> header = new HeadersToolbar<>(table, null);
+    table.addTopToolbar(header);
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) topologyModel.getRoot();
+    for (int i = 0; i < root.getChildCount(); i++) tree.expand((DefaultMutableTreeNode) root.getChildAt(i));
+    if (debugEnabled) log.debug("tree created");
     return tree;
   }
 
@@ -130,13 +199,14 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
    */
   private void createTopologyModel() {
     JPPFWebSession session = getJPPFSession();
-    topologyModel = session.getTopologyModel();
+    TableTreeData data = session.getTopologyData();
+    topologyModel = data.getModel();
     if (topologyModel == null) {
       JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
       topologyModel = new NodeTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), session.getLocale());
       populateTreeTableModel();
       app.getTopologyManager().addTopologyListener(this);
-      session.setTopologyModel(topologyModel);
+      data.setModel(topologyModel);
     }
   }
 
@@ -168,6 +238,38 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
     columns.add(new TopologyColumn(NodeTreeTableModel.NB_SLAVES));
     columns.add(new TopologyColumn(NodeTreeTableModel.PENDING_ACTION));
     return columns;
+  }
+
+  /**
+   * @return a form holding the toolbar components.
+   */
+  private ActionHandler createActions() {
+    TableTreeData data = getJPPFSession().getTopologyData();
+    ActionHandler actionHandler = data.getActionHandler();
+    if (actionHandler == null) actionHandler = new ActionHandler();
+    if (toolbar == null) {
+      toolbar = new Form<>("topology.tree.toolbar");
+      actionHandler.addActionLink(toolbar, new DriverStopRestartLink(toolbar));
+      actionHandler.addActionLink(toolbar, new ServerResetStatsLink());
+      actionHandler.addActionLink(toolbar, new SystemInfoLink(toolbar));
+      actionHandler.addActionLink(toolbar, new NodeConfigLink(toolbar));
+      actionHandler.addActionLink(toolbar, new NodeThreadsLink(toolbar));
+      actionHandler.addActionLink(toolbar, new ResetTaskCounterLink());
+      actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.STOP));
+      actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RESTART));
+      actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.STOP_DEFERRED));
+      actionHandler.addActionLink(toolbar, new StopRestartNodeLink(StopRestartNodeLink.ActionType.RESTART_DEFERRED));
+      actionHandler.addActionLink(toolbar, new CancelPendingActionLink());
+      actionHandler.addActionLink(toolbar, new SuspendNodeLink());
+      actionHandler.addActionLink(toolbar, new ProvisioningLink(toolbar));
+      actionHandler.addActionLink(toolbar, new ExpandAllLink());
+      actionHandler.addActionLink(toolbar, new CollapseAllLink());
+      actionHandler.addActionLink(toolbar, new SelectDriversLink());
+      actionHandler.addActionLink(toolbar, new SelectNodesLink());
+      actionHandler.addActionLink(toolbar, new SelectAllLink());
+      data.setActionHandler(actionHandler);
+    }
+    return actionHandler;
   }
 
   @Override
@@ -205,11 +307,26 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
     }
   }
 
+  @Override
+  public AjaxSelfUpdatingTimerBehavior getRefreshTimer() {
+    return refreshTimer;
+  }
+
+  @Override
+  public JPPFTableTree getTableTree() {
+    return tableTree;
+  }
+
+  @Override
+  public Form<String> getToolbar() {
+    return toolbar;
+  }
+
   /**
    * @return the tree table model.
    */
-  public NodeTreeTableModel getTopologyModel() {
-    return topologyModel != null ? topologyModel : getJPPFSession().getTopologyModel();
+  public AbstractJPPFTreeTableModel getTopologyModel() {
+    return topologyModel != null ? topologyModel : getJPPFSession().getTopologyData().getModel();
   }
 
   /**
@@ -234,18 +351,21 @@ public class TopologyTree extends TemplatePage implements TopologyListener {
       AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
       String cssClass = null;
       boolean selected = selectionHandler.isSelected(comp.getUuid());
+      boolean inactive = false;
       if (comp.isPeer()) cssClass = "peer";
       else if (comp.isNode()) {
         TopologyNode data = (TopologyNode) node.getUserObject();
         if (traceEnabled) log.trace("node status: {}", data.getStatus());
-        cssClass = (data.getStatus() == TopologyNodeStatus.UP) ? "node_up" : "node_tree_down";
+        inactive = !data.getManagementInfo().isActive();
+        if (data.getStatus() == TopologyNodeStatus.UP) {
+          if (inactive) cssClass = (selected) ? "tree_inactive_selected" : "tree_inactive";
+          else cssClass = (selected) ? "tree_selected" : "node_up";
+        }
+        else cssClass = (selected) ? "tree_inactive_selected" : "node_tree_down";
       } else if (comp.isDriver()) {
         TopologyDriver driver = (TopologyDriver) node.getUserObject();
-        cssClass = (driver.getConnection().getStatus().isWorkingStatus()) ? "driver_up" : "driver_down";
-      } else if (!selected) cssClass = "empty";
-      if (selected && !comp.isPeer()) {
-        if (cssClass == null) cssClass = "tree_selected";
-        else cssClass += " tree_selected";
+        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass = (selected) ? "tree_selected" : "driver_up";
+        else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
       }
       if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
     }
