@@ -16,15 +16,22 @@
   limitations under the License.
 */
 
-body, textarea {
-  font-size:10pt;
-  font-family: Arial, Verdana, Sans-serif;
+body {
   background-color: #E2E4F0;
   margin-top: 20px
 }
 
+body, textarea {
+  font-size:10pt;
+  font-family: Arial, Verdana, Sans-serif;
+}
+
 textarea {
   background-color: white;
+}
+
+textarea:disabled, input:disabled {
+  background-color: #DDD;
 }
 
 a { text-decoration: none; font-weight: normal; }

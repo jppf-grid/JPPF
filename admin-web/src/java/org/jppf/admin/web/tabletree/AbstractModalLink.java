@@ -27,7 +27,7 @@ import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
- *  @param <F> .
+ * @param <F> the type of form displayed in the modal window.
  * @author Laurent Cohen
  */
 public abstract class AbstractModalLink<F extends Form<String>> extends AbstractActionLink {
@@ -40,15 +40,15 @@ public abstract class AbstractModalLink<F extends Form<String>> extends Abstract
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   *
+   * The modal window opened upon click on the buttom.
    */
   protected transient ModalWindow modal;
   /**
-   *
+   * The form displayed inside the modal window.
    */
   protected F modalForm;
   /**
-   *
+   * The class of the page display inside the modal window.
    */
   protected Class<? extends Page> pageClass;
 
@@ -81,12 +81,11 @@ public abstract class AbstractModalLink<F extends Form<String>> extends Abstract
         restartRefreshTimer(target);
       }
     });
-    //modal.set
     modal.show(target);
   }
 
   /**
-   * Create a new form add tot he modal window.
+   * Create a new form add to the page in the modal window.
    * @return a new form.
    */
   protected abstract F createForm();

@@ -28,6 +28,7 @@ import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.*;
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTree;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.treetable.TreeViewType;
@@ -65,6 +66,7 @@ public class JPPFWebConsoleApplication extends WebApplication {
    */
   public JPPFWebConsoleApplication() {
     if (debugEnabled) log.debug("in JPPFWebConsoleApplication<init>()");
+    setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
   }
 
   @Override

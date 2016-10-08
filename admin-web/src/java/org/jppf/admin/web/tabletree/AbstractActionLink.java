@@ -35,7 +35,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    */
   private transient UpdatableAction action;
   /**
-   * 
+   * Name of the associated icon.
    */
   protected String imageName;
 

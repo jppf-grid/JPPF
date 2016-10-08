@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.*;
-import org.jppf.admin.web.tabletree.AbstractModalLink;
+import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.TopologyTree;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;

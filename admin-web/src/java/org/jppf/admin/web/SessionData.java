@@ -21,6 +21,7 @@ package org.jppf.admin.web;
 import java.util.EnumMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
 
@@ -70,9 +71,6 @@ public class SessionData {
           break;
 
         case HEALTH:
-          data = new TableTreeData(type);
-          break;
-
         case JOBS:
           data = new TableTreeData(type);
           break;

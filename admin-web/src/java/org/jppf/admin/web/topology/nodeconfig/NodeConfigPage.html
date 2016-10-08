@@ -5,14 +5,34 @@
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
+    <style>
+    #c2:disabled + span {
+      font-style: italic;
+      color: #666;
+    }
+    </style>
 	</head>	
-	<body>
+	<body onload="updateState('c1', 'c2')">
+    <script>
+    function updateState(src, dest) {
+        var disabled = !document.getElementById(src).checked;
+        document.getElementById(dest).disabled = disabled;
+        var style = document.getElementById('cl2').style;
+        if (disabled) {
+          style.color = "#666666";
+          style.fontStyle = "italic";
+        } else {
+          style.color = "black";
+          style.fontStyle = "normal";
+        }
+    }
+    </script>
 	  <form wicket:id="node_config.form" class="modal_form">
-      <input type="checkbox" wicket:id="node_config.force_restart.field"/>
+      <input id="c1" type="checkbox" wicket:id="node_config.force_restart.field" onclick="updateState('c1', 'c2')"/>
       <span wicket:id="node_config.force_restart.label"></span><br/>
 
-      <input type="checkbox" wicket:id="node_config.interrupt.field"/>
-      <span wicket:id="node_config.interrupt.label"></span><br/>
+      <input id="c2" type="checkbox" wicket:id="node_config.interrupt.field"/>
+      <span id="cl2" wicket:id="node_config.interrupt.label"></span><br/>
 
       <span wicket:id="node_config.config.label"></span><br/>
 	    <textarea wicket:id="node_config.config.field" rows="20" cols="80"></textarea><br/>

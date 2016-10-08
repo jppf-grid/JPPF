@@ -22,7 +22,6 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.TableTreeData;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigAction;
 import org.jppf.admin.web.topology.nodethreads.NodeThreadsAction;

@@ -22,7 +22,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.TableTreeData;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.AbstractComponent;
 

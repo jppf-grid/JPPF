@@ -5,17 +5,35 @@
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
-	</head>	
-	<body>
+	</head>
+	<body onload="updateState('c1', 't1')">
+    <script>
+      function updateState(src, dest) {
+        var disabled = !document.getElementById(src).checked;
+        document.getElementById(dest).disabled = disabled;
+        var style = document.getElementById('tl1').style;
+        if (disabled) {
+          style.color = "#666666";
+          style.fontStyle = "italic";
+        } else {
+          style.color = "black";
+          style.fontStyle = "normal";
+        }
+      }
+    </script>
 	  <form wicket:id="provisioning.form" class="modal_form">
       <span wicket:id="provisioning.nb_slaves.label"></span>&nbsp;
 	    <input type="text" wicket:id="provisioning.nb_slaves.field" value="0"/><br/>
+
       <input type="checkbox" wicket:id="provisioning.interrupt.field"/>
       <span wicket:id="provisioning.interrupt.label"></span><br/>
-      <input type="checkbox" wicket:id="provisioning.use_overrides.field"/>
+
+      <input id="c1" type="checkbox" wicket:id="provisioning.use_overrides.field" onclick="updateState('c1', 't1')"/>
       <span wicket:id="provisioning.use_overrides.label"></span><br/>
-      <span wicket:id="provisioning.overrides.label"></span><br/>
-	    <textarea wicket:id="provisioning.overrides.field" rows="10" cols="80"></textarea><br/>
+
+      <span id="tl1" wicket:id="provisioning.overrides.label"></span><br/>
+	    <textarea id="t1" wicket:id="provisioning.overrides.field" rows="10" cols="80"></textarea><br/>
+
       <p><a wicket:id="provisioning.ok" class="button_link">OK</a>&nbsp;
       <a wicket:id="provisioning.cancel" class="button_link">Cancel</a>
 		</form>

@@ -6,7 +6,21 @@
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>	
-	<body>
+	<body onload="updateState('c1', 't1')">
+    <script>
+    function updateState(src, dest) {
+        var disabled = !document.getElementById(src).checked;
+        document.getElementById(dest).disabled = disabled;
+        var style = document.getElementById('tl1').style;
+        if (disabled) {
+          style.color = "#666666";
+          style.fontStyle = "italic";
+        } else {
+          style.color = "black";
+          style.fontStyle = "normal";
+        }
+    }
+    </script>
 	  <form wicket:id="server_stop_restart.form" class="modal_form">
       <table class="modal_form">
         <tr>
@@ -15,13 +29,13 @@
         </tr>
         <tr>
           <td colspan="2">
-            <input type="checkbox" wicket:id="server_stop_restart.restart.field"/>
+            <input id="c1" type="checkbox" wicket:id="server_stop_restart.restart.field" onclick="updateState('c1', 't1')"/>
             <span wicket:id="server_stop_restart.restart.label"></span><br/>
           </td>
         </tr>
         <tr>
-          <td><span wicket:id="server_stop_restart.restart_delay.label"></span>&nbsp;</td>
-          <td><input type="text" wicket:id="server_stop_restart.restart_delay.field" value="0"/><br/></td>
+          <td><span id="tl1" wicket:id="server_stop_restart.restart_delay.label"></span>&nbsp;</td>
+          <td><input id="t1" type="text" wicket:id="server_stop_restart.restart_delay.field" value="0"/><br/></td>
         </tr>
       </table>
 
