@@ -33,7 +33,7 @@ import org.apache.wicket.markup.repeater.*;
 import org.apache.wicket.model.*;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.jppf.admin.web.*;
+import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;

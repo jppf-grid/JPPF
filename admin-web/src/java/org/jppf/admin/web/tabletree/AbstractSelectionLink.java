@@ -21,7 +21,7 @@ package org.jppf.admin.web.tabletree;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
-import org.jppf.admin.web.*;
+import org.jppf.admin.web.JPPFWebSession;
 
 /**
  * Abstract class for action links that select nodes in a table tree.

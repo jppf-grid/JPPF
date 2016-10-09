@@ -114,7 +114,7 @@
         <attribute name="JPPF-BuildDate" value="${readable.now}" />
       </manifest>
       <classes dir="${classes.dir}"/>
-      <lib dir="${lib.dir}" includes="*.jar" excludes="checkstyle*.jar"/>
+      <lib dir="${lib.dir}" includes="*.jar" excludes="checkstyle*.jar,spring*.jar,asm*.jar,*atmosphere*.jar,guava*.jar,hibernate*.jar,guice*.jar,jetty*.jar"/>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/**/*.*"/>
     </war>
     <echo message="WAR file created" />

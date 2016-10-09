@@ -21,7 +21,7 @@ package org.jppf.admin.web.topology;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.*;
+import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
 

@@ -28,7 +28,7 @@ import org.jppf.admin.web.tabletree.AbstractModalLink;
 import org.jppf.admin.web.topology.*;
 import org.jppf.admin.web.topology.systeminfo.SystemInfoLink;
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.*;
+import org.jppf.management.UuidSelector;
 import org.jppf.ui.monitoring.node.actions.NodeConfigurationAction;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;

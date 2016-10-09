@@ -143,7 +143,7 @@ public class JPPFWebConsoleApplication extends WebApplication {
   }
 
   /**
-   * Shall not save.
+   * Does not save to persistent store..
    */
   private static final class MyPageManagerProvider extends DefaultPageManagerProvider {
     /**
@@ -171,7 +171,7 @@ public class JPPFWebConsoleApplication extends WebApplication {
   }
 
   /**
-   *
+   * Disables serialization.
    */
   private static class NullPageStore implements IPageStore {
     @Override
