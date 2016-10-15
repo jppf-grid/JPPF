@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.tabletree.AbstractUpdatableAction;
+import org.jppf.admin.web.tabletree.AbstractManagerRoleAction;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JPPFManagementInfo;
 
@@ -30,7 +30,7 @@ import org.jppf.management.JPPFManagementInfo;
  * 
  * @author Laurent Cohen
  */
-public class ProvisioningAction extends AbstractUpdatableAction {
+public class ProvisioningAction extends AbstractManagerRoleAction {
   @Override
   public void setEnabled(final List<DefaultMutableTreeNode> selected) {
     enabled = false;

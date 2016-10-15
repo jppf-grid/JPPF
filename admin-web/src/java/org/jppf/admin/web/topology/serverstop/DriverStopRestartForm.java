@@ -69,14 +69,16 @@ public class DriverStopRestartForm extends Form<String> {
     add(restartField = new CheckBox(PREFIX + ".restart.field", Model.of(true)));
     add(new Label(PREFIX + ".restart_delay.label", Model.of("Restart delay")));
     add(restartDelayField = new TextField<>(PREFIX + ".restart_delay.field", Model.of(0L)));
-    add(new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
+    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on provisioning.ok");
         if (okAction != null) okAction.run();
         modal.close(target);
       }
-    });
+    };
+    add(okButton);
+    setDefaultButton(okButton);
     add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {

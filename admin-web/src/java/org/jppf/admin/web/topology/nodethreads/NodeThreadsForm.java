@@ -63,14 +63,16 @@ public class NodeThreadsForm extends Form<String> {
     add(nbThreadsField = new TextField<>(PREFIX + ".nb_threads.field", Model.of(Runtime.getRuntime().availableProcessors())));
     add(new Label(PREFIX + ".priority.label", Model.of("Priority")));
     add(priorityField = new TextField<>(PREFIX + ".priority.field", Model.of(5)));
-    add(new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
+    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on node_threads.ok");
         if (okAction != null) okAction.run();
         modal.close(target);
       }
-    });
+    };
+    add(okButton);
+    setDefaultButton(okButton);
     add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {

@@ -46,11 +46,13 @@ import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
+import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
  * This web page displays the topology tree.
  * @author Laurent Cohen
  */
+@MountPath("protected/topology")
 public class TopologyTree extends TemplatePage implements TopologyListener, TableTreeHolder {
   /**
    * Logger for this class.

@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+  </head>
+  <body>
+    <div align="center">
+      <div class="main_border">
+        <div wicket:id="jppf.header"></div>
+
+        <form wicket:id="login.form" class="modal_form">
+          <table class="modal_form" cellpadding="5px" style="width: 300px; border: 1px solid #6D78B6; box-shadow: 8px 8px 16px #6D78B6; border-radius: 10px;">
+            <tr> <td colspan="2"><h3>Please enter your credentials</h3></td></tr>
+            <tr>
+              <td><span wicket:id="login.username.label"></span>&nbsp;</td>
+              <td><input type="text" wicket:id="login.username.field" value="0"/><br/></td>
+            </tr>
+            <tr>
+              <td><span wicket:id="login.password.label"></span>&nbsp;</td>
+              <td><input type="password" wicket:id="login.password.field" value="0"/><br/></td>
+            </tr>        
+            <tr><td colspan="2" align="center"><br/><a wicket:id="login.ok" class="button_link" style="padding-left: 20px; padding-right: 20px;">Login</a><br/>&nbsp;</td></tr>
+          </table>
+          <div wicket:id="login.error" style="color: red; font-weight:bold;"></div>
+        </form>
+
+        <div wicket:id="jppf.footer"></div>
+      </div>
+    </div>
+  </body>
+</html>

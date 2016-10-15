@@ -1,19 +1,19 @@
 <!--
-	JPPF
-	Copyright (C) 2005-2016 JPPF Team. 
-	http://www.jppf.org
+  JPPF
+  Copyright (C) 2005-2016 JPPF Team. 
+  http://www.jppf.org
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-		 http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 
 <project name="WebAdminConsole" default="build" basedir=".">
@@ -47,7 +47,7 @@
   <!-- ==================================================================== -->
 
   <target name="clean">
-    <delete quiet="true">
+    <delete quiet="false">
       <fileset dir="${classes.dir}" includes="**/*.*" />
     </delete>
     <delete quiet="true">
@@ -86,6 +86,7 @@
     <checkstyle config="${basedir}/../JPPF/CheckStyle_JPPF_config.xml">
       <fileset dir="${src.dir}" includes="**/*.java" />
     </checkstyle>
+    <!--<javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">-->
     <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:none" />
@@ -114,7 +115,19 @@
         <attribute name="JPPF-BuildDate" value="${readable.now}" />
       </manifest>
       <classes dir="${classes.dir}"/>
-      <lib dir="${lib.dir}" includes="*.jar" excludes="checkstyle*.jar,spring*.jar,asm*.jar,*atmosphere*.jar,guava*.jar,hibernate*.jar,guice*.jar,jetty*.jar"/>
+      <lib dir="${lib.dir}">
+        <!--
+        <exclude name="guava*.jar"/>
+        <exclude name="asm*.jar"/>
+        -->
+        <include name="*.jar"/>
+        <exclude name="checkstyle*.jar"/>
+        <exclude name="hibernate*.jar"/>
+        <exclude name="jetty*.jar"/>
+        <exclude name="spring*.jar"/>
+        <exclude name="*atmosphere*.jar"/>
+        <exclude name="guice*.jar"/>
+      </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/**/*.*"/>
     </war>
     <echo message="WAR file created" />

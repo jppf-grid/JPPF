@@ -16,22 +16,26 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web;
+package org.jppf.admin.web.auth;
 
 import org.apache.wicket.markup.html.WebPage;
+import org.jppf.admin.web.*;
+import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
  * SUperclass for all pages in the web admin console.
  * Its associated html file provides the basic layout for all other pages.
  * @author Laurent Cohen
  */
-public class TemplatePage extends WebPage {
+@MountPath("login.html")
+public class LoginPage extends WebPage {
   /**
    * 
    */
-  public TemplatePage() {
+  public LoginPage() {
     setVersioned(false);
     add(new HeaderPanel());
+    add(new LoginForm());
     add(new FooterPanel());
   }
 
@@ -43,3 +47,4 @@ public class TemplatePage extends WebPage {
     return (JPPFWebSession) getSession();
   }
 }
+

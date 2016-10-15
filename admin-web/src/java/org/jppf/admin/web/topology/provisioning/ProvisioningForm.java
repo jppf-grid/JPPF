@@ -75,14 +75,16 @@ public class ProvisioningForm extends Form<String> {
     add(useOverridesField = new CheckBox(PREFIX + ".use_overrides.field", Model.of(false)));
     add(new Label(PREFIX + ".overrides.label", Model.of("Configuration overrides")));
     add(overridesField = new TextArea<>(PREFIX + ".overrides.field", Model.of("")));
-    add(new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
+    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on provisioning.ok");
         if (okAction != null) okAction.run();
         modal.close(target);
       }
-    });
+    };
+    add(okButton);
+    setDefaultButton(okButton);
     add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {

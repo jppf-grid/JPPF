@@ -16,21 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.topology.serverstop;
+package org.jppf.admin.web;
 
-import java.util.List;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import org.jppf.admin.web.tabletree.AbstractManagerRoleAction;
+import org.apache.wicket.markup.html.panel.Panel;
 
 /**
- * 
+ * A the header panel.
  * @author Laurent Cohen
  */
-public class DriverStopRestartAction extends AbstractManagerRoleAction {
-  @Override
-  public void setEnabled(final List<DefaultMutableTreeNode> selected) {
-    enabled = isDriverSelected(selected);
+public class FooterPanel extends Panel {
+  /**
+   * 
+   */
+  public FooterPanel() {
+    super("jppf.footer");
   }
 }

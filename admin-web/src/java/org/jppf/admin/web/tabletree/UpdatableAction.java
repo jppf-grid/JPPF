@@ -22,8 +22,10 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
+
 /**
- *
+ * Interface for actions whose enabled state can be updated based on the elements selected in a tree.
  * @author Laurent Cohen
  */
 public interface UpdatableAction {
@@ -37,4 +39,16 @@ public interface UpdatableAction {
    * @param selected a list of the selected elements, in depth-first traversal order of the tree model.
    */
   void setEnabled(List<DefaultMutableTreeNode> selected);
+
+  /**
+   * Determine wehtehr this action is autothorized.
+   * @return {@code true} if this action is authroized, {@code false} otherwise.
+   */
+  boolean isAuthorized();
+
+  /**
+   * Determine wehtehr this action is autothorized for the specified roles.
+   * @param roles the roles to check for authorization.
+   */
+  void setAuthorized(Roles roles);
 }

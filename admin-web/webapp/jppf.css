@@ -343,15 +343,17 @@ div#bodyContent div h2 {
  Web admin console rules
 **************************/
 
-a.navlink:link {
+div.navlink2 {
+  width: 100%;
+  font-size: 10pt;
+}
+
+div.navlink2 a:link {
   background: transparent;
 }
 
-a.navlink {
+div.navlink2 a {
   background-color: #C5D0F0;
-  font-size: 10pt;
-  width: 80px;
-  text-align: left;
 }
 
 table {

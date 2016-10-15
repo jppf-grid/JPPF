@@ -18,18 +18,18 @@
 
 package org.jppf.admin.web;
 
-import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.request.Request;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
+import org.wicketstuff.wicket.servlet3.auth.ServletContainerAuthenticatedWebSession;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class JPPFWebSession extends WebSession {
+public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   /**
    * Logger for this class.
    */
@@ -46,11 +46,14 @@ public class JPPFWebSession extends WebSession {
   /**
    * Initialize a new session.
    * @param request the request.
-   * @param sessionDataId the identifier for the non-persisted session data.
    */
-  public JPPFWebSession(final Request request, final long sessionDataId) {
+  public JPPFWebSession(final Request request) {
     super(request);
-    this.sessionDataId = sessionDataId;
+    SessionData sessionData = new SessionData();
+    JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
+    app.sessionDataMap.put(sessionData.getId(), sessionData);
+    log.info("created sessiondata with id={}", sessionData.getId());
+    this.sessionDataId = sessionData.getId();
     if (debugEnabled) log.debug(String.format("new instance #%d, request=%s", sessionDataId, request));
   }
 

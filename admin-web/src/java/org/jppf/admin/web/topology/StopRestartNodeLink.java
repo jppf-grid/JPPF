@@ -182,7 +182,7 @@ public class StopRestartNodeLink extends AbstractActionLink {
   /**
    *
    */
-  public static class Action extends AbstractUpdatableAction {
+  public static class Action extends AbstractManagerRoleAction {
     @Override
     public void setEnabled(final List<DefaultMutableTreeNode> selected) {
       enabled = isNodeSelected(selected);

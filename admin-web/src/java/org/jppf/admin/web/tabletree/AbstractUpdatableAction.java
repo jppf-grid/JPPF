@@ -22,17 +22,22 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class AbstractUpdatableAction implements UpdatableAction {
+public abstract class AbstractUpdatableAction implements UpdatableAction {
   /**
-   * 
+   *
    */
   protected boolean enabled = true;
+  /**
+   *
+   */
+  protected boolean authorized = true;
 
   @Override
   public boolean isEnabled() {
@@ -41,6 +46,15 @@ public class AbstractUpdatableAction implements UpdatableAction {
 
   @Override
   public void setEnabled(final List<DefaultMutableTreeNode> selected) {
+  }
+
+  @Override
+  public boolean isAuthorized() {
+    return authorized;
+  }
+
+  @Override
+  public void setAuthorized(final Roles roles) {
   }
 
   /**

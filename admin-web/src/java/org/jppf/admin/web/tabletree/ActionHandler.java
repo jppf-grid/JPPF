@@ -22,7 +22,9 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Form;
+import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -40,13 +42,13 @@ public class ActionHandler {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-  *
-  */
- private transient Map<String, UpdatableAction> actions = new HashMap<>();
- /**
- *
- */
-private transient Map<String, AbstractActionLink> actionLinks = new HashMap<>();
+   *
+   */
+  private transient Map<String, UpdatableAction> actions = new HashMap<>();
+  /**
+   *
+   */
+  private transient Map<String, AbstractActionLink> actionLinks = new HashMap<>();
 
   /**
    *
@@ -55,7 +57,7 @@ private transient Map<String, AbstractActionLink> actionLinks = new HashMap<>();
   }
 
   /**
-   * 
+   * Update the actions managed by this handler based ont he selected nodes.
    * @param treeNodes the selected nodes.
    */
   public void selectionChanged(final List<DefaultMutableTreeNode> treeNodes) {
@@ -64,8 +66,10 @@ private transient Map<String, AbstractActionLink> actionLinks = new HashMap<>();
       AbstractActionLink link = actionLinks.get(id);
       UpdatableAction action = actions.get(id);
       if (action != null) {
+        JPPFWebSession session = (JPPFWebSession) Session.get();
+        action.setAuthorized(session.getRoles());
         action.setEnabled(treeNodes);
-        if (link != null) link.setEnabled(action.isEnabled());
+        if (link != null) link.setEnabled(action.isAuthorized() && action.isEnabled());
       } else {
         if (link != null) link.setEnabled(true);
       }

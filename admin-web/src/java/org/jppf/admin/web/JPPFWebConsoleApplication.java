@@ -23,23 +23,25 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.wicket.*;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.request.*;
+import org.jppf.admin.web.auth.LoginPage;
 import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTree;
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.utils.*;
 import org.slf4j.*;
+import org.wicketstuff.wicket.servlet3.auth.*;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class JPPFWebConsoleApplication extends WebApplication {
+public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebApplication {
   /**
    * Logger for this class.
    */
@@ -60,6 +62,10 @@ public class JPPFWebConsoleApplication extends WebApplication {
    * The topololgy manager.
    */
   private transient TopologyManager topologyManager;
+  /**
+   * The topololgy manager.
+   */
+  private transient JobMonitor jobMonitor;
 
   /**
    * Default constructor.
@@ -77,19 +83,35 @@ public class JPPFWebConsoleApplication extends WebApplication {
   @Override
   protected void init() {
     super.init();
+    getPageSettings().setVersionPagesByDefault(false);
     this.setPageManagerProvider(new MyPageManagerProvider(this));
-    log.info("max size per session = {}", getStoreSettings().getMaxSizePerSession());
     this.topologyManager = new TopologyManager();
+    this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
   }
 
   /**
-   *
    * @return the topology manager.
    */
   public TopologyManager getTopologyManager() {
     return topologyManager;
   }
 
+  /**
+   * @return the topololgy manager.
+   */
+  public JobMonitor getJobMonitor() {
+    return jobMonitor;
+  }
+
+  @Override
+  protected Class<? extends ServletContainerAuthenticatedWebSession> getContainerManagedWebSessionClass() {
+    return JPPFWebSession.class;
+  }
+
+  @Override
+  protected Class<? extends WebPage> getSignInPageClass() {
+    return LoginPage.class;
+  }
 
   /**
    * Get a localized message given its unique name and the current locale.
@@ -99,14 +121,6 @@ public class JPPFWebConsoleApplication extends WebApplication {
    */
   public String localize(final String message) {
     return LocalizationUtils.getLocalized(BASE, message);
-  }
-
-  @Override
-  public Session newSession(final Request request, final Response response) {
-    SessionData sessionData = new SessionData();
-    sessionDataMap.put(sessionData.getId(), sessionData);
-    log.info("created sessiondata with id={}", sessionData.getId());
-    return new JPPFWebSession(request, sessionData.getId());
   }
 
   /**

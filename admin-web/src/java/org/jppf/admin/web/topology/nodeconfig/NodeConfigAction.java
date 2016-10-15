@@ -22,14 +22,14 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.tabletree.AbstractUpdatableAction;
+import org.jppf.admin.web.tabletree.AbstractManagerRoleAction;
 import org.jppf.admin.web.topology.TopologyTreeData;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class NodeConfigAction extends AbstractUpdatableAction {
+public class NodeConfigAction extends AbstractManagerRoleAction {
   @Override
   public void setEnabled(final List<DefaultMutableTreeNode> selected) {
     // enabled only if a single node is selected, regardless how many drivers are selected.

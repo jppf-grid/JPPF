@@ -31,11 +31,7 @@
 	<classpathentry kind="lib" path="lib/wicket-util-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-velocity-7.4.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
-	<classpathentry kind="lib" path="/JPPF/lib/log4j/log4j-1.2.15.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/ftp/dev/Apache/apache-log4j-1.2.15/site/apidocs/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="/JPPF/lib/log4j/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/LZ4/lz4-1.3.0.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar"/>
@@ -47,5 +43,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-mount-core-7.4.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

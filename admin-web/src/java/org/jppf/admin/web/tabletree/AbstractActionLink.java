@@ -22,6 +22,7 @@ import org.apache.wicket.ajax.*;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.model.*;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.jppf.admin.web.*;
 import org.jppf.utils.Pair;
 
@@ -78,8 +79,8 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
     Pair<String, String> pair = getImageNameAndExtension();
-    String format = "<img src='images/toolbar/%s.%s'/>";
-    if ((action != null) && !action.isEnabled()) {
+    String format = "<img src='" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s'/>";
+    if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
       if (pair != null) setBody(Model.of(String.format(format, pair.first() + "-disabled", pair.second())));
     } else {

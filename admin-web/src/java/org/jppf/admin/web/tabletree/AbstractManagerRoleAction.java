@@ -16,21 +16,18 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.topology.serverstop;
+package org.jppf.admin.web.tabletree;
 
-import java.util.List;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import org.jppf.admin.web.tabletree.AbstractManagerRoleAction;
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
+import org.jppf.admin.web.auth.JPPFRole;
 
 /**
- * 
+ * Abstract class for action authirized for the manager role only.
  * @author Laurent Cohen
  */
-public class DriverStopRestartAction extends AbstractManagerRoleAction {
+public class AbstractManagerRoleAction extends AbstractUpdatableAction {
   @Override
-  public void setEnabled(final List<DefaultMutableTreeNode> selected) {
-    enabled = isDriverSelected(selected);
+  public void setAuthorized(final Roles roles) {
+    authorized = roles.hasRole(JPPFRole.MANAGER.getRoleName());
   }
 }

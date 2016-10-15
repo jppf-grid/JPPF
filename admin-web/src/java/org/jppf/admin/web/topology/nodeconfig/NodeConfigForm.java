@@ -69,14 +69,16 @@ public class NodeConfigForm extends Form<String> {
     add(new Label(PREFIX + ".interrupt.label", Model.of("Interrupt even if running")));
     add(new Label(PREFIX + ".config.label", Model.of("Updated configuration")));
     add(configField = new TextArea<>(PREFIX + ".config.field", Model.of("Updated configuration")));
-    add(new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
+    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on node_config.ok");
         if (okAction != null) okAction.run();
         modal.close(target);
       }
-    });
+    };
+    add(okButton);
+    setDefaultButton(okButton);
     add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
