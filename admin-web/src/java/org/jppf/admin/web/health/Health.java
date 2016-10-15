@@ -26,7 +26,7 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * 
  * @author Laurent Cohen
  */
-@MountPath("protected/health")
+@MountPath("health")
 public class Health extends TemplatePage {
   /**
    * Initialize this web page.

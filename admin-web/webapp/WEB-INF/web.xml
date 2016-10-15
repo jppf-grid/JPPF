@@ -21,7 +21,9 @@
     <web-resource-collection>
       <web-resource-name>secure-example</web-resource-name>
       <description/>
-      <url-pattern>/protected/*</url-pattern>
+      <url-pattern>/topology/*</url-pattern>
+      <url-pattern>/jobs/*</url-pattern>
+      <url-pattern>/jvmhealth/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <description>JPPF Roles</description>

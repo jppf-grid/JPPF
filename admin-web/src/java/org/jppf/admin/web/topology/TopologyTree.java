@@ -52,7 +52,7 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * This web page displays the topology tree.
  * @author Laurent Cohen
  */
-@MountPath("protected/topology")
+@MountPath("topology")
 public class TopologyTree extends TemplatePage implements TopologyListener, TableTreeHolder {
   /**
    * Logger for this class.
