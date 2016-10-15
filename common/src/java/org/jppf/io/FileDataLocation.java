@@ -61,7 +61,8 @@ public class FileDataLocation extends AbstractDataLocation {
   private int blockSize = 0;
   /**
    * Count of instances of this class which refer to the same underlying file.
-   * This is a fix for bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-105">JPPF-105 Temporary files disappear when setting a large MemoryMapDataProvider as data provider in a JPPFJob</a>.
+   * This is a fix for bug
+   * <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-105">JPPF-105 Temporary files disappear when setting a large MemoryMapDataProvider as data provider in a JPPFJob</a>.
    */
   final AtomicLong copyCount;
 
@@ -126,7 +127,6 @@ public class FileDataLocation extends AbstractDataLocation {
     if (!transferring) {
       transferring = true;
       fileChannel = new FileOutputStream(filePath).getChannel();
-      //buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
       buffer = ByteBuffer.wrap(IO.TEMP_BUFFER_POOL.get());
       if (size < buffer.limit()) buffer.limit(size);
       count = 0;
@@ -298,16 +298,15 @@ public class FileDataLocation extends AbstractDataLocation {
    * @throws Throwable if an error occurs.
    */
   @Override
-  protected void finalize() throws Throwable
-  {
-    if (traceEnabled) log.trace("finalizing " + this);
-    if (copyCount.decrementAndGet() <= 0) {
-      try {
+  protected void finalize() throws Throwable {
+    try {
+      if (traceEnabled) log.trace("finalizing " + this);
+      if (copyCount.decrementAndGet() <= 0) {
         File file = new File(filePath);
         if (file.exists()) file.delete();
-      } finally {
-        super.finalize();
       }
+    } finally {
+      super.finalize();
     }
   }
 
