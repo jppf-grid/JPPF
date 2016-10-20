@@ -47,7 +47,7 @@ public class ServerResetStatsLink extends AbstractActionLink {
    * 
    */
   public ServerResetStatsLink() {
-    super(TopologyTree.SERVER_RESET_STATS_ACTION, Model.of("Reset statistics"), "server_reset_stats.gif");
+    super(TopologyConstants.SERVER_RESET_STATS_ACTION, Model.of("Reset statistics"), "server_reset_stats.gif");
     setEnabled(false);
   }
 

@@ -353,6 +353,7 @@ div.navlink2 a:link {
 }
 
 div.navlink2 a {
+  color: #6D78B6;
   background-color: #C5D0F0;
 }
 
@@ -389,6 +390,7 @@ textarea {
 
 .number {
   text-align: right;
+  padding-right: 2px;
 }
 
 .empty {

@@ -49,20 +49,20 @@ public class TopologyTreeData extends TableTreeData {
       }
     });
     ActionHandler ah = getActionHandler();
-    ah.addAction(TopologyTree.SYSTEM_INFO_ACTION, new SystemInfoAction());
-    ah.addAction(TopologyTree.PROVISIONING_ACTION, new ProvisioningAction());
-    ah.addAction(TopologyTree.SERVER_STOP_RESTART_ACTION, new DriverStopRestartAction());
-    ah.addAction(TopologyTree.SERVER_RESET_STATS_ACTION, new ServerResetStatsLink.Action());
-    ah.addAction(TopologyTree.NODE_CONFIG_ACTION, new NodeConfigAction());
-    ah.addAction(TopologyTree.NODE_THREADS_ACTION, new NodeThreadsAction());
-    ah.addAction(TopologyTree.CANCEL_PENDING_ACTION, new CancelPendingActionLink.Action());
-    ah.addAction(TopologyTree.NODE_RESET_TASKS_ACTION, new ResetTaskCounterLink.Action());
+    ah.addAction(TopologyConstants.SYSTEM_INFO_ACTION, new SystemInfoAction());
+    ah.addAction(TopologyConstants.PROVISIONING_ACTION, new ProvisioningAction());
+    ah.addAction(TopologyConstants.SERVER_STOP_RESTART_ACTION, new DriverStopRestartAction());
+    ah.addAction(TopologyConstants.SERVER_RESET_STATS_ACTION, new ServerResetStatsLink.Action());
+    ah.addAction(TopologyConstants.NODE_CONFIG_ACTION, new NodeConfigAction());
+    ah.addAction(TopologyConstants.NODE_THREADS_ACTION, new NodeThreadsAction());
+    ah.addAction(TopologyConstants.CANCEL_PENDING_ACTION, new CancelPendingActionLink.Action());
+    ah.addAction(TopologyConstants.NODE_RESET_TASKS_ACTION, new ResetTaskCounterLink.Action());
     UpdatableAction action = new StopRestartNodeLink.Action();
-    ah.addAction(TopologyTree.NODE_STOP_ACTION, action);
-    ah.addAction(TopologyTree.NODE_RESTART_ACTION, action);
-    ah.addAction(TopologyTree.NODE_STOP_DEFERRED_ACTION, action);
-    ah.addAction(TopologyTree.NODE_RESTART_DEFERRED_ACTION, action);
-    ah.addAction(TopologyTree.NODE_SUSPEND_ACTION, new SuspendNodeLink.Action());
+    ah.addAction(TopologyConstants.NODE_STOP_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_RESTART_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_STOP_DEFERRED_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, action);
+    ah.addAction(TopologyConstants.NODE_SUSPEND_ACTION, new SuspendNodeLink.Action());
   }
   
   /**

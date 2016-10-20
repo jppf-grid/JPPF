@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title>Max number of nodes</title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body onload="updateState()">
+    <script>
+    function updateState() {
+        var disabled = document.getElementById('c1').checked;
+        document.getElementById('t1').disabled = disabled;
+        var style = document.getElementById('tl1').style;
+        if (disabled) {
+          style.color = "#666666";
+          style.fontStyle = "italic";
+        } else {
+          style.color = "black";
+          style.fontStyle = "normal";
+        }
+    }
+    </script>
+	  <form wicket:id="max_nodes.form" class="modal_form">
+      <input id="c1" type="checkbox" wicket:id="max_nodes.unlimited.field" onclick="updateState()"/>
+      <span wicket:id="max_nodes.unlimited.label"></span><br/>
+
+      <span id="tl1" wicket:id="max_nodes.nb_nodes.label"></span>&nbsp;
+      <input id="t1" type="text" wicket:id="max_nodes.nb_nodes.field" value="0"/><br/>
+
+      <p><a wicket:id="max_nodes.ok" class="button_link">OK</a>&nbsp;
+      <a wicket:id="max_nodes.cancel" class="button_link">Cancel</a>
+		</form>
+	</body>
+</html>

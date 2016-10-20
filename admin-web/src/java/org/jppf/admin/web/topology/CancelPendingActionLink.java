@@ -51,7 +51,7 @@ public class CancelPendingActionLink extends AbstractActionLink {
    *
    */
   public CancelPendingActionLink() {
-    super(TopologyTree.CANCEL_PENDING_ACTION, Model.of("Cancel pending action"), "cancel_deferred_action.gif");
+    super(TopologyConstants.CANCEL_PENDING_ACTION, Model.of("Cancel pending action"), "cancel_deferred_action.gif");
     setEnabled(false);
   }
 

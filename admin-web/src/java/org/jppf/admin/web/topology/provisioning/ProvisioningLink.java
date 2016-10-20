@@ -27,7 +27,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
-import org.jppf.admin.web.topology.TopologyTree;
+import org.jppf.admin.web.topology.TopologyConstants;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.utils.*;
@@ -52,7 +52,7 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
    * @param form .
    */
   public ProvisioningLink(final Form<String> form) {
-    super(TopologyTree.PROVISIONING_ACTION, Model.of("Provisioning"), "provisioning.png", ProvisioningPage.class, form);
+    super(TopologyConstants.PROVISIONING_ACTION, Model.of("Provisioning"), "provisioning.png", ProvisioningPage.class, form);
     modal.setInitialWidth(600);
     modal.setInitialHeight(335);
   }

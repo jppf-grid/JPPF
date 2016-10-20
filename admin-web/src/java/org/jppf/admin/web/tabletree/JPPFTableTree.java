@@ -73,10 +73,11 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
    * @param rowsPerPage .
    * @param selectionHandler handles selection events.
    * @param nodeRenderer provides the content for rendering tree nodes, i.e. icon and text.
+   * @param expansionModel keeps tabs on the expanded nodes in the tree.
    */
   public JPPFTableTree(final TreeViewType type, final String id, final List<? extends IColumn<DefaultMutableTreeNode, String>> columns, final AbstractJPPFTreeTableModel nodeTreeModel,
-    final long rowsPerPage, final SelectionHandler selectionHandler, final TreeNodeRenderer nodeRenderer) {
-    super(id, columns, new JPPFModelProvider(nodeTreeModel), rowsPerPage);
+    final long rowsPerPage, final SelectionHandler selectionHandler, final TreeNodeRenderer nodeRenderer, final IModel<Set<DefaultMutableTreeNode>> expansionModel) {
+    super(id, columns, new JPPFModelProvider(nodeTreeModel), rowsPerPage, expansionModel);
     this.type = type;
     this.selectionHandler = selectionHandler;
     this.nodeRenderer = nodeRenderer;
@@ -172,19 +173,21 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
 
     @Override
     protected void onEvent(final AjaxRequestTarget target) {
-      IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
-      TypedProperties props = new TypedProperties()
-        .setBoolean("ctrl", params.getParameterValue("ctrl").toBoolean(false))
-        .setBoolean("shift", params.getParameterValue("shift").toBoolean(false));
       JPPFWebSession session = (JPPFWebSession) target.getPage().getSession();
       TableTreeData data = session.getSessionData().getData(type);
       SelectionHandler selectionHandler = data.getSelectionHandler();
       DefaultMutableTreeNode node = TreeTableUtils.findTreeNode((DefaultMutableTreeNode) data.getModel().getRoot(), uuid, selectionHandler.getFilter());
-      Page page = target.getPage();
-      if (selectionHandler.handle(target, node, props) && (page instanceof TableTreeHolder)) {
-        TableTreeHolder holder = (TableTreeHolder) page;
-        target.add(holder.getTableTree());
-        target.add(holder.getToolbar());
+      if (node != null) {
+        IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
+        TypedProperties props = new TypedProperties()
+          .setBoolean("ctrl", params.getParameterValue("ctrl").toBoolean(false))
+          .setBoolean("shift", params.getParameterValue("shift").toBoolean(false));
+        Page page = target.getPage();
+        if (selectionHandler.handle(target, node, props) && (page instanceof TableTreeHolder)) {
+          TableTreeHolder holder = (TableTreeHolder) page;
+          target.add(holder.getTableTree());
+          target.add(holder.getToolbar());
+        }
       }
     }
   }

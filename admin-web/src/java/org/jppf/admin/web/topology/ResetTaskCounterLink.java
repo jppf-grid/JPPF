@@ -51,7 +51,7 @@ public class ResetTaskCounterLink extends AbstractActionLink {
    * 
    */
   public ResetTaskCounterLink() {
-    super(TopologyTree.NODE_RESET_TASKS_ACTION, Model.of("Reset task counter"), "reset.gif");
+    super(TopologyConstants.NODE_RESET_TASKS_ACTION, Model.of("Reset task counter"), "reset.gif");
     setEnabled(false);
   }
 

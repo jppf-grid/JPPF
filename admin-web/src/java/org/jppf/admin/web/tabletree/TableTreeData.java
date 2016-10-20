@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.wicket.model.*;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.LoggingUtils;
@@ -55,6 +56,14 @@ public class TableTreeData implements SelectionListener {
    * The type of tree view.
    */
   private final TreeViewType viewType;
+  /**
+   * Keeps tabs on the expanded nodes in the tree.
+   */
+  private final IModel<Set<DefaultMutableTreeNode>> expansionModel;
+  /**
+   * Whether this is the first time any node is expanded.
+   */
+  private boolean firstExpansion = true;
 
   /**
    * @param viewType the view type.
@@ -64,6 +73,7 @@ public class TableTreeData implements SelectionListener {
     actionHandler = new ActionHandler();
     selectionHandler = new MultipleSelectionHandler();
     selectionHandler.addSelectionListener(this);
+    expansionModel = Model.ofSet(new HashSet<DefaultMutableTreeNode>());
   }
 
   /**
@@ -115,6 +125,7 @@ public class TableTreeData implements SelectionListener {
     model = null;
     selectionHandler = null;
     actionHandler = null;
+    expansionModel.getObject().clear();
   }
 
   @Override
@@ -154,4 +165,25 @@ public class TableTreeData implements SelectionListener {
     return viewType;
   }
 
+  /**
+   * @return the object that keeps tabs on the expanded nodes in the tree.
+   */
+  public IModel<Set<DefaultMutableTreeNode>> getExpansionModel() {
+    return expansionModel;
+  }
+
+  /**
+   * @return whether this is the first time any node is expanded.
+   */
+  public boolean isFirstExpansion() {
+    return firstExpansion;
+  }
+
+  /**
+   * Specify whether this is the first time any node is expanded.
+   * @param firstExpansion {@code true} if first-tome expansion, {@code false} otherwise.
+   */
+  public void setFirstExpansion(final boolean firstExpansion) {
+    this.firstExpansion = firstExpansion;
+  }
 }

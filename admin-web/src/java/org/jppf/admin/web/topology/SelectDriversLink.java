@@ -24,6 +24,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.AbstractComponent;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
  *
@@ -31,10 +32,10 @@ import org.jppf.client.monitoring.AbstractComponent;
  */
 public class SelectDriversLink extends AbstractSelectionLink {
   /**
-   *
+   * @param viewType the type this button is part of.
    */
-  public SelectDriversLink() {
-    super(TopologyTree.SELECT_DRIVERS_ACTION, Model.of("Select drivers"));
+  public SelectDriversLink(final TreeViewType viewType) {
+    super(TopologyConstants.SELECT_DRIVERS_ACTION, Model.of("Select drivers"), viewType);
     imageName = "select_drivers.gif";
   }
 

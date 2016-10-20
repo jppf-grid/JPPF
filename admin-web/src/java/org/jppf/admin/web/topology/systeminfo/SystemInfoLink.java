@@ -29,10 +29,10 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
-import org.jppf.admin.web.topology.TopologyTree;
+import org.jppf.admin.web.topology.TopologyConstants;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -58,7 +58,7 @@ public class SystemInfoLink extends AbstractActionLink {
    * @param form .
    */
   public SystemInfoLink(final Form<String> form) {
-    super(TopologyTree.SYSTEM_INFO_ACTION, Model.of("System info"));
+    super(TopologyConstants.SYSTEM_INFO_ACTION, Model.of("System info"));
     imageName = "info.gif";
     setEnabled(false);
     modal = new ModalWindow("topology.info.dialog");
@@ -75,7 +75,7 @@ public class SystemInfoLink extends AbstractActionLink {
       DefaultMutableTreeNode treeNode = selectedNodes.get(0);
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       String title = "System Information for " + (comp.isNode() ? "node " : "driver ") + comp.getDisplayName();
-      JPPFSystemInformation info = TreeTableUtils.retrieveSystemInfo(comp);
+      JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
       final StringBuilder html = new StringBuilder();
       html.append(TreeTableUtils.formatProperties(info, new HTMLPropertiesTableFormat(title, false)));
       if (debugEnabled) log.debug("html = {}", html);

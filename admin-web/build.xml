@@ -123,10 +123,11 @@
         <include name="*.jar"/>
         <exclude name="checkstyle*.jar"/>
         <exclude name="hibernate*.jar"/>
-        <exclude name="jetty*.jar"/>
-        <exclude name="spring*.jar"/>
-        <exclude name="*atmosphere*.jar"/>
-        <exclude name="guice*.jar"/>
+        <exclude name="*jetty*.jar"/>
+        <exclude name="*spring*.jar"/>
+        <exclude name="**atmosphere*.jar"/>
+        <exclude name="*guice*.jar"/>
+        <exclude name="javax.servlet*.jar"/>
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/**/*.*"/>
     </war>

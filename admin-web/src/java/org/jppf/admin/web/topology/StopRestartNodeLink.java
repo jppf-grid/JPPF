@@ -58,19 +58,19 @@ public class StopRestartNodeLink extends AbstractActionLink {
     /**
      * Stop.
      */
-    STOP(TopologyTree.NODE_STOP_ACTION, "Stop node", "traffic_light_red.gif", false, false),
+    STOP(TopologyConstants.NODE_STOP_ACTION, "Stop node", "traffic_light_red.gif", false, false),
     /**
      * Restart.
      */
-    RESTART(TopologyTree.NODE_RESTART_ACTION, "Restart node", "traffic_light_red_green.gif", true, false),
+    RESTART(TopologyConstants.NODE_RESTART_ACTION, "Restart node", "traffic_light_red_green.gif", true, false),
     /**
      * Deferred stop.
      */
-    STOP_DEFERRED(TopologyTree.NODE_STOP_DEFERRED_ACTION, "Stop node (deferred)", "traffic_light_red_yellow.gif", false, true),
+    STOP_DEFERRED(TopologyConstants.NODE_STOP_DEFERRED_ACTION, "Stop node (deferred)", "traffic_light_red_yellow.gif", false, true),
     /**
      * Deferred restart.
      */
-    RESTART_DEFERRED(TopologyTree.NODE_RESTART_DEFERRED_ACTION, "Restart node (deferred)", "traffic_light_red_green_yellow.gif", true, true);
+    RESTART_DEFERRED(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, "Restart node (deferred)", "traffic_light_red_green_yellow.gif", true, true);
 
     /**
      * The action id.

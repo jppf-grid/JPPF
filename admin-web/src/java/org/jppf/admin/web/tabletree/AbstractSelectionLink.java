@@ -22,6 +22,7 @@ import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
 import org.jppf.admin.web.JPPFWebSession;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
  * Abstract class for action links that select nodes in a table tree.
@@ -29,26 +30,35 @@ import org.jppf.admin.web.JPPFWebSession;
  */
 public abstract class AbstractSelectionLink extends AbstractActionLink {
   /**
+   * The type this button is part of.
+   */
+  private final TreeViewType viewType;
+
+  /**
    *
    * @param id the lnk id.
+   * @param viewType the type this button is part of.
    */
-  public AbstractSelectionLink(final String id) {
+  public AbstractSelectionLink(final String id, final TreeViewType viewType) {
     super(id);
+    this.viewType = viewType;
   }
 
   /**
    *
    * @param id the lnk id.
    * @param model the display model.
+   * @param viewType the type this button is part of.
    */
-  public AbstractSelectionLink(final String id, final IModel<String> model) {
+  public AbstractSelectionLink(final String id, final IModel<String> model, final TreeViewType viewType) {
     super(id, model);
+    this.viewType = viewType;
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
     JPPFWebSession session = getSession(target);
-    TableTreeData data = session.getTopologyData();
+    TableTreeData data = session.getSessionData().getData(viewType);
     onClick(target, data);
     data.selectionChanged(data.getSelectionHandler());
     Page page = target.getPage();

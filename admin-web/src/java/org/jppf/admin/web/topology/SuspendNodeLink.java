@@ -50,7 +50,7 @@ public class SuspendNodeLink extends AbstractActionLink {
    * 
    */
   public SuspendNodeLink() {
-    super(TopologyTree.NODE_SUSPEND_ACTION, Model.of("Suspend node"), "toggle_active.gif");
+    super(TopologyConstants.NODE_SUSPEND_ACTION, Model.of("Suspend node"), "toggle_active.gif");
     setEnabled(false);
   }
 

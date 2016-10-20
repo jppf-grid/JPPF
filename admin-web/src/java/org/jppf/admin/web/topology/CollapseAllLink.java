@@ -34,7 +34,7 @@ public class CollapseAllLink extends AbstractActionLink {
    *
    */
   public CollapseAllLink() {
-    super(TopologyTree.COLLAPSE_ALL_ACTION, Model.of("Collapse all"));
+    super(TopologyConstants.COLLAPSE_ALL_ACTION, Model.of("Collapse all"));
     imageName = "collapse.gif";
   }
 

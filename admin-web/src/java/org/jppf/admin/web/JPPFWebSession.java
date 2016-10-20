@@ -19,6 +19,8 @@
 package org.jppf.admin.web;
 
 import org.apache.wicket.request.Request;
+import org.jppf.admin.web.jobs.JobsTreeData;
+import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.utils.LoggingUtils;
@@ -64,10 +66,25 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   }
 
   /**
+   * @param type the type of view for which to obtain data.
+   * @return the data elements for the specified type of view.
+   */
+  public TableTreeData getTableTreeData(final TreeViewType type) {
+    return getSessionData().getData(type);
+  }
+
+  /**
    * @return the data elements for the grid topology.
    */
   public TopologyTreeData getTopologyData() {
     return (TopologyTreeData) getSessionData().getData(TreeViewType.TOPOLOGY);
+  }
+
+  /**
+   * @return the data elements for the jobs view.
+   */
+  public JobsTreeData getJobsData() {
+    return (JobsTreeData) getSessionData().getData(TreeViewType.JOBS);
   }
 
   /**

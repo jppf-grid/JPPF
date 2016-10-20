@@ -1,0 +1,19 @@
+<html>
+  <body>
+    <wicket:extend>
+      <form wicket:id="jobs.toolbar" class="jppf_toolbar">
+        <a wicket:id="jobs.terminate" class="button_link"></a>
+        <a wicket:id="jobs.suspend" class="button_link"></a>
+        <a wicket:id="jobs.suspend_requeue" class="button_link"></a>
+        <a wicket:id="jobs.resume" class="button_link"></a>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="jobs.update_max_nodes" class="button_link"></a><div wicket:id="jobs.update_max_nodes.dialog"></div>
+        <a wicket:id="jobs.update_priority" class="button_link"></a><div wicket:id="jobs.update_priority.dialog"></div>
+        <img src="images/toolbar/separator10.gif"/>
+        <a wicket:id="jobs.expand" class="button_link"></a>
+        <a wicket:id="jobs.collapse" class="button_link"></a>
+      </form>
+      <div wicket:id="jobs.table.tree" style="min-height: 300px">[jobs_tree]</div>
+    </wicket:extend>
+  </body>
+</html>

@@ -25,6 +25,7 @@ import org.apache.wicket.model.Model;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
  *
@@ -32,10 +33,10 @@ import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
  */
 public class SelectAllLink extends AbstractSelectionLink {
   /**
-   *
+   * @param viewType the type this button is part of.
    */
-  public SelectAllLink() {
-    super(TopologyTree.SELECT_ALL_ACTION, Model.of("Select all"));
+  public SelectAllLink(final TreeViewType viewType) {
+    super(TopologyConstants.SELECT_ALL_ACTION, Model.of("Select all"), viewType);
     imageName = "select_all.gif";
   }
 

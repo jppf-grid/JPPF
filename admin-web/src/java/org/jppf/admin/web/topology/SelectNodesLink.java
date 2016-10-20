@@ -24,6 +24,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
  *
@@ -31,10 +32,10 @@ import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
  */
 public class SelectNodesLink extends AbstractSelectionLink {
   /**
-   *
+   * @param viewType the type this button is part of.
    */
-  public SelectNodesLink() {
-    super(TopologyTree.SELECT_NODES_ACTION, Model.of("Select nodes"));
+  public SelectNodesLink(final TreeViewType viewType) {
+    super(TopologyConstants.SELECT_NODES_ACTION, Model.of("Select nodes"), viewType);
     imageName = "select_nodes.gif";
   }
 

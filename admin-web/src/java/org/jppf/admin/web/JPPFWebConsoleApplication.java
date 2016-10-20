@@ -28,11 +28,9 @@ import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
 import org.jppf.admin.web.auth.LoginPage;
-import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTree;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
-import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.utils.*;
 import org.slf4j.*;
 import org.wicketstuff.wicket.servlet3.auth.*;
@@ -129,12 +127,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   static void removeSessionData(final long id) {
     SessionData sessionData = sessionDataMap.remove(id);
-    if (sessionData != null) {
-      for (TreeViewType type: TreeViewType.values()) {
-        TableTreeData ttd = sessionData.getData(type);
-        if (ttd != null) ttd.cleanup();
-      }
-    }
+    if (sessionData != null) sessionData.cleanup();
   }
 
   /**

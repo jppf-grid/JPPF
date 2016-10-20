@@ -23,6 +23,8 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
+import org.jppf.client.monitoring.AbstractComponent;
+import org.jppf.client.monitoring.jobs.Job;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 /**
@@ -79,6 +81,19 @@ public abstract class AbstractUpdatableAction implements UpdatableAction {
     for (DefaultMutableTreeNode treeNode: selected) {
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isDriver()) return true;
+    }
+    return false;
+  }
+  
+  /**
+   * Determine whether at least one of the selected elements is a job.
+   * @param selected the selected elements.
+   * @return {@code true} if at least one node is selected, {@code false} otherwise.
+   */
+  protected boolean isJobSelected(final List<DefaultMutableTreeNode> selected) {
+    for (DefaultMutableTreeNode treeNode: selected) {
+      AbstractComponent<?> comp = (AbstractComponent<?>) treeNode.getUserObject();
+      if (comp instanceof Job) return true;
     }
     return false;
   }

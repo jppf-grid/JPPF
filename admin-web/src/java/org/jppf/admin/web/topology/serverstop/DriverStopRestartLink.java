@@ -49,7 +49,7 @@ public class DriverStopRestartLink extends AbstractModalLink<DriverStopRestartFo
    * @param form .
    */
   public DriverStopRestartLink(final Form<String> form) {
-    super(TopologyTree.SERVER_STOP_RESTART_ACTION, Model.of("Server stop/restart"), "server_restart.gif", DriverStopRestartPage.class, form);
+    super(TopologyConstants.SERVER_STOP_RESTART_ACTION, Model.of("Server stop/restart"), "server_restart.gif", DriverStopRestartPage.class, form);
     modal.setInitialWidth(350);
     modal.setInitialHeight(180);
   }

@@ -34,7 +34,7 @@ public class ExpandAllLink extends AbstractActionLink {
    *
    */
   public ExpandAllLink() {
-    super(TopologyTree.EXPAND_ALL_ACTION, Model.of("Expand all"));
+    super(TopologyConstants.EXPAND_ALL_ACTION, Model.of("Expand all"));
     imageName = "expand.gif";
   }
 
@@ -44,7 +44,7 @@ public class ExpandAllLink extends AbstractActionLink {
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyData().getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
-      for (int i=0; i<root.getChildCount(); i++) tableTree.expand((DefaultMutableTreeNode) root.getChildAt(i));
+      TableTreeHelper.expand(tableTree, root);
       target.add(tableTree);
     }
   }

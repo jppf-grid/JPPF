@@ -21,6 +21,7 @@ package org.jppf.admin.web;
 import java.util.EnumMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jppf.admin.web.jobs.JobsTreeData;
 import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
@@ -71,8 +72,11 @@ public class SessionData {
           break;
 
         case HEALTH:
-        case JOBS:
           data = new TableTreeData(type);
+          break;
+
+        case JOBS:
+          data = new JobsTreeData();
           break;
       }
     }
@@ -94,5 +98,16 @@ public class SessionData {
    */
   public long getId() {
     return instanceNumber;
+  }
+
+  /**
+   * Cleanup the resources used by this object.
+   */
+  public void cleanup() {
+    for (TreeViewType type: TreeViewType.values()) {
+      TableTreeData ttd = getData(type);
+      if (ttd != null) ttd.cleanup();
+    }
+    dataMap.clear();
   }
 }

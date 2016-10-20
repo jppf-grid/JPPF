@@ -42,4 +42,12 @@ public class TemplatePage extends WebPage {
   public JPPFWebSession getJPPFSession() {
     return (JPPFWebSession) getSession();
   }
+
+  /**
+   * Get the application object.
+   * @return a {@link JPPFWebConsoleApplication} instance.
+   */
+  public JPPFWebConsoleApplication getJPPFApplication() {
+    return (JPPFWebConsoleApplication) getApplication();
+  }
 }
