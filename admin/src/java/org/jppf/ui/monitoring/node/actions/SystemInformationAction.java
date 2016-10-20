@@ -27,7 +27,7 @@ import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -136,8 +136,8 @@ public class SystemInformationAction extends AbstractTopologyAction {
       final StringBuilder title = new StringBuilder("System information");
       try {
         AbstractTopologyComponent comp = dataArray[0];
-        JPPFSystemInformation info = TreeTableUtils.retrieveSystemInfo(comp);
-        String name = TreeTableUtils.getDisplayName(comp);
+        JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
+        String name = TopologyUtils.getDisplayName(comp);
         title.append(" for ").append(comp.isNode() ? "node " : "driver ").append(name);
         html.append(TreeTableUtils.formatProperties(info, new HTMLPropertiesTableFormat(title.toString())));
         toClipboard.append(TreeTableUtils.formatProperties(info, new TextPropertiesTableFormat(title.toString())));

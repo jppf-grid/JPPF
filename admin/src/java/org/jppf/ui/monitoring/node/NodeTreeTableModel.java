@@ -76,7 +76,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Initialize this model with the specified tree.
    * @param node the root of the tree.
-   * @param locale the locale used to translate coumn headers and cell values.
+   * @param locale the locale used to translate column headers and cell values.
    */
   public NodeTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);

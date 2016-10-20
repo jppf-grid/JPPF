@@ -172,7 +172,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
       if (debugEnabled) log.debug("adding driver: " + driver + " at index " + index);
       model.insertNodeInto(driverNode, treeTableRoot, index);
       */
-      DefaultMutableTreeNode driverNode = TreeTableUtils.addDriver(model, driver);
+      DefaultMutableTreeNode driverNode = TopologyUtils.addDriver(model, driver);
       if ((driverNode != null) && (treeTable != null)) {
         treeTable.expand(treeTableRoot);
         treeTable.expand(driverNode);
@@ -180,7 +180,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     } catch(RuntimeException | Error e) {
       log.debug(e.getMessage(), e);
     }
-    TreeTableUtils.addDriver(model, driver);
+    TopologyUtils.addDriver(model, driver);
   }
 
   /**
@@ -195,7 +195,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     if (driverNode == null) return;
     model.removeNodeFromParent(driverNode);
     */
-    TreeTableUtils.removeDriver(model, driverData);
+    TopologyUtils.removeDriver(model, driverData);
   }
 
   /**
@@ -217,7 +217,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
     model.insertNodeInto(nodeNode, driverNode, index);
     */
-    DefaultMutableTreeNode nodeNode = TreeTableUtils.addNode(model, driverData, nodeData);
+    DefaultMutableTreeNode nodeNode = TopologyUtils.addNode(model, driverData, nodeData);
     if (nodeNode != null) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) nodeNode.getParent();
       if ((driverNode.getChildCount() == 1) && !driverData.isCollapsed()) treeTable.expand(driverNode);

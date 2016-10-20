@@ -88,7 +88,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     textArea.setValue(getPropertiesAsString(data));
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("nodeConfigurationUpdatePanel.label") + " " + TreeTableUtils.getDisplayName(data), false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("nodeConfigurationUpdatePanel.label") + " " + TopologyUtils.getDisplayName(data), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override

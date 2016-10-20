@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
@@ -147,14 +146,11 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param driver a reference to the driver.
    */
   public void addDriver(final JobDriver driver) {
-    final int index = insertIndex(treeTableRoot, driver);
-    if (index < 0) return;
-    final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
-    if (debugEnabled) log.debug("adding driver: " + driver.getDisplayName() + " at index " + index);
-    getModel().insertNodeInto(driverNode, getTreeTableRoot(), index);
+    final DefaultMutableTreeNode driverNode = JobsUtils.addDriver(getModel(), driver);
+    if (driverNode == null) return;
     if (!firstDriverAdded) {
       firstDriverAdded = true;
-      if (debugEnabled) log.debug("adding first driver: " + driver.getDisplayName() + " at index " + index);
+      if (debugEnabled) log.debug("adding first driver: {}", driver.getDisplayName());
       Runnable r =  new Runnable() {
         @Override public synchronized void run() {
           try {
@@ -169,7 +165,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
       };
       new Thread(r, "Job tree expansion").start();
     } else {
-      if (debugEnabled) log.debug("additional driver: " + driver.getDisplayName() + " at index " + index);
+      if (debugEnabled) log.debug("additional driver: {}", driver.getDisplayName());
       JPPFTreeTable treeTable = getTreeTable();
       if (treeTable != null) {
         treeTable.expand(getTreeTableRoot());
@@ -183,10 +179,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param driver the name of the driver to remove.
    */
   public void removeDriver(final JobDriver driver) {
-    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (debugEnabled) log.debug("removing driver: " + driver.getDisplayName());
-    if (driverNode == null) return;
-    getModel().removeNodeFromParent(driverNode);
+    JobsUtils.removeDriver(getModel(), driver);
   }
 
   /**
@@ -195,14 +188,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param job information about the submitted job.
    */
   public void addJob(final JobDriver driver, final Job job) {
-    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (driverNode == null) return;
-    final int index = insertIndex(driverNode, job);
-    if (index < 0) return;
-    final DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(job);
-    if (debugEnabled) log.debug("adding job: " + job.getDisplayName() + " to driver " + driver.getDisplayName() + " at index " + index);
-    getModel().insertNodeInto(jobNode, driverNode, index);
-    if (getTreeTable() != null) getTreeTable().expand(driverNode);
+    final DefaultMutableTreeNode driverNode = JobsUtils.addJob(getModel(), driver, job);
+    if ((getTreeTable() != null) && (driverNode != null)) getTreeTable().expand(driverNode);
   }
 
   /**
@@ -211,14 +198,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param job the job.
    */
   public void removeJob(final JobDriver driver, final Job job) {
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
-    if (driverNode == null) return;
-    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    //if (debugEnabled) log.debug("*** jobNode =  " + jobNode);
-    if (jobNode == null) return;
-    if (debugEnabled) log.debug("removing job: " + job.getDisplayName() + " from driver " + driver.getDisplayName());
-    getModel().removeNodeFromParent(jobNode);
-    //if (getTreeTable() != null) getTreeTable().repaint();
+    JobsUtils.removeJob(getModel(), driver, job);
   }
 
   /**
@@ -226,12 +206,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param job information about the job.
    */
   public void updateJob(final Job job) {
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
-    if (driverNode == null) return;
-    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return;
-    if (debugEnabled) log.debug("updating job: " + job.getDisplayName() + " from driver " + job.getJobDriver().getDisplayName());
-    getModel().changeNode(jobNode);
+    JobsUtils.updateJob(getModel(), job);
   }
 
   /**
@@ -240,16 +215,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param dispatch information about the job dispatch.
    */
   public void addJobDispatch(final Job job, final JobDispatch dispatch) {
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
-    if (driverNode == null) return;
-    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return;
-    final int index = insertIndex(jobNode, dispatch);
-    if (index < 0) return;
-    final DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(dispatch);
-    if (debugEnabled) log.debug("sub-job: {} dispatched to node {} (index {})", new Object[] { job.getDisplayName(), dispatch.getDisplayName(), index});
-    getModel().insertNodeInto(subJobNode, jobNode, index);
-    if (getTreeTable() != null) getTreeTable().expand(jobNode);
+    final DefaultMutableTreeNode jobNode = JobsUtils.addJobDispatch(getModel(), job, dispatch);
+    if ((getTreeTable() != null) && (jobNode != null)) getTreeTable().expand(jobNode);
   }
 
   /**
@@ -258,27 +225,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param dispatch information about the node where the sub-job was dispatched.
    */
   public void removeJobDispatch(final Job job, final JobDispatch dispatch) {
-    if (dispatch == null) return;
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
-    if (driverNode == null) return;
-    DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
-    if (jobNode == null) return;
-    final DefaultMutableTreeNode subJobNode = TreeTableUtils.findComponent(jobNode, dispatch.getUuid());
-    if (subJobNode == null) return;
-    if (debugEnabled) log.debug("removing dispatch: " + job.getDisplayName() + " from node " + dispatch.getDisplayName());
-    getModel().removeNodeFromParent(subJobNode);
+    JobsUtils.removeJobDispatch(getModel(), job, dispatch);
     if (getTreeTable() != null) getTreeTable().repaint();
-  }
-
-  /**
-   * Find the position at which to insert a driver, using the sorted lexical order of driver display names.
-   * @param root the parent tree node of the component to insert.
-   * @param comp the driver to insert.
-   * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
-   */
-  int insertIndex(final DefaultMutableTreeNode root, final AbstractComponent<?> comp) {
-    if (TreeTableUtils.findComponent(root, comp.getUuid()) != null) return -1;
-    return TreeTableUtils.insertIndex(root, comp);
   }
 
   /**

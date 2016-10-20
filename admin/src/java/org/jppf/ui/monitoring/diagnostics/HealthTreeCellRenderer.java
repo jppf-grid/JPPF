@@ -59,7 +59,7 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
         AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
-        renderer.setText(TreeTableUtils.getDisplayName(data));
+        renderer.setText(TopologyUtils.getDisplayName(data));
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;

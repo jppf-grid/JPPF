@@ -18,6 +18,8 @@
 
 package org.jppf.ui.monitoring.job;
 
+import java.util.Locale;
+
 import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.jobs.*;
@@ -31,27 +33,27 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Column number for the node's url.
    */
-  static final int NODE_URL = 0;
+  public static final int NODE_URL = 0;
   /**
    * Column number for the job's execution state.
    */
-  static final int JOB_STATE = 1;
+  public static final int JOB_STATE = 1;
   /**
    * Column number for the job's initial task count (at submission time).
    */
-  static final int INITIAL_TASK_COUNT = 2;
+  public static final int INITIAL_TASK_COUNT = 2;
   /**
    * Column number for the dispatched job's task count.
    */
-  static final int TASK_COUNT = 3;
+  public static final int TASK_COUNT = 3;
   /**
    * Column number for the job's priority.
    */
-  static final int PRIORITY = 4;
+  public static final int PRIORITY = 4;
   /**
    * Column number for the maximum number of nodes a job can run on.
    */
-  static final int MAX_NODES = 5;
+  public static final int MAX_NODES = 5;
 
   /**
    * Initialize this model with the specified tree root.
@@ -59,6 +61,16 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JobTreeTableModel(final TreeNode node) {
     super(node);
+    BASE = "org.jppf.ui.i18n.JobDataPage";
+  }
+
+  /**
+   * Initialize this model with the specified tree root.
+   * @param node - the root of the tree.
+   * @param locale the locale used to translate column headers and cell values.
+   */
+  public JobTreeTableModel(final TreeNode node, final Locale locale) {
+    super(node, locale);
     BASE = "org.jppf.ui.i18n.JobDataPage";
   }
 

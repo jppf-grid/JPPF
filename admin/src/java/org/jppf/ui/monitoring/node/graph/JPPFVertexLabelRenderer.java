@@ -64,7 +64,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     AbstractTopologyComponent data = (AbstractTopologyComponent) vertex;
     renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
-    renderer.setText(TreeTableUtils.getDisplayName(data));
+    renderer.setText(TopologyUtils.getDisplayName(data));
 
     String path = null;
     Color background = Color.white;

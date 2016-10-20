@@ -59,7 +59,7 @@ public class JobRenderer extends AbstractTreeCellRenderer {
         Color backgroundSelected = defaultSelectionBackground;
         if (data instanceof JobDriver) {
           JobDriver driver = (JobDriver) data;
-          renderer.setText(TreeTableUtils.getDisplayName(driver.getTopologyDriver()));
+          renderer.setText(TopologyUtils.getDisplayName(driver.getTopologyDriver()));
           if (((JobDriver) data).getTopologyDriver().getConnection().getStatus().isWorkingStatus()) {
             path = DRIVER_ICON;
             background = ACTIVE_COLOR;

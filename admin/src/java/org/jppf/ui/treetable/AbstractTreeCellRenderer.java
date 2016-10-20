@@ -78,7 +78,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
   /**
    * Path to the icon used for a job.
    */
-  public static final String JOB_ICON = RESOURCES + "rack.gif";
+  public static final String JOB_ICON = RESOURCES + "job.png";
   /**
    * Critical icon.
    */
