@@ -335,7 +335,7 @@ public class JobMonitor extends TopologyListenerAdapter {
           break;
       }
     } catch(Exception e) {
-      log.error(String.format("error dispatching event of type %s, event=%, exception: %s", type, event, ExceptionUtils.getStackTrace(e)));
+      log.error(String.format("error dispatching event of type %s, event=%s, exception: %s", type, event, ExceptionUtils.getStackTrace(e)));
     }
   }
 
