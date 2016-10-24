@@ -20,19 +20,12 @@ package org.jppf.management;
 
 import java.io.Serializable;
 
-import org.jppf.utils.LocalizationUtils;
-
 /**
  * Instances of this class represent the state of a node.
  * They are used as the result of node JMX monitoring request.
  * @author Laurent Cohen
  */
 public class JPPFNodeState implements Serializable {
-  /**
-   * Base name for the localization resource bundles.
-   */
-  private static final String I18N = "org.jppf.server.i18n.server_messages";
-
   /**
    * Enumeration of connection states.
    */
@@ -63,9 +56,12 @@ public class JPPFNodeState implements Serializable {
       displayName = msg;
     }
 
-    @Override
-    public String toString() {
-      return LocalizationUtils.getLocalized(I18N, displayName);
+    /**
+     * Get the localizable display name.
+     * @return the key of a message ot localize.
+     */
+    public String getDisplayName() {
+      return displayName;
     }
   }
 
@@ -99,9 +95,12 @@ public class JPPFNodeState implements Serializable {
       displayName = msg;
     }
 
-    @Override
-    public String toString() {
-      return LocalizationUtils.getLocalized(I18N, displayName);
+    /**
+     * Get the localizable display name.
+     * @return the key of a message ot localize.
+     */
+    public String getDisplayName() {
+      return displayName;
     }
   }
 

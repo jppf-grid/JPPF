@@ -18,8 +18,6 @@
 
 package org.jppf.management;
 
-import org.jppf.utils.LocalizationUtils;
-
 /**
  * An enumeration of the possible pending actions for a node, set via one of the
  * {@code shutdown(false)} or {@code restart(false)} methods of {@link JPPFNodeAdminMBean}. 
@@ -40,10 +38,6 @@ public enum NodePendingAction {
   RESTART("node.pending.restart");
 
   /**
-   * Base name for the localization resource bundles.
-   */
-  private static final String I18N = "org.jppf.server.i18n.server_messages";
-  /**
    * The name to display.
    */
   private final String displayName;
@@ -56,8 +50,11 @@ public enum NodePendingAction {
     displayName = msg;
   }
 
-  @Override
-  public String toString() {
-    return LocalizationUtils.getLocalized(I18N, displayName);
+  /**
+   * Get the localizable display name.
+   * @return the key of a message ot localize.
+   */
+  public String getDisplayName() {
+    return displayName;
   }
 }
