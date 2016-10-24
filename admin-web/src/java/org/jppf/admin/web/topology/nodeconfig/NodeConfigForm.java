@@ -18,32 +18,17 @@
 
 package org.jppf.admin.web.topology.nodeconfig;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.utils.TypedProperties;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class NodeConfigForm extends Form<String> {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(NodeConfigForm.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the ids of this form and its fields.
-   */
-  private static final String PREFIX = "node_config";
+public class NodeConfigForm extends AbstractModalForm {
   /**
    * Check box for whether to interrupt nodes if running.
    */
@@ -62,30 +47,14 @@ public class NodeConfigForm extends Form<String> {
    * @param okAction the ok action.
    */
   public NodeConfigForm(final ModalWindow modal, final Runnable okAction) {
-    super(PREFIX + ".form");
-    add(forceRestartField = new CheckBox(PREFIX + ".force_restart.field", Model.of(false)));
-    add(new Label(PREFIX + ".force_restart.label", Model.of("Force node restart")));
-    add(interruptField = new CheckBox(PREFIX + ".interrupt.field", Model.of(true)));
-    add(new Label(PREFIX + ".interrupt.label", Model.of("Interrupt even if running")));
-    add(new Label(PREFIX + ".config.label", Model.of("Updated configuration")));
-    add(configField = new TextArea<>(PREFIX + ".config.field", Model.of("Updated configuration")));
-    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_config.ok");
-        if (okAction != null) okAction.run();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_config.cancel");
-        modal.close(target);
-      }
-    });
+    super("node_config", modal, okAction);
+  }
+
+  @Override
+  protected void createFields() {
+    add(forceRestartField = new CheckBox(prefix + ".force_restart.field", Model.of(false)));
+    add(interruptField = new CheckBox(prefix + ".interrupt.field", Model.of(true)));
+    add(configField = new TextArea<>(prefix + ".config.field", Model.of("")));
   }
 
   /**
@@ -131,5 +100,19 @@ public class NodeConfigForm extends Form<String> {
    */
   public void setConfig(final String config) {
     configField.setModel(Model.of(config));
+  }
+
+  @Override
+  protected void loadSettings(final TypedProperties props) {
+    setInterrupt(props.getBoolean(interruptField.getId(), true));
+    setForceRestart(props.getBoolean(forceRestartField.getId(), false));
+    setConfig(props.getString(configField.getId(), ""));
+  }
+
+  @Override
+  protected void saveSettings(final TypedProperties props) {
+    props.setBoolean(interruptField.getId(), isInterrupt())
+    .setBoolean(forceRestartField.getId(), isForceRestart())
+    .setString(configField.getId(), getConfig());
   }
 }

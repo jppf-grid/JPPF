@@ -18,32 +18,17 @@
 
 package org.jppf.admin.web.jobs.priority;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.utils.TypedProperties;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class PriorityForm extends Form<String> {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(PriorityForm.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the ids of this form and its fields.
-   */
-  private static final String PREFIX = "priority";
+public class PriorityForm extends AbstractModalForm {
   /**
    * Text field for the number of threads.
    */
@@ -54,26 +39,12 @@ public class PriorityForm extends Form<String> {
    * @param okAction the ok action.
    */
   public PriorityForm(final ModalWindow modal, final Runnable okAction) {
-    super(PREFIX + ".form");
-    add(new Label(PREFIX + ".priority.label", Model.of("Job priority")));
-    add(priorityField = new TextField<>(PREFIX + ".priority.field", Model.of(0)));
-    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.ok");
-        if (okAction != null) okAction.run();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.cancel");
-        modal.close(target);
-      }
-    });
+    super("priority", modal, okAction);
+  }
+
+  @Override
+  protected void createFields() {
+    add(priorityField = new TextField<>(prefix + ".priority.field", Model.of(0)));
   }
 
   /**
@@ -89,5 +60,15 @@ public class PriorityForm extends Form<String> {
    */
   public void setPriority(final int priority) {
     priorityField.setModel(Model.of(priority));
+  }
+
+  @Override
+  protected void loadSettings(final TypedProperties props) {
+    setPriority(props.getInt(priorityField.getId(), 0));
+  }
+
+  @Override
+  protected void saveSettings(final TypedProperties props) {
+    props.setInt(priorityField.getId(), getPriority());
   }
 }

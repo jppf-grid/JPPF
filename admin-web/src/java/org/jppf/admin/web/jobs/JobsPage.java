@@ -70,28 +70,22 @@ public class JobsPage extends AbstractTableTreePage implements JobMonitoringList
 
   @Override
   protected void createTreeTableModel() {
-    JPPFWebSession session = getJPPFSession();
+    JPPFWebSession session = JPPFWebSession.get();
     TableTreeData data = session.getTableTreeData(viewType);
     treeModel = data.getModel();
     if (treeModel == null) {
       JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
       treeModel = new JobTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), session.getLocale());
-      populateTreeTableModel();
+      // populate the tree table model
+      for (JobDriver driver: getJPPFApplication().getJobMonitor().getJobDrivers()) {
+        JobsUtils.addDriver(treeModel, driver);
+        for (Job job: driver.getJobs()) {
+          JobsUtils.addJob(treeModel, driver, job);
+          for (JobDispatch dispatch: job.getJobDispatches()) JobsUtils.addJobDispatch(treeModel, job, dispatch);
+        }
+      }
       data.setModel(treeModel);
       app.getJobMonitor().addJobMonitoringListener(this);
-    }
-  }
-
-  /**
-   * Create and initialize the tree table model holding the drivers and nodes data.
-   */
-  private synchronized void populateTreeTableModel() {
-    for (JobDriver driver: getJPPFApplication().getJobMonitor().getJobDrivers()) {
-      JobsUtils.addDriver(treeModel, driver);
-      for (Job job: driver.getJobs()) {
-        JobsUtils.addJob(treeModel, driver, job);
-        for (JobDispatch dispatch: job.getJobDispatches()) JobsUtils.addJobDispatch(treeModel, job, dispatch);
-      }
     }
   }
 
@@ -114,7 +108,7 @@ public class JobsPage extends AbstractTableTreePage implements JobMonitoringList
 
   @Override
   protected void createActions() {
-    ActionHandler actionHandler = getJPPFSession().getTableTreeData(viewType).getActionHandler();
+    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new CancelJobLink());
     actionHandler.addActionLink(toolbar, new SuspendJobLink(false));
     actionHandler.addActionLink(toolbar, new SuspendJobLink(true));

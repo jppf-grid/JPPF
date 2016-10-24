@@ -7,7 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="lib" path="lib/wicket-atmosphere-0.27.jar"/>
-	<classpathentry kind="lib" path="lib/wicket-auth-roles-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-auth-roles-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-auth-roles"/>
 	<classpathentry kind="lib" path="lib/wicket-bean-validation-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-cdi-1.1-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-cdi-7.4.0.jar"/>

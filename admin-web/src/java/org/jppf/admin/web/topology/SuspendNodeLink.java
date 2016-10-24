@@ -57,7 +57,7 @@ public class SuspendNodeLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on suspend node");
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TopologyTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {

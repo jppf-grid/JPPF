@@ -18,6 +18,7 @@
 
 body {
   background-color: #E2E4F0;
+  color: #6D78B6;
   margin-top: 20px
 }
 
@@ -28,6 +29,7 @@ body, textarea {
 
 textarea {
   background-color: white;
+  width: 100%;
 }
 
 textarea:disabled, input:disabled {
@@ -137,7 +139,6 @@ hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: 
   font-weight: normal;
   overflow: visible;
 }
-/*div.aboutMenuItem { background-color: #6D78B6;}*/
 
 .codeBlock { font-family: Courrier New, Courrier, Console; border: 1px dashed blue }
 
@@ -475,16 +476,24 @@ textarea {
 .button_link {
   margin: 0px;
   padding: 4px;
+  font-weight: bold;
   text-decoration: none;
   vertical-align: middle;
   border: 1px solid #6D78B6;
   border-radius: 2px;
-  box-shadow: -1px -1px 2px #A5B0D0 inset;
+  box-shadow: -1px -1px 2px #6D78B6 inset;
+  background-color: #C5D0F0;
+}
+
+.button_ok {
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 a.button_link:hover {
   box-shadow: inset 2px 2px 2px #888;
   text-decoration: none;
+  color: #6D78B6;
 }
 
 .button_link_disabled {

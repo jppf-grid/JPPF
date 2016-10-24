@@ -36,14 +36,6 @@ public class TemplatePage extends WebPage {
   }
 
   /**
-   * Get the associated JPPF session obect.
-   * @return a {@link JPPFWebSession} instance.
-   */
-  public JPPFWebSession getJPPFSession() {
-    return (JPPFWebSession) getSession();
-  }
-
-  /**
    * Get the application object.
    * @return a {@link JPPFWebConsoleApplication} instance.
    */

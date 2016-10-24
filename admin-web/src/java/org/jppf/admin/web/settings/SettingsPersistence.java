@@ -16,22 +16,28 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.health;
+package org.jppf.admin.web.settings;
 
-import org.apache.wicket.markup.html.basic.Label;
-import org.jppf.admin.web.TemplatePage;
-import org.wicketstuff.wicket.mount.core.annotation.MountPath;
+import org.jppf.utils.TypedProperties;
 
 /**
  * 
  * @author Laurent Cohen
  */
-@MountPath("health")
-public class Health extends TemplatePage {
+public interface SettingsPersistence {
   /**
-   * Initialize this web page.
+   * Load the settings for the specified user.
+   * @param userHash a hash of the user name.
+   * @param settings the settings to load into.
+   * @throws Exception if any error occurs.
    */
-  public Health() {
-    add(new Label("message", "Health page!"));
-  }
+  public void load(String userHash, TypedProperties settings) throws Exception;
+
+  /**
+   * Save the settings for the specified user.
+   * @param userHash a hash of the user name.
+   * @param settings the settings to save.
+   * @throws Exception if any error occurs.
+   */
+  public void save(String userHash, TypedProperties settings) throws Exception;
 }

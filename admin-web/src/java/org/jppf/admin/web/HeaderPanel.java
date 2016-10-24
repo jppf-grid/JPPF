@@ -18,10 +18,9 @@
 
 package org.jppf.admin.web;
 
-import java.security.Principal;
+import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
@@ -29,7 +28,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * A the header panel.
@@ -41,9 +40,12 @@ public class HeaderPanel extends Panel {
    */
   public HeaderPanel() {
     super("jppf.header");
-    HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
-    Principal principal = req.getUserPrincipal();
-    add(new Label("jppf.header.user", Model.of((principal == null) ? "Not signed in" : "User: " + principal.getName())));
+    String user = JPPFWebSession.getUserName();
+    Locale locale = Session.get().getLocale();
+    String s = (user != null)
+      ? LocalizationUtils.getLocalized(getClass().getName(), "jppf.header.user.label", locale) + " " + user
+      : LocalizationUtils.getLocalized(getClass().getName(), "jppf.header.not.signed_in.label", locale);
+    add(new Label("jppf.header.user", Model.of(s)));
     Form<String> form = new Form<>("login.signout.form");
     AjaxButton link = new AjaxButton("login.signout.link", Model.of("Sign out")) {
       @Override
@@ -55,8 +57,8 @@ public class HeaderPanel extends Panel {
       }
     };
     form.add(link);
-    form.setVisible(principal != null);
-    link.setVisible(principal != null);
+    form.setVisible(user != null);
+    link.setVisible(user != null);
     add(form);
   }
 }

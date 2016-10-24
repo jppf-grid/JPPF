@@ -18,32 +18,17 @@
 
 package org.jppf.admin.web.topology.serverstop;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.utils.TypedProperties;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class DriverStopRestartForm extends Form<String> {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(DriverStopRestartForm.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the ids of this form and its fields.
-   */
-  private static final String PREFIX = "server_stop_restart";
+public class DriverStopRestartForm extends AbstractModalForm {
   /**
    * Text field for the driver shutdown delay.
    */
@@ -62,30 +47,14 @@ public class DriverStopRestartForm extends Form<String> {
    * @param okAction the ok action.
    */
   public DriverStopRestartForm(final ModalWindow modal, final Runnable okAction) {
-    super(PREFIX + ".form");
-    add(new Label(PREFIX + ".shutdown_delay.label", Model.of("Shutdown delay")));
-    add(shutdownDelayField = new TextField<>(PREFIX + ".shutdown_delay.field", Model.of(0L)));
-    add(new Label(PREFIX + ".restart.label", Model.of("Restart")));
-    add(restartField = new CheckBox(PREFIX + ".restart.field", Model.of(true)));
-    add(new Label(PREFIX + ".restart_delay.label", Model.of("Restart delay")));
-    add(restartDelayField = new TextField<>(PREFIX + ".restart_delay.field", Model.of(0L)));
-    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on provisioning.ok");
-        if (okAction != null) okAction.run();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on provisioning.cancel");
-        modal.close(target);
-      }
-    });
+    super("server_stop_restart", modal, okAction);
+  }
+
+  @Override
+  protected void createFields() {
+    add(shutdownDelayField = new TextField<>(prefix + ".shutdown_delay.field", Model.of(0L)));
+    add(restartField = new CheckBox(prefix + ".restart.field", Model.of(true)));
+    add(restartDelayField = new TextField<>(prefix + ".restart_delay.field", Model.of(0L)));
   }
 
   /**
@@ -131,5 +100,19 @@ public class DriverStopRestartForm extends Form<String> {
    */
   public void setRestartDelay(final long restartDelay) {
     this.restartDelayField.setModel(Model.of(restartDelay));
+  }
+
+  @Override
+  protected void loadSettings(final TypedProperties props) {
+    setShutdownDelay(props.getLong(shutdownDelayField.getId(), 0L));
+    setRestart(props.getBoolean(restartField.getId(), true));
+    setRestartDelay(props.getLong(restartDelayField.getId(), 0L));
+  }
+
+  @Override
+  protected void saveSettings(final TypedProperties props) {
+    props.setLong(shutdownDelayField.getId(), getShutdownDelay())
+      .setBoolean(restartField.getId(), isRestart())
+      .setLong(restartDelayField.getId(), getRestartDelay());
   }
 }

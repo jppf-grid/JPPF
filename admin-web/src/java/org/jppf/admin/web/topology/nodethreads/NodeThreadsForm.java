@@ -18,32 +18,17 @@
 
 package org.jppf.admin.web.topology.nodethreads;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.utils.TypedProperties;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class NodeThreadsForm extends Form<String> {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(NodeThreadsForm.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the ids of this form and its fields.
-   */
-  private static final String PREFIX = "node_threads";
+public class NodeThreadsForm extends AbstractModalForm {
   /**
    * Text field for the number of threads.
    */
@@ -58,28 +43,13 @@ public class NodeThreadsForm extends Form<String> {
    * @param okAction the ok action.
    */
   public NodeThreadsForm(final ModalWindow modal, final Runnable okAction) {
-    super(PREFIX + ".form");
-    add(new Label(PREFIX + ".nb_threads.label", Model.of("Number of threads")));
-    add(nbThreadsField = new TextField<>(PREFIX + ".nb_threads.field", Model.of(Runtime.getRuntime().availableProcessors())));
-    add(new Label(PREFIX + ".priority.label", Model.of("Priority")));
-    add(priorityField = new TextField<>(PREFIX + ".priority.field", Model.of(5)));
-    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.ok");
-        if (okAction != null) okAction.run();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.cancel");
-        modal.close(target);
-      }
-    });
+    super("node_threads", modal, okAction);
+  }
+
+  @Override
+  protected void createFields() {
+    add(nbThreadsField = new TextField<>(prefix + ".nb_threads.field", Model.of(1)));
+    add(priorityField = new TextField<>(prefix + ".priority.field", Model.of(Thread.NORM_PRIORITY)));
   }
 
   /**
@@ -109,6 +79,17 @@ public class NodeThreadsForm extends Form<String> {
    * @param priority the threads priority to set.
    */
   public void setPriority(final int priority) {
-    nbThreadsField.setModel(Model.of(priority));
+    priorityField.setModel(Model.of(priority));
+  }
+
+  @Override
+  protected void loadSettings(final TypedProperties props) {
+    setNbThreads(props.getInt(nbThreadsField.getId(), Runtime.getRuntime().availableProcessors()));
+    setPriority(props.getInt(priorityField.getId(), Thread.NORM_PRIORITY));
+  }
+
+  @Override
+  protected void saveSettings(final TypedProperties props) {
+    props.setInt(nbThreadsField.getId(), getNbThreads()).setInt(priorityField.getId(), getPriority());
   }
 }

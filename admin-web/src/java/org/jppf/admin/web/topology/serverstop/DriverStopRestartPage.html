@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <html xmlns:wicket="http://wicket.apache.org">
 	<head>
-    <title>Server stop/restart</title>
+    <title><wicket:message key="server_stop_restart.title"></wicket:message></title>
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
@@ -24,23 +24,23 @@
 	  <form wicket:id="server_stop_restart.form" class="modal_form">
       <table class="modal_form">
         <tr>
-          <td><span wicket:id="server_stop_restart.shutdown_delay.label"></span>&nbsp;</td>
+          <td><wicket:message key="server_stop_restart.shutdown_delay.label"></wicket:message>&nbsp;</td>
     	    <td><input type="text" wicket:id="server_stop_restart.shutdown_delay.field" value="0"/><br/></td>
         </tr>
         <tr>
           <td colspan="2">
             <input id="c1" type="checkbox" wicket:id="server_stop_restart.restart.field" onclick="updateState('c1', 't1')"/>
-            <span wicket:id="server_stop_restart.restart.label"></span><br/>
+            <wicket:message key="server_stop_restart.restart.label"></wicket:message><br/>
           </td>
         </tr>
         <tr>
-          <td><span id="tl1" wicket:id="server_stop_restart.restart_delay.label"></span>&nbsp;</td>
+          <td><span id="tl1"><wicket:message key="server_stop_restart.restart_delay.label"></wicket:message></span>&nbsp;</td>
           <td><input id="t1" type="text" wicket:id="server_stop_restart.restart_delay.field" value="0"/><br/></td>
         </tr>
       </table>
 
-      <p><a wicket:id="server_stop_restart.ok" class="button_link">OK</a>&nbsp;
-      <a wicket:id="server_stop_restart.cancel" class="button_link">Cancel</a>
+      <p><a wicket:id="server_stop_restart.ok" class="button_link button_ok"><wicket:message key="server_stop_restart.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="server_stop_restart.cancel" class="button_link"><wicket:message key="server_stop_restart.cancel.label"></wicket:message></a>
     </form>
 	</body>
 </html>

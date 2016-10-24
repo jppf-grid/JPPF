@@ -52,7 +52,7 @@ public class StopRestartNodeLink extends AbstractActionLink {
   private ActionType actionType;
 
   /**
-   *
+   *  The type of stop/restart and immediate/differed node action.
    */
   public static enum ActionType {
     /**
@@ -157,7 +157,7 @@ public class StopRestartNodeLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on {}", actionType);
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {

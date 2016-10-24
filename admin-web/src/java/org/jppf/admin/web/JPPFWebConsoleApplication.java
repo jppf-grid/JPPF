@@ -28,7 +28,7 @@ import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
 import org.jppf.admin.web.auth.LoginPage;
-import org.jppf.admin.web.topology.TopologyTree;
+import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.utils.*;
@@ -75,7 +75,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
 
   @Override
   public Class<? extends Page> getHomePage() {
-    return TopologyTree.class;
+    return TopologyPage.class;
   }
 
   @Override

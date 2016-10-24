@@ -29,7 +29,7 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.table.*;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.*;
-import org.jppf.admin.web.JPPFWebConsoleApplication;
+import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigLink;
 import org.jppf.admin.web.topology.nodethreads.NodeThreadsLink;
@@ -49,11 +49,11 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * @author Laurent Cohen
  */
 @MountPath("topology")
-public class TopologyTree extends AbstractTableTreePage implements TopologyListener {
+public class TopologyPage extends AbstractTableTreePage implements TopologyListener {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(TopologyTree.class);
+  static Logger log = LoggerFactory.getLogger(TopologyPage.class);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -66,32 +66,26 @@ public class TopologyTree extends AbstractTableTreePage implements TopologyListe
   /**
    * Initialize this web page.
    */
-  public TopologyTree() {
+  public TopologyPage() {
     super(TreeViewType.TOPOLOGY, "topology");
   }
 
   @Override
   protected void createTreeTableModel() {
-    TableTreeData data = getJPPFSession().getTableTreeData(viewType);
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     treeModel = data.getModel();
     if (treeModel == null) {
       JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
-      treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), getJPPFSession().getLocale());
-      populateTreeTableModel();
+      treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), JPPFWebSession.get().getLocale());
+      // populate the tree table model
+      for (TopologyDriver driver : getJPPFApplication().getTopologyManager().getDrivers()) {
+        TopologyUtils.addDriver(treeModel, driver);
+        for (AbstractTopologyComponent child : driver.getChildren()) {
+          TopologyUtils.addNode(treeModel, driver, (TopologyNode) child);
+        }
+      }
       data.setModel(treeModel);
       app.getTopologyManager().addTopologyListener(this);
-    }
-  }
-
-  /**
-   * Create and initialize the tree table model holding the drivers and nodes data.
-   */
-  protected synchronized void populateTreeTableModel() {
-    for (TopologyDriver driver : getJPPFApplication().getTopologyManager().getDrivers()) {
-      TopologyUtils.addDriver(treeModel, driver);
-      for (AbstractTopologyComponent child : driver.getChildren()) {
-        TopologyUtils.addNode(treeModel, driver, (TopologyNode) child);
-      }
     }
   }
 
@@ -112,7 +106,7 @@ public class TopologyTree extends AbstractTableTreePage implements TopologyListe
 
   @Override
   protected void createActions() {
-    ActionHandler actionHandler = getJPPFSession().getTableTreeData(viewType).getActionHandler();
+    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new DriverStopRestartLink(toolbar));
     actionHandler.addActionLink(toolbar, new ServerResetStatsLink());
     actionHandler.addActionLink(toolbar, new SystemInfoLink(toolbar));
@@ -175,7 +169,7 @@ public class TopologyTree extends AbstractTableTreePage implements TopologyListe
    * This class renders cells of the first column as tree.
    */
   public class TopologyTreeColumn extends TreeColumn<DefaultMutableTreeNode, String> {
-    /** Explicit serailVersionUID. */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -217,7 +211,7 @@ public class TopologyTree extends AbstractTableTreePage implements TopologyListe
    * This class renders cells of each columns except the first.
    */
   public class TopologyColumn extends AbstractColumn<DefaultMutableTreeNode, String> {
-    /** Explicit serailVersionUID. */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /**
      * The column index.

@@ -18,13 +18,15 @@
 
 package org.jppf.admin.web.auth;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -56,19 +58,27 @@ public class LoginForm extends Form<String> {
    * The eventual error message.
    */
   private Label error;
+  /**
+   * 
+   */
+  private boolean hasError;
 
   /**
    * .
    */
   public LoginForm() {
     super(PREFIX + ".form");
-    add(new Label(PREFIX + ".username.label", Model.of("User name")));
     add(username = new TextField<>(PREFIX + ".username.field", Model.of("")));
-    add(new Label(PREFIX + ".password.label", Model.of("Password")));
     add(password = new PasswordTextField(PREFIX + ".password.field", Model.of("")));
     password.setRequired(false);
-    add(error = new Label(PREFIX + ".error", Model.of("")));
-    AjaxButton button = new AjaxButton(PREFIX + ".ok", Model.of("Login")) {
+    add(error = new Label(PREFIX + ".error", Model.of("")) {
+
+      @Override
+      protected void onComponentTag(final ComponentTag tag) {
+        if (hasError) tag.append("style", "margin-top: 15px", ";");
+      }
+    });
+    AjaxButton button = new AjaxButton(PREFIX + ".ok") {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on login.ok");
@@ -116,9 +126,12 @@ public class LoginForm extends Form<String> {
     if (AuthenticatedWebSession.get().signIn(getUsername(), getPassword())) {
       continueToOriginalDestination();
       setResponsePage(getApplication().getHomePage());
+      hasError = false;
     } else {
-      this.error.setDefaultModel(Model.of("Sign-in failed, please try again"));
+      String message = LocalizationUtils.getLocalized(LoginPage.class.getName(), "login.error", Session.get().getLocale());
+      this.error.setDefaultModel(Model.of(message));
       target.add(this.getParent());
+      hasError = true;
     }
   }
 }

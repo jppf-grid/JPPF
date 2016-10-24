@@ -38,13 +38,5 @@ public class LoginPage extends WebPage {
     add(new LoginForm());
     add(new FooterPanel());
   }
-
-  /**
-   * Get the associated JPPF session obect.
-   * @return a {@link JPPFWebSession} instance.
-   */
-  public JPPFWebSession getJPPFSession() {
-    return (JPPFWebSession) getSession();
-  }
 }
 

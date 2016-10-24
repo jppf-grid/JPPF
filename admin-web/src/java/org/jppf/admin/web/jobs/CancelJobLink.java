@@ -58,7 +58,7 @@ public class CancelJobLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on cancel");
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getJobsData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {

@@ -58,7 +58,7 @@ public class ResetTaskCounterLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on reset task counter");
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {

@@ -40,7 +40,7 @@ public class ExpandAllLink extends AbstractActionLink {
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyData().getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();

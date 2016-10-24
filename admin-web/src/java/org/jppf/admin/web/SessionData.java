@@ -55,7 +55,7 @@ public class SessionData {
    * @param instanceNumber .
    */
   SessionData(final long instanceNumber) {
-   this.instanceNumber = instanceNumber;
+    this.instanceNumber = instanceNumber;
   }
 
   /**

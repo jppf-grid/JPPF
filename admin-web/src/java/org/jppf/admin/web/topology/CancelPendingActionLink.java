@@ -58,7 +58,7 @@ public class CancelPendingActionLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on System info");
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {

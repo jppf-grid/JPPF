@@ -23,7 +23,6 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.model.*;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.jppf.admin.web.*;
 import org.jppf.utils.Pair;
 
 /**
@@ -63,16 +62,6 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   public AbstractActionLink(final String id, final IModel<String> model, final String imageName) {
     super(id, model);
     this.imageName = imageName;
-  }
-
-  /**
-   * Get the session from the ajax target.
-   * @param target the ajax target.
-   * @return a {@link JPPFWebSession} instance.
-   */
-  protected JPPFWebSession getSession(final AjaxRequestTarget target) {
-    TemplatePage page = (TemplatePage) target.getPage();
-    return page.getJPPFSession();
   }
 
   @Override

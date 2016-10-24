@@ -53,7 +53,7 @@ public class NodeConfigLink extends AbstractModalLink<NodeConfigForm> {
   public NodeConfigLink(final Form<String> form) {
     super(TopologyConstants.NODE_CONFIG_ACTION, Model.of("Node configuration"), "update.gif", NodeConfigPage.class, form);
     modal.setInitialWidth(565);
-    modal.setInitialHeight(475);
+    modal.setInitialHeight(500);
   }
 
   @Override

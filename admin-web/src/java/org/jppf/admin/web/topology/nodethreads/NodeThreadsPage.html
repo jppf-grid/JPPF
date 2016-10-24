@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <html xmlns:wicket="http://wicket.apache.org">
 	<head>
-    <title>Node thread pool</title>
+    <title><wicket:message key="node_threads.title"></wicket:message></title>
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
@@ -10,17 +10,17 @@
 	  <form wicket:id="node_threads.form" class="modal_form">
       <table class="modal_form">
         <tr>
-          <td><span wicket:id="node_threads.nb_threads.label"></span>&nbsp;</td>
+          <td><wicket:message key="node_threads.nb_threads.label"></wicket:message>&nbsp;</td>
           <td><input type="text" wicket:id="node_threads.nb_threads.field" value="0"/><br/></td>
         </tr>
         <tr>
-          <td><span wicket:id="node_threads.priority.label"></span>&nbsp;</td>
+          <td><wicket:message key="node_threads.priority.label"></wicket:message>&nbsp;</td>
           <td><input type="text" wicket:id="node_threads.priority.field" value="0"/><br/></td>
         </tr>        
       </table>
 
-      <p><a wicket:id="node_threads.ok" class="button_link">OK</a>&nbsp;
-      <a wicket:id="node_threads.cancel" class="button_link">Cancel</a>
+      <p><a wicket:id="node_threads.ok" class="button_link button_ok"><wicket:message key="node_threads.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="node_threads.cancel" class="button_link"><wicket:message key="node_threads.cancel.label"></wicket:message></a>
 		</form>
 	</body>
 </html>

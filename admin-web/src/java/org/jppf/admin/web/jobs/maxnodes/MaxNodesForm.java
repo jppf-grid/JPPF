@@ -18,32 +18,17 @@
 
 package org.jppf.admin.web.jobs.maxnodes;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
+import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.utils.TypedProperties;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class MaxNodesForm extends Form<String> {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(MaxNodesForm.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the ids of this form and its fields.
-   */
-  private static final String PREFIX = "max_nodes";
+public class MaxNodesForm extends AbstractModalForm {
   /**
    * Text field for the number of threads.
    */
@@ -58,28 +43,13 @@ public class MaxNodesForm extends Form<String> {
    * @param okAction the ok action.
    */
   public MaxNodesForm(final ModalWindow modal, final Runnable okAction) {
-    super(PREFIX + ".form");
-    add(new Label(PREFIX + ".nb_nodes.label", Model.of("Max number of nodes")));
-    add(nbNodesField = new TextField<>(PREFIX + ".nb_nodes.field", Model.of(Integer.MAX_VALUE)));
-    add(new Label(PREFIX + ".unlimited.label", Model.of("Unlimited nodes")));
-    add(unlimitedField = new CheckBox(PREFIX + ".unlimited.field", Model.of(true)));
-    AjaxButton okButton = new AjaxButton(PREFIX + ".ok", Model.of("OK")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.ok");
-        if (okAction != null) okAction.run();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(PREFIX + ".cancel", Model.of("Cancel")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on node_threads.cancel");
-        modal.close(target);
-      }
-    });
+    super("max_nodes", modal, okAction);
+  }
+
+  @Override
+  protected void createFields() {
+    add(nbNodesField = new TextField<>(prefix + ".nb_nodes.field", Model.of(Integer.MAX_VALUE)));
+    add(unlimitedField = new CheckBox(prefix + ".unlimited.field", Model.of(true)));
   }
 
   /**
@@ -110,5 +80,16 @@ public class MaxNodesForm extends Form<String> {
    */
   public void setUnlimited(final boolean unlimited) {
     unlimitedField.setModel(Model.of(unlimited));
+  }
+
+  @Override
+  protected void loadSettings(final TypedProperties props) {
+    setNbNodes(props.getInt(nbNodesField.getId(), Integer.MAX_VALUE));
+    setUnlimited(props.getBoolean(unlimitedField.getId(), true));
+  }
+
+  @Override
+  protected void saveSettings(final TypedProperties props) {
+    props.setInt(nbNodesField.getId(), getNbNodes()).setBoolean(unlimitedField.getId(), isUnlimited());
   }
 }

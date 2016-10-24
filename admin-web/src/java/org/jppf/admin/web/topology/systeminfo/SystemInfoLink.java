@@ -18,11 +18,11 @@
 
 package org.jppf.admin.web.topology.systeminfo;
 
-import java.util.List;
+import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.wicket.Page;
+import org.apache.wicket.*;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.Form;
@@ -32,7 +32,7 @@ import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.TopologyConstants;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.ui.utils.*;
+import org.jppf.ui.utils.TopologyUtils;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -68,16 +68,17 @@ public class SystemInfoLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on System info");
-    JPPFWebSession session = getSession(target);
+    JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
       DefaultMutableTreeNode treeNode = selectedNodes.get(0);
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
-      String title = "System Information for " + (comp.isNode() ? "node " : "driver ") + comp.getDisplayName();
+      Locale locale = Session.get().getLocale();
+      String title = TopologyUtils.getSystemInfoTitle(comp, locale);
       JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
       final StringBuilder html = new StringBuilder();
-      html.append(TreeTableUtils.formatProperties(info, new HTMLPropertiesTableFormat(title, false)));
+      html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title, false), locale));
       if (debugEnabled) log.debug("html = {}", html);
       modal.setPageCreator(new PageCreator(html.toString()));
       stopRefreshTimer(target);

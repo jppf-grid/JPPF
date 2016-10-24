@@ -27,12 +27,12 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
 import org.apache.wicket.extensions.markup.html.repeater.tree.theme.WindowsTheme;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.util.time.Duration;
-import org.jppf.admin.web.TemplatePage;
+import org.jppf.admin.web.*;
 import org.jppf.ui.treetable.*;
 import org.slf4j.*;
 
 /**
- *
+ * Abstract super class for pages holding a toolbar and a table tree view.
  * @author Laurent Cohen
  */
 public abstract class AbstractTableTreePage extends TemplatePage implements TableTreeHolder {
@@ -82,7 +82,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
     this.viewType = viewType;
     this.namePrefix = namePrefix;
     add(getOrCreateToolbar());
-    TableTreeData data = getJPPFSession().getTableTreeData(viewType);
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     selectionHandler = data.getSelectionHandler();
     tableTree = createTableTree();
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
@@ -97,20 +97,6 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   @Override
   public JPPFTableTree getTableTree() {
     return tableTree;
-  }
-
-  /**
-   * @return the tree model.
-   */
-  public AbstractJPPFTreeTableModel getTreeModel() {
-    return treeModel;
-  }
-
-  /**
-   * @return the selection handler.
-   */
-  public SelectionHandler getSelectionHandler() {
-    return selectionHandler;
   }
 
   @Override
@@ -128,10 +114,9 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    * @return a {@link JPPFTableTree} instance.
    */
   protected JPPFTableTree createTableTree() {
-    if (debugEnabled) log.debug("creating tree model for {}", viewType);
+    if (debugEnabled) log.debug("getting tree model for {}", viewType);
     createTreeTableModel();
-    if (debugEnabled) log.debug("model created for {}", viewType);
-    TableTreeData data = getJPPFSession().getTopologyData();
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     JPPFTableTree tree = new JPPFTableTree(
       viewType, namePrefix + ".table.tree", createColumns(), treeModel, Integer.MAX_VALUE, selectionHandler, TableTreeHelper.newTreeNodeRenderer(viewType), data.getExpansionModel());
     DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
@@ -147,11 +132,11 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   }
 
   /**
-   * Get the tolbar and it create it if necessary.
+   * Get the tolbar and create it if necessary.
    * @return the toolbar.
    */
   private Form<String> getOrCreateToolbar() {
-    TableTreeData data = getJPPFSession().getTableTreeData(viewType);
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     ActionHandler actionHandler = data.getActionHandler();
     if (actionHandler == null) {
       actionHandler = new ActionHandler();

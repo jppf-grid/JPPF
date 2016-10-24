@@ -18,8 +18,10 @@
 
 package org.jppf.admin.web;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.request.Request;
 import org.jppf.admin.web.jobs.JobsTreeData;
+import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
@@ -44,6 +46,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * The JPPF-internal id for this session data.
    */
   private final long sessionDataId;
+  /**
+   * The user settings.
+   */
+  private UserSettings userSettings;
 
   /**
    * Initialize a new session.
@@ -52,8 +58,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public JPPFWebSession(final Request request) {
     super(request);
     SessionData sessionData = new SessionData();
-    JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
-    app.sessionDataMap.put(sessionData.getId(), sessionData);
+    JPPFWebConsoleApplication.sessionDataMap.put(sessionData.getId(), sessionData);
     log.info("created sessiondata with id={}", sessionData.getId());
     this.sessionDataId = sessionData.getId();
     if (debugEnabled) log.debug(String.format("new instance #%d, request=%s", sessionDataId, request));
@@ -63,6 +68,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public void onInvalidate() {
     super.onInvalidate();
     JPPFWebConsoleApplication.removeSessionData(sessionDataId);
+    if (userSettings != null) {
+      userSettings.getProperties().clear();
+      userSettings = null;
+    }
   }
 
   /**
@@ -104,5 +113,30 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
       JPPFWebConsoleApplication.setSessionData(sessionDataId, data);
     }
     return data;
+  }
+
+  /**
+   * Get the associated JPPF session obect.
+   * @return a {@link JPPFWebSession} instance.
+   */
+  public static JPPFWebSession get() {
+    return (JPPFWebSession) Session.get();
+  }
+
+  @Override
+  public boolean authenticate(final String user, final String pwd) {
+    boolean ret = super.authenticate(user, pwd);
+    if (ret) {
+      userSettings = new UserSettings(user);
+      userSettings.load();
+    }
+    return ret;
+  }
+
+  /**
+   * @return the user settings, or {@code null} if the user is not authenticated.
+   */
+  public UserSettings getUserSettings() {
+    return userSettings;
   }
 }

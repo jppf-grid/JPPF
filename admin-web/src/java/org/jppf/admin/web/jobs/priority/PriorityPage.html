@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <html xmlns:wicket="http://wicket.apache.org">
 	<head>
-    <title>Job priority</title>
+    <title><wicket:message key="priority.title"></wicket:message></title>
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>	
 	<body>
 	  <form wicket:id="priority.form" class="modal_form">
-      <span iwicket:id="priority.priority.label"></span>&nbsp;
+      <wicket:message key="priority.priority.label"></wicket:message>&nbsp;
       <input type="text" wicket:id="priority.priority.field" value="0"/><br/>
 
-      <p><a wicket:id="priority.ok" class="button_link">OK</a>&nbsp;
-      <a wicket:id="priority.cancel" class="button_link">Cancel</a>
+      <p><a wicket:id="priority.ok" class="button_link button_ok"><wicket:message key="priority.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="priority.cancel" class="button_link"><wicket:message key="priority.cancel.label"></wicket:message></a>
 		</form>
 	</body>
 </html>

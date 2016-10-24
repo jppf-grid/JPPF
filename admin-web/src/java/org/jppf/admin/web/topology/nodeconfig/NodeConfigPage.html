@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <html xmlns:wicket="http://wicket.apache.org">
 	<head>
-    <title>Node configuration</title>
+    <title><wicket:message key="node_config.title"></wicket:message></title>
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
@@ -29,16 +29,16 @@
     </script>
 	  <form wicket:id="node_config.form" class="modal_form">
       <input id="c1" type="checkbox" wicket:id="node_config.force_restart.field" onclick="updateState('c1', 'c2')"/>
-      <span wicket:id="node_config.force_restart.label"></span><br/>
+      <wicket:message key="node_config.force_restart.label"></wicket:message><br/>
 
       <input id="c2" type="checkbox" wicket:id="node_config.interrupt.field"/>
-      <span id="cl2" wicket:id="node_config.interrupt.label"></span><br/>
+      <span id="cl2"><wicket:message key="node_config.interrupt.label"></wicket:message><br/></span><br/>
 
-      <span wicket:id="node_config.config.label"></span><br/>
+      <wicket:message key="node_config.config.label"></wicket:message><br/>
 	    <textarea wicket:id="node_config.config.field" rows="20" cols="80"></textarea><br/>
 
-      <p><a wicket:id="node_config.ok" class="button_link">OK</a>&nbsp;
-      <a wicket:id="node_config.cancel" class="button_link">Cancel</a>
+      <p><a wicket:id="node_config.ok" class="button_link button_ok"><wicket:message key="node_config.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="node_config.cancel" class="button_link"><wicket:message key="node_config.cancel.label"></wicket:message></a>
 		</form>
 	</body>
 </html>
