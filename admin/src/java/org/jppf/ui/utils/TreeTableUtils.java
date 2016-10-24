@@ -39,7 +39,6 @@ public final class TreeTableUtils {
    * Determines whether debug log statements are enabled.
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
   /**
    * Find the position at which to insert a driver, using the sorted lexical order of driver names.
    * @param parent the parent tree node for the driver to insert.
@@ -47,7 +46,6 @@ public final class TreeTableUtils {
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
   public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent<?> comp) {
-    //if (findComponent(root, comp.getUuid()) == null) return -1;
     int n = parent.getChildCount();
     for (int i=0; i<n; i++) {
       DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
@@ -84,30 +82,6 @@ public final class TreeTableUtils {
   public static String getNodeIconPath(final JPPFManagementInfo info) {
     if (info.isMasterNode()) return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_MASTER_DOTNET_ICON : AbstractTreeCellRenderer.NODE_MASTER_ICON;
     return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_DOTNET_ICON : AbstractTreeCellRenderer.NODE_ICON;
-  }
-
-  /**
-   * Print the specified system info to a string.
-   * @param info the information to print.
-   * @param format the formatter to use.
-   * @return a String with the formatted information.
-   */
-  public static String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format) {
-    format.start();
-    if (info == null) format.print("No information was found");
-    else {
-      format.formatTable(info.getUuid(), "UUID");
-      format.formatTable(info.getSystem(), "System Properties");
-      format.formatTable(info.getEnv(), "Environment Variables");
-      format.formatTable(info.getRuntime(), "Runtime Information");
-      format.formatTable(info.getJppf(), "JPPF configuration");
-      format.formatTable(info.getNetwork(), "Network configuration");
-      format.formatTable(info.getStorage(), "Storage Information");
-      format.formatTable(info.getOS(), "Operating System Information");
-      if (!info.getStats().isEmpty()) format.formatTable(info.getStats(), "Statistics");
-    }
-    format.end();
-    return format.getText();
   }
 
   /**

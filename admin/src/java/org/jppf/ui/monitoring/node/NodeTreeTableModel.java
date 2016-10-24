@@ -69,8 +69,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
    * @param node the root of the tree.
    */
   public NodeTreeTableModel(final TreeNode node) {
-    super(node);
-    BASE = "org.jppf.ui.i18n.NodeDataPage";
+    this(node, Locale.getDefault());
   }
 
   /**
@@ -127,10 +126,10 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case NODE_STATUS:
-            if (isNode) res = state.getConnectionStatus().toString();
+            if (isNode) res = localize(state.getConnectionStatus().getDisplayName());
             break;
           case EXECUTION_STATUS:
-            if (isNode) res = state.getExecutionStatus().toString();
+            if (isNode) res = localize(state.getExecutionStatus().getDisplayName());
             break;
           case NB_TASKS:
             if (isNode) res = nf.format(state.getNbTasksExecuted());
@@ -144,7 +143,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case PENDING_ACTION:
-            if (isNode) res = ((TopologyNode) info).getPendingAction().toString();
+            if (isNode) res = localize(((TopologyNode) info).getPendingAction().getDisplayName());
             break;
         }
       } else {

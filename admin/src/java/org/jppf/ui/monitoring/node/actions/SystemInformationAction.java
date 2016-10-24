@@ -48,6 +48,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
    * Initialize this action.
    */
   public SystemInformationAction() {
+    BASE = "org.jppf.ui.i18n.SystemInfoPage";
     setupIcon("/org/jppf/ui/resources/info.gif");
     setupNameAndTooltip("show.information");
   }
@@ -71,8 +72,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "System information", false);
-    //dialog.getRootPane().setWindowDecorationStyle(JRootPane.WARNING_DIALOG);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("system.information"), false);
     dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.addWindowListener(new WindowAdapter() {
@@ -82,7 +82,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
         dialog.dispose();
       }
     });
-    final JEditorPane editor = new JEditorPane("text/html", "retrieving information ...");
+    final JEditorPane editor = new JEditorPane("text/html", localize("system.retrieving"));
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     editor.setEditable(false);
@@ -133,14 +133,12 @@ public class SystemInformationAction extends AbstractTopologyAction {
     public void run() {
       final StringBuilder html = new StringBuilder();
       final StringBuilder toClipboard = new StringBuilder();
-      final StringBuilder title = new StringBuilder("System information");
+      AbstractTopologyComponent comp = dataArray[0];
+      final String title = TopologyUtils.getSystemInfoTitle(comp, Locale.getDefault());
       try {
-        AbstractTopologyComponent comp = dataArray[0];
         JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
-        String name = TopologyUtils.getDisplayName(comp);
-        title.append(" for ").append(comp.isNode() ? "node " : "driver ").append(name);
-        html.append(TreeTableUtils.formatProperties(info, new HTMLPropertiesTableFormat(title.toString())));
-        toClipboard.append(TreeTableUtils.formatProperties(info, new TextPropertiesTableFormat(title.toString())));
+        html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title), Locale.getDefault()));
+        toClipboard.append(TopologyUtils.formatProperties(info, new TextPropertiesTableFormat(title.toString()), Locale.getDefault()));
       } catch(Exception e) {
         toClipboard.append(ExceptionUtils.getStackTrace(e));
         html.append(toClipboard.toString().replace("\n", "<br>"));
@@ -149,7 +147,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
         @Override
         public void run() {
           try {
-          dialog.setTitle(title.toString());
+          dialog.setTitle(title);
           editor.setText(html.toString());
           editor.setCaretPosition(0);
           editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));

@@ -19,20 +19,20 @@
 package org.jppf.ui.treetable;
 
 /**
- * 
+ * ENumeration of the types of tree view available in the admin console.
  * @author Laurent Cohen
  */
 public enum TreeViewType {
   /**
-   * 
+   * Topology tree view.
    */
   TOPOLOGY,
   /**
-   * 
+   * JVM health tree view.
    */
   HEALTH,
   /**
-   * 
+   * Jobs data view.
    */
   JOBS
 }
