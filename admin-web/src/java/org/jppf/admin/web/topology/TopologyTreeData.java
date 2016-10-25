@@ -33,12 +33,17 @@ import org.jppf.ui.treetable.*;
 import org.jppf.utils.collections.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class TopologyTreeData extends TableTreeData {
   /**
-   * 
+   * Listens to topology events.
+   */
+  private TopologyListener listener;
+
+  /**
+   *
    */
   public TopologyTreeData() {
     super(TreeViewType.TOPOLOGY);
@@ -64,7 +69,7 @@ public class TopologyTreeData extends TableTreeData {
     ah.addAction(TopologyConstants.NODE_RESTART_DEFERRED_ACTION, action);
     ah.addAction(TopologyConstants.NODE_SUSPEND_ACTION, new SuspendNodeLink.Action());
   }
-  
+
   /**
    * Extract the nodes, if any, from the list of selected elements.
    * @param selected a list of all the selected elements.
@@ -92,7 +97,7 @@ public class TopologyTreeData extends TableTreeData {
     }
     return result;
   }
- 
+
   /**
    * Get a mapping of driver to nodes uuids from the selected elements.
    * @param selected the selected elements.
@@ -105,5 +110,20 @@ public class TopologyTreeData extends TableTreeData {
       if (comp.isNode() && (comp.getParent() != null)) map.putValue((TopologyDriver) comp.getParent(), comp.getUuid());
     }
     return map;
+  }
+
+  /**
+   * @return the topology listener.
+   */
+  public TopologyListener getListener() {
+    return listener;
+  }
+
+  /**
+   * Set the topology listener.
+   * @param listener the listener to set.
+   */
+  public void setListener(final TopologyListener listener) {
+    this.listener = listener;
   }
 }

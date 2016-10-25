@@ -49,7 +49,7 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * @author Laurent Cohen
  */
 @MountPath("topology")
-public class TopologyPage extends AbstractTableTreePage implements TopologyListener {
+public class TopologyPage extends AbstractTableTreePage {
   /**
    * Logger for this class.
    */
@@ -68,15 +68,22 @@ public class TopologyPage extends AbstractTableTreePage implements TopologyListe
    */
   public TopologyPage() {
     super(TreeViewType.TOPOLOGY, "topology");
+    TopologyTreeData data = JPPFWebSession.get().getTopologyData();
+    TopologyTreeListener listener = (TopologyTreeListener) data.getListener();
+    if (data.getListener() == null) {
+      listener = new TopologyTreeListener(treeModel, data.getSelectionHandler());
+      listener.setTableTree(tableTree);
+      data.setListener(listener);
+      ((JPPFWebConsoleApplication) getApplication()).getTopologyManager().addTopologyListener(listener);
+    } else listener.setTableTree(tableTree);
   }
 
   @Override
   protected void createTreeTableModel() {
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    TopologyTreeData data = JPPFWebSession.get().getTopologyData();
     treeModel = data.getModel();
     if (treeModel == null) {
-      JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
-      treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), JPPFWebSession.get().getLocale());
+      treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
       // populate the tree table model
       for (TopologyDriver driver : getJPPFApplication().getTopologyManager().getDrivers()) {
         TopologyUtils.addDriver(treeModel, driver);
@@ -85,7 +92,6 @@ public class TopologyPage extends AbstractTableTreePage implements TopologyListe
         }
       }
       data.setModel(treeModel);
-      app.getTopologyManager().addTopologyListener(this);
     }
   }
 
@@ -125,44 +131,6 @@ public class TopologyPage extends AbstractTableTreePage implements TopologyListe
     actionHandler.addActionLink(toolbar, new SelectDriversLink(TreeViewType.TOPOLOGY));
     actionHandler.addActionLink(toolbar, new SelectNodesLink(TreeViewType.TOPOLOGY));
     actionHandler.addActionLink(toolbar, new SelectAllLink(TreeViewType.TOPOLOGY));
-  }
-
-
-  @Override
-  public void driverAdded(final TopologyEvent event) {
-    TopologyUtils.addDriver(treeModel, event.getDriver());
-  }
-
-  @Override
-  public void driverRemoved(final TopologyEvent event) {
-    TopologyUtils.removeDriver(treeModel, event.getDriver());
-    selectionHandler.unselect(event.getDriver().getUuid());
-  }
-
-  @Override
-  public void driverUpdated(final TopologyEvent event) {
-  }
-
-  @Override
-  public void nodeAdded(final TopologyEvent event) {
-    DefaultMutableTreeNode node = TopologyUtils.addNode(treeModel, event.getDriver(), event.getNodeOrPeer());
-    if (node != null) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-      if (parent.getChildCount() == 1) tableTree.expand(parent);
-    }
-  }
-
-  @Override
-  public void nodeRemoved(final TopologyEvent event) {
-    TopologyUtils.removeNode(treeModel, event.getDriver(), event.getNodeOrPeer());
-    selectionHandler.unselect(event.getNodeOrPeer().getUuid());
-  }
-
-  @Override
-  public synchronized void nodeUpdated(final TopologyEvent event) {
-    if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {
-      TopologyUtils.updateNode(treeModel, event.getDriver(), event.getNodeOrPeer());
-    }
   }
 
   /**

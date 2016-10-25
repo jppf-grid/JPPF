@@ -47,7 +47,7 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * @author Laurent Cohen
  */
 @MountPath("jobs")
-public class JobsPage extends AbstractTableTreePage implements JobMonitoringListener {
+public class JobsPage extends AbstractTableTreePage {
   /**
    * Logger for this class.
    */
@@ -66,6 +66,14 @@ public class JobsPage extends AbstractTableTreePage implements JobMonitoringList
    */
   public JobsPage() {
     super(TreeViewType.JOBS, "jobs");
+    JobsTreeData data = JPPFWebSession.get().getJobsData();
+    JobsTreeListener listener = (JobsTreeListener) data.getListener();
+    if (listener == null) {
+      listener = new JobsTreeListener(treeModel, selectionHandler);
+      listener.setTableTree(tableTree);
+      data.setListener(listener);
+      ((JPPFWebConsoleApplication) getApplication()).getJobMonitor().addJobMonitoringListener(listener);
+    } else listener.setTableTree(tableTree);
   }
 
   @Override
@@ -85,7 +93,6 @@ public class JobsPage extends AbstractTableTreePage implements JobMonitoringList
         }
       }
       data.setModel(treeModel);
-      app.getJobMonitor().addJobMonitoringListener(this);
     }
   }
 
@@ -117,52 +124,6 @@ public class JobsPage extends AbstractTableTreePage implements JobMonitoringList
     actionHandler.addActionLink(toolbar, new PriorityLink(toolbar));
     actionHandler.addActionLink(toolbar, new ExpandAllLink());
     actionHandler.addActionLink(toolbar, new CollapseAllLink());
-  }
-
-  @Override
-  public void driverAdded(final JobMonitoringEvent event) {
-    JobsUtils.addDriver(treeModel, event.getJobDriver());
-  }
-
-  @Override
-  public void driverRemoved(final JobMonitoringEvent event) {
-    JobsUtils.removeDriver(treeModel, event.getJobDriver());
-    selectionHandler.unselect(event.getJobDriver().getUuid());
-  }
-
-  @Override
-  public void jobAdded(final JobMonitoringEvent event) {
-    DefaultMutableTreeNode jobNode = JobsUtils.addJob(treeModel, event.getJobDriver(), event.getJob());
-    if (jobNode != null) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) jobNode.getParent();
-      if (parent.getChildCount() == 1) tableTree.expand(parent);
-    }
-  }
-
-  @Override
-  public void jobRemoved(final JobMonitoringEvent event) {
-    JobsUtils.removeJob(treeModel, event.getJobDriver(), event.getJob());
-    selectionHandler.unselect(event.getJob().getUuid());
-  }
-
-  @Override
-  public void jobUpdated(final JobMonitoringEvent event) {
-    JobsUtils.updateJob(treeModel, event.getJob());
-  }
-
-  @Override
-  public void jobDispatchAdded(final JobMonitoringEvent event) {
-    DefaultMutableTreeNode dispatchNode = JobsUtils.addJobDispatch(treeModel, event.getJob(), event.getJobDispatch());
-    if (dispatchNode != null) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dispatchNode.getParent();
-      if (parent.getChildCount() == 1) tableTree.expand(parent);
-    }
-  }
-
-  @Override
-  public void jobDispatchRemoved(final JobMonitoringEvent event) {
-    JobsUtils.removeJobDispatch(treeModel, event.getJob(), event.getJobDispatch());
-    selectionHandler.unselect(event.getJobDispatch().getUuid());
   }
 
   /**

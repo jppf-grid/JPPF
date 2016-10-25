@@ -27,12 +27,17 @@ import org.jppf.client.monitoring.jobs.*;
 import org.jppf.ui.treetable.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JobsTreeData extends TableTreeData {
   /**
-   * 
+   * Listens to job events.
+   */
+  private JobMonitoringListener listener;
+
+  /**
+   *
    */
   public JobsTreeData() {
     super(TreeViewType.JOBS);
@@ -51,5 +56,20 @@ public class JobsTreeData extends TableTreeData {
     ah.addAction(JobsConstants.RESUME_ACTION, new ResumeJobLink.Action());
     ah.addAction(JobsConstants.UPDATE_MAX_NODES_ACTION, new MaxNodesAction());
     ah.addAction(JobsConstants.UPDATE_PRIORITY_ACTION, new PriorityAction());
+  }
+
+  /**
+   * @return the job event listener.
+   */
+  public synchronized JobMonitoringListener getListener() {
+    return listener;
+  }
+
+  /**
+   * Set the job event listener.
+   * @param listener the listener to set.
+   */
+  public synchronized void setListener(final JobMonitoringListener listener) {
+    this.listener = listener;
   }
 }
