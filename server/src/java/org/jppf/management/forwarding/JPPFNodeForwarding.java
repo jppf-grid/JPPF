@@ -257,6 +257,11 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   }
 
   @Override
+  public Map<String, Object> heapDump(final NodeSelector selector) throws Exception {
+    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "heapDump");
+  }
+
+  @Override
   public Map<String, Object> getNbSlaves(final NodeSelector selector) throws Exception {
     return forwardGetAttribute(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
   }
