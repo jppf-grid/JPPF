@@ -99,21 +99,21 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case TASK_COUNT:
-            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getTaskCount());
-            else if (data instanceof JobDispatch) res = Integer.toString(((JobDispatch) data).getJobInformation().getTaskCount());
+            if (data instanceof Job) res = nfInt.format(((Job) data).getJobInformation().getTaskCount());
+            else if (data instanceof JobDispatch) res = nfInt.format(((JobDispatch) data).getJobInformation().getTaskCount());
             break;
           case INITIAL_TASK_COUNT:
-            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getInitialTaskCount());
-            else if (data instanceof JobDispatch) res = Integer.toString(((JobDispatch) data).getJobInformation().getInitialTaskCount());
+            if (data instanceof Job) res = nfInt.format(((Job) data).getJobInformation().getInitialTaskCount());
+            else if (data instanceof JobDispatch) res = nfInt.format(((JobDispatch) data).getJobInformation().getInitialTaskCount());
             break;
           case PRIORITY:
-            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getPriority());
+            if (data instanceof Job) res = nfInt.format(((Job) data).getJobInformation().getPriority());
             break;
           case MAX_NODES:
             if (data instanceof Job) {
               int n = ((Job) data).getJobInformation().getMaxNodes();
               // \u221E = infinity symbol
-              res = (n == Integer.MAX_VALUE) ? "\u221E" : Integer.toString(n);
+              res = (n == Integer.MAX_VALUE) ? "\u221E" : nfInt.format(n);
             }
             break;
           default:

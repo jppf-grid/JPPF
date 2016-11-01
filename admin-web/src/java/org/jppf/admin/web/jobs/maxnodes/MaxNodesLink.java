@@ -74,7 +74,7 @@ public class MaxNodesLink extends AbstractModalLink<MaxNodesForm> {
       AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
       if ((comp instanceof Job) && (comp.getParent() != null)) {
         Job job = (Job) comp;
-        List<JobDriver> drivers = ((JPPFWebConsoleApplication) getApplication()).getJobMonitor().getDriversForJob(job.getUuid());
+        List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
         for (JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
       }
     }

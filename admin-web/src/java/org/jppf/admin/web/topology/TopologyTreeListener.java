@@ -26,7 +26,7 @@ import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 import org.jppf.ui.utils.TopologyUtils;
 
 /**
- *
+ * Listens to topology events so as to update the topology view.
  * @author Laurent Cohen
  */
 public class TopologyTreeListener extends AbstractMonitoringListener implements TopologyListener {

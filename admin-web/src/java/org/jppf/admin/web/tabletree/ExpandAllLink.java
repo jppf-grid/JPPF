@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.jobs;
+package org.jppf.admin.web.tabletree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
-import org.jppf.admin.web.tabletree.*;
 
 /**
  *
@@ -31,17 +30,17 @@ import org.jppf.admin.web.tabletree.*;
  */
 public class ExpandAllLink extends AbstractActionLink {
   /**
-   *
+   * @param id the id of this link.
    */
-  public ExpandAllLink() {
-    super(JobsConstants.EXPAND_ALL_ACTION, Model.of("Expand all"));
+  public ExpandAllLink(final String id) {
+    super(id, Model.of("Expand all"));
     imageName = "expand.gif";
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
     JPPFWebSession session = JPPFWebSession.get();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getJobsData().getModel().getRoot();
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getHealthData().getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       TableTreeHelper.expand(tableTree, root);

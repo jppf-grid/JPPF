@@ -26,7 +26,7 @@ import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 import org.jppf.ui.utils.JobsUtils;
 
 /**
- * 
+ * Listens to job events so as to update the jobs view.
  * @author Laurent Cohen
  */
 public class JobsTreeListener extends AbstractMonitoringListener implements JobMonitoringListener {

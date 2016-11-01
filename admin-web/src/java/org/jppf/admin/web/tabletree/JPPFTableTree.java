@@ -174,7 +174,7 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
     @Override
     protected void onEvent(final AjaxRequestTarget target) {
       JPPFWebSession session = (JPPFWebSession) target.getPage().getSession();
-      TableTreeData data = session.getSessionData().getData(type);
+      TableTreeData data = session.getTableTreeData(type);
       SelectionHandler selectionHandler = data.getSelectionHandler();
       DefaultMutableTreeNode node = TreeTableUtils.findTreeNode((DefaultMutableTreeNode) data.getModel().getRoot(), uuid, selectionHandler.getFilter());
       if (node != null) {

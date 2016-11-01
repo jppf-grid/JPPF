@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.topology;
+package org.jppf.admin.web.tabletree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
-import org.jppf.admin.web.tabletree.*;
 
 /**
  *
@@ -31,17 +30,17 @@ import org.jppf.admin.web.tabletree.*;
  */
 public class CollapseAllLink extends AbstractActionLink {
   /**
-   *
+   * @param id the id of this link.
    */
-  public CollapseAllLink() {
-    super(TopologyConstants.COLLAPSE_ALL_ACTION, Model.of("Collapse all"));
+  public CollapseAllLink(final String id) {
+    super(id, Model.of("Collapse all"));
     imageName = "collapse.gif";
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
     JPPFWebSession session = JPPFWebSession.get();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getTopologyData().getModel().getRoot();
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getHealthData().getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       for (int i=0; i<root.getChildCount(); i++) tableTree.collapse((DefaultMutableTreeNode) root.getChildAt(i));

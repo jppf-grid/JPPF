@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigAction;
 import org.jppf.admin.web.topology.nodethreads.NodeThreadsAction;
@@ -125,5 +126,11 @@ public class TopologyTreeData extends TableTreeData {
    */
   public void setListener(final TopologyListener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public void cleanup() {
+    super.cleanup();
+    if (listener != null) JPPFWebConsoleApplication.get().getTopologyManager().removeTopologyListener(listener);
   }
 }

@@ -18,7 +18,6 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.swing.tree.*;
@@ -59,10 +58,6 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
    * Column number for the node's number of provisioned slaves.
    */
   public static final int PENDING_ACTION = 6;
-  /**
-   *
-   */
-  static NumberFormat nf = createNumberFormat();
 
   /**
    * Initialize this model with the specified tree.
@@ -132,13 +127,13 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             if (isNode) res = localize(state.getExecutionStatus().getDisplayName());
             break;
           case NB_TASKS:
-            if (isNode) res = nf.format(state.getNbTasksExecuted());
+            if (isNode) res = nfInt.format(state.getNbTasksExecuted());
             break;
           case NB_SLAVES:
             if (isNode) {
               if ((mgtInfo != null) && mgtInfo.isMasterNode()) {
                 int n = ((TopologyNode) info).getNbSlaveNodes();
-                res = n >= 0 ? nf.format(n) : "";
+                res = n >= 0 ? nfInt.format(n) : "";
               } else res = "";
             }
             break;
@@ -172,15 +167,5 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
         return "column.pending";
     }
     return "";
-  }
-
-  /**
-   * Get a number formatter for the number of tasks for each node.
-   * @return a <code>NumberFormat</code> instance.
-   */
-  private static NumberFormat createNumberFormat() {
-    NumberFormat nf = NumberFormat.getIntegerInstance();
-    nf.setGroupingUsed(true);
-    return nf;
   }
 }

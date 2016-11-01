@@ -16,26 +16,26 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.topology;
+package org.jppf.admin.web.tabletree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.TreeViewType;
 
 /**
- *
+ * Select all nodes within a topology tree.
  * @author Laurent Cohen
  */
 public class SelectNodesLink extends AbstractSelectionLink {
   /**
+   * @param id the id of this link.
    * @param viewType the type this button is part of.
    */
-  public SelectNodesLink(final TreeViewType viewType) {
-    super(TopologyConstants.SELECT_NODES_ACTION, Model.of("Select nodes"), viewType);
+  public SelectNodesLink(final String id, final TreeViewType viewType) {
+    super(id, Model.of("Select nodes"), viewType);
     imageName = "select_nodes.gif";
   }
 

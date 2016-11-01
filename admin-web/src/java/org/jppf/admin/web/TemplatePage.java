@@ -21,7 +21,7 @@ package org.jppf.admin.web;
 import org.apache.wicket.markup.html.WebPage;
 
 /**
- * SUperclass for all pages in the web admin console.
+ * SUperclass for all pages in the web admin console (except the login page).
  * Its associated html file provides the basic layout for all other pages.
  * @author Laurent Cohen
  */
@@ -33,13 +33,5 @@ public class TemplatePage extends WebPage {
     setVersioned(false);
     add(new HeaderPanel());
     add(new FooterPanel());
-  }
-
-  /**
-   * Get the application object.
-   * @return a {@link JPPFWebConsoleApplication} instance.
-   */
-  public JPPFWebConsoleApplication getJPPFApplication() {
-    return (JPPFWebConsoleApplication) getApplication();
   }
 }

@@ -54,7 +54,7 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
   public ProvisioningLink(final Form<String> form) {
     super(TopologyConstants.PROVISIONING_ACTION, Model.of("Provisioning"), "provisioning.png", ProvisioningPage.class, form);
     modal.setInitialWidth(600);
-    modal.setInitialHeight(335);
+    modal.setInitialHeight(340);
   }
 
   @Override

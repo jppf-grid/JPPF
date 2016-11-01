@@ -3,7 +3,7 @@
   Copyright (C) 2005-2016 JPPF Team. 
   http://www.jppf.org
 
-  Licensed under the Apache License, Version 2.0 (the "License");
+  Licensed under the Apache License, Version 2.0 (the "License
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
@@ -451,6 +451,21 @@ textarea {
   background: #D67FFF;
 }
 
+.health_tree {
+  color: black;
+  background-color: lightgreen;
+}
+
+.health_warning {
+  color: black;
+  background-color: #FFD800;
+}
+ 
+.health_critical {
+  color: black;
+  background-color: lightcoral;
+}
+ 
 .main_border {
   border: 1px solid #6D78B6;
   border-top: 10px solid #6D78B6;
@@ -483,6 +498,7 @@ textarea {
   border-radius: 2px;
   box-shadow: -1px -1px 2px #6D78B6 inset;
   background-color: #C5D0F0;
+  cursor: pointer;
 }
 
 .button_ok {
@@ -521,4 +537,40 @@ img {
 
 .modal_form {
   line-height: 1.5em;
+}
+
+/* Thread dump dialog */
+
+.t_new        { background-color: white; }
+.t_runnable   { background-color: #80FF80; }
+.t_wait       { background-color: yellow; }
+.t_time_wait  { background-color: yellow; }
+.t_blocked    { background-color: #FF8080; }
+.t_terminated { background-color: #FAFAFA; }
+.t_lock { font-style: italic; font-size: 11pt; }
+
+/* spinner styles */
+
+.spinnerContainer {
+  border: 0px solid #999;
+}
+
+.spinnerContainer span {
+  background-color: #6D78B6;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 0 0.4em;
+}
+
+.spinnerContainer span:hover {
+  background-color: #909090;
+}
+
+.spinnerContainer span:focus {
+  background-color: red;
+}
+
+.spinnerContainer input {
+  border-width: 0px;
+  text-align: right;
 }

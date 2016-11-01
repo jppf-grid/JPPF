@@ -18,6 +18,7 @@
 
 package org.jppf.ui.treetable;
 
+import java.text.*;
 import java.util.Locale;
 
 import javax.swing.tree.*;
@@ -42,6 +43,14 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * The locale used to translate coumn headers and cell values.
    */
   protected transient Locale locale;
+  /**
+   * Formatter for cells that contain integer numbers.
+   */
+  protected final NumberFormat nfInt;
+  /**
+   * Formatter for cells that contain decimal numbers.
+   */
+  protected final NumberFormat nfDec;
 
   /**
    * Initialize this model with the specified tree root.
@@ -59,6 +68,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   public AbstractJPPFTreeTableModel(final TreeNode root, final Locale locale) {
     super(root);
     this.locale = locale;
+    nfInt = createNumberFormat();
+    nfDec = createDecimalNumberFormat();
   }
 
   /**
@@ -181,4 +192,27 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return the column name as a string.
    */
   protected abstract String getBaseColumnName(final int column);
+
+  /**
+   * Get a number formatter for the number of tasks for each node.
+   * @return a <code>NumberFormat</code> instance.
+   */
+  protected NumberFormat createNumberFormat() {
+    NumberFormat nf = NumberFormat.getIntegerInstance(locale);
+    nf.setGroupingUsed(true);
+    nf.setMaximumFractionDigits(0);
+    return nf;
+  }
+
+  /**
+   * Get a number formatter for the number of tasks for each node.
+   * @return a <code>NumberFormat</code> instance.
+   */
+  protected NumberFormat createDecimalNumberFormat() {
+    NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
+    nf.setGroupingUsed(true);
+    nf.setMinimumFractionDigits(1);
+    nf.setMaximumFractionDigits(1);
+    return nf;
+  }
 }

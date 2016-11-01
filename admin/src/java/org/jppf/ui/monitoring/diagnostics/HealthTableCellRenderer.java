@@ -78,16 +78,17 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
       case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
       case JVMHealthTreeTableModel.RAM_MB:
       case JVMHealthTreeTableModel.THREADS:
-        alignment = SwingConstants.RIGHT;
-        break;
-
       case JVMHealthTreeTableModel.CPU_LOAD:
       case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
       case JVMHealthTreeTableModel.HEAP_MEM_PCT:
       case JVMHealthTreeTableModel.RAM_PCT:
       case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
+        alignment = SwingConstants.RIGHT;
+        break;
+        /*
         alignment = SwingConstants.CENTER;
         break;
+        */
     }
     JPPFTreeTable treeTable = (JPPFTreeTable) table;
     TreePath path = treeTable.getPathForRow(row);

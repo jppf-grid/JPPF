@@ -44,7 +44,7 @@ public class PriorityForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(priorityField = new TextField<>(prefix + ".priority.field", Model.of(0)));
+    add(priorityField = createIntField(prefix + ".priority.field", 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
   }
 
   /**

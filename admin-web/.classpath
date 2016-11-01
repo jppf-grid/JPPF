@@ -44,5 +44,8 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-mount-core-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-core-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-theme-start-7.4.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -74,7 +74,7 @@ public class TopologyPage extends AbstractTableTreePage {
       listener = new TopologyTreeListener(treeModel, data.getSelectionHandler());
       listener.setTableTree(tableTree);
       data.setListener(listener);
-      ((JPPFWebConsoleApplication) getApplication()).getTopologyManager().addTopologyListener(listener);
+      JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
     } else listener.setTableTree(tableTree);
   }
 
@@ -85,7 +85,7 @@ public class TopologyPage extends AbstractTableTreePage {
     if (treeModel == null) {
       treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
       // populate the tree table model
-      for (TopologyDriver driver : getJPPFApplication().getTopologyManager().getDrivers()) {
+      for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
         TopologyUtils.addDriver(treeModel, driver);
         for (AbstractTopologyComponent child : driver.getChildren()) {
           TopologyUtils.addNode(treeModel, driver, (TopologyNode) child);
@@ -126,11 +126,11 @@ public class TopologyPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new CancelPendingActionLink());
     actionHandler.addActionLink(toolbar, new SuspendNodeLink());
     actionHandler.addActionLink(toolbar, new ProvisioningLink(toolbar));
-    actionHandler.addActionLink(toolbar, new ExpandAllLink());
-    actionHandler.addActionLink(toolbar, new CollapseAllLink());
-    actionHandler.addActionLink(toolbar, new SelectDriversLink(TreeViewType.TOPOLOGY));
-    actionHandler.addActionLink(toolbar, new SelectNodesLink(TreeViewType.TOPOLOGY));
-    actionHandler.addActionLink(toolbar, new SelectAllLink(TreeViewType.TOPOLOGY));
+    actionHandler.addActionLink(toolbar, new ExpandAllLink(TopologyConstants.EXPAND_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new CollapseAllLink(TopologyConstants.COLLAPSE_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new SelectDriversLink(TopologyConstants.SELECT_DRIVERS_ACTION, TreeViewType.TOPOLOGY));
+    actionHandler.addActionLink(toolbar, new SelectNodesLink(TopologyConstants.SELECT_NODES_ACTION, TreeViewType.TOPOLOGY));
+    actionHandler.addActionLink(toolbar, new SelectAllLink(TopologyConstants.SELECT_ALL_ACTION, TreeViewType.TOPOLOGY));
   }
 
   /**

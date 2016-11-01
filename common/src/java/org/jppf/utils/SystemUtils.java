@@ -436,4 +436,21 @@ public final class SystemUtils {
     Runtime rt = Runtime.getRuntime();
     return (double) (rt.totalMemory() - rt.freeMemory()) / (double) rt.maxMemory();
   }
+
+  /**
+   *
+   * @param <T> the type of values to check.
+   * @param value the value to compare.
+   * @param possibles the possible values to compare with
+   * @return {@code true} if value is one of the possibe values, {@code false} otherwise.
+   */
+  @SafeVarargs
+  public static <T> boolean isOneOf(final T value, final T...possibles) {
+    if ((possibles == null) || (possibles.length <= 0)) return false;
+    for (T t: possibles) {
+      if (value == t) return true;
+      if ((value != null) && (t != null) && t.equals(value)) return true;
+    }
+    return false;
+  }
 }

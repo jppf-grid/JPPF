@@ -99,6 +99,11 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
+  public Map heapDump(final NodeSelector param0) {
+    return (Map) invoke("heapDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
   public Map provisionSlaveNodes(final NodeSelector param0, final int param1) {
     return (Map) invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "int" });
   }

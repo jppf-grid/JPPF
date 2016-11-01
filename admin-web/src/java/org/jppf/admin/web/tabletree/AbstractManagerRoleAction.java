@@ -28,6 +28,6 @@ import org.jppf.admin.web.auth.JPPFRole;
 public class AbstractManagerRoleAction extends AbstractUpdatableAction {
   @Override
   public void setAuthorized(final Roles roles) {
-    authorized = roles.hasRole(JPPFRole.MANAGER.getRoleName());
+    authorized = (roles == null) ? false : roles.hasRole(JPPFRole.MANAGER.getRoleName());
   }
 }

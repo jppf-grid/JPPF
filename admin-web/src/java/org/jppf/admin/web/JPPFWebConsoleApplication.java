@@ -19,8 +19,6 @@
 package org.jppf.admin.web;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.wicket.*;
 import org.apache.wicket.markup.html.WebPage;
@@ -36,7 +34,7 @@ import org.slf4j.*;
 import org.wicketstuff.wicket.servlet3.auth.*;
 
 /**
- *
+ * This is the Wicket {@link Application} class for the JPPF web console.
  * @author Laurent Cohen
  */
 public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebApplication {
@@ -52,10 +50,6 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    * Base name for localization bundle lookups.
    */
   protected static String BASE = "";
-  /**
-   *
-   */
-  static Map<Long, SessionData> sessionDataMap = new ConcurrentHashMap<>();
   /**
    * The topololgy manager.
    */
@@ -122,39 +116,17 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   }
 
   /**
-   * Remove the session data with the specified id.
-   * @param id the id of the session data to remove.
+   * @return the current application instance.
    */
-  static void removeSessionData(final long id) {
-    SessionData sessionData = sessionDataMap.remove(id);
-    if (sessionData != null) sessionData.cleanup();
+  public static JPPFWebConsoleApplication get() {
+    return (JPPFWebConsoleApplication) Application.get();
   }
 
   /**
-   * Add the specified session data with the specified id.
-   * @param id the id of the session data to remove.
-   * @param data the data to add.
-   */
-  static void setSessionData(final long id, final SessionData data) {
-    if (data != null) {
-      sessionDataMap.put(id, data);
-    }
-  }
-
-  /**
-   * @param id the id of the session data to lookup
-   * @return the {@link SessionData} instance for the specified id.
-   */
-  static SessionData getSessionData(final long id) {
-    return sessionDataMap.get(id);
-  }
-
-  /**
-   * Does not save to persistent store..
+   * Does not save to persistent store.
    */
   private static final class MyPageManagerProvider extends DefaultPageManagerProvider {
     /**
-     *
      * @param application the wicket application.
      */
     private MyPageManagerProvider(final Application application) {
@@ -166,8 +138,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
       // keep everything in memory
       return new HttpSessionDataStore(new DefaultPageManagerContext(), new IDataStoreEvictionStrategy() {
         @Override
-        public void evict(final PageTable pageTable) {
-        }
+        public void evict(final PageTable pageTable) { }
       });
     }
 
@@ -182,39 +153,20 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   private static class NullPageStore implements IPageStore {
     @Override
-    public void destroy() {
-    }
-
+    public void destroy() { }
     @Override
-    public IManageablePage getPage(final String sessionId, final int pageId) {
-      return null;
-    }
-
+    public IManageablePage getPage(final String sessionId, final int pageId) { return null; }
     @Override
-    public void removePage(final String sessionId, final int pageId) {
-    }
-
+    public void removePage(final String sessionId, final int pageId) { }
     @Override
-    public void storePage(final String sessionId, final IManageablePage page) {
-    }
-
+    public void storePage(final String sessionId, final IManageablePage page) { }
     @Override
-    public void unbind(final String sessionId) {
-    }
-
+    public void unbind(final String sessionId) { }
     @Override
-    public Serializable prepareForSerialization(final String sessionId, final Serializable page) {
-      return null;
-    }
-
+    public Serializable prepareForSerialization(final String sessionId, final Serializable page) { return null; }
     @Override
-    public Object restoreAfterSerialization(final Serializable serializable) {
-      return null;
-    }
-
+    public Object restoreAfterSerialization(final Serializable serializable) { return null; }
     @Override
-    public IManageablePage convertToPage(final Object page) {
-      return null;
-    }
+    public IManageablePage convertToPage(final Object page) { return null; }
   }
 }

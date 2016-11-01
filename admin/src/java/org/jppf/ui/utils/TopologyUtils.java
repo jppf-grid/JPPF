@@ -220,8 +220,7 @@ public class TopologyUtils {
    */
   public static String getSystemInfoTitle(final AbstractTopologyComponent comp, final Locale locale) {
     return localizeSysInfo("system.info_for", locale) + " " +
-      localizeSysInfo(comp.isNode() ? "system.node" : "system.driver", locale) + " " +
-      getDisplayName(comp);
+      localizeSysInfo(comp.isNode() ? "system.node" : "system.driver", locale) + " " + getDisplayName(comp);
   }
 
   /**

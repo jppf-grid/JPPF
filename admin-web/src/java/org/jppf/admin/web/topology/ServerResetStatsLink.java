@@ -26,6 +26,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -57,7 +59,13 @@ public class ServerResetStatsLink extends AbstractActionLink {
     JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
-    if (!selectedNodes.isEmpty()) {
+    for (TopologyDriver driver: TopologyTreeData.getSelectedDrivers(selectedNodes)) {
+      try {
+        JMXDriverConnectionWrapper jmx =  driver.getJmx();
+        if ((jmx != null) && jmx.isConnected()) jmx.resetStatistics();
+      } catch (Exception e) {
+        log.warn(e.getMessage(), e);
+      }
     }
   }
 

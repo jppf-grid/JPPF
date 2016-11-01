@@ -60,14 +60,15 @@ public class UserSettings {
   }
 
   /**
-   *
+   * @return these user settings.
    */
-  public void load() {
-      try  {
-        persistence.load(getUserHash(), properties);
-      } catch(Exception e) {
-        log.error("error loading settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
-      }
+  public UserSettings load() {
+    try  {
+      persistence.load(getUserHash(), properties);
+    } catch(Exception e) {
+      log.error("error loading settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
+    }
+    return this;
   }
 
   /**

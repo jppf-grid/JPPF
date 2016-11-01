@@ -18,34 +18,28 @@
 
 package org.jppf.admin.web;
 
+import java.util.EnumMap;
+
 import org.apache.wicket.Session;
 import org.apache.wicket.request.Request;
+import org.jppf.admin.web.health.HealthTreeData;
 import org.jppf.admin.web.jobs.JobsTreeData;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 import org.wicketstuff.wicket.servlet3.auth.ServletContainerAuthenticatedWebSession;
 
 /**
- *
+ * The Wession class. It handles container-based authentication and holds the data used to
+ * render the views in the web console.
  * @author Laurent Cohen
  */
 public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   /**
-   * Logger for this class.
+   * Holds the data for each type of table tree view.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFWebSession.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * The JPPF-internal id for this session data.
-   */
-  private final long sessionDataId;
+  private transient EnumMap<TreeViewType, TableTreeData> dataMap = new EnumMap<>(TreeViewType.class);
   /**
    * The user settings.
    */
@@ -57,17 +51,16 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   public JPPFWebSession(final Request request) {
     super(request);
-    SessionData sessionData = new SessionData();
-    JPPFWebConsoleApplication.sessionDataMap.put(sessionData.getId(), sessionData);
-    log.info("created sessiondata with id={}", sessionData.getId());
-    this.sessionDataId = sessionData.getId();
-    if (debugEnabled) log.debug(String.format("new instance #%d, request=%s", sessionDataId, request));
   }
 
   @Override
   public void onInvalidate() {
     super.onInvalidate();
-    JPPFWebConsoleApplication.removeSessionData(sessionDataId);
+    for (TreeViewType type: TreeViewType.values()) {
+      TableTreeData ttd = dataMap.get(type);
+      if (ttd != null) ttd.cleanup();
+    }
+    dataMap.clear();
     if (userSettings != null) {
       userSettings.getProperties().clear();
       userSettings = null;
@@ -79,40 +72,45 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * @return the data elements for the specified type of view.
    */
   public TableTreeData getTableTreeData(final TreeViewType type) {
-    return getSessionData().getData(type);
+    TableTreeData data = dataMap.get(type);
+    if (data == null) {
+      switch(type) {
+        case TOPOLOGY:
+          data = new TopologyTreeData();
+          break;
+
+        case HEALTH:
+          data = new HealthTreeData();
+          break;
+
+        case JOBS:
+          data = new JobsTreeData();
+          break;
+      }
+    }
+    dataMap.put(type, data);
+    return data;
   }
 
   /**
    * @return the data elements for the grid topology.
    */
   public TopologyTreeData getTopologyData() {
-    return (TopologyTreeData) getSessionData().getData(TreeViewType.TOPOLOGY);
+    return (TopologyTreeData) getTableTreeData(TreeViewType.TOPOLOGY);
   }
 
   /**
    * @return the data elements for the jobs view.
    */
   public JobsTreeData getJobsData() {
-    return (JobsTreeData) getSessionData().getData(TreeViewType.JOBS);
+    return (JobsTreeData) getTableTreeData(TreeViewType.JOBS);
   }
 
   /**
-   * @return the JPPF-internal id for this session.
+   * @return the data elements for the JVM health view.
    */
-  public long getSessionDataId() {
-    return sessionDataId;
-  }
-
-  /**
-   * @return the session data for this session.
-   */
-  public SessionData getSessionData() {
-    SessionData data = JPPFWebConsoleApplication.getSessionData(sessionDataId);
-    if (data == null) {
-      data = new SessionData(sessionDataId);
-      JPPFWebConsoleApplication.setSessionData(sessionDataId, data);
-    }
-    return data;
+  public HealthTreeData getHealthData() {
+    return (HealthTreeData) getTableTreeData(TreeViewType.HEALTH);
   }
 
   /**
@@ -127,8 +125,8 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public boolean authenticate(final String user, final String pwd) {
     boolean ret = super.authenticate(user, pwd);
     if (ret) {
-      userSettings = new UserSettings(user);
-      userSettings.load();
+      userSettings = new UserSettings(user).load();
+      getHealthData().initThresholds(userSettings.getProperties());
     }
     return ret;
   }

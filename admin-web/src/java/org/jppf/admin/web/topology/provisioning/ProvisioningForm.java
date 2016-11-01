@@ -56,7 +56,7 @@ public class ProvisioningForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(nbSlavesField = new TextField<>(prefix + ".nb_slaves.field", Model.of(0)));
+    add(nbSlavesField = createIntField(prefix + ".nb_slaves.field", 0, 0, 1024, 1));
     add(interruptField = new CheckBox(prefix + ".interrupt.field", Model.of(true)));
     add(useOverridesField = new CheckBox(prefix + ".use_overrides.field", Model.of(false)));
     add(overridesField = new TextArea<>(prefix + ".overrides.field", Model.of("")));

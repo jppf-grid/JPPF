@@ -20,6 +20,7 @@ package org.jppf.admin.web.jobs;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.admin.web.jobs.maxnodes.MaxNodesAction;
 import org.jppf.admin.web.jobs.priority.PriorityAction;
 import org.jppf.admin.web.tabletree.*;
@@ -71,5 +72,11 @@ public class JobsTreeData extends TableTreeData {
    */
   public synchronized void setListener(final JobMonitoringListener listener) {
     this.listener = listener;
+  }
+
+  @Override
+  public void cleanup() {
+    super.cleanup();
+    if (listener != null) JPPFWebConsoleApplication.get().getJobMonitor().removeJobMonitoringListener(listener);
   }
 }

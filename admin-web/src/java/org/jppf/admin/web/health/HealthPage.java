@@ -18,20 +18,252 @@
 
 package org.jppf.admin.web.health;
 
+import java.util.*;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
+import org.apache.wicket.extensions.markup.html.repeater.tree.table.*;
 import org.apache.wicket.markup.html.basic.Label;
-import org.jppf.admin.web.TemplatePage;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.model.*;
+import org.jppf.admin.web.*;
+import org.jppf.admin.web.health.threaddump.ThreadDumpLink;
+import org.jppf.admin.web.health.thresholds.ThresholdsLink;
+import org.jppf.admin.web.tabletree.*;
+import org.jppf.client.monitoring.topology.*;
+import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.ui.monitoring.diagnostics.JVMHealthTreeTableModel;
+import org.jppf.ui.treetable.TreeViewType;
+import org.jppf.ui.utils.TopologyUtils;
+import org.jppf.utils.*;
+import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 @MountPath("health")
-public class HealthPage extends TemplatePage {
+public class HealthPage extends AbstractTableTreePage {
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(HealthPage.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  static boolean traceEnabled = log.isTraceEnabled();
+
   /**
    * Initialize this web page.
    */
   public HealthPage() {
-    add(new Label("message", "Health page!"));
+    super(TreeViewType.HEALTH, "health");
+    HealthTreeData data = JPPFWebSession.get().getHealthData();
+    HealthTreeListener listener = (HealthTreeListener) data.getListener();
+    if (data.getListener() == null) {
+      listener = new HealthTreeListener(treeModel, data.getSelectionHandler());
+      listener.setTableTree(tableTree);
+      data.setListener(listener);
+      JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
+    } else listener.setTableTree(tableTree);
+  }
+
+  @Override
+  protected void createTreeTableModel() {
+    HealthTreeData data = JPPFWebSession.get().getHealthData();
+    treeModel = data.getModel();
+    if (treeModel == null) {
+      treeModel = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
+      // populate the tree table model
+      for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
+        TopologyUtils.addDriver(treeModel, driver);
+        for (AbstractTopologyComponent child : driver.getChildren()) {
+          if (!child.isPeer()) TopologyUtils.addNode(treeModel, driver, (TopologyNode) child);
+        }
+      }
+      data.setModel(treeModel);
+    }
+  }
+
+  @Override
+  protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
+    List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
+    Locale locale = getSession().getLocale();
+    if (locale == null) locale = Locale.US;
+    columns.add(new HealthTreeColumn(Model.of("Tree")));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.HEAP_MEM_PCT));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.HEAP_MEM_MB));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.NON_HEAP_MEM_PCT));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.NON_HEAP_MEM_MB));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.RAM_PCT));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.RAM_MB));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.THREADS));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.CPU_LOAD));
+    columns.add(new HealthColumn(JVMHealthTreeTableModel.SYSTEM_CPU_LOAD));
+    return columns;
+  }
+
+  @Override
+  protected void createActions() {
+    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    actionHandler.addActionLink(toolbar, new GCLink());
+    actionHandler.addActionLink(toolbar, new ThreadDumpLink(toolbar));
+    actionHandler.addActionLink(toolbar, new HeapDumpLink());
+    actionHandler.addActionLink(toolbar, new ThresholdsLink(toolbar));
+    actionHandler.addActionLink(toolbar, new ExpandAllLink(HealthConstants.EXPAND_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new CollapseAllLink(HealthConstants.COLLAPSE_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new SelectDriversLink(HealthConstants.SELECT_DRIVERS_ACTION, TreeViewType.HEALTH));
+    actionHandler.addActionLink(toolbar, new SelectNodesLink(HealthConstants.SELECT_NODES_ACTION, TreeViewType.HEALTH));
+    actionHandler.addActionLink(toolbar, new SelectAllLink(HealthConstants.SELECT_ALL_ACTION, TreeViewType.HEALTH));
+  }
+
+  /**
+   * This class renders cells of the first column as tree.
+   */
+  public class HealthTreeColumn extends TreeColumn<DefaultMutableTreeNode, String> {
+    /** Explicit serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Initialize this column.
+     * @param displayModel the header display string.
+     */
+    public HealthTreeColumn(final IModel<String> displayModel) {
+      super(displayModel);
+    }
+
+    @Override
+    public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
+      super.populateItem(cellItem, componentId, rowModel);
+      DefaultMutableTreeNode node = rowModel.getObject();
+      AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
+      String cssClass = null;
+      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      boolean inactive = false;
+      if (comp.isPeer()) cssClass = "peer";
+      else if (comp.isNode()) {
+        TopologyNode data = (TopologyNode) node.getUserObject();
+        if (traceEnabled) log.trace("node status: {}", data.getStatus());
+        inactive = !data.getManagementInfo().isActive();
+        if (data.getStatus() == TopologyNodeStatus.UP) {
+          if (inactive) cssClass = selected ? "tree_inactive_selected" : "tree_inactive";
+          else cssClass = selected ? "tree_selected" : "node_up";
+        }
+        else cssClass = selected ? "tree_inactive_selected" : "node_tree_down";
+      } else if (comp.isDriver()) {
+        TopologyDriver driver = (TopologyDriver) node.getUserObject();
+        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass = (selected) ? "tree_selected" : "driver_up";
+        else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
+      }
+      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+    }
+  }
+
+  /**
+   * This class renders cells of each columns except the first.
+   */
+  public class HealthColumn extends AbstractColumn<DefaultMutableTreeNode, String> {
+    /** Explicit serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+    /**
+     * The column index.
+     */
+    private final int index;
+
+    /**
+     * Initialize this column.
+     * @param index the column index.
+     */
+    public HealthColumn(final int index) {
+      super(Model.of(treeModel.getColumnName(index)));
+      this.index = index;
+      if (debugEnabled) log.debug("adding column index {}", index);
+    }
+
+    @Override
+    public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
+      NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
+      DefaultMutableTreeNode treeNode = nodeModel.getObject();
+      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+      String value = (String) treeModel.getValueAt(treeNode, index);
+      cellItem.add(new Label(componentId, value));
+      if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
+      String cssClass = null;
+      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      if (!comp.isPeer()) cssClass = (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
+      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+    }
+
+    @Override
+    public String getCssClass() {
+      switch (index) {
+        case JVMHealthTreeTableModel.CPU_LOAD:
+        case JVMHealthTreeTableModel.HEAP_MEM_MB:
+        case JVMHealthTreeTableModel.HEAP_MEM_PCT:
+        case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
+        case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
+        case JVMHealthTreeTableModel.RAM_MB:
+        case JVMHealthTreeTableModel.RAM_PCT:
+        case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
+        case JVMHealthTreeTableModel.THREADS:
+          return "number";
+      }
+      return "string";
+    }
+
+    /**
+     * @param comp the tree component for which to determine the background color.
+     * @return the css class that specifies the cell's background color.
+     */
+    private String getThresholdCssClass(final AbstractTopologyComponent comp) {
+      HealthTreeData data = JPPFWebSession.get().getHealthData();
+      HealthSnapshot snapshot = comp.getHealthSnapshot();
+      double value = -1d;
+      String css = "health_tree";
+      AlertThresholds thresholds = null;
+      if (SystemUtils.isOneOf(index, JVMHealthTreeTableModel.CPU_LOAD, JVMHealthTreeTableModel.SYSTEM_CPU_LOAD)) {
+        thresholds = data.getCpuThresholds();
+        switch (index) {
+          case JVMHealthTreeTableModel.CPU_LOAD:
+            value = snapshot.getCpuLoad();
+            break;
+          case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
+            value = snapshot.getSystemCpuLoad();
+            break;
+        }
+      } else if (SystemUtils.isOneOf(index, JVMHealthTreeTableModel.HEAP_MEM_PCT, JVMHealthTreeTableModel.NON_HEAP_MEM_PCT, JVMHealthTreeTableModel.RAM_PCT,
+        JVMHealthTreeTableModel.HEAP_MEM_MB, JVMHealthTreeTableModel.NON_HEAP_MEM_MB, JVMHealthTreeTableModel.RAM_MB)) {
+        thresholds = data.getMemoryThresholds();
+        switch (index) {
+          case JVMHealthTreeTableModel.HEAP_MEM_PCT:
+          case JVMHealthTreeTableModel.HEAP_MEM_MB:
+            value = snapshot.getHeapUsedRatio();
+            break;
+          case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
+          case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
+            value = snapshot.getNonheapUsedRatio();
+            break;
+          case JVMHealthTreeTableModel.RAM_PCT:
+          case JVMHealthTreeTableModel.RAM_MB:
+            value = snapshot.getRamUsedRatio();
+            break;
+        }
+      }
+      if ((thresholds != null) && (value >= 0d)) {
+        value *= 100d;
+        if (value >= thresholds.getCritical()) css = "health_critical";
+        else if (value >= thresholds.getWarning()) css = "health_warning";
+      }
+      if (traceEnabled) log.trace(String.format(""));
+      return css;
+    }
   }
 }

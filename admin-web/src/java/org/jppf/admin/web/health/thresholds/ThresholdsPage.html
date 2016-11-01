@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title><wicket:message key="thresholds.title"></wicket:message></title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body>
+    <form wicket:id="thresholds.form" class="modal_form">
+      <h4><wicket:message key="thresholds.cpu.label"></wicket:message></h4>
+      <table class="modal_form">
+        <tr>
+          <td class="health_warning"><wicket:message key="thresholds.cpu.warning.label"></wicket:message>&nbsp;</td>
+          <td><input type="text" wicket:id="thresholds.cpu.warning.field" value="0"/><br/></td>
+        </tr>
+        <tr>
+          <td class="health_critical"><wicket:message key="thresholds.cpu.critical.label"></wicket:message>&nbsp;</td>
+          <td><input type="text" wicket:id="thresholds.cpu.critical.field" value="0"/><br/></td>
+        </tr>        
+      </table>
+
+      <h4><wicket:message key="thresholds.memory.label"></wicket:message></h4>
+      <table class="modal_form">
+        <tr>
+          <td class="health_warning"><wicket:message key="thresholds.memory.warning.label"></wicket:message>&nbsp;</td>
+          <td><input type="text" wicket:id="thresholds.memory.warning.field" value="0"/><br/></td>
+        </tr>
+        <tr>
+          <td class="health_critical"><wicket:message key="thresholds.memory.critical.label"></wicket:message>&nbsp;</td>
+          <td><input type="text" wicket:id="thresholds.memory.critical.field" value="0"/><br/></td>
+        </tr>        
+      </table>
+
+      <p><a wicket:id="thresholds.ok" class="button_link button_ok"><wicket:message key="thresholds.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="thresholds.cancel" class="button_link"><wicket:message key="thresholds.cancel.label"></wicket:message></a>
+		</form>
+	</body>
+</html>

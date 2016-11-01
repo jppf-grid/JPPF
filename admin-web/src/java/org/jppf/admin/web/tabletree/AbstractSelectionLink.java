@@ -58,7 +58,7 @@ public abstract class AbstractSelectionLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     JPPFWebSession session = JPPFWebSession.get();
-    TableTreeData data = session.getSessionData().getData(viewType);
+    TableTreeData data = session.getTableTreeData(viewType);
     onClick(target, data);
     data.selectionChanged(data.getSelectionHandler());
     Page page = target.getPage();

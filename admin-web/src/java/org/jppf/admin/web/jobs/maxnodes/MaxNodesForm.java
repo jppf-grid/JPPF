@@ -48,7 +48,7 @@ public class MaxNodesForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(nbNodesField = new TextField<>(prefix + ".nb_nodes.field", Model.of(Integer.MAX_VALUE)));
+    add(nbNodesField = createIntField(prefix + ".nb_nodes.field", Integer.MAX_VALUE, 1, Integer.MAX_VALUE, 1));
     add(unlimitedField = new CheckBox(prefix + ".unlimited.field", Model.of(true)));
   }
 

@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.diagnostics;
 
-import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.tree.*;
 
@@ -41,47 +41,43 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Column number for the driver or node's url.
    */
-  static final int URL = 0;
+  public static final int URL = 0;
   /**
    * Column number for the heap memory usage in percentage.
    */
-  static final int HEAP_MEM_PCT = 1;
+  public static final int HEAP_MEM_PCT = 1;
   /**
    * Column number for the heap usage in MB.
    */
-  static final int HEAP_MEM_MB = 2;
+  public static final int HEAP_MEM_MB = 2;
   /**
    * Column number for the non-heap memory usage in percentage.
    */
-  static final int NON_HEAP_MEM_PCT = 3;
+  public static final int NON_HEAP_MEM_PCT = 3;
   /**
    * Column number for the non-heap memory usage in percentage.
    */
-  static final int NON_HEAP_MEM_MB = 4;
+  public static final int NON_HEAP_MEM_MB = 4;
   /**
    * Column number for the RAM usage in percentage.
    */
-  static final int RAM_PCT = 5;
+  public static final int RAM_PCT = 5;
   /**
    * Column number for the RAM usage in MB.
    */
-  static final int RAM_MB = 6;
+  public static final int RAM_MB = 6;
   /**
    * Column number for the node's last event.
    */
-  static final int THREADS = 7;
+  public static final int THREADS = 7;
   /**
    * Column number for the process CPU load.
    */
-  static final int CPU_LOAD = 8;
+  public static final int CPU_LOAD = 8;
   /**
    * Column number for the process CPU load.
    */
-  static final int SYSTEM_CPU_LOAD = 9;
-  /**
-   * A number formatter for the used memory %.
-   */
-  NumberFormat nf = createNumberFormat();
+  public static final int SYSTEM_CPU_LOAD = 9;
 
   /**
    * Initialize this model with the specified tree.
@@ -89,6 +85,16 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JVMHealthTreeTableModel(final TreeNode node) {
     super(node);
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
+  }
+
+  /**
+   * Initialize this model with the specified tree and locale.
+   * @param node the root of the tree.
+   * @param locale the locale to use for translation.
+   */
+  public JVMHealthTreeTableModel(final TreeNode node, final Locale locale) {
+    super(node, locale);
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
 
@@ -113,39 +119,39 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case HEAP_MEM_PCT:
             d = health.getHeapUsedRatio();
-            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
             break;
           case HEAP_MEM_MB:
             d = health.getHeapUsed();
-            res = d < 0d ? NA : nf.format(d / MB);
+            res = d < 0d ? NA : nfInt.format(d / MB);
             break;
           case NON_HEAP_MEM_PCT:
             d = health.getNonheapUsedRatio();
-            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
             break;
           case NON_HEAP_MEM_MB:
             d = health.getNonheapUsed();
-            res = d < 0d ? NA : nf.format(d / MB);
+            res = d < 0d ? NA : nfInt.format(d / MB);
             break;
           case RAM_PCT:
             d = health.getRamUsedRatio();
-            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
             break;
           case RAM_MB:
             d = health.getRamUsed();
-            res = d < 0d ? NA : nf.format(d / MB);
+            res = d < 0d ? NA : nfInt.format(d / MB);
             break;
           case THREADS:
             int n = health.getLiveThreads();
-            res = n < 0 ? NA : Integer.toString(n);
+            res = n < 0 ? NA : nfInt.format(n);
             break;
           case CPU_LOAD:
             d = health.getCpuLoad();
-            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
             break;
           case SYSTEM_CPU_LOAD:
             d = health.getSystemCpuLoad();
-            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
             break;
         }
       } else {
@@ -180,17 +186,5 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
         return "column.health.systemCpuload";
     }
     return "";
-  }
-
-  /**
-   * Get a number formatter for the used memory %.
-   * @return a <code>NumberFormat</code> instance.
-   */
-  private NumberFormat createNumberFormat() {
-    NumberFormat nf = NumberFormat.getInstance();
-    nf.setGroupingUsed(true);
-    nf.setMaximumFractionDigits(1);
-    nf.setMinimumFractionDigits(1);
-    return nf;
   }
 }

@@ -43,7 +43,7 @@ import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
- *
+ * The jobs view page.
  * @author Laurent Cohen
  */
 @MountPath("jobs")
@@ -72,7 +72,7 @@ public class JobsPage extends AbstractTableTreePage {
       listener = new JobsTreeListener(treeModel, selectionHandler);
       listener.setTableTree(tableTree);
       data.setListener(listener);
-      ((JPPFWebConsoleApplication) getApplication()).getJobMonitor().addJobMonitoringListener(listener);
+      JPPFWebConsoleApplication.get().getJobMonitor().addJobMonitoringListener(listener);
     } else listener.setTableTree(tableTree);
   }
 
@@ -82,10 +82,9 @@ public class JobsPage extends AbstractTableTreePage {
     TableTreeData data = session.getTableTreeData(viewType);
     treeModel = data.getModel();
     if (treeModel == null) {
-      JPPFWebConsoleApplication app = (JPPFWebConsoleApplication) getApplication();
-      treeModel = new JobTreeTableModel(new DefaultMutableTreeNode(app.localize("tree.root.name")), session.getLocale());
+      treeModel = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), session.getLocale());
       // populate the tree table model
-      for (JobDriver driver: getJPPFApplication().getJobMonitor().getJobDrivers()) {
+      for (JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
         JobsUtils.addDriver(treeModel, driver);
         for (Job job: driver.getJobs()) {
           JobsUtils.addJob(treeModel, driver, job);
@@ -122,8 +121,8 @@ public class JobsPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new ResumeJobLink());
     actionHandler.addActionLink(toolbar, new MaxNodesLink(toolbar));
     actionHandler.addActionLink(toolbar, new PriorityLink(toolbar));
-    actionHandler.addActionLink(toolbar, new ExpandAllLink());
-    actionHandler.addActionLink(toolbar, new CollapseAllLink());
+    actionHandler.addActionLink(toolbar, new ExpandAllLink(JobsConstants.EXPAND_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new CollapseAllLink(JobsConstants.COLLAPSE_ALL_ACTION));
   }
 
   /**

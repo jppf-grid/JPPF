@@ -20,6 +20,7 @@ package org.jppf.admin.web.tabletree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jppf.admin.web.health.HealthNodeRenderer;
 import org.jppf.admin.web.jobs.JobNodeRenderer;
 import org.jppf.admin.web.topology.TopologyNodeRenderer;
 import org.jppf.ui.treetable.TreeViewType;
@@ -29,7 +30,6 @@ import org.jppf.ui.treetable.TreeViewType;
  * @author Laurent Cohen
  */
 public class TableTreeHelper {
-
   /**
    * Recursively expand all non-leaf nodes in the specified table tree.
    * @param tableTree the table tree that renders the nodes.
@@ -50,7 +50,7 @@ public class TableTreeHelper {
     switch(type) {
       case TOPOLOGY: return new TopologyNodeRenderer();
       case JOBS: return new JobNodeRenderer();
-      //case HEALTH: return new TopologyNodeRenderer();
+      case HEALTH: return new HealthNodeRenderer();
     }
     throw new IllegalArgumentException(String.format("Unsupported tree view type: %s", type));
   }

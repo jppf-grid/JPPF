@@ -21,10 +21,13 @@ package org.jppf.admin.web;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.model.Model;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
+
+import com.googlecode.wicket.jquery.ui.form.spinner.Spinner;
 
 /**
  * Abstract super class for modal dialogs with ok and cancel buttons.
@@ -84,7 +87,10 @@ public abstract class AbstractModalForm extends Form<String> {
    * Load the fields values.
    */
   protected final void loadSettings() {
-    loadSettings(JPPFWebSession.get().getUserSettings().getProperties());
+    if (JPPFWebSession.get() != null) {
+      UserSettings settings = JPPFWebSession.get().getUserSettings();
+      if (settings != null) loadSettings(settings.getProperties());
+    }
   }
 
   /**
@@ -107,4 +113,58 @@ public abstract class AbstractModalForm extends Form<String> {
    * @param props the properties to save to.
    */
   protected abstract void saveSettings(final TypedProperties props);
+
+  /**
+   * Create a spinner field for long values.
+   * @param id id of the field.
+   * @param value the current value.
+   * @param min the minimum allowed value.
+   * @param max the maximum allowed value.
+   * @param step the amount to increment by.
+   * @return the newly created text field.
+   */
+  protected TextField<Long> createLongField(final String id, final long value, final long min, final long max, final long step) {
+    Spinner<Long> spinner = new Spinner<>(id, Model.of(value), Long.class);
+    spinner.setMin(min);
+    spinner.setMax(max);
+    spinner.setStep(step);
+    spinner.setRequired(false);
+    return spinner;
+  }
+
+  /**
+   * Create a spinner field for int values.
+   * @param id id of the field.
+   * @param value the current value.
+   * @param min the minimum allowed value.
+   * @param max the maximum allowed value.
+   * @param step the amount to increment by.
+   * @return the newly created text field.
+   */
+  protected TextField<Integer> createIntField(final String id, final int value, final int min, final int max, final int step) {
+    Spinner<Integer> spinner = new Spinner<>(id, Model.of(value), Integer.class);
+    spinner.setMin(min);
+    spinner.setMax(max);
+    spinner.setStep(step);
+    spinner.setRequired(false);
+    return spinner;
+  }
+
+  /**
+   * Create a spinner field for decimal values.
+   * @param id id of the field.
+   * @param value the current value.
+   * @param min the minimum allowed value.
+   * @param max the maximum allowed value.
+   * @param step the amount to increment by.
+   * @return the newly created text field.
+   */
+  protected TextField<Double> createDecField(final String id, final double value, final double min, final double max, final double step) {
+    Spinner<Double> spinner = new Spinner<>(id, Model.of(value), Double.class);
+    spinner.setMin(min);
+    spinner.setMax(max);
+    spinner.setStep(step);
+    spinner.setRequired(false);
+    return spinner;
+  }
 }

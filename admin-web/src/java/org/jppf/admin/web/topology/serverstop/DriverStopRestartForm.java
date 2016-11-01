@@ -52,9 +52,9 @@ public class DriverStopRestartForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(shutdownDelayField = new TextField<>(prefix + ".shutdown_delay.field", Model.of(0L)));
+    add(shutdownDelayField = createLongField(prefix + ".shutdown_delay.field", 0L, 0L, Long.MAX_VALUE, 1L));
     add(restartField = new CheckBox(prefix + ".restart.field", Model.of(true)));
-    add(restartDelayField = new TextField<>(prefix + ".restart_delay.field", Model.of(0L)));
+    add(restartDelayField = createLongField(prefix + ".restart_delay.field", 0L, 0L, Long.MAX_VALUE, 1L));
   }
 
   /**

@@ -48,8 +48,8 @@ public class NodeThreadsForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(nbThreadsField = new TextField<>(prefix + ".nb_threads.field", Model.of(1)));
-    add(priorityField = new TextField<>(prefix + ".priority.field", Model.of(Thread.NORM_PRIORITY)));
+    add(nbThreadsField = createIntField(prefix + ".nb_threads.field", 1, 1, 1024, 1));
+    add(priorityField = createIntField(prefix + ".priority.field", Thread.NORM_PRIORITY, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY, 1));
   }
 
   /**

@@ -23,14 +23,13 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.*;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.utils.TopologyUtils;
-import org.jppf.utils.*;
+import org.jppf.ui.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -79,7 +78,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       });
       JEditorPane editor = new JEditorPane("text/html", "");
       editor.setBackground(Color.WHITE);
-      editor.setText("retrieving thread dump information ...");
+      editor.setText(HealthUtils.localizeThreadDumpInfo("threaddump.retrieving", Locale.getDefault()));
       editor.setCaretPosition(0);
       AbstractButton btn = (AbstractButton) event.getSource();
       if (btn.isShowing()) location = btn.getLocationOnScreen();
@@ -103,27 +102,6 @@ public class ThreadDumpAction extends AbstractTopologyAction {
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
-  }
-
-  /**
-   * Retrieve the system information for the specified topology object.
-   * @param data the topology object for which to get the information.
-   * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
-   */
-  private ThreadDump retrieveThreadDump(final AbstractTopologyComponent data) {
-    ThreadDump info = null;
-    try {
-      if (data.isNode()) {
-        TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
-        Object o = result.get(data.getUuid());
-        if (o instanceof ThreadDump) info = (ThreadDump) o;
-      }
-      else info = ((TopologyDriver) data).getDiagnostics().threadDump();
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-    }
-    return info;
   }
 
   /**
@@ -153,15 +131,14 @@ public class ThreadDumpAction extends AbstractTopologyAction {
     public void run() {
       final StringBuilder html = new StringBuilder();
       final StringBuilder toClipboard = new StringBuilder();
-      final StringBuilder title = new StringBuilder("Thread dump");
+      final String title = HealthUtils.getThreadDumpTitle(dataArray[0], Locale.getDefault());
       try {
-        ThreadDump info = retrieveThreadDump(dataArray[0]);
-        boolean isNode = dataArray[0].isNode();
-        title.append(" for ").append(isNode ? "node " : "driver ").append(TopologyUtils.getDisplayName(dataArray[0]));
+        ThreadDump info = HealthUtils.retrieveThreadDump(dataArray[0]);
         if (info == null) html.append("<p><b>No thread dump was generated</b>");
+        if (info == null) html.append(HealthUtils.localizeThreadDumpInfo("threaddump.info_not_found", Locale.getDefault()));
         else {
-          html.append(HTMLThreadDumpWriter.printToString(info, title.toString()));
-          toClipboard.append(TextThreadDumpWriter.printToString(info, title.toString()));
+          html.append(HTMLThreadDumpWriter.printToString(info, title, true));
+          toClipboard.append(TextThreadDumpWriter.printToString(info, title));
         }
       } catch(Exception e) {
         toClipboard.append(ExceptionUtils.getStackTrace(e));
@@ -171,7 +148,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
         @Override
         public void run() {
           try {
-          dialog.setTitle(title.toString());
+          dialog.setTitle(title);
           editor.setText(html.toString());
           editor.setCaretPosition(0);
           editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));

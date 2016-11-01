@@ -16,27 +16,28 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.topology;
+package org.jppf.admin.web.tabletree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.AbstractComponent;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.TreeViewType;
 
 /**
- *
+ * Select all nodes and drivers within a topology tree.
  * @author Laurent Cohen
  */
-public class SelectDriversLink extends AbstractSelectionLink {
+public class SelectAllLink extends AbstractSelectionLink {
   /**
+   * @param id the id of this link.
    * @param viewType the type this button is part of.
    */
-  public SelectDriversLink(final TreeViewType viewType) {
-    super(TopologyConstants.SELECT_DRIVERS_ACTION, Model.of("Select drivers"), viewType);
-    imageName = "select_drivers.gif";
+  public SelectAllLink(final String id, final TreeViewType viewType) {
+    super(id, Model.of("Select all"), viewType);
+    imageName = "select_all.gif";
   }
 
   @Override
@@ -45,8 +46,13 @@ public class SelectDriversLink extends AbstractSelectionLink {
     SelectionHandler handler = data.getSelectionHandler();
     handler.clearSelection();
     for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) root.getChildAt(i);
-      handler.select(((AbstractComponent<?>) dmtn.getUserObject()).getUuid());
+      DefaultMutableTreeNode dmtnDriver = (DefaultMutableTreeNode) root.getChildAt(i);
+      handler.select(((AbstractComponent<?>) dmtnDriver.getUserObject()).getUuid());
+      for (int j=0; j<dmtnDriver.getChildCount(); j++) {
+        DefaultMutableTreeNode dmtnNode = (DefaultMutableTreeNode) dmtnDriver.getChildAt(j);
+        AbstractTopologyComponent node = (AbstractTopologyComponent) dmtnNode.getUserObject();
+        if (node.isNode()) handler.select(node.getUuid());
+      }
     }
   }
 }
