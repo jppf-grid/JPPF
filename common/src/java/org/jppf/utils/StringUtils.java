@@ -195,12 +195,12 @@ public final class StringUtils {
   public static String toStringDuration(final long duration) {
     long elapsed = duration;
     StringBuilder sb = new StringBuilder();
-    sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(':');
-    elapsed = elapsed % 3600000L;
-    sb.append(padLeft(""+(elapsed / 60000L), '0', 2)).append(':');
-    elapsed = elapsed % 60000L;
-    sb.append(padLeft(""+(elapsed / 1000L), '0', 2)).append('.');
-    sb.append(padLeft(""+(elapsed % 1000L), '0', 3));
+    sb.append(padLeft("" + (elapsed / 3_600_000L), '0', 2)).append(':');
+    elapsed = elapsed % 3_600_000L;
+    sb.append(padLeft("" + (elapsed / 60_000L), '0', 2)).append(':');
+    elapsed = elapsed % 60_000L;
+    sb.append(padLeft("" + (elapsed / 1000L), '0', 2)).append('.');
+    sb.append(padLeft("" + (elapsed % 1000L), '0', 3));
     return sb.toString();
   }
 
