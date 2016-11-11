@@ -63,7 +63,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    */
   private final Map<String, TopologyNode> nodeMap = new Hashtable<>();
   /**
-   *
+   * Mapping of the driver connections to their assocated status listener.
    */
   private final Map<JPPFClientConnection, ClientConnectionStatusListener> statusListenerMap = new Hashtable<>();
   /**
@@ -325,7 +325,6 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    */
   void driverRemoved(final TopologyDriver driver) {
     if (debugEnabled) log.debug("removing driver {}", driver);
-    //if (driverMap.get(driver.getUuid()) == null) return;
     JPPFClientConnection c = driver.getConnection();
     ClientConnectionStatusListener listener = statusListenerMap.remove(c);
     if (listener != null) c.removeClientConnectionStatusListener(listener);
@@ -440,12 +439,13 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
         TopologyDriver driver = new TopologyDriver(c);
         if (debugEnabled) log.debug("before adding driver {}", driver);
         driverAdded(driver);
-      } else if (!newStatus.isWorkingStatus() && oldStatus.isWorkingStatus()) {
-        String uuid = c.getDriverUuid();
-        TopologyDriver driver = getDriver(uuid);
+      } else if (!newStatus.isWorkingStatus() && (c.getDriverUuid() != null)) {
+        TopologyDriver driver = getDriver(c.getDriverUuid());
         if (driver != null) {
-          for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
-          //driverRemoved(driver);
+          if (oldStatus.isWorkingStatus()) {
+            for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
+          }
+          if (newStatus.isTerminatedStatus() && !oldStatus.isTerminatedStatus()) driverRemoved(driver);
         }
       }
     }
