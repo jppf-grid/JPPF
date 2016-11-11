@@ -22,25 +22,25 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.JPPFWebSession;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
- *
+ * Collapse all the nodes in a tree.
  * @author Laurent Cohen
  */
-public class CollapseAllLink extends AbstractActionLink {
+public class CollapseAllLink extends AbstractViewTypeLink {
   /**
    * @param id the id of this link.
+   * @param viewType the type of view this button is part of.
    */
-  public CollapseAllLink(final String id) {
-    super(id, Model.of("Collapse all"));
+  public CollapseAllLink(final String id, final TreeViewType viewType) {
+    super(id, Model.of("Collapse all"), viewType, false);
     imageName = "collapse.gif";
   }
 
   @Override
-  public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = JPPFWebSession.get();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getHealthData().getModel().getRoot();
+  public void onClick(final AjaxRequestTarget target, final TableTreeData data) {
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       for (int i=0; i<root.getChildCount(); i++) tableTree.collapse((DefaultMutableTreeNode) root.getChildAt(i));

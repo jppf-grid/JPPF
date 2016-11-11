@@ -6,26 +6,26 @@
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>	
-	<body onload="updateState('c1', 't1')">
+	<body onload="updateState('c1', 't1'); document.getElementsByClassName('default_focus')[0].focus()">
     <script>
     function updateState(src, dest) {
-        var disabled = !document.getElementById(src).checked;
-        document.getElementById(dest).disabled = disabled;
-        var style = document.getElementById('tl1').style;
-        if (disabled) {
-          style.color = "#666666";
-          style.fontStyle = "italic";
-        } else {
-          style.color = "black";
-          style.fontStyle = "normal";
-        }
+      var disabled = !document.getElementById(src).checked;
+      document.getElementById(dest).disabled = disabled;
+      var style = document.getElementById('tl1').style;
+      if (disabled) {
+        style.color = "#8D98D6";
+        style.fontStyle = "italic";
+      } else {
+        style.color = "6D78B6";
+        style.fontStyle = "normal";
+      }
     }
     </script>
 	  <form wicket:id="server_stop_restart.form" class="modal_form">
       <table class="modal_form">
         <tr>
           <td><wicket:message key="server_stop_restart.shutdown_delay.label"></wicket:message>&nbsp;</td>
-    	    <td><input type="text" wicket:id="server_stop_restart.shutdown_delay.field" value="0"/><br/></td>
+    	    <td><input type="text" wicket:id="server_stop_restart.shutdown_delay.field" value="0" class="default_focus"/><br/></td>
         </tr>
         <tr>
           <td colspan="2">

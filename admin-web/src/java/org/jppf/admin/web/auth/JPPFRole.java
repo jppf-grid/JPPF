@@ -30,12 +30,16 @@ public enum JPPFRole {
   /**
    * Monitor role.
    */
-  MONITOR("jppf-monitor"),
+  MONITOR(JPPFRoles.MONITOR),
   /**
    * Manager role.
    */
-  MANAGER("jppf-manager", MONITOR);
-  
+  MANAGER(JPPFRoles.MANAGER, MONITOR),
+  /**
+   * Admin role.
+   */
+  ADMIN(JPPFRoles.ADMIN, MONITOR);
+
   /**
    * The role name.
    */

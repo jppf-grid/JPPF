@@ -29,13 +29,13 @@ import org.jppf.ui.treetable.TreeViewType;
  * Select all nodes within a topology tree.
  * @author Laurent Cohen
  */
-public class SelectNodesLink extends AbstractSelectionLink {
+public class SelectNodesLink extends AbstractViewTypeLink {
   /**
    * @param id the id of this link.
-   * @param viewType the type this button is part of.
+   * @param viewType the type of view this button is part of.
    */
   public SelectNodesLink(final String id, final TreeViewType viewType) {
-    super(id, Model.of("Select nodes"), viewType);
+    super(id, Model.of("Select nodes"), viewType, true);
     imageName = "select_nodes.gif";
   }
 

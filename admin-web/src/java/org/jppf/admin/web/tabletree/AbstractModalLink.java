@@ -23,6 +23,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.jppf.admin.web.utils.AbstractActionLink;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 

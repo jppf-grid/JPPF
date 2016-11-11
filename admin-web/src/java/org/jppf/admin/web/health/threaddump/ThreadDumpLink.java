@@ -30,6 +30,7 @@ import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.health.HealthConstants;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.utils.AbstractActionLink;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.*;
 import org.jppf.ui.utils.HealthUtils;
@@ -80,7 +81,7 @@ public class ThreadDumpLink extends AbstractActionLink {
       try {
         ThreadDump info = HealthUtils.retrieveThreadDump(comp);
         if (info == null) html.append(HealthUtils.localizeThreadDumpInfo("threaddump.info_not_found", locale));
-        else html.append(HTMLThreadDumpWriter.printToString(info, title, false));
+        else html.append(HTMLThreadDumpWriter.printToString(info, title, false, 10));
       } catch(Exception e) {
         html.append(ExceptionUtils.getStackTrace(e).replace("\n", "<br>"));
       }

@@ -21,7 +21,7 @@ package org.jppf.admin.web.topology.nodethreads;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.admin.web.utils.AbstractModalForm;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -29,6 +29,10 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  */
 public class NodeThreadsForm extends AbstractModalForm {
+  /**
+   * Base name for localization.
+   */
+  private static final String I18N_BASE = NodeThreadsPage.class.getName();
   /**
    * Text field for the number of threads.
    */
@@ -48,8 +52,8 @@ public class NodeThreadsForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    add(nbThreadsField = createIntField(prefix + ".nb_threads.field", 1, 1, 1024, 1));
-    add(priorityField = createIntField(prefix + ".priority.field", Thread.NORM_PRIORITY, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY, 1));
+    add(nbThreadsField = setTooltip(createIntField(prefix + ".nb_threads.field", 1, 1, 1024, 1), I18N_BASE));
+    add(priorityField =  setTooltip(createIntField(prefix + ".priority.field", Thread.NORM_PRIORITY, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY, 1), I18N_BASE));
   }
 
   /**

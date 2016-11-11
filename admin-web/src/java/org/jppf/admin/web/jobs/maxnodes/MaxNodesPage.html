@@ -6,23 +6,23 @@
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>	
-	<body onload="updateState()">
+	<body onload="updateState(); document.getElementsByClassName('default_focus')[0].focus()">
     <script>
     function updateState() {
       var disabled = document.getElementById('c1').checked;
       document.getElementById('t1').disabled = disabled;
       var style = document.getElementById('tl1').style;
       if (disabled) {
-        style.color = "#666666";
+        style.color = "#8D98D6";
         style.fontStyle = "italic";
       } else {
-        style.color = "black";
+        style.color = "6D78B6";
         style.fontStyle = "normal";
       }
     }
     </script>
 	  <form wicket:id="max_nodes.form" class="modal_form">
-      <input id="c1" type="checkbox" wicket:id="max_nodes.unlimited.field" onclick="updateState()"/>
+      <input id="c1" type="checkbox" wicket:id="max_nodes.unlimited.field" onclick="updateState()" class="default_focus"/>
       <wicket:message key="max_nodes.unlimited.label"></wicket:message><br/>
 
       <span id="tl1"><wicket:message key="max_nodes.nb_nodes.label"></wicket:message></span>&nbsp;

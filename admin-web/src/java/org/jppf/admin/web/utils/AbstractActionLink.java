@@ -16,14 +16,16 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.tabletree;
+package org.jppf.admin.web.utils;
 
 import org.apache.wicket.ajax.*;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.model.*;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.jppf.utils.Pair;
+import org.jppf.admin.web.AbstractJPPFPage;
+import org.jppf.admin.web.tabletree.*;
+import org.jppf.utils.*;
 
 /**
  *
@@ -31,19 +33,23 @@ import org.jppf.utils.Pair;
  */
 public abstract class AbstractActionLink extends AjaxLink<String> {
   /**
-   *
+   * Determines whether this link is enabled and/or authorized.  
    */
   private transient UpdatableAction action;
   /**
    * Name of the associated icon.
    */
   protected String imageName;
+  /**
+   * Whether this link has an associated tooltip.
+   */
+  protected boolean tooltip = true;
 
   /**
    * @param id the link id.
    */
   public AbstractActionLink(final String id) {
-    super(id);
+    this(id, null, null);
   }
 
   /**
@@ -51,7 +57,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    * @param model the display model.
    */
   public AbstractActionLink(final String id, final IModel<String> model) {
-    super(id, model);
+    this(id, model, null);
   }
 
   /**
@@ -67,7 +73,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   @Override
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
-    Pair<String, String> pair = getImageNameAndExtension();
+    Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
     String format = "<img src='" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s'/>";
     if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
@@ -90,17 +96,6 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    */
   public void setAction(final UpdatableAction action) {
     this.action = action;
-  }
-
-  /**
-   * Decompose a file name into name + extension.
-   * @return a Pair of name, extension.
-   */
-  protected Pair<String, String> getImageNameAndExtension() {
-    if (imageName == null) return null;
-    int idx = imageName.lastIndexOf('.');
-    if (idx <= 0) return new Pair<>(imageName, null);
-    return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
   }
 
   /**
@@ -134,5 +129,11 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       if (tableTree != null) target.add(tableTree);
     }
+  }
+
+  @Override
+  protected void onInitialize() {
+    super.onInitialize();
+    if (tooltip) ((AbstractJPPFPage) getPage()).setTooltip(this);
   }
 }

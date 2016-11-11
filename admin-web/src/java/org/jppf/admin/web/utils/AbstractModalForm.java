@@ -16,15 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web;
+package org.jppf.admin.web.utils;
 
+import java.util.Locale;
+
+import org.apache.wicket.*;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
+import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.settings.UserSettings;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 import com.googlecode.wicket.jquery.ui.form.spinner.Spinner;
@@ -46,9 +50,13 @@ public abstract class AbstractModalForm extends Form<String> {
    * The prefix for the ids of all components.
    */
   protected final String prefix;
+  /**
+   *
+   */
+  protected final Locale locale;
 
   /**
-   * 
+   *
    * @param prefix the prefix for the ids of all components.
    * @param modal the modal window.
    * @param okAction the ok action.
@@ -56,6 +64,7 @@ public abstract class AbstractModalForm extends Form<String> {
   public AbstractModalForm(final String prefix, final ModalWindow modal, final Runnable okAction) {
     super(prefix + ".form");
     this.prefix = prefix;
+    this.locale = JPPFWebSession.get().getLocale();
     createFields();
     AjaxButton okButton = new AjaxButton(prefix + ".ok") {
       @Override
@@ -166,5 +175,23 @@ public abstract class AbstractModalForm extends Form<String> {
     spinner.setStep(step);
     spinner.setRequired(false);
     return spinner;
+  }
+
+  /**
+   * Add a tooltip to the specified component.
+   * @param <T> the type of the component.
+   * @param comp the component on which to set a tooltip.
+   * @param base the base name for localization resource bundle lookup.
+   * @return the component itself.
+   */
+  protected <T extends Component> T setTooltip(final T comp, final String base) {
+    String id = comp.getId();
+    String key = null;
+    if (id.endsWith(".field")) {
+      int idx = id.lastIndexOf(".field");
+      key = id.substring(0, idx) + ".tooltip";
+    } else key = id + ".tooltip";
+    comp.add(new AttributeModifier("title", LocalizationUtils.getLocalized(base, key, locale)));
+    return comp;
   }
 }

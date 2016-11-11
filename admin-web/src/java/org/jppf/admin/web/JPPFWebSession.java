@@ -39,7 +39,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   /**
    * Holds the data for each type of table tree view.
    */
-  private transient EnumMap<TreeViewType, TableTreeData> dataMap = new EnumMap<>(TreeViewType.class);
+  private final EnumMap<TreeViewType, TableTreeData> dataMap;
   /**
    * The user settings.
    */
@@ -51,6 +51,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   public JPPFWebSession(final Request request) {
     super(request);
+    dataMap = new EnumMap<>(TreeViewType.class);
   }
 
   @Override

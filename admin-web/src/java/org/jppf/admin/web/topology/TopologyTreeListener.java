@@ -46,8 +46,10 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    TopologyUtils.removeDriver(treeModel, event.getDriver());
-    selectionHandler.unselect(event.getDriver().getUuid());
+    TopologyDriver driver = event.getDriver();
+    selectionHandler.unselect(driver.getUuid());
+    for (TopologyNode node: driver.getNodesAndPeers()) selectionHandler.unselect(node.getUuid());
+    TopologyUtils.removeDriver(treeModel, driver);
   }
 
   @Override

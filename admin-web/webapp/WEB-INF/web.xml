@@ -29,6 +29,7 @@
       <description>JPPF Roles</description>
       <role-name>jppf-monitor</role-name>
       <role-name>jppf-manager</role-name>
+      <role-name>jppf-admin</role-name>
     </auth-constraint>
   </security-constraint>
   <login-config>
@@ -44,5 +45,8 @@
   </security-role>
   <security-role>
     <role-name>jppf-manager</role-name>
+  </security-role>
+  <security-role>
+    <role-name>jppf-admin</role-name>
   </security-role>
 </web-app>

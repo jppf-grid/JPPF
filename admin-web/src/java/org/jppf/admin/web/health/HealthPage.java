@@ -118,11 +118,11 @@ public class HealthPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new ThreadDumpLink(toolbar));
     actionHandler.addActionLink(toolbar, new HeapDumpLink());
     actionHandler.addActionLink(toolbar, new ThresholdsLink(toolbar));
-    actionHandler.addActionLink(toolbar, new ExpandAllLink(HealthConstants.EXPAND_ALL_ACTION));
-    actionHandler.addActionLink(toolbar, new CollapseAllLink(HealthConstants.COLLAPSE_ALL_ACTION));
-    actionHandler.addActionLink(toolbar, new SelectDriversLink(HealthConstants.SELECT_DRIVERS_ACTION, TreeViewType.HEALTH));
-    actionHandler.addActionLink(toolbar, new SelectNodesLink(HealthConstants.SELECT_NODES_ACTION, TreeViewType.HEALTH));
-    actionHandler.addActionLink(toolbar, new SelectAllLink(HealthConstants.SELECT_ALL_ACTION, TreeViewType.HEALTH));
+    actionHandler.addActionLink(toolbar, new ExpandAllLink(HealthConstants.EXPAND_ALL_ACTION, viewType));
+    actionHandler.addActionLink(toolbar, new CollapseAllLink(HealthConstants.COLLAPSE_ALL_ACTION, viewType));
+    actionHandler.addActionLink(toolbar, new SelectDriversLink(HealthConstants.SELECT_DRIVERS_ACTION, viewType));
+    actionHandler.addActionLink(toolbar, new SelectNodesLink(HealthConstants.SELECT_NODES_ACTION, viewType));
+    actionHandler.addActionLink(toolbar, new SelectAllLink(HealthConstants.SELECT_ALL_ACTION, viewType));
   }
 
   /**
@@ -151,7 +151,7 @@ public class HealthPage extends AbstractTableTreePage {
       if (comp.isPeer()) cssClass = "peer";
       else if (comp.isNode()) {
         TopologyNode data = (TopologyNode) node.getUserObject();
-        if (traceEnabled) log.trace("node status: {}", data.getStatus());
+        //if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
           if (inactive) cssClass = selected ? "tree_inactive_selected" : "tree_inactive";
@@ -195,11 +195,11 @@ public class HealthPage extends AbstractTableTreePage {
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
-      if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
-      String cssClass = null;
+      String css = null;
       boolean selected = selectionHandler.isSelected(comp.getUuid());
-      if (!comp.isPeer()) cssClass = (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+      if (!comp.isPeer()) css = (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
+      if (css != null) cellItem.add(new AttributeModifier("class", css));
+      if (traceEnabled && (index == 1)) log.trace(String.format("index=%d, value=%s, css=%s, comp=%s", index, value, css, comp));
     }
 
     @Override
@@ -239,8 +239,7 @@ public class HealthPage extends AbstractTableTreePage {
             value = snapshot.getSystemCpuLoad();
             break;
         }
-      } else if (SystemUtils.isOneOf(index, JVMHealthTreeTableModel.HEAP_MEM_PCT, JVMHealthTreeTableModel.NON_HEAP_MEM_PCT, JVMHealthTreeTableModel.RAM_PCT,
-        JVMHealthTreeTableModel.HEAP_MEM_MB, JVMHealthTreeTableModel.NON_HEAP_MEM_MB, JVMHealthTreeTableModel.RAM_MB)) {
+      } else if (!SystemUtils.isOneOf(index, JVMHealthTreeTableModel.THREADS, JVMHealthTreeTableModel.URL)) {
         thresholds = data.getMemoryThresholds();
         switch (index) {
           case JVMHealthTreeTableModel.HEAP_MEM_PCT:
@@ -262,7 +261,7 @@ public class HealthPage extends AbstractTableTreePage {
         if (value >= thresholds.getCritical()) css = "health_critical";
         else if (value >= thresholds.getWarning()) css = "health_warning";
       }
-      if (traceEnabled) log.trace(String.format(""));
+      //if (traceEnabled) log.trace(String.format(""));
       return css;
     }
   }

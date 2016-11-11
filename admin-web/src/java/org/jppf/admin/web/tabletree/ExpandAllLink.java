@@ -22,25 +22,25 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.JPPFWebSession;
+import org.jppf.ui.treetable.TreeViewType;
 
 /**
- *
+ * Expand all the nodes in a tree.
  * @author Laurent Cohen
  */
-public class ExpandAllLink extends AbstractActionLink {
+public class ExpandAllLink extends AbstractViewTypeLink {
   /**
    * @param id the id of this link.
+   * @param viewType the type of view this button is part of.
    */
-  public ExpandAllLink(final String id) {
-    super(id, Model.of("Expand all"));
+  public ExpandAllLink(final String id, final TreeViewType viewType) {
+    super(id, Model.of("Expand all"), viewType, false);
     imageName = "expand.gif";
   }
 
   @Override
-  public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = JPPFWebSession.get();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) session.getHealthData().getModel().getRoot();
+  public void onClick(final AjaxRequestTarget target, final TableTreeData data) {
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
       JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       TableTreeHelper.expand(tableTree, root);

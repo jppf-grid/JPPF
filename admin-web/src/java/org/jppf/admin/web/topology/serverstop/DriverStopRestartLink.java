@@ -35,6 +35,7 @@ import org.slf4j.*;
  *
  * @author Laurent Cohen
  */
+//@AuthorizeActions(actions = { @AuthorizeAction(action="RENDER", roles=JPPFRoles.MANAGER) })
 public class DriverStopRestartLink extends AbstractModalLink<DriverStopRestartForm> {
   /**
    * Logger for this class.

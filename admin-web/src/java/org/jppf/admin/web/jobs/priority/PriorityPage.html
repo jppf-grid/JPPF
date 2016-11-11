@@ -6,10 +6,10 @@
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>	
-	<body>
+	<body onload="document.getElementsByClassName('default_focus')[0].focus()">
 	  <form wicket:id="priority.form" class="modal_form">
       <wicket:message key="priority.priority.label"></wicket:message>&nbsp;
-      <input type="text" wicket:id="priority.priority.field" value="0"/><br/>
+      <input type="text" wicket:id="priority.priority.field" value="0" class="default_focus"/><br/>
 
       <p><a wicket:id="priority.ok" class="button_link button_ok"><wicket:message key="priority.ok.label"></wicket:message></a>&nbsp;
       <a wicket:id="priority.cancel" class="button_link"><wicket:message key="priority.cancel.label"></wicket:message></a>

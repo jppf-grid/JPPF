@@ -25,6 +25,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
+import org.jppf.admin.web.admin.AdminData;
 import org.jppf.admin.web.auth.LoginPage;
 import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.monitoring.jobs.*;
@@ -58,6 +59,10 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    * The topololgy manager.
    */
   private transient JobMonitor jobMonitor;
+  /**
+   * COntains all asministrative settings.
+   */
+  private final AdminData adminData = new AdminData();
 
   /**
    * Default constructor.
@@ -77,6 +82,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     super.init();
     getPageSettings().setVersionPagesByDefault(false);
     this.setPageManagerProvider(new MyPageManagerProvider(this));
+    JPPFConfiguration.reset(adminData.getConfig());
     this.topologyManager = new TopologyManager();
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
   }
@@ -120,6 +126,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   public static JPPFWebConsoleApplication get() {
     return (JPPFWebConsoleApplication) Application.get();
+  }
+
+  /**
+   * @return the adminstrative settings.
+   */
+  public AdminData getAdminData() {
+    return adminData;
   }
 
   /**

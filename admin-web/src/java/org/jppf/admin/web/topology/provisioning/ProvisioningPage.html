@@ -6,24 +6,24 @@
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
 	</head>
-	<body onload="updateState('c1', 't1')">
+	<body onload="updateState('c1', 't1'); document.getElementsByClassName('default_focus')[0].focus()">
     <script>
       function updateState(src, dest) {
         var disabled = !document.getElementById(src).checked;
         document.getElementById(dest).disabled = disabled;
         var style = document.getElementById('tl1').style;
         if (disabled) {
-          style.color = "#666666";
+          style.color = "#8D98D6";
           style.fontStyle = "italic";
         } else {
-          style.color = "black";
+          style.color = "6D78B6";
           style.fontStyle = "normal";
         }
       }
     </script>
     <form wicket:id="provisioning.form" class="modal_form">
       <wicket:message key="provisioning.nb_slaves.label"></wicket:message>&nbsp;
-	    <input type="text" wicket:id="provisioning.nb_slaves.field" value="0"/><br/>
+	    <input type="text" wicket:id="provisioning.nb_slaves.field" value="0" class="default_focus"/><br/>
 
       <input type="checkbox" wicket:id="provisioning.interrupt.field"/>
       <wicket:message key="provisioning.interrupt.label"></wicket:message><br/>

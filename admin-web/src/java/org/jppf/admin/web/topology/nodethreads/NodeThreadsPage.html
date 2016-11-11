@@ -5,13 +5,13 @@
     <wicket:head>
       <link rel="stylesheet" href="jppf.css" type="text/css" />
     </wicket:head>
-	</head>	
-	<body>
+	</head>
+	<body onload="document.getElementsByClassName('default_focus')[0].focus()">
 	  <form wicket:id="node_threads.form" class="modal_form">
       <table class="modal_form">
         <tr>
           <td><wicket:message key="node_threads.nb_threads.label"></wicket:message>&nbsp;</td>
-          <td><input type="text" wicket:id="node_threads.nb_threads.field" value="0"/><br/></td>
+          <td><input type="text" wicket:id="node_threads.nb_threads.field" value="0" class="default_focus"/><br/></td>
         </tr>
         <tr>
           <td><wicket:message key="node_threads.priority.label"></wicket:message>&nbsp;</td>

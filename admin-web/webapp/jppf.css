@@ -111,7 +111,6 @@ hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: 
 .blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
 .simpleList { list-style: none; text-indent: -20 }
 
-.news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #6D78B6 }
 .links { color: #000060; font-size: 10pt; font-family: Arial, Verdana, sans-serif }
 .linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
 .headerlink { text-decoration: underline; color: #6D78B6 }
@@ -275,65 +274,8 @@ pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
   box-shadow: inset -3px -3px 4px #6D78B6;
 }
 
-.version_select {
-  font-size: 12pt;
-  font-weight: 900;
-  font-family: Arial, Verdana, sans-serif;
-  color: #6D78B6
-}
-
 div#mw-content-text h3 a {
   font-size: 14pt;
-}
-
-.yh {
-  color: white;
-  background-color: 6D78B6;
-  font-weight: bold;
-  font-style: italic;
-  padding: 10px 10px;
-  border-radius: 10px;
-  box-shadow: 4px 4px 4px #444;
-}
-
-a.yellow_highlight:hover {
-  text-decoration: none;
-  box-shadow: none;
-}
-
-.yhd {
-  color: white;
-  background-color: 6D78B6;
-  font-size: 16pt;
-  font-style: italic;
-  font-weight: bold;
-  padding: 20px;
-  margin: 0px;
-  border-radius: 20px;
-  box-shadow: 4px 4px 4px #222;
-
-  animation-name: glow_effect;
-  animation-delay: 0s;
-  animation-duration: 3s;
-  animation-timing-function: ease-in-out;
-  animation-direction: alternate;
-  animation-iteration-count: infinite;
-}
-
-@keyframes glow_effect {
-  from {
-    color: white;
-  }
-  to {
-    color: #DDD;
-  }
-}
-
-a.yhd:hover {
-  text-decoration: none;
-  color: #E8EAFD;
-  box-shadow: inset 2px 2px 2px #444;
-  padding-left: 19px;
 }
 
 div#bodyContent div h2 {
@@ -353,7 +295,7 @@ div.navlink2 a:link {
   background: transparent;
 }
 
-div.navlink2 a {
+div.navlink2 a, .navlink2_current {
   color: #6D78B6;
   background-color: #C5D0F0;
 }
@@ -541,36 +483,37 @@ img {
 
 /* Thread dump dialog */
 
+p { font-size: 10pt; }
 .t_new        { background-color: white; }
 .t_runnable   { background-color: #80FF80; }
 .t_wait       { background-color: yellow; }
 .t_time_wait  { background-color: yellow; }
 .t_blocked    { background-color: #FF8080; }
 .t_terminated { background-color: #FAFAFA; }
-.t_lock { font-style: italic; font-size: 11pt; }
+.t_lock { font-style: italic; font-size: 9pt; }
 
-/* spinner styles */
+/* tooltips */
 
-.spinnerContainer {
-  border: 0px solid #999;
+.jppf-tooltip {
+  padding: 2px 4px;
+  background: #FFFFA0;
 }
 
-.spinnerContainer span {
-  background-color: #6D78B6;
-  color: #FFFFFF;
+.jppf-tab {
+  background-color: #E2E4F0;
+  color: #6D78B6;
+  padding: 0px;
+}
+
+.file-upload {
   cursor: pointer;
-  padding: 0 0.4em;
-}
-
-.spinnerContainer span:hover {
-  background-color: #909090;
-}
-
-.spinnerContainer span:focus {
-  background-color: red;
-}
-
-.spinnerContainer input {
-  border-width: 0px;
-  text-align: right;
+  width: 300px;
+  height:16px;
+  background-color: #C5D0F0;
+  vertical-align: middle;
+  display: inline-block;
+  border-radius: 8px;
+  border: 1px solid #C5D0F0;
+  box-shadow: 1px 1px 5px #6D78B6 inset;
+  padding: 4px 6px;
 }

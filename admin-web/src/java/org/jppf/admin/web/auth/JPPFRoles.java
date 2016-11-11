@@ -16,18 +16,23 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.tabletree;
-
-import org.apache.wicket.authroles.authorization.strategies.role.Roles;
-import org.jppf.admin.web.auth.JPPFRole;
+package org.jppf.admin.web.auth;
 
 /**
- * Abstract class for action authirized for the manager role only.
+ * Names of the possible JPPF roles.
  * @author Laurent Cohen
  */
-public class AbstractManagerRoleAction extends AbstractUpdatableAction {
-  @Override
-  public void setAuthorized(final Roles roles) {
-    authorized = (roles == null) ? false : roles.hasRole(JPPFRole.MANAGER.getRoleName());
-  }
+public class JPPFRoles {
+  /**
+   * JPPF monitor role name.
+   */
+  public static final String MONITOR = "jppf-monitor";
+  /**
+   * JPPF manager role name.
+   */
+  public static final String MANAGER = "jppf-manager";
+  /**
+   * JPPF admin role name.
+   */
+  public static final String ADMIN = "jppf-admin";
 }

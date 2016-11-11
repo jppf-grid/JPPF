@@ -29,6 +29,7 @@ import org.jppf.admin.web.topology.nodethreads.NodeThreadsAction;
 import org.jppf.admin.web.topology.provisioning.ProvisioningAction;
 import org.jppf.admin.web.topology.serverstop.DriverStopRestartAction;
 import org.jppf.admin.web.topology.systeminfo.SystemInfoAction;
+import org.jppf.admin.web.utils.UpdatableAction;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.collections.*;

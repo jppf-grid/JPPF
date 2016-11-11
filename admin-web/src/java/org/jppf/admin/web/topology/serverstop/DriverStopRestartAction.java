@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.tabletree.AbstractManagerRoleAction;
+import org.jppf.admin.web.utils.AbstractManagerRoleAction;
 
 /**
  * 

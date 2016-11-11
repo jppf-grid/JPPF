@@ -22,45 +22,53 @@ import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.IModel;
 import org.jppf.admin.web.JPPFWebSession;
+import org.jppf.admin.web.utils.AbstractActionLink;
 import org.jppf.ui.treetable.TreeViewType;
 
 /**
- * Abstract class for action links that select nodes in a table tree.
+ * Abstract class for action links common to all types of table tree views.
  * @author Laurent Cohen
  */
-public abstract class AbstractSelectionLink extends AbstractActionLink {
+public abstract class AbstractViewTypeLink extends AbstractActionLink {
   /**
    * The type this button is part of.
    */
   private final TreeViewType viewType;
+  /**
+   * Whether this is a selection action.
+   */
+  private final boolean selection;
 
   /**
    *
    * @param id the lnk id.
    * @param viewType the type this button is part of.
+   * @param selection whether this is a selection action.
    */
-  public AbstractSelectionLink(final String id, final TreeViewType viewType) {
+  public AbstractViewTypeLink(final String id, final TreeViewType viewType, final boolean selection) {
     super(id);
     this.viewType = viewType;
+    this.selection = selection;
   }
 
   /**
    *
-   * @param id the lnk id.
+   * @param id the link id.
    * @param model the display model.
    * @param viewType the type this button is part of.
+   * @param selection whether this is a selection action.
    */
-  public AbstractSelectionLink(final String id, final IModel<String> model, final TreeViewType viewType) {
+  public AbstractViewTypeLink(final String id, final IModel<String> model, final TreeViewType viewType, final boolean selection) {
     super(id, model);
     this.viewType = viewType;
+    this.selection = selection;
   }
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = JPPFWebSession.get();
-    TableTreeData data = session.getTableTreeData(viewType);
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     onClick(target, data);
-    data.selectionChanged(data.getSelectionHandler());
+    if (selection) data.selectionChanged(data.getSelectionHandler());
     Page page = target.getPage();
     if (page instanceof TableTreeHolder) target.add(((TableTreeHolder) page).getTableTree());
     if (getParent() != null) target.add(getParent());

@@ -18,15 +18,15 @@
 
 package org.jppf.admin.web.topology.nodethreads;
 
-import org.apache.wicket.markup.html.WebPage;
+import org.jppf.admin.web.AbstractJPPFPage;
 
 /**
- * @author Matej Knopp
  *
+ * @author Laurent Cohen
  */
-public class NodeThreadsPage extends WebPage {
+public class NodeThreadsPage extends AbstractJPPFPage {
   /**
-   *
+   * 
    * @param form .
    */
   public NodeThreadsPage(final NodeThreadsForm form) {

@@ -21,7 +21,7 @@ package org.jppf.admin.web.topology.provisioning;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.AbstractModalForm;
+import org.jppf.admin.web.utils.AbstractModalForm;
 import org.jppf.utils.TypedProperties;
 
 /**

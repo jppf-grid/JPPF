@@ -26,6 +26,7 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
+import org.jppf.admin.web.admin.AdminPage;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -72,7 +73,6 @@ public class LoginForm extends Form<String> {
     add(password = new PasswordTextField(PREFIX + ".password.field", Model.of("")));
     password.setRequired(false);
     add(error = new Label(PREFIX + ".error", Model.of("")) {
-
       @Override
       protected void onComponentTag(final ComponentTag tag) {
         if (hasError) tag.append("style", "margin-top: 15px", ";");
@@ -123,9 +123,10 @@ public class LoginForm extends Form<String> {
    * @param target .
    */
   private void doOK(final AjaxRequestTarget target) {
-    if (AuthenticatedWebSession.get().signIn(getUsername(), getPassword())) {
-      continueToOriginalDestination();
-      setResponsePage(getApplication().getHomePage());
+    AuthenticatedWebSession session = AuthenticatedWebSession.get();
+    if (session.signIn(getUsername(), getPassword())) {
+      //continueToOriginalDestination();
+      setResponsePage(session.getRoles().hasRole(JPPFRoles.ADMIN) ? AdminPage.class  : getApplication().getHomePage());
       hasError = false;
     } else {
       String message = LocalizationUtils.getLocalized(LoginPage.class.getName(), "login.error", Session.get().getLocale());

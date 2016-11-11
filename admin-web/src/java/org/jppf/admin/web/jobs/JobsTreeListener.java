@@ -46,8 +46,10 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
 
   @Override
   public void driverRemoved(final JobMonitoringEvent event) {
-    JobsUtils.removeDriver(treeModel, event.getJobDriver());
-    selectionHandler.unselect(event.getJobDriver().getUuid());
+    JobDriver driver = event.getJobDriver();
+    selectionHandler.unselect(driver.getUuid());
+    for (Job job: driver.getJobs()) selectionHandler.unselect(job.getUuid());
+    JobsUtils.removeDriver(treeModel, driver);
   }
 
   @Override

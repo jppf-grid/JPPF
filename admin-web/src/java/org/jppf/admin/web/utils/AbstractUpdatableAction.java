@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.tabletree;
+package org.jppf.admin.web.utils;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import org.jppf.client.monitoring.jobs.Job;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 /**
- *
+ * Abstract super class for all link actions. Enabled and authorized by default. 
  * @author Laurent Cohen
  */
 public abstract class AbstractUpdatableAction implements UpdatableAction {

@@ -24,6 +24,7 @@ import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.admin.web.jobs.maxnodes.MaxNodesAction;
 import org.jppf.admin.web.jobs.priority.PriorityAction;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.utils.UpdatableAction;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.ui.treetable.*;
 

@@ -16,34 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web;
+package org.jppf.admin.web.admin;
 
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.model.IModel;
+import org.apache.wicket.markup.html.panel.Panel;
 
 /**
- *
+ * 
  * @author Laurent Cohen
  */
-public class ActionButton extends Button {
+public class SSLPanel extends Panel {
   /**
-   * The action to run when clicked.
+   * 
    */
-  private final Runnable action;
-
-  /**
-   *
-   * @param id the id of this button.
-   * @param model this buttons model.
-   * @param action the action to run when clicked.
-   */
-  public ActionButton(final String id, final IModel<String> model, final Runnable action) {
-    super(id, model);
-    this.action = action;
-  }
-
-  @Override
-  public void onSubmit() {
-    if (action != null) action.run();
+  public SSLPanel() {
+    super("admin.ssl");
   }
 }

@@ -25,7 +25,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
-import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.utils.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
 import org.jppf.utils.LoggingUtils;

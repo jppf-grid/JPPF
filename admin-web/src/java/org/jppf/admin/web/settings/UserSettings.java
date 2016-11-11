@@ -18,13 +18,12 @@
 
 package org.jppf.admin.web.settings;
 
-import java.security.MessageDigest;
-
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- *
+ * Persistent user settings. The settings are simple properties, persisted via a persistence handler,
+ * which is an instance of an implementation of {@link SettingsPersistence}.  
  * @author Laurent Cohen
  */
 public class UserSettings {
@@ -45,7 +44,7 @@ public class UserSettings {
    */
   private final TypedProperties properties = new TypedProperties();
   /**
-   * 
+   * The perisstence handler for these settings.
    */
   private final SettingsPersistence persistence = new JPPFFileSettingsPersistence();
 
@@ -60,6 +59,7 @@ public class UserSettings {
   }
 
   /**
+   * Load the settings  with the persistence handler.
    * @return these user settings.
    */
   public UserSettings load() {
@@ -72,7 +72,7 @@ public class UserSettings {
   }
 
   /**
-   *
+   * Save the settings  with the persistence handler.
    */
   public void save() {
     try  {
@@ -83,21 +83,10 @@ public class UserSettings {
   }
 
   /**
-   * 
    * @return the user hash.
    */
   private String getUserHash() {
-    if (userHash == null) {
-      try {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        JPPFBuffer buf = new JPPFBuffer(user);
-        digest.update(buf.buffer, 0, buf.length);
-        byte[] sig = digest.digest();
-        userHash = StringUtils.toHexString(sig);
-      } catch (Exception e) {
-        log.error("error compputing hash for user {} : {}", user, ExceptionUtils.getStackTrace(e));
-      }
-    }
+    if (userHash == null) userHash = CryptoUtils.computeHash(user, "SHA-256");
     return userHash;
   }
 

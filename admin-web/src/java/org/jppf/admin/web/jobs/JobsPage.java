@@ -121,8 +121,8 @@ public class JobsPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new ResumeJobLink());
     actionHandler.addActionLink(toolbar, new MaxNodesLink(toolbar));
     actionHandler.addActionLink(toolbar, new PriorityLink(toolbar));
-    actionHandler.addActionLink(toolbar, new ExpandAllLink(JobsConstants.EXPAND_ALL_ACTION));
-    actionHandler.addActionLink(toolbar, new CollapseAllLink(JobsConstants.COLLAPSE_ALL_ACTION));
+    actionHandler.addActionLink(toolbar, new ExpandAllLink(JobsConstants.EXPAND_ALL_ACTION, viewType));
+    actionHandler.addActionLink(toolbar, new CollapseAllLink(JobsConstants.COLLAPSE_ALL_ACTION, viewType));
   }
 
   /**
