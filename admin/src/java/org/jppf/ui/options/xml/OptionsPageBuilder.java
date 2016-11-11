@@ -28,6 +28,7 @@ import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -270,8 +271,9 @@ public class OptionsPageBuilder {
    * @throws Exception if an error was raised while building the page.
    */
   public List<OptionElement> build(final OptionDescriptor desc) throws Exception {
-    OptionElementFactory f = getFactory();
     List<OptionElement> list = new ArrayList<>();
+    if (desc.debug && !JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED)) return list;
+    OptionElementFactory f = getFactory();
     String type = desc.type;
     if ("page".equalsIgnoreCase(type)) list.add(f.buildPage(desc));
     else if ("SplitPane".equalsIgnoreCase(desc.type)) list.add(f.buildSplitPane(desc));

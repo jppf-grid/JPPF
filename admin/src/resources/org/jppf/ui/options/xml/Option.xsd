@@ -39,6 +39,7 @@
     <xs:attribute name="name"/>
     <xs:attribute name="type"/>
     <xs:attribute name="i18n" use="optional"/>
+    <xs:attribute name="debug" use="optional" default="false"/>
   </xs:complexType>
 
 	<!-- Property with value and name -->

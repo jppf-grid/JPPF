@@ -84,6 +84,10 @@ public class OptionDescriptor extends TypedProperties
    * Mouse listener.
    */
   public ListenerDescriptor mouseListener = null;
+  /**
+   * Component shown only When debug attribute is {@code true}.
+   */
+  public boolean debug = false;
 
   /**
    * Descriptor for listeners set on option elements.

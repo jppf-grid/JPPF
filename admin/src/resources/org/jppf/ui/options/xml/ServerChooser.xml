@@ -27,6 +27,18 @@
 
   <child name="sep1" type="ToolbarSeparator"/>
 
+  <!-- only shown when "jppf.debug.enabled = true" in the configuration -->
+  <child name="reset.client" type="Button" debug="true">
+    <property name="icon" value="/org/jppf/ui/resources/restart.png"/>
+    <property name="tooltip" value="Reset the JPPF client"/>
+    <listener type="script">
+      <script language="groovy">
+        JPPFConfiguration.reset()
+        JPPFAdminConsole.getJPPFClient().reset()
+      </script>
+    </listener>
+  </child>
+  
   <child name="settings.import" type="FileChooser">
     <property name="icon" value="/org/jppf/ui/resources/import.png"/>
     <property name="tooltip" value="Import UI settings from file"/>
