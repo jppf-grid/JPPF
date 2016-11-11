@@ -452,9 +452,28 @@ public class TypedProperties extends Properties {
    * @return a representation of this object as a string.
    */
   public String asString() {
-    StringBuilder sb = new StringBuilder();
-    for (String key: stringPropertyNames()) sb.append(key).append(" = ").append(getProperty(key)).append('\n');
-    return sb.toString();
+    String result = "";
+    try (Writer writer = new StringWriter()) {
+      store(writer, null);
+      result = writer.toString();
+    } catch(Exception e) {
+      return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage()); 
+    }
+    return result;
+  }
+
+  /**
+   * Populat this propertis object from a string source.
+   * @param source the source to read the properties from.
+   * @return this properties object.
+   */
+  public TypedProperties fromString(final String source) {
+    clear();
+    try (Reader reader = new StringReader(source)) {
+      loadAndResolve(reader);
+    } catch (@SuppressWarnings("unused") Exception e) {
+    }
+    return this;
   }
 
   /**

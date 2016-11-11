@@ -118,6 +118,31 @@ public final class JPPFConfiguration {
   }
 
   /**
+   * Reset the JPPF configuration with the specified properties.
+   * @param newConfig the properties to use as the new configuration.
+   * @since 6.0
+   */
+  public static void reset(final TypedProperties newConfig) {
+    SSLHelper.resetConfig();
+    loadProperties(newConfig);
+    JPPFSerialization.Factory.reset();
+  }
+
+  /**
+   * Load the JPPF configuration properties from a file.
+   * @param newConfig the properties to use as the new configuration.
+   * @since 6.0
+   */
+  private static void loadProperties(final TypedProperties newConfig) {
+    props = new TypedProperties();
+    try (Reader reader = new StringReader(newConfig.asString())) {
+      props.loadAndResolve(reader);
+    } catch(Exception e) {
+      log.error("error reading the configuration", e);
+    }
+  }
+
+  /**
    * Load the JPPF configuration properties from a file.
    */
   private static void loadProperties() {
@@ -126,11 +151,6 @@ public final class JPPFConfiguration {
       if (reader != null) props.loadAndResolve(reader);
     } catch(Exception e) {
       log.error("error reading the configuration", e);
-    }
-    if (log.isTraceEnabled()) {
-      StringBuilder sb = new StringBuilder("predefined configuration properties:");
-      for (JPPFProperty<?> prop: JPPFProperties.allProperties()) sb.append('\n').append(prop.toString());
-      log.trace(sb.toString());
     }
   }
 
