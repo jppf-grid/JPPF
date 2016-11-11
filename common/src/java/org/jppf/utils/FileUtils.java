@@ -551,4 +551,16 @@ public final class FileUtils {
     }
     return baseDir;
   }
+
+  /**
+   * Decompose a file name into name + extension.
+   * @param imageName the file name to convert.
+   * @return a Pair of name, extension.
+   */
+  public static Pair<String, String> getFileNameAndExtension(final String imageName) {
+    if (imageName == null) return null;
+    int idx = imageName.lastIndexOf('.');
+    if (idx <= 0) return new Pair<>(imageName, null);
+    return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
+  }
 }

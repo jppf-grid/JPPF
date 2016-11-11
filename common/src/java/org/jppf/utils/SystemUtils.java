@@ -438,7 +438,7 @@ public final class SystemUtils {
   }
 
   /**
-   *
+   * Determine whether the specified value is one of the possibles.
    * @param <T> the type of values to check.
    * @param value the value to compare.
    * @param possibles the possible values to compare with
