@@ -191,14 +191,15 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
    * @param dump the thread dump to print.
    * @param title title given to the dump.
    * @param includeBody whether to add the html and body tags.
+   * @param fontSize the size of the font used to write the thread dump.
    * @return the thread dump printed to an HTML string, or null if it could not be printed.
    */
-  public static String printToString(final ThreadDump dump, final String title, final boolean includeBody) {
+  public static String printToString(final ThreadDump dump, final String title, final boolean includeBody, final int fontSize) {
     String result = null;
     HTMLThreadDumpWriter writer = null;
     try {
       StringWriter sw = new StringWriter();
-      writer = new HTMLThreadDumpWriter(sw, title, 12, includeBody);
+      writer = new HTMLThreadDumpWriter(sw, title, fontSize, includeBody);
       writer.printThreadDump(dump);
       result = sw.toString();
     } finally {

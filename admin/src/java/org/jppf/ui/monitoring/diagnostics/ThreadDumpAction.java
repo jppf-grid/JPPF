@@ -137,7 +137,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
         if (info == null) html.append("<p><b>No thread dump was generated</b>");
         if (info == null) html.append(HealthUtils.localizeThreadDumpInfo("threaddump.info_not_found", Locale.getDefault()));
         else {
-          html.append(HTMLThreadDumpWriter.printToString(info, title, true));
+          html.append(HTMLThreadDumpWriter.printToString(info, title, true, 12));
           toClipboard.append(TextThreadDumpWriter.printToString(info, title));
         }
       } catch(Exception e) {
