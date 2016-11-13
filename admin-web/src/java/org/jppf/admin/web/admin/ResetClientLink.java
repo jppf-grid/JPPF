@@ -20,9 +20,7 @@ package org.jppf.admin.web.admin;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebConsoleApplication;
-import org.jppf.admin.web.utils.AjaxButtonWithIcon;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -30,7 +28,7 @@ import org.slf4j.*;
  * This class represents the GC button and its associated action in the JVM Health view.
  * @author Laurent Cohen
  */
-public class ResetClientLink extends AjaxButtonWithIcon {
+public class ResetClientLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
@@ -42,16 +40,17 @@ public class ResetClientLink extends AjaxButtonWithIcon {
 
   /**
    * Initialize.
+   * @param type the type of config panel to add this button to.
    */
-  public ResetClientLink() {
-    super(AdminConfigConstants.RESET_CLIENT_ACTION, Model.of("Reset client"), "restart.png");
+  public ResetClientLink(final PanelType type) {
+    super(type, AdminConfigConstants.RESET_CLIENT_ACTION, "restart.png");
   }
 
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on admin.config.reset_client");
+    if (debugEnabled) log.debug("clicked on {}.reset_client", type.getPrefix());
     JPPFWebConsoleApplication app = JPPFWebConsoleApplication.get();
-    TypedProperties config = app.getAdminData().getConfig();
+    TypedProperties config = app.getConfig(PanelType.CLIENT).getProperties();
     app.getTopologyManager().getJPPFClient().reset(config);
   }
 }

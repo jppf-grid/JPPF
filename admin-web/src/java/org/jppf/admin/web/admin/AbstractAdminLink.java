@@ -18,39 +18,46 @@
 
 package org.jppf.admin.web.admin;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.*;
-import org.jppf.admin.web.JPPFWebConsoleApplication;
-import org.jppf.utils.*;
+import org.jppf.admin.web.utils.AjaxButtonWithIcon;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
  * This class represents the save configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
-public class SaveLink extends AbstractAdminLink {
+public abstract class AbstractAdminLink extends AjaxButtonWithIcon {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(SaveLink.class);
+  static Logger log = LoggerFactory.getLogger(AbstractAdminLink.class);
   /**
    * Determines whether debug log statements are enabled.
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * The type of config panel to add this button to.
+   */
+  protected final PanelType type;
 
   /**
    * Initialize.
    * @param type the type of config panel to add this button to.
+   * @param id the id assigned to this action button.
+   * @param imageName the name of the icon associated with this button..
    */
-  public SaveLink(final PanelType type) {
-    super(type, AdminConfigConstants.SAVE_ACTION, "save.png");
+  public AbstractAdminLink(final PanelType type, final String id, final String imageName) {
+    super(computeId(type, id), imageName);
+    this.type = type;
   }
 
-  @Override
-  public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on {}.save", type.getPrefix());
-    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
-    String configString = area.getModelObject();
-    JPPFWebConsoleApplication.get().getConfig(type).setProperties(new TypedProperties().fromString(configString)).save();
+  /**
+   * Compute an id given the config panel type and id suffix.
+   * @param type the type of config panel.
+   * @param id the given id.
+   * @return a Wicket-compatible id.
+   */
+  private static String computeId(final PanelType type, final String id) {
+    return (id.startsWith(type.getPrefix())) ? id : type.getPrefix() + id;
   }
 }

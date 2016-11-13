@@ -18,6 +18,8 @@
 
 package org.jppf.admin.web.admin;
 
+import java.util.*;
+
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.jppf.admin.web.TemplatePage;
@@ -42,30 +44,40 @@ public class AdminPage extends TemplatePage {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The config panel.
+   * 
    */
-  private final ConfigPanel configPanel;
+  private final Map<PanelType, AbstractConfigPanel> panelMap = new EnumMap<>(PanelType.class);
 
   /**
    * 
    */
   public AdminPage() {
     add(new JQueryUIBehavior("#tabs", "tabs"));
-    add(configPanel = new ConfigPanel());
-    add(new DiscoveryPanel());
-    add(new SSLPanel());
+    add(PanelType.CLIENT, new ClientConfigPanel());
+    //add(new DiscoveryConfigPanel());
+    add(PanelType.SSL, new SSLConfigPanel());
     if (adminLink != null) {
       if (debugEnabled) log.debug("setting style on the link");
-      //link.add(new AttributeModifier("class", "navlink2_current"));
       adminLink.add(new AttributeModifier("style", "color: #6D78B6; background-color: #C5D0F0"));
       adminLink.setEnabled(false);
     }
   }
 
   /**
+   * 
+   * @param type the trype of panel to add.
+   * @param panel the panel to add.
+   */
+  private void add(final PanelType type, final AbstractConfigPanel panel) {
+    panelMap.put(type, panel);
+    add(panel);
+  }
+
+  /**
+   * @param type the type of panel to get.
    * @return the config panel.
    */
-  public ConfigPanel getConfigPanel() {
-    return configPanel;
+  public AbstractConfigPanel getConfigPanel(final PanelType type) {
+    return panelMap.get(type);
   }
 }

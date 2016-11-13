@@ -24,7 +24,6 @@ import java.util.*;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.utils.AjaxButtonWithIcon;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -32,7 +31,7 @@ import org.slf4j.*;
  * This class represents the save configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
-public class SortLink extends AjaxButtonWithIcon {
+public class SortLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
@@ -48,18 +47,18 @@ public class SortLink extends AjaxButtonWithIcon {
 
   /**
    * Initialize.
-   * @param id the id assigned to this action button.
+   * @param type the type of config panel to add this button to.
    * @param ascending whether to perform a sort in ascending ({@code true}) or descending ({@code false}) order.
    */
-  public SortLink(final String id, final boolean ascending) {
-    super(id, ascending ? "sort-ascending.png" : "sort-descending.png");
+  public SortLink(final PanelType type, final boolean ascending) {
+    super(type, ascending ? AdminConfigConstants.SORT_ASC_ACTION : AdminConfigConstants.SORT_DESC_ACTION, ascending ? "sort-ascending.png" : "sort-descending.png");
     this.ascending = ascending;
   }
 
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on admin.config.save");
-    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel().getConfig();
+    if (debugEnabled) log.debug("clicked on {}.sort[{}]", type.getPrefix(), ((ascending ? "a" : "de") + "scending"));
+    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
     String configString = area.getModelObject();
     try {
       List<String> list = FileUtils.textFileAsLines(new StringReader(configString));

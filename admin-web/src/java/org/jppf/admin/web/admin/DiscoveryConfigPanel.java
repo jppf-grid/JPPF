@@ -24,11 +24,11 @@ import org.apache.wicket.markup.html.panel.Panel;
  * 
  * @author Laurent Cohen
  */
-public class DiscoveryPanel extends Panel {
+public class DiscoveryConfigPanel extends Panel {
   /**
    * 
    */
-  public DiscoveryPanel() {
+  public DiscoveryConfigPanel() {
     super("admin.discovery");
   }
 }

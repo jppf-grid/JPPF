@@ -16,19 +16,32 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.admin;
+package org.jppf.utils.configuration;
 
-import org.apache.wicket.markup.html.panel.Panel;
+import java.io.*;
+import java.util.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class SSLPanel extends Panel {
+public class PropertiesHelper {
   /**
-   * 
+   * Store the specified properties into the specified writer.
+   * @param props the properties to store.
+   * @param writer the writer to store with.
+   * @throws IOException if any error occurs.
    */
-  public SSLPanel() {
-    super("admin.ssl");
+  public static void store(final Properties props, final Writer writer) throws IOException {
+    Set<String> keys = new TreeSet<>(props.stringPropertyNames());
+    for (String k: keys) {
+      Object v = props.get(k);
+      if (v instanceof String) {
+        writer.write(k);
+        writer.write(" = ");
+        writer.write((String) v);
+        writer.write('\n');
+      }
+    }
   }
 }

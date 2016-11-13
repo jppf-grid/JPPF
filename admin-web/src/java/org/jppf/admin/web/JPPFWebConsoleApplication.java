@@ -19,18 +19,20 @@
 package org.jppf.admin.web;
 
 import java.io.Serializable;
+import java.util.*;
 
 import org.apache.wicket.*;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
 import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
-import org.jppf.admin.web.admin.AdminData;
+import org.jppf.admin.web.admin.*;
 import org.jppf.admin.web.auth.LoginPage;
 import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 import org.wicketstuff.wicket.servlet3.auth.*;
 
@@ -60,9 +62,9 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   private transient JobMonitor jobMonitor;
   /**
-   * COntains all asministrative settings.
+   * Mapping of configurations to their type.
    */
-  private final AdminData adminData = new AdminData();
+  private final Map<PanelType, ConfigurationHandler> configMap = new EnumMap<>(PanelType.class);
 
   /**
    * Default constructor.
@@ -70,6 +72,21 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   public JPPFWebConsoleApplication() {
     if (debugEnabled) log.debug("in JPPFWebConsoleApplication<init>()");
     setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
+    configMap.put(PanelType.CLIENT, new ConfigurationHandler(PanelType.CLIENT) {
+      @Override
+      public synchronized ConfigurationHandler load() {
+        ConfigurationHandler handler = super.load();
+        getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
+        return handler;
+      }
+
+      @Override
+      public synchronized ConfigurationHandler save() {
+        getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
+        return super.save();
+      }
+    });
+    configMap.put(PanelType.SSL, new ConfigurationHandler(PanelType.SSL));
   }
 
   @Override
@@ -82,7 +99,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     super.init();
     getPageSettings().setVersionPagesByDefault(false);
     this.setPageManagerProvider(new MyPageManagerProvider(this));
-    JPPFConfiguration.reset(adminData.getConfig());
+    JPPFConfiguration.reset(getConfig(PanelType.CLIENT).getProperties());
     this.topologyManager = new TopologyManager();
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
   }
@@ -129,10 +146,11 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   }
 
   /**
-   * @return the adminstrative settings.
+   * @param type the type of config to get.
+   * @return the configuration handler for the specified config type.
    */
-  public AdminData getAdminData() {
-    return adminData;
+  public ConfigurationHandler getConfig(final PanelType type) {
+    return (type == null) ? null : configMap.get(type);
   }
 
   /**
@@ -142,44 +160,29 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     /**
      * @param application the wicket application.
      */
-    private MyPageManagerProvider(final Application application) {
-      super(application);
-    }
+    private MyPageManagerProvider(final Application application) { super(application); }
 
-    @Override
-    protected IDataStore newDataStore() {
+    @Override protected IDataStore newDataStore() {
       // keep everything in memory
       return new HttpSessionDataStore(new DefaultPageManagerContext(), new IDataStoreEvictionStrategy() {
-        @Override
-        public void evict(final PageTable pageTable) { }
+        @Override public void evict(final PageTable pageTable) { }
       });
     }
 
-    @Override
-    protected IPageStore newPageStore(final IDataStore dataStore) {
-      return new NullPageStore();
-    }
+    @Override protected IPageStore newPageStore(final IDataStore dataStore) { return new NullPageStore(); }
   }
 
   /**
    * Disables serialization.
    */
   private static class NullPageStore implements IPageStore {
-    @Override
-    public void destroy() { }
-    @Override
-    public IManageablePage getPage(final String sessionId, final int pageId) { return null; }
-    @Override
-    public void removePage(final String sessionId, final int pageId) { }
-    @Override
-    public void storePage(final String sessionId, final IManageablePage page) { }
-    @Override
-    public void unbind(final String sessionId) { }
-    @Override
-    public Serializable prepareForSerialization(final String sessionId, final Serializable page) { return null; }
-    @Override
-    public Object restoreAfterSerialization(final Serializable serializable) { return null; }
-    @Override
-    public IManageablePage convertToPage(final Object page) { return null; }
+    @Override public void destroy() { }
+    @Override public IManageablePage getPage(final String sessionId, final int pageId) { return null; }
+    @Override public void removePage(final String sessionId, final int pageId) { }
+    @Override public void storePage(final String sessionId, final IManageablePage page) { }
+    @Override public void unbind(final String sessionId) { }
+    @Override public Serializable prepareForSerialization(final String sessionId, final Serializable page) { return null; }
+    @Override public Object restoreAfterSerialization(final Serializable serializable) { return null; }
+    @Override public IManageablePage convertToPage(final Object page) { return null; }
   }
 }

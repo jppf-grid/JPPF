@@ -25,8 +25,7 @@ import java.util.*;
 import org.jppf.utils.configuration.*;
 
 /**
- * Extension of the <code>java.util.Properties</code> class to handle the conversion of
- * string values to other types.
+ * Extension of the <code>java.util.Properties</code> class to handle the conversion of string values to other types.
  * @author Laurent Cohen
  */
 public class TypedProperties extends Properties {
@@ -49,9 +48,7 @@ public class TypedProperties extends Properties {
   public TypedProperties(final Map<Object, Object> map) {
     if (map != null) {
       for (Map.Entry<Object, Object> entry: map.entrySet()) {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-          setProperty((String) entry.getKey(), (String) entry.getValue());
-        }
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) setProperty((String) entry.getKey(), (String) entry.getValue());
       }
     }
   }
@@ -111,8 +108,7 @@ public class TypedProperties extends Properties {
       } catch(@SuppressWarnings("unused") NumberFormatException e) {
         try {
           intVal = Double.valueOf(val).intValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
-        }
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
       }
     }
     return intVal;
@@ -125,8 +121,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setInt(final String key, final int value) {
-    setProperty(key, Integer.toString(value));
-    return this;
+    return setString(key, Integer.toString(value));
   }
 
   /**
@@ -154,8 +149,7 @@ public class TypedProperties extends Properties {
       } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
         try {
           longVal = Double.valueOf(val).longValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore2) {
-        }
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore2) { }
       }
     }
     return longVal;
@@ -168,8 +162,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setLong(final String key, final long value) {
-    setProperty(key, Long.toString(value));
-    return this;
+    return setString(key, Long.toString(value));
   }
 
   /**
@@ -193,8 +186,7 @@ public class TypedProperties extends Properties {
     if (val != null) {
       try {
         floatVal = Float.parseFloat(val.trim());
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
-      }
+      } catch(@SuppressWarnings("unused") NumberFormatException e) { }
     }
     return floatVal;
   }
@@ -206,8 +198,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setFloat(final String key, final float value) {
-    setProperty(key, Float.toString(value));
-    return this;
+    return setString(key, Float.toString(value));
   }
 
   /**
@@ -232,8 +223,7 @@ public class TypedProperties extends Properties {
     if (val != null) {
       try {
         doubleVal = Double.parseDouble(val.trim());
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
-      }
+      } catch(@SuppressWarnings("unused") NumberFormatException e) { }
     }
     return doubleVal;
   }
@@ -245,8 +235,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setDouble(final String key, final double value) {
-    setProperty(key, Double.toString(value));
-    return this;
+    return setString(key, Double.toString(value));
   }
 
   /**
@@ -279,8 +268,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setBoolean(final String key, final boolean value) {
-    setProperty(key, Boolean.toString(value));
-    return this;
+    return setString(key, Boolean.toString(value));
   }
 
   /**
@@ -314,8 +302,7 @@ public class TypedProperties extends Properties {
    * @return this {@code TypedProperties} object.
    */
   public TypedProperties setChar(final String key, final char value) {
-    setProperty(key, Character.toString(value));
-    return this;
+    return setString(key, Character.toString(value));
   }
 
   /**
@@ -457,7 +444,7 @@ public class TypedProperties extends Properties {
       store(writer, null);
       result = writer.toString();
     } catch(Exception e) {
-      return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage()); 
+      return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage());
     }
     return result;
   }
@@ -471,15 +458,14 @@ public class TypedProperties extends Properties {
     clear();
     try (Reader reader = new StringReader(source)) {
       loadAndResolve(reader);
-    } catch (@SuppressWarnings("unused") Exception e) {
-    }
+    } catch (@SuppressWarnings("unused") Exception e) { }
     return this;
   }
 
   /**
    * Extract the properties that pass the specified filter.
-   * @param filter the filter to use, if <code>null</code> then all properties are retruned.
-   * @return a new <code>TypedProperties</code> object containing only the properties matching the filter.
+   * @param filter the filter to use, if {@code null} then all properties are retruned.
+   * @return a new {@code TypedProperties} object containing only the properties matching the filter.
    */
   public TypedProperties filter(final Filter filter) {
     TypedProperties result = new TypedProperties();
@@ -491,22 +477,21 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * A filter for <code>TypedProperties</code> objects.
+   * A filter for {@code TypedProperties} objects.
    */
   public interface Filter {
     /**
      * Determine whether this filter accepts a property with the specirfied name and value.
      * @param name the name of the property.
      * @param value the value of the property.
-     * @return <code>true</code> if the property is accepted, <code>false</code> otherwise.
+     * @return {@code true} if the property is accepted, {@code false} otherwise.
      */
     boolean accepts(String name, String value);
   }
 
   /**
    * Load the properties from the specified reader.
-   * The properties are first loaded, then includes are resolved, variable substitutions are resolved,
-   * and finally scripted values are computed.
+   * The properties are first loaded, then includes are resolved, variable substitutions are resolved, and finally scripted values are computed.
    * @param reader the reader to read the properties from.
    * @return this {@code TypedProperties} object.
    * @throws IOException if any error occurs.
@@ -526,18 +511,11 @@ public class TypedProperties extends Properties {
    * @since 5.2
    */
   public <T> T get(final JPPFProperty<T> property) {
-    String value = null;
-    if (this.containsKey(property.getName())) {
-      value = getProperty(property.getName());
-      return property.valueOf(value);
-    }
+    if (this.containsKey(property.getName())) return property.valueOf(getProperty(property.getName()));
     String[] aliases = property.getAliases();
     if ((aliases != null) && (aliases.length > 0)) {
       for (String alias: aliases) {
-        if (this.containsKey(alias)) {
-          value = getProperty(alias);
-          return property.valueOf(value);
-        }
+        if (this.containsKey(alias)) return property.valueOf(getProperty(alias));
       }
     }
     return property.getDefaultValue();
@@ -566,5 +544,10 @@ public class TypedProperties extends Properties {
   @SuppressWarnings("unchecked")
   public <T> T remove(final JPPFProperty<T> property) {
     return (T) remove(property.getName());
+  }
+
+  @Override
+  public void store(final Writer writer, final String comments) throws IOException {
+    PropertiesHelper.store(this, writer);
   }
 }

@@ -18,6 +18,8 @@
 
 package org.jppf.admin.web.admin;
 
+import java.io.Reader;
+
 import org.jppf.admin.web.settings.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -26,19 +28,15 @@ import org.slf4j.*;
  * This class holds the administrative data, such as JPPF client config, SSL settings and server discovery settings.
  * @author Laurent Cohen
  */
-public class AdminData {
+public class ConfigurationHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AdminData.class);
+  private static Logger log = LoggerFactory.getLogger(ConfigurationHandler.class);
   /**
-   * The name from which the config properties file is derived.
+   * A hash of the name assigned to this configuration.
    */
-  public static final String CONFIG_NAME = "jppf_client_config";
-  /**
-   * The name from which the config properties file is derived.
-   */
-  private static final String CONFIG_NAME_HASH = CryptoUtils.computeHash(CONFIG_NAME, "SHA-256");
+  private final PanelType type;
   /**
    * The persistence manager.
    */
@@ -49,16 +47,17 @@ public class AdminData {
   private TypedProperties config;
 
   /**
-   * 
+   * @param type the type of this config.
    */
-  public AdminData() {
-    loadConfig();
+  public ConfigurationHandler(final PanelType type) {
+    this.type = type;
+    load();
   }
 
   /**
    * @return the JPPF client configuration.
    */
-  public synchronized TypedProperties getConfig() {
+  public synchronized TypedProperties getProperties() {
     return config;
   }
 
@@ -67,20 +66,25 @@ public class AdminData {
    * @param config the onifguration to set.
    * @return {@code this}, for method call chaining.
    */
-  public synchronized AdminData setConfig(final TypedProperties config) {
+  public synchronized ConfigurationHandler setProperties(final TypedProperties config) {
     this.config = config;
     return this;
   }
 
   /**
-   * Load the client configuration.
+   * Load the configuration.
    * @return {@code this}, for method call chaining.
    */
-  public synchronized AdminData loadConfig() {
+  public synchronized ConfigurationHandler load() {
     TypedProperties props = new TypedProperties();
     try {
-      persistence.load(CONFIG_NAME_HASH, props);
-      config = (props.isEmpty()) ? JPPFConfiguration.getProperties() : props;
+      persistence.load(type.getHash(), props);
+      if (props.isEmpty()) {
+        try (Reader reader = FileUtils.getFileReader(type.getDefaultPath())) {
+          props.load(reader);
+        }
+      }
+      config = props;
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -88,12 +92,12 @@ public class AdminData {
   }
 
   /**
-   * Save the client configuration.
+   * Save the configuration.
    * @return {@code this}, for method call chaining.
    */
-  public synchronized AdminData saveConfig() {
+  public synchronized ConfigurationHandler save() {
     try {
-      persistence.save(CONFIG_NAME_HASH, config);
+      persistence.save(type.getHash(), config);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

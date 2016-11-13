@@ -22,7 +22,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebConsoleApplication;
-import org.jppf.admin.web.utils.AjaxButtonWithIcon;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -30,7 +29,7 @@ import org.slf4j.*;
  * This class represents the revert configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
-public class RevertLink extends AjaxButtonWithIcon {
+public class RevertLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
@@ -42,16 +41,17 @@ public class RevertLink extends AjaxButtonWithIcon {
 
   /**
    * Initialize.
+   * @param type the type of config panel to add this button to.
    */
-  public RevertLink() {
-    super(AdminConfigConstants.REVERT_ACTION, Model.of("Revert"), "revert.png");
+  public RevertLink(final PanelType type) {
+    super(type, AdminConfigConstants.REVERT_ACTION, "revert.png");
   }
 
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on admin.config.revert");
-    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel().getConfig();
-    area.setModel(Model.of(JPPFWebConsoleApplication.get().getAdminData().getConfig().asString()));
+    if (debugEnabled) log.debug("clicked on {}.revert", type.getPrefix());
+    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
+    area.setModel(Model.of(JPPFWebConsoleApplication.get().getConfig(type).getProperties().asString()));
     target.add(form);
   }
 }

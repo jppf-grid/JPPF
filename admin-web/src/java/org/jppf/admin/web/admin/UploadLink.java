@@ -23,7 +23,6 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.form.upload.*;
 import org.apache.wicket.model.Model;
-import org.jppf.admin.web.utils.AjaxButtonWithIcon;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -31,7 +30,7 @@ import org.slf4j.*;
  * This class represents the upload configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
-public class UploadLink extends AjaxButtonWithIcon {
+public class UploadLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
@@ -43,17 +42,17 @@ public class UploadLink extends AjaxButtonWithIcon {
 
   /**
    * Initialize.
+   * @param type the type of config panel to add this button to.
    */
-  public UploadLink() {
-    super(AdminConfigConstants.UPLOAD_ACTION, Model.of("Upload"), "upload.png");
-    //setVisible(false);
+  public UploadLink(final PanelType type) {
+    super(type, AdminConfigConstants.UPLOAD_ACTION, "upload.png");
     setEnabled(true);
   }
 
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on admin.config.upload");
-    ConfigPanel panel = ((AdminPage) target.getPage()).getConfigPanel();
+    if (debugEnabled) log.debug("clicked on {}.upload", type.getPrefix());
+    AbstractConfigPanel panel = ((AdminPage) target.getPage()).getConfigPanel(type);
     FileUploadField fileUploadField = panel.getFileUploadField();
     FileUpload fileUpload = fileUploadField.getFileUpload();
     try {

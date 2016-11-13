@@ -29,38 +29,44 @@ import org.jppf.admin.web.*;
  * The JPPF client configuration panel of the admin page.
  * @author Laurent Cohen
  */
-public class ConfigPanel extends Panel {
+public class AbstractConfigPanel extends Panel {
+  /**
+   * The form associated with the panel.
+   */
+  protected final Form<String> form;
   /**
    * The config editor component.
    */
-  private final TextArea<String> config;
+  protected final TextArea<String> config;
   /**
    * The field that handles the file to upload.
    */
-  private final FileUploadField fileUploadField;
+  protected final FileUploadField fileUploadField;
   /**
    * Reference to the 'upload' image. 
    */
-  private final ContextImage cimg;
+  protected final ContextImage cimg;
+  /**
+   * The type of config panel to add this button to.
+   */
+  protected final PanelType type;
 
   /**
-   * 
+   * @param type the type of config panel to add this button to.
    */
-  public ConfigPanel() {
-    super("admin.config");
-    Form<String> form = new Form<>("admin.config.form");
-    add(form);
-    form.add(new SortLink(AdminConfigConstants.SORT_ASC_ACTION, true));
-    form.add(new SortLink(AdminConfigConstants.SORT_DESC_ACTION, false));
-    form.add(new SaveLink());
-    form.add(new RevertLink());
-    form.add(new ResetClientLink());
-    form.add(new DownloadLink());
-    form.add(new UploadLink());
-    form.add(fileUploadField = new FileUploadField("admin.config.upload.browse"));
-    cimg = new ContextImage("admin.config.upload.img", "images/toolbar/upload.png");
-    form.add(cimg);
-    form.add(config = new TextArea<>("admin.config.properties.field", Model.of(JPPFWebConsoleApplication.get().getAdminData().getConfig().asString())));
+  public AbstractConfigPanel(final PanelType type) {
+    super(type.getPrefix());
+    this.type = type;
+    add(form = new Form<>(type.getPrefix() + ".form"));
+    form.add(new SortLink(type, true));
+    form.add(new SortLink(type, false));
+    form.add(new SaveLink(type));
+    form.add(new RevertLink(type));
+    form.add(new DownloadLink(type));
+    form.add(new UploadLink(type));
+    form.add(fileUploadField = new FileUploadField(type.getPrefix() + ".upload.browse"));
+    form.add(cimg = new ContextImage(type.getPrefix() + ".upload.img", "images/toolbar/upload.png"));
+    form.add(config = new TextArea<>(type.getPrefix() + ".properties.field", Model.of(JPPFWebConsoleApplication.get().getConfig(type).getProperties().asString())));
   }
 
   /**
@@ -80,7 +86,6 @@ public class ConfigPanel extends Panel {
   @Override
   protected void onInitialize() {
     super.onInitialize();
-    //((AbstractJPPFPage) getPage()).setTooltip(fileUploadField);
     ((AbstractJPPFPage) getPage()).setTooltip(cimg);
   }
 }

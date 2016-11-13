@@ -42,8 +42,8 @@ public class JPPFFileSettingsPersistence implements SettingsPersistence {
     File file = new File(FileUtils.getJPPFTempDir(), userHash + ".settings");
     if (debugEnabled) log.debug("loading settings from file {}", file);
     if (file.exists()) {
-      try (Reader is = new BufferedReader(new FileReader(file))) {
-        settings.loadAndResolve(is);
+      try (Reader reader = new BufferedReader(new FileReader(file))) {
+        settings.loadAndResolve(reader);
       }
     }
   }
@@ -51,8 +51,8 @@ public class JPPFFileSettingsPersistence implements SettingsPersistence {
   @Override
   public void save(final String userHash, final TypedProperties settings) throws Exception {
     File file = new File(FileUtils.getJPPFTempDir(), userHash + ".settings");
-    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-      settings.store(os, null);
+    try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+      settings.store(writer, null);
     }
   }
 }

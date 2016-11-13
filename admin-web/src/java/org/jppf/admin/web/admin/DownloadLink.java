@@ -20,9 +20,8 @@ package org.jppf.admin.web.admin;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.*;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.util.resource.*;
-import org.jppf.admin.web.utils.*;
+import org.jppf.admin.web.utils.AJAXDownload;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -30,7 +29,7 @@ import org.slf4j.*;
  * This class represents the download configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
-public class DownloadLink extends AjaxButtonWithIcon {
+public class DownloadLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
@@ -46,15 +45,16 @@ public class DownloadLink extends AjaxButtonWithIcon {
 
   /**
    * Initialize.
+   * @param type the type of config panel to add this button to.
    */
-  public DownloadLink() {
-    super(AdminConfigConstants.DOWNLOAD_ACTION, Model.of("Save"), "download.png");
+  public DownloadLink(final PanelType type) {
+    super(type, AdminConfigConstants.DOWNLOAD_ACTION, "download.png");
     add(configDownload = new ConfigDownload());
   }
 
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-    if (debugEnabled) log.debug("clicked on admin.config.download");
+    if (debugEnabled) log.debug("clicked on {}.download", type.getPrefix());
     configDownload.initiate(target);
   }
 
@@ -64,12 +64,12 @@ public class DownloadLink extends AjaxButtonWithIcon {
   private class ConfigDownload extends AJAXDownload {
     @Override
     protected String getFileName() {
-      return "jppf-admin.properties";
+      return type == PanelType.CLIENT ? "jppf-admin.properties" : "jppf-ssl.properties";
     }
 
     @Override
     protected IResourceStream getResourceStream() {
-      TextArea<String> area = ((AdminPage) getPage()).getConfigPanel().getConfig();
+      TextArea<String> area = ((AdminPage) getPage()).getConfigPanel(type).getConfig();
       String configString = area.getModelObject();
       return new StringResourceStream(configString, "text/plain");
     }

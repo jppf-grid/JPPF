@@ -19,36 +19,37 @@
 package org.jppf.admin.web.admin;
 
 /**
- * 
+ * The action constants defined in this class need to be appended to a config panel's prefix name,
+ * as defined in {@link PanelType}'s {@link PanelType#getPrefix() getPrefix()} method.
  * @author Laurent Cohen
  */
 public class AdminConfigConstants {
   /**
    * Save edit config as current config action id.
    */
-  public static String SAVE_ACTION = "admin.config.save";
+  public static String SAVE_ACTION = ".save";
   /**
    * Revert to current config action id.
    */
-  public static String REVERT_ACTION = "admin.config.revert";
+  public static String REVERT_ACTION = ".revert";
   /**
    * Save the new config as current and reset the client action id.
    */
-  public static String RESET_CLIENT_ACTION = "admin.config.reset_client";
+  public static String RESET_CLIENT_ACTION = ".reset_client";
   /**
    * Download the current config to file action id.
    */
-  public static String DOWNLOAD_ACTION = "admin.config.download";
+  public static String DOWNLOAD_ACTION = ".download";
   /**
    * Upload the current config from file action id.
    */
-  public static String UPLOAD_ACTION = "admin.config.upload";
+  public static String UPLOAD_ACTION = ".upload";
   /**
    * Sort in ascending order action id.
    */
-  public static String SORT_ASC_ACTION = "admin.config.sort_asc";
+  public static String SORT_ASC_ACTION = ".sort_asc";
   /**
    * Sort in ascending order action id.
    */
-  public static String SORT_DESC_ACTION = "admin.config.sort_desc";
+  public static String SORT_DESC_ACTION = ".sort_desc";
 }

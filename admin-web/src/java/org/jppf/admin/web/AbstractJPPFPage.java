@@ -71,4 +71,10 @@ public class AbstractJPPFPage extends WebPage {
     comp.add(new AttributeModifier("title", LocalizationUtils.getLocalized(base, key, JPPFWebSession.get().getLocale())));
     return comp;
   }
+
+  @Override
+  protected void onConfigure() {
+    super.onConfigure();
+    if (!JPPFWebSession.get().isSignedIn()) JPPFWebConsoleApplication.get().restartResponseAtSignInPage();
+  }
 }
