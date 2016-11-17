@@ -62,30 +62,52 @@ public abstract class AbstractModalForm extends Form<String> {
    * @param okAction the ok action.
    */
   public AbstractModalForm(final String prefix, final ModalWindow modal, final Runnable okAction) {
-    super(prefix + ".form");
-    this.prefix = prefix;
-    this.locale = JPPFWebSession.get().getLocale();
-    createFields();
-    AjaxButton okButton = new AjaxButton(prefix + ".ok") {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on {}.ok", AbstractModalForm.this.prefix);
-        if (okAction != null) okAction.run();
-        saveSettings();
-        modal.close(target);
-      }
-    };
-    add(okButton);
-    setDefaultButton(okButton);
-    add(new AjaxButton(prefix + ".cancel") {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-        if (debugEnabled) log.debug("clicked on {}.cancel", AbstractModalForm.this.prefix);
-        modal.close(target);
-      }
-    });
-    loadSettings();
+    this(prefix, modal, okAction, true);
   }
+
+  /**
+  *
+  * @param prefix the prefix for the ids of all components.
+  * @param modal the modal window.
+  */
+ public AbstractModalForm(final String prefix, final ModalWindow modal) {
+   this(prefix, modal, null, false);
+ }
+
+ /**
+  *
+  * @param prefix the prefix for the ids of all components.
+  * @param modal the modal window.
+  * @param okAction the ok action.
+  * @param addDefaultButtons whether to add default ok and cancel buttons.
+  */
+ public AbstractModalForm(final String prefix, final ModalWindow modal, final Runnable okAction, final boolean addDefaultButtons) {
+   super(prefix + ".form");
+   this.prefix = prefix;
+   this.locale = JPPFWebSession.get().getLocale();
+   createFields();
+   if (addDefaultButtons) {
+     AjaxButton okButton = new AjaxButton(prefix + ".ok") {
+       @Override
+       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+         if (debugEnabled) log.debug("clicked on {}.ok", AbstractModalForm.this.prefix);
+         if (okAction != null) okAction.run();
+         saveSettings();
+         modal.close(target);
+       }
+     };
+     add(okButton);
+     setDefaultButton(okButton);
+     add(new AjaxButton(prefix + ".cancel") {
+       @Override
+       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+         if (debugEnabled) log.debug("clicked on {}.cancel", AbstractModalForm.this.prefix);
+         modal.close(target);
+       }
+     });
+   }
+   loadSettings();
+ }
 
   /**
    * Create the fields and add them to this form.

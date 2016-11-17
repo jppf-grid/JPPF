@@ -24,6 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.topology.loadbalancing.LoadBalancingLink;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigAction;
 import org.jppf.admin.web.topology.nodethreads.NodeThreadsAction;
 import org.jppf.admin.web.topology.provisioning.ProvisioningAction;
@@ -60,6 +61,7 @@ public class TopologyTreeData extends TableTreeData {
     ah.addAction(TopologyConstants.PROVISIONING_ACTION, new ProvisioningAction());
     ah.addAction(TopologyConstants.SERVER_STOP_RESTART_ACTION, new DriverStopRestartAction());
     ah.addAction(TopologyConstants.SERVER_RESET_STATS_ACTION, new ServerResetStatsLink.Action());
+    ah.addAction(TopologyConstants.SERVER_LOAD_BALANCING_ACTION, new LoadBalancingLink.Action());
     ah.addAction(TopologyConstants.NODE_CONFIG_ACTION, new NodeConfigAction());
     ah.addAction(TopologyConstants.NODE_THREADS_ACTION, new NodeThreadsAction());
     ah.addAction(TopologyConstants.CANCEL_PENDING_ACTION, new CancelPendingActionLink.Action());

@@ -24,10 +24,13 @@
 	<property name="scrollable" value="true"/>
   <property name="icon" value="/org/jppf/ui/resources/configure-2.png"/>
 	<property name="layoutConstraints" value="fill, flowy"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+  <!--
 	<script language="groovy" source="org/jppf/ui/options/xml/LoadBalancingSettings.groovy"/>
 	<initializer type="script">
 		<script language="groovy">refresh()</script>
 	</initializer>
+	-->
 
 	<child name="AlgorithmPanel" type="page">
 		<property name="componentConstraints" value="growx"/>
@@ -71,22 +74,26 @@
 		<child name="ConfigBtn" type="page">
 			<property name="label" value="Configuration Buttons"/>
 
-			<child name="Refresh" type="Button">
-				<property name="label" value="Refresh Settings"/>
-				<property name="tooltip" value="Refreshes the settings from the values in the server"/>
-				<property name="componentConstraints" value="growx 0"/>
+      <child name="Refresh" type="Button">
+        <property name="label" value="Refresh Settings"/>
+        <property name="tooltip" value="Refreshes the settings from the values in the server"/>
+        <property name="componentConstraints" value="growx 0"/>
+        <!--
 				<listener type="script">
 					<script language="groovy">refresh()</script>
 				</listener>
+				-->
 			</child>
 
 			<child name="Apply" type="Button">
 				<property name="label" value="Apply Settings"/>
 				<property name="tooltip" value="Send the new settings to the server"/>
 				<property name="componentConstraints" value="growx 0"/>
+        <!--
 				<listener type="script">
 					<script language="groovy">apply()</script>
 				</listener>
+        -->
 			</child>
 
 			<child name="filler" type="page">

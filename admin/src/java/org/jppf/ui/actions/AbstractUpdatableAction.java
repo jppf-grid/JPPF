@@ -116,6 +116,16 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   }
 
   /**
+   * Get a localized message given its unique name and the current locale.
+   * @param message the unique name of the localized message.
+   * @param params optional parmeters for the message.
+   * @return a message in the current locale, or the default locale if the localization for the current locale is not found.
+   */
+  protected String localize(final String message, final Object...params) {
+    return LocalizationUtils.getLocalized(BASE, message, message, Locale.getDefault(), params);
+  }
+
+  /**
    * Execute the specified runnable in a new thread.
    * The thread name is <code>this.getClass().getSimpleName()</code>.
    * @param r the <code>Runnable</code> to execute.

@@ -33,7 +33,8 @@
     <property name="componentConstraints" value="gap rel"/>
 		<property name="layoutConstraints" value="insets 4 2 0 2"/>
 
-		<child name="shutdown.restart.driver" type="Button"/>
+    <child name="shutdown.restart.driver" type="Button"/>
+    <child name="load.balancing.settings" type="Button"/>
 		<child name="driver.reset.statistics" type="Button"/>
 
 		<child name="sep1" type="ToolbarSeparator"/>

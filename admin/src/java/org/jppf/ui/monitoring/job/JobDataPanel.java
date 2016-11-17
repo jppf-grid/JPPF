@@ -65,7 +65,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    */
   public JobDataPanel() {
     BASE = "org.jppf.ui.i18n.JobDataPage";
-    if (debugEnabled) log.debug("initializing NodeDataPanel");
+    if (debugEnabled) log.debug("initializing JobDataPanel");
     this.jobMonitor = StatsHandler.getInstance().getJobMonitor();
     createTreeTableModel();
     jobMonitor.addJobMonitoringListener(this);
@@ -248,6 +248,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
       actionHandler.putAction("resume.job", new ResumeJobAction());
       actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
       actionHandler.putAction("update.priority.job", new UpdatePriorityAction());
+      actionHandler.putAction("job.select.jobs", new SelectJobsAction(this));
       actionHandler.putAction("job.show.hide", new ShowHideColumnsAction(this));
       actionHandler.updateActions();
     }

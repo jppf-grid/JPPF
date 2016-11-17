@@ -61,7 +61,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction {
         if (info != null) list.add(data);
       }
     }
-    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new AbstractTopologyComponent[list.size()]);
+    dataArray = list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : list.toArray(new AbstractTopologyComponent[list.size()]);
   }
 
   /**

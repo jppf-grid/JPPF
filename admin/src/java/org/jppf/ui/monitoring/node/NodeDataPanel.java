@@ -135,6 +135,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   public void setupActions() {
     actionHandler = new JTreeTableActionHandler(treeTable);
     actionHandler.putAction("shutdown.restart.driver", new ServerShutdownRestartAction());
+    actionHandler.putAction("load.balancing.settings", new LoadBalancingAction());
     actionHandler.putAction("driver.reset.statistics", new ServerStatisticsResetAction());
     actionHandler.putAction("update.configuration", new NodeConfigurationAction());
     actionHandler.putAction("show.information", new SystemInformationAction());
@@ -162,16 +163,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    */
   private synchronized void addDriver(final TopologyDriver driver) {
     try {
-      /*
-      if (!driver.getConnection().getStatus().isWorkingStatus()) return;
-      String uuid = driver.getUuid();
-      if (TreeTableUtils.findComponent(treeTableRoot, uuid) != null) return;
-      int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
-      if (index < 0) return;
-      DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
-      if (debugEnabled) log.debug("adding driver: " + driver + " at index " + index);
-      model.insertNodeInto(driverNode, treeTableRoot, index);
-      */
       DefaultMutableTreeNode driverNode = TopologyUtils.addDriver(model, driver);
       if ((driverNode != null) && (treeTable != null)) {
         treeTable.expand(treeTableRoot);
@@ -188,13 +179,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * @param driverData the driver to add.
    */
   private synchronized void removeDriver(final TopologyDriver driverData) {
-    /*
-    if (debugEnabled) log.debug("removing driver: " + driverData);
-    String uuid = driverData.getUuid();
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
-    if (driverNode == null) return;
-    model.removeNodeFromParent(driverNode);
-    */
     TopologyUtils.removeDriver(model, driverData);
   }
 
@@ -204,19 +188,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * @param nodeData the node to add.
    */
   private synchronized void addNode(final TopologyDriver driverData, final TopologyNode nodeData) {
-    /*
-    if ((driverData == null) || (nodeData == null)) return;
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
-    if (driverNode == null) return;
-    String nodeUuid = nodeData.getUuid();
-    if (TreeTableUtils.findComponent(driverNode, nodeUuid) != null) return;
-    if (debugEnabled) log.debug("attempting to add node={} to driver={}", nodeData, driverData);
-    int index = TreeTableUtils.insertIndex(driverNode, nodeData);
-    if (index < 0) return;
-    if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
-    DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
-    model.insertNodeInto(nodeNode, driverNode, index);
-    */
     DefaultMutableTreeNode nodeNode = TopologyUtils.addNode(model, driverData, nodeData);
     if (nodeNode != null) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) nodeNode.getParent();

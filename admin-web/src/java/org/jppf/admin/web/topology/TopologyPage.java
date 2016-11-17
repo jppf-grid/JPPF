@@ -31,6 +31,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.*;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.topology.loadbalancing.LoadBalancingLink;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigLink;
 import org.jppf.admin.web.topology.nodethreads.NodeThreadsLink;
 import org.jppf.admin.web.topology.provisioning.ProvisioningLink;
@@ -115,6 +116,7 @@ public class TopologyPage extends AbstractTableTreePage {
     ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new DriverStopRestartLink(toolbar));
     actionHandler.addActionLink(toolbar, new ServerResetStatsLink());
+    actionHandler.addActionLink(toolbar, new LoadBalancingLink(toolbar));
     actionHandler.addActionLink(toolbar, new SystemInfoLink(toolbar));
     actionHandler.addActionLink(toolbar, new NodeConfigLink(toolbar));
     actionHandler.addActionLink(toolbar, new NodeThreadsLink(toolbar));

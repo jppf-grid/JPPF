@@ -32,6 +32,8 @@
   <import source="file" location="org/jppf/ui/options/xml/JobData.xml" pluggableView="JobData"/>
   <import source="file" location="org/jppf/ui/options/xml/ServerStats.xml" pluggableView="ServerStats"/>
   <import source="file" location="org/jppf/ui/options/xml/Charts.xml" pluggableView="Charts"/>
+  <!--
   <import source="file" location="org/jppf/ui/options/xml/LoadBalancingSettings.xml" pluggableView="LoadBalancing"/>
+  -->
   <import source="file" location="org/jppf/ui/options/xml/FilterPanel.xml" pluggableView="Filter"/>
 </opt:main>

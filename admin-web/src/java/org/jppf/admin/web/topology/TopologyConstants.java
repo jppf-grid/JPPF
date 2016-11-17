@@ -32,6 +32,10 @@ public class TopologyConstants {
    */
   public static String SERVER_RESET_STATS_ACTION = "topology.server_reset_stats";
   /**
+   * Server load-balancing settings action id.
+   */
+  public static String SERVER_LOAD_BALANCING_ACTION = "topology.load_balancing";
+  /**
    * Node configuration update action id.
    */
   public static String NODE_CONFIG_ACTION = "topology.node_config";

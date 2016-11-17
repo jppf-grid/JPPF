@@ -48,6 +48,10 @@ public class JobsConstants {
    */
   public static String UPDATE_PRIORITY_ACTION = "jobs.update_priority";
   /**
+   * Select jobs action id.
+   */
+  public static String SELECT_JOBS_ACTION = "jobs.select_jobs";
+  /**
    * Expand all action id.
    */
   public static String EXPAND_ALL_ACTION = "jobs.expand";

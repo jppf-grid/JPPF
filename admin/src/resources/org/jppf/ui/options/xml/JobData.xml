@@ -68,6 +68,9 @@
 			</listener>
 		</child>
 
+    <child name="sep4" type="ToolbarSeparator"/>
+    <child name="job.select.jobs" type="Button"/>
+
 		<child name="sep3" type="ToolbarSeparator"/>
 
 		<child name="job.button.expand" type="Button">
