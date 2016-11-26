@@ -20,52 +20,75 @@ package org.jppf.caching;
 
 import java.util.*;
 
+import org.slf4j.*;
+
 /**
  * Cache implementation backed by a {@link Set} wihh synchronized access.
  * @param <E> the type of the cache elements.
  * @author Laurent Cohen
  */
-public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E>
-{
+public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFSimpleSetCache.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The backing set for this cache.
    */
   private final Set<E> set = new HashSet<>();
+  /**
+   * Name assigned to this cache, for debugging and tracing purposes.
+   */
+  private final String name;
+
+  /**
+   * Initialize with the default name {@code getClass().getSimpleName()}.
+   */
+  public JPPFSimpleSetCache() {
+    name = getClass().getSimpleName();
+  }
+
+  /**
+   * Initialize with the specified name.
+   * @param name the name assigned to this cache.
+   */
+  public JPPFSimpleSetCache(final String name) {
+    this.name = name;
+  }
 
   @Override
-  public void add(final E element)
-  {
-    synchronized(set)
-    {
+  public void add(final E element) {
+    synchronized (set) {
+      if (debugEnabled) log.debug("{}: adding {}", name, element);
       set.add(element);
     }
   }
 
   @Override
-  public boolean has(final E element)
-  {
-    synchronized(set)
-    {
+  public boolean has(final E element) {
+    synchronized (set) {
       return set.contains(element);
     }
   }
 
   @Override
-  public E remove(final E element)
-  {
+  public E remove(final E element) {
     boolean b;
-    synchronized(set)
-    {
+    synchronized (set) {
+      if (debugEnabled) log.debug("{}: removing {}", name, element);
       b = set.remove(element);
     }
     return b ? element : null;
   }
 
   @Override
-  public void clear()
-  {
-    synchronized(set)
-    {
+  public void clear() {
+    synchronized (set) {
+      if (debugEnabled) log.debug("{}: clearing all elements", name);
       set.clear();
     }
   }
