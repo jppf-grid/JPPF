@@ -45,4 +45,13 @@ public final class LoggingUtils {
   public static boolean isDebugEnabled(final Logger log) {
     return ANDROID || log.isDebugEnabled();
   }
+
+  /**
+   * Determine whether trace level is enabled for the specified logger.
+   * @param log the logger to check.
+   * @return {@code true} if debug level is enabled, {@code false} otherwise.
+   */
+  public static boolean isTraceEnabled(final Logger log) {
+    return ANDROID || log.isTraceEnabled();
+  }
 }

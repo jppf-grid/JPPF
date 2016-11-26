@@ -59,7 +59,7 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> CLASSLOADER_FILE_LOOKUP = new BooleanProperty("jppf.classloader.file.lookup", true);
   /** Class loader delegation mode: 'parent' or 'url' */
   public static final JPPFProperty<String> CLASSLOADER_DELEGATION = new StringProperty("jppf.classloader.delegation", "parent");
-  /** How often batched class loadin requests are sent to the server */
+  /** How often batched class loading requests are sent to the server, expressed in nanos */
   public static final JPPFProperty<Long> NODE_CLASSLOADING_BATCH_PERIOD = new LongProperty("jppf.node.classloading.batch.period", 100L);
   /** Optional network data transformation */
   public static final JPPFProperty<String> DATA_TRANSFORM_CLASS = new StringProperty("jppf.data.transform.class", null);
