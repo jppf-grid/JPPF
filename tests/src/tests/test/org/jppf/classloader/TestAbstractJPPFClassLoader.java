@@ -151,7 +151,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
       if (i == 1) {
         assertNull(task.getResult());
         assertTrue(job.isCancelled());
-      } else if (i > 2) {
+      } else if (i == 10) {
         assertNotNull(task.getResult());
         assertEquals(task.getResult(), "result of job " + i);
         assertFalse(job.isCancelled());
