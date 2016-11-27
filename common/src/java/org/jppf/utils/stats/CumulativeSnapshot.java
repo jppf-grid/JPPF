@@ -18,12 +18,23 @@
 
 package org.jppf.utils.stats;
 
+import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
+
 /**
  * In this implementation, {@code getLatest()} is computed as the cumulated sum of all values added to the snapshot.
  * If values are only added, and not removed, then it will always return the same value as getTotal().
  * @author Laurent Cohen
  */
 public class CumulativeSnapshot extends AbstractJPPFSnapshot {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CumulativeSnapshot.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Explicit serialVersionUID.
    */
@@ -47,7 +58,11 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
     total += accumulatedValues;
     if (count > 0L) {
       valueCount += count;
-      //if (label == JPPFStatisticsHelper.TASK_QUEUE_COUNT) log.info(String.format("latest=%5d; adding %4d; new value=%5d", (long) latest, (long) accumulatedValues, (long) (latest + accumulatedValues)));
+      if (debugEnabled && (label == JPPFStatisticsHelper.TASK_QUEUE_COUNT)) {
+        log.debug(String.format("latest=%5d; adding %4d; new value=%5d", (long) latest, (long) accumulatedValues, (long) (latest + accumulatedValues)));
+        String name = Thread.currentThread().getName();
+        if ((accumulatedValues <= 0d) && (name != null) && name.startsWith("JPPF NIO-")) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
+      }
       latest += accumulatedValues;
       if (latest > max) max = latest;
       if (latest < min) min = latest;

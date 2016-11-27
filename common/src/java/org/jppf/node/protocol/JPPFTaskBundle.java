@@ -97,8 +97,14 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    */
   public JPPFTaskBundle() {
     uuidPath = new TraversalList<>();
-    jobSLA = new JPPFJobSLA();
-    jobMetadata = new JPPFJobMetadata();
+  }
+
+  /**
+   * Initialize this task bundle with the specified uuid path.
+   * @param uuidPath the uuidPath to set.
+   */
+  public JPPFTaskBundle(final TraversalList<String> uuidPath) {
+    this.uuidPath = uuidPath;
   }
 
   @Override
@@ -144,7 +150,6 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    * @param bundle the bundle compare this one to.
    * @return a positive int if this bundle is greater, 0 if both are equal,
    * or a negative int if this bundle is less than the other.
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
   public int compareTo(final JPPFTaskBundle bundle) {
@@ -157,8 +162,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
 
   @Override
   public synchronized JPPFTaskBundle copy() {
-    JPPFTaskBundle bundle = new JPPFTaskBundle();
-    bundle.setUuidPath(uuidPath);
+    JPPFTaskBundle bundle = new JPPFTaskBundle(uuidPath);
     bundle.setUuid(uuid);
     bundle.setName(name);
     bundle.setTaskCount(taskCount);

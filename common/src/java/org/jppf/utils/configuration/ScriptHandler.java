@@ -130,10 +130,11 @@ public class ScriptHandler {
     this.config = props;
     bindings.put("thisProperties", config);
 
+    boolean hasDefaultScriptLanguage = config.containsKey(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName());
     String value = config.get(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE);
     value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value).trim();
     if ("".equals(value)) value = "javascript";
-    props.set(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE, value);
+    if (hasDefaultScriptLanguage) props.set(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE, value);
     defaultLanguage = value;
 
     for (String name: config.stringPropertyNames()) {

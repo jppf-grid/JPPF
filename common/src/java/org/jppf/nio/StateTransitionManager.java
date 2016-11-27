@@ -92,7 +92,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param runnable the runnable to submit.
    */
   public void submit(final Runnable runnable) {
-    executor.submit(runnable);
+    executor.execute(runnable);
   }
 
   /**
@@ -104,7 +104,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     synchronized(channel) {
       setInterestOps(channel, 0);
     }
-    executor.submit(new StateTransitionTask<>(channel, factory));
+    executor.execute(new StateTransitionTask<>(channel, factory));
   }
 
   /**

@@ -21,6 +21,8 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.utils.JPPFThreadFactory;
+
 /**
  * Instances of this class hold statistics snapshots.
  * To create and add a new snapshot, <code>createSnapshot(String)</code> should be called first,
@@ -49,6 +51,10 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * The list of listeners.
    */
   private transient List<ListenerInfo> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * 
+   */
+  private final transient ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("StatsEventDispatcher"));
 
   /**
    * Default constructor.
@@ -315,22 +321,21 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @param type the type of event: created, removd, update.
    */
   private void fireEvent(final JPPFSnapshot snapshot, final EventType type) {
-    JPPFStatisticsEvent event = new JPPFStatisticsEvent(this, snapshot);
-    for (ListenerInfo info: listeners) {
-      if (info.filter.accept(snapshot)) {
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        JPPFStatisticsEvent event = new JPPFStatisticsEvent(JPPFStatistics.this, snapshot);
+        List<ListenerInfo> accepted = new ArrayList<>(listeners.size());
+        for (ListenerInfo info: listeners) {
+          if (info.filter.accept(snapshot)) accepted.add(info);
+        }
         switch(type) {
-          case ADDED:
-            info.listener.snapshotAdded(event);
-            break;
-          case REMOVED:
-            info.listener.snapshotRemoved(event);
-            break;
-          case UPDATED:
-            info.listener.snapshotUpdated(event);
-            break;
+          case ADDED:   for (ListenerInfo info: accepted) info.listener.snapshotAdded(event); break;
+          case REMOVED: for (ListenerInfo info: accepted) info.listener.snapshotRemoved(event); break;
+          case UPDATED: for (ListenerInfo info: accepted) info.listener.snapshotUpdated(event); break;
         }
       }
-    }
+    });
   }
 
   @Override
