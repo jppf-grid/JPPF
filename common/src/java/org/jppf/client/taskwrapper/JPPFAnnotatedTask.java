@@ -150,4 +150,11 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
     if (o instanceof DataProviderHolder) ((DataProviderHolder) o).setDataProvider(dataProvider);
     else super.setDataProvider(dataProvider);
   }
+
+  @Override
+  public boolean isInterruptible() {
+    Object o = getTaskObject();
+    if (o instanceof Interruptibility) return ((Interruptibility) o).isInterruptible();
+    return super.isInterruptible();
+  }
 }

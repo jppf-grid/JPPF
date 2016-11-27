@@ -20,10 +20,14 @@ package test.org.jppf.classloader;
 
 import static org.junit.Assert.*;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Callable;
 
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -34,16 +38,14 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit tests for {@link org.jppf.classloader.AbstractJPPFClassLoader}.
  * @author Laurent Cohen
  */
-public class TestAbstractJPPFClassLoader extends Setup1D1N1C
-{
+public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   /**
    * Test that no exception is raised upon calling AbstractJPPFClassloader.getResources() from 2 jobs in sequence.
    * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-116">JPPF-116 NPE in AbstractJPPFClassLoader.findResources()</a>
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
-  public void testGetResources() throws Exception
-  {
+  public void testGetResources() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
     String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
@@ -62,8 +64,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
-  public void testGetResourcesNoDuplicate() throws Exception
-  {
+  public void testGetResourcesNoDuplicate() throws Exception {
     int nbLookups = 3;
     String name = ReflectionUtils.getCurrentMethodName();
     String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
@@ -95,8 +96,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
-  public void testClassLoadersMatch() throws Exception
-  {
+  public void testClassLoadersMatch() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
     String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
@@ -113,8 +113,54 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   }
 
   /**
-   * 
+   * Test that class loading is not interrupted when a job is cancelled before class loading is over. 
+   * Here we test that class loading is not interrupted even with static initializers that last longer
+   * than the job expiration timeout. 
+   * @throws Exception if any error occurs
    */
+  @Test(timeout=5000)
+  public void testClassLoadingInterruptionWithTask() throws Exception {
+    testInterruption(false);
+  }
+
+  /**
+   * Test that class loading is not interrupted when a job is cancelled before class loading is over.
+   * Here we test that class loading is not interrupted even when it involves a large number of classes
+   * with a total loading time larger than the job expiration timeout. 
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testClassLoadingInterruptionWithCallable() throws Exception {
+    testInterruption(true);
+  }
+
+  /**
+   * @param callable .
+   * @throws Exception if any error occurs
+   */
+  private void testInterruption(final boolean callable) throws Exception {
+    String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "Callable" : "task") + " ";
+    for (int i=1; i<=10; i++) {
+      JPPFJob job = new JPPFJob();
+      job.setName(name + i);
+      if (callable) job.add(new MyCallable(i));
+      else job.add(new MyTask2(i));
+      job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
+      Task<?> task = client.submitJob(job).get(0);
+      Throwable t = task.getThrowable();
+      assertNull(t);
+      if (i == 1) {
+        assertNull(task.getResult());
+        assertTrue(job.isCancelled());
+      } else if (i > 2) {
+        assertNotNull(task.getResult());
+        assertEquals(task.getResult(), "result of job " + i);
+        assertFalse(job.isCancelled());
+      }
+    }
+  }
+
+  /** */
   public static class MyTask extends AbstractTask<String> {
     /**
      * Name of a resource to lookup.
@@ -160,8 +206,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
      * Get the outcome of <code>Thread.currentThread().getContextClassLoader().toString()</code>.
      * @return a string describing the class loader.
      */
-    public String getContextClassLoaderStr()
-    {
+    public String getContextClassLoaderStr() {
       return contextClassLoaderStr;
     }
 
@@ -169,8 +214,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
      * Get the outcome of <code>this.getClass(().getClassLoader().toString()</code>.
      * @return a string describing the class loader.
      */
-    public String getTaskClassLoaderStr()
-    {
+    public String getTaskClassLoaderStr() {
       return taskClassLoaderStr;
     }
 
@@ -178,9 +222,108 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
      * Determine whether both class loaders are identical.
      * @return <code>true</code> if the class loaders match, <code>false</code> otherwise.
      */
-    public boolean isClassLoaderMatch()
-    {
+    public boolean isClassLoaderMatch() {
       return classLoaderMatch;
     }
+  }
+
+  /** */
+  public static class MyCallable implements Callable<String>, Serializable, Interruptibility {
+    /** */
+    private final int index;
+
+    /**
+     * @param index .
+     */
+    public MyCallable(final int index) {
+      this.index = index;
+    }
+
+    @Override
+    public String call() throws Exception {
+      long start = System.nanoTime();
+      try {
+        // scala-library.jar and scala-reflect.jar must be in the client's classpath
+        Class.forName("scala.Predef$");
+        return "result of job " + index;
+      } finally {
+        System.out.printf("job %d time=%,d ms%n", index, (System.nanoTime() - start) / 1_000_000L);
+      }
+    }
+
+    @Override
+    public boolean isInterruptible() {
+      return false;
+    }
+  }
+
+  /** */
+  public static class MyTask2 extends AbstractTask<String> {
+    /** */
+    private final int index;
+
+    /**
+     * @param index .
+     */
+    public MyTask2(final int index) {
+      this.index = index;
+    }
+
+    @Override
+    public void run() {
+      long start = System.nanoTime();
+      try {
+        new Test1();
+        new Test2();
+        new Test3();
+        setResult("result of job " + index);
+      } catch(Error e) {
+        System.out.printf("job %d has exception: %s%n", index, ExceptionUtils.getStackTrace(e));
+        throw e;
+      } finally {
+        System.out.printf("job %d time=%,d ms%n", index, (System.nanoTime() - start) / 1_000_000L);
+      }
+    }
+
+    @Override
+    public boolean isInterruptible() {
+      return false;
+    }
+  }
+
+  /** */
+  public static class Initialization {
+    /** */
+    public static final long WAIT_TIME = 400L;
+    /** */
+    public static final boolean RETHROW = true;
+
+    /**
+     * @param simpleName the simple name (without namespace) of the class being initialized.
+     */
+    public static void init(final String simpleName) {
+      try {
+        System.out.println("initializing " + simpleName + ".class");
+        Thread.sleep(WAIT_TIME);
+      } catch (Exception e) {
+        System.out.println(ExceptionUtils.getStackTrace(e));
+        if (RETHROW) throw new RuntimeException(e);
+      }
+    }
+  }
+
+  /** */
+  public static class Test1 {
+    static { Initialization.init("Test1"); }
+  }
+
+  /** */
+  public static class Test2 {
+    static { Initialization.init("Test2"); }
+  }
+
+  /** */
+  public static class Test3 {
+    static { Initialization.init("Test3"); }
   }
 }
