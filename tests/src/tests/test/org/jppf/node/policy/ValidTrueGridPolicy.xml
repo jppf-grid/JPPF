@@ -1,0 +1,12 @@
+<jppf:ExecutionPolicy xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd">
+  <!--
+    We expect the number of nodes matching the nested policy to be GREATER than 1.
+    in clear language: "if there is more than 1 node with at least 1 processing thread ..."
+  -->
+  <NodesMatching operator="MORE_THAN" expected="1">
+    <AtLeast>
+      <Property>jppf.processing.threads</Property>
+      <Value>1</Value>
+    </AtLeast>
+  </NodesMatching>
+</jppf:ExecutionPolicy>
