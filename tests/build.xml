@@ -70,6 +70,8 @@
     <pathelement location="${samples-pack}/KryoSerializer/classes"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-2.22-all.jar"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
+    <pathelement location="${basedir}/lib/scala-library.jar"/>
+    <pathelement location="${basedir}/lib/scala-reflect.jar"/>
   </path>
 
   <!-- ========================================================================= -->
