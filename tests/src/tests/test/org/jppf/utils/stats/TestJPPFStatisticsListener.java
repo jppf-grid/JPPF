@@ -171,6 +171,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
     for (int i=0; i<LABELS.length; i++) stats.createSnapshot(LABELS[i]);
     for (int i=0; i<UPDATES_PER_SNAPSHOT*LABELS.length; i++) stats.addValue(LABELS[i % LABELS.length], i + 1);
     for (int i=0; i<LABELS.length; i++) stats.removeSnapshot(LABELS[i]);
+    Thread.sleep(500L); // wait for asynchronous notifications
     return stats;
   }
 }
