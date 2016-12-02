@@ -71,7 +71,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       //driver.getNodeNioServer().getNodeReservationHandler().onJobCancelled(serverJob);
       JPPFStatistics stats = driver.getStatistics();
       stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -serverJob.getTaskCount());
-    } else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+    } else if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
   }
 
   /**
@@ -84,10 +84,10 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception {
     ServerJob bundleWrapper = getServerJob(jobUuid);
     if (bundleWrapper == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+      if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
       return;
     }
-    if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to suspend jobId = '{}'", bundleWrapper.getJob().getName());
     bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
   }
 
@@ -100,10 +100,10 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void resumeJob(final String jobUuid) throws Exception {
     ServerJob bundleWrapper = getServerJob(jobUuid);
     if (bundleWrapper == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+      if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
       return;
     }
-    if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to resume jobId = '{}'", bundleWrapper.getJob().getName());
     bundleWrapper.setSuspended(false, false);
     driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
@@ -118,10 +118,10 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void updateMaxNodes(final String jobUuid, final Integer maxNodes) throws Exception {
     ServerJob serverJob = getServerJob(jobUuid);
     if (serverJob == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+      if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
       return;
     }
-    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + serverJob.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to update maxNodes to {} for jobId = '{}'", maxNodes, serverJob.getJob().getName());
     serverJob.setMaxNodes(maxNodes);
   }
 
@@ -219,7 +219,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void sendNotification(final Notification notification) {
     if (debugEnabled && (notification instanceof JobNotification)) {
       JobNotification event = (JobNotification) notification;
-      if (debugEnabled) log.debug(String.format("sending event %s for job %s, node=%s", event.getEventType(), event.getJobInformation(), event.getNodeInfo()));
+      if (event.getEventType() != JobEventType.JOB_UPDATED)
+        log.debug(String.format("sending event %s for job %s, node=%s", event.getEventType(), event.getJobInformation(), event.getNodeInfo()));
     }
     super.sendNotification(notification);
   }

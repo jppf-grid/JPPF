@@ -138,7 +138,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   void addIdleChannel(final C channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
-    if (debugEnabled) log.debug("Adding idle channel " + channel);
+    if (debugEnabled) log.debug("Adding idle channel {}", channel);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
@@ -165,7 +165,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * @return a reference to the removed channel.
    */
   C removeIdleChannel(final C channel) {
-    if (debugEnabled) log.debug("Removing idle channel " + channel);
+    if (debugEnabled) log.debug("Removing idle channel {}", channel);
     synchronized(idleChannels) {
       if (idleChannels.remove(channel)) {
         channel.idle.set(false);

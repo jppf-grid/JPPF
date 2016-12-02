@@ -262,10 +262,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
     }
     sb.append(", nbBundles=").append(getNbBundles());
     //sb.append(", nbChannels=").append(getNbChannels());
-    sb.append(']');
     sb.append(", jobExpired=").append(jobExpired);
     sb.append(", pending=").append(pending);
     sb.append(", suspended=").append(isSuspended());
+    sb.append(']');
     return sb.toString();
   }
 

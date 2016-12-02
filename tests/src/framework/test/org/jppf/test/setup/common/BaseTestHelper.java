@@ -171,7 +171,7 @@ public class BaseTestHelper {
   }
 
   /**
-   * Print a formatted to the server log via the server debug mbean on all connected servers.
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
    * @param client JPPF client holding the server connections.
    * @param toServers whether to log to the discovered servers.
    * @param toNodes whether to log to the nodes attached to the discovered servers.

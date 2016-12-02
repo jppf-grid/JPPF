@@ -116,7 +116,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     synchronized(jobMap) {
       jobMap.putValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
+    if (debugEnabled) log.debug("jobId '{}' : dispatched to node {}", bundle.getName(), channel);
     submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
     fireJobTasksEvent(channel, nodeBundle, true);
   }
@@ -128,7 +128,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     synchronized(jobMap) {
       if (!jobMap.removeValue(jobUuid, new ChannelJobPair(channel, serverJob))) {
         log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
-      } else if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
+      } else if (debugEnabled) log.debug("jobId '{}' : returned from node {}", bundle.getName(), channel);
     }
     //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
@@ -141,7 +141,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public void jobQueued(final ServerJob serverJob) {
     TaskBundle bundle = serverJob.getJob();
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
+    if (debugEnabled) log.debug("jobId '{}' queued", bundle.getName());
     submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
@@ -163,7 +163,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     synchronized(jobMap) {
       jobMap.removeValues(jobUuid);
     }
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
+    if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
     //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
@@ -173,7 +173,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public void jobUpdated(final AbstractServerJob job) {
-    if (debugEnabled) log.debug("jobId '" + job.getName() + "' updated");
+    //if (debugEnabled) log.debug("jobId '{}' updated", job.getName());
     submitEvent(JobEventType.JOB_UPDATED, (ServerJob) job, null);
   }
 
@@ -189,7 +189,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param channel the id of the job source of the event.
    */
   private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel<?> channel) {
-    executor.submit(new JobEventTask(this, eventType, bundle, null, channel));
+    executor.execute(new JobEventTask(this, eventType, bundle, null, channel));
     if (JPPFDriver.JPPF_DEBUG) incNotifCount();
   }
 
@@ -200,7 +200,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param channel the id of the job source of the event.
    */
   private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel<?> channel) {
-    executor.submit(new JobEventTask(this, eventType, null, job, channel));
+    executor.execute(new JobEventTask(this, eventType, null, job, channel));
     if (JPPFDriver.JPPF_DEBUG) incNotifCount();
   }
 

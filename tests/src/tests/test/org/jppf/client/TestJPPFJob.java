@@ -111,24 +111,30 @@ public class TestJPPFJob extends Setup1D1N {
    */
   @Test(timeout=15000)
   public void testCancelWithInterruptFlagFalse() throws Exception {
+    String method = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
-      int nbTasks = 1;
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
-      client.submitJob(job);
-      listener.await(JobEventType.JOB_DISPATCHED);
-      boolean cancelled = job.cancel(false);
-      assertFalse(cancelled);
-      List<Task<?>> results = job.get();
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      int count = 0;
-      for (Task<?> task: results) {
-        if (task.getResult() == null) count++;
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", method);
+      try {
+        int nbTasks = 1;
+        AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+        JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+        client.submitJob(job);
+        listener.await(JobEventType.JOB_DISPATCHED);
+        boolean cancelled = job.cancel(false);
+        assertFalse(cancelled);
+        List<Task<?>> results = job.get();
+        assertNotNull(results);
+        assertEquals(nbTasks, results.size());
+        int count = 0;
+        for (Task<?> task: results) {
+          if (task.getResult() == null) count++;
+        }
+        assertEquals(0, count);
+        assertFalse(job.isCancelled());
+        assertTrue(job.isDone());
+      } finally {
+        BaseTestHelper.printToServersAndNodes(client, true, true, "end of method %s()", method);
       }
-      assertEquals(0, count);
-      assertFalse(job.isCancelled());
-      assertTrue(job.isDone());
     }
   }
 
