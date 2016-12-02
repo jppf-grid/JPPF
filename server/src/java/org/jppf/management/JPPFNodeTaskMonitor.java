@@ -95,13 +95,13 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     else taskSuccessfulCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    executor.submit(new NotificationSender(info, null, false));
+    executor.execute(new NotificationSender(info, null, false));
   }
 
   @Override
   public void taskNotification(final TaskExecutionEvent event)
   {
-    if (event.isSendViaJmx()) executor.submit(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
+    if (event.isSendViaJmx()) executor.execute(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
   }
 
   /**
