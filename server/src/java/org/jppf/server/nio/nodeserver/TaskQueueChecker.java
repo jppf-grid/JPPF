@@ -251,7 +251,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
       }
     }
     if (!toRemove.isEmpty()) {
-      for (C c: toRemove) removeIdleChannel(c);
+      for (C c: toRemove) removeIdleChannelAsync(c);
     }
     //if ((desiredConfiguration != null) && !reservationHandler.hasPendingNode(job.getUuid())) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);

@@ -136,8 +136,16 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * @param channel the channel to add to the list.
    */
   void addIdleChannel(final C channel) {
-    if (channel == null) throw new IllegalArgumentException("channel is null");
-    if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
+    if (channel == null) {
+      String message  = "channel is null";
+      log.error(message);
+      throw new IllegalArgumentException(message);
+    }
+    if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) { 
+      String message  = "channel is not active: " + channel;
+      log.error(message);
+      throw new IllegalStateException(message);
+    }
     if (debugEnabled) log.debug("Adding idle channel {}", channel);
     channelsExecutor.execute(new Runnable() {
       @Override
@@ -178,11 +186,12 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   }
 
   /**
-   * Remove a channel from the list of idle channels.
+   * Asynchronously remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
+   * @return a futrue on the removal request task.
    */
-  void removeIdleChannelAsync(final C channel) {
-    channelsExecutor.execute(new Runnable() {
+  Future<?> removeIdleChannelAsync(final C channel) {
+    return channelsExecutor.submit(new Runnable() {
       @Override
       public void run() {
         removeIdleChannel(channel);

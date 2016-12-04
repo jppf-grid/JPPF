@@ -129,10 +129,9 @@ class WaitingResultsState extends NodeServerState {
           for (int n: resubmitPositions) resubmitSet.add(n);
           if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
         }
-        boolean anyResubmit = resubmitSet != null;
         int count = 0;
         for (ServerTask task: nodeBundle.getTaskList()) {
-          if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
+          if ((resubmitSet != null) && resubmitSet.contains(task.getJobPosition())) {
             if (task.incResubmitCount() <= task.getMaxResubmits()) {
               task.resubmit();
               count++;
