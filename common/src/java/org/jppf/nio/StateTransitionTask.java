@@ -73,6 +73,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
       synchronized(channel) {
         try {
           S s = ctx.getState();
+          //boolean traceEnabled = (s != null) && "NodeState".equals(s.getClass().getSimpleName());
           NioState<T> state = factory.getState(s);
           if (traceEnabled) log.trace("performing transition to state {} for {}", s, channel);
           transition = state.performTransition(channel);

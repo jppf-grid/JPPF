@@ -30,6 +30,8 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 
+import test.org.jppf.test.setup.common.TestUtils;
+
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -223,7 +225,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception {
-    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes);
+    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, false);
   }
 
   /**
@@ -234,6 +236,18 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception {
+    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes, false);
+  }
+
+  /**
+   * Check that the driver and all nodes have been started and are accessible.
+   * @param client the JPPF client to use for the checks.
+   * @param nbDrivers the number of drivers that were started.
+   * @param nbNodes the number of nodes that were started.
+   * @param printEpilogue whether to print a message once the initialization is confirmed.
+   * @throws Exception if any error occurs.
+   */
+  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
     Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
@@ -263,6 +277,7 @@ public class BaseSetup {
         else break;
       }
     }
+    if (printEpilogue) TestUtils.printf("%d drivers and %d nodes successfully initialized", nbDrivers, nbNodes);
   }
 
   /**

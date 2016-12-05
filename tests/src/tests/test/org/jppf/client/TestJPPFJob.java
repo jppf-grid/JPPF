@@ -85,6 +85,8 @@ public class TestJPPFJob extends Setup1D1N {
   @Test(timeout=10000)
   public void testCancel() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
+      BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       int nbTasks = 10;
       AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
@@ -113,6 +115,7 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancelWithInterruptFlagFalse() throws Exception {
     String method = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
+      BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", method);
       try {
         int nbTasks = 1;
@@ -145,6 +148,8 @@ public class TestJPPFJob extends Setup1D1N {
   @Test(timeout=15000, expected=TimeoutException.class)
   public void testGetWithTimeout() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
+      BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
       client.submitJob(job);
@@ -159,6 +164,8 @@ public class TestJPPFJob extends Setup1D1N {
   @Test(timeout=15000)
   public void testIsCancelledClientSideExpiration() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
+      BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       int nbTasks = 1;
       long duration = 3000L;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, duration);

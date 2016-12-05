@@ -365,6 +365,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         executionStatus = ExecutorStatus.DISABLED;
         break;
     }
+    if (debugEnabled) log.debug(String.format("changing state to %s, newStatus=%s, oldStatus=%s, node=%s", state, executionStatus, oldExecutionStatus, this));
     fireExecutionStatusChanged(oldExecutionStatus, executionStatus);
     return b;
   }

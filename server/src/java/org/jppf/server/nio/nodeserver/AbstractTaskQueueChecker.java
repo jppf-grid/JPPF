@@ -146,10 +146,11 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
       log.error(message);
       throw new IllegalStateException(message);
     }
-    if (debugEnabled) log.debug("Adding idle channel {}", channel);
+    if (debugEnabled) log.debug("request to add idle channel {}", channel);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
+        if (debugEnabled) log.debug("adding idle channel {}", channel);
         if (channel.getChannel().isOpen()) {
           synchronized(idleChannels) {
             if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
@@ -173,14 +174,14 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * @return a reference to the removed channel.
    */
   C removeIdleChannel(final C channel) {
-    if (debugEnabled) log.debug("Removing idle channel {}", channel);
+    if (debugEnabled) log.debug("removing idle channel {}", channel);
     synchronized(idleChannels) {
       if (idleChannels.remove(channel)) {
         channel.idle.set(false);
         JPPFSystemInformation info = channel.getSystemInformation();
         if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
         stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
-      }
+      } // else log.warn("could not remove idle channel {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());
     }
     return channel;
   }
@@ -191,6 +192,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * @return a futrue on the removal request task.
    */
   Future<?> removeIdleChannelAsync(final C channel) {
+    if (debugEnabled) log.debug("request to remove idle channel {}", channel);
     return channelsExecutor.submit(new Runnable() {
       @Override
       public void run() {

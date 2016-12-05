@@ -43,6 +43,7 @@ public class ConfigurationHelper {
   public static String createTempConfigFile(final TypedProperties config) {
     String path = null;
     try {
+      System.err.println("jppf temp dir: " + FileUtils.getJPPFTempDir());
       File file = File.createTempFile("config", ".properties", FileUtils.getJPPFTempDir());
       file.deleteOnExit();
       Writer writer = null;

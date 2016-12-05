@@ -167,7 +167,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
           }
         }
       }
-    } catch (RuntimeException e) {
+    //} catch (RuntimeException e) {
+    } catch (Exception e) {
       log.info(e.getMessage(), e);
       throw e;
     } finally {
