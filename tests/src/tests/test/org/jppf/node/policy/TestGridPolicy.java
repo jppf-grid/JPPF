@@ -193,7 +193,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       assertEquals(results.size(), nbTasks);
       for (int i=0; i<nbTasks; i++) {
         Task<?> task = results.get(i);
-        assertNotNull(task.getResult());
+        assertNotNull("result of task #" + i + " is null", task.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       }
     } finally {
