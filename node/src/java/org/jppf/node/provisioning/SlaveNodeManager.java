@@ -119,7 +119,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   void submitProvisioningRequest(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
     if (requestedSlaves < 0) return;
-    executor.submit(new Runnable() {
+    executor.execute(new Runnable() {
       @Override
       public void run() {
         shrinkOrGrowSlaves(requestedSlaves, interruptIfRunning, configOverrides);
