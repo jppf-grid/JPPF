@@ -154,13 +154,15 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       if (!isJobCancelled()) {
         int count = 0;
         ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
-        for (Task task : taskList) {
-          if (!(task instanceof JPPFExceptionResult)) {
-            if (task instanceof AbstractTask) ((AbstractTask) task).setExecutionDispatcher(taskNotificationDispatcher);
-            NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
-            taskWrapperList.add(taskWrapper);
-            Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
-            count++;
+        synchronized(taskWrapperList) {
+          for (Task task : taskList) {
+            if (!(task instanceof JPPFExceptionResult)) {
+              if (task instanceof AbstractTask) ((AbstractTask) task).setExecutionDispatcher(taskNotificationDispatcher);
+              NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
+              taskWrapperList.add(taskWrapper);
+              Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
+              count++;
+            }
           }
         }
         for (int i=0; i<count; i++) {
@@ -195,7 +197,9 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       }
     }
     if (taskWrapperList != null) {
+      synchronized(taskWrapperList) {
       for (NodeTaskWrapper ntw: taskWrapperList) cancelTask(ntw, callOnCancel);
+      }
     }
   }
 
