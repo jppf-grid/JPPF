@@ -121,6 +121,7 @@ class JobPollingHandler extends AbstractRefreshHandler {
    * @throws Exception if any error occurs.
    */
   private void refreshDispatches(final JobDriver jobDriver, final Job job, final NodeJobInformation[] nodeInfos) throws Exception {
+    if (job == null) return;
     List<JobDispatch> monitorDispatches = job.getJobDispatches();
     Map<String, NodeJobInformation> nodeJobInfoMap = new HashMap<>();
     for (NodeJobInformation nji: nodeInfos) nodeJobInfoMap.put(nji.getNodeInfo().getUuid(), nji);

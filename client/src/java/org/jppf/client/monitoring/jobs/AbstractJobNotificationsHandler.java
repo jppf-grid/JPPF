@@ -69,7 +69,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     //if (log.isTraceEnabled()) log.trace("got jmx notification: {}", notification);
-    executor.submit(new NotificationHandlingTask((JobNotification) notification));
+    executor.execute(new NotificationHandlingTask((JobNotification) notification));
   }
 
   /**

@@ -415,7 +415,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
         }
       }
     };
-    executor.submit(dispatchTask);
+    executor.execute(dispatchTask);
   }
 
   /**
