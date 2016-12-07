@@ -126,7 +126,7 @@ public class ThreadService {
     try {
       isTerminated();
       if (job == null) throw new IllegalArgumentException("Null job.");
-      executor.submit(job);
+      executor.execute(job);
     } catch(RuntimeException | Error e) {
       if (logger.traceOn()) logger.trace("handoff", "got exception: ", e);
       throw e;
