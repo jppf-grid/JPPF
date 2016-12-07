@@ -228,7 +228,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
       // create a task for each trade
       for (String tradeId: tradeIdList) job.add(createTask(tradeId));
       jppfClient.submitJob(job);
-      resultsExecutor.submit(new ResultCollectionTask(job, timestamp));
+      resultsExecutor.execute(new ResultCollectionTask(job, timestamp));
     }
 
     /**
@@ -249,7 +249,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
         job.getSLA().setExecutionPolicy(policy);
         job.add(createTask(tradeId));
         jppfClient.submitJob(job);
-        resultsExecutor.submit(new ResultCollectionTask(job, timestamp));
+        resultsExecutor.execute(new ResultCollectionTask(job, timestamp));
       }
     }
 

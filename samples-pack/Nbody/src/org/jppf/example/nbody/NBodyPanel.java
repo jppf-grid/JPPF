@@ -140,7 +140,7 @@ public class NBodyPanel extends JPanel
    */
   public void updatePositions(final Vector2d[] pos)
   {
-    if (!isUpdating()) executor.submit(new UpdateRequest(pos));
+    if (!isUpdating()) executor.execute(new UpdateRequest(pos));
   }
 
   /**

@@ -138,7 +138,7 @@ public class Ticker extends ThreadSynchronization implements Runnable {
    * @param marketData the market data that was updated.
    */
   private void fireTickerEvent(final MarketData marketData) {
-    notificationExecutor.submit(new NotificationTask(marketData));
+    notificationExecutor.execute(new NotificationTask(marketData));
   }
 
   /**

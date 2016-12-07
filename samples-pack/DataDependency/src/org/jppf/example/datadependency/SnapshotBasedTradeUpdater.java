@@ -153,7 +153,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater {
         lock.unlock();
       }
       //for (MarketData marketData: processingUpdates) jobExecutor.submit(new SubmissionTask(marketData));
-      jobExecutor.submit(new SubmissionTask(processingUpdates.toArray(new MarketData[0])));
+      jobExecutor.execute(new SubmissionTask(processingUpdates.toArray(new MarketData[0])));
     }
   }
 }

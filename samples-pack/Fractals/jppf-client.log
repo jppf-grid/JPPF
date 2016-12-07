@@ -1,9 +1,0 @@
-2016-05-24 09:08:18,866 [DEBUG][org.jppf.client.AbstractJPPFClient.<init>(96)]: Instantiating JPPF client with uuid=BF501137-6D64-8842-B4AB-B2D2E8B85DE1
-2016-05-24 09:08:18,898 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(80)]: --------------------------------------------------------------------------------
-2016-05-24 09:08:18,898 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(81)]: JPPF Version: 5.2, Build number: 1814, Build date: 2016-05-24 08:35 CEST
-2016-05-24 09:08:18,898 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(82)]: starting client with PID=12496, UUID=BF501137-6D64-8842-B4AB-B2D2E8B85DE1
-2016-05-24 09:08:18,898 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(83)]: --------------------------------------------------------------------------------
-2016-05-24 09:08:18,913 [DEBUG][org.jppf.client.AbstractGenericClient.initPools(143)]: initializing connections
-2016-05-24 09:08:18,913 [DEBUG][org.jppf.client.AbstractGenericClient.initRemotePools(165)]: initializing connections from discovery with priority = 0 and acceptMultipleInterfaces = false
-2016-05-24 09:08:18,913 [DEBUG][org.jppf.client.AbstractGenericClient.initRemotePools(189)]: found peers in the configuration
-2016-05-24 09:08:18,913 [DEBUG][org.jppf.client.AbstractGenericClient.initRemotePools(191)]: list of drivers: [driver1]

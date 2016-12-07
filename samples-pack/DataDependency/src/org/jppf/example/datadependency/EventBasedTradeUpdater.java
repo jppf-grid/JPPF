@@ -91,7 +91,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
   public void marketDataUpdated(final TickerEvent event) {
     if (jobExecutor.isShutdown()) return;
     if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
-    jobExecutor.submit(new SubmissionTask(event.getMarketData()));
+    jobExecutor.execute(new SubmissionTask(event.getMarketData()));
     statsCollector.dataUpdated();
   }
 }

@@ -83,7 +83,7 @@ public class WebCrawlerRunner {
     urlCount = 0;
     createOrDisplayWaitWindow();
     CrawlExecution exec = new CrawlExecution(url, query, depth);
-    executor.submit(exec);
+    executor.execute(exec);
   }
 
   /**

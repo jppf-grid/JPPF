@@ -99,7 +99,7 @@ public class SequenceAlignmentRunner {
     SequenceAlignmentRunner.option = option;
     createOrDisplayWaitWindow();
     AlignmentExecution exec = new AlignmentExecution(targetSequence, matrix, dbPath);
-    executor.submit(exec);
+    executor.execute(exec);
   }
 
   /**

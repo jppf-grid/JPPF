@@ -80,7 +80,7 @@ public class MarketDataHandler implements TickerListener {
    */
   @Override
   public void marketDataUpdated(final TickerEvent event) {
-    executor.submit(new NodesUpdateTask(event.getMarketData()));
+    executor.execute(new NodesUpdateTask(event.getMarketData()));
   }
 
   /**
