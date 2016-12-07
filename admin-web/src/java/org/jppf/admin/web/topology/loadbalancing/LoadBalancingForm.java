@@ -42,7 +42,7 @@ public class LoadBalancingForm extends AbstractModalForm {
    */
   private TextArea<String> propertiesField;
   /**
-   * The abel containing the name of the driver.
+   * The label containing the name of the driver.
    */
   private Label driverNameLabel;
 

@@ -93,12 +93,11 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
         if (serverListOption != null) serverListOption.getUIComponent().repaint();
       }
     });
-    //getJppfClient(null);
   }
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    scheduler.submit(new NewConnectionTask(statsHandler, event.getDriver()));
+    scheduler.submit(new NewConnectionTask(statsHandler.getRolloverPosition(), statsHandler, event.getDriver()));
   }
 
   @Override
@@ -201,8 +200,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
         params.setValue(info.getParameters().asString());
         return true;
       }
-    }
-    catch(Exception e) {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return false;
@@ -248,7 +246,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     });
     List<TopologyDriver> list = manager.getDrivers();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (TopologyDriver driver: list) scheduler.submit(new NewConnectionTask(statsHandler, driver));
+    for (TopologyDriver driver: list) scheduler.submit(new NewConnectionTask(statsHandler.getRolloverPosition(), statsHandler, driver));
     notifyAll();
   }
 

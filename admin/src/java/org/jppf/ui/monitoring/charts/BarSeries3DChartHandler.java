@@ -123,7 +123,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
     invokeMethod(ds.getClass(), ds, "clear");
     ConnectionDataHolder cdh = statsHandler.getCurrentDataHolder();
     if (cdh == null) return config;
-    int statsCount = cdh.getDataList().size();
+    int statsCount = cdh.getSize();
     if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentDriver(), statsCount);
     int start = Math.max(0, statsHandler.getTickCount() - statsCount);
     int count = 0;

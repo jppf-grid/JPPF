@@ -16,25 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.data;
-
 /**
- * Interface for export of full statistics snapshots.
- * @author Laurent Cohen
+ * Support update and handling of the server statiscs.
+ * @exclude
  */
-public interface StatsExporter {
-  /**
-   * Export in plain text format.
-   */
-  int TEXT = 1;
-  /**
-   * Export in csv format.
-   */
-  int CSV = 2;
-
-  /**
-   * Format all the fields in the server stats page.
-   * @return a formatted plain text string containing all the fields and their values.
-   */
-  String formatAll();
-}
+package org.jppf.admin.web.stats;

@@ -28,6 +28,7 @@ import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
 import org.jppf.admin.web.admin.*;
 import org.jppf.admin.web.auth.LoginPage;
+import org.jppf.admin.web.stats.StatsUpdater;
 import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
@@ -65,6 +66,10 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    * Mapping of configurations to their type.
    */
   private final Map<PanelType, ConfigurationHandler> configMap = new EnumMap<>(PanelType.class);
+  /**
+   * Updates the statistics from all drivers.
+   */
+  private StatsUpdater statsUpdater;
 
   /**
    * Default constructor.
@@ -102,6 +107,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     JPPFConfiguration.reset(getConfig(PanelType.CLIENT).getProperties());
     this.topologyManager = new TopologyManager();
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
+    this.statsUpdater = new StatsUpdater(topologyManager);
   }
 
   /**
@@ -151,6 +157,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   public ConfigurationHandler getConfig(final PanelType type) {
     return (type == null) ? null : configMap.get(type);
+  }
+
+  /**
+   * @return the objects which updates the statistics from all drivers.
+   */
+  public StatsUpdater getStatsUpdater() {
+    return statsUpdater;
   }
 
   /**

@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 import org.jppf.utils.LocalizationUtils;
 
 /**
- * 
+ * An enumeration of the fields used i the charts and statistics views.
  * @author Laurent Cohen
  */
 public enum Fields {

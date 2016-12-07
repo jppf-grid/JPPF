@@ -42,7 +42,6 @@ public abstract class AJAXDownload extends AbstractAjaxBehavior {
   }
 
   /**
-   *
    * @param addAntiCache whether to disable the cache.
    */
   public AJAXDownload(final boolean addAntiCache) {

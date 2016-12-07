@@ -64,7 +64,10 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   @Override
   public void run() {
     synchronized(statsHandler) {
-      if (statsHandler.dataHolderMap.get(driver.getUuid()) != null)  statsHandler.dataHolderMap.remove(driver.getUuid());
+      if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) {
+        ConnectionDataHolder cdh = statsHandler.dataHolderMap.remove(driver.getUuid());
+        if (cdh != null) cdh.close();
+      }
     }
     JComboBox<?> box = null;
     while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);

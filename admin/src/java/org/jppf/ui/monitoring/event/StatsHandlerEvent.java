@@ -19,7 +19,7 @@ package org.jppf.ui.monitoring.event;
 
 import java.util.EventObject;
 
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.data.BaseStatsHandler;
 
 /**
  * Event sent when the stats data has changed.
@@ -50,7 +50,7 @@ public class StatsHandlerEvent extends EventObject {
    * @param source the stats formatter whose data has changed.
    * @param type the type of this event.
    */
-  public StatsHandlerEvent(final StatsHandler source, final Type type) {
+  public StatsHandlerEvent(final BaseStatsHandler source, final Type type) {
     super(source);
     this.type = type;
   }

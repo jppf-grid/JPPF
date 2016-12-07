@@ -19,98 +19,145 @@ package org.jppf.ui.monitoring.data;
 
 import static org.jppf.ui.monitoring.data.Fields.*;
 
+import java.util.*;
+
 import org.jppf.utils.collections.CollectionUtils;
 
 /**
- * Constants for the JPPF statistics collected form the server.
+ * Constants for the JPPF statistics collected from the servers.
  * @author Laurent Cohen
  */
-public interface StatsConstants
-{
+public class StatsConstants {
   /**
    * List of stats properties related to network connections.
    */
-  Fields[] CONNECTION_PROPS = {
-      NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_BUSY_NODES, NB_CLIENTS, MAX_CLIENTS
-  };
+  public static final Fields[] CONNECTION_FIELDS = { NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_BUSY_NODES, NB_CLIENTS, MAX_CLIENTS };
   /**
    * List of stats properties related to queue operations.
    */
-  Fields[] QUEUE_PROPS = {
-      LATEST_QUEUE_TIME, TOTAL_QUEUE_TIME, MIN_QUEUE_TIME, MAX_QUEUE_TIME, AVG_QUEUE_TIME, TOTAL_QUEUED, QUEUE_SIZE,
-      MAX_QUEUE_SIZE
-  };
+  public static final Fields[] QUEUE_FIELDS = { LATEST_QUEUE_TIME, TOTAL_QUEUE_TIME, MIN_QUEUE_TIME, MAX_QUEUE_TIME, AVG_QUEUE_TIME, TOTAL_QUEUED, QUEUE_SIZE, MAX_QUEUE_SIZE };
   /**
    * List of stats properties related to tasks execution.
    */
-  Fields[] EXECUTION_PROPS = {
-      TOTAL_TASKS_EXECUTED, TOTAL_EXECUTION_TIME, LATEST_EXECUTION_TIME, MIN_EXECUTION_TIME, MAX_EXECUTION_TIME,
-      AVG_EXECUTION_TIME
-  };
-
+  public static final Fields[] EXECUTION_FIELDS = { TOTAL_TASKS_EXECUTED, TOTAL_EXECUTION_TIME, LATEST_EXECUTION_TIME, MIN_EXECUTION_TIME, MAX_EXECUTION_TIME, AVG_EXECUTION_TIME };
   /**
    * List of stats properties related to tasks execution.
    */
-  Fields[] NODE_EXECUTION_PROPS = {
-      TOTAL_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME, MIN_NODE_EXECUTION_TIME, MAX_NODE_EXECUTION_TIME,
-      AVG_NODE_EXECUTION_TIME
-  };
+  public static final Fields[] NODE_EXECUTION_FIELDS = { TOTAL_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME, MIN_NODE_EXECUTION_TIME, MAX_NODE_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME };
   /**
    * List of stats properties related to tasks execution.
    */
-  Fields[] TRANSPORT_PROPS = {
-      TOTAL_TRANSPORT_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME
-  };
+  public static final Fields[] TRANSPORT_FIELDS = { TOTAL_TRANSPORT_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME };
   /**
    * List of stats properties related to job execution.
    */
-  Fields[] JOB_PROPS = {
-      JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_LATEST_TIME, JOBS_MIN_TIME, JOBS_MAX_TIME, JOBS_AVG_TIME, JOBS_MIN_TASKS, JOBS_MAX_TASKS, JOBS_AVG_TASKS
-  };
+  public static final Fields[] JOB_FIELDS = { JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_LATEST_TIME, JOBS_MIN_TIME, JOBS_MAX_TIME, JOBS_AVG_TIME, JOBS_MIN_TASKS, JOBS_MAX_TASKS, JOBS_AVG_TASKS };
   /**
    * List of stats properties related to class loading requests to the clients.
    */
-  Fields[] CLIENT_CL_REQUEST_TIME_PROPS = {
-      CLIENT_TOTAL_CL_REQUEST_COUNT, CLIENT_AVG_CL_REQUEST_TIME, CLIENT_MIN_CL_REQUEST_TIME, CLIENT_MAX_CL_REQUEST_TIME, CLIENT_LATEST_CL_REQUEST_TIME
-  };
+  public static final Fields[] CLIENT_CL_REQUEST_TIME_FIELDS = { CLIENT_TOTAL_CL_REQUEST_COUNT, CLIENT_AVG_CL_REQUEST_TIME, CLIENT_MIN_CL_REQUEST_TIME, CLIENT_MAX_CL_REQUEST_TIME,
+    CLIENT_LATEST_CL_REQUEST_TIME };
   /**
    * List of stats properties related to class loading requests from the nodes.
    */
-  Fields[] NODE_CL_REQUEST_TIME_PROPS = {
-      NODE_TOTAL_CL_REQUEST_COUNT, NODE_AVG_CL_REQUEST_TIME, NODE_MIN_CL_REQUEST_TIME, NODE_MAX_CL_REQUEST_TIME, NODE_LATEST_CL_REQUEST_TIME
-  };
+  public static final Fields[] NODE_CL_REQUEST_TIME_FIELDS = { NODE_TOTAL_CL_REQUEST_COUNT, NODE_AVG_CL_REQUEST_TIME, NODE_MIN_CL_REQUEST_TIME, NODE_MAX_CL_REQUEST_TIME,
+    NODE_LATEST_CL_REQUEST_TIME };
   /**
    * List of stats properties for inbound network traffic.
    */
-  Fields[] INBOUND_NETWORK_TRAFFIC_PROPS = {
-      //CLIENT_INBOUND_MB, NODE_INBOUND_MB, PEER_INBOUND_MB, UNIDENTIFIED_INBOUND_MB, TOTAL_INBOUND_MB
-      CLIENT_INBOUND_MB, NODE_INBOUND_MB, UNIDENTIFIED_INBOUND_MB, TOTAL_INBOUND_MB
-  };
+  public static final Fields[] INBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_INBOUND_MB, NODE_INBOUND_MB, UNIDENTIFIED_INBOUND_MB, TOTAL_INBOUND_MB };
   /**
    * List of stats properties for inbound network traffic.
    */
-  Fields[] OUTBOUND_NETWORK_TRAFFIC_PROPS = {
-      //CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, PEER_OUTBOUND_MB, UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB
-      CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB
-  };
+  public static final Fields[] OUTBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB };
   /**
    * List of properties for health snapshots.
    * @since 5.0
    */
-  Fields[] HEALTH_PROPS = {
-      HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_RAM, HEALTH_RAM_PCT, HEALTH_THREADS, HEALTH_CPU, HEALTH_SYSTEM_CPU
-  };
+  public static final Fields[] HEALTH_FIELDS = { HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_RAM, HEALTH_RAM_PCT, HEALTH_THREADS, HEALTH_CPU, HEALTH_SYSTEM_CPU };
   /**
    * List of all fields displayed in the server stats view.
    */
-  Fields[] ALL_FIELDS =
-    CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS, NODE_CL_REQUEST_TIME_PROPS,
-        INBOUND_NETWORK_TRAFFIC_PROPS, OUTBOUND_NETWORK_TRAFFIC_PROPS);
+  public static final Fields[] ALL_FIELDS = CollectionUtils.concatArrays(EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
+    NODE_CL_REQUEST_TIME_FIELDS, INBOUND_NETWORK_TRAFFIC_FIELDS, OUTBOUND_NETWORK_TRAFFIC_FIELDS);
   /**
    * List of all fields available in the charts.
    * @since 5.0
    */
-  Fields[] ALL_CHART_FIELDS =
-    CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS, NODE_CL_REQUEST_TIME_PROPS,
-        INBOUND_NETWORK_TRAFFIC_PROPS, OUTBOUND_NETWORK_TRAFFIC_PROPS, HEALTH_PROPS);
+  public static final Fields[] ALL_CHART_FIELDS = CollectionUtils.concatArrays(EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
+    NODE_CL_REQUEST_TIME_FIELDS, INBOUND_NETWORK_TRAFFIC_FIELDS, OUTBOUND_NETWORK_TRAFFIC_FIELDS, HEALTH_FIELDS);
+  /**
+   * Name of the execution table.
+   */
+  public static final String EXECUTION = "ExecutionTable";
+  /**
+   * Name of the node execution table.
+   */
+  public static final String NODE_EXECUTION = "NodeExecutionTable";
+  /**
+   * Name of the network overhead table.
+   */
+  public static final String TRANSPORT = "NetworkOverheadTable";
+  /**
+   * Name of the connections table.
+   */
+  public static final String CONNECTION = "ConnectionsTable";
+  /**
+   * Name of the tasks queue table.
+   */
+  public static final String QUEUE = "QueueTable";
+  /**
+   * Name of the jobs queue table.
+   */
+  public static final String JOB = "JobTable";
+  /**
+   * Name of the node class loading requests table.
+   */
+  public static final String NODE_CL_REQUEST_TIME = "NodeClassLoadingRequestTable";
+  /**
+   * Name of the client class loading requests table.
+   */
+  public static final String CLIENT_CL_REQUEST_TIME = "ClientClassLoadingRequestTable";
+  /**
+   * Name of the inboud network traffic requests table.
+   */
+  public static final String INBOUND_NETWORK_TRAFFIC = "InboundTrafficTable";
+  /**
+   * Name of the outboud network traffic requests table.
+   */
+  public static final String OUTBOUND_NETWORK_TRAFFIC = "OutboundTrafficTable";
+  /**
+   * Mapping of table names to the associated fields.
+   */
+  public static final Map<String, Fields[]> ALL_TABLES_MAP = createFieldsMap();
+
+  /**
+   * Create a mapping of table names to the corresponding set of fields.
+   * @return a map of names to {@code Field[]}.
+   */
+  private static Map<String, Fields[]> createFieldsMap() {
+    Map<String, Fields[]> map = new LinkedHashMap<>();
+    addFieldsMapping(map, EXECUTION, EXECUTION_FIELDS);
+    addFieldsMapping(map, NODE_EXECUTION, NODE_EXECUTION_FIELDS);
+    addFieldsMapping(map, TRANSPORT, TRANSPORT_FIELDS);
+    addFieldsMapping(map, CONNECTION, CONNECTION_FIELDS);
+    addFieldsMapping(map, QUEUE, QUEUE_FIELDS);
+    addFieldsMapping(map, JOB, JOB_FIELDS);
+    addFieldsMapping(map, NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_FIELDS);
+    addFieldsMapping(map, CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_FIELDS);
+    addFieldsMapping(map, INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_FIELDS);
+    addFieldsMapping(map, OUTBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC_FIELDS);
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * Add a mmping of the localized specified name to a set of fields.
+   * @param map the map to add the mapping to.
+   * @param name the name to localize and use as a key in the map.
+   * @param fields the fileds associated with the key.
+   */
+  private static void addFieldsMapping(final Map<String, Fields[]> map, final String name, final Fields[] fields) {
+    map.put(name, fields);
+  }
+
 }

@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.data;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
@@ -29,52 +30,53 @@ import org.jppf.utils.stats.JPPFStatistics;
  */
 public class ConnectionDataHolder {
   /**
-   * The list of all snapshots kept in memory. the size of this list is always equal to or less than
-   * the rollover position.
-   */
-  private final List<JPPFStatistics> dataList = new Vector<>();
-  /**
-   * Cache of the data snapshots fields maps to their corresponding string values.
-   */
-  private final List<Map<Fields, String>> stringValuesMaps = new Vector<>();
-  /**
    * Cache of the data snapshots fields maps to their corresponding double values.
    */
-  private final List<Map<Fields, Double>> doubleValuesMaps = new Vector<>();
+  private final LinkedList<Map<Fields, Double>> doubleValuesMaps = new LinkedList<>();
   /**
    * The topology data associated with the driver connection.
    * @since 5.0
    */
-  private TopologyDriver driverData;
+  private final TopologyDriver driver;
+  /**
+   * Formats the statistics.
+   */
+  private final StatsTransformer statsFormatter;
+  /**
+   * The maximum size of the snapshots lists.
+   */
+  private int capacity;
+  /**
+   * The size of the snapshots lists.
+   */
+  private int size;
 
   /**
    * Default constructor.
+   * @param capacity the maximum number of snapshots held by this data holder.
+   * @param driver a the drivr for which to get the statistics.
    */
-  public ConnectionDataHolder() {
+  public ConnectionDataHolder(final int capacity, final TopologyDriver driver) {
+    this.driver = driver;
+    if (capacity <= 0) throw new IllegalArgumentException("capacity must be greater than 0");
+    this.capacity = capacity;
+    this.statsFormatter = new StatsTransformer();
   }
 
   /**
-   * Get the list of statistic snapshots for this connection data holder.
-   * @return a list of <code>JPPFStats</code> instances.
+   * Get the size of the list of statistic snapshots.
+   * @return the number of snapshots current held.
    */
-  public List<JPPFStatistics> getDataList() {
-    return dataList;
+  public synchronized int getSize() {
+    return size;
   }
 
   /**
    * Get a cache of the data snapshots fields maps to their corresponding double values.
    * @return a list of maps of field names to double values.
    */
-  public List<Map<Fields, Double>> getDoubleValuesMaps() {
+  public synchronized List<Map<Fields, Double>> getDoubleValuesMaps() {
     return doubleValuesMaps;
-  }
-
-  /**
-   * Get a cache of the data snapshots fields maps to their corresponding string values.
-   * @return a list of maps of field names to string values.
-   */
-  public List<Map<Fields, String>> getStringValuesMaps() {
-    return stringValuesMaps;
   }
 
   /**
@@ -82,21 +84,19 @@ public class ConnectionDataHolder {
    * @return a map of field names to double values.
    * @since 5.0
    */
-  public Map<Fields, Double> getLatestDoubleValues() {
-    synchronized(doubleValuesMaps) {
-      return doubleValuesMaps.isEmpty() ? null : doubleValuesMaps.get(doubleValuesMaps.size() - 1);
-    }
+  public synchronized Map<Fields, Double> getLatestDoubleValues() {
+    return doubleValuesMaps.getLast();
   }
 
   /**
-   * Get the latest data snapshot mapping fields to their corresponding string values.
-   * @return a map of field names to string values.
-   * @since 5.0
+   * Get the data snapshot mapping fields to their corresponding double values, at the specified position.
+   * @param pos the position of the values to get in the list of snapshots.
+   * @return a map of field names to double values if it exists, {@code null} otherwise.
    */
-  public Map<Fields, String> getLatestStringValues() {
-    synchronized(stringValuesMaps) {
-      return stringValuesMaps.isEmpty() ? null : stringValuesMaps.get(stringValuesMaps.size() - 1);
-    }
+  public synchronized Map<Fields, Double> getDoubleValuesAt(final int pos) {
+    if (doubleValuesMaps.isEmpty()) return null;
+    if ((pos < 0) || (pos >= getSize())) return null;
+    return doubleValuesMaps.get(pos);
   }
 
   /**
@@ -104,16 +104,50 @@ public class ConnectionDataHolder {
    * @return a {@link TopologyDriver} object.
    * @since 5.0
    */
-  public synchronized TopologyDriver getDriverData() {
-    return driverData;
+  public TopologyDriver getDriver() {
+    return driver;
   }
 
   /**
-   * Set the topology data associated with the driver connection.
-   * @param driverData a {@link TopologyDriver} object.
-   * @since 5.0
+   *
+   * @param stats the data snapshot to map.
+   * @param snapshot the health data snapshot to map.
    */
-  public synchronized void setDriverData(final TopologyDriver driverData) {
-    this.driverData = driverData;
+  public synchronized void update(final JPPFStatistics stats, final HealthSnapshot snapshot) {
+    while (size >= capacity) removeFirst();
+    doubleValuesMaps.add(statsFormatter.formatDoubleValues(stats, snapshot));
+    size++;
+  }
+
+  /**
+   * Remove the first snapshot in all the lists.
+   */
+  private synchronized void removeFirst() {
+    doubleValuesMaps.removeFirst();
+    size--;
+  }
+
+  /**
+   * @return the maximum size of the snapshots lists.
+   */
+  public synchronized int getCapacity() {
+    return capacity;
+  }
+
+  /**
+   * Set the maximum size of the snapshots lists.
+   * @param capacity the size to set.
+   */
+  public synchronized void setCapacity(final int capacity) {
+    if (capacity <= 0) throw new IllegalArgumentException("capacity must be greater than 0");
+    this.capacity = capacity;
+    while (size > capacity) removeFirst();
+  }
+
+  /**
+   * Cleanup the resources used by this object.
+   */
+  public synchronized void close() {
+    doubleValuesMaps.clear();
   }
 }

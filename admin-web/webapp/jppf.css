@@ -105,7 +105,7 @@ h2,h3, h4 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bot
 h2 { font-weight: 900; ; font-size: 18pt }
 h3 { font-size: 14pt; }
 h4 { font-size: 12pt; font-weight: bold }
-h5 { font-size: 10pt; font-weight: bold; margin-top: 10pt; margin-bottom: 10pt }
+h5 { font-size: 11pt; font-weight: bold; margin-top: 10pt; margin-bottom: 10pt }
 table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: #E2E4F0; }
 .blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
@@ -336,6 +336,19 @@ textarea {
   padding-right: 2px;
 }
 
+.stats_number {
+  text-align: right;
+  padding-right: 2px;
+  font-weight: normal;
+  color: black;
+}
+
+.stats_label {
+  text-align: left;
+  padding-right: 20px;
+  font-weight: normal;
+}
+
 .empty {
   color: black;
   background: transparent;
@@ -516,4 +529,27 @@ p { font-size: 10pt; }
   border: 1px solid #C5D0F0;
   box-shadow: 1px 1px 5px #6D78B6 inset;
   padding: 4px 6px;
+}
+
+.stats_table_header {
+  margin: 0px;
+  padding: 3px;
+  color: white;
+  background-color: #6D78B6;
+}
+
+.stats_table {
+  border: 1px solid #6D78B6;
+  background-color: white;
+  line-height: 1em;
+}
+
+.stats_block {
+  box-shadow: 4px 4px 4px #6D78B6;
+  min-width: 270px;
+}
+
+.separator {
+  width: 10px;
+  display: inline-block;
 }

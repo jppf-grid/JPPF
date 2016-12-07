@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.data;
 
-import java.util.TimerTask;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -51,16 +51,22 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
    * The {@link ClientHandler}.
    */
   private final ClientHandler clientHandler;
+  /**
+   * The size of the snapshots lists.
+   */
+  private final int capacity;
 
   /**
    * Initialized this task with the specified client connection.
+   * @param capacity the size of the snapshots lists.
    * @param statsHandler the {@link StatsHandler}.
    * @param driver represents the new connection that was created.
    */
-  public NewConnectionTask(final StatsHandler statsHandler, final TopologyDriver driver) {
+  public NewConnectionTask(final int capacity, final StatsHandler statsHandler, final TopologyDriver driver) {
     this.statsHandler = statsHandler;
     this.clientHandler = statsHandler.getClientHandler();
     this.driver = driver;
+    this.capacity = capacity;
   }
 
   @Override
@@ -68,8 +74,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
     synchronized(statsHandler) {
       if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) return;
       if (debugEnabled) log.debug("adding client connection " + driver);
-      ConnectionDataHolder cdh = new ConnectionDataHolder();
-      cdh.setDriverData(driver);
+      ConnectionDataHolder cdh = new ConnectionDataHolder(capacity, driver);
       statsHandler.dataHolderMap.put(driver.getUuid(), cdh);
       if (statsHandler.timer != null) {
         TimerTask task = new StatsRefreshTask(driver);

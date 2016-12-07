@@ -22,6 +22,7 @@ import static org.jppf.ui.monitoring.data.StatsConstants.*;
 
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.utils.LocalizationUtils;
 
 /**
@@ -36,32 +37,37 @@ public class CsvStatsExporter implements StatsExporter {
   /**
    * The object from which to get the values.
    */
-  private final StatsHandler statsHandler;
+  private final BaseStatsHandler statsHandler;
+  /**
+   * The driver for which statistics are exported.
+   */
+  private final TopologyDriver driver;
 
   /**
-   * 
    * @param statsHandler the object from which to get the values.
+   * @param driver the driver for which statistics are exported.
    */
-  public CsvStatsExporter(final StatsHandler statsHandler) {
+  public CsvStatsExporter(final BaseStatsHandler statsHandler, final TopologyDriver driver) {
     this.statsHandler = statsHandler;
+    this.driver = driver;
   }
 
   @Override
   public String formatAll() {
     StringBuilder sb = new StringBuilder();
     sb.append("\"JPPF driver statistics\",\n\n");
-    Map<Fields, Double> m = statsHandler.getLatestDoubleValues();
+    Map<Fields, Double> m = statsHandler.getLatestDoubleValues(driver);
     Map<Fields, Double> map = (m == null) ? new HashMap<Fields, Double>() : new HashMap<>(m);
-    sb.append(format(map, EXECUTION_PROPS, "ExecutionTable.label"));
-    sb.append(format(map, NODE_EXECUTION_PROPS, "NodeExecutionTable.label"));
-    sb.append(format(map, TRANSPORT_PROPS, "NetworkOverheadTable.label"));
-    sb.append(format(map, JOB_PROPS, "JobTable.label"));
-    sb.append(format(map, QUEUE_PROPS, "QueueTable.label"));
-    sb.append(format(map, CONNECTION_PROPS, "ConnectionsTable.label"));
-    sb.append(format(map, NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable.label"));
-    sb.append(format(map, CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable.label"));
-    sb.append(format(map, INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable.label"));
-    sb.append(format(map, OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable.label"));
+    sb.append(format(map, EXECUTION_FIELDS, "ExecutionTable.label"));
+    sb.append(format(map, NODE_EXECUTION_FIELDS, "NodeExecutionTable.label"));
+    sb.append(format(map, TRANSPORT_FIELDS, "NetworkOverheadTable.label"));
+    sb.append(format(map, JOB_FIELDS, "JobTable.label"));
+    sb.append(format(map, QUEUE_FIELDS, "QueueTable.label"));
+    sb.append(format(map, CONNECTION_FIELDS, "ConnectionsTable.label"));
+    sb.append(format(map, NODE_CL_REQUEST_TIME_FIELDS, "NodeClassLoadingRequestTable.label"));
+    sb.append(format(map, CLIENT_CL_REQUEST_TIME_FIELDS, "ClientClassLoadingRequestTable.label"));
+    sb.append(format(map, INBOUND_NETWORK_TRAFFIC_FIELDS, "InboundTrafficTable.label"));
+    sb.append(format(map, OUTBOUND_NETWORK_TRAFFIC_FIELDS, "OutboundTrafficTable.label"));
     return sb.toString();
   }
 

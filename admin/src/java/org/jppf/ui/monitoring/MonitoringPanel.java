@@ -45,7 +45,7 @@ import net.miginfocom.swing.MigLayout;
  * and switching the color scheme (skin) fot the whole UI.
  * @author Laurent Cohen
  */
-public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants {
+public class MonitoringPanel extends JPanel implements StatsHandlerListener {
   /**
    * Logger for this class.
    */
@@ -59,67 +59,23 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    */
   private static final String VISIBLE_STATS_KEY = "visible.server.stats";
   /**
-   *
-   */
-  private static final String EXECUTION = "ExecutionTable";
-  /**
-   *
-   */
-  private static final String NODE_EXECUTION = "NodeExecutionTable";
-  /**
-   *
-   */
-  private static final String TRANSPORT = "NetworkOverheadTable";
-  /**
-   *
-   */
-  private static final String CONNECTION = "ConnectionsTable";
-  /**
-   *
-   */
-  private static final String QUEUE = "QueueTable";
-  /**
-   *
-   */
-  private static final String JOB = "JobTable";
-  /**
-   *
-   */
-  private static final String NODE_CL_REQUEST_TIME = "NodeClassLoadingRequestTable";
-  /**
-   *
-   */
-  private static final String CLIENT_CL_REQUEST_TIME = "ClientClassLoadingRequestTable";
-  /**
-   *
-   */
-  private static final String INBOUND_NETWORK_TRAFFIC = "InboundTrafficTable";
-  /**
-   *
-   */
-  private static final String OUTBOUND_NETWORK_TRAFFIC = "OutboundTrafficTable";
-  /**
    * The stats formatter that provides the data.
    */
   private transient StatsHandler statsHandler = null;
   /**
-   *
+   * Mapping of table names to the corresponding items in the pick list for selecting the visible tables.
    */
-  private final Map<String, Fields[]> allTablesMap = createFieldsMap();
-  /**
-   *
-   */
-  private final Map<String, Item> allItems = createItems();
+  private final Map<String, LocalizedListItem> allItems = createItems();
   /**
    * Holds a list of table models to update when new stats are received.
    */
   private final List<MonitorTableModel> tableModels = new ArrayList<>();
   /**
-   *
+   * The list of displayed (visible) tables.
    */
-  private final List<Item> visibleItems = new ArrayList<>();
+  private final List<LocalizedListItem> visibleItems = new ArrayList<>();
   /**
-   *
+   * The list of displayed (visible) tables components.
    */
   private final List<JComponent> visibleTableComps = new ArrayList<>();
   /**
@@ -134,7 +90,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     this.statsHandler = StatsHandler.getInstance();
     JTable tmp = new JTable();
     FontMetrics metrics = tmp.getFontMetrics(tmp.getFont());
-    for (Map.Entry<String, Fields[]> entry: allTablesMap.entrySet()) {
+    for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) {
       int n = computeMaxWidth(entry.getValue(), metrics);
       if (n > maxLabelWidth) maxLabelWidth = n;
     }
@@ -154,7 +110,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * Add all visible tables to the view.
    */
   private void addTables() {
-    for (Item item: visibleItems) addTablePanel(allTablesMap.get(item.name), item.name);
+    for (LocalizedListItem item: visibleItems) addTablePanel(StatsConstants.ALL_TABLES_MAP.get(item.name), item.name);
   }
 
   /**
@@ -172,7 +128,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * @param title the reference to the localized title of the table.
    */
   private void addTablePanel(final Fields[] fields, final String title) {
-    Item item = allItems.get(title);
+    LocalizedListItem item = allItems.get(title);
     JComponent comp = makeTablePanel(fields, item.label);
     comp.setToolTipText(item.tooltip);
     add(comp);
@@ -199,7 +155,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * Create a chartPanel displaying a group of values.
    * @param props the names of the values to display.
    * @param title the title of the chartPanel.
-   * @return a <code>JComponent</code> instance.
+   * @return a {@code JComponent} instance.
    */
   private JComponent makeTablePanel(final Fields[] props, final String title) {
     JPanel panel = new JPanel();
@@ -234,44 +190,14 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   }
 
   /**
-   * Create a mapping of table names to the corresponding set of fields.
-   * @return a map of names to {@code Field[]}.
-   */
-  private Map<String, Fields[]> createFieldsMap() {
-    Map<String, Fields[]> map = new LinkedHashMap<>();
-    addFieldsMapping(map, EXECUTION, EXECUTION_PROPS);
-    addFieldsMapping(map, NODE_EXECUTION, NODE_EXECUTION_PROPS);
-    addFieldsMapping(map, TRANSPORT, TRANSPORT_PROPS);
-    addFieldsMapping(map, CONNECTION, CONNECTION_PROPS);
-    addFieldsMapping(map, QUEUE, QUEUE_PROPS);
-    addFieldsMapping(map, JOB, JOB_PROPS);
-    addFieldsMapping(map, NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_PROPS);
-    addFieldsMapping(map, CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_PROPS);
-    addFieldsMapping(map, INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_PROPS);
-    addFieldsMapping(map, OUTBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC_PROPS);
-    //return map;
-    return Collections.unmodifiableMap(map);
-  }
-
-  /**
-   * Add a mmping of the localized specified name to a set of fields.
-   * @param map the map to add the mapping to.
-   * @param name the name to localize and use as a key in the map.
-   * @param fields the fileds associated with the key.
-   */
-  private void addFieldsMapping(final Map<String, Fields[]> map, final String name, final Fields[] fields) {
-    map.put(name, fields);
-  }
-
-  /**
    * Create the map of all items.
-   * @return a mapping of non-localized names to {@link Item} objects.
+   * @return a mapping of non-localized names to {@link LocalizedListItem} objects.
    */
-  private Map<String, Item> createItems() {
-    String[] names = { EXECUTION, NODE_EXECUTION, TRANSPORT, CONNECTION, QUEUE, JOB, NODE_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME, INBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC };
-    Map<String, Item> map = new LinkedHashMap<>();
-    for (String name: names) map.put(name, new Item(name));
-    //return map;
+  private Map<String, LocalizedListItem> createItems() {
+    String[] names = { StatsConstants.EXECUTION, StatsConstants.NODE_EXECUTION, StatsConstants.TRANSPORT, StatsConstants.CONNECTION, StatsConstants.QUEUE, StatsConstants.JOB,
+      StatsConstants.NODE_CL_REQUEST_TIME, StatsConstants.CLIENT_CL_REQUEST_TIME, StatsConstants.INBOUND_NETWORK_TRAFFIC, StatsConstants.OUTBOUND_NETWORK_TRAFFIC };
+    Map<String, LocalizedListItem> map = new LinkedHashMap<>();
+    for (String name: names) map.put(name, new LocalizedListItem(name, BASE, Locale.getDefault()));
     return Collections.unmodifiableMap(map);
   }
 
@@ -292,8 +218,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
         @Override public void actionPerformed(final ActionEvent event) {
           visibleItems.clear();
           List<Object> picked = option.getPickList().getPickedItems();
-          List<Item> value = (picked == null) ? new ArrayList<Item>() : new ArrayList<Item>(picked.size());
-          for (Object o: picked) value.add((Item) o);
+          List<LocalizedListItem> value = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
+          for (Object o: picked) value.add((LocalizedListItem) o);
           visibleItems.addAll(value);
           clearTablesFromView();
           addTables();
@@ -331,7 +257,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     if (s != null) {
       String[] names = RegexUtils.SPACES_PATTERN.split(s);
       for (String name: names) {
-        Item item = allItems.get(name);
+        LocalizedListItem item = allItems.get(name);
         if (item != null) visibleItems.add(item);
       }
     }
@@ -346,45 +272,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     Preferences pref = OptionsHandler.getPreferences();
     StringBuilder sb = new StringBuilder();
     int count  = 0;
-    for (Item item: visibleItems) {
+    for (LocalizedListItem item: visibleItems) {
       if (count > 0) sb.append(' ');
       sb.append(item.name);
       count++;
     }
     pref.put(VISIBLE_STATS_KEY, sb.toString());
-  }
-
-  /**
-   * Instances of this class are the items displayed int he pick list.
-   */
-  public static class Item {
-    /**
-     * The non-localized name of this item
-     */
-    public final String name;
-    /**
-     * The localized name of this item
-     */
-    public final String label;
-    /**
-     * The localized name of this item
-     */
-    public final String tooltip;
-
-    /**
-     * Initialize this item.
-     * @param name the non-localized name of this item.
-     */
-    public Item(final String name) {
-      this.name = name;
-      this.label = LocalizationUtils.getLocalized(BASE, name + ".label");
-      this.tooltip = LocalizationUtils.getLocalized(BASE, name + ".tooltip");
-    }
-
-    @Override
-    public String toString() {
-      return label;
-    }
   }
 
   /**

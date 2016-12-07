@@ -19,10 +19,11 @@ package org.jppf.ui.monitoring;
 
 import static org.jppf.utils.stats.JPPFStatisticsHelper.createServerStatistics;
 
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -33,7 +34,7 @@ class MonitorTableModel extends AbstractTableModel {
   /**
    * Default values to use when the driver connection is no longer available.
    */
-  private static final Map<Fields, String> EMPTY_VALUES = StatsFormatter.getStringValuesMap(createServerStatistics());
+  private static final Map<Fields, String> EMPTY_VALUES = initEmptyValues();
   /**
    * The list of fields whose values are displayed in the table.
    */
@@ -73,11 +74,20 @@ class MonitorTableModel extends AbstractTableModel {
    */
   @Override
   public Object getValueAt(final int row, final int column) {
-    Fields name = fields[row];
-    if (column == 0) return GuiUtils.shortenLabel(name.toString());
-    Map<Fields, String> valuesMap = null;
-    if (StatsHandler.getInstance().getStatsCount() > 0) valuesMap = StatsHandler.getInstance().getLatestStringValues();
-    else valuesMap = EMPTY_VALUES;
-    return valuesMap.get(name);
+    Fields field = fields[row];
+    if (column == 0) return GuiUtils.shortenLabel(field.toString());
+    StatsHandler handler = StatsHandler.getInstance();
+    if (handler.getStatsCount() <= 0) return EMPTY_VALUES;
+    return handler.formatLatestValue(Locale.getDefault(), handler.getCurrentDataHolder().getDriver(), field);
+  }
+
+  /**
+   * 
+   * @return .
+   */
+  private static Map<Fields, String> initEmptyValues() {
+    StatsTransformer t = new StatsTransformer();
+    Map<Fields, Double> values = t.formatDoubleValues(createServerStatistics(), new HealthSnapshot());
+    return new StatsFormatter(Locale.getDefault()).formatValues(values);
   }
 }

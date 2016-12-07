@@ -27,6 +27,7 @@ import org.jppf.admin.web.jobs.JobsTreeData;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.treetable.TreeViewType;
 import org.wicketstuff.wicket.servlet3.auth.ServletContainerAuthenticatedWebSession;
 
@@ -44,6 +45,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * The user settings.
    */
   private UserSettings userSettings;
+  /**
+   * The currently selected driver.
+   */
+  private TopologyDriver currentDriver;
 
   /**
    * Initialize a new session.
@@ -137,5 +142,21 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   public UserSettings getUserSettings() {
     return userSettings;
+  }
+
+  /**
+   * @return the currently selected driver.
+   */
+  public TopologyDriver getCurrentDriver() {
+    if (currentDriver == null) currentDriver = JPPFWebConsoleApplication.get().getStatsUpdater().getCurrentDriver();
+    return currentDriver;
+  }
+
+  /**
+   * Set the current driver.
+   * @param currentDriver the driver to set.
+   */
+  public void setCurrentDriver(final TopologyDriver currentDriver) {
+    this.currentDriver = currentDriver;
   }
 }

@@ -19,7 +19,7 @@
 package org.jppf.admin.web.utils;
 
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
-import org.jppf.admin.web.auth.JPPFRole;
+import org.jppf.admin.web.auth.JPPFRoles;
 
 /**
  * Abstract class for action authorized for the manager role only.
@@ -28,6 +28,6 @@ import org.jppf.admin.web.auth.JPPFRole;
 public class AbstractManagerRoleAction extends AbstractUpdatableAction {
   @Override
   public void setAuthorized(final Roles roles) {
-    authorized = (roles == null) ? false : roles.hasRole(JPPFRole.MANAGER.getRoleName());
+    authorized = (roles == null) ? false : roles.hasRole(JPPFRoles.MANAGER);
   }
 }

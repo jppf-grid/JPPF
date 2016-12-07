@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
@@ -37,7 +38,7 @@ import org.slf4j.*;
  * This class provides a convenient access to the statistics obtained from the JPPF server.
  * @author Laurent Cohen
  */
-public final class StatsHandler extends BaseStatsHandler {
+public final class StatsHandler {
   /**
    * Logger for this class.
    */
@@ -47,9 +48,17 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * A string values map with no values.
+   */
+  private static final Map<Fields, String> NO_STRING_VALUES = new HashMap<>();
+  /**
    * Singleton instance of this class.
    */
   private static StatsHandler instance = null;
+  /**
+   * List of listeners registered with this stats handler.
+   */
+  private List<StatsHandlerListener> listeners = new ArrayList<>();
   /**
    * List of listeners tot he state of og the ShowIP toggle registered with this stats handler.
    */
@@ -57,15 +66,27 @@ public final class StatsHandler extends BaseStatsHandler {
   /**
    * Timer used to query the stats from the server.
    */
-  protected java.util.Timer timer = null;
+  java.util.Timer timer = null;
+  /**
+   * Interval, in milliseconds, between refreshes from the server.
+   */
+  long refreshInterval = 2000L;
+  /**
+   * Number of data snapshots kept in memory.
+   */
+  private int rolloverPosition = 200;
+  /**
+   * Contains all the data and its converted values received from the server.
+   */
+  final Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<>();
+  /**
+   * Number of data updates so far.
+   */
+  private int tickCount = 0;
   /**
    * The client handler.
    */
   private final ClientHandler clientHandler;
-  /**
-   * {@code true} to show IP addresses, {@code false} to display host names.
-   */
-  private AtomicBoolean showIP = new AtomicBoolean(false);
   /**
    * The object which monitors and maintains a representation of the grid topology.
    */
@@ -75,9 +96,9 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   private final JobMonitor jobMonitor;
   /**
-   * Localized formatter for stats values.
+   * {@code true} to show IP addresses, {@code false} to display host names.
    */
-  private final StatsFormatter formatter = new StatsFormatter(Locale.getDefault());
+  private AtomicBoolean showIP = new AtomicBoolean(false);
 
   /**
    * Get the singleton instance of this class.
@@ -105,16 +126,15 @@ public final class StatsHandler extends BaseStatsHandler {
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     if (debugEnabled) log.debug("initializing TopologyManager");
     topologyManager = new TopologyManager();
-    if (debugEnabled) log.debug("initializing JobMonitor");
+    if (debugEnabled) log.debug("done initializing JobMonitor");
     String modeStr = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_MODE);
     long period = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_PERIOD);
     JobMonitorUpdateMode mode = JobMonitorUpdateMode.IMMEDIATE_NOTIFICATIONS;
     if ("deferred_notifications".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.DEFERRED_NOTIFICATIONS;
     else if ("polling".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.POLLING;
     jobMonitor = new JobMonitor(mode, period, topologyManager);
-    if (debugEnabled) log.debug("initializing ClientHandler");
+    if (debugEnabled) log.debug("done initializing JobMonitor");
     clientHandler = new ClientHandler(this);
-    if (debugEnabled) log.debug("done initializing StatsHandler");
   }
 
   /**
@@ -128,19 +148,88 @@ public final class StatsHandler extends BaseStatsHandler {
   }
 
   /**
+   * Get the interval between refreshes from the server.
+   * @return the interval in milliseconds.
+   */
+  public long getRefreshInterval() {
+    return refreshInterval;
+  }
+
+  /**
+   * Set the interval between refreshes from the server.
+   * @param refreshInterval the interval in milliseconds.
+   */
+  public void setRefreshInterval(final long refreshInterval) {
+    this.refreshInterval = refreshInterval;
+  }
+
+  /**
    * Request an update from the current server connection.
    */
   public void requestUpdate() {
-    if (debugEnabled) log.debug("stats update requested");
     ConnectionDataHolder cdh = getCurrentDataHolder();
     if (cdh != null) requestUpdate(cdh.getDriver());
   }
 
-  @Override
+  /**
+   * Request an update from the server.
+   * @param driver represents the client connection to request the data from.
+   * @return a {@link JPPFStatistics} object.
+   */
+  public JPPFStatistics requestUpdate(final TopologyDriver driver) {
+    JPPFStatistics stats = null;
+    try {
+      JMXDriverConnectionWrapper jmx = driver.getJmx();
+      if ((jmx != null) && jmx.isConnected()) {
+        stats = jmx.statistics();
+        if (stats != null) update(driver, stats);
+      }
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return stats;
+  }
+
+  /**
+   * Update the current statistics with new values obtained from the server.
+   * @param driver represents the client connection from which the data is obtained.
+   * @param stats the object holding the new statistics values.
+   */
   public synchronized void update(final TopologyDriver driver, final JPPFStatistics stats) {
-    super.update(driver, stats);
+    if (stats == null) return;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    tickCount++;
+    if (dataHolder == null) return;
+    TopologyDriver data = dataHolder.getDriver();
+    HealthSnapshot snapshot = (data == null) ? new HealthSnapshot() : data.getHealthSnapshot();
+    dataHolder.update(stats, snapshot);
     TopologyDriver current = clientHandler.getCurrentDriver();
     if ((current != null) && driver.getUuid().equals(current.getUuid())) fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
+  }
+
+  /**
+   * Register a <code>StatsHandlerListener</code> with this stats formatter.
+   * @param listener the listener to register.
+   */
+  public void addStatsHandlerListener(final StatsHandlerListener listener) {
+    if (listener != null) listeners.add(listener);
+  }
+
+  /**
+   * Unregister a <code>StatsHandlerListener</code> from this stats formatter.
+   * @param listener the listener to unregister.
+   */
+  public void removeStatsHandlerListener(final StatsHandlerListener listener) {
+    if (listener != null) listeners.remove(listener);
+  }
+
+  /**
+   * Notify all listeners of a change in this stats formatter.
+   * @param type the type of event to fire.
+   */
+  public void fireStatsHandlerEvent(final StatsHandlerEvent.Type type) {
+    StatsHandlerEvent event = new StatsHandlerEvent(this, type);
+    for (StatsHandlerListener listener: listeners) listener.dataUpdated(event);
   }
 
   /**
@@ -181,12 +270,33 @@ public final class StatsHandler extends BaseStatsHandler {
   }
 
   /**
+   * Get the number of data snapshots kept in memory.
+   * @return the rollover position as an int value.
+   */
+  public synchronized int getRolloverPosition() {
+    return rolloverPosition;
+  }
+
+  /**
+   * Set the number of data snapshots kept in memory. If the value if less than the former values, the corresponding
+   * older data snapshots will be deleted.
+   * @param rolloverPosition the rollover position as an int value.
+   */
+  public synchronized void setRolloverPosition(final int rolloverPosition) {
+    if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: " + rolloverPosition);
+    for (ConnectionDataHolder dataHolder: dataHolderMap.values()) dataHolder.setCapacity(rolloverPosition);
+    this.rolloverPosition = rolloverPosition;
+  }
+
+  /**
    * Get the current number of data snapshots.
    * @return the number of snapshots as an int.
    */
   public int getStatsCount() {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? 0 : super.getStatsCount(driver);
+    if (driver == null) return 0;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    return (dataHolder == null) ? -1 : dataHolder.getSize();
   }
 
   /**
@@ -205,7 +315,9 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public synchronized Map<Fields, String> getStringValues(final int position) {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? null : getStringValues(Locale.getDefault(), driver, position);
+    if (driver == null) return null;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    return dataHolder.getStringValuesAt(position);
   }
 
   /**
@@ -214,7 +326,10 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public Map<Fields, String> getLatestStringValues() {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? NO_STRING_VALUES : getLatestStringValues(Locale.getDefault(), driver);
+    if (driver == null) return NO_STRING_VALUES;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    if (dataHolder == null) return NO_STRING_VALUES;
+    return dataHolder.getLatestStringValues();
   }
 
   /**
@@ -224,7 +339,9 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public synchronized Map<Fields, Double> getDoubleValues(final int position) {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? null : getDoubleValues(driver, position);
+    if (driver == null) return null;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    return (dataHolder == null) ? null : dataHolder.getDoubleValuesAt(position);
   }
 
   /**
@@ -233,7 +350,17 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public Map<Fields, Double> getLatestDoubleValues() {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? null : getLatestDoubleValues(driver);
+    if (driver == null) return null;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    return (dataHolder == null) ? null : dataHolder.getLatestDoubleValues();
+  }
+
+  /**
+   * Get the number of data updates so far.
+   * @return the number of updates as an int.
+   */
+  public int getTickCount() {
+    return tickCount;
   }
 
   /**
@@ -241,9 +368,9 @@ public final class StatsHandler extends BaseStatsHandler {
    * @param format specifies the format, among the constants defined in {@link StatsExporter}.
    */
   public void copyStatsToClipboard(final int format) {
-    try {
-      TopologyDriver driver = getCurrentDataHolder().getDriver();
-      StatsExporter exporter = (format == StatsExporter.CSV) ? new CsvStatsExporter(this, driver) : new TextStatsExporter(this, driver, Locale.getDefault());
+    try
+    {
+      StatsExporter exporter = (format == StatsExporter.CSV) ? new CsvStatsExporter(this) : new TextStatsExporter(this);
       String text = exporter.formatAll();
       Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
       clip.setContents(new StringSelection(text), null);
@@ -256,7 +383,6 @@ public final class StatsHandler extends BaseStatsHandler {
    * Reset the statistics of the currently selected driver, if any.
    */
   public void resetCurrentStats() {
-    if (debugEnabled) log.debug("resetting current stats");
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -298,10 +424,5 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public JobMonitor getJobMonitor() {
     return jobMonitor;
-  }
-
-  @Override
-  protected StatsFormatter getFormatter(final Locale locale) {
-    return formatter;
   }
 }
