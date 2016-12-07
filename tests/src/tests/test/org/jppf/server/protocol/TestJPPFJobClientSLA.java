@@ -259,7 +259,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   }
 
   /**
-   * Test that a job is executed on both local and remote channels.
+   * Test that a job is executed on both local and remote channels,
+   * with at least 2 tasks executing at the same time on each channel.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000)
@@ -269,20 +270,20 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
       client.awaitActiveConnectionPool();
       int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 50L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 100L);
       job.getClientSLA().setMaxChannels(2);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       boolean found = false;
-      // check that no 2 tasks were executing at the same time on different channels
+      // check that 2 tasks were executing at the same time on different channels
       for (int i=0; i<results.size()-1; i++) {
         LifeCycleTask t1 = (LifeCycleTask) results.get(i);
         Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
         for (int j=i+1; j<results.size(); j++) {
           LifeCycleTask t2 = (LifeCycleTask) results.get(j);
           Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
-          if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid())) {
+          if ((r1.intersects(r2) || r2.intersects(r1)) && !t1.getNodeUuid().equals(t2.getNodeUuid())) {
             found = true;
             break;
           }
