@@ -166,26 +166,28 @@ public class ServerDebug implements ServerDebugMBean {
     StringBuilder sb = new StringBuilder();
     String hr = StringUtils.padRight("", '-', 80) + '\n';
     for (String uuid: set) {
-      sb.append(hr);
       ServerJob serverJob = queue.getJob(uuid);
-      sb.append(serverJob).append('\n');
-      List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
-      if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
-      else {
-        sb.append("client bundles:\n");
-        for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
-      }
-      List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
-      if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
-      else {
-        sb.append("client completion bundles:\n");
-        for (ServerTaskBundleClient clientBundle: completionBundles) sb.append("- ").append(clientBundle).append("\n");
-      }
-      Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
-      if (dispatchSet.isEmpty()) sb.append("node bundles: empty\n");
-      else {
-        sb.append("node bundles:\n");
-        for (ServerTaskBundleNode nodeBundle: dispatchSet) sb.append("- ").append(nodeBundle).append("\n");
+      if (serverJob != null) {
+        sb.append(hr);
+        sb.append(serverJob).append('\n');
+        List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
+        if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
+        else {
+          sb.append("client bundles:\n");
+          for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
+        }
+        List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
+        if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
+        else {
+          sb.append("client completion bundles:\n");
+          for (ServerTaskBundleClient clientBundle: completionBundles) sb.append("- ").append(clientBundle).append("\n");
+        }
+        Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
+        if (dispatchSet.isEmpty()) sb.append("node bundles: empty\n");
+        else {
+          sb.append("node bundles:\n");
+          for (ServerTaskBundleNode nodeBundle: dispatchSet) sb.append("- ").append(nodeBundle).append("\n");
+        }
       }
     }
     return sb.toString();
