@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.ui.monitoring.ShowIPHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -41,10 +42,6 @@ public class BaseStatsHandler {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * A string values map with no values.
-   */
-  protected static final Map<Fields, String> NO_STRING_VALUES = new HashMap<>();
   /**
    * Interval, in milliseconds, between refreshes from the server.
    */
@@ -65,6 +62,10 @@ public class BaseStatsHandler {
    * Number of data updates so far.
    */
   private int tickCount = 0;
+  /**
+   * Handles the toggle for showing host names vs. IP addresses.
+   */
+  private final ShowIPHandler showIPHandler = new ShowIPHandler();
 
   /**
    * Initialize this statistics handler.
@@ -162,7 +163,7 @@ public class BaseStatsHandler {
   public synchronized Map<Fields, String> getStringValues(final Locale locale, final TopologyDriver driver, final int position) {
     if (driver == null) return null;
     ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
-    if (dataHolder == null) return NO_STRING_VALUES;
+    if (dataHolder == null) return StatsConstants.NO_STRING_VALUES;
     StatsFormatter formatter = getFormatter(locale);
     synchronized(formatter) {
       return formatter.formatValues(dataHolder.getDoubleValuesAt(position));
@@ -176,9 +177,9 @@ public class BaseStatsHandler {
    * @return a map of field names to their values represented as strings.
    */
   public synchronized Map<Fields, String> getLatestStringValues(final Locale locale, final TopologyDriver driver) {
-    if (driver == null) return NO_STRING_VALUES;
+    if (driver == null) return StatsConstants.NO_STRING_VALUES;
     ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
-    if (dataHolder == null) return NO_STRING_VALUES;
+    if (dataHolder == null) return StatsConstants.NO_STRING_VALUES;
     StatsFormatter formatter = getFormatter(locale);
     synchronized(formatter) {
       return formatter.formatValues(dataHolder.getLatestDoubleValues());
@@ -266,5 +267,12 @@ public class BaseStatsHandler {
    */
   protected StatsFormatter getFormatter(final Locale locale) {
     return new StatsFormatter(locale);
+  }
+
+  /**
+   * @return the object that handles the toggle for showing host names vs. IP addresses.
+   */
+  public ShowIPHandler getShowIPHandler() {
+    return showIPHandler;
   }
 }

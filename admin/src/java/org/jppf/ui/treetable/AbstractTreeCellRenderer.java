@@ -22,6 +22,8 @@ import java.awt.*;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.jppf.ui.monitoring.data.StatsHandler;
+
 /**
  * Renderer used to render the tree nodes in the node data panel.
  * @author Laurent Cohen
@@ -201,5 +203,13 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
       boldItalicFont = new Font(font.getName(), Font.BOLD | Font.ITALIC, font.getSize());
     }
     return boldItalicFont;
+  }
+
+  /**
+   * Determine whether IP addresses or host names are displayed.
+   * @return {@code true} if IP addresses are displayed, {@code false} otherwise.
+   */
+  protected static boolean isShowIP() {
+    return StatsHandler.getInstance().getShowIPHandler().isShowIP();
   }
 }

@@ -99,7 +99,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
-    StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+    StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
       @Override
       public void stateChanged(final ShowIPEvent event) {
         treeTable.repaint();

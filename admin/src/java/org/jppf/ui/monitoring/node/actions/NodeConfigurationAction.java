@@ -26,6 +26,7 @@ import javax.swing.*;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
@@ -88,7 +89,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     textArea.setValue(getPropertiesAsString(data));
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("nodeConfigurationUpdatePanel.label") + " " + TopologyUtils.getDisplayName(data), false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(),
+      localize("nodeConfigurationUpdatePanel.label") + " " + TopologyUtils.getDisplayName(data, StatsHandler.getInstance().getShowIPHandler().isShowIP()), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override

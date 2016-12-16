@@ -103,8 +103,10 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    * @param target the Ajax target.
    */
   protected void stopRefreshTimer(final AjaxRequestTarget target) {
-    if (target.getPage() instanceof TableTreeHolder) {
-      AjaxSelfUpdatingTimerBehavior timer = ((TableTreeHolder) target.getPage()).getRefreshTimer();
+    //if (debugEnabled) log.debug("stopping timer for page {}", target.getPage());
+    if (target.getPage() instanceof RefreshTimerHolder) {
+      AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
+      //if (debugEnabled) log.debug("stopping timer {} for page {}", timer, target.getPage());
       if (timer != null) timer.stop(null);
     }
   }
@@ -114,8 +116,10 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    * @param target the Ajax target.
    */
   protected void restartRefreshTimer(final AjaxRequestTarget target) {
-    if (target.getPage() instanceof TableTreeHolder) {
-      AjaxSelfUpdatingTimerBehavior timer = ((TableTreeHolder) target.getPage()).getRefreshTimer();
+    //if (debugEnabled) log.debug("restarting timer for page {}", target.getPage());
+    if (target.getPage() instanceof RefreshTimerHolder) {
+      AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
+      //if (debugEnabled) log.debug("restarting timer {} for page {}", timer, target.getPage());
       if (timer != null) timer.restart(null);
     }
   }

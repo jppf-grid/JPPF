@@ -20,13 +20,11 @@ package org.jppf.ui.monitoring.data;
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.event.*;
+import org.jppf.ui.monitoring.event.StatsHandlerEvent;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -51,10 +49,6 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   private static StatsHandler instance = null;
   /**
-   * List of listeners tot he state of og the ShowIP toggle registered with this stats handler.
-   */
-  private List<ShowIPListener> showIPListeners = new CopyOnWriteArrayList<>();
-  /**
    * Timer used to query the stats from the server.
    */
   protected java.util.Timer timer = null;
@@ -62,10 +56,6 @@ public final class StatsHandler extends BaseStatsHandler {
    * The client handler.
    */
   private final ClientHandler clientHandler;
-  /**
-   * {@code true} to show IP addresses, {@code false} to display host names.
-   */
-  private AtomicBoolean showIP = new AtomicBoolean(false);
   /**
    * The object which monitors and maintains a representation of the grid topology.
    */
@@ -144,43 +134,6 @@ public final class StatsHandler extends BaseStatsHandler {
   }
 
   /**
-   * Register a <code>StatsHandlerListener</code> with this stats formatter.
-   * @param listener the listener to register.
-   */
-  public void addShowIPListener(final ShowIPListener listener) {
-    if (listener != null) showIPListeners.add(listener);
-  }
-
-  /**
-   * Unregister a <code>StatsHandlerListener</code> from this stats formatter.
-   * @param listener the listener to unregister.
-   */
-  public void removeShowIPListener(final ShowIPListener listener) {
-    if (listener != null) showIPListeners.remove(listener);
-  }
-
-  /**
-   * Determine whether to show IP addresses or host names.
-   * @return {@code true} to show IP addresses, {@code false} to display host names.
-   */
-  public boolean isShowIP() {
-    return showIP.get();
-  }
-
-  /**
-   * Specify whether to show IP addresses or host names.
-   * @param showIP {@code true} to show IP addresses, {@code false} to display host names.
-   */
-  public void setShowIP(final boolean showIP) {
-    if (showIP != this.showIP.get()) {
-      boolean oldState = this.showIP.get();
-      this.showIP.set(showIP);
-      ShowIPEvent event = new ShowIPEvent(this, oldState);
-      for (ShowIPListener listener: showIPListeners) listener.stateChanged(event);
-    }
-  }
-
-  /**
    * Get the current number of data snapshots.
    * @return the number of snapshots as an int.
    */
@@ -214,7 +167,7 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public Map<Fields, String> getLatestStringValues() {
     TopologyDriver driver = clientHandler.getCurrentDriver();
-    return (driver == null) ? NO_STRING_VALUES : getLatestStringValues(Locale.getDefault(), driver);
+    return (driver == null) ? StatsConstants.NO_STRING_VALUES : getLatestStringValues(Locale.getDefault(), driver);
   }
 
   /**

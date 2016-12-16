@@ -38,6 +38,7 @@ import org.jppf.admin.web.topology.provisioning.ProvisioningLink;
 import org.jppf.admin.web.topology.serverstop.DriverStopRestartLink;
 import org.jppf.admin.web.topology.systeminfo.SystemInfoLink;
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.node.NodeTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.ui.utils.TopologyUtils;
@@ -99,15 +100,8 @@ public class TopologyPage extends AbstractTableTreePage {
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
-    Locale locale = getSession().getLocale();
-    if (locale == null) locale = Locale.US;
     columns.add(new TopologyTreeColumn(Model.of("Tree")));
-    columns.add(new TopologyColumn(NodeTreeTableModel.NODE_THREADS));
-    columns.add(new TopologyColumn(NodeTreeTableModel.NODE_STATUS));
-    columns.add(new TopologyColumn(NodeTreeTableModel.EXECUTION_STATUS));
-    columns.add(new TopologyColumn(NodeTreeTableModel.NB_TASKS));
-    columns.add(new TopologyColumn(NodeTreeTableModel.NB_SLAVES));
-    columns.add(new TopologyColumn(NodeTreeTableModel.PENDING_ACTION));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new TopologyColumn(item.index));
     return columns;
   }
 

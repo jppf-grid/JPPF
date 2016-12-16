@@ -57,9 +57,9 @@ public class ConnectionDataHolder {
    * @param driver a the drivr for which to get the statistics.
    */
   public ConnectionDataHolder(final int capacity, final TopologyDriver driver) {
-    this.driver = driver;
     if (capacity <= 0) throw new IllegalArgumentException("capacity must be greater than 0");
     this.capacity = capacity;
+    this.driver = driver;
     this.statsFormatter = new StatsTransformer();
   }
 
@@ -85,7 +85,7 @@ public class ConnectionDataHolder {
    * @since 5.0
    */
   public synchronized Map<Fields, Double> getLatestDoubleValues() {
-    return doubleValuesMaps.getLast();
+    return doubleValuesMaps.isEmpty() ? StatsConstants.NO_DOUBLE_VALUES : doubleValuesMaps.getLast();
   }
 
   /**

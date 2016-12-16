@@ -41,6 +41,7 @@ public class NodeConfigForm extends AbstractModalForm {
    * Text area for the slaves' configuration overrides.
    */
   private TextArea<String> configField;
+  //private TextArea<String> configField;
 
   /**
    * @param modal the modal window.
@@ -110,9 +111,10 @@ public class NodeConfigForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setBoolean(interruptField.getId(), isInterrupt())
     .setBoolean(forceRestartField.getId(), isForceRestart())
     .setString(configField.getId(), getConfig());
+    return true;
   }
 }

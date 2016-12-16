@@ -22,7 +22,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.auth.JPPFRoles;
-import org.jppf.admin.web.utils.AbstractActionLink;
+import org.jppf.admin.web.utils.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.LoggingUtils;
@@ -47,7 +47,14 @@ public class ServerResetStatsLink extends AbstractActionLink {
    */
   public ServerResetStatsLink() {
     super("stats.server_reset_stats", Model.of("Reset statistics"), "server_reset_stats.gif");
-    setEnabled(JPPFWebSession.get().getRoles().hasRole(JPPFRoles.MANAGER));
+    final boolean allowed = ((JPPFWebSession.get() != null) && (JPPFWebSession.get().getRoles() != null)) ? JPPFWebSession.get().getRoles().hasRole(JPPFRoles.MANAGER) : true;
+    setEnabled(allowed);
+    setAction(new AbstractManagerRoleAction() {
+      @Override
+      public boolean isAuthorized() {
+        return allowed;
+      } 
+    });
   }
 
   @Override

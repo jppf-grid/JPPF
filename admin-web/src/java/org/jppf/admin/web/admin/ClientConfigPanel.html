@@ -19,30 +19,25 @@
 <html>
   <body>
     <wicket:panel xmlns:wicket="http://wicket.apache.org">
-      <script>
-        function updateFileName() {
-          document.getElementById('config_upload_link').click();
-        }
-      </script>
       <form wicket:id="admin.config.form" class="jppf_toolbar">
         <a wicket:id="admin.config.sort_asc" class="button_link"></a>
         <a wicket:id="admin.config.sort_desc" class="button_link"></a>
-        <img src="images/toolbar/separator10.gif"/>
+        <div class="separator"/>
         <a wicket:id="admin.config.save" class="button_link"></a>
         <a wicket:id="admin.config.revert" class="button_link"></a>
-        <img src="images/toolbar/separator10.gif"/>
+        <div class="separator"/>
         <a wicket:id="admin.config.reset_client" class="button_link"></a>
-        <img src="images/toolbar/separator10.gif"/>
+        <div class="separator"/>
         <a wicket:id="admin.config.download" class="button_link"></a>
         <!-- Upload button is hidden and triggered via javascript -->
         <a id="config_upload_link" wicket:id="admin.config.upload" class="button_link" style="display:none"></a>
         <label>
-          <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.config.upload.browse" style="display:none" onchange="updateFileName()"/>
+          <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.config.upload.browse" style="display:none" onchange="updateFileName('config_upload_link')"/>
           <img wicket:id="admin.config.upload.img" src="images/toolbar/upload.png" class="button_link"/>
         </label>
         <br/>&nbsp;
-        <h4 style="margin: 0px"><wicket:message key="admin.config.properties.label"></wicket:message></h4>
-        <textarea wicket:id="admin.config.properties.field" rows="20" cols="80"></textarea><br/>
+        <h4 style="margin: 0px"><wicket:message key="admin.config.properties.label"></wicket:message></h4><br/>
+        <textarea wicket:id="admin.config.properties.field" id="editor" rows="20" cols="100"></textarea><br/>
       </form>
     </wicket:panel>
   </body>

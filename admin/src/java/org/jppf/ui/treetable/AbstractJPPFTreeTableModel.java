@@ -38,7 +38,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   /**
    * Base name for localization bundle lookups.
    */
-  protected transient String BASE = null;
+  protected String i18nBase = null;
   /**
    * The locale used to translate coumn headers and cell values.
    */
@@ -167,13 +167,13 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a message in the current locale, or the default locale if the localization for the current locale is not found.
    */
   protected String localize(final String message) {
-    return LocalizationUtils.getLocalized(BASE, message, locale);
+    return LocalizationUtils.getLocalized(getI18nBase(), message, locale);
   }
 
   @Override
   public String getColumnName(final int column) {
     if ((column >= 0) && (column <= getColumnCount())) {
-      return localize(getBaseColumnName(column));
+      return localize(getBaseColumnName(column) + ".label");
     }
     return "";
   }
@@ -191,7 +191,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param column the index of the column for which to get a name.
    * @return the column name as a string.
    */
-  protected abstract String getBaseColumnName(final int column);
+  public abstract String getBaseColumnName(final int column);
 
   /**
    * Get a number formatter for the number of tasks for each node.
@@ -214,5 +214,12 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
     nf.setMinimumFractionDigits(1);
     nf.setMaximumFractionDigits(1);
     return nf;
+  }
+
+  /**
+   * @return the base name for localization bundle lookups.
+   */
+  public String getI18nBase() {
+    return i18nBase;
   }
 }

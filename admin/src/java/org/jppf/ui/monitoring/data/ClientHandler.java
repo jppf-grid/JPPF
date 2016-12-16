@@ -87,7 +87,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     this.statsHandler = statsHandler;
     manager = statsHandler.getTopologyManager();
     manager.addTopologyListener(this);
-    statsHandler.addShowIPListener(new ShowIPListener() {
+    statsHandler.getShowIPHandler().addShowIPListener(new ShowIPListener() {
       @Override
       public void stateChanged(final ShowIPEvent event) {
         if (serverListOption != null) serverListOption.getUIComponent().repaint();
@@ -238,7 +238,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
         TopologyDriver driver = (TopologyDriver) value;
         if (driver != null) {
           JPPFManagementInfo info = driver.getManagementInfo();
-          if (info != null) renderer.setText((statsHandler.isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
+          if (info != null) renderer.setText((statsHandler.getShowIPHandler().isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
           else renderer.setText(driver.getDisplayName());
         }
         return renderer;

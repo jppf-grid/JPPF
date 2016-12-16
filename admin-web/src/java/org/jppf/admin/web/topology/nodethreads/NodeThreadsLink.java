@@ -27,6 +27,7 @@ import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.TopologyConstants;
+import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.utils.LoggingUtils;

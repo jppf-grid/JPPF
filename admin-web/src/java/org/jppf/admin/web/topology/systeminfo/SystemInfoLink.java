@@ -76,7 +76,7 @@ public class SystemInfoLink extends AbstractActionLink {
       DefaultMutableTreeNode treeNode = selectedNodes.get(0);
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       Locale locale = Session.get().getLocale();
-      String title = TopologyUtils.getSystemInfoTitle(comp, locale);
+      String title = TopologyUtils.getSystemInfoTitle(comp, locale, false);
       JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
       final StringBuilder html = new StringBuilder();
       html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title, false), locale));

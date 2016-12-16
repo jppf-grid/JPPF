@@ -110,9 +110,10 @@ public class DriverStopRestartForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setLong(shutdownDelayField.getId(), getShutdownDelay())
       .setBoolean(restartField.getId(), isRestart())
       .setLong(restartDelayField.getId(), getRestartDelay());
+    return true;
   }
 }

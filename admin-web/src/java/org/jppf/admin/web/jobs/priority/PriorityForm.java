@@ -68,7 +68,8 @@ public class PriorityForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setInt(priorityField.getId(), getPriority());
+    return true;
   }
 }

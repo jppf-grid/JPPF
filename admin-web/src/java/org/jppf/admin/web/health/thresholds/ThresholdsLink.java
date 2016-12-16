@@ -22,7 +22,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.admin.web.health.HealthConstants;
-import org.jppf.admin.web.tabletree.AbstractModalLink;
+import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 

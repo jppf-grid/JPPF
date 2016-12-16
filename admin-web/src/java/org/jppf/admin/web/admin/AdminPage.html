@@ -19,6 +19,11 @@
 <html>
   <body>
     <wicket:extend>
+      <script>
+        function updateFileName(id) {
+          document.getElementById(id).click();
+        }
+      </script>
       <div id="tabs" style="border: none; border-left: 1px solid #6D78B6; border-radius: 0px">
         <ul>
           <li><a href="#config"><wicket:message key="admin.config.label"></wicket:message></a></li>

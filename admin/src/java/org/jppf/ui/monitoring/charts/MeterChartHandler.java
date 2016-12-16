@@ -120,7 +120,7 @@ public class MeterChartHandler implements ChartHandler {
       for (int i=0; i<config.fields.length; i++) {
         Fields field = config.fields[i];
         //ds[i].setValue(valueMap.get(field));
-        invokeMethod(ds[i].getClass(), ds[i], "setValue", new Class[] {Number.class}, valueMap.get(field));
+        if (ds != null) invokeMethod(ds[i].getClass(), ds[i], "setValue", new Class[] {Number.class}, valueMap.get(field));
         setIntervals(config, i);
       }
     }

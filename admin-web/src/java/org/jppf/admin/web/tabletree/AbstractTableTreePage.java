@@ -18,7 +18,7 @@
 
 package org.jppf.admin.web.tabletree;
 
-import java.util.List;
+import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -28,6 +28,8 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.theme.WindowsTheme
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.util.time.Duration;
 import org.jppf.admin.web.*;
+import org.jppf.admin.web.layout.*;
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.treetable.*;
 import org.slf4j.*;
 
@@ -72,6 +74,10 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    * The name prefix for the toolbar and table tree.
    */
   protected final String namePrefix;
+  /**
+   * Holds the available and visible stats.
+   */
+  protected SelectableLayout selectableLayout;
 
   /**
    * 
@@ -84,7 +90,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
     add(getOrCreateToolbar());
     TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     selectionHandler = data.getSelectionHandler();
-    tableTree = createTableTree();
+    tableTree = createTableTree("jppf." + namePrefix + ".visible.columns");
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
     tableTree.add(refreshTimer);
     tableTree.addUpdateTarget(toolbar);
@@ -95,6 +101,13 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   }
 
   @Override
+  protected void onInitialize() {
+    super.onInitialize();
+    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    actionHandler.addActionLink(toolbar, new SelectableLayoutLink(selectableLayout, toolbar));
+  }
+
+ @Override
   public JPPFTableTree getTableTree() {
     return tableTree;
   }
@@ -111,11 +124,13 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
 
   /**
    * Create the tree table.
+   * @param layoutProperty name of the property used when saving/loading the visible columns to/from the user settings.
    * @return a {@link JPPFTableTree} instance.
    */
-  protected JPPFTableTree createTableTree() {
+  protected JPPFTableTree createTableTree(final String layoutProperty) {
     if (debugEnabled) log.debug("getting tree model for {}", viewType);
     createTreeTableModel();
+    createSelectableLayout(layoutProperty);
     TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     JPPFTableTree tree = new JPPFTableTree(
       viewType, namePrefix + ".table.tree", createColumns(), treeModel, Integer.MAX_VALUE, selectionHandler, TableTreeHelper.newTreeNodeRenderer(viewType), data.getExpansionModel());
@@ -147,6 +162,17 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
       createActions();
     }
     return toolbar;
+  }
+
+  /**
+   * Create a SelectableLayout populated with the list of all available columns, except the tree column.
+   * @param propertyName name of the property used when saving to / loading from the user settings.
+   */
+  protected void createSelectableLayout(final String propertyName) {
+    Locale locale = JPPFWebSession.get().getLocale();
+    List<LocalizedListItem> allItems = new ArrayList<>();
+    for (int i=1; i<treeModel.getColumnCount(); i++) allItems.add(new LocalizedListItem(treeModel.getBaseColumnName(i), i, treeModel.getI18nBase(), locale));
+    selectableLayout = new SelectableLayoutImpl(allItems, propertyName);
   }
 
   /**

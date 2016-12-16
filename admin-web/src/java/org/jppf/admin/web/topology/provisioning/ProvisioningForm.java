@@ -131,10 +131,11 @@ public class ProvisioningForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setInt(nbSlavesField.getId(), getNbSlaves())
       .setBoolean(interruptField.getId(), isInterrupt())
       .setBoolean(useOverridesField.getId(), isUseOverrides())
       .setString(overridesField.getId(), getOverrides());
+    return true;
   }
 }

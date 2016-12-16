@@ -118,6 +118,7 @@ public class LoadBalancingForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
+    return false;
   }
 }

@@ -147,7 +147,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);
       graphComponent.addComponentListener(new ViewerComponentListener());
-      StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+      StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
         @Override
         public void stateChanged(final ShowIPEvent event) {
           graphComponent.repaint();

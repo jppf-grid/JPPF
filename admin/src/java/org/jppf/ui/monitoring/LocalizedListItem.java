@@ -39,15 +39,21 @@ public class LocalizedListItem {
    * The localized tooltip of this item
    */
   public final String tooltip;
+  /**
+   * Unique index for this item.
+   */
+  public final int index;
 
   /**
    * Initialize this item.
    * @param name the non-localized name of this item.
+   * @param index unique index for this item.
    * @param base base name for localization bundle lookups.
    * @param locale the locale to localize in.
    */
-  public LocalizedListItem(final String name, final String base, final Locale locale) {
+  public LocalizedListItem(final String name, final int index, final String base, final Locale locale) {
     this.name = name;
+    this.index = index;
     this.label = LocalizationUtils.getLocalized(base, name + ".label", locale);
     this.tooltip = LocalizationUtils.getLocalized(base, name + ".tooltip", locale);
   }

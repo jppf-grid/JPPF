@@ -20,14 +20,17 @@ package org.jppf.admin.web.stats;
 
 import java.util.*;
 
-import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
+import org.apache.wicket.ajax.*;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.list.*;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 import org.jppf.admin.web.*;
+import org.jppf.admin.web.layout.*;
+import org.jppf.admin.web.utils.RefreshTimerHolder;
 import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.data.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
@@ -36,15 +39,20 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * @author Laurent Cohen
  */
 @MountPath("statistics")
-public class StatisticsPage extends TemplatePage {
-  /**
-   * The behavior that periodically refreshes the toolbar and table tree.
-   */
-  protected final transient AjaxSelfUpdatingTimerBehavior refreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5));
+public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
   /**
    * Container for all the visible statitics tables.
    */
   private WebMarkupContainer tablesContainer;
+  /**
+   * Holds the available and visible stats.
+   */
+  private final SelectableLayout selectableLayout = new SelectableLayoutImpl(
+    new ArrayList<>(StatsConstants.createLocalizedItems(JPPFWebSession.get().getLocale()).values()), "jppf.stats.visible.stats");
+  /**
+   * The behavior that periodically refreshes the statistics.
+   */
+  protected final AjaxSelfUpdatingTimerBehavior statsRefreshTimer;
 
   /**
    *
@@ -71,16 +79,24 @@ public class StatisticsPage extends TemplatePage {
     form.add(new ServerResetStatsLink());
     form.add(new ExportLink(ExportLink.TEXT));
     form.add(new ExportLink(ExportLink.CSV));
+    form.add(new SelectableLayoutLink(selectableLayout, form) {
+      @Override
+      public void onClick(final AjaxRequestTarget target) {
+        target.add(tablesContainer);
+        super.onClick(target);
+      }
+    });
     tablesContainer = new WebMarkupContainer("stats.tables.container");
     List<StatsTableData> tables = new ArrayList<>();
-    for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) tables.add(new StatsTableData(entry.getKey(), entry.getValue()));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) tables.add(new StatsTableData(item.name, StatsConstants.ALL_TABLES_MAP.get(item.name)));
+    //for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) tables.add(new StatsTableData(entry.getKey(), entry.getValue()));
     ListView<StatsTableData> listView = new ListView<StatsTableData>("stats.visible.tables", tables) {
       @Override
       protected void populateItem(final ListItem<StatsTableData> item) {
         item.add(new StatisticsTablePanel("stats.table", item.getModelObject().name, item.getModelObject().fields));
       }
     };
-    tablesContainer.add(refreshTimer);
+    tablesContainer.add(statsRefreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5)));
     tablesContainer.add(listView);
     add(tablesContainer);
   }
@@ -90,6 +106,11 @@ public class StatisticsPage extends TemplatePage {
    */
   public WebMarkupContainer getTablesContainer() {
     return tablesContainer;
+  }
+
+  @Override
+  public AjaxSelfUpdatingTimerBehavior getRefreshTimer() {
+    return statsRefreshTimer;
   }
 
   /**

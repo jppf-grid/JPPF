@@ -436,7 +436,7 @@ textarea {
 }
 
 .layout_cell_left {
-  width: 100px;
+  min-width: 100px;
   background-color: white;
   color: #6D78B6;
   font-size: 9pt;
@@ -552,4 +552,25 @@ p { font-size: 10pt; }
 .separator {
   width: 10px;
   display: inline-block;
+}
+
+ .editor_container {
+  width: 100%;
+  height: 100%;
+  /*
+  position: relative;
+  */
+}
+
+#editor_editor, #editor2_editor {
+  /*
+  position: relative;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  */
+  width: 100%;
+  height: 350px;
 }

@@ -89,7 +89,8 @@ public class MaxNodesForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setInt(nbNodesField.getId(), getNbNodes()).setBoolean(unlimitedField.getId(), isUnlimited());
+    return true;
   }
 }

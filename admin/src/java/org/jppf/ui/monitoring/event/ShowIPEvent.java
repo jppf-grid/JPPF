@@ -20,7 +20,8 @@ package org.jppf.ui.monitoring.event;
 
 import java.util.EventObject;
 
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.ShowIPHandler;
+import org.jppf.ui.monitoring.data.BaseStatsHandler;
 
 /**
  * Events sent to all listeners interested in changes to the "ShowIP" toggle.
@@ -38,7 +39,7 @@ public class ShowIPEvent extends EventObject {
    * @param source the source of this event.
    * @param oldState the old state of the toggle.
    */
-  public ShowIPEvent(final StatsHandler source, final boolean oldState) {
+  public ShowIPEvent(final ShowIPHandler source, final boolean oldState) {
     super(source);
     this.oldState = oldState;
   }
@@ -53,9 +54,9 @@ public class ShowIPEvent extends EventObject {
 
   /**
    * Get the source of this event.
-   * @return the source as a {@link StatsHandler} instance.
+   * @return the source as a {@link BaseStatsHandler} instance.
    */
-  public StatsHandler getStatsHandler() {
-    return (StatsHandler) getSource();
+  public ShowIPHandler getStatsHandler() {
+    return (ShowIPHandler) getSource();
   }
 }

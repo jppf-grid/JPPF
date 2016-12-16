@@ -73,7 +73,7 @@
       <script language="groovy"><![CDATA[
         def comp = option.getUIComponent();
         def b = comp.isSelected();
-        StatsHandler.getInstance().setShowIP(b);
+        StatsHandler.getInstance().getShowIPHandler().setShowIP(b);
       ]]></script>
     </listener>
   </child>

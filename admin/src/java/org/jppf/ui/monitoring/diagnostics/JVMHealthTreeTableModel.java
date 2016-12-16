@@ -85,7 +85,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JVMHealthTreeTableModel(final TreeNode node) {
     super(node);
-    BASE = "org.jppf.ui.i18n.NodeDataPage";
+    i18nBase = "org.jppf.ui.i18n.NodeDataPage";
   }
 
   /**
@@ -95,7 +95,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JVMHealthTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);
-    BASE = "org.jppf.ui.i18n.NodeDataPage";
+    i18nBase = "org.jppf.ui.i18n.NodeDataPage";
   }
 
   @Override

@@ -131,10 +131,11 @@ public class ThresholdsForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setDouble(cpuWarningField.getId(), getCpuWarningLevel())
     .setDouble(cpuCriticalField.getId(), getCpuCriticalLevel())
     .setDouble(memoryWarningField.getId(), getMemoryWarningLevel())
     .setDouble(memoryCriticalField.getId(), getMemoryCriticalLevel());
+    return true;
   }
 }

@@ -35,6 +35,7 @@ import org.jppf.admin.web.jobs.priority.PriorityLink;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.job.JobTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.ui.utils.JobsUtils;
@@ -101,14 +102,8 @@ public class JobsPage extends AbstractTableTreePage {
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
-    Locale locale = getSession().getLocale();
-    if (locale == null) locale = Locale.US;
     columns.add(new JobTreeColumn(Model.of("Tree")));
-    columns.add(new JobColumn(JobTreeTableModel.JOB_STATE));
-    columns.add(new JobColumn(JobTreeTableModel.INITIAL_TASK_COUNT));
-    columns.add(new JobColumn(JobTreeTableModel.TASK_COUNT));
-    columns.add(new JobColumn(JobTreeTableModel.PRIORITY));
-    columns.add(new JobColumn(JobTreeTableModel.MAX_NODES));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new JobColumn(item.index));
     return columns;
   }
 

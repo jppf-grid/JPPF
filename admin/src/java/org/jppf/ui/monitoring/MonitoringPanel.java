@@ -65,7 +65,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
   /**
    * Mapping of table names to the corresponding items in the pick list for selecting the visible tables.
    */
-  private final Map<String, LocalizedListItem> allItems = createItems();
+  protected final Map<String, LocalizedListItem> allItems = StatsConstants.createLocalizedItems(Locale.getDefault());
   /**
    * Holds a list of table models to update when new stats are received.
    */
@@ -187,18 +187,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
     table.doLayout();
     table.setShowGrid(false);
     return panel;
-  }
-
-  /**
-   * Create the map of all items.
-   * @return a mapping of non-localized names to {@link LocalizedListItem} objects.
-   */
-  private Map<String, LocalizedListItem> createItems() {
-    String[] names = { StatsConstants.EXECUTION, StatsConstants.NODE_EXECUTION, StatsConstants.TRANSPORT, StatsConstants.CONNECTION, StatsConstants.QUEUE, StatsConstants.JOB,
-      StatsConstants.NODE_CL_REQUEST_TIME, StatsConstants.CLIENT_CL_REQUEST_TIME, StatsConstants.INBOUND_NETWORK_TRAFFIC, StatsConstants.OUTBOUND_NETWORK_TRAFFIC };
-    Map<String, LocalizedListItem> map = new LinkedHashMap<>();
-    for (String name: names) map.put(name, new LocalizedListItem(name, BASE, Locale.getDefault()));
-    return Collections.unmodifiableMap(map);
   }
 
   /**

@@ -18,14 +18,14 @@
 
 package org.jppf.admin.web.tabletree;
 
-import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.markup.html.form.Form;
+import org.jppf.admin.web.utils.RefreshTimerHolder;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public interface TableTreeHolder {
+public interface TableTreeHolder extends RefreshTimerHolder {
   /**
    * @return the table tree.
    */
@@ -35,9 +35,4 @@ public interface TableTreeHolder {
    * @return the toolbar.
    */
   Form<String> getToolbar();
-
-  /**
-   * @return the refresh timer.
-   */
-  AjaxSelfUpdatingTimerBehavior getRefreshTimer();
 }

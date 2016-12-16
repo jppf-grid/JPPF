@@ -21,8 +21,6 @@
     <wicket:extend>
       <div style="width: 100%; padding: 0px; margin: 0px; border-left: 1px solid #6D78B6;">
         <form wicket:id="stats.toolbar" class="jppf_toolbar">
-          <!--
-          -->
           <wicket:message key="stats.driver_selector.label"></wicket:message>
           <select wicket:id="stats.driver_selector.field" class="default_focus"></select>
           <div class="separator"/>
@@ -30,12 +28,15 @@
           <div class="separator"/>
           <a wicket:id="stats.export.text" class="button_link"></a>
           <a wicket:id="stats.export.csv" class="button_link"></a>
+          <div class="separator"/>
+          <a wicket:id="visible.items" class="button_link"></a><div wicket:id="visible.items.dialog"></div>
         </form>
-        <div wicket:id="stats.tables.container" style="padding: 0px; text-align: justify; width: 100%">
+        <div wicket:id="stats.tables.container" style="padding: 0px; text-align: center; width: 100%">
           <div wicket:id="stats.visible.tables" style="display: inline-block; padding: 10px; text-align: center; width: 45%">
             <div wicket:id="stats.table" class="stats_block"></div>
           </div>
         </div>
+        <br/>
       </div>
     </wicket:extend>
   </body>

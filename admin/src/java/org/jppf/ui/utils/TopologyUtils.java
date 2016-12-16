@@ -145,16 +145,12 @@ public class TopologyUtils {
   /**
    * COmpute a display name for the given topology component.
    * @param comp the ocmponent for which to get a display name.
+   * @param showIP whether to show IP addresses vs. host names.
    * @return the display name as a string.
    */
-  public static String getDisplayName(final AbstractTopologyComponent comp) {
-    StatsHandler handler = StatsHandler.getInstance();
-    JPPFManagementInfo info = null;
-    if (comp.isPeer()) {
-      TopologyDriver driver = handler.getTopologyManager().getDriver(comp.getUuid());
-      if (driver != null) info = driver.getManagementInfo();
-    } else info = comp.getManagementInfo();
-    if (info != null) return (handler.isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort();
+  public static String getDisplayName(final AbstractTopologyComponent comp, final boolean showIP) {
+    JPPFManagementInfo info = comp.getManagementInfo();
+    if (info != null) return (showIP ? info.getIpAddress() : info.getHost()) + ":" + info.getPort();
     return comp.getDisplayName();
   }
 
@@ -216,11 +212,12 @@ public class TopologyUtils {
    * Generate the localized title for the system information popup dialog/window for a given topology component.
    * @param comp the the topology object for which to get the information.
    * @param locale the locale to display the title in.
+   * @param showIP whether to show IP addresses vs. host names.
    * @return a localized string.
    */
-  public static String getSystemInfoTitle(final AbstractTopologyComponent comp, final Locale locale) {
+  public static String getSystemInfoTitle(final AbstractTopologyComponent comp, final Locale locale, final boolean showIP) {
     return localizeSysInfo("system.info_for", locale) + " " +
-      localizeSysInfo(comp.isNode() ? "system.node" : "system.driver", locale) + " " + getDisplayName(comp);
+      localizeSysInfo(comp.isNode() ? "system.node" : "system.driver", locale) + " " + getDisplayName(comp, showIP);
   }
 
   /**

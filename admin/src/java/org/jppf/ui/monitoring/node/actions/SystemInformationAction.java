@@ -26,6 +26,7 @@ import javax.swing.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.*;
@@ -134,7 +135,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
       final StringBuilder html = new StringBuilder();
       final StringBuilder toClipboard = new StringBuilder();
       AbstractTopologyComponent comp = dataArray[0];
-      final String title = TopologyUtils.getSystemInfoTitle(comp, Locale.getDefault());
+      final String title = TopologyUtils.getSystemInfoTitle(comp, Locale.getDefault(), StatsHandler.getInstance().getShowIPHandler().isShowIP());
       try {
         JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
         html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title), Locale.getDefault()));

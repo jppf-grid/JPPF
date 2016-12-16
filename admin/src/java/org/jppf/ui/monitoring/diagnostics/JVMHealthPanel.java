@@ -112,7 +112,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
-    StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+    StatsHandler.getInstance().getShowIPHandler().addShowIPListener(new ShowIPListener() {
       @Override
       public void stateChanged(final ShowIPEvent event) {
         treeTable.repaint();

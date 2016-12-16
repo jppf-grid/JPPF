@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.tabletree;
+package org.jppf.admin.web.utils;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.jppf.admin.web.utils.AbstractActionLink;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -31,7 +30,7 @@ import org.slf4j.*;
  * @param <F> the type of form displayed in the modal window.
  * @author Laurent Cohen
  */
-public abstract class AbstractModalLink<F extends Form<String>> extends AbstractActionLink {
+public abstract class AbstractModalLink<F extends AbstractModalForm> extends AbstractActionLink {
   /**
    * Logger for this class.
    */
@@ -67,6 +66,11 @@ public abstract class AbstractModalLink<F extends Form<String>> extends Abstract
     this.pageClass = pageClass;
     modal = new ModalWindow(id + ".dialog");
     form.add(modal);
+  }
+
+  @Override
+  protected void onInitialize() {
+    super.onInitialize();
     modalForm = createForm();
   }
 

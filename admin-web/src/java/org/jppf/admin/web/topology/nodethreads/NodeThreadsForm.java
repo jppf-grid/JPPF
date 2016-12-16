@@ -93,7 +93,8 @@ public class NodeThreadsForm extends AbstractModalForm {
   }
 
   @Override
-  protected void saveSettings(final TypedProperties props) {
+  protected boolean saveSettings(final TypedProperties props) {
     props.setInt(nbThreadsField.getId(), getNbThreads()).setInt(priorityField.getId(), getPriority());
+    return true;
   }
 }

@@ -27,6 +27,7 @@ import org.apache.wicket.model.Model;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.jobs.JobsConstants;
 import org.jppf.admin.web.tabletree.*;
+import org.jppf.admin.web.utils.AbstractModalLink;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.*;

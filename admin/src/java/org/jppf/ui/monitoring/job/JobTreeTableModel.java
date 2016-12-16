@@ -61,7 +61,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JobTreeTableModel(final TreeNode node) {
     super(node);
-    BASE = "org.jppf.ui.i18n.JobDataPage";
+    i18nBase = "org.jppf.ui.i18n.JobDataPage";
   }
 
   /**
@@ -71,7 +71,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public JobTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);
-    BASE = "org.jppf.ui.i18n.JobDataPage";
+    i18nBase = "org.jppf.ui.i18n.JobDataPage";
   }
 
   @Override

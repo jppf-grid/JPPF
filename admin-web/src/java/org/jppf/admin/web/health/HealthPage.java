@@ -35,6 +35,7 @@ import org.jppf.admin.web.health.thresholds.ThresholdsLink;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.diagnostics.JVMHealthTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.ui.utils.TopologyUtils;
@@ -96,18 +97,8 @@ public class HealthPage extends AbstractTableTreePage {
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
-    Locale locale = getSession().getLocale();
-    if (locale == null) locale = Locale.US;
     columns.add(new HealthTreeColumn(Model.of("Tree")));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.HEAP_MEM_PCT));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.HEAP_MEM_MB));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.NON_HEAP_MEM_PCT));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.NON_HEAP_MEM_MB));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.RAM_PCT));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.RAM_MB));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.THREADS));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.CPU_LOAD));
-    columns.add(new HealthColumn(JVMHealthTreeTableModel.SYSTEM_CPU_LOAD));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new HealthColumn(item.index));
     return columns;
   }
 

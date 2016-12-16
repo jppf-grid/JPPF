@@ -59,7 +59,7 @@ public class JobRenderer extends AbstractTreeCellRenderer {
         Color backgroundSelected = defaultSelectionBackground;
         if (data instanceof JobDriver) {
           JobDriver driver = (JobDriver) data;
-          renderer.setText(TopologyUtils.getDisplayName(driver.getTopologyDriver()));
+          renderer.setText(TopologyUtils.getDisplayName(driver.getTopologyDriver(), isShowIP()));
           if (((JobDriver) data).getTopologyDriver().getConnection().getStatus().isWorkingStatus()) {
             path = DRIVER_ICON;
             background = ACTIVE_COLOR;
@@ -80,7 +80,7 @@ public class JobRenderer extends AbstractTreeCellRenderer {
           TopologyNode nodeData = dispatch.getNode();
           if (nodeData != null) {
             JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
-            renderer.setText((StatsHandler.getInstance().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
+            renderer.setText((StatsHandler.getInstance().getShowIPHandler().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
             path = GuiUtils.computeNodeIconKey(nodeData);
             //else path = AbstractTreeCellRenderer.NODE_ICON;
           }

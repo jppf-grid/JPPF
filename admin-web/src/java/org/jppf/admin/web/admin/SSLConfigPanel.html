@@ -20,27 +20,24 @@
   <body>
     <wicket:panel xmlns:wicket="http://wicket.apache.org">
       <script>
-        function updateSSLFileName() {
-          document.getElementById('ssl_upload_link').click();
-        }
       </script>
       <form wicket:id="admin.ssl.form" class="jppf_toolbar">
         <a wicket:id="admin.ssl.sort_asc" class="button_link"></a>
         <a wicket:id="admin.ssl.sort_desc" class="button_link"></a>
-        <img src="images/toolbar/separator10.gif"/>
+        <div class="separator"/>
         <a wicket:id="admin.ssl.save" class="button_link"></a>
         <a wicket:id="admin.ssl.revert" class="button_link"></a>
-        <img src="images/toolbar/separator10.gif"/>
+        <div class="separator"/>
         <a wicket:id="admin.ssl.download" class="button_link"></a>
         <!-- Upload button is hidden and triggered via javascript -->
         <a id="ssl_upload_link" wicket:id="admin.ssl.upload" class="button_link" style="display:none"></a>
         <label>
-          <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.ssl.upload.browse" style="display:none" onchange="updateSSLFileName()"/>
+          <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.ssl.upload.browse" style="display:none" onchange="updateFileName('ssl_upload_link')"/>
           <img wicket:id="admin.ssl.upload.img" src="images/toolbar/upload.png" class="button_link"/>
         </label>
         <br/>&nbsp;
         <h4 style="margin: 0px"><wicket:message key="admin.ssl.properties.label"></wicket:message></h4>
-        <textarea wicket:id="admin.ssl.properties.field" rows="20" cols="80"></textarea><br/>
+        <textarea wicket:id="admin.ssl.properties.field" id="editor2" rows="20" cols="100"></textarea><br/>
       </form>
     </wicket:panel>
   </body>

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.tabletree;
+package org.jppf.admin.web.utils;
 
 import java.lang.reflect.Constructor;
 

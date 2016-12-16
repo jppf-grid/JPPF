@@ -86,6 +86,6 @@ public abstract class PluggableView {
    * @since 5.1
    */
   public final boolean isShowIP() {
-    return StatsHandler.getInstance().isShowIP();
+    return StatsHandler.getInstance().getShowIPHandler().isShowIP();
   }
 }

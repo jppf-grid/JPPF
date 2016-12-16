@@ -21,6 +21,7 @@ import static org.jppf.ui.monitoring.data.Fields.*;
 
 import java.util.*;
 
+import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.utils.collections.CollectionUtils;
 
 /**
@@ -28,6 +29,18 @@ import org.jppf.utils.collections.CollectionUtils;
  * @author Laurent Cohen
  */
 public class StatsConstants {
+  /**
+   * Base name for localization bundle lookups.
+   */
+  private static final String STATS_BASE = "org.jppf.ui.i18n.StatsPage";
+  /**
+   * A double values map with no values.
+   */
+  protected static final Map<Fields, Double> NO_DOUBLE_VALUES = new HashMap<>();
+  /**
+   * A string values map with no values.
+   */
+  protected static final Map<Fields, String> NO_STRING_VALUES = new HashMap<>();
   /**
    * List of stats properties related to network connections.
    */
@@ -137,27 +150,28 @@ public class StatsConstants {
    */
   private static Map<String, Fields[]> createFieldsMap() {
     Map<String, Fields[]> map = new LinkedHashMap<>();
-    addFieldsMapping(map, EXECUTION, EXECUTION_FIELDS);
-    addFieldsMapping(map, NODE_EXECUTION, NODE_EXECUTION_FIELDS);
-    addFieldsMapping(map, TRANSPORT, TRANSPORT_FIELDS);
-    addFieldsMapping(map, CONNECTION, CONNECTION_FIELDS);
-    addFieldsMapping(map, QUEUE, QUEUE_FIELDS);
-    addFieldsMapping(map, JOB, JOB_FIELDS);
-    addFieldsMapping(map, NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_FIELDS);
-    addFieldsMapping(map, CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_FIELDS);
-    addFieldsMapping(map, INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_FIELDS);
-    addFieldsMapping(map, OUTBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC_FIELDS);
+    map.put(EXECUTION, EXECUTION_FIELDS);
+    map.put(NODE_EXECUTION, NODE_EXECUTION_FIELDS);
+    map.put(TRANSPORT, TRANSPORT_FIELDS);
+    map.put(CONNECTION, CONNECTION_FIELDS);
+    map.put(QUEUE, QUEUE_FIELDS);
+    map.put(JOB, JOB_FIELDS);
+    map.put(NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_FIELDS);
+    map.put(CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_FIELDS);
+    map.put(INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_FIELDS);
+    map.put(OUTBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC_FIELDS);
     return Collections.unmodifiableMap(map);
   }
 
   /**
-   * Add a mmping of the localized specified name to a set of fields.
-   * @param map the map to add the mapping to.
-   * @param name the name to localize and use as a key in the map.
-   * @param fields the fileds associated with the key.
+   * Create the map of localized items fo all the statistics tables.
+   * @param locale the locale to localize into.
+   * @return a mapping of non-localized names to {@link LocalizedListItem} objects.
    */
-  private static void addFieldsMapping(final Map<String, Fields[]> map, final String name, final Fields[] fields) {
-    map.put(name, fields);
+  public static Map<String, LocalizedListItem> createLocalizedItems(final Locale locale) {
+    Map<String, LocalizedListItem> map = new LinkedHashMap<>();
+    int i = 0;
+    for (String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
+    return Collections.unmodifiableMap(map);
   }
-
 }

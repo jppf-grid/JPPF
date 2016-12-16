@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.*;
 
@@ -64,7 +65,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     AbstractTopologyComponent data = (AbstractTopologyComponent) vertex;
     renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
-    renderer.setText(TopologyUtils.getDisplayName(data));
+    renderer.setText(TopologyUtils.getDisplayName(data, StatsHandler.getInstance().getShowIPHandler().isShowIP()));
 
     String path = null;
     Color background = Color.white;

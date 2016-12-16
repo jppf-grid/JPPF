@@ -74,7 +74,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public NodeTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);
-    BASE = "org.jppf.ui.i18n.NodeDataPage";
+    i18nBase = "org.jppf.ui.i18n.NodeDataPage";
   }
 
   /**
