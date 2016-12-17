@@ -18,6 +18,8 @@
 
 package org.jppf.node.debug;
 
+import org.jppf.node.NodeRunner;
+import org.jppf.server.node.JPPFNode;
 import org.slf4j.*;
 
 /**
@@ -35,5 +37,11 @@ public class NodeDebug implements NodeDebugMBean {
     if (messages != null) {
       for (String message: messages) log.info(message);
     }
+  }
+
+  @Override
+  public void cancel() {
+    JPPFNode node = (JPPFNode) NodeRunner.getNode();
+    node.getExecutionManager().cancelAllTasks(true, false);
   }
 }

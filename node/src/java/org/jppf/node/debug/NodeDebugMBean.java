@@ -35,4 +35,9 @@ public interface NodeDebugMBean extends Serializable {
    * @param messages the messages ot print.
    */
   void log(String...messages);
+
+  /**
+   * Cancel the currently executing job, if any.
+   */
+  void cancel();
 }
