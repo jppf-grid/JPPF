@@ -29,6 +29,7 @@ import org.objenesis.strategy.*;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.*;
+import com.esotericsoftware.kryo.util.*;
 
 import de.javakaffee.kryoserializers.*;
 
@@ -112,13 +113,24 @@ public class KryoSerialization implements JPPFSerialization {
   }
  
   /**
+   * Forces the clearing of the class name to class map upon invocation of the {@code reset()} method.
+   */
+  public static class CustomClassResolver extends DefaultClassResolver {
+    @Override
+    public void reset() {
+      super.reset();
+      if (nameToClass != null) nameToClass.clear();
+    }
+  }
+
+  /**
    * Create a Kryo instance, with its instantiator strategy and a set of
    * common serializers (from kryo-serializers project) initialized.
    * @return an instance of {@link Kryo}.
    */
   private static Kryo createKryo() {
-    Kryo kryo = new Kryo();
-    //kryo.setInstantiatorStrategy(str);
+    Kryo kryo = new Kryo(new CustomClassResolver(), new MapReferenceResolver());
+    kryo.setAutoReset(true);
     kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 
     kryo.register(Arrays.asList( "" ).getClass(), new ArraysAsListSerializer() );
