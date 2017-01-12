@@ -289,7 +289,7 @@ public class PolicyParser {
     SchemaValidator validator = new SchemaValidator(reporter);
     if (!validator.validate(reader, FileUtils.getFileReader(schemaPath))) {
       StringBuilder sb = new StringBuilder();
-      sb.append("The XML document has errors:\n");
+      //sb.append("The XML document has errors:\n");
       if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append('\n');
       if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append('\n');
       if (!reporter.warnings.isEmpty())    sb.append("warnings    : ").append(reporter.allWarningsAsStrings()).append('\n');

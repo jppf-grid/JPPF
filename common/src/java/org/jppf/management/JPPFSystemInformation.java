@@ -56,11 +56,11 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    */
   private Map<String, TypedProperties> map = new HashMap<>();
   /**
-   * <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
+   * {@code true} if the JPPF component is local (local node or local client executor), {@code false} otherwise.
    */
   private boolean local;
   /**
-   * If <code>true</code>, then the name resolution for <code>InetAddress</code>es should occur immediately,
+   * If {@code true}, then the name resolution for {@code InetAddress}es should occur immediately,
    */
   private boolean resolveInetAddressesNow;
   /**
@@ -75,20 +75,19 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Initialize this system information object with the specified uuid.
    * @param uuid the uuid of the corresponding JPPF component.
-   * @param local <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
-   * @param resolveInetAddressesNow if <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * @param local {@code true} if the JPPF component is local (local node or local client executor), {@code false} otherwise.
+   * @param resolveInetAddressesNow if {@code true}, then name resolution for {@code InetAddress}es should occur immediately,
    * otherwise it is different and executed in a separate thread.
    */
   public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow) {
     this(uuid, local, resolveInetAddressesNow, null);
   }
 
-
   /**
    * Initialize this system information object with the specified uuid.
    * @param uuid the uuid of the corresponding JPPF component.
-   * @param local <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
-   * @param resolveInetAddressesNow if <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * @param local {@code true} if the JPPF component is local (local node or local client executor), {@code false} otherwise.
+   * @param resolveInetAddressesNow if {@code true}, then name resolution for {@code InetAddress}es should occur immediately,
    * otherwise it is different and executed in a separate thread.
    * @param stats an optional statistics object from which events can be received so the corresponding properties can be kept up to date.
    */
@@ -107,10 +106,9 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     populate();
   }
 
-
   /**
    * Get the map holding the system properties.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.SystemUtils#getSystemProperties()
    */
   public TypedProperties getSystem() {
@@ -134,7 +132,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * </ul>
    * <p>Some or all of these properties may be missing if a security manager is installed
    * that does not grant access to the related {@link java.lang.Runtime} APIs.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.SystemUtils#getRuntimeInformation()
    */
   public TypedProperties getRuntime() {
@@ -143,7 +141,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
 
   /**
    * Get the map holding the environment variables.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.SystemUtils#getEnvironment()
    */
   public TypedProperties getEnv() {
@@ -159,7 +157,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * </ul>
    * <p>Each property is a space-separated list of <i>hostname</i>|<i>ip_address</i> pairs,
    * the hostname and ip address being separated by a pipe symbol &quot;|&quot;.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.SystemUtils#getNetwork()
    */
   public TypedProperties getNetwork() {
@@ -168,7 +166,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
 
   /**
    * Get the map holding the JPPF configuration properties.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.JPPFConfiguration#getProperties()
    */
   public TypedProperties getJppf() {
@@ -188,7 +186,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * <li>root.<i>i</i>.space.usable = <i>space_in_bytes</i> : space available to the user the JVM is running under</li>
    * </ul>
    * If the JVM version is prior to 1.6, the space information will not be available.
-   * @return a <code>TypedProperties</code> instance.
+   * @return a {@code TypedProperties} instance.
    * @see org.jppf.utils.SystemUtils#getStorageInformation()
    */
   public TypedProperties getStorage() {
@@ -205,7 +203,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * <li>"jppf.build.number" : the current build number</li>
    * <li>"jppf.build.date" : the build date, including the time zone, in the format "yyyy-MM-dd hh:mm z" </li>
    * </ul>
-   * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
+   * @return a {@code TypedProperties} wrapper for the uuid and version information of the corresponding JPPF component.
    */
   public TypedProperties getUuid() {
     return getProperties("uuid");
@@ -213,7 +211,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
 
   /**
    * Get the properties object holding the JPPF server statistics, listed as constants in {@link JPPFStatisticsHelper}.
-   * @return a <code>TypedProperties</code> wrapper for the server statistics; for a node this will return an empty set of properties.
+   * @return a {@code TypedProperties} wrapper for the server statistics; for a node this will return an empty set of properties.
    */
   public TypedProperties getStats() {
     return getProperties("stats");
@@ -237,7 +235,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * <li>"os.AvailableProcessors" : number of processors available to the OS (int value)</li>
    * <li>"os.SystemLoadAverage" : average system CPU load over the last minute (double value in the range [0 ... 1], always returns -1 on Windows)</li>
    * </ul>
-   * @return a <code>TypedProperties</code> wrapper for the operating system information of the corresponding JPPF component.
+   * @return a {@code TypedProperties} wrapper for the operating system information of the corresponding JPPF component.
    */
   public TypedProperties getOS() {
     return getProperties("os");
@@ -272,7 +270,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
 
   /**
    * Populate this system information object.
-   * @return this <code>JPPFSystemInformation</code> object.
+   * @return this {@code JPPFSystemInformation} object.
    */
   public JPPFSystemInformation populate() {
     if (traceEnabled) {
@@ -306,7 +304,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Parse the list of IP v4 addresses contained in this JPPFSystemInformation instance.<br>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
-   * @return an array of <code>HostIP</code> instances.
+   * @return an array of {@code HostIP} instances.
    * @exclude
    */
   public HostIP[] parseIPV4Addresses() {
@@ -316,7 +314,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Parse the list of IP v6 addresses contained in this JPPFSystemInformation instance.<br>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
-   * @return an array of <code>HostIP</code> instances.
+   * @return an array of {@code HostIP} instances.
    * @exclude
    */
   public HostIP[] parseIPV6Addresses() {
