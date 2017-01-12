@@ -64,10 +64,6 @@ public final class GuiUtils {
    */
   private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
   /**
-   * The default empty execution policy for node filtering from a resource file.
-   */
-  public static final String DEFAULT_EMPTY_FILTER = loadDefaultEmptyFilter();
-  /**
    * A mapping of words or phrases to abbreviated versions for use in the UI.
    */
   private static Map<String, String> shortenerMap = createShortener();
@@ -333,19 +329,6 @@ public final class GuiUtils {
    */
   public static void runAction(final Runnable r, final String name) {
     new Thread(r, name).start();
-  }
-
-  /**
-   * Load the default empty execution policy for node filtering from a resource file.
-   * @return an XML execution policy as a string.
-   */
-  private static String loadDefaultEmptyFilter() {
-    try {
-      return FileUtils.readTextFile("org/jppf/ui/filtering/empty_policy.xml");
-    } catch (Exception e) {
-      if (log.isDebugEnabled()) log.debug("Could not load default empty policy", e);
-      return "<ExecutionPolicy>\n  \n</ExecutionPolicy>";
-    }
   }
 
   /**

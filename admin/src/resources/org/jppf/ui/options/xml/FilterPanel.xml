@@ -33,21 +33,21 @@
 	<!-- Filter actions bar                                                    -->
 	<!-- ===================================================================== -->
 
-	<child name="FilterActionsPanel" type="page">
+	<child name="node.filter.actions" type="page">
 		<property name="label" value="Filter actions"/>
 		<property name="layoutConstraints" value="fill, flowx, insets 4 2 0 2"/>
 		<property name="componentConstraints" value="growx"/>
 		<property name="bordered" value="false"/>
 
-    <child name="ApplyFilter" type="Button">
+    <child name="node.filter.apply" type="Button">
       <property name="componentConstraints" value="growx 0"/>
       <property name="icon" value="/org/jppf/ui/resources/run-rebuild.png"/>
       <listener type="script">
-        <script language="groovy">option.findFirstWithName("/ActivateFilter").setValue(true)</script>
+        <script language="groovy">option.findFirstWithName("/node.filter.activate").setValue(true)</script>
       </listener>
     </child>
 
-    <child name="ActivateFilter" type="Button">
+    <child name="node.filter.activate" type="Button">
       <property name="icon" value="/org/jppf/ui/resources/toggle_active.gif"/>
       <property name="toggle" value="true"/>
       <property name="persistent" value="true"/>
@@ -61,7 +61,16 @@
 
     <child name="sep1" type="ToolbarSeparator"/>
 
-    <child name="LoadFilter" type="FileChooser">
+    <child name="node.filter.validate" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/checkbox.png"/>
+      <listener type="script">
+        <script language="groovy">validate()</script>
+      </listener>
+    </child>
+
+    <child name="sep2" type="ToolbarSeparator"/>
+
+    <child name="node.filter.load" type="FileChooser">
       <property name="icon" value="/org/jppf/ui/resources/import.png"/>
       <property name="type" value="open"/>
       <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
@@ -71,7 +80,7 @@
       </listener>
     </child>
   
-    <child name="SaveFilter" type="FileChooser">
+    <child name="node.filter.save" type="FileChooser">
       <property name="icon" value="/org/jppf/ui/resources/export.png"/>
       <property name="type" value="save"/>
       <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
@@ -91,7 +100,7 @@
   <!-- Code editor area                                                      -->
   <!-- ===================================================================== -->
 
-  <child name="ExecutionPolicy" type="CodeEditor">
+  <child name="node.filter.policy" type="CodeEditor">
     <property name="scrollable" value="true"/>
     <property name="value" value=""/>
     <property name="language" value="text/xml"/>
