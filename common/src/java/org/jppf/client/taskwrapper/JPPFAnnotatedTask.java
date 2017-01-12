@@ -27,7 +27,7 @@ import org.jppf.node.protocol.*;
  * JPPF task wrapper for an object whose class is annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}.
  * @author Laurent Cohen
  */
-public class JPPFAnnotatedTask extends AbstractTask<Object> {
+public class JPPFAnnotatedTask extends AbstractTask<Object> implements CancellationHandler {
   /**
    * Explicit serialVersionUID.
    */
@@ -140,5 +140,11 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> {
     Object o = getTaskObject();
     if (o instanceof Interruptibility) return ((Interruptibility) o).isInterruptible();
     return super.isInterruptible();
+  }
+
+  @Override
+  public void doCancelAction() throws Exception {
+    Object o = getTaskObject();
+    if (o instanceof CancellationHandler) ((CancellationHandler) o).doCancelAction();
   }
 }
