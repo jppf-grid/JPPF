@@ -18,8 +18,7 @@
 
 package org.jppf.admin.web.topology;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
+import org.jppf.admin.web.filter.*;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
@@ -34,9 +33,10 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
    * Initialize with the specified tree model and selection handler.
    * @param treeModel the tree table model.
    * @param selectionHandler handles the selection of rows in the tree table.
+   * @param nodeFilter the node filter to use.
    */
-  public TopologyTreeListener(final AbstractJPPFTreeTableModel treeModel, final SelectionHandler selectionHandler) {
-    super(treeModel, selectionHandler);
+  public TopologyTreeListener(final AbstractJPPFTreeTableModel treeModel, final SelectionHandler selectionHandler, final TopologyFilter nodeFilter) {
+    super(treeModel, selectionHandler, nodeFilter);
   }
 
   @Override
@@ -58,11 +58,15 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
+    if (!isAccepted(event.getNodeOrPeer())) return;
+    addNode(event.getDriver(), event.getNodeOrPeer());
+    /*
     DefaultMutableTreeNode node = TopologyUtils.addNode(treeModel, event.getDriver(), event.getNodeOrPeer());
     if ((node != null) && (getTableTree() != null)) {
       DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
       if (parent.getChildCount() == 1) getTableTree().expand(parent);
     }
+    */
   }
 
   @Override
@@ -73,8 +77,14 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
 
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
+    if (!isAccepted(event.getNodeOrPeer())) return;
     if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {
       TopologyUtils.updateNode(treeModel, event.getDriver(), event.getNodeOrPeer());
     }
+  }
+
+  @Override
+  public void onFilterChange(final TopologyFilterEvent event) {
+    updateTopology(event);
   }
 }

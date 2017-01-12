@@ -44,7 +44,7 @@ public class UploadLink extends AbstractAdminLink {
    * Initialize.
    * @param type the type of config panel to add this button to.
    */
-  public UploadLink(final PanelType type) {
+  public UploadLink(final ConfigType type) {
     super(type, AdminConfigConstants.UPLOAD_ACTION, "upload.png");
     setEnabled(true);
   }

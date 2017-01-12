@@ -46,6 +46,10 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * The topology manager to which topology change notifications are to be sent.
    */
   private final TopologyManager manager;
+  /**
+   * Whether the system info of the nodes should be loaded.
+   */
+  private final boolean loadSystemInfo;
 
   /**
    * Initialize this node handler.
@@ -53,8 +57,19 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * @param period the interval between refreshes in millis.
    */
   NodeRefreshHandler(final TopologyManager manager, final long period) {
+    this(manager, period, false);
+  }
+
+  /**
+   * Initialize this node handler.
+   * @param manager the topology manager.
+   * @param period the interval between refreshes in millis.
+   * @param loadSystemInfo whether the system info of the nodes should be loaded.
+   */
+  NodeRefreshHandler(final TopologyManager manager, final long period, final boolean loadSystemInfo) {
     super("JPPF Topology Update Timer", period);
     this.manager = manager;
+    this.loadSystemInfo = loadSystemInfo;
     startRefreshTimer();
   }
 
@@ -103,6 +118,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (debugEnabled) log.debug("removing node " + node);
       if (node != null) manager.nodeRemoved(driver, node);
     }
+    List<String> addedNodes = new ArrayList<>();
     for (Map.Entry<String, JPPFManagementInfo> entry: actualMap.entrySet()) {
       String uuid = entry.getKey();
       JPPFManagementInfo info = entry.getValue();
@@ -111,6 +127,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         TopologyNode node = null;
         node = info.isPeer() ? new TopologyPeer(info) : new TopologyNode(info);
         manager.nodeAdded(driver, node);
+        if (info.isNode()) addedNodes.add(uuid);
       } else {
         TopologyNode node = manager.getNodeOrPeer(uuid);
         if (node != null) {
@@ -118,6 +135,20 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
             node.getManagementInfo().setIsActive(entry.getValue().isActive());
             manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.NODE_STATE);
           }
+        }
+      }
+      if (!addedNodes.isEmpty() && loadSystemInfo) {
+        try {
+          Map<String, Object> map = jmx.getNodeForwarder().systemInformation(new UuidSelector(addedNodes));
+          for (Map.Entry<String, Object> ent: map.entrySet()) {
+            Object o = ent.getValue();
+            if (o instanceof JPPFSystemInformation) {
+              TopologyNode node = manager.getNode(ent.getKey());
+              if (node != null) node.getManagementInfo().setSystemInfo((JPPFSystemInformation) o);
+            }
+          }
+        } catch(Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }
     }

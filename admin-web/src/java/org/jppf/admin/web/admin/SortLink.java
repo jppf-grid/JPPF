@@ -50,7 +50,7 @@ public class SortLink extends AbstractAdminLink {
    * @param type the type of config panel to add this button to.
    * @param ascending whether to perform a sort in ascending ({@code true}) or descending ({@code false}) order.
    */
-  public SortLink(final PanelType type, final boolean ascending) {
+  public SortLink(final ConfigType type, final boolean ascending) {
     super(type, ascending ? AdminConfigConstants.SORT_ASC_ACTION : AdminConfigConstants.SORT_DESC_ACTION, ascending ? "sort-ascending.png" : "sort-descending.png");
     this.ascending = ascending;
   }

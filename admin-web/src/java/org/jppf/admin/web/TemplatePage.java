@@ -20,11 +20,14 @@ package org.jppf.admin.web;
 
 import java.util.Set;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.head.*;
 import org.apache.wicket.markup.html.link.*;
 import org.jppf.admin.web.admin.AdminPage;
 import org.jppf.admin.web.auth.JPPFRole;
+import org.jppf.admin.web.filter.NodeFilterPage;
+import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.utils.LocalizationUtils;
 
 /**
@@ -37,6 +40,10 @@ public class TemplatePage extends AbstractJPPFPage {
    * Link to the admin page. Made invisible to non-admin users.
    */
   protected Link<String> adminLink;
+  /**
+   * Link to the node filter. Its color changes based on whether it is active (green) or inactive (red).
+   */
+  protected Link<String> nodeFilterLink;
 
   /**
    *
@@ -53,6 +60,13 @@ public class TemplatePage extends AbstractJPPFPage {
     if (!set.contains(JPPFRole.ADMIN.getRoleName())) {
       adminLink.setVisible(false);
       adminLink.setEnabled(false);
+    }
+    nodeFilterLink =  new BookmarkablePageLink<>("jppf.filter.link", NodeFilterPage.class);
+    add(nodeFilterLink);
+    UserSettings settings = session.getUserSettings();
+    if (getClass() != NodeFilterPage.class) {
+      boolean active = settings.getProperties().getBoolean("node.filter.active", false);
+      nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
     }
   }
 

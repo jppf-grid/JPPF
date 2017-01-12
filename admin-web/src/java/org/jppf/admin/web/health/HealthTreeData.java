@@ -25,7 +25,9 @@ import org.jppf.admin.web.health.threaddump.ThreadDumpAction;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.monitoring.diagnostics.JVMHealthTreeTableModel;
 import org.jppf.ui.treetable.*;
+import org.jppf.ui.utils.TopologyUtils;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -53,6 +55,8 @@ public class HealthTreeData extends TableTreeData {
         return (node != null) && !((AbstractTopologyComponent) node.getUserObject()).isPeer();
       }
     });
+    listener = new HealthTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
+    JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
     ActionHandler ah = getActionHandler();
     ah.addAction(HealthConstants.GC_ACTION, new GCLink.Action());
     ah.addAction(HealthConstants.THREAD_DUMP_ACTION, new ThreadDumpAction());
@@ -111,5 +115,17 @@ public class HealthTreeData extends TableTreeData {
   public void cleanup() {
     super.cleanup();
     if (listener != null) JPPFWebConsoleApplication.get().getTopologyManager().removeTopologyListener(listener);
+  }
+
+  @Override
+  protected void createTreeTableModel() {
+    model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
+    // populate the tree table model
+    for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
+      TopologyUtils.addDriver(model, driver);
+      for (AbstractTopologyComponent child : driver.getChildren()) {
+        if (!child.isPeer()) TopologyUtils.addNode(model, driver, (TopologyNode) child);
+      }
+    }
   }
 }

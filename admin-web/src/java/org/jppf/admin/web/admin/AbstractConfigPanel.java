@@ -49,12 +49,12 @@ public class AbstractConfigPanel extends Panel {
   /**
    * The type of config panel to add this button to.
    */
-  protected final PanelType type;
+  protected final ConfigType type;
 
   /**
    * @param type the type of config panel to add this button to.
    */
-  public AbstractConfigPanel(final PanelType type) {
+  public AbstractConfigPanel(final ConfigType type) {
     super(type.getPrefix());
     this.type = type;
     add(form = new Form<>(type.getPrefix() + ".form"));

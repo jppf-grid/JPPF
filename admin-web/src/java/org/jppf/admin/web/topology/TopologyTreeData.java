@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.JPPFWebConsoleApplication;
+import org.jppf.admin.web.*;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.loadbalancing.LoadBalancingLink;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigAction;
@@ -32,7 +32,9 @@ import org.jppf.admin.web.topology.serverstop.DriverStopRestartAction;
 import org.jppf.admin.web.topology.systeminfo.SystemInfoAction;
 import org.jppf.admin.web.utils.UpdatableAction;
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.monitoring.node.NodeTreeTableModel;
 import org.jppf.ui.treetable.*;
+import org.jppf.ui.utils.TopologyUtils;
 import org.jppf.utils.collections.*;
 
 /**
@@ -56,6 +58,8 @@ public class TopologyTreeData extends TableTreeData {
         return (node != null) && !((AbstractTopologyComponent) node.getUserObject()).isPeer();
       }
     });
+    listener = new TopologyTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
+    JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
     ActionHandler ah = getActionHandler();
     ah.addAction(TopologyConstants.SYSTEM_INFO_ACTION, new SystemInfoAction());
     ah.addAction(TopologyConstants.PROVISIONING_ACTION, new ProvisioningAction());
@@ -135,5 +139,17 @@ public class TopologyTreeData extends TableTreeData {
   public void cleanup() {
     super.cleanup();
     if (listener != null) JPPFWebConsoleApplication.get().getTopologyManager().removeTopologyListener(listener);
+  }
+
+  @Override
+  protected void createTreeTableModel() {
+    model = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
+    // populate the tree table model
+    for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
+      TopologyUtils.addDriver(model, driver);
+      for (AbstractTopologyComponent child : driver.getChildren()) {
+        TopologyUtils.addNode(model, driver, (TopologyNode) child);
+      }
+    }
   }
 }

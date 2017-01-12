@@ -27,6 +27,6 @@ public class SSLConfigPanel extends AbstractConfigPanel {
    * 
    */
   public SSLConfigPanel() {
-    super(PanelType.SSL);
+    super(ConfigType.SSL);
   }
 }

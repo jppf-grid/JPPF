@@ -444,7 +444,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
-   * Reconstitute the {@code TreeMap} instance from a stream (i.e., deserialize it).
+   * Reconstitute the {@code JPPFJob} instance from a stream (i.e., deserialize it).
    * @param in the input stream from which to read the job. 
    * @throws IOException if any I/O error occurs.
    * @throws ClassNotFoundException if the class of an object in the object graph can not be found.

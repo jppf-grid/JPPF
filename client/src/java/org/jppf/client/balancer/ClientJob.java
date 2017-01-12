@@ -27,6 +27,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.JobEvent.Type;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -445,8 +446,9 @@ public class ClientJob extends AbstractClientJob {
               uuids.add(driverUuid);
               try {
                 if (debugEnabled) log.debug("sending cancel request for jobId={} to driver={}", this.getUuid(), driverUuid);
-                pool.getJmxConnection().cancelJob(this.getUuid());
-              } catch(Exception e) {
+                JMXDriverConnectionWrapper jmx = pool.getJmxConnection();
+                if (jmx != null) jmx.cancelJob(this.getUuid());
+            } catch(Exception e) {
                 if (debugEnabled) log.debug(e.getMessage(), e);
                 else log.warn(ExceptionUtils.getMessage(e));
               }

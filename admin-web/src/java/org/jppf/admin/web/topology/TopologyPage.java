@@ -23,6 +23,7 @@ import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
 import org.apache.wicket.extensions.markup.html.repeater.tree.table.*;
@@ -41,7 +42,6 @@ import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.node.NodeTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.ui.utils.TopologyUtils;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
@@ -50,7 +50,8 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * This web page displays the topology tree.
  * @author Laurent Cohen
  */
-@MountPath("topology")
+@MountPath(AbstractJPPFPage.PATH_PREFIX + "topology")
+@AuthorizeInstantiation({"jppf-manager", "jppf-monitor"})
 public class TopologyPage extends AbstractTableTreePage {
   /**
    * Logger for this class.
@@ -72,29 +73,7 @@ public class TopologyPage extends AbstractTableTreePage {
     super(TreeViewType.TOPOLOGY, "topology");
     TopologyTreeData data = JPPFWebSession.get().getTopologyData();
     TopologyTreeListener listener = (TopologyTreeListener) data.getListener();
-    if (data.getListener() == null) {
-      listener = new TopologyTreeListener(treeModel, data.getSelectionHandler());
-      listener.setTableTree(tableTree);
-      data.setListener(listener);
-      JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
-    } else listener.setTableTree(tableTree);
-  }
-
-  @Override
-  protected void createTreeTableModel() {
-    TopologyTreeData data = JPPFWebSession.get().getTopologyData();
-    treeModel = data.getModel();
-    if (treeModel == null) {
-      treeModel = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
-      // populate the tree table model
-      for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
-        TopologyUtils.addDriver(treeModel, driver);
-        for (AbstractTopologyComponent child : driver.getChildren()) {
-          TopologyUtils.addNode(treeModel, driver, (TopologyNode) child);
-        }
-      }
-      data.setModel(treeModel);
-    }
+    listener.setTableTree(tableTree);
   }
 
   @Override

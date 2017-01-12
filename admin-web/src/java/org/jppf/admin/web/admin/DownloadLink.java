@@ -47,7 +47,7 @@ public class DownloadLink extends AbstractAdminLink {
    * Initialize.
    * @param type the type of config panel to add this button to.
    */
-  public DownloadLink(final PanelType type) {
+  public DownloadLink(final ConfigType type) {
     super(type, AdminConfigConstants.DOWNLOAD_ACTION, "download.png");
     add(configDownload = new ConfigDownload());
   }
@@ -64,7 +64,7 @@ public class DownloadLink extends AbstractAdminLink {
   private class ConfigDownload extends AJAXDownload {
     @Override
     protected String getFileName() {
-      return type == PanelType.CLIENT ? "jppf-admin.properties" : "jppf-ssl.properties";
+      return type == ConfigType.CLIENT ? "jppf-admin.properties" : "jppf-ssl.properties";
     }
 
     @Override

@@ -21,6 +21,8 @@ package org.jppf.admin.web;
 import java.io.Serializable;
 import java.util.*;
 
+import javax.servlet.FilterConfig;
+
 import org.apache.wicket.*;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
@@ -28,6 +30,7 @@ import org.apache.wicket.pageStore.*;
 import org.apache.wicket.pageStore.memory.*;
 import org.jppf.admin.web.admin.*;
 import org.jppf.admin.web.auth.LoginPage;
+import org.jppf.admin.web.settings.*;
 import org.jppf.admin.web.stats.StatsUpdater;
 import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.monitoring.jobs.*;
@@ -65,19 +68,36 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   /**
    * Mapping of configurations to their type.
    */
-  private final Map<PanelType, ConfigurationHandler> configMap = new EnumMap<>(PanelType.class);
+  private final Map<ConfigType, ConfigurationHandler> configMap = new EnumMap<>(ConfigType.class);
   /**
    * Updates the statistics from all drivers.
    */
   private StatsUpdater statsUpdater;
+  /**
+   * The persistence factory for this web application.
+   */
+  private PersistenceFactory persistenceFactory;
 
   /**
    * Default constructor.
    */
   public JPPFWebConsoleApplication() {
-    if (debugEnabled) log.debug("in JPPFWebConsoleApplication<init>()");
     setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
-    configMap.put(PanelType.CLIENT, new ConfigurationHandler(PanelType.CLIENT) {
+  }
+
+  @Override
+  protected void init() {
+    super.init();
+    FilterConfig filterCOnfig = getWicketFilter().getFilterConfig();
+    String name = filterCOnfig.getInitParameter("jppfPersistenceClassName");
+    if (debugEnabled) log.debug("read persistence class name '{}' from init parameter", name);
+    if (name == null) {
+      name = JPPFAsyncFilePersistence.class.getName();
+      if (debugEnabled) log.debug("using default persistence class name '{}'", name);
+    }
+    persistenceFactory = PersistenceFactory.newInstance(name);
+    if (debugEnabled) log.debug("in JPPFWebConsoleApplication.init()");
+    configMap.put(ConfigType.CLIENT, new ConfigurationHandler(ConfigType.CLIENT) {
       @Override
       public synchronized ConfigurationHandler load() {
         ConfigurationHandler handler = super.load();
@@ -91,21 +111,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
         return super.save();
       }
     });
-    configMap.put(PanelType.SSL, new ConfigurationHandler(PanelType.SSL));
-  }
+    configMap.put(ConfigType.SSL, new ConfigurationHandler(ConfigType.SSL));
 
-  @Override
-  public Class<? extends Page> getHomePage() {
-    return TopologyPage.class;
-  }
-
-  @Override
-  protected void init() {
-    super.init();
     getPageSettings().setVersionPagesByDefault(false);
     this.setPageManagerProvider(new MyPageManagerProvider(this));
-    JPPFConfiguration.reset(getConfig(PanelType.CLIENT).getProperties());
-    this.topologyManager = new TopologyManager();
+    TypedProperties config = getConfig(ConfigType.CLIENT).getProperties();
+    JPPFConfiguration.reset(config);
+    this.topologyManager = new TopologyManager(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), null, true);
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
     this.statsUpdater = new StatsUpdater(topologyManager);
   }
@@ -118,11 +130,17 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   }
 
   /**
-   * @return the topololgy manager.
+   * @return the job monitor.
    */
   public JobMonitor getJobMonitor() {
     return jobMonitor;
   }
+
+  @Override
+  public Class<? extends Page> getHomePage() {
+    return TopologyPage.class;
+  }
+
 
   @Override
   protected Class<? extends ServletContainerAuthenticatedWebSession> getContainerManagedWebSessionClass() {
@@ -132,16 +150,6 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   @Override
   protected Class<? extends WebPage> getSignInPageClass() {
     return LoginPage.class;
-  }
-
-  /**
-   * Get a localized message given its unique name and the current locale.
-   * @param message - the unique name of the localized message.
-   * @return a message in the current locale, or the default locale
-   * if the localization for the current locale is not found.
-   */
-  public String localize(final String message) {
-    return LocalizationUtils.getLocalized(BASE, message);
   }
 
   /**
@@ -155,7 +163,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    * @param type the type of config to get.
    * @return the configuration handler for the specified config type.
    */
-  public ConfigurationHandler getConfig(final PanelType type) {
+  public ConfigurationHandler getConfig(final ConfigType type) {
     return (type == null) ? null : configMap.get(type);
   }
 
@@ -164,6 +172,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   public StatsUpdater getStatsUpdater() {
     return statsUpdater;
+  }
+
+  /**
+   * @return the persistence factory for this web application.
+   */
+  public PersistenceFactory getPersistenceFactory() {
+    return persistenceFactory;
   }
 
   /**

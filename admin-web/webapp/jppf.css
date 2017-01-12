@@ -437,6 +437,7 @@ textarea {
 
 .layout_cell_left {
   min-width: 100px;
+  max-width: 100px;
   background-color: white;
   color: #6D78B6;
   font-size: 9pt;

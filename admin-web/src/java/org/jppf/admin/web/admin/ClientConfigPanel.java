@@ -27,7 +27,7 @@ public class ClientConfigPanel extends AbstractConfigPanel {
    *
    */
   public ClientConfigPanel() {
-    super(PanelType.CLIENT);
+    super(ConfigType.CLIENT);
     form.add(new ResetClientLink(type));
   }
 }

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+<!--
+  JPPF
+  Copyright (C) 2005-2016 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
   <display-name>JPPF Web Admin Console</display-name>
   <filter>
     <filter-name>JPPFWebConsoleApplication</filter-name>
@@ -9,6 +26,10 @@
       <param-name>applicationClassName</param-name>
       <param-value>org.jppf.admin.web.JPPFWebConsoleApplication</param-value>
     </init-param>
+    <init-param>
+      <param-name>jppfPersistenceClassName</param-name>
+      <param-value>org.jppf.admin.web.settings.JPPFAsyncFilePersistence</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>JPPFWebConsoleApplication</filter-name>
@@ -16,6 +37,7 @@
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>FORWARD</dispatcher> 
   </filter-mapping>
+
   <security-constraint>
     <display-name>ExampleConstraint</display-name>
     <web-resource-collection>
@@ -23,7 +45,9 @@
       <description/>
       <url-pattern>/topology/*</url-pattern>
       <url-pattern>/jobs/*</url-pattern>
-      <url-pattern>/jvmhealth/*</url-pattern>
+      <url-pattern>/health/*</url-pattern>
+      <url-pattern>/admin/*</url-pattern>
+      <url-pattern>/statistics/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <description>JPPF Roles</description>

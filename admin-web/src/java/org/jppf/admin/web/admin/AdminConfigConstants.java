@@ -20,7 +20,7 @@ package org.jppf.admin.web.admin;
 
 /**
  * The action constants defined in this class need to be appended to a config panel's prefix name,
- * as defined in {@link PanelType}'s {@link PanelType#getPrefix() getPrefix()} method.
+ * as defined in {@link ConfigType}'s {@link ConfigType#getPrefix() getPrefix()} method.
  * @author Laurent Cohen
  */
 public class AdminConfigConstants {

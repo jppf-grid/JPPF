@@ -498,6 +498,9 @@ button.ui-button::-moz-focus-inner {
 	padding: .4em 1em;
 	position: relative;
 }
+.ui-dialog-title {
+  background-color: #6D78B6;
+}
 .ui-dialog .ui-dialog-title {
 	float: left;
 	margin: .1em 0;
@@ -922,8 +925,11 @@ body .ui-tooltip {
 }
 .ui-widget-header {
 	border: none;
-	/*background: #E8EAFD;*/
-	background: #E2E4F0;
+	/*
+	background: #E8EAFD;
+  background: #E2E4F0;
+	*/
+	background: 6D78B6;
 	color: white;
 	font-weight: bold;
 }

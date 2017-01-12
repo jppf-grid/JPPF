@@ -20,13 +20,15 @@ package org.jppf.admin.web.jobs;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.admin.web.JPPFWebConsoleApplication;
+import org.jppf.admin.web.*;
 import org.jppf.admin.web.jobs.maxnodes.MaxNodesAction;
 import org.jppf.admin.web.jobs.priority.PriorityAction;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.utils.UpdatableAction;
 import org.jppf.client.monitoring.jobs.*;
+import org.jppf.ui.monitoring.job.JobTreeTableModel;
 import org.jppf.ui.treetable.*;
+import org.jppf.ui.utils.JobsUtils;
 
 /**
  *
@@ -50,6 +52,8 @@ public class JobsTreeData extends TableTreeData {
         return (comp instanceof Job);
       }
     });
+    listener = new JobsTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
+    JPPFWebConsoleApplication.get().getJobMonitor().addJobMonitoringListener(listener);
     ActionHandler ah = getActionHandler();
     ah.addAction(JobsConstants.CANCEL_ACTION, new CancelJobLink.Action());
     UpdatableAction suspendAction = new SuspendJobLink.Action();
@@ -79,5 +83,18 @@ public class JobsTreeData extends TableTreeData {
   public void cleanup() {
     super.cleanup();
     if (listener != null) JPPFWebConsoleApplication.get().getJobMonitor().removeJobMonitoringListener(listener);
+  }
+
+  @Override
+  protected void createTreeTableModel() {
+    model = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), JPPFWebSession.get().getLocale());
+    // populate the tree table model
+    for (JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
+      JobsUtils.addDriver(model, driver);
+      for (Job job: driver.getJobs()) {
+        JobsUtils.addJob(model, driver, job);
+        for (JobDispatch dispatch: job.getJobDispatches()) JobsUtils.addJobDispatch(model, job, dispatch);
+      }
+    }
   }
 }

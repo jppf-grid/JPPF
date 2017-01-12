@@ -31,7 +31,7 @@ import org.slf4j.*;
 /**
  * @author Laurent Cohen
  */
-public class TableTreeData implements SelectionListener {
+public abstract class TableTreeData implements SelectionListener {
   /**
    * Logger for this class.
    */
@@ -43,7 +43,7 @@ public class TableTreeData implements SelectionListener {
   /**
    * The tree table model.
    */
-  private transient AbstractJPPFTreeTableModel model;
+  protected transient AbstractJPPFTreeTableModel model;
   /**
    * Handles the selection of rows in the tree table.
    */
@@ -74,6 +74,7 @@ public class TableTreeData implements SelectionListener {
     selectionHandler = new MultipleSelectionHandler();
     selectionHandler.addSelectionListener(this);
     expansionModel = Model.ofSet(new HashSet<DefaultMutableTreeNode>());
+    createTreeTableModel();
   }
 
   /**
@@ -81,13 +82,6 @@ public class TableTreeData implements SelectionListener {
    */
   public AbstractJPPFTreeTableModel getModel() {
     return model;
-  }
-
-  /**
-   * @param model the tree table model.
-   */
-  public void setModel(final AbstractJPPFTreeTableModel model) {
-    this.model = model;
   }
 
   /**
@@ -186,4 +180,9 @@ public class TableTreeData implements SelectionListener {
   public void setFirstExpansion(final boolean firstExpansion) {
     this.firstExpansion = firstExpansion;
   }
+
+  /**
+   * Create the tree model.
+   */
+  protected abstract void createTreeTableModel();
 }

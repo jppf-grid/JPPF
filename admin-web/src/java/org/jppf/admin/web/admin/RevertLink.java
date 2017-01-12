@@ -43,7 +43,7 @@ public class RevertLink extends AbstractAdminLink {
    * Initialize.
    * @param type the type of config panel to add this button to.
    */
-  public RevertLink(final PanelType type) {
+  public RevertLink(final ConfigType type) {
     super(type, AdminConfigConstants.REVERT_ACTION, "revert.png");
   }
 

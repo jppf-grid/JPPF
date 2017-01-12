@@ -18,10 +18,16 @@
 
 package org.jppf.admin.web;
 
-import java.util.EnumMap;
+import java.security.Principal;
+import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.jppf.admin.web.auth.*;
+import org.jppf.admin.web.filter.TopologyFilter;
 import org.jppf.admin.web.health.HealthTreeData;
 import org.jppf.admin.web.jobs.JobsTreeData;
 import org.jppf.admin.web.settings.UserSettings;
@@ -29,6 +35,7 @@ import org.jppf.admin.web.tabletree.TableTreeData;
 import org.jppf.admin.web.topology.TopologyTreeData;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.treetable.TreeViewType;
+import org.slf4j.*;
 import org.wicketstuff.wicket.servlet3.auth.ServletContainerAuthenticatedWebSession;
 
 /**
@@ -37,6 +44,14 @@ import org.wicketstuff.wicket.servlet3.auth.ServletContainerAuthenticatedWebSess
  * @author Laurent Cohen
  */
 public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFWebSession.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Holds the data for each type of table tree view.
    */
@@ -49,6 +64,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * The currently selected driver.
    */
   private TopologyDriver currentDriver;
+  /**
+   * The user's node filter
+   */
+  private TopologyFilter nodeFilter;
 
   /**
    * Initialize a new session.
@@ -57,6 +76,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public JPPFWebSession(final Request request) {
     super(request);
     dataMap = new EnumMap<>(TreeViewType.class);
+    nodeFilter = new TopologyFilter(getUserName());
   }
 
   @Override
@@ -131,9 +151,16 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public boolean authenticate(final String user, final String pwd) {
     boolean ret = super.authenticate(user, pwd);
     if (ret) {
+      List<String> roles = getUserRoles();
+      if (debugEnabled) log.debug("successful authentication for user {}, roles = {}", user, roles);
+      if (debugEnabled) log.debug("user from request: {}", getSignedInUser());
       userSettings = new UserSettings(user).load();
+      if (roles.contains(JPPFRoles.MANAGER) || roles.contains(JPPFRoles.MONITOR)) {
+        for (TreeViewType type: TreeViewType.values()) getTableTreeData(type);
+      }
       getHealthData().initThresholds(userSettings.getProperties());
-    }
+      
+    } else if (debugEnabled) log.debug("failed authentication for user {}", user);
     return ret;
   }
 
@@ -158,5 +185,36 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   public void setCurrentDriver(final TopologyDriver currentDriver) {
     this.currentDriver = currentDriver;
+  }
+
+
+  /**
+   * @return the name of the authenticated user, or {@code null} if the user is not authenticated.
+   */
+  public static String getSignedInUser() {
+    HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
+    Principal p = req.getUserPrincipal();
+    return p == null ? null : p.getName();
+  }
+
+  /**
+   * 
+   * @return the roles of the current signed-in user, if any.
+   */
+  private List<String> getUserRoles() {
+    List<String> result = new ArrayList<>();
+    HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
+    for (JPPFRole r: JPPFRole.values()) {
+      String role = r.getRoleName();
+      if (req.isUserInRole(role)) result.add(role); 
+    }
+    return result;
+  }
+
+  /**
+   * @return the user's node filter
+   */
+  public TopologyFilter getNodeFilter() {
+    return nodeFilter;
   }
 }

@@ -18,12 +18,13 @@
 
 package org.jppf.admin.web.settings;
 
+import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * Persistent user settings. The settings are simple properties, persisted via a persistence handler,
- * which is an instance of an implementation of {@link SettingsPersistence}.  
+ * which is an instance of an implementation of {@link Persistence}.  
  * @author Laurent Cohen
  */
 public class UserSettings {
@@ -38,7 +39,7 @@ public class UserSettings {
   /**
    * The user name.
    */
-  private String userHash;
+  private final String userHash;
   /**
    * The settings.
    */
@@ -46,16 +47,16 @@ public class UserSettings {
   /**
    * The perisstence handler for these settings.
    */
-  private final SettingsPersistence persistence = new JPPFFileSettingsPersistence();
+  private final Persistence persistence;
 
   /**
    * Initialize with the specified user.
    * @param user th euser name.
    */
   public UserSettings(final String user) {
-    super();
     this.user = user;
-    this.userHash = getUserHash();
+    this.userHash = CryptoUtils.computeHash(user, "SHA-256");
+    this.persistence = JPPFWebConsoleApplication.get().getPersistenceFactory().newPersistence();
   }
 
   /**
@@ -64,7 +65,11 @@ public class UserSettings {
    */
   public UserSettings load() {
     try  {
-      persistence.load(getUserHash(), properties);
+      TypedProperties props = persistence.loadProperties(userHash);
+      if (!props.isEmpty()) {
+        properties.clear();
+        properties.putAll(props);
+      }
     } catch(Exception e) {
       log.error("error loading settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
@@ -76,18 +81,10 @@ public class UserSettings {
    */
   public void save() {
     try  {
-      persistence.save(getUserHash(), properties);
+      persistence.saveProperties(userHash, properties);
     } catch(Exception e) {
       log.error("error saving settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
-  }
-
-  /**
-   * @return the user hash.
-   */
-  private String getUserHash() {
-    if (userHash == null) userHash = CryptoUtils.computeHash(user, "SHA-256");
-    return userHash;
   }
 
   /**

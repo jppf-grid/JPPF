@@ -38,7 +38,7 @@ public abstract class AbstractAdminLink extends AjaxButtonWithIcon {
   /**
    * The type of config panel to add this button to.
    */
-  protected final PanelType type;
+  protected final ConfigType type;
 
   /**
    * Initialize.
@@ -46,7 +46,7 @@ public abstract class AbstractAdminLink extends AjaxButtonWithIcon {
    * @param id the id assigned to this action button.
    * @param imageName the name of the icon associated with this button..
    */
-  public AbstractAdminLink(final PanelType type, final String id, final String imageName) {
+  public AbstractAdminLink(final ConfigType type, final String id, final String imageName) {
     super(computeId(type, id), imageName);
     this.type = type;
   }
@@ -57,7 +57,7 @@ public abstract class AbstractAdminLink extends AjaxButtonWithIcon {
    * @param id the given id.
    * @return a Wicket-compatible id.
    */
-  private static String computeId(final PanelType type, final String id) {
+  private static String computeId(final ConfigType type, final String id) {
     return (id.startsWith(type.getPrefix())) ? id : type.getPrefix() + id;
   }
 }

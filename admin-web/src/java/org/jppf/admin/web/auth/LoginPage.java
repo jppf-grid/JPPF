@@ -19,7 +19,9 @@
 package org.jppf.admin.web.auth;
 
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.jppf.admin.web.*;
+import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
@@ -29,6 +31,16 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  */
 @MountPath("login.html")
 public class LoginPage extends WebPage {
+  
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LoginPage.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+
   /**
    * 
    */
@@ -37,6 +49,13 @@ public class LoginPage extends WebPage {
     add(new HeaderPanel());
     add(new LoginForm());
     add(new FooterPanel());
+  }
+
+
+  @Override
+  protected void onConfigure() {
+    super.onConfigure();
+    if (debugEnabled) log.debug("in onConfigure() for page {} ==> '{}'", getClass().getSimpleName(), RequestCycle.get().urlFor(getClass(), null));
   }
 }
 

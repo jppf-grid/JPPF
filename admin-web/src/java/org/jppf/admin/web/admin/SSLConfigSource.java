@@ -31,7 +31,7 @@ public class SSLConfigSource implements Callable<InputStream> {
   @Override
   public InputStream call() throws Exception {
     InputStream is = null;
-    TypedProperties sslConfig = JPPFWebConsoleApplication.get().getConfig(PanelType.SSL).getProperties();
+    TypedProperties sslConfig = JPPFWebConsoleApplication.get().getConfig(ConfigType.SSL).getProperties();
     if (sslConfig.isEmpty()) {
       is = FileUtils.getFileInputStream("ssl.properties");
     } else {

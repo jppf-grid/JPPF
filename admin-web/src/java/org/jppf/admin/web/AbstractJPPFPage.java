@@ -20,7 +20,9 @@ package org.jppf.admin.web;
 
 import org.apache.wicket.*;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.jppf.utils.LocalizationUtils;
+import org.slf4j.*;
 
 import com.googlecode.wicket.jquery.core.Options;
 import com.googlecode.wicket.jquery.ui.widget.tooltip.TooltipBehavior;
@@ -30,6 +32,14 @@ import com.googlecode.wicket.jquery.ui.widget.tooltip.TooltipBehavior;
  * @author Laurent Cohen
  */
 public class AbstractJPPFPage extends WebPage {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractJPPFPage.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Options for tooltips.
    */
@@ -41,6 +51,10 @@ public class AbstractJPPFPage extends WebPage {
     TOOLTIP_OPTIONS.set("show", "{ delay: '500', duration: '2000' }");
     //TOOLTIP_OPTIONS.set("hide", "{ delay: '3000' }");
   }
+  /**
+   * Prefix for the mount path of all pages.
+   */
+  public static final String PATH_PREFIX = "";
 
   /**
    *
@@ -75,6 +89,7 @@ public class AbstractJPPFPage extends WebPage {
   @Override
   protected void onConfigure() {
     super.onConfigure();
+    if (debugEnabled) log.debug("in onConfigure() for page {} ==> '{}'", getClass().getSimpleName(), RequestCycle.get().urlFor(getClass(), null));
     if (!JPPFWebSession.get().isSignedIn()) JPPFWebConsoleApplication.get().restartResponseAtSignInPage();
   }
 }

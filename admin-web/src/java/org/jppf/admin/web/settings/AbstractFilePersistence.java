@@ -27,32 +27,20 @@ import org.slf4j.*;
  * File-based settings persistence.
  * @author Laurent Cohen
  */
-public class JPPFFileSettingsPersistence implements SettingsPersistence {
+public abstract class AbstractFilePersistence extends AbstracPersistence {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFFileSettingsPersistence.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractFilePersistence.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
 
   @Override
-  public void load(final String userHash, final TypedProperties settings) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), userHash + ".settings");
+  public String loadString(final String name) throws Exception {
+    File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
     if (debugEnabled) log.debug("loading settings from file {}", file);
-    if (file.exists()) {
-      try (Reader reader = new BufferedReader(new FileReader(file))) {
-        settings.loadAndResolve(reader);
-      }
-    }
-  }
-
-  @Override
-  public void save(final String userHash, final TypedProperties settings) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), userHash + ".settings");
-    try (Writer writer = new BufferedWriter(new FileWriter(file))) {
-      settings.store(writer, null);
-    }
+    return file.exists() ? FileUtils.readTextFile(file) : null;
   }
 }

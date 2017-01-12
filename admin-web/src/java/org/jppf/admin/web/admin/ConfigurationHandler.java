@@ -20,6 +20,7 @@ package org.jppf.admin.web.admin;
 
 import java.io.Reader;
 
+import org.jppf.admin.web.JPPFWebConsoleApplication;
 import org.jppf.admin.web.settings.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -36,11 +37,11 @@ public class ConfigurationHandler {
   /**
    * A hash of the name assigned to this configuration.
    */
-  private final PanelType type;
+  private final ConfigType type;
   /**
    * The persistence manager.
    */
-  private final SettingsPersistence persistence = new JPPFFileSettingsPersistence();
+  private final Persistence persistence;
   /**
    * The JPPF client configuration.
    */
@@ -49,8 +50,9 @@ public class ConfigurationHandler {
   /**
    * @param type the type of this config.
    */
-  public ConfigurationHandler(final PanelType type) {
+  public ConfigurationHandler(final ConfigType type) {
     this.type = type;
+    this.persistence = JPPFWebConsoleApplication.get().getPersistenceFactory().newPersistence();
     load();
   }
 
@@ -76,9 +78,8 @@ public class ConfigurationHandler {
    * @return {@code this}, for method call chaining.
    */
   public synchronized ConfigurationHandler load() {
-    TypedProperties props = new TypedProperties();
     try {
-      persistence.load(type.getHash(), props);
+      TypedProperties props = persistence.loadProperties(type.getHash());
       if (props.isEmpty()) {
         try (Reader reader = FileUtils.getFileReader(type.getDefaultPath())) {
           props.load(reader);
@@ -97,7 +98,7 @@ public class ConfigurationHandler {
    */
   public synchronized ConfigurationHandler save() {
     try {
-      persistence.save(type.getHash(), config);
+      persistence.saveProperties(type.getHash(), config);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

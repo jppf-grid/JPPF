@@ -89,6 +89,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
     this.namePrefix = namePrefix;
     add(getOrCreateToolbar());
     TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    treeModel = data.getModel();
     selectionHandler = data.getSelectionHandler();
     tableTree = createTableTree("jppf." + namePrefix + ".visible.columns");
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
@@ -129,9 +130,9 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    */
   protected JPPFTableTree createTableTree(final String layoutProperty) {
     if (debugEnabled) log.debug("getting tree model for {}", viewType);
-    createTreeTableModel();
-    createSelectableLayout(layoutProperty);
+    //createTreeTableModel();
     TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    createSelectableLayout(layoutProperty);
     JPPFTableTree tree = new JPPFTableTree(
       viewType, namePrefix + ".table.tree", createColumns(), treeModel, Integer.MAX_VALUE, selectionHandler, TableTreeHelper.newTreeNodeRenderer(viewType), data.getExpansionModel());
     DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
@@ -170,15 +171,12 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    */
   protected void createSelectableLayout(final String propertyName) {
     Locale locale = JPPFWebSession.get().getLocale();
+    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    AbstractJPPFTreeTableModel model = data.getModel();
     List<LocalizedListItem> allItems = new ArrayList<>();
-    for (int i=1; i<treeModel.getColumnCount(); i++) allItems.add(new LocalizedListItem(treeModel.getBaseColumnName(i), i, treeModel.getI18nBase(), locale));
+    for (int i=1; i<treeModel.getColumnCount(); i++) allItems.add(new LocalizedListItem(model.getBaseColumnName(i), i, model.getI18nBase(), locale));
     selectableLayout = new SelectableLayoutImpl(allItems, propertyName);
   }
-
-  /**
-   * Create and initialize the tree table model.
-   */
-  protected abstract void createTreeTableModel();
 
   /**
    * @return the list of columns.

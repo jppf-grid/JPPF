@@ -42,7 +42,7 @@ public class ResetClientLink extends AbstractAdminLink {
    * Initialize.
    * @param type the type of config panel to add this button to.
    */
-  public ResetClientLink(final PanelType type) {
+  public ResetClientLink(final ConfigType type) {
     super(type, AdminConfigConstants.RESET_CLIENT_ACTION, "restart.png");
   }
 
@@ -50,7 +50,7 @@ public class ResetClientLink extends AbstractAdminLink {
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on {}.reset_client", type.getPrefix());
     JPPFWebConsoleApplication app = JPPFWebConsoleApplication.get();
-    TypedProperties config = app.getConfig(PanelType.CLIENT).getProperties();
+    TypedProperties config = app.getConfig(ConfigType.CLIENT).getProperties();
     app.getTopologyManager().getJPPFClient().reset(config);
   }
 }

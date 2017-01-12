@@ -23,7 +23,7 @@ import org.jppf.utils.CryptoUtils;
 /**
  * The types of configurations handled in the admin panels.
  */
-public enum PanelType {
+public enum ConfigType {
   /**
    * The JPPF client configuration
    */
@@ -51,7 +51,7 @@ public enum PanelType {
    * @param prefix the prefix for component ids in the corresponding panel.
    * @param defaultPath the default path for the configuration file.
    */
-  private PanelType(final String name, final String prefix, final String defaultPath) {
+  private ConfigType(final String name, final String prefix, final String defaultPath) {
     this.nameHash = CryptoUtils.computeHash(name, "SHA-256");
     this.prefix = prefix;
     this.defaultPath = defaultPath;

@@ -51,7 +51,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    */
   private final Map<String, TopologyDriver> driverMap = new Hashtable<>();
   /**
-   * Synchronizationlock.
+   * Synchronization lock.
    */
   private final Object driversLock = new Object();
   /**
@@ -108,7 +108,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final TopologyListener...listeners) {
-    this(topologyRefreshInterval, jvmHealthRefreshInterval, null, listeners);
+    this(topologyRefreshInterval, jvmHealthRefreshInterval, null, false, listeners);
   }
 
   /**
@@ -118,7 +118,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {
-    this(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), client, listeners);
+    this(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), client, false, listeners);
   }
 
   /**
@@ -129,7 +129,19 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final JPPFClient client, final TopologyListener...listeners) {
-    this.refreshHandler = new NodeRefreshHandler(this, topologyRefreshInterval);
+    this(topologyRefreshInterval, jvmHealthRefreshInterval, client, false, listeners);
+  }
+
+  /**
+   * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
+   * @param topologyRefreshInterval the interval in millis between refreshes of the topology.
+   * @param jvmHealthRefreshInterval the interval in millis between refreshes of the JVM health data.
+   * @param client the JPPF client used to discover and monitor the grid topology.
+   * @param listeners a set of listeners to subscribe immediately for topology events.
+   * @param loadSystemInfo whether the system info of the nodes should be loaded.
+   */
+  public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final JPPFClient client, final boolean loadSystemInfo, final TopologyListener...listeners) {
+    this.refreshHandler = new NodeRefreshHandler(this, topologyRefreshInterval, loadSystemInfo);
     this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this, jvmHealthRefreshInterval);
     this.client = (client == null) ? new JPPFClient(this) : client;
     if (client != null) client.addConnectionPoolListener(this);
@@ -138,7 +150,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
   }
 
   /**
-   * Intialize the topology tree.
+   * Initialize the topology tree.
    */
   private void init() {
     for (JPPFConnectionPool pool: client.getConnectionPools()) {
@@ -156,7 +168,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return a list of {@link TopologyDriver} instances.
    */
   public List<TopologyDriver> getDrivers() {
-    synchronized(driverMap) {
+    synchronized(driversLock) {
       return new ArrayList<>(driverMap.values());
     }
   }
@@ -167,7 +179,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return a {@link TopologyDriver} instance.
    */
   public TopologyDriver getDriver(final String uuid) {
-    return driverMap.get(uuid);
+    synchronized(driversLock) {
+      return driverMap.get(uuid);
+    }
   }
 
   /**
@@ -186,7 +200,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return a {@link TopologyNode} instance.
    */
   public TopologyNode getNode(final String uuid) {
-    return nodeMap.get(uuid);
+    synchronized(nodeMap) {
+      return nodeMap.get(uuid);
+    }
   }
 
   /**
@@ -205,7 +221,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return a {@link TopologyPeer} instance.
    */
   public TopologyPeer getPeer(final String uuid) {
-    return peerMap.get(uuid);
+    synchronized(peerMap) {
+      return peerMap.get(uuid);
+    }
   }
 
   /**
@@ -213,7 +231,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return the number of drivers.
    */
   public int getDriverCount() {
-    return driverMap.size();
+    synchronized(driversLock) {
+      return driverMap.size();
+    }
   }
 
   /**
@@ -221,7 +241,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return the number of nodes.
    */
   public int getNodeCount() {
-    return nodeMap.size();
+    synchronized(nodeMap) {
+      return nodeMap.size();
+    }
   }
 
   /**
@@ -229,7 +251,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return the number of peers.
    */
   public int getPeerCount() {
-    return peerMap.size();
+    synchronized(peerMap) {
+      return peerMap.size();
+    }
   }
 
   /**

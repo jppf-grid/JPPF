@@ -21,6 +21,7 @@ package org.jppf.admin.web.stats;
 import java.util.*;
 
 import org.apache.wicket.ajax.*;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.list.*;
@@ -38,7 +39,8 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * This is the admin page. It can only be instantiated for users with a {@code jppf-admin} role.
  * @author Laurent Cohen
  */
-@MountPath("statistics")
+@MountPath(AbstractJPPFPage.PATH_PREFIX + "statistics")
+@AuthorizeInstantiation({"jppf-manager", "jppf-monitor"})
 public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
   /**
    * Container for all the visible statitics tables.

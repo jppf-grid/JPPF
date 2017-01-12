@@ -16,28 +16,27 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.settings;
+package org.jppf.admin.web.filter;
 
-import org.jppf.utils.TypedProperties;
+import java.util.EventObject;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public interface SettingsPersistence {
+public class TopologyFilterEvent extends EventObject {
   /**
-   * Load the settings for the specified user.
-   * @param userHash a hash of the user name.
-   * @param settings the settings to load into.
-   * @throws Exception if any error occurs.
+   * Initialize with the psecified filter as source.
+   * @param filter the source of ths event.
    */
-  public void load(String userHash, TypedProperties settings) throws Exception;
+  public  TopologyFilterEvent(final TopologyFilter filter) {
+    super(filter);
+  }
 
   /**
-   * Save the settings for the specified user.
-   * @param userHash a hash of the user name.
-   * @param settings the settings to save.
-   * @throws Exception if any error occurs.
+   * @return the source of ths event.
    */
-  public void save(String userHash, TypedProperties settings) throws Exception;
+  public TopologyFilter getFilter() {
+    return (TopologyFilter) getSource();
+  }
 }

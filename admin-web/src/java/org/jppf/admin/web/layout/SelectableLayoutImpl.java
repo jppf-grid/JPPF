@@ -56,18 +56,20 @@ public class SelectableLayoutImpl implements SelectableLayout {
   public List<LocalizedListItem> getVisibleItems() {
     if (visibleItems == null) {
       UserSettings settings = JPPFWebSession.get().getUserSettings();
-      String s = settings.getProperties().getString(propertyName);
-      if ((s != null) && !s.trim().isEmpty()) {
-        int[] indices = StringUtils.parseIntValues(s);
-        visibleItems = new ArrayList<>(indices.length);
-        for (int i=0; i<indices.length; i++) {
-          for (LocalizedListItem item: getAllItems()) {
-            if (item.index == indices[i]) {
-              visibleItems.add(item);
-              break;
+      if (settings != null) { 
+        String s = settings.getProperties().getString(propertyName);
+        if ((s != null) && !s.trim().isEmpty()) {
+          int[] indices = StringUtils.parseIntValues(s);
+          visibleItems = new ArrayList<>(indices.length);
+          for (int i=0; i<indices.length; i++) {
+            for (LocalizedListItem item: getAllItems()) {
+              if (item.index == indices[i]) {
+                visibleItems.add(item);
+                break;
+              }
             }
-          }
-        } 
+          } 
+        }
       }
     }
     if ((visibleItems == null) || visibleItems.isEmpty()) visibleItems = new ArrayList<>(getAllItems());

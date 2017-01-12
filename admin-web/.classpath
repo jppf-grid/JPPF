@@ -37,7 +37,7 @@
 			<attribute name="javadoc_location" value="https://tomcat.apache.org/tomcat-7.0-doc/servletapi/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/core-wicketstuff-core-7.4.0/wicket-servlet3-parent/wicket-servlet3-auth/src/main/java"/>
 	<classpathentry kind="lib" path="lib/wicket-mount-core-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-jquery-ui-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-jquery-ui-core-7.4.0.jar"/>

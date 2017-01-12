@@ -23,6 +23,7 @@ import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
 import org.apache.wicket.extensions.markup.html.repeater.tree.table.*;
@@ -38,7 +39,6 @@ import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.monitoring.job.JobTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.ui.utils.JobsUtils;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
@@ -47,7 +47,8 @@ import org.wicketstuff.wicket.mount.core.annotation.MountPath;
  * The jobs view page.
  * @author Laurent Cohen
  */
-@MountPath("jobs")
+@MountPath(AbstractJPPFPage.PATH_PREFIX + "jobs")
+@AuthorizeInstantiation({"jppf-manager", "jppf-monitor"})
 public class JobsPage extends AbstractTableTreePage {
   /**
    * Logger for this class.
@@ -69,31 +70,7 @@ public class JobsPage extends AbstractTableTreePage {
     super(TreeViewType.JOBS, "jobs");
     JobsTreeData data = JPPFWebSession.get().getJobsData();
     JobsTreeListener listener = (JobsTreeListener) data.getListener();
-    if (listener == null) {
-      listener = new JobsTreeListener(treeModel, selectionHandler);
-      listener.setTableTree(tableTree);
-      data.setListener(listener);
-      JPPFWebConsoleApplication.get().getJobMonitor().addJobMonitoringListener(listener);
-    } else listener.setTableTree(tableTree);
-  }
-
-  @Override
-  protected void createTreeTableModel() {
-    JPPFWebSession session = JPPFWebSession.get();
-    TableTreeData data = session.getTableTreeData(viewType);
-    treeModel = data.getModel();
-    if (treeModel == null) {
-      treeModel = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), session.getLocale());
-      // populate the tree table model
-      for (JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
-        JobsUtils.addDriver(treeModel, driver);
-        for (Job job: driver.getJobs()) {
-          JobsUtils.addJob(treeModel, driver, job);
-          for (JobDispatch dispatch: job.getJobDispatches()) JobsUtils.addJobDispatch(treeModel, job, dispatch);
-        }
-      }
-      data.setModel(treeModel);
-    }
+    listener.setTableTree(tableTree);
   }
 
   /**

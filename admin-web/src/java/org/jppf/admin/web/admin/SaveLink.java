@@ -42,7 +42,7 @@ public class SaveLink extends AbstractAdminLink {
    * Initialize.
    * @param type the type of config panel to add this button to.
    */
-  public SaveLink(final PanelType type) {
+  public SaveLink(final ConfigType type) {
     super(type, AdminConfigConstants.SAVE_ACTION, "save.png");
   }
 
