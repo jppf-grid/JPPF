@@ -53,6 +53,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Long> ADMIN_REFRESH_INTERVAL_STATS = new LongProperty("jppf.admin.refresh.interval.stats", 1000L);
   /** Interval between updates of the topology views */
   public static final JPPFProperty<Long> ADMIN_REFRESH_INTERVAL_TOPOLOGY = new LongProperty("jppf.admin.refresh.interval.topology", 1000L);
+  /** Wether to refresh the node's system info as well (to use for node filtering on the client side) */
+  public static final JPPFProperty<Boolean> ADMIN_REFRESH_SYSTEM_INFO = new BooleanProperty("jppf.admin.refresh.system.info", false);
   /** Size of the class loader cache for the node */
   public static final JPPFProperty<Integer> CLASSLOADER_CACHE_SIZE = new IntProperty("jppf.classloader.cache.size", 50);
   /** Enable/disable lookup of classpath resources in the file system */

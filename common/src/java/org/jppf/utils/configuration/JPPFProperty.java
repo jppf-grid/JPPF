@@ -19,6 +19,7 @@
 package org.jppf.utils.configuration;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Interface for predefined JPPF properties expected to handle a specific balue type.
@@ -70,4 +71,10 @@ public interface JPPFProperty<T> extends Serializable {
    * @return the description as a string.
    */
   String getDocumentation();
+
+  /**
+   * Get the set of tags that apply to this property.
+   * @return a set of tags as strings.
+   */
+  Set<String> getTags();
 }

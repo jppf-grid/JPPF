@@ -18,9 +18,9 @@
 
 package org.jppf.utils.configuration;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 
 /**
  * Abstract implementation of the {@link JPPFProperty} interface.
@@ -49,6 +49,10 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * The possible values for this property, if any.
    */
   private T[] possibleValues;
+  /**
+   * The tags that apply to this property.
+   */
+  private Set<String> tags;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -116,5 +120,20 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   @Override
   public String getDocumentation() {
     return LocalizationUtils.getLocalized(I18N_BASE, name + ".doc");
+  }
+
+  @Override
+  public Set<String> getTags() {
+    if (tags == null) {
+      tags = new TreeSet<>();
+      List<String> tokens = StringUtils.parseStrings(LocalizationUtils.getLocalized(I18N_BASE, name + ".tags"), ",", false);
+      if (tokens != null) {
+        for (String token: tokens) {
+          String t = token.trim();
+          if (!tags.contains(t)) tags.add(t);
+        }
+      } else tags.add("");
+    }
+    return tags;
   }
 }
