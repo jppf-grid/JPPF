@@ -21,10 +21,11 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.Deque;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.utils.*;
+import org.jppf.serialization.SerializationUtils.StringLengthDesc;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -428,29 +429,51 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   String readString() throws Exception {
-    Pair<Integer, Boolean> result = SerializationUtils.readStringLength(in, buf);
-    String value = null;
-    int len = result.first();
-    if (len == 0) value = "";
-    else if (result.second()) {
-      if (traceEnabled) log.trace("reading ASCII string for len={}", len);
-      char[] chars = new char[len];
-      for (int count=0; count<len;) {
-        int n = Math.min(buf.length, len-count);
-        readToBuf(0, n);
-        for (int i=0; i<n; i++) chars[count++] = (char) (buf[i] & 0x7F);
-      }
-      value = new String(chars);
+    StringLengthDesc result = SerializationUtils.readStringLength(in, buf);
+    if (result.length == 0) return "";
+    else if (result.ascii) return readAsciiString(result.length);
+    else if (result.length <= 65535/3) return readUTFString(result.length);
+    return readCharString(result.length);
+  }
+
+  /**
+   * Read an ASCII string.
+   * @param len the length of the string to read.
+   * @return the string read form the stream.
+   * @throws Exception if any error occurs.
+   */
+  private String readAsciiString(final int len) throws Exception {
+    if (traceEnabled) log.trace("reading ASCII string for len={}", len);
+    char[] chars = new char[len];
+    for (int count=0; count<len;) {
+      int n = Math.min(buf.length, len - count);
+      readToBuf(0, n);
+      //for (int i=0; i<n; i++) chars[count++] = (char) (buf[i] & 0x7F);
+      for (int i=0; i<n; i++) chars[count++] = (char) buf[i];
     }
-    else if (len <= 65535/3) {
-      if (traceEnabled) log.trace("calling readUTF() for len={}", len);
-      value = in.readUTF(); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
-    }
-    else {
-      if (traceEnabled) log.trace("reading normal string for len={}", len);
-      value = new String(readCharArray(len));
-    }
-    return value;
+    return new String(chars);
+  }
+
+  /**
+   * Read an UTF string.
+   * @param len the length of the string to read.
+   * @return the string read form the stream.
+   * @throws Exception if any error occurs.
+   */
+  private String readUTFString(final int len) throws Exception {
+    if (traceEnabled) log.trace("calling readUTF() for len={}", len);
+    return in.readUTF(); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
+  }
+
+  /**
+   * Read a string as an array of chars.
+   * @param len the length of the string to read.
+   * @return the string read form the stream.
+   * @throws Exception if any error occurs.
+   */
+  private String readCharString(final int len) throws Exception {
+    if (traceEnabled) log.trace("reading normal string for len={}", len);
+    return new String(readCharArray(len));
   }
 
   /**

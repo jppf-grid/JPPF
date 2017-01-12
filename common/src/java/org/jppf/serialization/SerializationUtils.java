@@ -22,8 +22,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
-import org.jppf.utils.Pair;
-
 /**
  * Utility methods for serializing and deserializing data
  * @author Laurent Cohen
@@ -410,11 +408,11 @@ public final class SerializationUtils {
     }
     byte b = n;
     if (isAscii) b |= ASCII_BIT;
-    if (value < 0) b |= SIGN_BIT;
+    //if (value < 0) b |= SIGN_BIT;
     //if (b < 0) throw new IOException(String.format("negative string length header: %d, isAscii=%b, value=%d", b, isAscii, value));
     data[0] = b;
     for (int i=8*(n-1), pos=1; i>=0; i-=8) data[pos++] = (byte) ((absValue >>> i) & 0xFF);
-    os.write(data, 0, n+1);
+    os.write(data, 0, n + 1);
   }
 
   /**
@@ -424,15 +422,15 @@ public final class SerializationUtils {
    * @return the int value read from the stream.
    * @throws IOException if an error occurs while reading the data.
    */
-  public static Pair<Integer, Boolean> readStringLength(final InputStream is, final byte[] buf) throws IOException {
+  public static StringLengthDesc readStringLength(final InputStream is, final byte[] buf) throws IOException {
     byte b = (byte) (is.read() & 0xFF);
-    if (b == ZERO_BIT) return new Pair<>(0, true);
+    if (b == ZERO_BIT) return new StringLengthDesc(0, true);
     byte n = (byte) (b & 0x0F);
     int result = 0;
     readToBuf(is, buf, 0, n);
     for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (buf[pos++] & 0xFF) << i;
-    if ((b & SIGN_BIT) != 0) result = -result;
-    return new Pair<>(result, (b & ASCII_BIT) != 0);
+    //if ((b & SIGN_BIT) != 0) result = -result;
+    return new StringLengthDesc(result, (b & ASCII_BIT) != 0);
   }
 
   /**
@@ -451,6 +449,30 @@ public final class SerializationUtils {
         count += n;
       }
       else if (n < 0) throw new EOFException("could only read " + count + " bytes out of " + len);
+    }
+  }
+
+  /**
+   * 
+   */
+  static class StringLengthDesc {
+    /**
+     * The string legnth.
+     */
+    final int length;
+    /**
+     * Whether the string is pure ascii.
+     */
+    final boolean ascii;
+
+    /**
+     * 
+     * @param length the string legnth.
+     * @param ascii whether the string is pure ascii.
+     */
+    StringLengthDesc(final int length, final boolean ascii) {
+      this.length = length;
+      this.ascii = ascii;
     }
   }
 }
