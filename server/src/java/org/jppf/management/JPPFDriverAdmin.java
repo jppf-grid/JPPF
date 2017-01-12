@@ -81,7 +81,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Collection<JPPFManagementInfo> nodesInformation() {
-    return nodesInformation(null);
+    return nodesInformation(null, false);
   }
 
   @Override
