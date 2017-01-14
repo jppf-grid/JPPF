@@ -241,6 +241,13 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   }
 
   /**
+   * @return the uuid of the current job, if any.
+   */
+  synchronized String getJobUuid() {
+    return jobUuid;
+  }
+
+  /**
    * Send the job ended notification.
    */
   void jobEnded() {
@@ -253,39 +260,29 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   }
 
   /**
-   * Send the job ended notification.
+   * Cancel the job upon client disconnection.
    */
-  synchronized void cancelJobOnClose() {
-    ServerTaskBundleClient clientBundle;
-    int count = 0;
-    int pendingCount = 0;
-    int nbTasksToSend = this.nbTasksToSend;
-    int n = 0;
-    for (ServerTaskBundleClient bundle: completedBundles) {
-      count += bundle.getTaskCount();
-      pendingCount += bundle.getPendingTasksCount();
-    }
-    if ((clientBundle = getInitialBundleWrapper()) != null) {
+  void cancelJobOnClose() {
+    String jobUuid = getJobUuid();
+    int tasksToSend = getNbTasksToSend();
+    ServerTaskBundleClient clientBundle = getInitialBundleWrapper();
+    if (clientBundle != null) {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
         try {
           ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
+          int taskCount = 0;
           if (job != null) {
-            // count the tasks from the client bundle that are dispatched to nodes
-            for (ServerTaskBundleNode nodeBundle: job.getDispatchSet()) {
-              for (ServerTask task: nodeBundle.getTaskList()) {
-                if (task.getBundle() == clientBundle) n++;
-              }
-            }
+            taskCount = job.getTaskCount();
             if (debugEnabled) log.debug("cancelling job {}", job);
             job.cancel(true);
           }
-          if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {nbTasksToSend, n, job});
+          int tasksToSend2 = getNbTasksToSend();
+          int n = tasksToSend - tasksToSend2 - taskCount;
+          if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", new Object[] {tasksToSend, tasksToSend2, n, taskCount, job});
           JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
-          stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, n - nbTasksToSend);
-          //clientBundle.cancel();
-          //clientBundle.bundleEnded();
+          stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
           driver.getQueue().removeBundle(job);
           setInitialBundleWrapper(null);
         } catch(Exception e) {
