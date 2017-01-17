@@ -21,11 +21,9 @@ package org.jppf.node.protocol;
 /**
  * This interface should be implemented by tasks that wish a callback invoked as soon
  * as they are cancelled. This differs from the {@link org.jppf.node.protocol.Task#onCancel() Task.onCancel()}
- * callback in that {@code onCancel()} is called after the task has ended, whether the cancellation
- * succeeded or not.
+ * callback in that {@code onCancel()} is called after the task has ended, whether the cancellation succeeded or not.
  * @author Laurent Cohen
  * @since 5.0
- * @exclude
  */
 public interface CancellationHandler {
   /**
