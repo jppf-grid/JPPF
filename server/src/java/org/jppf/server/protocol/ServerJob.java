@@ -206,7 +206,7 @@ public class ServerJob extends AbstractServerJobBase {
     }
     if (hasPending()) {
       if (throwable != null) setSubmissionStatus(SubmissionStatus.FAILED);
-      if (requeue && onRequeue != null) onRequeue.run();
+      if (!isCancelled() && requeue && (onRequeue != null)) onRequeue.run();
     } else {
       setSubmissionStatus(SubmissionStatus.COMPLETE);
       updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
@@ -284,10 +284,9 @@ public class ServerJob extends AbstractServerJobBase {
   public NodeJobInformation[] getNodeJobInformation() {
     ServerTaskBundleNode[] entries;
     synchronized (dispatchSet) {
+      if (dispatchSet.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
       entries = dispatchSet.values().toArray(new ServerTaskBundleNode[dispatchSet.size()]);
     }
-    if (entries.length == 0) return NodeJobInformation.EMPTY_ARRAY;
-
     NodeJobInformation[] result = new NodeJobInformation[entries.length];
     int i = 0;
     for (ServerTaskBundleNode nodeBundle : entries) {
