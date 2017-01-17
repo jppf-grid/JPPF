@@ -28,8 +28,7 @@ import org.jppf.node.protocol.*;
  * JPPF task wrapper for an object whose class is annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}.
  * @author Laurent Cohen
  */
-public class JPPFAnnotatedTask extends AbstractTask<Object>
-{
+public class JPPFAnnotatedTask extends AbstractTask<Object> implements CancellationHandler {
   /**
    * Explicit serialVersionUID.
    */
@@ -54,8 +53,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}.
    * @throws JPPFException if an error is raised while initializing this task.
    */
-  public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException
-  {
+  public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
     else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
     else taskObjectWrapper = new AnnotatedTaskWrapper(taskObject, args);
@@ -68,8 +66,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * @param args the arguments for the method to execute.
    * @throws JPPFException if an error is raised while initializing this task.
    */
-  public JPPFAnnotatedTask(final Object taskObject, final String method, final Object...args) throws JPPFException
-  {
+  public JPPFAnnotatedTask(final Object taskObject, final String method, final Object...args) throws JPPFException {
     taskObjectWrapper = new PojoTaskWrapper(method, taskObject, args);
   }
 
@@ -77,15 +74,11 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * Run the <code>JPPFRunnable</code>-annotated method of the task object.
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       Object result = taskObjectWrapper.execute();
       if ((getResult() == null) && ((taskObjectWrapper instanceof RunnableTaskWrapper) || (result != null))) setResult(result);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       setThrowable(e);
     }
   }
@@ -95,8 +88,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * @return an object or class that is JPPF-annotated.
    */
   @Override
-  public Object getTaskObject()
-  {
+  public Object getTaskObject() {
     return taskObjectWrapper.getTaskObject();
   }
 
@@ -104,8 +96,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * Set the delegate for the <code>onCancel()</code> method.
    * @param cancelCallback a {@link JPPFTaskCallback} instance.
    */
-  public void setCancelCallback(final JPPFTaskCallback cancelCallback)
-  {
+  public void setCancelCallback(final JPPFTaskCallback cancelCallback) {
     this.cancelCallback = cancelCallback;
   }
 
@@ -113,26 +104,21 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * Set the delegate for the <code>onTimeout()</code> method.
    * @param timeoutCallback a {@link JPPFTaskCallback} instance.
    */
-  public void setTimeoutCallback(final JPPFTaskCallback timeoutCallback)
-  {
+  public void setTimeoutCallback(final JPPFTaskCallback timeoutCallback) {
     this.timeoutCallback = timeoutCallback;
   }
 
   @Override
-  public void onCancel()
-  {
-    if (cancelCallback != null)
-    {
+  public void onCancel() {
+    if (cancelCallback != null) {
       cancelCallback.setTask(this);
       cancelCallback.run();
     }
   }
 
   @Override
-  public void onTimeout()
-  {
-    if (timeoutCallback != null)
-    {
+  public void onTimeout() {
+    if (timeoutCallback != null) {
       timeoutCallback.setTask(this);
       timeoutCallback.run();
     }
@@ -144,8 +130,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * @param dataProvider the data provider to set onto the task.
    */
   @Override
-  public void setDataProvider(final DataProvider dataProvider)
-  {
+  public void setDataProvider(final DataProvider dataProvider) {
     Object o = taskObjectWrapper.getTaskObject();
     if (o instanceof DataProviderHolder) ((DataProviderHolder) o).setDataProvider(dataProvider);
     else super.setDataProvider(dataProvider);
@@ -156,5 +141,11 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
     Object o = getTaskObject();
     if (o instanceof Interruptibility) return ((Interruptibility) o).isInterruptible();
     return super.isInterruptible();
+  }
+
+  @Override
+  public void doCancelAction() throws Exception {
+    Object o = getTaskObject();
+    if (o instanceof CancellationHandler) ((CancellationHandler) o).doCancelAction();
   }
 }
