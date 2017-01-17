@@ -58,17 +58,10 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
-    if (!isAccepted(event.getNodeOrPeer())) return;
+    if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
     TopologyNode nodeComp = event.getNodeOrPeer();
     if (!nodeComp.isPeer()) {
       addNode(event.getDriver(), nodeComp);
-      /*
-      DefaultMutableTreeNode node = TopologyUtils.addNode(treeModel, event.getDriver(), nodeComp);
-      if ((node != null) && (getTableTree() != null)) {
-        DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-        if (parent.getChildCount() == 1) getTableTree().expand(parent);
-      }
-      */
     }
   }
 
@@ -83,7 +76,7 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
 
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
-    if (!isAccepted(event.getNodeOrPeer())) return;
+    if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
     TopologyNode nodeComp = event.getNodeOrPeer();
     if (!nodeComp.isPeer()) {
       if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {

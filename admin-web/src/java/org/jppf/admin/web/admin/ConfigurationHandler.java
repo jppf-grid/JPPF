@@ -52,7 +52,7 @@ public class ConfigurationHandler {
    */
   public ConfigurationHandler(final ConfigType type) {
     this.type = type;
-    this.persistence = JPPFWebConsoleApplication.get().getPersistenceFactory().newPersistence();
+    this.persistence = JPPFWebConsoleApplication.get().getPersistence();
     load();
   }
 

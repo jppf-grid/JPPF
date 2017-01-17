@@ -21,6 +21,7 @@ package org.jppf.admin.web.health;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.*;
+import org.jppf.admin.web.filter.TopologyFilter;
 import org.jppf.admin.web.health.threaddump.ThreadDumpAction;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.tabletree.*;
@@ -119,12 +120,13 @@ public class HealthTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
-    // populate the tree table model
+    JPPFWebSession session = JPPFWebSession.get();
+    model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale());
+    TopologyFilter filter = session.getNodeFilter();
     for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
       TopologyUtils.addDriver(model, driver);
-      for (AbstractTopologyComponent child : driver.getChildren()) {
-        if (!child.isPeer()) TopologyUtils.addNode(model, driver, (TopologyNode) child);
+      for (TopologyNode node : driver.getNodes()) {
+        if (AbstractMonitoringListener.isAccepted(filter, node)) TopologyUtils.addNode(model, driver, node);
       }
     }
   }

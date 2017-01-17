@@ -82,15 +82,8 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
   @Override
   public void jobDispatchAdded(final JobMonitoringEvent event) {
     TopologyNode node = event.getJobDispatch().getNode();
-    if ((node == null) || !isAccepted(node)) return;
+    if ((node == null) || !isAccepted(nodeFilter, node)) return;
     addDispatch(event.getJob(), event.getJobDispatch());
-    /*
-    DefaultMutableTreeNode dispatchNode = JobsUtils.addJobDispatch(treeModel, event.getJob(), event.getJobDispatch());
-    if ((dispatchNode != null) && (getTableTree() != null)) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dispatchNode.getParent();
-      if (parent.getChildCount() == 1) getTableTree().expand(parent);
-    }
-    */
   }
 
   @Override
@@ -113,7 +106,7 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
         DefaultMutableTreeNode jobDmtn = TreeTableUtils.findComponent(driverDmtn, job.getUuid());
         if (jobDmtn == null) continue;
         for (JobDispatch dispatch: job.getJobDispatches()) {
-          boolean accepted = isAccepted(dispatch.getNode());
+          boolean accepted = isAccepted(nodeFilter, dispatch.getNode());
           DefaultMutableTreeNode dispatchDmtn = TreeTableUtils.findComponent(jobDmtn, dispatch.getUuid());
           boolean present = dispatchDmtn!= null;
           if (accepted && !present) toAdd.putValue(job, dispatch);
@@ -144,28 +137,4 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
       if (parent.getChildCount() == 1) getTableTree().expand(parent);
     }
   }
-
-  /*
-  public void onFilterChange(final TopologyFilterEvent event) {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
-    for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode driverDmtn = (DefaultMutableTreeNode) root.getChildAt(i);
-      for (int j=0; j<driverDmtn.getChildCount(); j++) {
-        DefaultMutableTreeNode jobDmtn = (DefaultMutableTreeNode) driverDmtn.getChildAt(j);
-        Job job = (Job) jobDmtn.getUserObject();
-        List<JobDispatch> toRemove = new ArrayList<>();
-        for (int k=0; k<jobDmtn.getChildCount(); k++) {
-          DefaultMutableTreeNode dispatchDmtn = (DefaultMutableTreeNode) jobDmtn.getChildAt(k);
-          JobDispatch dispatch = (JobDispatch) dispatchDmtn.getUserObject();
-          TopologyNode node = dispatch.getNode();
-          if (!isAccepted(node)) toRemove.add(dispatch);
-        }
-        for (JobDispatch dispatch: toRemove) {
-          JobsUtils.removeJobDispatch(treeModel, job, dispatch);
-          selectionHandler.unselect(dispatch.getUuid());
-        }
-      }
-    }
-  }
-  */
 }

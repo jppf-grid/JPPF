@@ -65,7 +65,7 @@ public class TemplatePage extends AbstractJPPFPage {
     add(nodeFilterLink);
     UserSettings settings = session.getUserSettings();
     if (getClass() != NodeFilterPage.class) {
-      boolean active = settings.getProperties().getBoolean("node.filter.active", false);
+      boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
       nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
     }
   }

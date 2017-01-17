@@ -21,8 +21,6 @@ package org.jppf.admin.web;
 import java.io.Serializable;
 import java.util.*;
 
-import javax.servlet.FilterConfig;
-
 import org.apache.wicket.*;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.page.*;
@@ -74,9 +72,9 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   private StatsUpdater statsUpdater;
   /**
-   * The persistence factory for this web application.
+   * The persistence for this web application.
    */
-  private PersistenceFactory persistenceFactory;
+  private Persistence persistence;
 
   /**
    * Default constructor.
@@ -88,14 +86,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   @Override
   protected void init() {
     super.init();
-    FilterConfig filterCOnfig = getWicketFilter().getFilterConfig();
-    String name = filterCOnfig.getInitParameter("jppfPersistenceClassName");
+    String name = getInitParameter("jppfPersistenceClassName");
     if (debugEnabled) log.debug("read persistence class name '{}' from init parameter", name);
     if (name == null) {
       name = JPPFAsyncFilePersistence.class.getName();
       if (debugEnabled) log.debug("using default persistence class name '{}'", name);
     }
-    persistenceFactory = PersistenceFactory.newInstance(name);
+    persistence = PersistenceFactory.newPersistence(name);
     if (debugEnabled) log.debug("in JPPFWebConsoleApplication.init()");
     configMap.put(ConfigType.CLIENT, new ConfigurationHandler(ConfigType.CLIENT) {
       @Override
@@ -175,11 +172,18 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
   }
 
   /**
-   * @return the persistence factory for this web application.
+   * @return the persistence for this web application.
    */
-  public PersistenceFactory getPersistenceFactory() {
-    return persistenceFactory;
+  public Persistence getPersistence() {
+    return persistence;
   }
+
+  /*
+  public String getInitParameter(final String key) {
+    FilterConfig filterCOnfig = getWicketFilter().getFilterConfig();
+    return filterCOnfig.getInitParameter("jppfPersistenceClassName");
+  }
+  */
 
   /**
    * Does not save to persistent store.

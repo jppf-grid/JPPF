@@ -56,7 +56,7 @@ public class UserSettings {
   public UserSettings(final String user) {
     this.user = user;
     this.userHash = CryptoUtils.computeHash(user, "SHA-256");
-    this.persistence = JPPFWebConsoleApplication.get().getPersistenceFactory().newPersistence();
+    this.persistence = JPPFWebConsoleApplication.get().getPersistence();
   }
 
   /**

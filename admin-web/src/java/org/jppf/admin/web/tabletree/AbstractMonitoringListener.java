@@ -82,11 +82,12 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
   }
 
   /**
-   * Determine whether the specified node passes the ode filter.
+   * Determine whether the specified node passes the node filter.
+   * @param nodeFilter the filter to evaluate against.
    * @param node the node to evaluate.
    * @return {@code true} if the node passes the filter, {@code false} otherwise.
    */
-  protected boolean isAccepted(final TopologyNode node) {
+  public static boolean isAccepted(final TopologyFilter nodeFilter, final TopologyNode node) {
     if ((nodeFilter == null) || !nodeFilter.isActive()) return true;
     ExecutionPolicy policy = nodeFilter.getPolicy();
     if (policy == null) return true;
@@ -109,7 +110,7 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
       DefaultMutableTreeNode driverDmtn = TreeTableUtils.findComponent(root, driver.getUuid());
       if (driverDmtn == null) continue;
       for (TopologyNode node: driver.getNodes()) {
-        boolean accepted = isAccepted(node);
+        boolean accepted = isAccepted(nodeFilter, node);
         DefaultMutableTreeNode nodeDmtn = TreeTableUtils.findComponent(driverDmtn, node.getUuid());
         boolean present = nodeDmtn!= null;
         if (accepted && !present) toAdd.putValue(driver, node);
@@ -139,31 +140,4 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
       if (parent.getChildCount() == 1) getTableTree().expand(parent);
     }
   }
-
-  /*
-  protected void updateTopology(final TopologyFilterEvent event) {
-    TopologyManager mgr = JPPFWebConsoleApplication.get().getTopologyManager();
-    List<TopologyDriver> allDrivers= mgr.getDrivers();
-    List<TopologyNode> allNodes= mgr.getNodes();
-    
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
-    for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode driverDmtn = (DefaultMutableTreeNode) root.getChildAt(i);
-      TopologyDriver driver = (TopologyDriver) driverDmtn.getUserObject();
-      List<TopologyNode> toRemove = new ArrayList<>();
-      for (int j=0; j<driverDmtn.getChildCount(); j++) {
-        DefaultMutableTreeNode nodeDmtn = (DefaultMutableTreeNode) driverDmtn.getChildAt(j);
-        TopologyNode node = (TopologyNode) nodeDmtn.getUserObject();
-        if (!isAccepted(node)) {
-          if (debugEnabled) log.debug("filtering out node {}", node);
-          toRemove.add(node);
-        } else if (debugEnabled) log.debug("keeping node {}", node);
-      }
-      for (TopologyNode node: toRemove) {
-        TopologyUtils.removeNode(treeModel, driver, node);
-        selectionHandler.unselect(node.getUuid());
-      }
-    }
-  }
-  */
 }

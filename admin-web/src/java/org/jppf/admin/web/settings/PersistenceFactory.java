@@ -28,7 +28,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class PersistenceFactory {
-  
   /**
    * Logger for this class.
    */
@@ -37,34 +36,14 @@ public class PersistenceFactory {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Name of the persistence class to instantiate.
-   */
-  private final String persistenceClassName;
 
   /**
-   * Create a new persistence factory.
    * @param persistenceClassName the name of the persistence class to instantiate.
-   */
-  PersistenceFactory(final String persistenceClassName) {
-    this.persistenceClassName = persistenceClassName;
-  }
-
-  /**
-   * Create a new instance of this persistence factory.
-   * @param persistenceClassName the name of the persistence class to instantiate.
-   * @return an instance of {@link PersistenceFactory}.
-   */
-  public static PersistenceFactory newInstance(final String persistenceClassName) {
-    return new PersistenceFactory(persistenceClassName);
-  }
-
-  /**
    * @return a new persistence instance based on the class name configured in the init paremeters of the Wicket filter in the web.xml
    */
-  public Persistence newPersistence() {
+  public static Persistence newPersistence(final String persistenceClassName) {
     try {
-      ClassLoader cl = getClass().getClassLoader();
+      ClassLoader cl = PersistenceFactory.class.getClassLoader();
       return (Persistence) Class.forName(persistenceClassName, true, cl).newInstance();
     } catch (Exception e) {
       if (debugEnabled) log.debug("error creating persistence for className = {}:\n{}", persistenceClassName, ExceptionUtils.getStackTrace(e));

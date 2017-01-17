@@ -34,6 +34,10 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
    */
   private static Logger log = LoggerFactory.getLogger(JPPFAsyncFilePersistence.class);
   /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Used to sequentialize the file wwrites from a single queue.
    */
   private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(new JPPFThreadFactory(JPPFAsyncFilePersistence.class.getSimpleName()));
@@ -41,7 +45,7 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
   /**
    * 
    */
-  JPPFAsyncFilePersistence() {
+  public JPPFAsyncFilePersistence() {
   }
 
   @Override
@@ -49,11 +53,12 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
     EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
+        File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
         try {
-          File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
           FileUtils.writeTextFile(file, settings);
-        } catch (IOException e) {
-          log.error("error writing settings to file", e);
+        } catch (Exception e) {
+          if (debugEnabled) log.debug("error writing to file '{}' : {}", file, settings);
+          else log.error("error writing settings to file", e);
         }
       }
     });

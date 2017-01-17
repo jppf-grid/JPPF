@@ -21,11 +21,13 @@ package org.jppf.admin.web.jobs;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.*;
+import org.jppf.admin.web.filter.TopologyFilter;
 import org.jppf.admin.web.jobs.maxnodes.MaxNodesAction;
 import org.jppf.admin.web.jobs.priority.PriorityAction;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.utils.UpdatableAction;
 import org.jppf.client.monitoring.jobs.*;
+import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.ui.monitoring.job.JobTreeTableModel;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.JobsUtils;
@@ -87,13 +89,17 @@ public class JobsTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    model = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), JPPFWebSession.get().getLocale());
-    // populate the tree table model
+    JPPFWebSession session = JPPFWebSession.get();
+    TopologyFilter filter = session.getNodeFilter();
+    model = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), session.getLocale());
     for (JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
       JobsUtils.addDriver(model, driver);
       for (Job job: driver.getJobs()) {
         JobsUtils.addJob(model, driver, job);
-        for (JobDispatch dispatch: job.getJobDispatches()) JobsUtils.addJobDispatch(model, job, dispatch);
+        for (JobDispatch dispatch: job.getJobDispatches()) {
+          TopologyNode node = dispatch.getNode();
+          if (AbstractMonitoringListener.isAccepted(filter, node)) JobsUtils.addJobDispatch(model, job, dispatch);
+        }
       }
     }
   }

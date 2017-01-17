@@ -53,10 +53,6 @@ public class NodeFilterPage extends TemplatePage {
    */
   static final String BASE = "org.jppf.ui.i18n.FilterPanel";
   /**
-   * Name of the settings property for the node filter's active state.
-   */
-  public static final String ACTIVE_PROP = "node.filter.active";
-  /**
    * The form associated with the panel.
    */
   private final Form<String> form;
@@ -95,7 +91,7 @@ public class NodeFilterPage extends TemplatePage {
       }
     });
     UserSettings settings = JPPFWebSession.get().getUserSettings();
-    final boolean active = settings.getProperties().getBoolean(ACTIVE_PROP, false);
+    final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
     form.add(new CheckBox("node.filter.active", Model.of(active)) {
       @Override
       protected void onSelectionChanged(final Boolean newSelection) {
@@ -153,7 +149,7 @@ public class NodeFilterPage extends TemplatePage {
     if (debugEnabled) log.debug("changing active state to {}", active);
     UserSettings settings = JPPFWebSession.get().getUserSettings();
     JPPFWebSession.get().getNodeFilter().setActive(active);
-    settings.getProperties().setBoolean(ACTIVE_PROP, active);
+    settings.getProperties().setBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, active);
     settings.save();
   }
 
@@ -161,7 +157,7 @@ public class NodeFilterPage extends TemplatePage {
   protected void onConfigure() {
     super.onConfigure();
     UserSettings settings = JPPFWebSession.get().getUserSettings();
-    final boolean active = settings.getProperties().getBoolean(ACTIVE_PROP, false);
+    final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
     JPPFWebSession.get().getNodeFilter().setActive(active);
     nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
   }

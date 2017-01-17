@@ -58,15 +58,8 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
-    if (!isAccepted(event.getNodeOrPeer())) return;
+    if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
     addNode(event.getDriver(), event.getNodeOrPeer());
-    /*
-    DefaultMutableTreeNode node = TopologyUtils.addNode(treeModel, event.getDriver(), event.getNodeOrPeer());
-    if ((node != null) && (getTableTree() != null)) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-      if (parent.getChildCount() == 1) getTableTree().expand(parent);
-    }
-    */
   }
 
   @Override
@@ -77,7 +70,7 @@ public class TopologyTreeListener extends AbstractMonitoringListener implements 
 
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
-    if (!isAccepted(event.getNodeOrPeer())) return;
+    if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
     if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {
       TopologyUtils.updateNode(treeModel, event.getDriver(), event.getNodeOrPeer());
     }

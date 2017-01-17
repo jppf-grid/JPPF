@@ -23,6 +23,7 @@ import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.*;
+import org.jppf.admin.web.filter.TopologyFilter;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.admin.web.topology.loadbalancing.LoadBalancingLink;
 import org.jppf.admin.web.topology.nodeconfig.NodeConfigAction;
@@ -143,12 +144,13 @@ public class TopologyTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    model = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), JPPFWebSession.get().getLocale());
-    // populate the tree table model
+    JPPFWebSession session = JPPFWebSession.get();
+    model = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale());
+    TopologyFilter filter = session.getNodeFilter();
     for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
       TopologyUtils.addDriver(model, driver);
-      for (AbstractTopologyComponent child : driver.getChildren()) {
-        TopologyUtils.addNode(model, driver, (TopologyNode) child);
+      for (TopologyNode node : driver.getNodesAndPeers()) {
+        if (node.isPeer() || AbstractMonitoringListener.isAccepted(filter, node)) TopologyUtils.addNode(model, driver, node);
       }
     }
   }

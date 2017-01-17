@@ -53,6 +53,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Name of the settings property for the node filter's active state.
+   */
+  public static final String NODE_FILTER_ACTIVE_PROP = "node.filter.active";
+  /**
    * Holds the data for each type of table tree view.
    */
   private final EnumMap<TreeViewType, TableTreeData> dataMap;
@@ -76,7 +80,6 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   public JPPFWebSession(final Request request) {
     super(request);
     dataMap = new EnumMap<>(TreeViewType.class);
-    nodeFilter = new TopologyFilter(getUserName());
   }
 
   @Override
@@ -153,13 +156,15 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
     if (ret) {
       List<String> roles = getUserRoles();
       if (debugEnabled) log.debug("successful authentication for user {}, roles = {}", user, roles);
-      if (debugEnabled) log.debug("user from request: {}", getSignedInUser());
       userSettings = new UserSettings(user).load();
+      nodeFilter = new TopologyFilter(getUserName());
+      boolean active = userSettings.getProperties().getBoolean(NODE_FILTER_ACTIVE_PROP, false);
+      if (debugEnabled) log.debug("node filter is {}", active ? "active" : "inactive");
+      nodeFilter.setActive(active);
       if (roles.contains(JPPFRoles.MANAGER) || roles.contains(JPPFRoles.MONITOR)) {
         for (TreeViewType type: TreeViewType.values()) getTableTreeData(type);
       }
       getHealthData().initThresholds(userSettings.getProperties());
-      
     } else if (debugEnabled) log.debug("failed authentication for user {}", user);
     return ret;
   }

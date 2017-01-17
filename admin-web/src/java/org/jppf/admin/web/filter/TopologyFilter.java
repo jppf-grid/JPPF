@@ -43,7 +43,7 @@ public class TopologyFilter {
   /**
    * The user name.
    */
-  private final String userHash;
+  private final String nameHash;
   /**
    * The perisstence handler for these settings.
    */
@@ -71,8 +71,9 @@ public class TopologyFilter {
    */
   public TopologyFilter(final String user) {
     this.user = user;
-    this.userHash = CryptoUtils.computeHash(user + "_node_filter", "SHA-256");
-    this.persistence = JPPFWebConsoleApplication.get().getPersistenceFactory().newPersistence();
+    this.nameHash = CryptoUtils.computeHash(user + "_node_filter", "SHA-256");
+    this.persistence = JPPFWebConsoleApplication.get().getPersistence();
+    load();
   }
 
   /**
@@ -81,8 +82,7 @@ public class TopologyFilter {
    */
   public synchronized TopologyFilter load() {
     try  {
-      xmlPolicy = persistence.loadString(userHash);
-      if ((xmlPolicy != null) && !xmlPolicy.isEmpty()) policy = PolicyParser.parsePolicy(xmlPolicy);
+      setXmlPolicy(persistence.loadString(nameHash));
     } catch(Exception e) {
       log.error("error loading topology filter for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
@@ -94,7 +94,7 @@ public class TopologyFilter {
    */
   public synchronized void save() {
     try  {
-      persistence.saveString(userHash, xmlPolicy);
+      persistence.saveString(nameHash, xmlPolicy);
     } catch(Exception e) {
       log.error("error saving topology filter for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }

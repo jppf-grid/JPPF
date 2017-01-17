@@ -30,7 +30,7 @@ public class JPPFFilePersistence extends AbstractFilePersistence {
   /**
    * 
    */
-  JPPFFilePersistence() {
+  public JPPFFilePersistence() {
   }
 
   @Override
