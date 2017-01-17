@@ -221,7 +221,7 @@ public class LargeDataRunner {
     @Override
     public synchronized void jobReturned(final JobEvent event) {
       //System.out.println("received " + event.getTaskList().size() + " task results");
-      executor.submit(new MergerTask(event.getJobTasks()));
+      executor.execute(new MergerTask(event.getJobTasks()));
     }
   }
 
