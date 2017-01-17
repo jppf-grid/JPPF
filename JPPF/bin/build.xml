@@ -267,6 +267,7 @@
       <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
       <zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
       <zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
+      <zipfileset dir="${admin-web}" prefix="${zip.prefix}/admin-web" excludes="**/*.war"/>
       <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
