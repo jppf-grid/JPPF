@@ -1,0 +1,10 @@
+node process id: 6944, uuid: 074a2fae-dad5-437b-9551-2f2423f3c64d
+Attempting connection to the class server at localhost:11101
+RemoteClassLoaderConnection: Reconnected to the class server
+initialized NodeTest
+JPPF Node management initialized on port 11205
+Attempting connection to the node server at localhost:11101
+Reconnected to the node server
+Node successfully initialized
+immediate node shutdown requested
+resetting with stopJmx=true

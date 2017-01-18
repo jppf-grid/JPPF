@@ -173,7 +173,7 @@
       - propname: the name of the property to display to the output console
   -->
   <macrodef name="echoprop">
-  <attribute name="name"/>
+    <attribute name="name"/>
     <sequential>
       <echo message="@{name} = ${@{name}}"/>
     </sequential>

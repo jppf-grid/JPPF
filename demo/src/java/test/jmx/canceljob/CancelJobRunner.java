@@ -20,102 +20,75 @@ package test.jmx.canceljob;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.job.JobSelector;
-import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.slf4j.*;
+import org.jppf.node.protocol.*;
 
 /**
- * Runner class for the &quot;Long Task&quot; demo.
- * @author Laurent Cohen
+ * Test class for job cancellation.
  */
 public class CancelJobRunner {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(CancelJobRunner.class);
-  /**
-   * JPPF client used to submit execution requests.
-   */
-  private static JPPFClient client = null;
-  /**
-   * Used to test JPPFTask.compute(JPPFCallable) in method {@link #testComputeCallable()}.
-   */
-  private static String callableResult = "";
-
   /**
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
   public static void main(final String... args) {
-    try {
-      configure();
-      client = new JPPFClient();
-      long duration = 100_000L;
-      int n = 30;
+    long taskDuration = 10_000L, sleepTime = 1_000L;
+    int nbJobs = 5, nbTasks = 5, nbConnections = 1;
+    try (JPPFClient client = new JPPFClient()) {
       JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-      pool.setSize(n);
-      print("waiting for " + n + " client connections ...");
-      client.awaitConnectionPools(Operator.EQUAL, n, 100_000L, JPPFClientConnectionStatus.workingStatuses());
-      JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-      DriverJobManagementMBean jobManager = jmx.getJobManager();
-      forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, n - 1);
-      int idleNodes;
-      print("waiting for " + (n-1) + " slave nodes ...");
-      while ((idleNodes = jmx.nbIdleNodes()) < n) Thread.sleep(10L);
+      if (pool.getSize() != nbConnections) {
+        System.out.printf("changing connection pool size from %d to %d%n", pool.getSize(), nbConnections);
+        pool.setSize(nbConnections);
+        pool.awaitWorkingConnections(Operator.EQUAL, nbConnections);
+        System.out.printf("got %d connections%n", pool.getSize());
+      }
       List<JPPFJob> jobs = new ArrayList<>();
-      for (int i=0; i<n; i++) {
+      for (int i=1; i<=nbJobs; i++) {
         JPPFJob job = new JPPFJob();
         job.setName("Cancel-" + i);
         job.setBlocking(false);
-        job.add(new LifeCycleTask(duration)).setId(job.getName() + ":task-0");
+        for (int j=1; j<=nbTasks; j++) job.add(new MyTask(taskDuration)).setId(job.getName() + ":task-" + j);
         jobs.add(job);
       }
-      print("submitting " + n + " jobs and waiting for tasks notifications ...");
-      new AwaitTaskNotificationListener(client, LifeCycleTask.MSG, n).submitAndAwait(jobs);
-      print("got all tasks notifications");
-      print("cancelling jobs");
-      jobManager.cancelJobs(JobSelector.ALL_JOBS);
-      print("jobs cancel request submitted, waiting for results");
+      System.out.println("submitting " + nbJobs + " jobs");
+      for (JPPFJob job: jobs) client.submitJob(job);
+      Thread.sleep(sleepTime);
+      System.out.println("cancelling jobs");
+      for (JPPFJob job: jobs) job.cancel();
+      System.out.println("jobs cancel request submitted, waiting for results");
       for (JPPFJob job: jobs) {
         List<Task<?>> results = job.awaitResults();
-        /*
-        print("********** got results for job '" + job.getName() + "' **********");
-        for (Task task : results) {
-          Throwable e = task.getThrowable();
-          if (e != null) print("task '" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));
-          else print("result for task '" + task.getId() + "' : " + task.getResult());
-        }
-        */
+        System.out.printf("- got %s results for job '%s'%n", (results == null ? "null" : "" + results.size()), job.getName());
       }
-      idleNodes = jmx.nbIdleNodes();
-      if (idleNodes < n) {
-        print(String.format("got all results. There are %d out of %d nodes idle, waiting for all to be idle", idleNodes, n));
-        while ((idleNodes = jmx.nbIdleNodes()) < n) Thread.sleep(10L);
-      } else print("got all results");
-      print("end: nb idle nodes = " + idleNodes);
+      System.out.println("got all results");
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      if (client != null) client.close();
     }
   }
 
   /**
-   * 
+   * A simple task that sleeps for a specified duration.
    */
-  private static void configure() {
-  }
+  public static class MyTask extends AbstractTask<String> {
+    /**
+     * How long this task will sleep.
+     */
+    private final long duration;
 
-  /**
-   * Print a message tot he log and to the console.
-   * @param msg the message to print.
-   */
-  private static void print(final String msg) {
-    log.info(msg);
-    System.out.println(msg);
+    /**
+     * @param duration how long this task will sleep.
+     */
+    public MyTask(final long duration) {
+      this.duration = duration;
+    }
+
+    @Override
+    public void run() {
+      try {
+        Thread.sleep(duration);
+        setResult("success");
+      } catch (Exception e) {
+        setThrowable(e);
+      }
+    }
   }
 }
