@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root type="user">
+    <map/>
+    <node name="jppf">
+      <map/>
+      <node name="JPPFAdminTool">
+        <map/>
+        <node name="TabConfigurations">
+          <map/>
+          <node name="TabConfiguration0">
+            <map>
+              <entry key="name" value="Peformance"/>
+              <entry key="position" value="0"/>
+            </map>
+            <node name="ChartConfiguration0">
+              <map>
+                <entry key="name" value="Tasks execution"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="ms"/>
+                <entry key="type" value="CHART_PLOTXY"/>
+                <entry key="fields" value="LATEST_EXECUTION_TIME|AVG_EXECUTION_TIME"/>
+                <entry key="position" value="0"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration1">
+              <map>
+                <entry key="name" value="Node exec vs. transport time"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="ms"/>
+                <entry key="type" value="CHART_STACKED_3DBAR_SERIES"/>
+                <entry key="fields" value="LATEST_NODE_EXECUTION_TIME|LATEST_TRANSPORT_TIME"/>
+                <entry key="position" value="1"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration2">
+              <map>
+                <entry key="name" value="Jobs"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="ms"/>
+                <entry key="type" value="CHART_AREA"/>
+                <entry key="fields" value="JOBS_LATEST_TIME|JOBS_AVG_TIME"/>
+                <entry key="position" value="2"/>
+              </map>
+            </node>
+          </node>
+          <node name="TabConfiguration1">
+            <map>
+              <entry key="name" value="Health"/>
+              <entry key="position" value="1"/>
+            </map>
+            <node name="ChartConfiguration0">
+              <map>
+                <entry key="name" value="Process vs. System CPU load"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="%"/>
+                <entry key="type" value="CHART_METER"/>
+                <entry key="fields" value="HEALTH_CPU|HEALTH_SYSTEM_CPU"/>
+                <entry key="position" value="0"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration1">
+              <map>
+                <entry key="name" value="Heap vs. non-heap usage"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="MB"/>
+                <entry key="type" value="CHART_STACKED_3DBAR_SERIES"/>
+                <entry key="fields" value="HEALTH_HEAP|HEALTH_NON_HEAP"/>
+                <entry key="position" value="1"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration2">
+              <map>
+                <entry key="name" value="Process meters"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="%"/>
+                <entry key="type" value="CHART_METER"/>
+                <entry key="fields" value="HEALTH_HEAP_PCT|HEALTH_NON_HEAP_PCT|HEALTH_CPU"/>
+                <entry key="position" value="2"/>
+              </map>
+            </node>
+          </node>
+          <node name="TabConfiguration2">
+            <map>
+              <entry key="name" value="Misc"/>
+              <entry key="position" value="2"/>
+            </map>
+            <node name="ChartConfiguration0">
+              <map>
+                <entry key="name" value="System - Process load"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="%"/>
+                <entry key="type" value="CHART_DIFFERENCE"/>
+                <entry key="fields" value="HEALTH_CPU|HEALTH_SYSTEM_CPU"/>
+                <entry key="position" value="0"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration1">
+              <map>
+                <entry key="name" value="Queue time"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="ms"/>
+                <entry key="type" value="CHART_PLOTXY"/>
+                <entry key="fields" value="LATEST_QUEUE_TIME|AVG_QUEUE_TIME"/>
+                <entry key="position" value="1"/>
+              </map>
+            </node>
+            <node name="ChartConfiguration2">
+              <map>
+                <entry key="name" value="Nodes state"/>
+                <entry key="precision" value="0"/>
+                <entry key="unit" value="ms"/>
+                <entry key="type" value="CHART_3DPIE"/>
+                <entry key="fields" value="NB_IDLE_NODES|NB_BUSY_NODES"/>
+                <entry key="position" value="2"/>
+              </map>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </root>
+</preferences>

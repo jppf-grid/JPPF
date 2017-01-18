@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.tigris.subversion.subclipse.core.svnnature">
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/admin,admin"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/application-template,application-template"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/client,client"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/common,common"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/demo,demo"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/jca-client,jca-client"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/JPPF,JPPF"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/node,node"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/samples-pack,samples-pack"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/server,server"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/stress-tests,stress-tests"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_4_0/tests,tests"/>
+</provider>
+</psf>

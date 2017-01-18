@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2016 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the status bar in the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatusBar" type="page" i18n="org.jppf.ui.i18n.JPPFAdminTool">
+	<property name="layoutConstraints" value="fillx, insets 2 2 2 2"/>
+	<property name="componentConstraints" value="pushy 0, growx, pushx, h 26!"/>
+	<property name="bordered" value="false"/>
+  <initializer type="script">
+    <script language="groovy">def handler = new StatusBarHandler(option)</script>
+  </initializer>
+
+	<child name="filler" type="page">
+		<property name="componentConstraints" value="w 10!"/>
+	</child>
+
+	<child name="StatusNbServers" type="FormattedNumber">
+		<property name="label" value="Active servers"/>
+		<property name="tooltip" value="Current number of active JPPF servers"/>
+		<property name="value" value="0"/>
+		<property name="pattern" value="##0"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="enabled" value="false"/>
+		<property name="editable" value="false"/>
+	</child>
+
+	<child name="filler" type="page">
+		<property name="componentConstraints" value="w 20!"/>
+	</child>
+
+	<child name="StatusNbNodes" type="FormattedNumber">
+		<property name="label" value="Active nodes"/>
+		<property name="tooltip" value="Current number of active JPPF nodes"/>
+		<property name="value" value="0"/>
+		<property name="pattern" value="## ##0"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="enabled" value="false"/>
+		<property name="editable" value="false"/>
+	</child>
+
+	<child name="filler" type="page">
+		<property name="componentConstraints" value="growx, pushx"/>
+	</child>
+
+</opt:main>
