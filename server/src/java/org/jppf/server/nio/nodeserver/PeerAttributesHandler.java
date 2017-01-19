@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -61,11 +62,11 @@ public class PeerAttributesHandler implements NotificationListener {
   /**
    * Executes tasks that fetch the number of nodes and total threads for a single peer driver.
    */
-  private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new JPPFThreadFactory("PeerHandler"));
+  private final ExecutorService executor;
   /**
    * Completion service used to fetch the results of the tasks submitted tot he executor.
    */
-  private final CompletionService<Void> completer = new ExecutorCompletionService<>(executor);
+  private CompletionService<Void> completer;
   /**
    * Whether the timer task is currently running.
    */
@@ -73,11 +74,11 @@ public class PeerAttributesHandler implements NotificationListener {
   /**
    * Executes a task periodically to update the number of nodes and total threads of all the peer drivers.
    */
-  private final Timer timer;
+  private Timer timer;
   /**
    * The task which updates the number of nodes and total threads of all the peer drivers.
    */
-  private final TimerTask timerTask;
+  private TimerTask timerTask;
   /**
    * Total number of fully connected nodes.
    */
@@ -99,7 +100,9 @@ public class PeerAttributesHandler implements NotificationListener {
    * Initialize this handler.
    */
   public PeerAttributesHandler() {
+    executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new JPPFThreadFactory("PeerHandler"));
     if (pollingMode) {
+      completer = new ExecutorCompletionService<>(executor);
       timer = new Timer("PeerHandlerTimer", true);
       this.timerTask = new TimerTask() {
         @Override
@@ -108,9 +111,6 @@ public class PeerAttributesHandler implements NotificationListener {
         }
       };
       timer.schedule(timerTask, 1000L, PERIOD);
-    } else {
-      timer = null;
-      timerTask = null;
     }
   }
 
@@ -210,12 +210,14 @@ public class PeerAttributesHandler implements NotificationListener {
     int newThreads = props.getInt(PEER_TOTAL_THREADS, 0);
     JPPFSystemInformation info = peer.getSystemInformation();
     if (info != null) {
-      int nodes = info.getJppf().getInt(PEER_TOTAL_NODES);
-      int threads = info.getJppf().getInt(PEER_TOTAL_THREADS);
+      TypedProperties jppf = info.getJppf();
+      int nodes = jppf.getInt(PEER_TOTAL_NODES);
+      int threads = jppf.getInt(PEER_TOTAL_THREADS);
       if ((nodes != newNodes) || (threads != newThreads)) {
         if (debugEnabled) log.debug("newNodes={}, newThreads={} for " + peer, newNodes, newThreads);
-        info.getJppf().setInt(PEER_TOTAL_NODES, newNodes);
-        info.getJppf().setInt(PEER_TOTAL_THREADS, newThreads);
+        jppf.setInt(PEER_TOTAL_NODES, newNodes).setInt(PEER_TOTAL_THREADS, newThreads);
+        Bundler<?> bundler = peer.getBundler();
+        if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(info);
       }
     }
   }
@@ -288,13 +290,15 @@ public class PeerAttributesHandler implements NotificationListener {
    * Close and cleanup this handler.
    */
   void close() {
+    if (pollingMode) {
+      timer.cancel();
+      timerTask.cancel();
+      timer.purge();
+    }
+    executor.shutdownNow();
     synchronized(peers) {
       peers.clear();
     }
-    executor.shutdownNow();
-    timer.cancel();
-    timerTask.cancel();
-    timer.purge();
   }
 
   @Override
