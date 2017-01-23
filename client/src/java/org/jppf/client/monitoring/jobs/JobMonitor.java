@@ -34,7 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.1
  */
-public class JobMonitor extends TopologyListenerAdapter {
+public class JobMonitor extends TopologyListenerAdapter implements JobMonitoringHandler {
   /**
    * Logger for this class.
    */
@@ -66,7 +66,7 @@ public class JobMonitor extends TopologyListenerAdapter {
   /**
    * The object that receives information on the jobs and publishes it a job monitoring events.
    */
-  final Object refreshHandler;
+  final AutoCloseable refreshHandler;
   /**
    * Initialize this job manager with the specified topology manager in {@link JobMonitorUpdateMode#IMMEDIATE_NOTIFICATIONS IMMEDIATE_NOTFICATIONS} mode.
    * @param topologyManager the topology manager to use.
@@ -226,7 +226,7 @@ public class JobMonitor extends TopologyListenerAdapter {
   void driverRemoved(final JobDriver driver) {
     if (debugEnabled) log.debug("driver {} removed", driver.getDisplayName());
     synchronized(lock) {
-      driverMap.remove(driver);
+      driverMap.remove(driver.getUuid());
     }
     dispatchEvent(DRIVER_REMOVED, new JobMonitoringEvent(this, driver, null, null));
   }
@@ -348,5 +348,15 @@ public class JobMonitor extends TopologyListenerAdapter {
   boolean isJobUpdated(final JobInformation oldJob, final JobInformation newJob) {
     return (oldJob.getTaskCount() != newJob.getTaskCount()) || (oldJob.getMaxNodes() != newJob.getMaxNodes()) ||
         (oldJob.getPriority() != newJob.getPriority()) || (oldJob.isSuspended() ^ newJob.isSuspended()) || (oldJob.isPending() ^ newJob.isPending());
+  }
+
+  @Override
+  public void close() {
+    try {
+      listeners.clear();
+      refreshHandler.close();
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 }

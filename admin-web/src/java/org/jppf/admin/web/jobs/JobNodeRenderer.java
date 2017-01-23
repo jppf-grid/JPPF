@@ -21,8 +21,8 @@ package org.jppf.admin.web.jobs;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.tabletree.TreeNodeRenderer;
-import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.jobs.*;
+import org.jppf.ui.utils.TopologyUtils;
 
 /**
  *
@@ -30,8 +30,10 @@ import org.jppf.client.monitoring.jobs.*;
  */
 public class JobNodeRenderer implements TreeNodeRenderer {
   @Override
-  public String getText(final DefaultMutableTreeNode treeNode) {
-    AbstractComponent<?> comp = (AbstractComponent<?>) treeNode.getUserObject();
+  public String getText(final DefaultMutableTreeNode treeNode, final boolean showIP) {
+    AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+    if (comp instanceof JobDriver) return TopologyUtils.getDisplayName(((JobDriver) comp).getTopologyDriver(), showIP);
+    else if (comp instanceof JobDispatch) return TopologyUtils.getDisplayName(((JobDispatch) comp).getNode(), showIP);
     return comp.getDisplayName();
   }
 

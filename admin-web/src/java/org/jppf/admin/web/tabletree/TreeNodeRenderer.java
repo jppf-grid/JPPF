@@ -28,9 +28,10 @@ public interface TreeNodeRenderer {
   /**
    * Get the text to render for the node.
    * @param treeNode represents the node in the tree.
+   * @param showIP whether to show IP addresses vs. host names.
    * @return an optionally null text.
    */
-  String getText(DefaultMutableTreeNode treeNode);
+  String getText(DefaultMutableTreeNode treeNode, boolean showIP);
 
   /**
    * Get the path to an icon to render for the node.

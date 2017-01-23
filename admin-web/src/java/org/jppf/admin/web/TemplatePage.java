@@ -50,7 +50,9 @@ public class TemplatePage extends AbstractJPPFPage {
    */
   public TemplatePage() {
     setVersioned(false);
-    add(new HeaderPanel());
+    HeaderPanel hp = new HeaderPanel();
+    add(hp);
+    setTooltip(hp.getShowIPCheckBox(), HeaderPanel.class.getName());
     add(new FooterPanel());
     adminLink =  new BookmarkablePageLink<>("jppf.admin.link", AdminPage.class);
     add(adminLink);

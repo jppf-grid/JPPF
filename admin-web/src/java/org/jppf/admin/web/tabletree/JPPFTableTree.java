@@ -88,7 +88,7 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
   @Override
   protected Component newContentComponent(final String id, final IModel<DefaultMutableTreeNode> model) {
     DefaultMutableTreeNode node = model.getObject();
-    WebMarkupContainer panel = new NodeContent(id, node, nodeRenderer);
+    WebMarkupContainer panel = new NodeContent(id, node, nodeRenderer, JPPFWebSession.get().isShowIP());
     return panel;
   }
 

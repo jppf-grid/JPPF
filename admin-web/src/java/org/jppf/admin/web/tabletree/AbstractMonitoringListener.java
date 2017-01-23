@@ -30,12 +30,21 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.collections.*;
+import org.slf4j.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
 public abstract class AbstractMonitoringListener implements TopologyFilterListener {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractMonitoringListener.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The tree table model.
    */
@@ -137,7 +146,12 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
     DefaultMutableTreeNode nodeDmtn = TopologyUtils.addNode(treeModel, driver, node);
     if ((nodeDmtn != null) && (getTableTree() != null)) {
       DefaultMutableTreeNode parent = (DefaultMutableTreeNode) nodeDmtn.getParent();
-      if (parent.getChildCount() == 1) getTableTree().expand(parent);
+      try {
+        JPPFTableTree tree = getTableTree();
+        if ((parent.getChildCount() == 1) && (tree.getRequestCycle() != null)) tree.expand(parent);
+      } catch (Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
     }
   }
 }

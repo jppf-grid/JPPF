@@ -22,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.admin.web.tabletree.TreeNodeRenderer;
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.utils.TopologyUtils;
 
 /**
  *
@@ -29,9 +30,10 @@ import org.jppf.client.monitoring.topology.*;
  */
 public class HealthNodeRenderer implements TreeNodeRenderer {
   @Override
-  public String getText(final DefaultMutableTreeNode treeNode) {
+  public String getText(final DefaultMutableTreeNode treeNode, final boolean showIP) {
     AbstractTopologyComponent topologyComp = (AbstractTopologyComponent) treeNode.getUserObject();
-    return topologyComp.getDisplayName();
+    //return topologyComp.getDisplayName();
+    return TopologyUtils.getDisplayName(topologyComp, showIP);
   }
 
   @Override

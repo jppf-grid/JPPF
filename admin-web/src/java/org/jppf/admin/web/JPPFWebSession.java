@@ -72,6 +72,10 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * The user's node filter
    */
   private TopologyFilter nodeFilter;
+  /**
+   * Whether to show IP addresses vs. host names.
+   */
+  private boolean showIP;
 
   /**
    * Initialize a new session.
@@ -203,7 +207,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   }
 
   /**
-   * 
+   *
    * @return the roles of the current signed-in user, if any.
    */
   private List<String> getUserRoles() {
@@ -211,7 +215,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
     HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
     for (JPPFRole r: JPPFRole.values()) {
       String role = r.getRoleName();
-      if (req.isUserInRole(role)) result.add(role); 
+      if (req.isUserInRole(role)) result.add(role);
     }
     return result;
   }
@@ -221,5 +225,20 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   public TopologyFilter getNodeFilter() {
     return nodeFilter;
+  }
+
+  /**
+   * @return whether to show IP addresses vs. host names.
+   */
+  public boolean isShowIP() {
+    return showIP;
+  }
+
+  /**
+   *
+   * @param showIP {@code true} to show IP addresses, {@code false} to show host names.
+   */
+  public void setShowIP(final boolean showIP) {
+    this.showIP = showIP;
   }
 }

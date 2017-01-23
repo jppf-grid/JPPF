@@ -49,7 +49,7 @@ public class NodeFilterPage extends TemplatePage {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   *
+   * Base name for localization bundles.
    */
   static final String BASE = "org.jppf.ui.i18n.FilterPanel";
   /**
@@ -109,7 +109,9 @@ public class NodeFilterPage extends TemplatePage {
     form.add(new DownloadLink());
     form.add(new UploadLink());
     form.add(fileUploadField = new FileUploadField("node.filter.upload.browse"));
-    form.add(new ContextImage("node.filter.upload.img", "images/toolbar/upload.png"));
+    ContextImage cimg = new ContextImage("node.filter.upload.img", "images/toolbar/upload.png");
+    form.add(cimg);
+    setTooltip(cimg);
     form.add(policyField = new TextArea<>("node.filter.policy.field", Model.of(JPPFWebSession.get().getNodeFilter().getXmlPolicy())));
   }
 

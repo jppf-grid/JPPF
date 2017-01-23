@@ -10,7 +10,7 @@ BASE = "org.jppf.ui.i18n.FilterPanel"
 void init() {
   def editor = option.findFirstWithName("/node.filter.policy")
   def text = editor.getValue()
-  if ((text == null) || text.trim().isEmpty()) editor.setValue(GuiUtils.DEFAULT_EMPTY_FILTER)
+  if ((text == null) || text.trim().isEmpty()) editor.setValue(NodeFilterUtils.DEFAULT_EMPTY_FILTER)
   apply()
 }
 

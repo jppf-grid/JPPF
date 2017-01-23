@@ -24,7 +24,7 @@ import org.jppf.utils.TypedProperties;
  * 
  * @author Laurent Cohen
  */
-public interface Persistence {
+public interface Persistence extends AutoCloseable {
   /**
    * Load the settings for the specified user.
    * @param name the name fo the file to load from.
@@ -56,4 +56,7 @@ public interface Persistence {
    * @throws Exception if any error occurs.
    */
   public void saveString(String name, String settings) throws Exception;
+
+  @Override
+  void close();
 }

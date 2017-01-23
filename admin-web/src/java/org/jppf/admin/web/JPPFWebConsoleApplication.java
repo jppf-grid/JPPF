@@ -31,6 +31,7 @@ import org.jppf.admin.web.auth.LoginPage;
 import org.jppf.admin.web.settings.*;
 import org.jppf.admin.web.stats.StatsUpdater;
 import org.jppf.admin.web.topology.TopologyPage;
+import org.jppf.client.JPPFClient;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.utils.*;
@@ -178,12 +179,19 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     return persistence;
   }
 
-  /*
-  public String getInitParameter(final String key) {
-    FilterConfig filterCOnfig = getWicketFilter().getFilterConfig();
-    return filterCOnfig.getInitParameter("jppfPersistenceClassName");
+  @Override
+  protected void onDestroy() {
+    if (persistence != null) persistence.close();
+    JPPFClient client = null;
+    if (topologyManager != null) {
+      topologyManager.close();
+      client = topologyManager.getJPPFClient();
+    }
+    if (jobMonitor != null) {
+      jobMonitor.close();
+    }
+    if (client != null) client.close();
   }
-  */
 
   /**
    * Does not save to persistent store.

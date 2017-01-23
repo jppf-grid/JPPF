@@ -34,12 +34,13 @@ public class NodeContent extends Panel {
    * @param id id of this component.
    * @param treeNode represents the node to render.
    * @param renderer provides the content for rendering the tree node, i.e. icon and text.
+   * @param showIP whether to show IP addresses vs. host names.
    */
-  public NodeContent(final String id, final DefaultMutableTreeNode treeNode, final TreeNodeRenderer renderer) {
+  public NodeContent(final String id, final DefaultMutableTreeNode treeNode, final TreeNodeRenderer renderer, final boolean showIP) {
     super(id);
     String iconPath = renderer.getIconPath(treeNode);
     add(new ContextImage("icon", (iconPath != null) ? iconPath : ""));
-    String text = renderer.getText(treeNode);
+    String text = renderer.getText(treeNode, showIP);
     add(new Label("text", (text != null) ? text : ""));
   }
 }

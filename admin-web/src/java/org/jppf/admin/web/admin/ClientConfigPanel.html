@@ -33,7 +33,9 @@
         <a id="config_upload_link" wicket:id="admin.config.upload" class="button_link" style="display:none"></a>
         <label>
           <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.config.upload.browse" style="display:none" onchange="updateFileName('config_upload_link')"/>
-          <img wicket:id="admin.config.upload.img" src="images/toolbar/upload.png" class="button_link"/>
+          <a class="button_link">
+            <img wicket:id="admin.config.upload.img" src="images/toolbar/upload.png"/>
+          </a>
         </label>
         <br/>&nbsp;
         <h4 style="margin: 0px"><wicket:message key="admin.config.properties.label"></wicket:message></h4><br/>

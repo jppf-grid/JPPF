@@ -25,7 +25,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.jppf.utils.LocalizationUtils;
@@ -35,6 +35,11 @@ import org.jppf.utils.LocalizationUtils;
  * @author Laurent Cohen
  */
 public class HeaderPanel extends Panel {
+  /**
+   * 
+   */
+  CheckBox showIPCheckBox;
+
   /**
    *
    */
@@ -58,8 +63,27 @@ public class HeaderPanel extends Panel {
       }
     };
     form.add(link);
+    showIPCheckBox = new CheckBox("jppf.header.show.ip", Model.of(JPPFWebSession.get().isShowIP())) {
+      @Override
+      protected void onSelectionChanged(final Boolean newSelection) {
+        JPPFWebSession.get().setShowIP((newSelection != null) && newSelection);
+      }
+
+      @Override
+      protected boolean wantOnSelectionChangedNotifications() {
+        return true;
+      }
+    };
+    form.add(showIPCheckBox);
     form.setVisible(user != null);
     link.setVisible(user != null);
     add(form);
+  }
+
+  /**
+   * @return the check for show IP flag.
+   */
+  public CheckBox getShowIPCheckBox() {
+    return showIPCheckBox;
   }
 }

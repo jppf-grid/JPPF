@@ -70,7 +70,17 @@ public class AbstractJPPFPage extends WebPage {
    * @return the component itself.
    */
   public <T extends Component> T setTooltip(final T comp) {
-    String base = getClass().getName();
+    return setTooltip(comp, getClass().getName());
+  }
+
+  /**
+   * Add a tooltip to the specified component.
+   * @param <T> the type of the component.
+   * @param comp the component on which to set a tooltip.
+   * @param base the base for the localization bundle name.
+   * @return the component itself.
+   */
+  public <T extends Component> T setTooltip(final T comp, final String base) {
     String id = comp.getId();
     String key = null;
     String[] possibleEndings = { ".field", ".label" };

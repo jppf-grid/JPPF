@@ -16,31 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.admin.web.settings;
-
-import java.io.*;
-
-import org.jppf.utils.*;
+package org.jppf.client.monitoring.jobs;
 
 /**
- * 
+ * Interface implemented by all handlers that monitor and mantain the jobs tree.
  * @author Laurent Cohen
  */
-public abstract class AbstracPersistence implements Persistence {
+public interface JobMonitoringHandler extends AutoCloseable {
   @Override
-  public TypedProperties loadProperties(final String name) throws Exception {
-    TypedProperties settings = new TypedProperties();
-    String s = loadString(name);
-    if (s != null) {
-      try (Reader reader = new StringReader(s)) {
-        settings.loadAndResolve(reader);
-      }
-    } else settings.putAll(JPPFConfiguration.getProperties());
-    return settings;
-  }
-
-  @Override
-  public void saveProperties(final String name, final TypedProperties settings) throws Exception {
-    saveString(name, settings.asString());
-  }
+  void close();
 }

@@ -18,6 +18,7 @@
 
 package org.jppf.client.monitoring.jobs;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 import javax.management.*;
@@ -25,7 +26,7 @@ import javax.management.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobNotification;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -34,7 +35,7 @@ import org.slf4j.*;
  * @since 5.1
  * @exclude
  */
-abstract class AbstractJobNotificationsHandler implements NotificationListener {
+abstract class AbstractJobNotificationsHandler implements NotificationListener, JobMonitoringHandler {
   /**
    * Logger for this class.
    */
@@ -51,6 +52,14 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
    * Used to queue the JMX notifications in the same order they are received with a minimum of interruption.
    */
   final ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobNotificationsHandler"));
+  /**
+   * 
+   */
+  final Map<String, JmxInitializer> initializerMap = new HashMap<>();
+  /**
+   * 
+   */
+  final DriverListener driverListener;
 
   /**
    * Initialize with the specified job monitor.
@@ -58,12 +67,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
    */
   AbstractJobNotificationsHandler(final JobMonitor monitor) {
     this.monitor = monitor;
-    monitor.getTopologyManager().addTopologyListener(new TopologyListenerAdapter() {
-      @Override
-      public void driverAdded(final TopologyEvent event) {
-        new Thread(new JmxInitializer(event.getDriver())).start();
-      }
-    });
+    monitor.getTopologyManager().addTopologyListener(driverListener = new DriverListener());
   }
 
   @Override
@@ -77,6 +81,15 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
    * @param notif the notification to handle.
    */
   abstract void handleNotificationAsync(final JobNotification notif);
+
+  @Override
+  public void close() {
+    monitor.getTopologyManager().removeTopologyListener(driverListener);
+    executor.shutdownNow();
+    synchronized(initializerMap) {
+      initializerMap.clear();
+    }
+  }
 
   /**
    * Instances of this task handle raw JMX notifications handed to the executor queue.
@@ -102,9 +115,36 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
   }
 
   /**
+   * Listens to driver added/removed events.
+   */
+  private class DriverListener extends TopologyListenerAdapter {
+    @Override
+    public void driverAdded(final TopologyEvent event) {
+      TopologyDriver driver = event.getDriver();
+      JmxInitializer jinit = new JmxInitializer(driver);
+      synchronized(initializerMap) {
+        initializerMap.put(driver.getUuid(), jinit);
+      }
+      new Thread(jinit).start();
+    }
+
+    @Override
+    public void driverRemoved(final TopologyEvent event) {
+      String uuid = event.getDriver().getUuid();
+      if (uuid != null) {
+        JmxInitializer jinit = null;
+        synchronized(initializerMap) {
+          jinit = initializerMap.remove(uuid);
+        }
+        if (jinit != null) jinit.setStopped(true);
+      }
+    }
+  }
+
+  /**
    * Initializer running in a separate thread for each driver, until it gets a working (connected) proxy to the job management MBean.
    */
-  private class JmxInitializer implements Runnable {
+  private class JmxInitializer extends ThreadSynchronization implements Runnable {
     /**
      * The driver to connect to
      */
@@ -122,14 +162,17 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener {
     public void run() {
       if (debugEnabled) log.debug("starting jmx intializer for " + driver);
       boolean done = false;
-      while (!done) {
+      while (!done && !isStopped()) {
         try {
           DriverJobManagementMBean mbean = driver.getJobManager();
           if (mbean != null) {
             done = true;
             mbean.addNotificationListener(AbstractJobNotificationsHandler.this, null, null);
             if (debugEnabled) log.debug("registered jmx listener for " + driver);
-          } else Thread.sleep(10L);
+            synchronized(initializerMap) {
+              initializerMap.remove(driver.getUuid());
+            }
+          } else goToSleep(10L);
         } catch (Exception e) {
           log.error(e.getMessage(), e);
         }

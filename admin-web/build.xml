@@ -73,9 +73,6 @@
   <!-- ==================================================================== -->
   
   <target name="prep">
-    <condition property="cmd.prefix" value="" else="./">
-      <os family="windows"/>
-    </condition>
     <condition property="cmd.ext" value=".bat" else=".sh">
       <os family="windows"/>
     </condition>
@@ -92,7 +89,6 @@
     <checkstyle config="${basedir}/../JPPF/CheckStyle_JPPF_config.xml">
       <fileset dir="${src.dir}" includes="**/*.java" />
     </checkstyle>
-    <!--<javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">-->
     <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:none" />
@@ -131,9 +127,6 @@
         <exclude name="*guice*.jar"/>
         <exclude name="javax.servlet*.jar"/>
       </lib>
-      <!--
-      <fileset dir="${basedir}/webapp" excludes="WEB-INF/**/*.*"/>
-      -->
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
     </war>
     <echo message="${war.name}.war file created" />
@@ -151,7 +144,7 @@
   <target name="liberty.build.deploy.start" depends="build, liberty.deploy, liberty.start" description="generate and deploy the war file and start Liberty"/>
 
   <!-- =====================================================================-->
-  <!-- Misc                                                                 -->
+  <!-- Deployment and start/stop of various servers                         -->
   <!-- =====================================================================-->
 
   <!-- Tomcat deployment -->

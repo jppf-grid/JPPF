@@ -33,7 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.1
  */
-class JobPollingHandler extends AbstractRefreshHandler {
+class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringHandler {
   /**
    * Logger for this class.
    */
@@ -140,5 +140,10 @@ class JobPollingHandler extends AbstractRefreshHandler {
       TopologyNode node = monitor.getTopologyManager().getNode(uuid);
       if (node != null) monitor.dispatchAdded(jobDriver, job, new JobDispatch(nji.getJobInformation(), node));
     }
+  }
+
+  @Override
+  public void close() {
+    stopRefreshTimer();
   }
 }

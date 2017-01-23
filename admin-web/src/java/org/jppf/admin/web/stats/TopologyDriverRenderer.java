@@ -22,7 +22,9 @@ import java.util.List;
 
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
+import org.jppf.admin.web.JPPFWebSession;
 import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.ui.utils.TopologyUtils;
 
 /**
  *
@@ -31,7 +33,8 @@ import org.jppf.client.monitoring.topology.TopologyDriver;
 public class TopologyDriverRenderer implements IChoiceRenderer<TopologyDriver> {
   @Override
   public Object getDisplayValue(final TopologyDriver driver) {
-    return driver.getDisplayName();
+    //return driver.getDisplayName();
+    return TopologyUtils.getDisplayName(driver, JPPFWebSession.get().isShowIP());
   }
 
   @Override

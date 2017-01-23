@@ -21,26 +21,30 @@ package org.jppf.admin.web.settings;
 import java.io.*;
 
 import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
- * File-based settings persistence.
+ * 
  * @author Laurent Cohen
  */
-public abstract class AbstractFilePersistence extends AbstractPersistence {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractFilePersistence.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
+public abstract class AbstractPersistence implements Persistence {
+  @Override
+  public TypedProperties loadProperties(final String name) throws Exception {
+    TypedProperties settings = new TypedProperties();
+    String s = loadString(name);
+    if (s != null) {
+      try (Reader reader = new StringReader(s)) {
+        settings.loadAndResolve(reader);
+      }
+    } else settings.putAll(JPPFConfiguration.getProperties());
+    return settings;
+  }
 
   @Override
-  public String loadString(final String name) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
-    if (debugEnabled) log.debug("loading settings from file {}", file);
-    return file.exists() ? FileUtils.readTextFile(file) : null;
+  public void saveProperties(final String name, final TypedProperties settings) throws Exception {
+    saveString(name, settings.asString());
+  }
+
+  @Override
+  public void close() {
   }
 }

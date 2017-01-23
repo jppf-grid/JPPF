@@ -33,7 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.0
  */
-public class TopologyManager extends ConnectionPoolListenerAdapter {
+public class TopologyManager extends ConnectionPoolListenerAdapter implements AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -491,5 +491,13 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    */
   public synchronized void setNodeFilter(final NodeSelector nodeFilter) {
     this.nodeFilter = nodeFilter;
+  }
+
+  @Override
+  public void close() {
+    refreshHandler.stopRefreshTimer();;
+    jvmHealthRefreshHandler.stopRefreshTimer();;
+    listeners.clear();
+    client.removeConnectionPoolListener(this);
   }
 }

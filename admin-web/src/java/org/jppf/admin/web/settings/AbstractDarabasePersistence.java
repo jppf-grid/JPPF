@@ -30,7 +30,7 @@ import org.slf4j.*;
  * File-based settings persistence.
  * @author Laurent Cohen
  */
-public abstract class AbstractDarabasePersistence extends AbstracPersistence {
+public abstract class AbstractDarabasePersistence extends AbstractPersistence {
   /**
    * Logger for this class.
    */

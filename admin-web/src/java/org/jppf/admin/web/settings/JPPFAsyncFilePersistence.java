@@ -40,7 +40,7 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
   /**
    * Used to sequentialize the file wwrites from a single queue.
    */
-  private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(new JPPFThreadFactory(JPPFAsyncFilePersistence.class.getSimpleName()));
+  private final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(new JPPFThreadFactory(JPPFAsyncFilePersistence.class.getSimpleName()));
 
   /**
    * 
@@ -62,5 +62,10 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
         }
       }
     });
+  }
+
+  @Override
+  public void close() {
+    if (EXECUTOR != null) EXECUTOR.shutdownNow();
   }
 }
