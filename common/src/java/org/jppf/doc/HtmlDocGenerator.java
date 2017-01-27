@@ -69,7 +69,7 @@ public class HtmlDocGenerator {
    */
   private static final String DIR_EXCLUDES = "-de";
   /**
-   * Name ofr the recursive directory processing flag parameter.
+   * Name of the recursive directory processing flag parameter.
    */
   private static final String RECURSIVE = "-r";
   /**

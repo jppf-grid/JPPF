@@ -249,7 +249,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           pools.putValue(priority, pool);
         }
         HostIP hostIP = new HostIP(info.host, info.host);
-        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
+        if (JPPFConfiguration.get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
         pool.setDriverHostIP(hostIP);
         fireConnectionPoolAdded(pool);
