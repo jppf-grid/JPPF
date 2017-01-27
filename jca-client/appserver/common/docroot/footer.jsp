@@ -8,7 +8,7 @@
         <tr><td colspan="*" style="height: 10px"></td></tr>
         <tr>
           <td align="center"><img src="images/jppf_group_large.gif"</td>
-          <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2016 JPPF Team</td>
+          <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2017 JPPF Team</td>
           <td align="right">
             <a href="http://sourceforge.net/projects/jppf-project">
             <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
