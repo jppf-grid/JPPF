@@ -50,6 +50,10 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
 
   @Override
   public void saveString(final String name, final String settings) throws Exception {
+    if (settings == null) {
+      if (debugEnabled) log.debug(String.format("attempting to write null string to '%s', call stack:%n%s%n", name, ExceptionUtils.getCallStack()));
+      return;
+    }
     EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {

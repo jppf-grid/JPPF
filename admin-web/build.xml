@@ -76,6 +76,9 @@
     <condition property="cmd.ext" value=".bat" else=".sh">
       <os family="windows"/>
     </condition>
+    <condition property="wls.ext" value=".cmd" else=".sh">
+      <os family="windows"/>
+    </condition>
   </target>
 
   <!-- ==================================================================== -->
@@ -126,6 +129,9 @@
         <exclude name="*atmosphere*.jar"/>
         <exclude name="*guice*.jar"/>
         <exclude name="javax.servlet*.jar"/>
+        <!--
+        <exclude name="wicket-cdi.jar"/>
+        -->
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
     </war>
@@ -142,6 +148,7 @@
   <target name="wildfly.build.deploy.start" depends="build, wildfly.deploy, wildfly.start" description="generate and deploy the war file and start Wildfly"/>
   <target name="glassfish.build.deploy.start" depends="build, glassfish.start, glassfish.deploy" description="generate and deploy the war file and start Glassfish"/>
   <target name="liberty.build.deploy.start" depends="build, liberty.deploy, liberty.start" description="generate and deploy the war file and start Liberty"/>
+  <target name="weblogic.build.deploy.start" depends="build, weblogic.deploy, weblogic.start" description="generate and deploy the war file and start Tomcat"/>
 
   <!-- =====================================================================-->
   <!-- Deployment and start/stop of various servers                         -->
@@ -242,8 +249,29 @@
     <liberty action="stop"/>
   </target>
 
+  <!-- Weblogic deployment -->
+  
+  <property name="weblogic.dir" value="C:/Tools/Oracle/wls12130"/>
+  <property name="weblogic.domain" value="mydomain"/>
+  <property name="weblogic.domain.dir" value="${weblogic.dir}/user_projects/domains/${weblogic.domain}"/>
+  
+  <target name="weblogic.deploy" depends="prep">
+    <copy todir="${weblogic.domain.dir}/autodeploy" file="${build.dir}/${war.name}.war" />
+  </target>
+  
+  <target name="weblogic.start" depends="prep">
+    <delete quiet="true">
+      <fileset dir="${weblogic.domain.dir}" includes="**/*.log,**/logs/*.log*"/>
+    </delete>
+    <weblogic action="start"/>
+  </target>
+  
+  <target name="weblogic.stop" description="stop Weblogic" depends="prep">
+    <weblogic action="stop"/>
+  </target>
+
   <!-- =============================================================================
-    Start or stop the liberty server
+    Start or stop the Liberty server
     Attributes:
     - action: either "start" or "stop"
     - servername: name of the liberty server, defaults to "jppf"
@@ -259,9 +287,8 @@
     </sequential>
   </macrodef>
   
-  
   <!-- =============================================================================
-    Start or stop the glassfish server
+    Start or stop the Glassfish server
     Attributes:
     - action: either "start" or "stop"
     - domain: name of the glassfish domain, defaults to "jppf"
@@ -274,6 +301,18 @@
         <arg value="@{action}-domain"/>
         <arg value="@{domain}"/>
       </exec>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Start or stop the Weblogic server
+    Attributes:
+    - action: either "start" or "stop"
+  ============================================================================== -->
+  <macrodef name="weblogic">
+    <attribute name="action"/>
+    <sequential>
+      <exec executable="${weblogic.domain.dir}/bin/@{action}Weblogic${wls.ext}" dir="${weblogic.domain.dir}/bin" failonerror="true" searchpath="true"/>
     </sequential>
   </macrodef>
 

@@ -100,7 +100,24 @@ h3 a, h3 a:link, h3 a:visited {
   font-size: 12pt
 }
 
-h1.header { font-family: Arial Black, Arial, Verdana, sans-serif;  color: #6D78B6; font-size: 24pt }
+h1.header {
+  font-family: Arial Black, Arial, Verdana, sans-serif;
+  color: #6D78B6;
+  font-size: 24pt;
+  margin: 5px 0px;
+  box-shadow: 3px 3px 4px 2px #6D78B6;
+  padding: 0px;
+}
+
+.headertitle {
+  font-family: Arial Black, Arial, Verdana, sans-serif;
+  color: #6D78B6;
+  font-size: 24pt;
+  margin: 5px 0px;
+  box-shadow: 3px 3px 4px 2px #6D78B6;
+  padding: 0px;
+}
+
 h2,h3, h4 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
 h2 { font-weight: 900; ; font-size: 18pt }
 h3 { font-size: 14pt; }
@@ -436,12 +453,15 @@ textarea {
 }
 
 .layout_cell_left {
-  min-width: 100px;
-  max-width: 100px;
+  width: 120px;
   background-color: white;
   color: #6D78B6;
   font-size: 9pt;
   padding: 5px;
+}
+
+.layout_cell_right {
+  width: calc(100% - 120px);
 }
 
 .button_link {
