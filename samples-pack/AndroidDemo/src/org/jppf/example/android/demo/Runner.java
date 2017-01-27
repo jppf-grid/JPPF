@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2016 JPPF Team.
+ * Copyright (C) 2005-2017 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ public class Runner {
     TypedProperties config = JPPFConfiguration.getProperties();
     int nbTasks = config.getInt("demo.nbTasks", 1);
     long duration = config.getLong("demo.taskDuration", 2000L);
-    System.out.printf("Android demo parameters: nb tasks=%,d; task duration=%,d msµn", nbTasks, duration);
+    System.out.printf("Android demo parameters: nb tasks=%,d; task duration=%,d msï¿½n", nbTasks, duration);
     // create and start the JPPF client
     try (JPPFClient client = new JPPFClient()) {
       // create the JPPF job
