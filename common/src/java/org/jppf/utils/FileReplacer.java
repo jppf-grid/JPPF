@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2016 JPPF Team.
+ * Copyright (C) 2005-2017 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,7 +168,7 @@ public class FileReplacer {
         .addSwitch("-r", "If specified, then interpret the content of '-i' as a regular expression")
         .addArg("-ef", "A list of comma-separated file patterns to exclude folders from the search")
         .parseArguments(args);
-      System.out.println("parsed arguments: " + namedArgs);
+      System.out.println("parsed arguments:\n" + namedArgs);
       //namedArgs.printUsage();
       new FileReplacer().replace(namedArgs);
     } catch(Exception e) {
