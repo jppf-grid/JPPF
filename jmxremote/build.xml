@@ -70,8 +70,8 @@
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean, init">
-		<javac srcdir="" destdir="${classes.dir}"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+		<javac srcdir="" destdir="${classes.dir}" debug="on" deprecation="off"
+      optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
 			<src path="${src.dir}"/>

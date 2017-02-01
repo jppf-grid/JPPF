@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="JPPF-connectors" basedir="..">
+<project name="JPPF-admin-web" basedir="..">
 
   <!-- ========================================================================= -->
   <!--             Package the j2ee connector for deployment                     -->

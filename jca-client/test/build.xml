@@ -113,7 +113,7 @@
 
   <target name="compile" depends="init">
     <echo message="compiling the project..." />
-    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:unchecked" />
       <src path="${src.dir}/java" />

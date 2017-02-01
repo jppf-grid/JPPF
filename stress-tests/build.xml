@@ -96,19 +96,19 @@
     <delete dir="${scenarios.classes}" quiet="true" includes="**/*.*"/>
     <delete dir="${addons.classes}" quiet="true" includes="**/*.*"/>
     <echo message="compiling addons classes : addons.classes=${addons.classes}"/>
-    <javac destdir="${addons.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac destdir="${addons.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${addons.src}"/>
     </javac>
     <echo message="compiling framework classes"/>
-    <javac destdir="${framework.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac destdir="${framework.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${framework.src}"/>
     </javac>
     <echo message="compiling scenarios classes : scenarios.classes=${scenarios.classes}"/>
-    <javac destdir="${scenarios.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac destdir="${scenarios.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${scenarios.src}"/>

@@ -48,9 +48,9 @@ limitations under the License.
       </checkstyle>
       <mkdir dir="@{path}/classes"/>
       <javac srcdir="" destdir="@{path}/classes" source="1.7" target="1.7"
-        debug="on" deprecation="off" optimize="on" includes="**/*.java">
+        debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
         <classpath refid="project.classpath"/>
-        <compilerarg line="-Xlint:none"/>
+        <compilerarg line=" -Xlint:none"/>
         <src path="@{path}/src/java"/>
         <src path="@{path}/src/resources"/>
       </javac>
