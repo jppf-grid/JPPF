@@ -23,15 +23,16 @@
   <!-- ==================================================================== -->
 
   <property name="build.sysclasspath" value="last" />
-  <property name="config.dir"         value="${basedir}/config" />
-  <property name="classes.dir"        value="${basedir}/classes" />
+  <property name="config.dir"         value="${basedir}/config"/>
+  <property name="classes.dir"        value="${basedir}/classes"/>
   <property name="src.dir"            value="${basedir}/src" />
-  <property name="build.dir"          value="${basedir}/build" />
-  <property name="lib.dir"            value="${basedir}/lib" />
-  <property name="web.dir"            value="${basedir}/webapp" />
-  <property name="war.name"           value="JPPFWebAdmin" />
-  <property file="${basedir}/bin/build.properties" />
-  <property file="${basedir}/bin/build.number" />
+  <property name="build.dir"          value="${basedir}/build"/>
+  <property name="lib.dir"            value="${basedir}/lib"/>
+  <property name="web.dir"            value="${basedir}/webapp"/>
+  <property name="war.name"           value="JPPFWebAdmin"/>
+  <property file="${basedir}/bin/build.properties"/>
+  <property file="${basedir}/build.properties"/>
+  <property file="${basedir}/bin/build.number"/>
 
 
   <!-- ==================================================================== -->
@@ -49,10 +50,10 @@
 
   <target name="clean">
     <delete quiet="false">
-      <fileset dir="${classes.dir}" includes="**/*.*" />
+      <fileset dir="${classes.dir}" includes="**/*.*"/>
     </delete>
     <delete quiet="true">
-      <fileset dir="${build.dir}" includes="**/*.*" />
+      <fileset dir="${build.dir}" includes="**/*.*"/>
     </delete>
   </target>
 
@@ -61,8 +62,8 @@
   <!-- ==================================================================== -->
 
   <target name="init" depends="clean, prep">
-    <mkdir dir="${classes.dir}" />
-    <mkdir dir="${build.dir}" />
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${build.dir}"/>
     <tstamp>
       <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
     </tstamp>
@@ -89,10 +90,10 @@
 
   <target name="compile" depends="init">
     <echo message="compiling the JPPFWebAdmin classes ..." />
-    <checkstyle config="${basedir}/../JPPF/CheckStyle_JPPF_config.xml">
+    <checkstyle config="${basedir}/bin/CheckStyle_JPPF_config.xml">
       <fileset dir="${src.dir}" includes="**/*.java" />
     </checkstyle>
-    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:none" />
       <src path="${src.dir}/java" />
@@ -129,13 +130,10 @@
         <exclude name="*atmosphere*.jar"/>
         <exclude name="*guice*.jar"/>
         <exclude name="javax.servlet*.jar"/>
-        <!--
-        <exclude name="wicket-cdi.jar"/>
-        -->
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
     </war>
-    <echo message="${war.name}.war file created" />
+    <echo message="${war.name}.war file created in '${build.dir}' directory" />
   </target>
 
   <!-- ==================================================================== -->
@@ -156,8 +154,6 @@
 
   <!-- Tomcat deployment -->
 
-  <property name="tomcat.dir" value="C:/Tools/Apache/apache-tomcat-7.0.70"/>
-
   <target name="tomcat.deploy">
     <property name="tomcat.deploy.dir" value="${tomcat.dir}/webapps"/>
     <copy todir="${tomcat.deploy.dir}" file="${build.dir}/${war.name}.war" />
@@ -170,8 +166,6 @@
 
   <!-- Glassfish deployment -->
   
-  <property name="glassfish.dir" value="C:/Tools/AppServers/glassfish4"/>
-  
   <target name="glassfish.deploy" depends="prep">
     <exec executable="${glassfish.dir}/bin/asadmin${cmd.ext}" dir="${glassfish.dir}/bin" failonerror="true" searchpath="true">
       <arg value="deploy"/>
@@ -179,23 +173,21 @@
       <arg value="${build.dir}/${war.name}.war"/>
     </exec>
     <echo message="waiting for JPPFWebAdmin to be ready" />
-    <waitfor maxwait="1" maxwaitunit="minute" checkevery="500">
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
       <http url="http://localhost:8080/JPPFWebAdmin"/>
     </waitfor>
   </target>
   
   <target name="glassfish.start" depends="prep">
-    <local name="domain.dir"/>
-    <property name="domain.dir" value="${glassfish.dir}/glassfish/domains/jppf"/>
     <delete quiet="true">
-      <fileset dir="${domain.dir}/config" includes="*.log" />
+      <fileset dir="${glassfish.domain.dir}/config" includes="*.log" />
     </delete>
     <delete quiet="true">
-      <fileset dir="${domain.dir}/logs" includes="*.log" />
+      <fileset dir="${glassfish.domain.dir}/logs" includes="*.log" />
     </delete>
     <glassfish action="start"/>
     <echo message="waiting for web container to be ready" />
-    <waitfor maxwait="1" maxwaitunit="minute" checkevery="500">
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
       <http url="http://localhost:8080/index.html"/>
     </waitfor>
   </target>
@@ -206,19 +198,12 @@
 
   <!-- Wildfly deployment -->
   
-  <property name="wildfly.dir" value="C:/Tools/AppServers/wildfly-8.2.0.Final"/>
-  
   <target name="wildfly.deploy" depends="prep">
-    <property name="wildfly.deploy.dir" value="${wildfly.dir}/standalone/deployments"/>
     <copy todir="${wildfly.deploy.dir}" file="${build.dir}/${war.name}.war" />
   </target>
   
   <target name="wildfly.start" depends="prep">
-    <exec executable="cmd.exe" dir="${wildfly.dir}/bin" failonerror="true" searchpath="true">
-      <arg value="/c"/>
-      <arg value="start"/>
-      <arg value="${wildfly.dir}/bin/standalone__${cmd.ext}"/>
-    </exec>
+    <exec executable="${wildfly.dir}/bin/${wildfly.server}${cmd.ext}" dir="${wildfly.dir}/bin" failonerror="true" searchpath="true" vmlauncher="false" spawn="true"/>
   </target>
   
   <target name="wildfly.stop" description="stop wildfly" depends="prep">
@@ -230,9 +215,6 @@
   </target>
 
   <!-- Liberty deployment -->
-
-  <property name="liberty.dir" value="C:/Tools/IBM/wlp"/>
-  <property name="liberty.server.dir" value="${liberty.dir}/usr/servers/jppf"/>
 
   <target name="liberty.deploy" depends="prep">
     <copy todir="${liberty.server.dir}/apps" file="${build.dir}/${war.name}.war" />
@@ -250,10 +232,6 @@
   </target>
 
   <!-- Weblogic deployment -->
-  
-  <property name="weblogic.dir" value="C:/Tools/Oracle/wls12130"/>
-  <property name="weblogic.domain" value="mydomain"/>
-  <property name="weblogic.domain.dir" value="${weblogic.dir}/user_projects/domains/${weblogic.domain}"/>
   
   <target name="weblogic.deploy" depends="prep">
     <copy todir="${weblogic.domain.dir}/autodeploy" file="${build.dir}/${war.name}.war" />

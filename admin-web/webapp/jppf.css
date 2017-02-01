@@ -114,7 +114,7 @@ h1.header {
   color: #6D78B6;
   font-size: 24pt;
   margin: 5px 0px;
-  box-shadow: 3px 3px 4px 2px #6D78B6;
+  text-shadow: 2px 2px 2px #8D98D6;
   padding: 0px;
 }
 

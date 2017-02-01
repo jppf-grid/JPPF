@@ -16,18 +16,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<wls:weblogic-web-app xmlns:wls="http://xmlns.oracle.com/weblogic/weblogic-web-app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
-    <wls:context-root>JPPFWebAdmin</wls:context-root>
-    <wls:security-role-assignment>
-        <wls:role-name>jppf-admin</wls:role-name>
-        <wls:principal-name>jppf-admins</wls:principal-name>
-    </wls:security-role-assignment>
-    <wls:security-role-assignment>
-        <wls:role-name>jppf-monitor</wls:role-name>
-        <wls:principal-name>jppf-monitors</wls:principal-name>
-    </wls:security-role-assignment>
-    <wls:security-role-assignment>
-        <wls:role-name>jppf-manager</wls:role-name>
-        <wls:principal-name>jppf-managers</wls:principal-name>
-    </wls:security-role-assignment>
+<wls:weblogic-web-app xmlns:wls="http://xmlns.oracle.com/weblogic/weblogic-web-app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.4/weblogic-web-app.xsd">
+
+  <wls:context-root>JPPFWebAdmin</wls:context-root>
+  <wls:security-role-assignment>
+    <wls:role-name>jppf-admin</wls:role-name>
+    <wls:principal-name>jppf-admins</wls:principal-name>
+  </wls:security-role-assignment>
+  <wls:security-role-assignment>
+    <wls:role-name>jppf-monitor</wls:role-name>
+    <wls:principal-name>jppf-monitors</wls:principal-name>
+  </wls:security-role-assignment>
+  <wls:security-role-assignment>
+    <wls:role-name>jppf-manager</wls:role-name>
+    <wls:principal-name>jppf-managers</wls:principal-name>
+  </wls:security-role-assignment>
+
+  <wls:container-descriptor>
+    <wls:prefer-web-inf-classes>true</wls:prefer-web-inf-classes>
+  </wls:container-descriptor>
+
 </wls:weblogic-web-app>
