@@ -78,7 +78,7 @@ class WaitInitialBundleState extends NodeServerState {
       if (debugEnabled) log.debug("received handshake response for channel id = {}", context.getChannel().getId());
       BundleResults received = context.deserializeBundle();
       TaskBundle bundle = received.bundle();
-      boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
+      boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
       if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
@@ -99,18 +99,18 @@ class WaitInitialBundleState extends NodeServerState {
       bundler.setup();
       context.setBundler(bundler);
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
+      String host = getChannelHost(channel);
+      HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
+      boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
       boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+      int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
-        String host = getChannelHost(channel);
-        boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-        int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
           DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
           JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }
-        HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
@@ -119,7 +119,14 @@ class WaitInitialBundleState extends NodeServerState {
         if (debugEnabled) log.debug(String.format("configuring management for node %s", info));
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
-      } else server.nodeConnected(context);
+      } else {
+        if (offline || (port < 0)) {
+          JPPFManagementInfo info = new JPPFManagementInfo(hostIP, -1, context.getUuid(), type, sslEnabled);
+          if (systemInfo != null) info.setSystemInfo(systemInfo);
+          context.setManagementInfo(info);
+        }
+        server.nodeConnected(context);
+      }
       server.putConnection(context);
       if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
       return finalizeTransition(context);

@@ -24,6 +24,8 @@ import org.jppf.management.forwarding.NodeSelectionProvider;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
+import org.jppf.utils.HostIP;
+import org.slf4j.*;
 
 /**
  * 
@@ -31,6 +33,14 @@ import org.jppf.server.nio.nodeserver.*;
  * @exclude
  */
 public class NodeSelectionHelper implements NodeSelectionProvider {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeSelectionHelper.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Reference to the JPPF driver.
    */
@@ -69,23 +79,30 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @return a set of {@link AbstractNodeContext} instances.
    */
   public Set<AbstractNodeContext> getChannels(final NodeSelector selector) {
-    return getChannels(selector, false);
+    return getChannels(selector, false, false);
   }
 
   /**
    * Get a set of channels based on a NodeSelector.
    * @param selector the node selector used as a filter.
    * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return a set of {@link AbstractNodeContext} instances.
    */
-  public Set<AbstractNodeContext> getChannels(final NodeSelector selector, final boolean includePeers) {
+  public Set<AbstractNodeContext> getChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof ExecutionPolicySelector) return getChannels((ExecutionPolicySelector) selector, includePeers);
+    if (selector instanceof ExecutionPolicySelector) return getChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
     Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     Set<AbstractNodeContext> result = new HashSet<>();
     for (AbstractNodeContext ctx : fullSet) {
-      if ((hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) && selector.accepts(ctx.getManagementInfo())) result.add(ctx);
+      if (forForwarding && !hasWorkingJmxConnection(ctx)) continue;
+      if (ctx.isPeer() && !includePeers) continue;
+      JPPFManagementInfo info = getManagementInfo(ctx);
+      if (traceEnabled) log.trace(String.format("node '%s', info = %s", ctx.getUuid(), info));
+      if (info == null) continue;
+      if (selector.accepts(info)) result.add(ctx);
     }
+    if (traceEnabled) log.trace("got {} results", result.size());
     return result;
   }
 
@@ -93,36 +110,63 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * Get the available channels for the specified nodes.
    * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private Set<AbstractNodeContext> getChannels(final ExecutionPolicySelector selector, final boolean includePeers) {
+  private Set<AbstractNodeContext> getChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
     ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
-      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      JPPFManagementInfo info = context.getManagementInfo();
+      if (forForwarding && !hasWorkingJmxConnection(context)) continue;
+      if (!includePeers && context.isPeer()) continue;
+      JPPFManagementInfo info = getManagementInfo(context);
+      if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
       if (info == null) continue;
       if (selector.accepts(info)) result.add(context);
     }
+    if (traceEnabled) log.trace("got {} results", result.size());
     return result;
   }
   
   /**
+   * Get the management info for a given node or create one if needed.
+   * @param context the node for which to get the management info.
+   * @return a {@link JPPFManagementInfo} instyance, or {@code null}.
+   */
+  private JPPFManagementInfo getManagementInfo(final AbstractNodeContext context) {
+    JPPFManagementInfo info = context.getManagementInfo();
+    if (info == null) {
+      JPPFSystemInformation sysInfo = context.getSystemInformation();
+      if (sysInfo != null) {
+        info = new JPPFManagementInfo(new HostIP("", ""), -1, context.getUuid(), -1, false);
+        info.setSystemInfo(sysInfo);
+      }
+    }
+    return info;
+  }
+
+  /**
    * Get the number of channels matching a NodeSelector.
    * @param selector the node selector used as a filter.
    * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return a set of {@link AbstractNodeContext} instances.
    */
-  public int getNbChannels(final NodeSelector selector, final boolean includePeers) {
+  public int getNbChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof ExecutionPolicySelector) return getNbChannels((ExecutionPolicySelector) selector, includePeers);
+    if (selector instanceof ExecutionPolicySelector) return getNbChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
     Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     int result = 0;
     for (AbstractNodeContext ctx : fullSet) {
-      if ((hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) && selector.accepts(ctx.getManagementInfo())) result++;
+      if (forForwarding && !hasWorkingJmxConnection(ctx)) continue;
+      if (!includePeers && ctx.isPeer()) continue;
+      JPPFManagementInfo info = getManagementInfo(ctx);
+      if (traceEnabled) log.trace(String.format("node '%s', info = %s", ctx.getUuid(), info));
+      if (info == null) continue;
+      if (selector.accepts(info)) result++;
     }
     return result;
   }
@@ -131,17 +175,20 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * Get the number of available channels that match the specified execution policy.
    * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private int getNbChannels(final ExecutionPolicySelector selector, final boolean includePeers) {
+  private int getNbChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
     ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     int result = 0;
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
-      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      JPPFManagementInfo info = context.getManagementInfo();
+      if (forForwarding && !hasWorkingJmxConnection(context)) continue;
+      if (!includePeers && context.isPeer()) continue;
+      JPPFManagementInfo info = getManagementInfo(context);
+      if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
       if (info == null) continue;
       if (selector.accepts(info)) result++;
     }
