@@ -68,9 +68,8 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
    * Configure this client connection with the specified parameters.
    * @param uuid the remote driver's UUID.
    * @param name configuration name for this local client.
-   * @param priority the assigned to this client connection.
    */
-  void configure(final String uuid, final String name, final int priority) {
+  void configure(final String uuid, final String name) {
     pool.setDriverUuid(uuid);
     this.name = name;
     displayName = name;
@@ -205,7 +204,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   @Override
   public void close() {
     if (!closed.compareAndSet(false, true)) return;
-    setStatus(CLOSED);
+    if (!getStatus().isTerminatedStatus()) setStatus(CLOSED);
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();

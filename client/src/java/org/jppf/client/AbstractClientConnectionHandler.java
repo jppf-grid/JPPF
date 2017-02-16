@@ -213,4 +213,12 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   {
     return owner.isClosed();
   }
+
+  /**
+   * Get the object that performs connection attempts until the max retry time is reached or connection succeeds.
+   * @return a {@link SocketInitializer} instance.
+   */
+  public SocketInitializer getSocketInitializer() {
+    return socketInitializer;
+  }
 }
