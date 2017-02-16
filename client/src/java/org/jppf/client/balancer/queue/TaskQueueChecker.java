@@ -76,6 +76,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * The load-balancer factory.
    */
   private final JPPFBundlerFactory bundlerFactory;
+  /**
+   * The highest priority for which there is a working connection.
+   */
+  private int highestPriority = Integer.MIN_VALUE;
+  /**
+   * Used to synchronize on the highestPriority.
+   */
+  private final Object priorityLock = new Object();
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -95,6 +103,26 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   public JPPFContext getJPPFContext() {
     return jppfContext;
+  }
+
+  /**
+   * Set the highest priority.
+   * @param priority the new highest priority.
+   */
+  public void setHighestPriority(final int priority) {
+    synchronized(priorityLock) {
+      this.highestPriority = priority;
+    }
+  }
+
+  /**
+   * Set the highest priority.
+   * @return the highest priority.
+   */
+  public int getHighestPriority() {
+    synchronized(priorityLock) {
+      return highestPriority;
+    }
   }
 
   /**
@@ -193,7 +221,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
           Iterator<ClientJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
             ClientJob bundleWrapper = it.next();
-            channel = retrieveChannel(bundleWrapper);
+            channel = findIdleChannelIndex(bundleWrapper);
             if (channel != null) selectedBundle = bundleWrapper;
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
@@ -214,16 +242,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   }
 
   /**
-   * Retrieve a suitable channel for the specified job.
-   * @param bundleWrapper the job to execute.
-   * @return a channel for a node on which to execute the job.
-   * @throws Exception if any error occurs.
-   */
-  private ChannelWrapper retrieveChannel(final ClientJob bundleWrapper) throws Exception {
-    return findIdleChannelIndex(bundleWrapper);
-  }
-
-  /**
    * Find a channel that can send the specified task bundle for execution.
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
@@ -231,10 +249,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   private ChannelWrapper findIdleChannelIndex(final ClientJob bundle) {
     int idleChannelsSize = idleChannels.size();
     List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
-    //Iterator<ChannelWrapper> iterator = idleChannels.iterator();
-    Integer highestPriority = idleChannels.firstKey();
-    if (highestPriority == null) return null;
-    Iterator<ChannelWrapper> iterator = idleChannels.getValues(highestPriority).iterator();
+    int highestPriority = getHighestPriority();
+    Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
+    if (channels == null) return null;
+    Iterator<ChannelWrapper> iterator = channels.iterator();
     Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
     while (iterator.hasNext()) {
       ChannelWrapper ch = iterator.next();

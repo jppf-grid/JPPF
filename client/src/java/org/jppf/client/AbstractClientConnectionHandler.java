@@ -36,8 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Jeff Rosen
  */
-public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler
-{
+public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler {
   /**
    * Logger for this class.
    */
@@ -88,10 +87,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @param owner the client connection which owns this connection handler.
    * @param name the name given to this connection.
    */
-  protected AbstractClientConnectionHandler(final JPPFClientConnection owner, final String name)
-  {
+  protected AbstractClientConnectionHandler(final JPPFClientConnection owner, final String name) {
     this.owner = owner;
-    //if (owner != null) this.name = owner.getName();
     this.name = name;
     long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
@@ -114,14 +111,10 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
    */
   @Override
-  public void setStatus(final JPPFClientConnectionStatus newStatus)
-  {
+  public void setStatus(final JPPFClientConnectionStatus newStatus) {
     JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
     if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + newStatus);
-    if (newStatus != oldStatus)
-    {
-      fireStatusChanged(oldStatus);
-    }
+    if (newStatus != oldStatus) fireStatusChanged(oldStatus);
   }
 
   /**
@@ -130,8 +123,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @see org.jppf.client.ClientConnectionHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
    */
   @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.add(listener);
   }
 
@@ -141,8 +133,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @see org.jppf.client.ClientConnectionHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
    */
   @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.remove(listener);
   }
 
@@ -156,8 +147,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * Notify all listeners that the status of this connection has changed.
    * @param oldStatus the connection status before the change.
    */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
-  {
+  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
@@ -168,12 +158,10 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * @throws Exception if any error occurs.
    */
   @Override
-  public SocketWrapper getSocketClient() throws Exception
-  {
+  public SocketWrapper getSocketClient() throws Exception {
     // If the socket has been idle too long, recycle the connection.
     if ((maxSocketIdleMillis > 10000L)
-        && ((System.nanoTime() - socketClient.getSocketTimestamp()) / 1_000_000L > maxSocketIdleMillis))
-    {
+        && ((System.nanoTime() - socketClient.getSocketTimestamp()) / 1_000_000L > maxSocketIdleMillis)) {
       close();
       init();
     }
@@ -184,33 +172,35 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * Create the ssl connection over an established plain connection.
    * @throws Exception if any error occurs.
    */
-  protected void createSSLConnection() throws Exception
-  {
+  protected void createSSLConnection() throws Exception {
     socketClient = SSLHelper.createSSLClientConnection(socketClient);
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug("closing " + name);
     listeners.clear();
-    try
-    {
+    try {
       if (socketInitializer != null) socketInitializer.close();
       //socketInitializer = null;
       if (socketClient != null) socketClient.close();
       socketClient = null;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error('[' + name + "] " + e.getMessage(), e);
     }
     if (debugEnabled) log.debug(name  + " closed");
   }
 
   @Override
-  public boolean isClosed()
-  {
+  public boolean isClosed() {
     return owner.isClosed();
+  }
+
+  /**
+   * Get the object that performs connection attempts until the max retry time is reached or connection succeeds.
+   * @return a {@link SocketInitializer} instance.
+   */
+  public SocketInitializer getSocketInitializer() {
+    return socketInitializer;
   }
 }

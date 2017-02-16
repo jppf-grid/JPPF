@@ -210,8 +210,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   public int setSize(final int newSize) {
     int currentSize = getSize();
     if (currentSize == newSize) return currentSize;
-    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", newSize, currentSize);
-    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
+    if (debugEnabled) log.debug("requesting new size={}, current size={}", newSize, currentSize);
     int diff = newSize - currentSize;
     int size = connectionCount();
     if (diff < 0) {
@@ -234,7 +233,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
       int[] ports = null;
       synchronized(this) {
         info.uuid = driverUuid;
-        //info.host = hostIP != null ? hostIP.hostName() : null;
         info.host = hostIP != null ? hostIP.ipAddress() : null;
         ports = new int[] { driverPort };
         this.size += diff;

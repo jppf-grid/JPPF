@@ -21,9 +21,12 @@ package test.org.jppf.client;
 import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
+import org.jppf.discovery.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.*;
@@ -148,6 +151,63 @@ public class TestConnectionPool extends Setup1D1N {
   }
 
   /**
+   * Test a sequence of {@link JPPFConnectionPool#setSize(int)} calls.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = 10000)
+  public void testPoolPriority() throws Exception {
+    JPPFConfiguration.set(DISCOVERY_ENABLED, false).set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, false)
+    ;
+    try (JPPFClient client = new JPPFClient()) {
+      String methodName = ReflectionUtils.getCurrentMethodName();
+      SimpleDiscovery discovery = new SimpleDiscovery();
+      client.addDriverDiscovery(discovery);
+      discovery.emitPool("pool1", 10);
+      discovery.emitPool("pool2", 1);
+      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
+      testJobsInPool(client, "pool1", methodName);
+      // trigger close of pool1
+      JPPFConnectionPool pool = client.findConnectionPool("pool1");
+      assertNotNull(pool);
+      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.getConnection();
+      AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
+      csd.getSocketInitializer().close();
+      csd.getSocketClient().close();
+      while (client.awaitWorkingConnectionPools().size() >= 2) Thread.sleep(10L);
+      testJobsInPool(client, "pool2", methodName);
+      discovery.emitPool("pool3", 10);
+      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
+      testJobsInPool(client, "pool3", methodName);
+    }
+  }
+
+  /**
+   *
+   * @param client .
+   * @param poolName .
+   * @param prefix .
+   * @throws Exception if any error occurs
+   */
+  private void testJobsInPool(final JPPFClient client, final String poolName, final String prefix) throws Exception {
+    int nbJobs = 5;
+    List<JPPFJob> jobs = new ArrayList<>(nbJobs);
+    MyJobListener listener = new MyJobListener();
+    for (int i=1; i<=nbJobs; i++) {
+      JPPFJob job = BaseTestHelper.createJob(prefix + i, false, false, 1, LifeCycleTask.class, 0L);
+      job.addJobListener(listener);
+      jobs.add(job);
+    }
+    for (JPPFJob job: jobs) client.submitJob(job);
+    for (JPPFJob job: jobs) {
+      List<Task<?>> result = job.awaitResults();
+      testJobResults(1, result);
+      String name = listener.jobToPool.get(job.getUuid());
+      assertNotNull(name);
+      assertEquals(poolName, name);
+    }
+  }
+
+  /**
    * Test the results of a job execution.
    * @param nbTasks the expected number of tasks in the results.
    * @param results the results.
@@ -162,6 +222,57 @@ public class TestConnectionPool extends Setup1D1N {
       Throwable t = task.getThrowable();
       assertNull(prefix + "has an exception", t);
       assertNotNull(prefix + "result is null", task.getResult());
+    }
+  }
+
+  /** */
+  static class MyJobListener extends JobListenerAdapter {
+    /**
+     * Mapping of job uuid to the name of the pool to which it is dispatched.
+     */
+    public Map<String, String> jobToPool = new ConcurrentHashMap<>();
+
+    @Override
+    public void jobDispatched(final JobEvent event) {
+      jobToPool.put(event.getJob().getUuid(), event.getConnection().getConnectionPool().getName());
+    }
+  }
+
+  /** */
+  public class SimpleDiscovery extends ClientDriverDiscovery {
+    /** */
+    private final LinkedBlockingQueue<ClientConnectionPoolInfo> queue = new LinkedBlockingQueue<>();
+    /** */
+    private boolean stopped = false;
+
+    @Override
+    public synchronized void discover() throws InterruptedException {
+      while (!stopped) {
+        ClientConnectionPoolInfo info;
+        while ((info = queue.poll()) != null) {
+          BaseTest.print(true, false, "found new connection pool %s", info);
+          newConnection(info);
+        }
+        BaseTest.print(true, false, "SimpleDiscovery  about to wait in discover()");
+        wait();
+      }
+    }
+
+    /**
+     * "Discover" the pool with the specified name and priority.
+     * @param name the connection pool name.
+     * @param priority the connection pool priority.
+     */
+    public synchronized void emitPool(final String name, final int priority) {
+      BaseTest.print(true, false, "emitting %s with priority %d", name, priority);
+      queue.offer(new ClientConnectionPoolInfo(name, false, "localhost", 11101, priority, 1, 1));
+      notifyAll();
+    }
+
+    @Override
+    public synchronized void shutdown() {
+      stopped = true;
+      notifyAll();
     }
   }
 }

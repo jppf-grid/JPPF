@@ -56,14 +56,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
       if (debugEnabled) log.debug("error: initializing connection {} while client is closed", name);
       throw new IllegalStateException("error: initializing connection " + name + " while client is closed");
     }
-    boolean ssl = pool.isSslEnabled();
-    if (ssl && (info.sslServerPorts == null)) throw new IllegalStateException("ssl is enabled but no ssl port is provided");
     this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();
-    configure(uuid, name, 0);
+    configure(uuid, name);
     displayName = name + '[' + getHost() + ':' + getPort() + ']';
     pool.add(this);
-    int jmxPort = ssl ? info.sslManagementPort : info.managementPort;
-    if (jmxPort >= 0) pool.setJmxPort(jmxPort);
   }
 
   /**

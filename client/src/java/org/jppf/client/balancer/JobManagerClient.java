@@ -99,6 +99,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Determines whether this job manager has been closed.
    */
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * Counts the number of connections for each priority value.
+   */
+  private final SortedMap<Integer, Integer> priorityCounts = new TreeMap<>();
 
   /**
    * Instantiates client job manager.
@@ -153,7 +157,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   protected void removeConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     try {
-      updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
+      JPPFClientConnectionStatus status = wrapper.getStatus();
+      if (status.isTerminatedStatus()) updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, status);
+      else updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);
@@ -167,7 +173,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @return wrapper for the added client connection.
    */
   protected ChannelWrapper addConnection(final JPPFClientConnection cnn) {
-    if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
+    if (debugEnabled) log.debug("adding connection " + cnn);
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     ChannelWrapper wrapper = null;
     synchronized(wrapperMap) {
@@ -300,15 +306,32 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (wrapper == null || oldStatus == newStatus) return;
 
+    boolean bNew = newStatus.isWorkingStatus();
+    boolean bOld = oldStatus.isWorkingStatus();
+    int priority = wrapper.getPriority();
+    if (bNew && !bOld) {
+      synchronized(priorityCounts) {
+        Integer n = priorityCounts.get(priority);
+        priorityCounts.put(priority, (n == null) ? 1 : n + 1);
+        taskQueueChecker.setHighestPriority(priorityCounts.lastKey());
+      }
+      workingConnections.put(wrapper.getConnectionUuid(), wrapper);
+    } else if (!bNew && bOld) {
+      synchronized(priorityCounts) {
+        Integer n = priorityCounts.get(priority);
+        if (n != null) {
+          if (n <= 1) priorityCounts.remove(priority);
+          else priorityCounts.put(priority, n - 1);
+          taskQueueChecker.setHighestPriority(priorityCounts.isEmpty() ? Integer.MIN_VALUE : priorityCounts.lastKey());
+        }
+      }
+      workingConnections.remove(wrapper.getConnectionUuid());
+    }
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) taskQueueChecker.addIdleChannel(wrapper);
     else {
       taskQueueChecker.removeIdleChannel(wrapper);
-      if(newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
+      if (newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
-    boolean bNew = newStatus.isWorkingStatus();
-    boolean bOld = oldStatus.isWorkingStatus();
-    if (bNew && !bOld) workingConnections.put(wrapper.getConnectionUuid(), wrapper);
-    else if (!bNew && bOld) workingConnections.remove(wrapper.getConnectionUuid());
   }
 
   @Override

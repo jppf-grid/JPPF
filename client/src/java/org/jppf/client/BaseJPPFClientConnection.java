@@ -421,4 +421,13 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   public JPPFConnectionPool getPool() {
     return pool;
   }
+
+  /**
+   * Get the class server connection.
+   * @return a {@link ClassServerDelegate} instance.
+   * @exclude
+   */
+  public ClassServerDelegate getDelegate() {
+    return delegate;
+  }
 }

@@ -201,27 +201,37 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
       if (initPeers) {
+        List<ClientConnectionPoolInfo> infoList = new ArrayList<>();
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             boolean ssl = config.getBoolean(name + '.' + JPPFProperties.SSL_ENABLED.getName(), false);
             JPPFProperty<String> serverProp = JPPFProperties.SERVER_HOST;
-            info.host = config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
+            String host =  config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
+            info.host = host;
             JPPFProperty<Integer> portProp = JPPFProperties.SERVER_PORT;
             int port = config.getInt(name + '.' + portProp.getName(), portProp.getDefaultValue());
             if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
             portProp = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
-            port = config.getInt(name + '.' + portProp.getName(), -1);
-            if (!ssl) info.managementPort = port;
-            else info.sslManagementPort = port;
+            int jmxport = config.getInt(name + '.' + portProp.getName(), -1);
+            if (!ssl) info.managementPort = jmxport;
+            else info.sslManagementPort = jmxport;
             int priority = config.getInt(name + ".jppf.priority", 0);
             if (receiverThread != null) receiverThread.addConnectionInformation(info);
             int poolSize = config.get(new IntProperty(name + '.' + JPPFProperties.POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
             int jmxPoolSize = config.get(new IntProperty(name + '.' + JPPFProperties.JMX_POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
-            newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
+            infoList.add(new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize));
           }
         }
+        Collections.sort(infoList, new Comparator<ClientConnectionPoolInfo>() { // order by decreasing priority
+          @Override
+          public int compare(final ClientConnectionPoolInfo o1, final ClientConnectionPoolInfo o2) {
+            int p1 = o1.getPriority(), p2 = o2.getPriority();
+            return p1 > p2 ? -1 : (p1 < p2 ? 1 : 0);
+          }
+        });
+        for (ClientConnectionPoolInfo poolInfo: infoList) newConnectionPool(poolInfo);
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -263,13 +273,43 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
+   * Called when a new connection pool is read from the configuration.
+   * @param info the information required for the connection to connect to the driver.
+   * @exclude
+   */
+  protected void newConnectionPool(final ClientConnectionPoolInfo info) {
+    if (debugEnabled) log.debug("new connection pool: {}", info.getName());
+    final int size = info.getPoolSize() > 0 ? info.getPoolSize() : 1;
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(),
+          info.getName(), info.getPriority(), size, info.isSecure(), info.getJmxPoolSize());
+        pool.setDriverPort(info.getPort());
+        synchronized(pools) {
+          pools.putValue(info.getPriority(), pool);
+        }
+        HostIP hostIP = new HostIP(info.getHost(), info.getHost());
+        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.getHost());
+        if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.getHost(), hostIP.hostName());
+        pool.setDriverHostIP(hostIP);
+        fireConnectionPoolAdded(pool);
+        for (int i=1; i<=size; i++) {
+          if (isClosed()) return;
+          submitNewConnection(null, pool);
+        }
+      }
+    };
+    executor.submit(r);
+  }
+
+  /**
    * Called to submit the initialization of a new connection.
    * @param info the information required for the connection to connect to the driver.
    * @param pool thez connection pool to which the connection belongs.
    * @exclude
    */
   protected void submitNewConnection(final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
-    AbstractJPPFClientConnection c = createConnection(info.uuid, pool.getName() + "-" + pool.nextSequence(), info, pool);
+    AbstractJPPFClientConnection c = createConnection(info != null ? info.uuid : null, pool.getName() + "-" + pool.nextSequence(), info, pool);
     newConnection(c);
   }
 

@@ -201,6 +201,7 @@
         <fileset dir="${tests.src}">
           <include name="**/*.java"/>
           <exclude name="**/JPPFSuite.java"/>
+          <exclude name="**/package-info.java"/>
         </fileset>
       </batchtest>
     </junit>
@@ -216,7 +217,7 @@
   <!-- ========================================================================= -->
 
   <target name="test.pattern">
-    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
     <delete dir="${report}" quiet="true"/>
     <mkdir dir="${report}"/>
     <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true" logfailedtests="true">
@@ -231,6 +232,7 @@
       <batchtest fork="yes" todir="${report}" skipNonTests="true">
         <fileset dir="${tests.src}">
           <include name="${pattern}"/>
+          <exclude name="**/package-info.java"/>
         </fileset>
       </batchtest>
     </junit>

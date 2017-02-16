@@ -164,20 +164,24 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    */
   @Test(timeout = 5000)
   public void testSubmitWithClientExecutionPolicy() throws Exception {
-    client.setLocalExecutionEnabled(true);
-    executor.setBatchTimeout(100L);
-    executor.setBatchSize(2);
-    executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-    int nbTasks = 10;
-    List<Future<String>> futures = new ArrayList<>();
-    for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
-    assertEquals(nbTasks, futures.size());
-    for (Future<String> future : futures) {
-      String s = future.get();
-      assertTrue(future.isDone());
-      assertFalse(future.isCancelled());
-      assertNotNull(s);
-      assertEquals("local_client", s);
+    try {
+      client.setLocalExecutionEnabled(true);
+      executor.setBatchTimeout(100L);
+      executor.setBatchSize(2);
+      executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
+      int nbTasks = 10;
+      List<Future<String>> futures = new ArrayList<>();
+      for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
+      assertEquals(nbTasks, futures.size());
+      for (Future<String> future : futures) {
+        String s = future.get();
+        assertTrue(future.isDone());
+        assertFalse(future.isCancelled());
+        assertNotNull(s);
+        assertEquals("local_client", s);
+      }
+    } finally {
+      client.setLocalExecutionEnabled(false);
     }
   }
 
@@ -202,7 +206,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
       assertFalse(future.isCancelled());
     }
     Thread.sleep(500L);
-    // bath size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
+    // batch size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
     // driver load-balancing: manual, size=5 ==> 4 job returned notifs
     assertEquals(2, listener.startedCount.get());
     assertEquals(2, listener.endedCount.get());
