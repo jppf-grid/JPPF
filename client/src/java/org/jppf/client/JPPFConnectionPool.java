@@ -21,7 +21,7 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -84,6 +84,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * The host and IP address of the driver.
    */
   private HostIP hostIP;
+  /**
+   * Inofrmation on this pool as discovered.
+   */
+  private ClientConnectionPoolInfo discoveryInfo;
 
   /**
    * Initialize this pool with the specified parameters.
@@ -103,6 +107,17 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     this.name = name;
     this.sslEnabled = sslEnabled;
     jmxPool = new JMXConnectionPool(jmxPoolSize, sslEnabled);
+  }
+
+  /**
+   * Initialize this pool with the specified parameters.
+   * @param client the JPPF client which holds this pool.
+   * @param id the id of this pool.
+   * @param info information needed for the pool's attributes.
+   */
+  JPPFConnectionPool(final JPPFClient client, final int id, final ClientConnectionPoolInfo info) {
+    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize());
+    this.discoveryInfo = info;
   }
 
   @Override
@@ -229,17 +244,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
         this.size -= actual;
       }
     } else {
-      JPPFConnectionInformation info = new JPPFConnectionInformation();
-      int[] ports = null;
       synchronized(this) {
-        info.uuid = driverUuid;
-        info.host = hostIP != null ? hostIP.ipAddress() : null;
-        ports = new int[] { driverPort };
         this.size += diff;
       }
-      if (sslEnabled) info.sslServerPorts = ports;
-      else info.serverPorts = ports;
-      for (int i=0; i<diff; i++) client.submitNewConnection(info, this);
+      for (int i=0; i<diff; i++) client.submitNewConnection(this);
     }
     return getSize();
   }
@@ -289,7 +297,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
     final Operator op = operator == null ? Operator.EQUAL : operator;
     if (debugEnabled) log.debug(String.format("awaiting %d connections with operator=%s and status in %s", nbConnections, op, Arrays.asList(statuses)));
-    //setSize(nbConnections);
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
@@ -310,7 +317,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     sb.append(", driverHost=").append(hostIP != null ? hostIP.hostName() : null);
     sb.append(", driverPort=").append(driverPort);
     sb.append(", sslEnabled=").append(sslEnabled);
-    //sb.append(", client=").append(client);
     sb.append(']');
     return sb.toString();
   }
@@ -574,5 +580,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
     return awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+  }
+
+  /**
+   * @return the discovery information for this pool.
+   */
+  ClientConnectionPoolInfo getDiscoveryInfo() {
+    return discoveryInfo;
   }
 }

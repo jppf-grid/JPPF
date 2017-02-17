@@ -157,8 +157,9 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testPoolPriority() throws Exception {
     JPPFConfiguration.set(DISCOVERY_ENABLED, false).set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, false);
+    String methodName = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = new JPPFClient()) {
-      String methodName = ReflectionUtils.getCurrentMethodName();
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
       SimpleDiscovery discovery = new SimpleDiscovery();
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);
@@ -174,9 +175,9 @@ public class TestConnectionPool extends Setup1D1N {
       csd.getSocketClient().close();
       while (client.awaitWorkingConnectionPools().size() >= 2) Thread.sleep(10L);
       testJobsInPool(client, "pool2", methodName);
-      discovery.emitPool("pool3", 10);
+      discovery.emitPool("pool1", 10);
       while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
-      testJobsInPool(client, "pool3", methodName);
+      testJobsInPool(client, "pool1", methodName);
     }
   }
 

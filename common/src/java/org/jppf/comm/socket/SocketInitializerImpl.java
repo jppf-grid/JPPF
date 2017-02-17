@@ -63,6 +63,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
    */
   @Override
   public void initializeSocket(final SocketWrapper socketWrapper) {
+    successful = false;
     if (closed) return;
     if ("".equals(name)) name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     try {
@@ -76,7 +77,6 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
     long period = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INTERVAL);
     goToSleep(delay);
-    successful = false;
     long elapsed = 0L;
     long start = System.nanoTime();
     while ((elapsed < maxDuration) && !successful && !closed) {
