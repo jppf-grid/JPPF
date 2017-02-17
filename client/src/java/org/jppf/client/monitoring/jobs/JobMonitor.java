@@ -225,7 +225,7 @@ public class JobMonitor extends TopologyListenerAdapter {
   void driverRemoved(final JobDriver driver) {
     if (debugEnabled) log.debug("driver {} removed", driver.getDisplayName());
     synchronized(lock) {
-      driverMap.remove(driver);
+      driverMap.remove(driver.getUuid());
     }
     dispatchEvent(DRIVER_REMOVED, new JobMonitoringEvent(this, driver, null, null));
   }
