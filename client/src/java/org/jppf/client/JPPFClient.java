@@ -22,7 +22,6 @@ import java.util.*;
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
 import org.jppf.client.event.*;
-import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.ClientDriverDiscovery;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -128,8 +127,8 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   @Override
-  AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
-    return new JPPFClientConnectionImpl(this, uuid, name, info, pool);
+  AbstractJPPFClientConnection createConnection(final String name, final JPPFConnectionPool pool) {
+    return new JPPFClientConnectionImpl(this, name, pool);
   }
 
   @Override

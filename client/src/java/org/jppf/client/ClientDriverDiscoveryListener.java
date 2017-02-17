@@ -21,7 +21,6 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.*;
 
 /**
@@ -55,14 +54,19 @@ class ClientDriverDiscoveryListener implements DriverDiscoveryListener<ClientCon
     if (closed.get()) return false;
     boolean hasPool = false;
     synchronized(discoveredPools) {
-      hasPool = discoveredPools.contains(info);
-      if (!hasPool) discoveredPools.add(info);
+      if (!(hasPool = discoveredPools.contains(info))) discoveredPools.add(info);
     }
-    if (!hasPool) {
-      JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);
-      client.newConnectionPool(info.getName(), connectionInfo, info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize());
-    }
+    if (!hasPool) client.newConnectionPool(info);
     return !hasPool;
+  }
+
+  /**
+   * Called when a pool is removed from the client's set of pools.
+   * @param info information on the connection pool that was removed.
+   * @return {@code true} if this listener contained the specified info, {@code false} otherwise.
+   */
+  boolean onPoolRemoved(final ClientConnectionPoolInfo info) {
+    return discoveredPools.remove(info);
   }
 
   /**

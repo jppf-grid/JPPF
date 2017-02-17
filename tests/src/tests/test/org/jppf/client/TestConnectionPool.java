@@ -174,9 +174,9 @@ public class TestConnectionPool extends Setup1D1N {
       csd.getSocketClient().close();
       while (client.awaitWorkingConnectionPools().size() >= 2) Thread.sleep(10L);
       testJobsInPool(client, "pool2", methodName);
-      discovery.emitPool("pool3", 10);
+      discovery.emitPool("pool1", 10);
       while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
-      testJobsInPool(client, "pool3", methodName);
+      testJobsInPool(client, "pool1", methodName);
     }
   }
 

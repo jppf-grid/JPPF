@@ -248,8 +248,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     final int size = info.getPoolSize() > 0 ? info.getPoolSize() : 1;
     Runnable r = new Runnable() {
       @Override public void run() {
-        final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(),
-          info.getName(), info.getPriority(), size, info.isSecure(), info.getJmxPoolSize());
+        final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), info);
         pool.setDriverPort(info.getPort());
         synchronized(pools) {
           pools.putValue(info.getPriority(), pool);
@@ -261,7 +260,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         fireConnectionPoolAdded(pool);
         for (int i=1; i<=size; i++) {
           if (isClosed()) return;
-          submitNewConnection(null, pool);
+          submitNewConnection(pool);
         }
       }
     };
@@ -295,7 +294,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         fireConnectionPoolAdded(pool);
         for (int i=1; i<=size; i++) {
           if (isClosed()) return;
-          submitNewConnection(info, pool);
+          submitNewConnection(pool);
         }
       }
     };
@@ -304,24 +303,21 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Called to submit the initialization of a new connection.
-   * @param info the information required for the connection to connect to the driver.
    * @param pool thez connection pool to which the connection belongs.
    * @exclude
    */
-  protected void submitNewConnection(final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
-    AbstractJPPFClientConnection c = createConnection(info != null ? info.uuid : null, pool.getName() + "-" + pool.nextSequence(), info, pool);
+  protected void submitNewConnection(final JPPFConnectionPool pool) {
+    AbstractJPPFClientConnection c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
     newConnection(c);
   }
 
   /**
    * Create a new driver connection based on the specified parameters.
-   * @param uuid the uuid of the remote JPPF driver.
    * @param name the name of the connection.
-   * @param info the driver connection information.
    * @param pool id of the connection pool the connection belongs to.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    */
-  abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final JPPFConnectionPool pool);
+  abstract AbstractJPPFClientConnection createConnection(String name, final JPPFConnectionPool pool);
 
   @Override
   void newConnection(final AbstractJPPFClientConnection c) {
@@ -348,6 +344,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (poolRemoved) {
       fireConnectionPoolRemoved(pool);
       if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
+      ClientConnectionPoolInfo info = pool.getDiscoveryInfo();
+      if (info != null) {
+        boolean b = discoveryListener.onPoolRemoved(info);
+        if (debugEnabled) log.debug("removal of {} = {}", info, b);
+      }
     }
   }
 
