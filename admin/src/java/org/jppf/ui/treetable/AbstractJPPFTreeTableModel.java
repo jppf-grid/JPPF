@@ -51,6 +51,10 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * Formatter for cells that contain decimal numbers.
    */
   protected final NumberFormat nfDec;
+  /**
+   * Formatter for cells that contain decimal numbers.
+   */
+  protected final NumberFormat nfMB;
 
   /**
    * Initialize this model with the specified tree root.
@@ -70,6 +74,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
     this.locale = locale;
     nfInt = createNumberFormat();
     nfDec = createDecimalNumberFormat();
+    nfMB = createMBFormat();
   }
 
   /**
@@ -195,7 +200,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
 
   /**
    * Get a number formatter for the number of tasks for each node.
-   * @return a <code>NumberFormat</code> instance.
+   * @return a {@code NumberFormat} instance.
    */
   protected NumberFormat createNumberFormat() {
     NumberFormat nf = NumberFormat.getIntegerInstance(locale);
@@ -206,9 +211,21 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
 
   /**
    * Get a number formatter for the number of tasks for each node.
-   * @return a <code>NumberFormat</code> instance.
+   * @return a {@code NumberFormat} instance.
    */
   protected NumberFormat createDecimalNumberFormat() {
+    NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
+    nf.setGroupingUsed(true);
+    nf.setMinimumFractionDigits(1);
+    nf.setMaximumFractionDigits(1);
+    return nf;
+  }
+
+  /**
+   * Get a number formatter for values expressed in MB.
+   * @return a {@code NumberFormat} instance.
+   */
+  protected NumberFormat createMBFormat() {
     NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
     nf.setGroupingUsed(true);
     nf.setMinimumFractionDigits(1);

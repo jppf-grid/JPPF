@@ -123,7 +123,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case HEAP_MEM_MB:
             d = health.getHeapUsed();
-            res = d < 0d ? NA : nfInt.format(d / MB);
+            res = d < 0d ? NA : nfDec.format(d / MB);
             break;
           case NON_HEAP_MEM_PCT:
             d = health.getNonheapUsedRatio();
@@ -131,7 +131,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case NON_HEAP_MEM_MB:
             d = health.getNonheapUsed();
-            res = d < 0d ? NA : nfInt.format(d / MB);
+            res = d < 0d ? NA : nfDec.format(d / MB);
             break;
           case RAM_PCT:
             d = health.getRamUsedRatio();
