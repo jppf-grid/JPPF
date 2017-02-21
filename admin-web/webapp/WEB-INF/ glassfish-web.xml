@@ -21,7 +21,6 @@
   <context-root>/JPPFWebAdmin</context-root>
   <security-role-mapping>
     <role-name>jppf-admin</role-name>
-    <principal-name>jppfadmin</principal-name>
     <group-name>jppf-admin</group-name>
   </security-role-mapping>
   <security-role-mapping>

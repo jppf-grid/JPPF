@@ -18,7 +18,11 @@
 
 package org.jppf.admin.web;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.Model;
+import org.jppf.client.monitoring.topology.TopologyManager;
 
 /**
  * A the header panel.
@@ -30,5 +34,17 @@ public class FooterPanel extends Panel {
    */
   public FooterPanel() {
     super("jppf.footer");
+    int nbServers = 0, nbNodes = 0;
+    String user = JPPFWebSession.getSignedInUser();
+    WebMarkupContainer gridInfo = new WebMarkupContainer("jppf.footer.grid.info");
+    add(gridInfo);
+    if (user != null) {
+      TopologyManager mgr =JPPFWebConsoleApplication.get().getTopologyManager();
+      nbServers = mgr.getDriverCount();
+      nbNodes = mgr.getNodeCount();
+    }
+    gridInfo.add(new Label("jppf.footer.servers.value", Model.of(nbServers)));
+    gridInfo.add(new Label("jppf.footer.nodes.value", Model.of(nbNodes)));
+    gridInfo.setVisible(user != null);
   }
 }

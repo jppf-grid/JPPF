@@ -113,12 +113,12 @@
   <!-- =====================================================================-->
 
   <target name="war" depends="compile">
-    <echo message="creating the ${war.name}.war WAR file..." />
+    <echo message="creating the ${war.name}.war WAR file..."/>
     <war warfile="${build.dir}/${war.name}.war" webxml="${web.dir}/WEB-INF/web.xml">
       <manifest>
-        <attribute name="JPPF-Version" value="${version.number}" />
+        <attribute name="JPPF-Version" value="${version.number}"/>
         <attribute name="JPPF-Build" value="${build.number}" />
-        <attribute name="JPPF-BuildDate" value="${readable.now}" />
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
       </manifest>
       <classes dir="${classes.dir}"/>
       <lib dir="${lib.dir}">
@@ -133,20 +133,20 @@
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
     </war>
-    <echo message="${war.name}.war file created in '${build.dir}' directory" />
+    <echo message="${war.name}.war file created in '${build.dir}' directory"/>
   </target>
 
   <!-- ==================================================================== -->
   <!-- Build everything                                                     -->
   <!-- ==================================================================== -->
 
-  <target name="build" depends="war" />
+  <target name="build" depends="war"/>
   <target name="build.deploy.tomcat" depends="build, tomcat.deploy"/>
   <target name="tomcat.build.deploy.start" depends="build, tomcat.deploy, tomcat.start" description="generate and deploy the war file and start Tomcat"/>
   <target name="wildfly.build.deploy.start" depends="build, wildfly.deploy, wildfly.start" description="generate and deploy the war file and start Wildfly"/>
   <target name="glassfish.build.deploy.start" depends="build, glassfish.start, glassfish.deploy" description="generate and deploy the war file and start Glassfish"/>
   <target name="liberty.build.deploy.start" depends="build, liberty.deploy, liberty.start" description="generate and deploy the war file and start Liberty"/>
-  <target name="weblogic.build.deploy.start" depends="build, weblogic.deploy, weblogic.start" description="generate and deploy the war file and start Tomcat"/>
+  <target name="weblogic.build.deploy.start" depends="build, weblogic.deploy, weblogic.start" description="generate and deploy the war file and start Weblogic"/>
 
   <!-- =====================================================================-->
   <!-- Deployment and start/stop of various servers                         -->
@@ -156,7 +156,7 @@
 
   <target name="tomcat.deploy">
     <property name="tomcat.deploy.dir" value="${tomcat.dir}/webapps"/>
-    <copy todir="${tomcat.deploy.dir}" file="${build.dir}/${war.name}.war" />
+    <copy todir="${tomcat.deploy.dir}" file="${build.dir}/${war.name}.war"/>
   </target>
 
   <target name="tomcat.start" depends="prep">

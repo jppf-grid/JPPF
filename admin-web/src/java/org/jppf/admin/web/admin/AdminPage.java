@@ -20,10 +20,8 @@ package org.jppf.admin.web.admin;
 
 import java.util.*;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.jppf.admin.web.*;
-import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 import com.googlecode.wicket.jquery.ui.JQueryUIBehavior;
@@ -35,14 +33,6 @@ import com.googlecode.wicket.jquery.ui.JQueryUIBehavior;
 @MountPath(AbstractJPPFPage.PATH_PREFIX + "admin")
 @AuthorizeInstantiation("jppf-admin")
 public class AdminPage extends TemplatePage {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AdminPage.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * 
    */
@@ -56,11 +46,13 @@ public class AdminPage extends TemplatePage {
     add(ConfigType.CLIENT, new ClientConfigPanel());
     //add(new DiscoveryConfigPanel());
     add(ConfigType.SSL, new SSLConfigPanel());
+    /*
     if (adminLink != null) {
       if (debugEnabled) log.debug("setting style on the link");
       adminLink.add(new AttributeModifier("style", "color: #6D78B6; background-color: #C5D0F0"));
       adminLink.setEnabled(false);
     }
+    */
   }
 
   /**

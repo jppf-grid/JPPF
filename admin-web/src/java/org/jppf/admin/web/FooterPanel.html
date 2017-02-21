@@ -16,20 +16,30 @@
    limitations under the License.
 -->
 <html>
-<body>
-
-<wicket:panel xmlns:wicket="http://wicket.apache.org">
-  <div style="padding: 15px; border-top: 1px solid #6D78B6">
-    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="; border: none">
-      <tr>
-        <td align="left" valign="middle" >
-          <a href="http://www.jppf.org" target="_blank"><img src="images/logo-small.gif" alt="JPPF Home" style="box-shadow: 4px 4px 4px #6D78B6"/></a>
-        </td>
-        <td align="right" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2017 JPPF.org</td>
-      </tr>
-    </table>
-  </div>
-</wicket:panel>
-
-</body>
+  <body>
+    <wicket:panel xmlns:wicket="http://wicket.apache.org">
+      <div style="padding: 15px; border-top: 1px solid #6D78B6">
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="; border: none">
+          <tr>
+            <td align="left" valign="middle" >
+              <a href="http://www.jppf.org" target="_blank"><img src="images/logo-small.gif" alt="JPPF Home" style="box-shadow: 4px 4px 4px #6D78B6"/></a>
+            </td>
+            <td align="center" valign="middle">
+              <table wicket:id="jppf.footer.grid.info" align="left" class="gridinfo">
+                <tr>
+                  <td align="left" valign="middle"><wicket:message key="jppf.footer.servers.label"></wicket:message></td>
+                  <td align="right" valign="middle"><span wicket:id="jppf.footer.servers.value"></span><br/></td>
+                </tr>
+                <tr>
+                  <td align="left" valign="middle"><wicket:message key="jppf.footer.nodes.label"></wicket:message></td>
+                  <td align="right" valign="middle"><span wicket:id="jppf.footer.nodes.value"></span></td>
+                </tr>
+              </table>
+            </td>
+            <td align="right" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2017 JPPF.org</td>
+          </tr>
+        </table>
+      </div>
+    </wicket:panel>
+  </body>
 </html>

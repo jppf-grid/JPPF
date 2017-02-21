@@ -107,7 +107,8 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
       posToUuid.put(pos, driverUuid);
       uuidToPos.put(driverUuid, pos);
       pos++;
-      JPPFTableTree tableTree = (JPPFTableTree) target.getPage().get("table.tree");
+      //JPPFTableTree tableTree = (JPPFTableTree) target.getPage().get("table.tree");
+      JPPFTableTree tableTree = ((AbstractTableTreePage) target.getPage()).getTableTree();
       if (tableTree.getState(driver) == State.EXPANDED) {
         for (int j=0; j<driver.getChildCount(); j++) {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
