@@ -46,7 +46,6 @@
   <property name="wildfly8" value="Wildfly-8" />
   <property name="sunas" value="Glassfish" />
   <property name="weblogic" value="Weblogic" />
-  <property name="geronimo" value="Geronimo" />
 
   <!-- ==================================================================== -->
   <!--                           Classpath definitions                      -->
@@ -191,7 +190,6 @@
     <build.ear appserver="${sunas}" />
     <build.ear appserver="${was}" />
     <build.ear appserver="${weblogic}" />
-    <build.ear appserver="${geronimo}" />
     <!-- ***** add EAR generation for other application servers here  ***** -->
     <!-- ***** end of add other                                       ***** -->
     <echo message="EAR files created" />
@@ -265,7 +263,6 @@
     <rar appserver="${sunas}" />
     <rar appserver="${was}" />
     <rar appserver="${weblogic}" />
-    <rar appserver="${geronimo}" logging="log4j12" />
     <!-- ***** add RAR generation for other application servers here  ***** -->
     <!-- ***** end of add other                                       ***** -->
     <echo message="RAR files created" />

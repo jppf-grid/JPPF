@@ -79,12 +79,7 @@
   <!-- ==================================================================== -->
 
   <target name="build" depends="war"/>
-  <target name="build.run" depends="" description="build, run.geronimo, run.jboss"/>
-
-  <target name="run.geronimo" depends="build, geronimo.install, geronimo.start, geronimo.deploy.connector, geronimo.deploy.testwar" description="">
-    <run.tests appserver="geronimo" port="8080" contextroot="JPPF_J2EE_Tests"/>
-    <antcall target="geronimo.stop"/>
-  </target>
+  <target name="build.run" depends="" description="build, run.jboss"/>
 
   <target name="run.jboss" depends="build, jboss.install, jboss.deploy, jboss.start" description="">
     <run.tests appserver="jboss" port="8080" contextroot="JPPF_J2EE_Tests"/>
@@ -172,6 +167,5 @@
   <!-- ==================================================================== -->
 
   <import file="build-jboss.xml"/>
-  <import file="build-geronimo.xml"/>
 
 </project>
