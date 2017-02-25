@@ -19,6 +19,7 @@
 package org.jppf.node.protocol;
 
 import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a JPPF client for local execution of the job.
@@ -43,22 +44,15 @@ public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA 
   public JPPFJobClientSLA() {
   }
 
-  /**
-   * Initialize this job SLA with the specified execution policy.
-   * @param policy the tasks execution policy.
-   */
-  public JPPFJobClientSLA(final ExecutionPolicy policy) {
-    super(policy);
-  }
-
   @Override
   public int getMaxChannels() {
     return maxChannels;
   }
 
   @Override
-  public void setMaxChannels(final int maxChannels) {
+  public JobClientSLA setMaxChannels(final int maxChannels) {
     this.maxChannels = maxChannels > 0 ? maxChannels : Integer.MAX_VALUE;
+    return this;
   }
 
   /**
@@ -70,5 +64,20 @@ public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA 
     copyTo(sla);
     sla.setMaxChannels(maxChannels);
     return sla;
+  }
+
+  @Override
+  public JobClientSLA setExecutionPolicy(final ExecutionPolicy executionPolicy) {
+    return (JobClientSLA) super.setExecutionPolicy(executionPolicy);
+  }
+
+  @Override
+  public JobClientSLA setJobSchedule(final JPPFSchedule jobSchedule) {
+    return (JobClientSLA) super.setJobSchedule(jobSchedule);
+  }
+
+  @Override
+  public JobClientSLA setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
+    return (JobClientSLA) super.setJobExpirationSchedule(jobExpirationSchedule);
   }
 }

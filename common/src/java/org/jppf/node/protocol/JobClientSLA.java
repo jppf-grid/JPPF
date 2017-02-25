@@ -18,14 +18,15 @@
 
 package org.jppf.node.protocol;
 
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This interface represents the Service Level Agreement between a JPPF job and a JPPF client.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public interface JobClientSLA extends JobCommonSLA
-{
+public interface JobClientSLA extends JobCommonSLA {
   /**
    * Get the maximum number of channels, including the local execution channel if it is enabled, this job can be sent on.
    * @return the number of channels as an int value.
@@ -35,6 +36,16 @@ public interface JobClientSLA extends JobCommonSLA
   /**
    * Set the maximum number of channels, including the local execution channel if it is enabled, this job can be sent on.
    * @param maxChannels the number of channels as an int value. A value <= 0 means no limit on the number of channels.
+   * @return this SLA, for mathod chaining.
    */
-  void setMaxChannels(int maxChannels);
+  JobClientSLA setMaxChannels(int maxChannels);
+
+  @Override
+  JobClientSLA setExecutionPolicy(ExecutionPolicy executionPolicy);
+
+  @Override
+  JobClientSLA setJobSchedule(JPPFSchedule jobSchedule);
+
+  @Override
+  JobClientSLA setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
 }

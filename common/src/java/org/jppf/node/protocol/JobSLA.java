@@ -37,8 +37,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the priority of this job.
    * @param priority the priority as an int.
+   * @return this SLA, for mathod chaining.
    */
-  void setPriority(int priority);
+  JobSLA setPriority(int priority);
 
   /**
    * Get the maximum number of nodes this job can run on.
@@ -49,8 +50,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the maximum number of nodes this job can run on.
    * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+   * @return this SLA, for mathod chaining.
    */
-  void setMaxNodes(int maxNodes);
+  JobSLA setMaxNodes(int maxNodes);
 
   /**
    * Get the maximum number of groups of master/slaves nodes the job can be executed on at any given time.
@@ -65,9 +67,10 @@ public interface JobSLA extends JobCommonSLA {
    * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
    * @param maxNodeProvisioningGroups the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
    * Any value <= 0 will be ignored.
+   * @return this SLA, for mathod chaining.
    * @since 5.1
    */
-  void setMaxNodeProvisioningGroups(int maxNodeProvisioningGroups);
+  JobSLA setMaxNodeProvisioningGroups(int maxNodeProvisioningGroups);
 
   /**
    * Determine whether this job is initially suspended.
@@ -78,8 +81,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Specify whether this job is initially suspended.
    * @param suspended true if the job is suspended, false otherwise.
+   * @return this SLA, for mathod chaining.
    */
-  void setSuspended(boolean suspended);
+  JobSLA setSuspended(boolean suspended);
 
   /**
    * Determine whether the job is a broadcast job.
@@ -90,8 +94,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Specify whether the job is a broadcast job.
    * @param broadcastJob true for a broadcast job, false otherwise.
+   * @return this SLA, for mathod chaining.
    */
-  void setBroadcastJob(boolean broadcastJob);
+  JobSLA setBroadcastJob(boolean broadcastJob);
 
   /**
    * Determine whether the job should be canceled by the driver if the client gets disconnected.
@@ -102,8 +107,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Specify whether the job should be canceled by the driver if the client gets disconnected.
    * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
+   * @return this SLA, for mathod chaining.
    */
-  void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect);
+  JobSLA setCancelUponClientDisconnect(boolean cancelUponClientDisconnect);
 
   /**
    * Get the strategy used to return the results back to the client.
@@ -115,9 +121,10 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the strategy used to return the results back to the client.
    * @param name the name of the strategy to use.
+   * @return this SLA, for mathod chaining.
    * @exclude
    */
-  void setResultsStrategy(String name);
+  JobSLA setResultsStrategy(String name);
 
   /**
    * Get the class path associated with the job.
@@ -128,8 +135,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the class path associated with the job.
    * @param classpath an instance of {@link ClassPath}.
+   * @return this SLA, for mathod chaining.
    */
-  void setClassPath(ClassPath classpath);
+  JobSLA setClassPath(ClassPath classpath);
 
   /**
    * Get the expiration schedule for any subset of the job dispatched to a node.
@@ -140,8 +148,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the expiration schedule for any subset of the job dispatched to a node.
    * @param schedule a {@link JPPFSchedule} instance.
+   * @return this SLA, for mathod chaining.
    */
-  void setDispatchExpirationSchedule(JPPFSchedule schedule);
+  JobSLA setDispatchExpirationSchedule(JPPFSchedule schedule);
 
   /**
    * Get the number of times a dispatched task can expire before it is finally cancelled.
@@ -152,8 +161,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the number of times a dispatched task can expire before it is finally cancelled.
    * @param max the number of expirations as an int.
+   * @return this SLA, for mathod chaining.
    */
-  void setMaxDispatchExpirations(int max);
+  JobSLA setMaxDispatchExpirations(int max);
 
   /**
    * Get the naximum number of times a task can resubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
@@ -165,8 +175,9 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the naximum number of times a task can resubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
    * @param maxResubmits the maximum number of resubmits; a value of 0 or less means tasks in the job cannot be resubmitted.
+   * @return this SLA, for mathod chaining.
    */
-  void setMaxTaskResubmits(int maxResubmits);
+  JobSLA setMaxTaskResubmits(int maxResubmits);
 
   /**
    * Determine whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
@@ -179,9 +190,10 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Specify whether the max resubmits limit for tasks should also be applied when tasks are resubmitted due to a node error.
    * @param applyMaxResubmitsUponNodeError {@code true} to specify that the max resubmits count is applied upon node errors, {@code false} otherwise.
+   * @return this SLA, for mathod chaining.
    * @since 4.2
    */
-  void setApplyMaxResubmitsUponNodeError(boolean applyMaxResubmitsUponNodeError);
+  JobSLA setApplyMaxResubmitsUponNodeError(boolean applyMaxResubmitsUponNodeError);
 
   /**
    * Determine whether remote class loading is enabled for the job.
@@ -194,9 +206,10 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Specify whether remote class loading is enabled for the job.
    * @param enabled {@code true} to enable remote class loading, {@code false} to disable it.
+   * @return this SLA, for mathod chaining.
    * @since 4.2
    */
-  void setRemoteClassLoadingEnabled(boolean enabled);
+  JobSLA setRemoteClassLoadingEnabled(boolean enabled);
 
   /**
    * Get the global grid execution policy (which applies to the driver).
@@ -208,14 +221,16 @@ public interface JobSLA extends JobCommonSLA {
   /**
    * Set the global grid execution policy (which applies to the driver).
    * @param policy an {@link ExecutionPolicy} object.
+   * @return this SLA, for mathod chaining.
    * @since 5.2
    */
-  void setGridExecutionPolicy(ExecutionPolicy policy);
+  JobSLA setGridExecutionPolicy(ExecutionPolicy policy);
 
   /**
    * Get the configuration of the node(s) this job should be executed on,
    * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
    * @return the desired configuration as a {@link JPPFNodeConfigSpec} object.
+   * @since 5.2
    */
   JPPFNodeConfigSpec getDesiredNodeConfiguration();
 
@@ -223,6 +238,17 @@ public interface JobSLA extends JobCommonSLA {
    * Set the configuration of the node(s) this job should be executed on,
    * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
    * @param nodeConfigurationSpec the desired configuration as a {@link JPPFNodeConfigSpec} object.
+   * @return this SLA, for mathod chaining.
+   * @since 5.2
    */
-  void setDesiredNodeConfiguration(JPPFNodeConfigSpec nodeConfigurationSpec);
+  JobSLA setDesiredNodeConfiguration(JPPFNodeConfigSpec nodeConfigurationSpec);
+
+  @Override
+  JobSLA setExecutionPolicy(ExecutionPolicy executionPolicy);
+
+  @Override
+  JobSLA setJobSchedule(JPPFSchedule jobSchedule);
+
+  @Override
+  JobSLA setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
 }

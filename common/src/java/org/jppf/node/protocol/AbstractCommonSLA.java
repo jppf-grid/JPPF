@@ -51,22 +51,15 @@ public abstract class AbstractCommonSLA implements JobCommonSLA {
   public AbstractCommonSLA() {
   }
 
-  /**
-   * Initialize this job SLA with the specified execution policy.
-   * @param policy the tasks execution policy.
-   */
-  public AbstractCommonSLA(final ExecutionPolicy policy) {
-    this.executionPolicy = policy;
-  }
-
   @Override
   public ExecutionPolicy getExecutionPolicy() {
     return executionPolicy;
   }
 
   @Override
-  public void setExecutionPolicy(final ExecutionPolicy executionPolicy) {
+  public JobCommonSLA setExecutionPolicy(final ExecutionPolicy executionPolicy) {
     this.executionPolicy = executionPolicy;
+    return this;
   }
 
   @Override
@@ -75,8 +68,9 @@ public abstract class AbstractCommonSLA implements JobCommonSLA {
   }
 
   @Override
-  public void setJobSchedule(final JPPFSchedule jobSchedule) {
+  public JobCommonSLA setJobSchedule(final JPPFSchedule jobSchedule) {
     this.jobSchedule = jobSchedule;
+    return this;
   }
 
   @Override
@@ -85,8 +79,9 @@ public abstract class AbstractCommonSLA implements JobCommonSLA {
   }
 
   @Override
-  public void setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
+  public JobCommonSLA setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
     this.jobExpirationSchedule = jobExpirationSchedule;
+    return this;
   }
 
   /**

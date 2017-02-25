@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Interface for predefined JPPF properties expected to handle a specific balue type.
+ * Interface for predefined JPPF properties expected to handle a specific value type.
  * @param <T> the type of the value of this property.
  * @author Laurent Cohen
  * @since 5.2

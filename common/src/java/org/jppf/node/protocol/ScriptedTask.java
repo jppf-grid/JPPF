@@ -164,9 +164,11 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * Add the specified variable to the user-defined bindings.
    * @param name the name of the variable binding to add.
    * @param value the value of the variable.
+   * @return this task, for method chaining.
    */
-  public void addBinding(final String name, final Object value) {
+  public ScriptedTask<T>addBinding(final String name, final Object value) {
     bindings.put(name, value);
+    return this;
   }
 
   /**

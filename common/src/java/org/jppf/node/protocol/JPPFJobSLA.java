@@ -103,45 +103,15 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   public JPPFJobSLA() {
   }
 
-  /**
-   * Initialize this job SLA with the specified execution policy.
-   * @param policy the tasks execution policy.
-   */
-  public JPPFJobSLA(final ExecutionPolicy policy) {
-    this(policy, 0, Integer.MAX_VALUE, false);
-  }
-
-  /**
-   * Initialize this job SLA with the specified execution policy and priority.
-   * @param policy the tasks execution policy.
-   * @param priority the priority of this job.
-   */
-  public JPPFJobSLA(final ExecutionPolicy policy, final int priority) {
-    this(policy, priority, Integer.MAX_VALUE, false);
-  }
-
-  /**
-   * Initialize this job SLA with the specified execution policy, priority, max number of nodes and suspended indicator.
-   * @param policy the tasks execution policy.
-   * @param priority the priority of this job.
-   * @param maxNodes the maximum number of nodes this job can run on. A value <= 0 means no limit on the number of nodes.
-   * @param suspended determines whether this job is initially suspended.
-   */
-  public JPPFJobSLA(final ExecutionPolicy policy, final int priority, final int maxNodes, final boolean suspended) {
-    this.executionPolicy = policy;
-    this.priority = priority;
-    this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
-    this.suspended = suspended;
-  }
-
   @Override
   public int getPriority() {
     return priority;
   }
 
   @Override
-  public void setPriority(final int priority) {
+  public JobSLA setPriority(final int priority) {
     this.priority = priority;
+    return this;
   }
 
   @Override
@@ -150,26 +120,20 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setMaxNodes(final int maxNodes) {
+  public JobSLA setMaxNodes(final int maxNodes) {
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.1
-   */
   @Override
   public int getMaxNodeProvisioningGroupss() {
     return maxNodeProvisioningGroups;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.1
-   */
   @Override
-  public void setMaxNodeProvisioningGroups(final int maxNodeProvisioningGroups) {
+  public JobSLA setMaxNodeProvisioningGroups(final int maxNodeProvisioningGroups) {
     if (maxNodeProvisioningGroups > 0) this.maxNodeProvisioningGroups = maxNodeProvisioningGroups;
+    return this;
   }
 
   @Override
@@ -178,8 +142,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setSuspended(final boolean suspended) {
+  public JobSLA setSuspended(final boolean suspended) {
     this.suspended = suspended;
+    return this;
   }
 
   @Override
@@ -188,8 +153,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setBroadcastJob(final boolean broadcastJob) {
+  public JobSLA setBroadcastJob(final boolean broadcastJob) {
     this.broadcastJob = broadcastJob;
+    return this;
   }
 
   @Override
@@ -198,8 +164,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect) {
+  public JobSLA setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect) {
     this.cancelUponClientDisconnect = cancelUponClientDisconnect;
+    return this;
   }
 
   /**
@@ -226,8 +193,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setResultsStrategy(final String name) {
+  public JobSLA setResultsStrategy(final String name) {
     this.resultsStrategy = name;
+    return this;
   }
 
   @Override
@@ -236,9 +204,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setClassPath(final ClassPath classpath) {
+  public JobSLA setClassPath(final ClassPath classpath) {
     if (classpath == null) throw new IllegalArgumentException("classpath cannot be null");
     this.classPath = classpath;
+    return this;
   }
 
   @Override
@@ -247,8 +216,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setDispatchExpirationSchedule(final JPPFSchedule dispatchExpirationSchedule) {
+  public JobSLA setDispatchExpirationSchedule(final JPPFSchedule dispatchExpirationSchedule) {
     this.dispatchExpirationSchedule = dispatchExpirationSchedule;
+    return this;
   }
 
   @Override
@@ -257,8 +227,9 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setMaxDispatchExpirations(final int maxDispatchExpirations) {
+  public JobSLA setMaxDispatchExpirations(final int maxDispatchExpirations) {
     this.maxDispatchExpirations = maxDispatchExpirations;
+    return this;
   }
 
   @Override
@@ -267,79 +238,67 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   }
 
   @Override
-  public void setMaxTaskResubmits(final int maxResubmits) {
+  public JobSLA setMaxTaskResubmits(final int maxResubmits) {
     this.maxTaskResubmits = maxResubmits;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 4.2
-   */
   @Override
   public boolean isApplyMaxResubmitsUponNodeError() {
     return applyMaxResubmitsUponNodeError;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 4.2
-   */
   @Override
-  public void setApplyMaxResubmitsUponNodeError(final boolean applyMaxResubmitsUponNodeError) {
+  public JobSLA setApplyMaxResubmitsUponNodeError(final boolean applyMaxResubmitsUponNodeError) {
     this.applyMaxResubmitsUponNodeError = applyMaxResubmitsUponNodeError;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 4.2
-   */
   @Override
   public boolean isRemoteClassLoadingEnabled() {
     return remoteClassLoadingEnabled;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 4.2
-   */
   @Override
-  public void setRemoteClassLoadingEnabled(final boolean enabled) {
+  public JobSLA setRemoteClassLoadingEnabled(final boolean enabled) {
     this.remoteClassLoadingEnabled = enabled;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.2
-   */
   @Override
   public ExecutionPolicy getGridExecutionPolicy() {
     return gridExecutionPolicy;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.2
-   */
   @Override
-  public void setGridExecutionPolicy(final ExecutionPolicy gridExecutionPolicy) {
+  public JobSLA setGridExecutionPolicy(final ExecutionPolicy gridExecutionPolicy) {
     this.gridExecutionPolicy = gridExecutionPolicy;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.2
-   */
   @Override
   public JPPFNodeConfigSpec getDesiredNodeConfiguration() {
     return nodeConfigurationSpec;
   }
 
-  /**
-   * {@inheritDoc}
-   * @since 5.2
-   */
   @Override
-  public void setDesiredNodeConfiguration(final JPPFNodeConfigSpec nodeConfigurationSpec) {
+  public JobSLA setDesiredNodeConfiguration(final JPPFNodeConfigSpec nodeConfigurationSpec) {
     this.nodeConfigurationSpec = nodeConfigurationSpec;
+    return this;
+  }
+
+  @Override
+  public JobSLA setExecutionPolicy(final ExecutionPolicy executionPolicy) {
+    return (JobSLA) super.setExecutionPolicy(executionPolicy);
+  }
+
+  @Override
+  public JobSLA setJobSchedule(final JPPFSchedule jobSchedule) {
+    return (JobSLA) super.setJobSchedule(jobSchedule);
+  }
+
+  @Override
+  public JobSLA setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
+    return (JobSLA) super.setJobExpirationSchedule(jobExpirationSchedule);
   }
 }

@@ -94,17 +94,21 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> implements Cancellat
   /**
    * Set the delegate for the <code>onCancel()</code> method.
    * @param cancelCallback a {@link JPPFTaskCallback} instance.
+   * @return this task, for method chaining.
    */
-  public void setCancelCallback(final JPPFTaskCallback<Object> cancelCallback) {
+  public JPPFAnnotatedTask setCancelCallback(final JPPFTaskCallback<Object> cancelCallback) {
     this.cancelCallback = cancelCallback;
+    return this;
   }
 
   /**
    * Set the delegate for the <code>onTimeout()</code> method.
    * @param timeoutCallback a {@link JPPFTaskCallback} instance.
+   * @return this task, for method chaining.
    */
-  public void setTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback) {
+  public JPPFAnnotatedTask setTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback) {
     this.timeoutCallback = timeoutCallback;
+    return this;
   }
 
   @Override
@@ -127,12 +131,14 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> implements Cancellat
    * Override of {@link org.jppf.node.protocol.Task#setDataProvider(DataProvider) Task.setDataProvider(DataProvider)} to enable setting the data provider
    * onto tasks that are not subclasses of {@link org.jppf.node.protocol.Task Task} and which implement {@link DataProviderHolder}.
    * @param dataProvider the data provider to set onto the task.
+   * @return this task, for method chaining.
    */
   @Override
-  public void setDataProvider(final DataProvider dataProvider) {
+  public JPPFAnnotatedTask setDataProvider(final DataProvider dataProvider) {
     Object o = taskObjectWrapper.getTaskObject();
     if (o instanceof DataProviderHolder) ((DataProviderHolder) o).setDataProvider(dataProvider);
     else super.setDataProvider(dataProvider);
+    return this;
   }
 
   @Override

@@ -24,8 +24,7 @@ import java.util.*;
  * An implementation of the {@link Metadata} interface backed by a {@link Hashtable}.
  * @author Laurent Cohen
  */
-public class MetadataImpl implements Metadata
-{
+public class MetadataImpl implements Metadata {
   /**
    * The map holding the mapping of keys to values.
    */
@@ -33,47 +32,42 @@ public class MetadataImpl implements Metadata
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T getParameter(final Object key)
-  {
+  public <T> T getParameter(final Object key) {
     return (T) parameters.get(key);
   }
 
   @Override
-  public <T> T getParameter(final Object key, final T defaultValue)
-  {
+  public <T> T getParameter(final Object key, final T defaultValue) {
     @SuppressWarnings("unchecked")
     T res = (T) parameters.get(key);
     return res == null ? defaultValue : res;
   }
 
   @Override
-  public void setParameter(final Object key, final Object value)
-  {
+  public Metadata setParameter(final Object key, final Object value) {
     parameters.put(key, value);
+    return this;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T removeParameter(final Object key)
-  {
+  public <T> T removeParameter(final Object key) {
     return (T) parameters.remove(key);
   }
 
   @Override
-  public Map<Object, Object> getAll()
-  {
+  public Map<Object, Object> getAll() {
     return parameters;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append(parameters).toString();
   }
 
   @Override
-  public void clear()
-  {
+  public Metadata clear() {
     parameters.clear();
+    return this;
   }
 }

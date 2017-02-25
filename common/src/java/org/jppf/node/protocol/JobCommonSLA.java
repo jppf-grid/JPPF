@@ -28,8 +28,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public interface JobCommonSLA extends Serializable
-{
+public interface JobCommonSLA extends Serializable {
   /**
    * Get the tasks execution policy.
    * @return an <code>ExecutionPolicy</code> instance.
@@ -39,8 +38,9 @@ public interface JobCommonSLA extends Serializable
   /**
    * Set the tasks execution policy.
    * @param executionPolicy an <code>ExecutionPolicy</code> instance.
+   * @return this SLA, for mathod chaining.
    */
-  void setExecutionPolicy(ExecutionPolicy executionPolicy);
+  JobCommonSLA setExecutionPolicy(ExecutionPolicy executionPolicy);
 
   /**
    * Get the job schedule.
@@ -51,8 +51,9 @@ public interface JobCommonSLA extends Serializable
   /**
    * Set the job schedule.
    * @param jobSchedule a <code>JPPFSchedule</code> instance.
+   * @return this SLA, for mathod chaining.
    */
-  void setJobSchedule(JPPFSchedule jobSchedule);
+  JobCommonSLA setJobSchedule(JPPFSchedule jobSchedule);
 
   /**
    * Get the job expiration schedule configuration.
@@ -63,6 +64,7 @@ public interface JobCommonSLA extends Serializable
   /**
    * Set the job expiration schedule configuration.
    * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
+   * @return this SLA, for mathod chaining.
    */
-  void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
+  JobCommonSLA setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
 }

@@ -39,7 +39,7 @@ import org.jppf.utils.JPPFCallable;
  *   }
  * }
  * </pre>
- * @param <T> the type of results retrun by this task.
+ * @param <T> the type of results returned by this task.
  * @author Laurent Cohen
  * @since 4.0
  */
@@ -102,8 +102,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void setResult(final T result) {
+  public Task<T> setResult(final T result) {
     this.result = result;
+    return this;
   }
 
   @Override
@@ -112,8 +113,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void setThrowable(final Throwable throwable) {
+  public Task<T> setThrowable(final Throwable throwable) {
     this.throwable = throwable;
+    return this;
   }
 
   @Override
@@ -126,8 +128,9 @@ public class AbstractTask<T> implements Task<T> {
    * @exclude
    */
   @Override
-  public void setDataProvider(final DataProvider dataProvider) {
+  public Task<T> setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
+    return this;
   }
 
   @Override
@@ -136,8 +139,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void setId(final String id) {
+  public Task<T> setId(final String id) {
     this.id = id;
+    return this;
   }
 
   @Override
@@ -159,8 +163,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
+  public Task<T> setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
     this.timeoutSchedule = timeoutSchedule;
+    return this;
   }
 
   /**
@@ -177,8 +182,9 @@ public class AbstractTask<T> implements Task<T> {
    * @exclude
    */
   @Override
-  public void setPosition(final int position) {
+  public Task<T> setPosition(final int position) {
     this.position = position;
+    return this;
   }
 
   @Override
@@ -191,8 +197,9 @@ public class AbstractTask<T> implements Task<T> {
    * @exclude
    */
   @Override
-  public void setInNode(final boolean inNode) {
+  public Task<T> setInNode(final boolean inNode) {
     this.inNode = inNode;
+    return this;
   }
 
   @Override
@@ -220,8 +227,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void fireNotification(final Object userObject, final boolean sendViaJmx) {
+  public Task<T> fireNotification(final Object userObject, final boolean sendViaJmx) {
     if (executionDisptacher != null) executionDisptacher.fireTaskNotification(this, userObject, sendViaJmx);
+    return this;
   }
 
   /**
@@ -247,8 +255,9 @@ public class AbstractTask<T> implements Task<T> {
    * @since 4.1
    */
   @Override
-  public void setResubmit(final boolean resubmit) {
+  public Task<T> setResubmit(final boolean resubmit) {
     this.resubmit = resubmit;
+    return this;
   }
 
   @Override
@@ -257,8 +266,9 @@ public class AbstractTask<T> implements Task<T> {
   }
 
   @Override
-  public void setMaxResubmits(final int maxResubmits) {
+  public Task<T> setMaxResubmits(final int maxResubmits) {
     this.maxResubmits = maxResubmits;
+    return this;
   }
 
   /**
@@ -271,15 +281,6 @@ public class AbstractTask<T> implements Task<T> {
     Object o = getTaskObject();
     if (o == null) o = this;
     return o.getClass().getClassLoader();
-  }
-
-  @Override
-  public Exception getException() {
-    Throwable t = getThrowable();
-    if (t != null) {
-      return (t instanceof Exception) ? (Exception) t : new Exception(t);
-    }
-    return null;
   }
 
   @Override

@@ -104,6 +104,7 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * Specify whether the node should force a reset of the class loader before executing the tasks.
    * <p>This only applies when this classpath is empty. If it is not empty, then the reset will occur regardless the value of the specified flag.
    * @param forceReset <code>true</code> if the class loader reset should be forced, <code>false</code> otherwise.
+   * @return this classpath, for method chaining.
    */
-  void setForceClassLoaderReset(boolean forceReset);
+  ClassPath setForceClassLoaderReset(boolean forceReset);
 }

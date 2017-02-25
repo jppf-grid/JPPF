@@ -98,8 +98,9 @@ public class ClassPathImpl implements ClassPath {
   }
 
   @Override
-  public void setForceClassLoaderReset(final boolean forceClassLoaderReset) {
+  public ClassPath setForceClassLoaderReset(final boolean forceClassLoaderReset) {
     this.forceClassLoaderReset = forceClassLoaderReset;
+    return this;
   }
 
   @Override

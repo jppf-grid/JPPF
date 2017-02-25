@@ -17,6 +17,6 @@
  */
 
 /**
- * Unit tests for <code>org.jppf.io</code> code.
+ * Unit tests for {@code org.jppf.classloader} code.
  */
 package test.org.jppf.classloader;

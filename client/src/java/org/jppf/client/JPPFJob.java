@@ -94,9 +94,11 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   /**
    * Set the user-defined display name for this job.
    * @param name the display name as a string.
+   * @return this job, for method chaining.
    */
-  public void setName(final String name) {
+  public JPPFJob setName(final String name) {
     this.name = name;
+    return this;
   }
 
   /**
@@ -190,9 +192,11 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   /**
    * Set the container for data shared between tasks.
    * @param dataProvider a <code>DataProvider</code> instance.
+   * @return this job, for method chaining.
    */
-  public void setDataProvider(final DataProvider dataProvider) {
+  public JPPFJob setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
+    return this;
   }
 
   /**
@@ -206,9 +210,11 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   /**
    * Specify whether the execution of this job is blocking on the client side.
    * @param blocking true if the execution is blocking, false otherwise.
+   * @return this job, for method chaining.
    */
-  public void setBlocking(final boolean blocking) {
+  public JPPFJob setBlocking(final boolean blocking) {
     this.blocking = blocking;
+    return this;
   }
 
   @Override
@@ -281,9 +287,11 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * Set the persistence manager that enables saving and restoring the state of this job.
    * @param persistenceManager a {@link JobPersistence} instance.
    * @param <T> the type of the keys used by the persistence manager.
+   * @return this job, for method chaining.
    */
-  public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager) {
+  public <T> JPPFJob setPersistenceManager(final JobPersistence<T> persistenceManager) {
     this.persistenceManager = persistenceManager;
+    return this;
   }
 
   @Override

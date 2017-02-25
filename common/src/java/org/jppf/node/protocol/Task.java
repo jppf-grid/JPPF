@@ -38,8 +38,9 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Set the result of the task execution.
    * @param  result the result of this task's execution.
+   * @return this task, for method chaining.
    */
-  void setResult(T result);
+  Task<T> setResult(T result);
 
   /**
    * Get the Throwable that was raised by this task's execution.
@@ -49,19 +50,13 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   Throwable getThrowable();
 
   /**
-   * Get the {@code Throwable} that was raised by this task's execution, wrapped in an Exception.
-   * @return a <code>Exception</code> instance, or {@code null} if no exception was raised.
-   * @since 5.0
-   */
-  Exception getException();
-
-  /**
    * Sets the Throwable that was raised by this task's execution in the <code>run()</code> method.
    * The Throwable is normally set by the JPPF framework.
    * @param throwable a <code>Throwable</code> instance.
+   * @return this task, for method chaining.
    * @since 4.0
    */
-  void setThrowable(Throwable throwable);
+  Task<T> setThrowable(Throwable throwable);
 
   /**
    * Get the provider of shared data for this task.
@@ -72,9 +67,10 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Set the provider of shared data for this task.
    * @param dataProvider a <code>DataProvider</code> instance.
+   * @return this task, for method chaining.
    * @exclude
    */
-  void setDataProvider(DataProvider dataProvider);
+  Task<T> setDataProvider(DataProvider dataProvider);
 
   /**
    * Get the user-assigned id for this task.
@@ -85,8 +81,9 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Set the user-assigned id for this task.
    * @param id the id as a string.
+   * @return this task, for method chaining.
    */
-  void setId(String id);
+  Task<T> setId(String id);
 
   /**
    * Callback invoked when this task is cancelled.
@@ -117,8 +114,9 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Get the task timeout schedule configuration.
    * @param timeoutSchedule a <code>JPPFSchedule</code> instance.
+   * @return this task, for method chaining.
    */
-  void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
+  Task<T> setTimeoutSchedule(JPPFSchedule timeoutSchedule);
 
   /**
    * Returns the position of this task in the job in which it was submitted.
@@ -130,9 +128,10 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Set the position of this task in the job in which it was submitted.
    * @param position the position of this task as an <code>int</code>.
+   * @return this task, for method chaining.
    * @exclude
    */
-  void setPosition(int position);
+  Task<T> setPosition(int position);
 
   /**
    * Determine whether this task is executing within a node, or locally on the client side.
@@ -143,9 +142,10 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Determine whether this task is executing within a node, or locally on the client side.
    * @param inNode <code>true</code> if this task is executing in a node, <code>false</code> if it is on the client side.
+   * @return this task, for method chaining.
    * @exclude
    */
-  void setInNode(boolean inNode);
+  Task<T> setInNode(boolean inNode);
 
   /**
    * Compute a value on the client-side, as the result of the execution of a {@link JPPFCallable}.
@@ -168,9 +168,10 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
    * @param userObject a user-defined object to send as part of the notification.
    * @param sendViaJmx if <code>true</code> then also send the notification via the JMX MBean, otherwise only send to local listeners.
    * If the task is executing within a client local executor, this parameter has no effect. 
+   * @return this task, for method chaining.
    * @since 4.0
    */
-  void fireNotification(Object userObject, boolean sendViaJmx);
+  Task<T> fireNotification(Object userObject, boolean sendViaJmx);
 
   /**
    * Determine whether this task should be resubmitted by the server.
@@ -182,9 +183,10 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Specify whether this task should be resubmitted by the server.
    * @param resubmit {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * @return this task, for method chaining.
    * @since 4.2
    */
-  void setResubmit(final boolean resubmit);
+  Task<T> setResubmit(final boolean resubmit);
 
   /**
    * Get the maximum number of times a task can resubmit itself.
@@ -198,8 +200,9 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
    * If the specified value is greater than or equal to zero, it will override
    * the job-wide value provided by {@link JobSLA#getMaxTaskResubmits()}.
    * @param maxResubmits the maximum number of resubmits.
+   * @return this task, for method chaining.
    */
-  void setMaxResubmits(int maxResubmits);
+  Task<T> setMaxResubmits(int maxResubmits);
 
   /**
    * Get the class loader used to load this task, or the object it wraps if any.

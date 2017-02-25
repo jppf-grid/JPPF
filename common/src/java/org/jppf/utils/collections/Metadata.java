@@ -49,8 +49,9 @@ public interface Metadata extends Serializable
    * If a parameter with the same key already exists, its value is replaced with the new one.
    * @param key the parameter's key.
    * @param value the parameter's value.
+   * @return this metadata object, for method chaining.
    */
-  void setParameter(Object key, Object value);
+  Metadata setParameter(Object key, Object value);
 
   /**
    * Remove a parameter from the metadata.
@@ -68,6 +69,7 @@ public interface Metadata extends Serializable
 
   /**
    * Clear the underlying map.
+   * @return this metadata object, for method chaining.
    */
-  void clear();
+  Metadata clear();
 }
