@@ -33,11 +33,11 @@ abstract class AbstractJobConfiguration implements JobConfiguration {
   /**
    * The service level agreement between the job and the server.
    */
-  private JobSLA jobSLA = new JPPFJobSLA();
+  private JobSLA jobSLA = new JobSLA();
   /**
    * The service level agreement between the job and the server.
    */
-  private JobClientSLA jobClientSLA = new JPPFJobClientSLA();
+  private JobClientSLA jobClientSLA = new JobClientSLA();
   /**
    * The user-defined metadata associated with this job.
    */

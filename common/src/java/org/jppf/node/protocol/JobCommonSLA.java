@@ -26,45 +26,100 @@ import org.jppf.scheduling.JPPFSchedule;
 /**
  * This interface represents the Service Level Agreement between a JPPF job and a server.
  * It determines the state, conditions and order in which a job will be executed.
+ * @param <T> the type of SLA.
  * @author Laurent Cohen
  */
-public interface JobCommonSLA extends Serializable {
+@SuppressWarnings("unchecked")
+public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The tasks execution policy.
+   */
+  ExecutionPolicy executionPolicy = null;
+  /**
+   * The job start schedule configuration.
+   */
+  JPPFSchedule jobSchedule = null;
+  /**
+   * The job expiration schedule configuration.
+   */
+  JPPFSchedule jobExpirationSchedule = null;
+
+  /**
+   * Default constructor.
+   * @exclude
+   */
+  public JobCommonSLA() {
+  }
+
   /**
    * Get the tasks execution policy.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  ExecutionPolicy getExecutionPolicy();
+  public ExecutionPolicy getExecutionPolicy() {
+    return executionPolicy;
+  }
 
   /**
    * Set the tasks execution policy.
    * @param executionPolicy an <code>ExecutionPolicy</code> instance.
    * @return this SLA, for mathod chaining.
    */
-  JobCommonSLA setExecutionPolicy(ExecutionPolicy executionPolicy);
+  public T setExecutionPolicy(final ExecutionPolicy executionPolicy) {
+    this.executionPolicy = executionPolicy;
+    return (T) this;
+  }
 
   /**
    * Get the job schedule.
    * @return a <code>JPPFSchedule</code> instance.
    */
-  JPPFSchedule getJobSchedule();
+  public JPPFSchedule getJobSchedule() {
+    return jobSchedule;
+  }
 
   /**
    * Set the job schedule.
    * @param jobSchedule a <code>JPPFSchedule</code> instance.
    * @return this SLA, for mathod chaining.
    */
-  JobCommonSLA setJobSchedule(JPPFSchedule jobSchedule);
+  public T setJobSchedule(final JPPFSchedule jobSchedule) {
+    this.jobSchedule = jobSchedule;
+    return (T) this;
+  }
 
   /**
    * Get the job expiration schedule configuration.
    * @return a {@link JPPFSchedule} instance.
    */
-  JPPFSchedule getJobExpirationSchedule();
+  public JPPFSchedule getJobExpirationSchedule() {
+    return jobExpirationSchedule;
+  }
 
   /**
    * Set the job expiration schedule configuration.
    * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
    * @return this SLA, for mathod chaining.
    */
-  JobCommonSLA setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
+  public T setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
+    this.jobExpirationSchedule = jobExpirationSchedule;
+    return (T) this;
+  }
+
+  /**
+   * Create a copy of this job SLA.
+   * @param sla a {@link JobCommonSLA} into which to copy the attributes of this instance.
+   * @return a {@link JobCommonSLA} instance.
+   * @exclude
+   */
+  protected T copyTo(final T sla) {
+    sla.setExecutionPolicy(executionPolicy);
+    sla.setJobExpirationSchedule(jobExpirationSchedule);
+    sla.setJobSchedule(jobSchedule);
+    //sla.setPriority(priority);
+    return sla;
+  }
 }

@@ -62,11 +62,11 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * The service level agreement between the job and the server.
    */
-  JobSLA jobSLA = new JPPFJobSLA();
+  JobSLA jobSLA = new JobSLA();
   /**
    * The service level agreement on the client side.
    */
-  JobClientSLA jobClientSLA = new JPPFJobClientSLA();
+  JobClientSLA jobClientSLA = new JobClientSLA();
   /**
    * The user-defined metadata associated with this job.
    */

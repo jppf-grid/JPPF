@@ -218,8 +218,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       if ((uuid != null) && (uuid.length() > 0) && uuidSet.add(uuid)) {
         ClientJob newBundle = clientJob.createBroadcastJob(uuid);
         JPPFManagementInfo info = connection.getManagementInfo();
-        newBundle.setClientSLA(((JPPFJobClientSLA) bundle.getClientSLA()).copy());
-        newBundle.setSLA(((JPPFJobSLA) sla).copy());
+        newBundle.setClientSLA(bundle.getClientSLA().copy());
+        newBundle.setSLA(sla.copy());
         newBundle.setMetadata(bundle.getMetadata());
         newBundle.setName(bundle.getName() + " [driver: " + info.toString() + ']');
         newBundle.setUuid(JPPFUuid.normalUUID());

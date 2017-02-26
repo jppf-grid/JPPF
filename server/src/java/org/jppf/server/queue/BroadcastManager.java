@@ -205,7 +205,7 @@ public class BroadcastManager {
           ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
           if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
           ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
-          newBundle.setSLA(((JPPFJobSLA) sla).copy());
+          newBundle.setSLA(sla.copy());
           newBundle.setMetadata(broadcastJob.getMetadata());
           newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
           newBundle.setName(broadcastJob.getName() + " [node: " + info.toString() + ']');
