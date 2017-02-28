@@ -27,6 +27,7 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseTest;
 
@@ -35,6 +36,10 @@ import test.org.jppf.test.setup.BaseTest;
  * @author Laurent Cohen
  */
 public class BaseTestHelper {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger("TEST");
   /**
    * Message used for successful task execution.
    */
@@ -51,10 +56,10 @@ public class BaseTestHelper {
    * @return a <code>constructor</code> instance.
    * @throws Exception if any error occurs if a construcotr could not be found.
    */
-  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception {
-    Constructor[] constructors = taskClass.getConstructors();
-    Constructor constructor = null;
-    for (Constructor c: constructors) {
+  public static Constructor<?> findConstructor(final Class<?> taskClass, final int nbParams) throws Exception {
+    Constructor<?>[] constructors = taskClass.getConstructors();
+    Constructor<?> constructor = null;
+    for (Constructor<?> c: constructors) {
       if (c.getParameterTypes().length == nbParams) {
         constructor = c;
         break;
@@ -76,9 +81,9 @@ public class BaseTestHelper {
    */
   public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception {
     int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Constructor<?> constructor = findConstructor(taskClass, nbArgs);
     Object o = constructor.newInstance(params);
-    if (o instanceof Task) ((Task) o).setId(id);
+    if (o instanceof Task) ((Task<?>) o).setId(id);
     return o;
   }
 
@@ -99,7 +104,7 @@ public class BaseTestHelper {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Constructor<?> constructor = findConstructor(taskClass, nbArgs);
     // 0 padding of task number
     int nbDigits = Integer.toString(nbTasks).length();
     String format = "%s-task %0" + nbDigits + "d";
@@ -171,7 +176,7 @@ public class BaseTestHelper {
   }
 
   /**
-   * Print a formatted to the server log via the server debug mbean on all connected servers.
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
    * @param client JPPF client holding the server connections.
    * @param toServers whether to log to the discovered servers.
    * @param toNodes whether to log to the nodes attached to the discovered servers.
@@ -179,16 +184,47 @@ public class BaseTestHelper {
    * @param params the parameters of the message.
    */
   public static void printToServersAndNodes(final JPPFClient client, final boolean toServers, final boolean toNodes, final String format, final Object...params) {
+    printToAll(client, false, toServers, toNodes, true, format, params);
+  }
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param client JPPF client holding the server connections.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToAll(final JPPFClient client, final boolean decorate, final String format, final Object...params) {
+    printToAll(client, true, true, true, decorate, format, params);
+  }
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param client JPPF client holding the server connections.
+   * @param toClient whether to log to the client log.
+   * @param toServers whether to log to the discovered servers.
+   * @param toNodes whether to log to the nodes attached to the discovered servers.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToAll(final JPPFClient client, final boolean toClient, final boolean toServers, final boolean toNodes,
+    final boolean decorate, final String format, final Object...params) {
     if (!toServers && !toNodes) return;
     List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
-    //System.out.println("printToServers() : pools = " + pools);
     String fmt = String.format("%s %s %s", STARS, format, STARS);
     String msg = String.format(fmt, params);
     StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
     for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
-    String s = sb.append(' ').append(STARS).toString();
-    String[] messages = { s, msg, s };
+    String[] messages = { msg };
+    if (decorate) {
+      String s = sb.append(' ').append(STARS).toString();
+      messages = new String[] { s, msg, s };
+    }
+    if (toClient) {
+      for (String s: messages) log.info(s);
+    }
     for (JPPFConnectionPool pool: pools) {
       List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
       if (!jmxConnections.isEmpty()) {
@@ -197,7 +233,8 @@ public class BaseTestHelper {
           try {
             jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
           } catch (Exception e) {
-            System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n", BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
+            System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n",
+              BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
           }
         }
         if (toNodes) {

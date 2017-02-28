@@ -48,7 +48,7 @@ public class BaseTest {
     public boolean accept(final File path) {
       if (path.isDirectory()) return false;
       String s = path.getName();
-      return (s != null) && s.endsWith(".log") && !s.startsWith("jppf-client");
+      return (s != null) && s.endsWith(".log");
     }
   };
   /**
@@ -68,7 +68,7 @@ public class BaseTest {
   };
 
   /**
-   * Zip the drivers and nodes log files into the file {@code logs/<className>.zip}.
+   * Zip all log files into the file {@code logs/<className>.zip}.
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
@@ -156,6 +156,7 @@ public class BaseTest {
   public static class BaseTestClassWatcher extends TestWatcher {
     @Override
     protected void starting(final Description description) {
+      // redirect System.out and System.err to files
       stdOut = System.out;
       stdErr = System.err;
       try {
@@ -180,6 +181,7 @@ public class BaseTest {
       print("***** finished class %s *****", description.getClassName());
       zipLogs(description.getClassName());
       try {
+        // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) System.setOut(stdOut);
         if ((stdErr != null) && (stdErr != System.err)) System.setErr(stdErr);
       } catch (Exception e) {

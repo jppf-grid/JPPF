@@ -81,9 +81,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   public void testCancelJob() throws Exception {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
     client.submitJob(job);
-    listener.await(JobEventType.JOB_DISPATCHED);
+    listener.await();
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());

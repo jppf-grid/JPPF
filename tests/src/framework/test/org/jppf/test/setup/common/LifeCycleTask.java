@@ -76,14 +76,6 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   protected boolean interrupted = false;
   /**
-   * Job metadata that can optionally be set onto the task by a node lifecycle listener.
-   */
-  protected JobMetadata metadata;
-  /**
-   * Whether to set the job metadata onto this task.
-   */
-  protected boolean fetchMetadata = false;
-  /**
    * A message to send via JMX.
    */
   protected String startNotification;
@@ -125,8 +117,7 @@ public class LifeCycleTask extends AbstractTask<String> {
 
   @Override
   public void run() {
-    // System.nanoTime() has a different origin on different JVM instances
-    // so this value can't be used to compute the start time., null, null
+    // System.nanoTime() has a different origin on different JVM instances, thus it can't be used to compute the start time
     long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
     //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);

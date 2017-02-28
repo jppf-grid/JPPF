@@ -89,9 +89,9 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(true);
     job.getSLA().setSuspended(true);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_QUEUED);
     client.submitJob(job);
-    listener.await(JobEventType.JOB_QUEUED);
+    listener.await();
     try {
       client.close();
     } finally {
@@ -113,10 +113,10 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
     client.submitJob(job);
     long start = System.nanoTime();
-    listener.await(JobEventType.JOB_DISPATCHED);
+    listener.await();
     try {
       client.close();
     } finally {

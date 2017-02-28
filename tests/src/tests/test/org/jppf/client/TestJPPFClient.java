@@ -108,10 +108,10 @@ public class TestJPPFClient extends Setup1D1N {
     String name = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
       JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L);
       client.submitJob(job);
-      listener.await(JobEventType.JOB_DISPATCHED);
+      listener.await();
       client.cancelJob(job.getUuid());
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);

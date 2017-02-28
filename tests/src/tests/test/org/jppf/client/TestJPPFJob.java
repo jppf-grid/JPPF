@@ -87,10 +87,10 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancel() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
       int nbTasks = 10;
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
       client.submitJob(job);
-      listener.await(JobEventType.JOB_DISPATCHED);
+      listener.await();
       boolean cancelled = job.cancel(true);
       assertTrue(cancelled);
       List<Task<?>> results = job.get();
@@ -115,10 +115,10 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancelWithInterruptFlagFalse() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
       int nbTasks = 1;
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
       client.submitJob(job);
-      listener.await(JobEventType.JOB_DISPATCHED);
+      listener.await();
       boolean cancelled = job.cancel(false);
       assertFalse(cancelled);
       List<Task<?>> results = job.get();
