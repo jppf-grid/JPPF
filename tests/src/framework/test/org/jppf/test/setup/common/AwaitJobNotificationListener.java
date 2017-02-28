@@ -23,6 +23,7 @@ import javax.management.*;
 import org.jppf.client.JPPFClient;
 import org.jppf.job.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseSetup;
 
@@ -31,24 +32,40 @@ import test.org.jppf.test.setup.BaseSetup;
  */
 public class AwaitJobNotificationListener implements NotificationListener {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AwaitJobNotificationListener.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The expected event.
    */
-  private JobEventType expectedEvent = JobEventType.JOB_DISPATCHED;
+  private final JobEventType expectedEvent;
   /**
-   * 
+   * Whether the epxcted event has been received.
+   */
+  private boolean eventReceived;
+  /**
+   * P'roxy to the job management MBean.
    */
   private final DriverJobManagementMBean jobManager;
   /**
    * Whether this listener was unregistered from the {@code await()} method.
    */
-  private boolean listenerRemoved = false;
+  private boolean listenerRemoved;
 
   /**
    * 
    * @param client the JPPF client.
+   * @param eventType the type of event to wait for.
    * @throws Exception if any error occurs.
    */
-  public AwaitJobNotificationListener(final JPPFClient client) throws Exception {
+  public AwaitJobNotificationListener(final JPPFClient client, final JobEventType eventType) throws Exception {
+    this.expectedEvent = eventType;
+    this.eventReceived = false;
+    this.listenerRemoved = false;
     jobManager = BaseSetup.getJobManagementProxy(client);
     jobManager.addNotificationListener(this, null, null);
   }
@@ -56,9 +73,15 @@ public class AwaitJobNotificationListener implements NotificationListener {
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     JobNotification jobNotif = (JobNotification) notification;
+    JobInformation jobInfo = jobNotif.getJobInformation();
+    if (debugEnabled) log.debug("job {} received event {}", jobInfo.getJobName(), jobNotif.getEventType());
     try {
       synchronized(this) {
-        if (jobNotif.getEventType() == expectedEvent) notifyAll();
+        if (jobNotif.getEventType() == expectedEvent) {
+          if (debugEnabled) log.debug("job {} received expected event {}", jobInfo.getJobName(), expectedEvent);
+          eventReceived = true;
+          notifyAll();
+        }
       }
     } catch (Exception ignore) {
       ignore.printStackTrace();
@@ -66,15 +89,15 @@ public class AwaitJobNotificationListener implements NotificationListener {
   }
 
   /**
-   * Await the specified event.
-   * @param eventType the type of event to wait for.
+   * Wait for the specified event.
    * @throws Exception if any error occurs.
    */
-  public synchronized void await(final JobEventType eventType) throws Exception {
-    this.expectedEvent = eventType;
-    wait();
+  public synchronized void await() throws Exception {
+    while (!eventReceived) wait(100L);
+    if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
     jobManager.removeNotificationListener(this);
     listenerRemoved = true;
+    wait(100L);
   }
 
   /**

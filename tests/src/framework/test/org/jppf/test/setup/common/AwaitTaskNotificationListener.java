@@ -23,6 +23,7 @@ import javax.management.*;
 import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseSetup;
 
@@ -31,9 +32,21 @@ import test.org.jppf.test.setup.BaseSetup;
  */
 public class AwaitTaskNotificationListener implements NotificationListener {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AwaitTaskNotificationListener.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * A message we expect to receive as a notification.
    */
   private final String expectedMessage;
+  /**
+   * Whether the expected message was received as a task notification.
+   */
+  private boolean receivedMessage;
   /**
    *
    */
@@ -61,7 +74,9 @@ public class AwaitTaskNotificationListener implements NotificationListener {
     TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     Object data = actualNotif.getUserData();
     if (expectedMessage.equals(data)) {
+      if (debugEnabled) log.debug("received expected task notification {}", expectedMessage);
       synchronized(this) {
+        receivedMessage = true;
         notifyAll();
       }
     }
@@ -73,7 +88,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
    */
   public synchronized void await() throws Exception {
     if (listenerId != null) {
-      wait();
+      while (!receivedMessage) wait(100L);
       jmx.unregisterForwardingNotificationListener(listenerId);
       listenerId = null;
     }

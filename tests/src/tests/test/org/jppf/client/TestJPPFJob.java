@@ -75,6 +75,8 @@ public class TestJPPFJob extends Setup1D1N {
       client.submitJob(job);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
+    } finally {
+      BaseSetup.resetClientConfig();
     }
   }
 
@@ -88,10 +90,10 @@ public class TestJPPFJob extends Setup1D1N {
       BaseSetup.checkDriverAndNodesInitialized(client, BaseSetup.nbDrivers(), BaseSetup.nbNodes(), true);
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", ReflectionUtils.getCurrentMethodName());
       int nbTasks = 10;
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
       client.submitJob(job);
-      listener.await(JobEventType.JOB_DISPATCHED);
+      listener.await();
       boolean cancelled = job.cancel(true);
       assertTrue(cancelled);
       List<Task<?>> results = job.get();
@@ -119,10 +121,10 @@ public class TestJPPFJob extends Setup1D1N {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", method);
       try {
         int nbTasks = 1;
-        AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
         JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+        AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
         client.submitJob(job);
-        listener.await(JobEventType.JOB_DISPATCHED);
+        listener.await();
         boolean cancelled = job.cancel(false);
         assertFalse(cancelled);
         List<Task<?>> results = job.get();

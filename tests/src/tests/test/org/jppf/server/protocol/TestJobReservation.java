@@ -151,9 +151,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
-    jobNotificationListener = new AwaitJobNotificationListener(client);
+    jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
     client.submitJob(job);
-    jobNotificationListener.await(JobEventType.JOB_RETURNED);
+    jobNotificationListener.await();
     job.cancel();
     List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
@@ -197,9 +197,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
-    jobNotificationListener = new AwaitJobNotificationListener(client);
+    jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
     client.submitJob(job);
-    jobNotificationListener.await(JobEventType.JOB_RETURNED);
+    jobNotificationListener.await();
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
     jmx.getJobManager().updateJobs(new JobUuidSelector(job.getUuid()), job.getSLA(), null);
     List<Task<?>> result = job.awaitResults();

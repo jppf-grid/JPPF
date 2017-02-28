@@ -47,7 +47,6 @@ public class BaseTest {
       if (path.isDirectory()) return false;
       String s = path.getName();
       return (s != null) && s.endsWith(".log");
-      //return (s != null) && s.endsWith(".log") && !s.startsWith("jppf-client");
     }
   };
   /** */
@@ -67,7 +66,7 @@ public class BaseTest {
   private static final SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss.SSS");
 
   /**
-   * Zip the drivers and nodes log files into the file {@code logs/<className>.zip}.
+   * Zip all log files into the file {@code logs/<className>.zip}.
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
@@ -161,13 +160,13 @@ public class BaseTest {
       File[] logFiles = dir.listFiles(logFileFilter);
       if (logFiles != null) {
         for (File file: logFiles) {
-          //if (!file.getName().startsWith("std_") && file.exists()) {
           if (file.exists()) {
             if (!file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
           }
         }
       }
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
+      // redirect System.out and System.err to files
       stdOut = System.out;
       stdErr = System.err;
       try {
@@ -183,6 +182,7 @@ public class BaseTest {
     protected void finished(final Description description) {
       print("***** finished class %s *****", description.getClassName());
       try {
+        // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) {
           PrintStream tmp = System.out;
           System.setOut(stdOut);

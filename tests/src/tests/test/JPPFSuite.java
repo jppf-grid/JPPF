@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.serialization.TestJPPF;
+import test.org.jppf.client.TestJPPFJob;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,6 +28,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=2, shuffleClasses=false, shuffleMethods=true, classes={ TestJPPF.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes={ TestJPPFJob.class })
 public class JPPFSuite {
 }
