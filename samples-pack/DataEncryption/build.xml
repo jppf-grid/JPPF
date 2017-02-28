@@ -29,6 +29,7 @@
 	<property name="classes.dir" value="${basedir}/classes"/>	
 	<property name="src.dir"     value="${basedir}/src"/>
 	<property name="javadoc"     value="${basedir}/javadoc"/>
+  <property name="build.sysclasspath" value="last"/>
 
 	<!-- the keystore password in clear, will be encoded in Base64 and stored in a password file -->
 	<property name="password"    value="myPassword"/>

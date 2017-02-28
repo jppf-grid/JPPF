@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.*;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.data.transform.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.*;
@@ -109,7 +108,7 @@ public final class IOHelper {
   public static DataLocation readData(final InputSource source) throws Exception {
     int n = source.readInt();
     if (n == 0) return null;
-    if (traceEnabled) log.trace("read data size = " + nf.format(n));
+    if (traceEnabled) log.trace("read data size = {}", nf.format(n));
     DataLocation dl = createDataLocationMemorySensitive(n);
     dl.transferFrom(source, true);
     return dl;
@@ -211,65 +210,9 @@ public final class IOHelper {
    */
   public static Object unwrappedData(final DataLocation dl, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("unwrapping " + dl);
-    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-    InputStream is = null;
-    if (transform != null) {
-      int size = dl.getSize();
-      if (fitsInMemory(size)) {
-        try {
-          is = unwrapData(transform, dl);
-        } catch(OutOfMemoryError oome) {
-          if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
-        } finally {
-          footprint.addAndGet(-size);
-        }
-      }
-      if (is == null) is = unwrapDataToFile(transform, dl);
-    } else is = dl.getInputStream();
-    try {
+    try (InputStream is = dl.getInputStream()) {
       return ser.deserialize(is);
-    } finally {
-      StreamUtils.close(is);
     }
-  }
-
-  /**
-   * Apply a {@link JPPFDataTransform} to the specified source and store the results in memory.
-   * @param transform the {@link JPPFDataTransform} to apply.
-   * @param source the source data to transform.
-   * @return the transformed data as an <code>InputStream</code>.
-   * @throws Exception if an error occurs while preparing the data.
-   */
-  public static InputStream unwrapData(final JPPFDataTransform transform, final DataLocation source) throws Exception {
-    if (traceEnabled) log.trace("unwrapping to memory " + source);
-    MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-    InputStream is = source.getInputStream();
-    try {
-      transform.unwrap(is, mbos);
-    } finally {
-      StreamUtils.close(is);
-    }
-    return new MultipleBuffersInputStream(mbos.toBufferList());
-  }
-
-  /**
-   * Apply a {@link JPPFDataTransform} to the specified source and store the results in a temporary file.
-   * @param transform the {@link JPPFDataTransform} to apply.
-   * @param source the source data to transform.
-   * @return the transformed data as a <code>File</code>.
-   * @throws Exception if an error occurs while preparing the data.
-   */
-  public static InputStream unwrapDataToFile(final JPPFDataTransform transform, final DataLocation source) throws Exception {
-    if (traceEnabled) log.trace("unwrapping to file " + source);
-    File file = IOHelper.createTempFile(-1);
-    OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-    InputStream is = source.getInputStream();
-    try {
-      transform.unwrap(source.getInputStream(), os);
-    } finally {
-      StreamUtils.close(is);
-    }
-    return new BufferedInputStream(new FileInputStream(file));
   }
 
   /**
@@ -324,16 +267,9 @@ public final class IOHelper {
    */
   public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to memory " + o);
-    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
     NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
     ser.serialize(o, nos);
-    if (transform != null) {
-      MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
-      mbos = new MultipleBuffersOutputStream();
-      nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
-      transform.wrap(mbis, nos);
-    }
     return new MultipleBuffersLocation(mbos.toBufferList(), mbos.size());
   }
 
@@ -350,17 +286,7 @@ public final class IOHelper {
     OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
     NotifyingOutputStream nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
     ser.serialize(o, nos);
-    DataLocation dl = null;
-    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-    if (transform != null) {
-      InputStream is = new BufferedInputStream(new FileInputStream(file));
-      File file2 = IOHelper.createTempFile(-1);
-      os = new BufferedOutputStream(new FileOutputStream(file2));
-      nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
-      transform.wrap(is, nos);
-      dl = new FileDataLocation(file2);
-    }
-    else dl = new FileDataLocation(file);
+    DataLocation dl = new FileDataLocation(file);
     return dl;
   }
 

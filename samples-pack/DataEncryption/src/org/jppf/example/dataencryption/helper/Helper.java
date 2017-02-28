@@ -38,6 +38,22 @@ public final class Helper {
    * after it has been read from a file and decoded from Base64 encoding.
    */
   private static char[] some_chars = null;
+  /**
+   * Cipher algorithm name. See <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#Cipher">possible values</a>.
+   */
+  private static final String ALGO_NAME = "AES";
+  /**
+   * Cipher algorithm mode. See <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#Cipher">possible values</a>.
+   */
+  private static final String ALGO_MODE = "CBC";
+  /**
+   * Cipher algorithm padding. See <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#Cipher">possible values</a>.
+   */
+  private static final String ALGO_PADDING = "PKCS5Padding";
+  /**
+   * Full trnasformation specification used when instantiating a {@link Cipher}.
+   */
+  private static final String TRANSFORMATION = ALGO_NAME + "/" + ALGO_MODE + "/" + ALGO_PADDING;
 
   /**
    * Instantiation of this class is not permitted.
@@ -86,8 +102,7 @@ public final class Helper {
     KeyGenerator gen = KeyGenerator.getInstance(getAlgorithm());
     SecretKey key = gen.generateKey();
     // save the key in the keystore
-    KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(key);
-    ks.setEntry(getKeyAlias(), skEntry, new KeyStore.PasswordProtection(password));
+    ks.setKeyEntry(getKeyAlias(), key, password, null);
     // save the keystore to a file
     fos = new FileOutputStream(getKeystoreFilename());
     try {
@@ -95,6 +110,26 @@ public final class Helper {
     } finally {
       fos.close();
     }
+  }
+
+  /**
+   * Get the secret key used for encryption/decryption.
+   * In this method, the secret key is read from a location in the classpath.
+   * This is definitely unsecure, and for demonstration purposes only.
+   * The secret key should be stored in a secure location such as a key store.
+   * @return a SecretKey instance.
+   * @throws Exception if any error occurs.
+   */
+  public static synchronized SecretKey retrieveSecretKey()  throws Exception {
+    // get the keystore password
+    char[] password = Helper.getPassword();
+    ClassLoader cl = Helper.class.getClassLoader();
+    InputStream is = cl.getResourceAsStream(Helper.getKeystoreFolder() + Helper.getKeystoreFilename());
+    KeyStore ks = KeyStore.getInstance(Helper.getProvider());
+    // load the keystore
+    ks.load(is, password);
+    // get the secret key from the keystore
+    return (SecretKey) ks.getKey(Helper.getKeyAlias(), password);
   }
 
   /**
@@ -156,7 +191,8 @@ public final class Helper {
    */
   public static String getProvider() {
     // pkcs12 and jceks are the only ootb providers that allow storing a secret key
-    return "PKCS12";
+    //return "PKCS12";
+    return "JCEKS";
   }
 
   /**
@@ -164,7 +200,7 @@ public final class Helper {
    * @return the algorithm name as a string.
    */
   public static String getAlgorithm() {
-    return "DES";
+    return ALGO_NAME;
   }
 
   /**
@@ -172,6 +208,6 @@ public final class Helper {
    * @return the transformation as a string.
    */
   public static String getTransformation() {
-    return "DES/ECB/PKCS5Padding";
+    return TRANSFORMATION;
   }
 }
