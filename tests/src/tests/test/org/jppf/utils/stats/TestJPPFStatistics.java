@@ -29,7 +29,9 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.stats.*;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -41,6 +43,16 @@ import test.org.jppf.test.setup.common.*;
 public class TestJPPFStatistics extends Setup1D1N1C {
   /** */
   private static long WAIT_TIME = 3000L;
+  /** */
+  @Rule
+  public TestWatcher testJPPFStatisticsWatcher = new TestWatcher() {
+    @Override
+    protected void finished(final Description description) {
+      String message = String.format("end of method %s()", description.getMethodName());
+      BaseTest.print(message);
+      BaseTestHelper.printToServersAndNodes(client, true, true, message);
+    }
+  };
 
   /**
    * Test that the latest queue size is zero, after a job has completed and during whose execution the node was restarted.
@@ -50,22 +62,14 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testLatestQueueTaskCountUponNodeRestart() throws Exception {
     int nbTasks = 2;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
-    BaseTest.print("trace 1");
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
-    BaseTest.print("trace 2");
     jmx.resetStatistics();
-    BaseTest.print("trace 3");
     client.submitJob(job);
-    BaseTest.print("trace 4");
     Thread.sleep(1000L);
-    BaseTest.print("trace 5");
     jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
-    BaseTest.print("trace 6");
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
-    BaseTest.print("trace 7");
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
-    BaseTest.print("trace 8");
   }
 
   /**
@@ -117,25 +121,31 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testTaskAndJobCountUponClientCloseWithoutCancel() throws Exception {
     int nbTasks = 1;
     long duration = 3000L;
+    BaseTest.print(false, "*** trace 1 ***");
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, duration);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
     AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
+    BaseTest.print(false, "*** trace 2 ***");
     client.submitJob(job);
     long start = System.nanoTime();
     listener.await();
+    BaseTest.print(false, "*** trace 3 ***");
     try {
       client.close();
     } finally {
       client = BaseSetup.createClient(null);
     }
+    BaseTest.print(false, "*** trace 4 ***");
     jmx = BaseSetup.getJMXConnection();
     long elapsed = (System.nanoTime() - start) / 1_000_000L;
     long waitTime = duration - elapsed + 500L;
     // make sure the job has time to complete
     if (waitTime > 0L) Thread.sleep(waitTime);
+    BaseTest.print(false, "*** trace 5 ***");
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
+    BaseTest.print(false, "*** trace 6 ***");
   }
 
   /**
@@ -145,12 +155,16 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testTaskAndJobCountUponCompletion() throws Exception {
     int nbTasks = 1;
+    BaseTest.print(false, "*** trace 1 ***");
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
+    BaseTest.print(false, "*** trace 2 ***");
     List<Task<?>> results = client.submitJob(job);
+    BaseTest.print(false, "*** trace 3 ***");
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
+    BaseTest.print(false, "*** trace 4 ***");
   }
 
   /**
@@ -161,16 +175,21 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public void testTaskAndJobCountUponCancel() throws Exception {
     int nbTasks = 1;
     String notif = "task notif";
+    BaseTest.print(false, "*** trace 1 ***");
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
+    BaseTest.print(false, "*** trace 2 ***");
     AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
     client.submitJob(job);
     taskListener.await();
+    BaseTest.print(false, "*** trace 3 ***");
     jmx.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
+    BaseTest.print(false, "*** trace 4 ***");
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
+    BaseTest.print(false, "*** trace 5 ***");
   }
 
   /**

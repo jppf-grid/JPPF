@@ -52,7 +52,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  SocketInitializer socketInitializer = createSocketInitializer();
+  SocketInitializer socketInitializer = new SocketInitializerImpl();
   /**
    * The maximum time the underlying socket may be idle, before it is considered suspect and recycled.
    */
@@ -136,12 +136,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.remove(listener);
   }
-
-  /**
-   * Create a socket initializer for this connection handler.
-   * @return a <code>SocketInitializer</code> instance.
-   */
-  protected abstract SocketInitializer createSocketInitializer();
 
   /**
    * Notify all listeners that the status of this connection has changed.

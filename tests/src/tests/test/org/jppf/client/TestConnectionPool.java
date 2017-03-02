@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
+import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.discovery.*;
 import org.jppf.node.protocol.Task;
@@ -160,11 +161,12 @@ public class TestConnectionPool extends Setup1D1N {
     String methodName = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = new JPPFClient()) {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
+      JobManagerClient mgr = (JobManagerClient) client.getJobManager();
       SimpleDiscovery discovery = new SimpleDiscovery();
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
-      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
       // trigger close of pool1
       JPPFConnectionPool pool = client.findConnectionPool("pool1");
@@ -173,10 +175,10 @@ public class TestConnectionPool extends Setup1D1N {
       AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
       csd.getSocketInitializer().close();
       csd.getSocketClient().close();
-      while (client.awaitWorkingConnectionPools().size() >= 2) Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
       discovery.emitPool("pool1", 10);
-      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
     }
   }
@@ -223,6 +225,19 @@ public class TestConnectionPool extends Setup1D1N {
       assertNull(prefix + "has an exception", t);
       assertNotNull(prefix + "result is null", task.getResult());
     }
+  }
+
+  /**
+   * Await for the specified number of pools to be working and avaialble.
+   * @param client the client used to lookup the pools.
+   * @param operator a condition on the number of pools to wait for.
+   * @param nbPools the number of pools on which to apply the condition.
+   * @throws Exception if any error occurs.
+   */
+  private void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
+    while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
+    JobManagerClient mgr = (JobManagerClient) client.getJobManager();
+    while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
   }
 
   /** */

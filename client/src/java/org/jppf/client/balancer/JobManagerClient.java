@@ -399,6 +399,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
   }
 
+  /**
+   * Get the number of connections available for job scheduling.
+   * @return the number of available connections.
+   */
+  public int nbAvailableConnections() {
+    return taskQueueChecker.getNbIdleChannels();
+  }
+
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections() {
     List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
