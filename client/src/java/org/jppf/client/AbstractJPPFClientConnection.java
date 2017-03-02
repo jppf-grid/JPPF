@@ -193,7 +193,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   @Override
   TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle bundle = super.sendHandshakeJob();
-    pool.setSystemInfo((JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM));
+    if (pool.getSystemInfo() == null) pool.setSystemInfo((JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM));
     pool.setDriverUuid((String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM));
     return bundle;
   }

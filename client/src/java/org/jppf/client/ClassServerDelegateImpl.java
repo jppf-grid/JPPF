@@ -21,7 +21,6 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
-import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -115,14 +114,5 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
       log.error('[' +getName()+"] "+e.getMessage(), e);
       close();
     }
-  }
-
-  /**
-   * Create a socket initializer for this delegate.
-   * @return a <code>SocketInitializer</code> instance.
-   */
-  @Override
-  protected SocketInitializer createSocketInitializer() {
-    return new SocketInitializerImpl();
   }
 }

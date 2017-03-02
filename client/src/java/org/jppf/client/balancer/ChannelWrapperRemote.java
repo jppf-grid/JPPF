@@ -121,6 +121,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   @Override
   @SuppressWarnings("unchecked")
   public Future<?> submit(final ClientTaskBundle bundle) {
+    if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     Runnable task = new RemoteRunnable(bundle, channel);
     bundle.jobDispatched(this);
@@ -164,10 +165,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName());
-    sb.append("[channel=").append(channel).append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append("[channel=").append(channel).append(']').toString();
   }
 
   /**

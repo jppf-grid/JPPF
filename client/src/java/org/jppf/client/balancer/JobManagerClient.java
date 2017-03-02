@@ -335,8 +335,6 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
   }
 
-  
-
   @Override
   public String submitJob(final JPPFJob job) {
     return submitJob(job, null);
@@ -401,6 +399,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         wrapperLocal = null;
       }
     }
+  }
+
+  /**
+   * Get the number of connections available for job scheduling.
+   * @return the number of available connections.
+   */
+  public int nbAvailableConnections() {
+    return taskQueueChecker.getNbIdleChannels();
   }
 
   @Override

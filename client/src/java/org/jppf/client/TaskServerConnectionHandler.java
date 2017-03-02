@@ -22,7 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
-import org.jppf.comm.socket.*;
+import org.jppf.comm.socket.SocketClient;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -52,15 +52,6 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     super(owner, owner.getName() + " - TasksServer");
     this.host = host;
     this.port = port;
-  }
-
-  /**
-   * Create a socket initializer for this connection handler.
-   * @return a <code>SocketInitializer</code> instance.
-   */
-  @Override
-  protected SocketInitializer createSocketInitializer() {
-    return new SocketInitializerImpl();
   }
 
   /**

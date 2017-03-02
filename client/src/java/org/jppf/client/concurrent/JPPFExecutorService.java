@@ -414,7 +414,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   }
 
   /**
-   * Get the maximum time to wait before the next batch of tasks is to be sent for execution.
+   * Get the maximum time to wait in milliseconds before the next batch of tasks is to be sent for execution.
    * @return the timeout as a long.
    */
   public long getBatchTimeout() {
@@ -422,7 +422,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   }
 
   /**
-   * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
+   * Set the maximum time to wait in milliseconds before the next batch of tasks is to be sent for execution.
    * @param batchTimeout the timeout as a long.
    */
   public void setBatchTimeout(final long batchTimeout) {
