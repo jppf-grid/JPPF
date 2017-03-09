@@ -296,7 +296,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         }
       }
     };
-    executor.submit(r);
+    executor.execute(r);
   }
 
   /**
