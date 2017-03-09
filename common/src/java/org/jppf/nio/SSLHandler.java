@@ -21,7 +21,6 @@ package org.jppf.nio;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 import javax.net.ssl.*;
@@ -340,14 +339,16 @@ public class SSLHandler {
    */
   private void performDelegatedTasks() {
     Runnable delegatedTask;
-    List<Future<?>> futures = new ArrayList<>();
+    CompletionService<?> completer = new ExecutorCompletionService<>(executor);
+    int total = 0;
     while ((delegatedTask = sslEngine.getDelegatedTask()) != null) {
       if (traceEnabled) log.trace("running delegated task " + delegatedTask);
-      futures.add(executor.submit(delegatedTask));
+      completer.submit(delegatedTask, null);
+      total++;
     }
-    for (Future<?> f : futures) {
+    for (int i=0; i<total; i++) {
       try {
-        f.get();
+        completer.take();
       } catch (Exception e) {
         if (traceEnabled) log.trace(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));

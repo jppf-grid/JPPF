@@ -148,7 +148,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
   @Override
   public void execute(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     if ((taskList == null) || taskList.isEmpty()) return;
-    if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
+    if (debugEnabled) log.debug("executing {} tasks of bundle {}", taskList.size(), bundle);
     try {
       setup(bundle, taskList);
       if (!isJobCancelled()) {

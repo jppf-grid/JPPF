@@ -146,12 +146,11 @@ public class Reaper {
     @Override
     public void run() {
       ServerConnection[] connections = server.connections();
-      List<Future<?>> futures = new ArrayList<>(connections.length);
-      for (ServerConnection c : connections)
-        futures.add(threadPool.submit(c));
-      for (Future<?> f : futures) {
+      CompletionService<?> completer = new ExecutorCompletionService<>(threadPool, new ArrayBlockingQueue<Future<Object>>(connections.length));
+      for (ServerConnection c : connections) completer.submit(c, null);
+      for (int i=0; i<connections.length; i++) {
         try {
-          f.get();
+          completer.take();
         } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }

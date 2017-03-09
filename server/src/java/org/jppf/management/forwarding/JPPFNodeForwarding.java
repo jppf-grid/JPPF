@@ -91,10 +91,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
     int nbThreads = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
-    ThreadFactory factory = new JPPFThreadFactory("NodeForwarding");
-    executor = Executors.newFixedThreadPool(nbThreads, factory);
-    //executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), factory);
-    //executor = Executors.newCachedThreadPool(new JPPFThreadFactory("NodeForwarding"));
+    executor = Executors.newFixedThreadPool(nbThreads, new JPPFThreadFactory("NodeForwarding"));
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }
 
@@ -296,12 +293,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * @param memberName the name of the method to invoke, or of the attribute to get or set.
    * @param otherParams additional params to send with the request.
    * @return a mapping of node uuids to the result of invoking the MBean operation on the corresponding node. Each result may be an exception.
-   * <br>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
+   * Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
    * @throws Exception if the invocation failed.
    */
   private Map<String, Object> forward(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...otherParams) throws Exception {
-    List<Future<Pair<String, Object>>> futures = new ArrayList<>(nodes.size());
-    final Map<String, Object> map = new HashMap<>();
+    int size = nodes.size();
+    final Map<String, Object> map = new HashMap<>(size);
+    CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
     for (AbstractNodeContext node: nodes) {
       AbstractForwardingTask task = null;
       switch(type) {
@@ -317,9 +315,10 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
         default:
           continue;
       }
-      futures.add(executor.submit(task));
+      completionService.submit(task);
     }
-    for (Future<Pair<String, Object>> f: futures) {
+    for (int i=0; i<size; i++) {
+      Future<Pair<String, Object>> f = completionService.take();
       Pair<String, Object> result = f.get();
       if (result != null) map.put(result.first(), result.second());
     }
