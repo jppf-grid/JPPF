@@ -63,8 +63,6 @@ public class JPPFProperties {
   public static final JPPFProperty<String> CLASSLOADER_DELEGATION = new StringProperty("jppf.classloader.delegation", "parent");
   /** How often batched class loadin requests are sent to the server */
   public static final JPPFProperty<Long> NODE_CLASSLOADING_BATCH_PERIOD = new LongProperty("jppf.node.classloading.batch.period", 100L);
-  /** Optional network data transformation */
-  public static final JPPFProperty<String> DATA_TRANSFORM_CLASS = new StringProperty("jppf.data.transform.class", null);
   /** Prevent broadcast to the specified IPv4 addresses (exclusive filter, server only) */
   public static final JPPFProperty<String> DISCOVERY_BROADCAST_EXCLUDE_IPV4 = new StringProperty("jppf.discovery.broadcast.exclude.ipv4", null);
   /** Prevent broadcast to the specified IPv6 addresses (exclusive filter, server only) */
