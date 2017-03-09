@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.options;
 
-import java.text.NumberFormat;
-
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -49,10 +47,6 @@ public class SpinnerNumberOption extends AbstractOption {
    * Step size for the spinner control.
    */
   protected Number step = Integer.valueOf(0);
-  /**
-   * Use to parse from string values to <code>Number</code> instances.
-   */
-  protected NumberFormat nf = NumberFormat.getInstance();
   /**
    * The number format pattern.
    */
@@ -98,8 +92,8 @@ public class SpinnerNumberOption extends AbstractOption {
   @Override
   public void setValue(final Object value) {
     if (value instanceof String) this.value = StringUtils.parseNumber((String) value, min);
-    else if (!(value instanceof Number)) this.value = min;
-    else this.value = value;
+    else if (value instanceof Number) this.value = value;
+    else this.value = min;
     if (spinner != null) spinner.getModel().setValue(this.value);
   }
 

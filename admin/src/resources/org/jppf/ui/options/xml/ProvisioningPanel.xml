@@ -34,7 +34,6 @@
     <child name="nbSlaves" type="SpinnerNumber">
       <property name="label" value="Number of slave nodes"/>
       <property name="tooltip" value="Number of slave nodes to provision. Slaves will be started or terminated as needed"/>
-      <property name="value" value="0"/>
       <property name="minValue" value="0"/>
       <property name="maxValue" value="1000"/>
       <property name="persistent" value="true"/>

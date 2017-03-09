@@ -82,7 +82,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
+    thisPanel = loadPreferences(OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml"));
     CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
     textArea.setValue(getPropertiesAsString());
 
@@ -120,6 +120,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
+    savePreferences(thisPanel);
     CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
     final Boolean restart = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceRestart")).getValue();

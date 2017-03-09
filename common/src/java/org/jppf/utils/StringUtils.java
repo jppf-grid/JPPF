@@ -17,10 +17,9 @@
  */
 package org.jppf.utils;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -386,15 +385,11 @@ public final class StringUtils {
    * @return the source parsed as a number or <code>def</code> if it could not be parsed as a number.
    */
   public static Number parseNumber(final String source, final Number def) {
-    if (source == null) return def;
-    NumberFormat nf = NumberFormat.getInstance();
     try {
-      Number n = nf.parse(source);
-      //System.out.printf("source=%s, n=%s, locale=%s%n", source, n, Locale.getDefault());
-      return n;
-    } catch (ParseException ignore) {
+      return Double.valueOf(source);
+    } catch(Exception e) {
+      return def;
     }
-    return null;
   }
 
   /**

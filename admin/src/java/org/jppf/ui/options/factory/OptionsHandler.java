@@ -19,7 +19,6 @@ package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.prefs.*;
 
@@ -44,6 +43,10 @@ public final class OptionsHandler {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(OptionsHandler.class);
+  /**
+   * Whether TRACE level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * The root of the preferences subtree in which the chart configurations are saved.
    */
@@ -201,20 +204,23 @@ public final class OptionsHandler {
    */
   public static void savePreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
-      log.trace("persisting node {}", node.elt.getName());
+      if (traceEnabled) log.trace("persisting node {}", node.elt.getName());
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) savePreferences(child, p);
     } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
-      log.trace("persisting option {}", option);
       if (option.isPersistent()) {
         Object value = option.getValue();
+        String s = String.valueOf(value);
+        /*
         String s = null;
         if (value instanceof Number) s = NumberFormat.getInstance().format(value);
         else s = String.valueOf(value);
+        */
         prefs.put(option.getName(), s);
+        if (traceEnabled) log.trace("persisted option {}, value={}", option, s);
       }
-    } else log.trace("persisting node {}", node.elt.getName());
+    } else if (traceEnabled) log.trace("node {} has nothing to persist", node.elt.getName());
   }
 
   /**
@@ -234,6 +240,7 @@ public final class OptionsHandler {
    */
   public static void loadPreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
+      if (traceEnabled) log.trace("loading node {}", node.elt.getName());
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) loadPreferences(child, p);
     } else if (node.elt instanceof AbstractOption) {
@@ -241,7 +248,8 @@ public final class OptionsHandler {
       Object def = option.getValue();
       String val = prefs.get(option.getName(), def == null ? null : def.toString());
       option.setValue(val);
-    }
+      if (traceEnabled) log.trace("loaded option {}, value={}", option, val);
+    } else if (traceEnabled) log.trace("node {} has nothing to load", node.elt.getName());
   }
 
   /**

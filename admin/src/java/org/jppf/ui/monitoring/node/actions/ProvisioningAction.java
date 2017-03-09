@@ -91,9 +91,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml");
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
-    OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
+    thisPanel = loadPreferences(OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml"));
     CodeEditorOption editorOption = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
@@ -128,8 +126,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
-    OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
+    savePreferences(thisPanel);
     CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("useOverrides")).getValue();
     overrides = (String) textArea.getValue();
