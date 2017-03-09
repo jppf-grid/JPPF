@@ -24,7 +24,7 @@ import net.jpountz.lz4.*;
 
 /**
  * A composite serialization scheme which applies a LZ4 compression/decompression to a concrete {@link JPPFSerialization} implementation.
- * <p><b>See also: <a href="http://cyan4973.github.io/lz4/">LZ4 home</a></b>.
+ * <p><b>See also: <a href="https://github.com/lz4/lz4">LZ4 home</a></b>.
  * @author Laurent Cohen
  */
 public class LZ4Serialization extends JPPFCompositeSerialization {
