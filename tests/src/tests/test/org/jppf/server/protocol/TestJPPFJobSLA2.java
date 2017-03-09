@@ -98,15 +98,20 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   @Test(timeout=8000)
   public void testMaxDispatchExpirations() throws Exception {
     String listenerId = null;
+    int maxExpirations = 2;
     checkNodes();
+    BaseTestHelper.printToAll(client, false, "trace 0");
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     try {
+      BaseTestHelper.printToAll(client, false, "trace 1");
       NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
-      JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(5000L, true, true));
-      job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(1000L));
-      job.getSLA().setMaxDispatchExpirations(2);
+      BaseTestHelper.printToAll(client, false, "trace 2");
+      //Thread.sleep(250);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotifyingTask.class, 5000L, true, true);
+      job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(750L)).setMaxDispatchExpirations(maxExpirations);
       List<Task<?>> results = client.submitJob(job);
+      BaseTestHelper.printToAll(client, false, "trace 3");
       assertNotNull(results);
       assertEquals(results.size(), 1);
       Task<?> task = results.get(0);
@@ -114,7 +119,8 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       assertNull(task.getThrowable());
       Thread.sleep(1000L);
       assertNotNull(listener.notifs);
-      assertEquals(3, listener.notifs.size());
+      BaseTestHelper.printToAll(client, false, "trace 4");
+      assertEquals(maxExpirations + 1, listener.notifs.size());
       for (Notification notification: listener.notifs) {
         assertTrue(notification instanceof JPPFNodeForwardingNotification);
         JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
@@ -126,8 +132,10 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
         task = job.getJobTasks().get(0);
         assertEquals(NotifyingTask.START_PREFIX + task.getId(), userObject.taskId);
       }
+      BaseTestHelper.printToAll(client, false, "trace 5");
     } finally {
       if (listenerId != null) jmx.unregisterForwardingNotificationListener(listenerId);
+      BaseTestHelper.printToAll(client, false, "trace 6");
     }
   }
 

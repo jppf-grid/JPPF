@@ -124,7 +124,7 @@ public class BaseTest {
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
     String message = String.format(format, params);
-    System.out.printf("[%s] %s%n", getFormattedTimestamp(), message);
+    System.out.printf("[  client] [%s] %s%n", getFormattedTimestamp(), message);
     if (!systemOutOnly) {
       String s = "";
       if (decorate) {

@@ -21,14 +21,22 @@ package test.org.jppf.test.setup.common;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.test.addons.mbeans.UserObject;
-import org.jppf.test.addons.startups.TaskNotifier;
 import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
 public class NotifyingTask extends AbstractTask<String> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NotifyingTask.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Prefix of the string sent as notification at the start of a task.
    */
@@ -78,27 +86,24 @@ public class NotifyingTask extends AbstractTask<String> {
   public void run() {
     try {
       if (notifyStart) TaskNotifier.addNotification(new UserObject(NodeRunner.getUuid(), START_PREFIX + getId()));
+      if (debugEnabled) log.debug("sent start notification from {}", this);
       Thread.sleep(duration);
       if (notifyEnd) TaskNotifier.addNotification(new UserObject(NodeRunner.getUuid(), END_PREFIX + getId()));
+      if (debugEnabled) log.debug("sent end notification from {}", this);
       setResult(SUCCESS);
-      System.out.println("task " + getId() + " successful");
-    } catch (Exception e) {
-      System.out.println("Error on task " + getId() + " : " + ExceptionUtils.getMessage(e));
+      //System.out.println("task " + getId() + " successful");
+    } catch (@SuppressWarnings("unused") Exception e) {
+      //System.out.println("Error on task " + getId() + " : " + ExceptionUtils.getMessage(e));
       //e.printStackTrace();
     }
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("id=").append(getId());
-    sb.append(", result=").append(getResult());
-    sb.append(", throwable=").append(ExceptionUtils.getMessage(getThrowable()));
-    sb.append(", duration=").append(duration);
-    sb.append(", notifyStart=").append(notifyStart);
-    sb.append(", notifyEnd=").append(notifyEnd);
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName())
+      .append("[id=").append(getId()) .append(", result=").append(getResult())
+      .append(", throwable=").append(ExceptionUtils.getMessage(getThrowable())) .append(", duration=").append(duration)
+      .append(", notifyStart=").append(notifyStart) .append(", notifyEnd=").append(notifyEnd)
+      .append(']') .toString();
   }
 }

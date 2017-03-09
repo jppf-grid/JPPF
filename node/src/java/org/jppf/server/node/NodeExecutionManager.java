@@ -77,6 +77,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    */
   @Override
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
+    if (debugEnabled) log.debug("setting up bundle {}", bundle);
     taskNotificationDispatcher.setBundle(this.bundle = bundle);
     this.taskList = taskList;
     this.taskWrapperList = new ArrayList<>(taskList.size());
@@ -115,6 +116,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     setJobCancelled(false);
     this.taskWrapperList = null;
     timeoutHandler.clear();
+    if (debugEnabled) log.debug("cleaned up bundle {}", bundle);
   }
 
   /**

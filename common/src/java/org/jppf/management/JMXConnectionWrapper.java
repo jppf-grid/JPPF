@@ -281,7 +281,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         ObjectName mbeanName = new ObjectName(name);
         result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
       } catch(IOException e) {
-        if (debugEnabled) log.debug(String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e)));
+        String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
+        if (debugEnabled) {
+          log.debug(msg);
+        } else {
+          log.error(msg);
+        }
         reset();
       }
       return result;
@@ -539,13 +544,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('[');
-    sb.append("url=").append( url);
-    sb.append(", connected=").append( connected);
-    sb.append(", local=").append( local);
-    sb.append(", secure=").append( sslEnabled);
-    sb.append(']');
-    return sb.toString();
+    return  new StringBuilder().append(getClass().getSimpleName()).append('[')
+      .append("url=").append(url).append(", connected=").append(connected)
+      .append(", local=").append(local).append(", secure=").append(sslEnabled)
+      .append(']').toString();
   }
 
   /**

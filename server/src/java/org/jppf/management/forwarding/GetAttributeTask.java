@@ -51,9 +51,7 @@ class GetAttributeTask extends AbstractForwardingTask {
     String uuid = context.getUuid();
     JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
     Object o = wrapper.getAttribute(mbeanName, memberName);
-    if (debugEnabled) {
-      log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, uuid));
-    }
+    if (debugEnabled) log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, uuid));
     return new Pair<>(uuid, o);
   }
 }

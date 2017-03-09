@@ -84,14 +84,10 @@ public class JPPFNodeForwardingNotification extends Notification {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("type").append(getType());
-    sb.append(", source").append(getSource());
-    sb.append(", mBeanName").append(mBeanName);
-    sb.append(", nodeUuid").append(nodeUuid);
-    sb.append(", sequenceNumber").append(getSequenceNumber());
-    sb.append(", timeStamp").append(getTimeStamp());
-    sb.append(", notification").append(notification);
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName())
+      .append("[type=").append(getType()).append(", source=").append(getSource())
+      .append(", mBeanName=").append(mBeanName).append(", nodeUuid=").append(nodeUuid)
+      .append(", sequenceNumber=").append(getSequenceNumber()).append(", timeStamp=").append(getTimeStamp())
+      .append(", notification=").append(notification).toString();
   }
 }

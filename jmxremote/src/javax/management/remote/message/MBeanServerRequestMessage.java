@@ -244,7 +244,7 @@ public class MBeanServerRequestMessage implements Message {
    */
   private final Subject delegationSubject;
   /**
-   * Sequence number generator for the requetss.
+   * Sequence number generator for the requests.
    */
   private static AtomicLong count = new AtomicLong(0L);
   /**
@@ -302,7 +302,7 @@ public class MBeanServerRequestMessage implements Message {
   }
 
   /**
-   * Genrate a new request id.
+   * Generate a new request id.
    * @return a new id as a {@code long} value.
    */
   private static long newId() {

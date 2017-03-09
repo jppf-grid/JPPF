@@ -439,7 +439,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @throws Exception if any error occurs.
    */
   boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
-    if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
+    if (debugEnabled) log.debug(String.format("cancelling job uuid=%s from %s, jmxConnection=%s", jobId, this, jmxConnection));
     if (jmxConnection != null && jmxConnection.isConnected()) {
       try {
         jmxConnection.cancelJob(jobId, requeue);

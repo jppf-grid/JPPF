@@ -21,12 +21,12 @@ package org.jppf.management.forwarding;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-import javax.management.ListenerNotFoundException;
+import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.server.event.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -197,7 +197,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   @Override
   public void nodeConnected(final NodeConnectionEvent event) {
     JPPFManagementInfo info = event.getNodeInformation();
-    if (debugEnabled) log.debug("handling new connected node {}", info);
+    if (debugEnabled) log.debug("handling new connected node {},", info);
     if ((info == null) || (info.getPort() < 0) || (info.getHost() == null)) return;
     String uuid = info.getUuid();
     AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
@@ -238,7 +238,9 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
 
   @Override
   public synchronized void notificationReceived(final ForwardingNotificationEvent event) {
-    if (debugEnabled) log.debug("received notification from node=" +  event.getNodeUuid() + ", mbean='" + event.getMBeanName() + "' : " + event.getNotification());
-    forwarder.sendNotification(new JPPFNodeForwardingNotification(event.getNotification(), event.getNodeUuid(), event.getMBeanName()));
+    Notification notif = event.getNotification();
+    if (debugEnabled) log.debug(String.format("received notification from node=%s, mbean=%s, notification=%s (sequence=%d, timestamp=%d)",
+      event.getNodeUuid(), event.getMBeanName(), notif, notif.getSequenceNumber(), notif.getTimeStamp()));
+    forwarder.sendNotification(new JPPFNodeForwardingNotification(notif, event.getNodeUuid(), event.getMBeanName()));
   }
 }

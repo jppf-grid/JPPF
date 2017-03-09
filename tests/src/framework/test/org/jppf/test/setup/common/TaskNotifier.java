@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.test.addons.startups;
+package test.org.jppf.test.setup.common;
 
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.test.addons.mbeans.NodeTestMBean;
 import org.jppf.utils.ExceptionUtils;
 
@@ -27,31 +26,22 @@ import org.jppf.utils.ExceptionUtils;
  * This is a test of a node startup class.
  * @author Laurent Cohen
  */
-public class TaskNotifier implements JPPFNodeStartupSPI {
+public class TaskNotifier {
   /**
    * The proxy to the mbean that sends the actual notifications.
    */
   private static NodeTestMBean mbean = null;
-
-  @Override
-  public void run() {
-    initNotifier();
-  }
-
-  /**
-   * Initialize the task notifications MBean proxy.
-   */
-  private static void initNotifier() {
+  static {
     JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
     jmxWrapper.connect();
     if (!jmxWrapper.isConnected()) {
       System.out.println("Error: could not connect to the local MBean server");
-      return;
-    }
-    try {
-      mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
-    } catch (Exception e) {
-      System.out.println("Error: " + ExceptionUtils.getMessage(e));
+    } else {
+      try {
+        mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
+      } catch (Exception e) {
+        System.out.println("Error: " + ExceptionUtils.getMessage(e));
+      }
     }
   }
 

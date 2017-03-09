@@ -26,8 +26,7 @@ import javax.management.*;
  * Implementation of {@link NodeTestMBean}.
  * @author Laurent Cohen
  */
-public class NodeTest extends NotificationBroadcasterSupport implements NodeTestMBean
-{
+public class NodeTest extends NotificationBroadcasterSupport implements NodeTestMBean {
   /**
    * Notification sequence number.
    */
@@ -36,32 +35,25 @@ public class NodeTest extends NotificationBroadcasterSupport implements NodeTest
   /**
    * Default constructor.
    */
-  public NodeTest()
-  {
+  public NodeTest() {
     System.out.println("initialized NodeTest");
   }
 
   @Override
-  public void sendUserObject(final Object userObject) throws Exception
-  {
+  public void sendUserObject(final Object userObject) throws Exception {
     Notification notif = new Notification("NodeTest", NodeTestMBean.MBEAN_NAME, sequence.incrementAndGet());
     notif.setUserData(userObject);
     sendNotification(notif);
   }
 
-
   @Override
-  public Long getTotalNotifications() throws Exception
-  {
+  public long getTotalNotifications() throws Exception {
     return sequence.get();
   }
 
-  /*
-  */
   @Override
-  public synchronized void sendNotification(final Notification notification)
-  {
-    System.out.println("sending notification : " + notification);
+  public synchronized void sendNotification(final Notification notification) {
+    System.out.printf("sending notification: type=%s, sequence=%d, userData=%s%n", notification.getType(), notification.getSequenceNumber(), notification.getUserData());
     super.sendNotification(notification);
   }
 }

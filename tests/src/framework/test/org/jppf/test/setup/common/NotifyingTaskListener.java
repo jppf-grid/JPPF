@@ -24,6 +24,9 @@ import javax.management.*;
 
 import org.jppf.management.TaskExecutionNotification;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+import org.slf4j.*;
+
+import test.org.jppf.test.setup.BaseTest;
 
 /**
  * A JMX {@link NotificationListener} which simply accumulates the notifications it receives.
@@ -31,19 +34,27 @@ import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
  */
 public class NotifyingTaskListener implements NotificationListener {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NotifyingTaskListener.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The task information received as notifications from the node.
    */
   public List<Notification> notifs = new Vector<>();
   /**
-   * 
+   * An eventual exception that occurred in the {@link #handleNotification(Notification, Object)} method.
    */
   public Exception exception = null;
   /**
-   * 
+   * The count of user notifications sent via {@code Task.fireNotification()}.
    */
   public int taskExecutionUserNotificationCount = 0;
   /**
-   * 
+   * The count of JPPF notifications sent via {@code Task.fireNotification()}.
    */
   public int taskExecutionJppfNotificationCount = 0;
   /**
@@ -63,6 +74,11 @@ public class NotifyingTaskListener implements NotificationListener {
           else taskExecutionJppfNotificationCount++;
           Object o = notif.getUserData();
           if (o != null) userObjects.add(o);
+        } else {
+          if ("NodeTest".equals(realNotif.getType())) {
+            if (debugEnabled) log.debug("received test notification {}", realNotif);
+            BaseTest.print(true, false, "client-side received notification:  type=%s, sequence=%d, userData=%s", realNotif.getType(), realNotif.getSequenceNumber(), realNotif.getUserData());
+          }
         }
       }
     } catch (Exception e) {

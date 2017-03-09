@@ -57,7 +57,7 @@ class SetAttributeTask extends AbstractForwardingTask {
     String uuid = context.getUuid();
     JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
     wrapper.setAttribute(mbeanName, memberName, value);
-    if (debugEnabled) log.debug("set attribute '" + memberName + "' on node " + uuid);
+    if (debugEnabled) log.debug("set attribute '{}' on node {}", memberName, uuid);
     return null;
   }
 }

@@ -64,6 +64,7 @@ public class RepeatingSuite extends Suite {
     int repeat = annotation.repeat();
     if (repeat <= 0) throw new InitializationError(String.format("class '%s' must have a repeat >= 1, currently %d", suiteClass.getName(), repeat));
     List<Class<?>> classes = Arrays.asList(annotation.classes());
+    System.out.printf("Repeating tests with repeat=%d, shuffleClasses=%b, shuffleMethods=%b, classes=%s%n", repeat, annotation.shuffleClasses(), annotation.shuffleMethods(), classes);
     List<Runner> runners = new ArrayList<>(repeat * classes.size());
     // compute the max number of digits for the iteration numbers
     int nbDigits = (repeat > 1) ? (int) Math.ceil(Math.log10(repeat)) : 1;

@@ -161,7 +161,6 @@ public class TestConnectionPool extends Setup1D1N {
     String methodName = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = new JPPFClient()) {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
-      JobManagerClient mgr = (JobManagerClient) client.getJobManager();
       SimpleDiscovery discovery = new SimpleDiscovery();
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);

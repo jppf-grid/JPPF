@@ -32,7 +32,7 @@ public class JPPFLogFormatter extends Formatter {
   /**
    * Date format used in log entries.
    */
-  private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS ");
+  private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS ");
 
   /**
    * Format a log record.

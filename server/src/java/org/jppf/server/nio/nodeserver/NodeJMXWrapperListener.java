@@ -56,12 +56,15 @@ class NodeJMXWrapperListener implements JMXWrapperListener {
 
   @Override
   public void jmxWrapperConnected(final JMXWrapperEvent event) {
+    if (debugEnabled) log.debug("JMX connection established from {}, for {}", this, context);
+    context.getJmxConnection().removeJMXWrapperListener(this);
     server.nodeConnected(context);
   }
 
   @Override
   public void jmxWrapperTimeout(final JMXWrapperEvent event) {
     if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}", context);
+    context.getJmxConnection().removeJMXWrapperListener(this);
     context.jmxConnection = null;
     context.peerJmxConnection = null;
     server.nodeConnected(context);

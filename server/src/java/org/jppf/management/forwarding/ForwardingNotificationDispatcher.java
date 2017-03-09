@@ -129,8 +129,9 @@ class ForwardingNotificationDispatcher {
           jmx.removeNotificationListener(mBeanName, handler);
           return true;
         } catch (Exception e) {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.info(ExceptionUtils.getMessage(e));
+          String message = String.format("error removing notification listener for node=%s, mBeanName=%s", nodeUuid, mBeanName);
+          if (debugEnabled) log.debug(message, e);
+          else log.info("{} : {}", message, ExceptionUtils.getMessage(e));
         }
       }
     } finally {
@@ -206,8 +207,12 @@ class ForwardingNotificationDispatcher {
 
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
-      if (debugEnabled) log.debug("received notification from node=" + nodeUuid + ", mbean='" + mBeanName + "' : " + notification + ", handback=" + handback);
-      fireNotificationEvent(mBeanName, notification);
+      try {
+        if (debugEnabled) log.debug(String.format("received notification from node=%s, mbean=%s, notification=%s, handback=%s", nodeUuid, mBeanName, notification, handback));
+        fireNotificationEvent(mBeanName, notification);
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
+      }
     }
   }
 }

@@ -412,7 +412,8 @@ class ClientIntermediary extends AbstractClientIntermediary {
    */
   public Object invoke(final ObjectName name, final String operationName, final Object params[], final String signature[], final Subject delegationSubject)
       throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-    logger.trace("invoke", "called");
+    logger.trace("invoke", String.format("called with name=%s, opName=%s, params=%s, signature=%s",
+      name, operationName, params == null ? null : Arrays.asList(params), signature == null ? null : Arrays.asList(signature)));
     try {
       return mBeanServerRequest(MBeanServerRequestMessage.INVOKE, new Object[] { name, operationName, serialization.wrap(params), signature }, delegationSubject);
     } catch (InstanceNotFoundException|MBeanException|ReflectionException e) {

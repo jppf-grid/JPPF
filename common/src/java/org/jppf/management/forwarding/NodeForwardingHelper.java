@@ -28,8 +28,7 @@ import org.jppf.management.NodeSelector;
  * @author Laurent Cohen
  * @exclude
  */
-public final class NodeForwardingHelper
-{
+public final class NodeForwardingHelper {
   /**
    * Singleton instance of this class.
    */
@@ -46,16 +45,14 @@ public final class NodeForwardingHelper
   /**
    * This class can only be instantiated here.
    */
-  private NodeForwardingHelper()
-  {
+  private NodeForwardingHelper() {
   }
 
   /**
    * Get the singleton instance of this class.
    * @return a {@link NodeForwardingHelper} object.
    */
-  static NodeForwardingHelper getInstance()
-  {
+  static NodeForwardingHelper getInstance() {
     return instance;
   }
 
@@ -64,8 +61,7 @@ public final class NodeForwardingHelper
    * @param listenerID the id of the lisener wrapper to find.
    * @return a {@link NotificationListenerWrapper} object or <code>null</code> if there is no listener wrapper with this id.
    */
-  NotificationListenerWrapper getListener(final String listenerID)
-  {
+  NotificationListenerWrapper getListener(final String listenerID) {
     return listenerWrappers.get(listenerID);
   }
 
@@ -74,8 +70,7 @@ public final class NodeForwardingHelper
    * @param listenerID the id opf the lisener wrapper to find.
    * @param listenerWrapper a {@link NotificationListenerWrapper} object.
    */
-  void setListener(final String listenerID, final NotificationListenerWrapper listenerWrapper)
-  {
+  void setListener(final String listenerID, final NotificationListenerWrapper listenerWrapper) {
     listenerWrappers.put(listenerID, listenerWrapper);
   }
 
@@ -84,8 +79,7 @@ public final class NodeForwardingHelper
    * @param listenerID the id of the lisener wrapper to remove.
    * @return the tremoved {@link NotificationListenerWrapper} object or <code>null</code> if there is no listener wrapper with this id.
    */
-  NotificationListenerWrapper removeListener(final String listenerID)
-  {
+  NotificationListenerWrapper removeListener(final String listenerID) {
     return listenerWrappers.remove(listenerID);
   }
 
@@ -93,8 +87,7 @@ public final class NodeForwardingHelper
    * Get the list of all listenrs.
    * @return an {@link ArrayList} of {@link NotificationListenerWrapper} instances.
    */
-  Collection<NotificationListenerWrapper> allListeners()
-  {
+  Collection<NotificationListenerWrapper> allListeners() {
     return new ArrayList<>(listenerWrappers.values());
   }
 
@@ -102,8 +95,7 @@ public final class NodeForwardingHelper
    * Set the selection provider onto this helper.
    * @param selectionProvider the selction provider to set.
    */
-  void setSelectionProvider(final NodeSelectionProvider selectionProvider)
-  {
+  void setSelectionProvider(final NodeSelectionProvider selectionProvider) {
     this.selectionProvider = selectionProvider;
   }
 
@@ -113,8 +105,7 @@ public final class NodeForwardingHelper
    * @param selector the node selector used as a filter.
    * @return a set of {@link AbstractNodeContext} instances.
    */
-  boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector)
-  {
+  boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector) {
     return (selectionProvider != null) && selectionProvider.isNodeAccepted(nodeUuid, selector);
   }
 }

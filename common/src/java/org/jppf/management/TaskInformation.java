@@ -155,6 +155,7 @@ public class TaskInformation implements Serializable {
     sb.append('[');
     sb.append("taskId=").append(id);
     sb.append(", jobId=").append(jobId);
+    sb.append(", jobName=").append(jobName);
     sb.append(", cpuTime=").append(cpuTime);
     sb.append(", elapsedTime=").append(elapsedTime);
     sb.append(", error=").append(error);

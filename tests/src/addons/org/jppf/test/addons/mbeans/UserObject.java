@@ -23,8 +23,11 @@ import java.io.Serializable;
 /**
  * Sent as user object in JMX notifications.
  */
-public class UserObject implements Serializable
-{
+public class UserObject implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Uuid of the node on which the task executed.
    */
@@ -39,20 +42,13 @@ public class UserObject implements Serializable
    * @param nodeUuid uuid of the node on which the task executed.
    * @param taskId id of the task.
    */
-  public UserObject(final String nodeUuid, final String taskId)
-  {
+  public UserObject(final String nodeUuid, final String taskId) {
     this.nodeUuid = nodeUuid;
     this.taskId = taskId;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("nodeUuid=").append(nodeUuid);
-    sb.append(", taskId=").append(taskId);
-    sb.append(']');
-    return sb.toString();
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append("[nodeUuid=").append(nodeUuid).append(", taskId=").append(taskId).append(']').toString();
   }
 }

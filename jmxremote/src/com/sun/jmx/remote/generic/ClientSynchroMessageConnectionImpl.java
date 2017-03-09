@@ -129,7 +129,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
   /** */
   private long waitConnectedState;
   /** */
-  private final ClassLogger logger = new ClassLogger("javax.management.remote.misc", "SynchroMessageConnectionImpl");
+  private final ClassLogger logger = new ClassLogger("com.sun.jmx.remote.generic", "ClientSynchroMessageConnectionImpl");
 
   /**
    * 
@@ -182,10 +182,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           connection = clientAdmin.connectionOpen(connection);
         }
         // wakeup all waiting threads
-        if (logger.traceOn()) {
-          String s = "Wakeup the threads which are waiting a response " + "frome the server to inform them of the connection failure.";
-          logger.trace("connect", s);
-        }
+        if (logger.traceOn()) logger.trace("connect", "Wakeup the threads which are waiting a response from the server to inform them of the connection failure.");
         final ConnectionClosedException ce = new ConnectionClosedException("The connection has been closed by the server.");
         // Attention: lock order: stateLock before waitingList before ResponseMsgWrapper
         synchronized (waitingList) {
@@ -246,8 +243,9 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         notifResp = null;
       }
     } else if (msg instanceof MBeanServerRequestMessage) {
-      if (logger.traceOn()) logger.trace("sendWithReturn", "Send a MBeanServerRequestMessage.");
-      final Long id = new Long(((MBeanServerRequestMessage) msg).getMessageId());
+      MBeanServerRequestMessage reqMsg = (MBeanServerRequestMessage) msg;
+      if (logger.traceOn()) logger.trace("sendWithReturn", String.format("Send a MBeanServerRequestMessage with messageId=%d, methodId=%s",
+        reqMsg.getMessageId(), GeneralUtils.getMethodName(reqMsg.getMethodId())));
       // When receiving CloseMessage, it is possible that the server closes itself by timeout, so we will do reconnection and then wakeup all
       // threads which are waiting a response by a ConnectionClosedException , to ask them to try once time again, the flag "retried" is specified here to tell whether the retried has done.
       // Note: if a ConnectionClosedException is thrown by the server, that exception will be received by ClientIntermediary and it will inform the ClientCommunicationAdmin before doing retry.
@@ -255,7 +253,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       while (true) {
         ResponseMsgWrapper mwrapper = new ResponseMsgWrapper();
         synchronized (waitingList) {
-          waitingList.put(id, mwrapper);
+          waitingList.put(reqMsg.getMessageId(), mwrapper);
         }
         synchronized (connectionLock) { // send out the msg
           connection.writeMessage(msg);
@@ -268,16 +266,16 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
             try {
               checkState();
               synchronized(mwrapper) { mwrapper.wait(1000L); }
-            } catch (@SuppressWarnings("unused") InterruptedException ie) {
+            } catch (InterruptedException ie) {
+              if (logger.traceOn()) logger.trace("sendWithReturn", "InterruptedException: ", ie);
               break; // OK. This is a user thread, so it is possible that the user wants to stop waiting.
             }
           }
         }
         synchronized (waitingList) {
-          waitingList.remove(id);
+          waitingList.remove(reqMsg.getMessageId());
         }
-        // at this point mwrapper has been already removed from the waitinglist
-        // and it will not be modified any more. Synchronizing on mwrapper is no longer needed.
+        // at this point mwrapper has been already removed from the waitinglist and it will not be modified any more. Synchronizing on it is no longer needed.
         if (!mwrapper.got) {
           if (!isTerminated()) {
             throw new InterruptedIOException("Waiting response timeout: " + wtimeout);
@@ -364,13 +362,14 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     public void run() {
       try {
         executingThread = Thread.currentThread();
-        Message msg;
         while (!stopped()) {
           if (logger.traceOn()) logger.trace("MessageReader-run", "Waiting a coming message...");
-          msg = null;
+          Message msg = null;
           try {
             msg = connection.readMessage();
+            if (logger.traceOn()) logger.trace("MessageReader-run", "got incoming message " + msg);
           } catch (Exception e) {
+            if (logger.traceOn()) logger.trace("MessageReader-run", e);
             if (stopped()) break;
             try {
               callback.connectionException(e);
@@ -393,7 +392,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
             if (mwrapper == null) {
               checkState();
               // waiting thread is timeout
-              if (logger.traceOn()) logger.trace("MessageReader-run", "Receive a MBeanServerResponseMessage but no one is waiting it.");
+              if (logger.traceOn()) logger.trace("MessageReader-run", "Receive a MBeanServerResponseMessage but no one is awaiting it.");
             } else {
               synchronized (mwrapper) {
                 mwrapper.setMsg(msg);
@@ -426,7 +425,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     }
 
     /**
-     * 
      * @return .
      */
     private boolean stopped() {
@@ -448,7 +446,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     }
 
     /**
-     * 
      * @param msg .
      */
     public void setMsg(final Message msg) {
@@ -463,7 +460,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     private Message msg;
 
     /**
-     * 
      * @param msg .
      */
     public RemoteJob(final Message msg) {
@@ -492,7 +488,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
   }
 
   /**
-   * 
    * @throws IOException .
    */
   private void checkState() throws IOException {
@@ -516,7 +511,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
   }
 
   /**
-   * 
    * @return .
    */
   private boolean isTerminated() {

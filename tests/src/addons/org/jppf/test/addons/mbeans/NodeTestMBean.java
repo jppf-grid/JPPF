@@ -45,5 +45,5 @@ public interface NodeTestMBean extends Serializable, NotificationEmitter
    * @return the number of notifications as a long value.
    * @throws Exception if any error occurs.
    */
-  Long getTotalNotifications() throws Exception;
+  long getTotalNotifications() throws Exception;
 }

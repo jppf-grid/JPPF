@@ -31,12 +31,15 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implements JPPFNodeTaskMonitorMBean, TaskExecutionListener
-{
+public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implements JPPFNodeTaskMonitorMBean, TaskExecutionListener {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFNodeTaskMonitor.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The mbean object name sent with the notifications.
    */
@@ -74,21 +77,16 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * Default constructor.
    * @param objectName a string representing the MBean object name.
    */
-  public JPPFNodeTaskMonitor(final String objectName)
-  {
-    try
-    {
+  public JPPFNodeTaskMonitor(final String objectName) {
+    try {
       OBJECT_NAME = new ObjectName(objectName);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
   @Override
-  public synchronized void taskExecuted(final TaskExecutionEvent event)
-  {
+  public synchronized void taskExecuted(final TaskExecutionEvent event) {
     TaskInformation info = event.getTaskInformation();
     taskCount++;
     if (info.hasError()) taskInErrorCount++;
@@ -99,8 +97,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   }
 
   @Override
-  public void taskNotification(final TaskExecutionEvent event)
-  {
+  public void taskNotification(final TaskExecutionEvent event) {
     if (event.isSendViaJmx()) executor.execute(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
   }
 
@@ -109,8 +106,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * @return the number of tasks as an integer value.
    */
   @Override
-  public synchronized Integer getTotalTasksExecuted()
-  {
+  public synchronized Integer getTotalTasksExecuted() {
     return taskCount;
   }
 
@@ -119,8 +115,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * @return the cpu time as long value.
    */
   @Override
-  public synchronized Long getTotalTaskCpuTime()
-  {
+  public synchronized Long getTotalTaskCpuTime() {
     return totalCpuTime;
   }
 
@@ -129,8 +124,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * @return the elapsed time as long value.
    */
   @Override
-  public synchronized Long getTotalTaskElapsedTime()
-  {
+  public synchronized Long getTotalTaskElapsedTime() {
     return totalElapsedTime;
   }
 
@@ -139,8 +133,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * @return the number as an integer value.
    */
   @Override
-  public synchronized Integer getTotalTasksInError()
-  {
+  public synchronized Integer getTotalTasksInError() {
     return taskInErrorCount;
   }
 
@@ -149,14 +142,12 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * @return the number as an integer value.
    */
   @Override
-  public synchronized Integer getTotalTasksSucessfull()
-  {
+  public synchronized Integer getTotalTasksSucessfull() {
     return taskSuccessfulCount;
   }
 
   @Override
-  public synchronized void reset()
-  {
+  public synchronized void reset() {
     this.taskCount = 0;
     this.taskInErrorCount = 0;
     this.taskSuccessfulCount = 0;
@@ -167,8 +158,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * 
    */
-  private class NotificationSender implements Runnable
-  {
+  private class NotificationSender implements Runnable {
     /**
      * Information about the task for which this notification is created.
      */
@@ -188,16 +178,15 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
      * @param userObject a user-defined object sent along with the notification.
      * @param userNotification determines whether this is a user-defined notification sent from a task.
      */
-    public NotificationSender(final TaskInformation info, final Object userObject, final boolean userNotification)
-    {
+    public NotificationSender(final TaskInformation info, final Object userObject, final boolean userNotification) {
       this.info = info;
       this.userObject = userObject;
       this.userNotification = userNotification;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
+      if (debugEnabled) log.debug("sending task notification with userObject={}, info={}", userObject, info);
       sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info, userObject, userNotification));
     }
   }
