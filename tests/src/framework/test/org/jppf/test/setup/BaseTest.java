@@ -156,6 +156,18 @@ public class BaseTest {
   public static class BaseTestClassWatcher extends TestWatcher {
     @Override
     protected void starting(final Description description) {
+      // delete the drivers and nodes log files if they exist
+      org.apache.log4j.LogManager.resetConfiguration();
+      File dir = new File(System.getProperty("user.dir"));
+      File[] logFiles = dir.listFiles(logFileFilter);
+      if (logFiles != null) {
+        for (File file: logFiles) {
+          if (file.exists()) {
+            if (!file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
+          }
+        }
+      }
+      org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       // redirect System.out and System.err to files
       stdOut = System.out;
       stdErr = System.err;
@@ -166,14 +178,6 @@ public class BaseTest {
         print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
       print("***** start of class %s *****", description.getClassName());
-      // delete the drivers and nodes log files if they exist
-      File dir = new File(System.getProperty("user.dir"));
-      File[] logFiles = dir.listFiles(logFileFilter);
-      if (logFiles != null) {
-        for (File file: logFiles) {
-          if (!file.getName().startsWith("std_") && file.exists() && !file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
-        }
-      }
     }
 
     @Override

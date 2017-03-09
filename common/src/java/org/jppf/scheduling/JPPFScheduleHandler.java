@@ -126,10 +126,19 @@ public class JPPFScheduleHandler {
    * @param key the key associated with the action.
    */
   public void cancelAction(final Object key) {
+    cancelAction(key, true);
+  }
+
+  /**
+   * Cancel the scheduled action identified by the specified key.
+   * @param key the key associated with the action.
+   * @param mayInterruptIfRunning whether the thread that runs the task should be interrupted if the task is being executed.
+   */
+  public void cancelAction(final Object key, final boolean mayInterruptIfRunning) {
     if (key == null) return;
     ScheduledFuture<?> future = futureMap.remove(key);
     if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", future=" + future);
-    if (future != null) future.cancel(true);
+    if (future != null) future.cancel(mayInterruptIfRunning);
   }
 
   /**
