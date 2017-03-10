@@ -66,7 +66,8 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     for (int i=0; i<2; i++) {
       BaseTest.printOut("connecting to server %d", (i + 1));
       jmx[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
-      jmx[i].connectAndWait(3000L);
+      jmx[i].connectAndWait(5000L);
+      assertTrue(jmx[i].isConnected());
       assertEquals("ok", executeScriptOnServer(jmx[i], resourcePath + "/SetPeerDiscovery.js"));
     }
     String[] results = new String[2];
@@ -84,7 +85,6 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
           results[i] = result;
         }
       }
-      
     }
     for (int i=0; i<2; i++) {
       BaseTest.printOut("checking server %d", (i + 1));

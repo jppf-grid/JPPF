@@ -183,14 +183,22 @@ public class BaseTest {
     @Override
     protected void finished(final Description description) {
       print("***** finished class %s *****", description.getClassName());
-      zipLogs(description.getClassName());
       try {
         // redirect System.out and System.err back to their original destination
-        if ((stdOut != null) && (stdOut != System.out)) System.setOut(stdOut);
-        if ((stdErr != null) && (stdErr != System.err)) System.setErr(stdErr);
+        if ((stdOut != null) && (stdOut != System.out)) {
+          PrintStream tmp = System.out;
+          System.setOut(stdOut);
+          tmp.close();
+        }
+        if ((stdErr != null) && (stdErr != System.err)) {
+          PrintStream tmp = System.err;
+          System.setErr(stdErr);
+          tmp.close();
+        }
       } catch (Exception e) {
         print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
+      zipLogs(description.getClassName());
     }
   }
 }
