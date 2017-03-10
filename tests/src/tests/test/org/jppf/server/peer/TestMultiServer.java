@@ -71,14 +71,6 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   public void testSimpleJob() throws Exception {
     BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
     super.testSimpleJob(new Equal(JPPFProperties.SERVER_PORT.getName(), 11101));
-    /*
-    try {
-      super.testSimpleJob(new Equal(JPPFProperties.SERVER_PORT.getName(), 11101));
-    } catch(Exception|Error e) {
-      StreamUtils.waitKeyPressed();
-      throw e;
-    }
-    */
   }
 
   @Override
