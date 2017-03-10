@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (C) 2009 by Pavel Savara
+This file is part of tools for jni4net - bridge between Java and .NET
+http://jni4net.sourceforge.net/
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<jni4net-proxygen xmlns="http://jni4net.sf.net/@jni4net.version@/toolConfig.xsd">
+  <!-- Location where .java files will be generated into. It's relative or absolute path. -->
+  <TargetDirJvm>@outdir@/java/src</TargetDirJvm>
+  <!-- Location where .cs files will be generated into. It's relative or absolute path. -->
+  <TargetDirClr>@outdir@/cs</TargetDirClr>
+  <!--
+  <Verbose>true</Verbose>
+  -->
+
+  <ClassPath Path="classes"/>
+  <ClassPath Path="build/jppf.api.jar"/>
+  <ClassPath Path="../common/classes"/>
+  <ClassPath Path="../client/classes"/>
+  <ClassPath Path="../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
+  <ClassPath Path="../JPPF/lib/LZ4/lz4-1.3.0.jar"/>
+  <ClassPath Path="../JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
+  <ClassPath Path="@jni4net.home@/lib/jni4net.j-@jni4net.version@.jar"/>
+    
+  <!-- List of assemblies-->
+  <AssemblyReference Assembly="build/jppf.dotnet.api.dll"/>
+  <AssemblyReference Assembly="@jni4net.home@/lib/jni4net.n-@jni4net.version@.dll"/>
+ 
+  <ClrType TypeName="org.jppf.dotnet.DotnetSerializer"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetJobEventDispatcher"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetNotificationDispatcher"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetTopologyEventDispatcher"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetJobMonitoringEventDispatcher"/>
+
+</jni4net-proxygen>
