@@ -407,11 +407,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (channel.isOpen()) {
       if (debugEnabled) log.debug("establishing JMX connection for {}", info);
       JMXConnectionWrapper jmx = null;
-      if (!isPeer()) jmx = jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+      boolean peer = isPeer();
+      if (!peer) jmx = jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
       else jmx = peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
       jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this));
       jmx.connect();
-      if (debugEnabled && (jmxConnection == null)) log.debug("could not establish JMX connection for " + info);
     }
   }
 

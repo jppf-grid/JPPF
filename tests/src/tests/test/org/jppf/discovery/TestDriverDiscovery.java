@@ -64,10 +64,12 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   public void testServerSide() throws Exception {
     JMXDriverConnectionWrapper[] jmx = new JMXDriverConnectionWrapper[2];
     for (int i=0; i<2; i++) {
-      BaseTest.printOut("connecting to server %d", (i + 1));
+      BaseTest.print(false, false, "connecting to server %d", (i + 1));
       jmx[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
+      BaseTest.print(false, false, "connecting %s", jmx[i]);
       jmx[i].connectAndWait(5000L);
-      assertTrue(jmx[i].isConnected());
+      assertTrue("failed to connect " + jmx[i], jmx[i].isConnected());
+      BaseTest.print(false, false, "connected to %s", jmx[i]);
       assertEquals("ok", executeScriptOnServer(jmx[i], resourcePath + "/SetPeerDiscovery.js"));
     }
     String[] results = new String[2];
@@ -108,7 +110,6 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     JPPFConfiguration.set(JPPFProperties.REMOTE_EXECUTION_ENABLED, false);
     ClientDiscovery discovery = new ClientDiscovery();
     try (JPPFClient client = new JPPFClient()) {
-      AbstractNonStandardSetup.client = client;
       client.addDriverDiscovery(discovery);
       List<JPPFConnectionPool> pools = null;
       boolean end = false;
@@ -152,7 +153,6 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         assertNotNull(t.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
       }
-      AbstractNonStandardSetup.client = null;
     }
     assertTrue(discovery.shutdownFlag);
   }
