@@ -134,7 +134,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
-    assertTrue(n.get() >= BaseSetup.nbNodes());
+    assertTrue(String.format("expected at least <%d> but was <%d>", BaseSetup.nbNodes(), n.get()), n.get() >= BaseSetup.nbNodes());
   }
 
   /**
