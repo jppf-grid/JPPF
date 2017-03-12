@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes = { TestDriverDiscovery.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=1000, shuffleClasses=false, shuffleMethods=true, classes = { TestDriverDiscovery.class })
 public class JPPFSuite {
 }

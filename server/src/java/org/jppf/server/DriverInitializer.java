@@ -21,6 +21,7 @@ package org.jppf.server;
 import static org.jppf.utils.configuration.JPPFProperties.*;
 
 import java.lang.management.ManagementFactory;
+import java.net.*;
 import java.util.*;
 
 import javax.management.*;
@@ -128,6 +129,7 @@ public class DriverInitializer {
    */
   void registerDebugMBean() {
     if (JPPFDriver.JPPF_DEBUG) {
+      if (debugEnabled) log.debug("registering debug mbean");
       try {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         serverDebug = new ServerDebug();
@@ -162,10 +164,16 @@ public class DriverInitializer {
       connectionInfo.serverPorts = parsePorts(s, 11111);
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
-      connectionInfo.host = NetworkUtils.getManagementHost();
+      //connectionInfo.host = NetworkUtils.getManagementHost();
+      try {
+        connectionInfo.host = InetAddress.getLocalHost().getHostName();
+      } catch(UnknownHostException e) {
+        connectionInfo.host = "localhost";
+      }
       if (config.get(MANAGEMENT_ENABLED)) connectionInfo.managementPort = config.get(MANAGEMENT_PORT);
       if (config.get(MANAGEMENT_SSL_ENABLED)) connectionInfo.sslManagementPort = config.get(MANAGEMENT_SSL_PORT);
       if (config.get(RECOVERY_ENABLED)) connectionInfo.recoveryPort = config.get(RECOVERY_SERVER_PORT);
+      if (debugEnabled) log.debug("got connection information {}", connectionInfo);
     }
     return connectionInfo;
   }
@@ -175,6 +183,7 @@ public class DriverInitializer {
    */
   public void initBroadcaster() {
     if (config.get(DISCOVERY_ENABLED)) {
+      if (debugEnabled) log.debug("initializing broadcaster");
       broadcaster = new JPPFBroadcaster(getConnectionInformation());
       new Thread(broadcaster, "JPPF Broadcaster").start();
     }
@@ -185,6 +194,7 @@ public class DriverInitializer {
    */
   public void stopBroadcaster() {
     if (broadcaster != null) {
+      if (debugEnabled) log.debug("stopping broadcaster");
       broadcaster.close();
       broadcaster = null;
     }
@@ -296,11 +306,14 @@ public class DriverInitializer {
     try {
       // default is false for ssl, true for plain connection
       if (config.get(prop)) {
+        if (debugEnabled) log.debug("initializing {}management", tmp);
         server = JMXServerFactory.createServer(driver.getUuid(), ssl, ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT);
         server.start(getClass().getClassLoader());
         if (!ssl) info.managementPort = server.getManagementPort();
         else info.sslManagementPort = server.getManagementPort();
-        System.out.println(tmp + "management initialized and listening on port " + server.getManagementPort());
+        String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
+        System.out.println(msg);
+        if (debugEnabled) log.debug(msg);
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -318,6 +331,7 @@ public class DriverInitializer {
    */
   void stopJmxServer() {
     try {
+      if (debugEnabled) log.debug("stopping JMX server");
       if (jmxServer != null) jmxServer.stop();
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -337,6 +351,7 @@ public class DriverInitializer {
    */
   public void initRecoveryServer() {
     if (config.get(RECOVERY_ENABLED)) {
+      if (debugEnabled) log.debug("initializing recovery server");
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
     }
@@ -377,6 +392,7 @@ public class DriverInitializer {
   *
   */
  void registerNodeConfigListener() {
+   if (debugEnabled) log.debug("registering NodeConfigListener");
    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
    jmx.connect();
    try {

@@ -127,7 +127,8 @@ public class JPPFDriver {
    */
   private JPPFJobManager jobManager = null;
   /**
-   * Uuid for this driver.
+   * Uuid for this driver.log4j.logger.org.jppf.comm.interceptor=INFO
+
    */
   private final String uuid;
   /**
@@ -171,6 +172,7 @@ public class JPPFDriver {
    */
   @SuppressWarnings("unchecked")
   public void run() throws Exception {
+    if (debugEnabled) log.debug("starting JPPF driver");
     JPPFConnectionInformation info = initializer.getConnectionInformation();
     initializer.registerDebugMBean();
     initializer.initRecoveryServer();
@@ -178,6 +180,7 @@ public class JPPFDriver {
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
     int[] sslPorts = extractValidPorts(info.sslServerPorts);
     boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
+    if (debugEnabled) log.debug("starting nio servers");
     clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL));
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL));
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL));
@@ -203,6 +206,7 @@ public class JPPFDriver {
     }
     initializer.initBroadcaster();
     initializer.initPeers(clientClassServer);
+    if (debugEnabled) log.debug("JPPF Driver initialization complete");
     System.out.println("JPPF Driver initialization complete");
   }
 
@@ -402,6 +406,7 @@ public class JPPFDriver {
    */
   private static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer) {
     if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
+    if (debugEnabled) log.debug("starting nio server {}", nioServer);
     if(recoveryServer != null && nioServer instanceof ReaperListener) {
       Reaper reaper = recoveryServer.getReaper();
       reaper.addReaperListener((ReaperListener) nioServer);
@@ -434,6 +439,7 @@ public class JPPFDriver {
       for (int n: sslPorts) sb.append(' ').append(n);
     }
     System.out.println(sb.toString());
+    if (debugEnabled) log.debug(sb.toString());
   }
 
   /**

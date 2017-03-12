@@ -84,6 +84,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable {
    * Close this server and release the resources it is using.
    */
   public void close() {
+    if (debugEnabled) log.debug("stopping recovery server");
     setStopped(true);
     synchronized(connections) {
       try {

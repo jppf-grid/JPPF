@@ -19,7 +19,7 @@
 package org.jppf;
 
 /**
- * Performs static initializations that must be done before anything elsse.
+ * Performs static initializations that must be done before anything else.
  * @author Laurent Cohen
  * @exclude
  */

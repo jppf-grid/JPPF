@@ -49,7 +49,7 @@ public class InterceptorHandler {
     // using reflection because slf4j jars may not be in the classpath
     try {
       Class<?> loggerFactoryClass = Class.forName("org.slf4j.LoggerFactory");
-      Method m = loggerFactoryClass.getMethod("getLogger", new Class<?>[] { Class.class });
+      Method m = loggerFactoryClass.getMethod("getLogger", Class.class );
       log = m.invoke(null, InterceptorHandler.class);
       m = log.getClass().getMethod("isDebugEnabled");
       debugEnabled = (Boolean) m.invoke(log);
