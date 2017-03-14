@@ -228,9 +228,7 @@
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <formatter type="xml"/>
       <batchtest fork="yes" todir="${report}" skipNonTests="true">
-        <fileset dir="${tests.src}">
-          <include name="${pattern}"/>
-        </fileset>
+        <fileset dir="${tests.src}" includes="${pattern}"/>
       </batchtest>
     </junit>
     <antcall target="zip.last.test.logs"/>

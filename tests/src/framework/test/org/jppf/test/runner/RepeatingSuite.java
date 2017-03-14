@@ -42,7 +42,7 @@ import org.junit.runners.model.*;
  */
 public class RepeatingSuite extends Suite {
   /**
-   * Called reflectively on classes annotated with {@code @RunWith(Suite.class)}.
+   * Called reflectively on classes annotated with {@code @RunWith(RepeatingSuite.class)}.
    * @param suiteClass the root class.
    * @throws InitializationError if any error occurs.
    */

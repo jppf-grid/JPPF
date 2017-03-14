@@ -135,7 +135,7 @@ public interface ServerDebugMBean extends Serializable {
   void log(String...messages);
 
   /**
-   * Get information ont he peer driver this one is connected to.
+   * Execute the specified script.
    * @param language the script language.
    * @param script the script to execute.
    * @return the value returned by the script.

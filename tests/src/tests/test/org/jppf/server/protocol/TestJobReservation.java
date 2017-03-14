@@ -59,6 +59,13 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    *
    */
   private static JMXDriverConnectionWrapper jmx;
+  /**
+   * 
+   */
+  private static final String RESET_NODE_SCRIPT = new StringBuilder("org.jppf.utils.JPPFConfiguration.reset();\n")
+      .append("org.jppf.node.NodeRunner.getNode().triggerConfigChanged();\n")
+      .append("java.lang.System.out.println(\"reset configuration on node \" + org.jppf.node.NodeRunner.getUuid());")
+      .toString();
 
   /**
    * Launch 1 driver with 3 nodes and start the client.
@@ -104,8 +111,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   public void tearDown() throws Exception {
     if ((jobNotificationListener != null) && !jobNotificationListener.isListenerRemoved()) jmx.getJobManager().removeNotificationListener(jobNotificationListener);
     jobNotificationListener = null;
-    myNodeListener.map.clear();
-    myNodeListener.total.set(0);
+    myNodeListener.reset();
   }
 
   /**
@@ -130,6 +136,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
+    Thread.sleep(500L);
     while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
@@ -171,6 +178,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertEquals(nbTasksPerNode, nbSuccessful);
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
@@ -218,6 +226,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertEquals(nbTasksPerNode, nbSuccessful);
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
@@ -259,6 +268,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertFalse(actualNodes.isEmpty());
     assertTrue(expectedNodes.containsAll(actualNodes));
+    Thread.sleep(500L);
     while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertFalse(myNodeListener.map.isEmpty());
     assertTrue(expectedNodes.containsAll(myNodeListener.map.keySet()));
@@ -287,10 +297,49 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
+  }
+
+  /**
+   * Listener to node connection events, counts the number of times each node is restarted.
+   */
+  public static class MyNodeConnectionListener implements NotificationListener {
+    /**
+     * Map of node uuids to number of restarts.
+     */
+    final Map<String, AtomicInteger> map = new ConcurrentHashMap<>();
+    /**
+     * Total number of connection notifications.
+     */
+    final AtomicInteger total = new AtomicInteger(0);
+
+    @Override
+    public void handleNotification(final Notification notif, final Object handback) {
+      JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
+      if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(notif.getType())) {
+        String uuid = info.getUuid();
+        synchronized (this) {
+          AtomicInteger n = map.get(uuid);
+          if (n == null) map.put(uuid, n = new AtomicInteger(0));
+          n.incrementAndGet();
+          total.incrementAndGet();
+          BaseTest.print(false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
+        }
+      }
+    }
+
+    /**
+     * Reset the state of this listener.
+     */
+    public synchronized void reset() {
+      BaseTest.print(false, "resetting node connection listener");
+      map.clear();
+      total.set(0);
+    }
   }
 
   /**
@@ -310,52 +359,21 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   }
 
   /**
-   * Listener to node connection events, counts the number of times each node is restarted.
-   */
-  public static class MyNodeConnectionListener implements NotificationListener {
-    /**
-     * Map of node uuids to number of restarts.
-     */
-    final Map<String, AtomicInteger> map = new ConcurrentHashMap<>();
-    /**
-     * Total number of connection notifications.
-     */
-    final AtomicInteger total = new AtomicInteger(0);
-
-    @Override
-    public synchronized void handleNotification(final Notification notif, final Object handback) {
-      JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
-      switch (notif.getType()) {
-        case JPPFNodeConnectionNotifierMBean.CONNECTED:
-          String uuid = info.getUuid();
-          AtomicInteger n = map.get(uuid);
-          if (n == null) {
-            n = new AtomicInteger(0);
-            map.put(uuid, n);
-          }
-          n.incrementAndGet();
-          total.incrementAndGet();
-          break;
-
-        case JPPFNodeConnectionNotifierMBean.DISCONNECTED:
-          break;
-      }
-    }
-  }
-
-  /**
    * 
    */
   public class MyWatcher extends TestWatcher {
     @Override
     protected void starting(final Description description) {
       try {
-        BaseSetup.checkDriverAndNodesInitialized(1, 3);
+        int n = BaseSetup.nbNodes();
+        BaseSetup.checkDriverAndNodesInitialized(1, n);
         JPPFJob job = new JPPFJob();
         job.setName("broadcast reset node config");
         job.getSLA().setBroadcastJob(true);
         job.add(new BroadcastTask());
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** before resetting nodes configurations *****");
         client.submitJob(job);
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** after resetting nodes configurations *****");
         while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
         myNodeListener.map.clear();
       } catch (Exception e) {

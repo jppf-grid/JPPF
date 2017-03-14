@@ -18,6 +18,7 @@
 
 package org.jppf.node.debug;
 
+import org.jppf.scripting.*;
 import org.slf4j.*;
 
 /**
@@ -34,6 +35,18 @@ public class NodeDebug implements NodeDebugMBean {
   public void log(final String... messages) {
     if (messages != null) {
       for (String message: messages) log.info(message);
+    }
+  }
+
+  @Override
+  public Object executeScript(final String language, final String script) throws JPPFScriptingException {
+    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
+    ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
+    if (runner == null) throw new IllegalStateException("Could not instantiate a script runner for language = " + language);
+    try {
+      return runner.evaluate(script, null);
+    } finally {
+      ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 }

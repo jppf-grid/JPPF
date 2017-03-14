@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.discovery.TestDriverDiscovery;
+import test.org.jppf.server.protocol.TestJobReservation;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 
@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=1000, shuffleClasses=false, shuffleMethods=true, classes = { TestDriverDiscovery.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes = { TestJobReservation.class })
 public class JPPFSuite {
 }
