@@ -44,9 +44,13 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    * Path to the folder containng the scripts.
    */
   private final String resourcePath = getClass().getPackage().getName().replace(".", "/");
+  /**
+   * JMX connections to all drivers.
+   */
+  private static final JMXDriverConnectionWrapper[] JMX = new JMXDriverConnectionWrapper[2];
 
   /**
-   * Launches 2 drivers with 1 node attached to each and start the client.
+   * Launches 2 drivers with 1 node attached to each.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -54,6 +58,27 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     Configuration config = createConfig("discovery");
     config.driverLog4j = "classes/tests/config/discovery/log4j-driver.properties";
     BaseSetup.setup(2, 2, false, true, config);
+    long start = System.currentTimeMillis();
+    long timeout = 60_000L;
+    for (int i=0; i<JMX.length; i++) {
+      BaseTest.print(false, false, "connecting to server %d", (i + 1));
+      JMX[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
+      BaseTest.print(false, false, "connecting to %s", JMX[i]);
+      JMX[i].connectAndWait(timeout - (System.currentTimeMillis() - start));
+      assertTrue("failed to connect to " + JMX[i], JMX[i].isConnected());
+      BaseTest.print(false, false, "connected to %s", JMX[i]);
+    }
+  }
+
+  /**
+   * Close the JMX connections.
+   * @throws Exception if a process could not be started.
+   */
+  @AfterClass
+  public static void teardown() throws Exception {
+    for (int i=0; i<JMX.length; i++) {
+      if (JMX[i] != null) JMX[i].close();
+    }
   }
 
   /**
@@ -62,20 +87,15 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testServerSide() throws Exception {
-    JMXDriverConnectionWrapper[] jmx = new JMXDriverConnectionWrapper[2];
     for (int i=0; i<2; i++) {
-      BaseTest.printOut("connecting to server %d", (i + 1));
-      jmx[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
-      jmx[i].connectAndWait(5000L);
-      assertTrue(jmx[i].isConnected());
-      assertEquals("ok", executeScriptOnServer(jmx[i], resourcePath + "/SetPeerDiscovery.js"));
+      assertEquals("ok", executeScriptOnServer(JMX[i], resourcePath + "/SetPeerDiscovery.js"));
     }
     String[] results = new String[2];
     boolean good = false;
     while (!good) {
       good = true;
       for (int i=0; i<2; i++) {
-        String result = (String) executeScriptOnServer(jmx[i], resourcePath + "/RetrievePeerDiscovery.js");
+        String result = (String) executeScriptOnServer(JMX[i], resourcePath + "/RetrievePeerDiscovery.js");
         if (result.startsWith("ko")) {
           good = false;
           BaseTest.printOut("driver response: %s", result);

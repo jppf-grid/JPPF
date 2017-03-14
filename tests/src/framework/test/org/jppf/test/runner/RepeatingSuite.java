@@ -21,7 +21,7 @@ package test.org.jppf.test.runner;
 import java.lang.annotation.*;
 import java.util.*;
 
-import org.junit.runner.Runner;
+import org.junit.runner.*;
 import org.junit.runners.*;
 import org.junit.runners.model.*;
 
@@ -42,7 +42,7 @@ import org.junit.runners.model.*;
  */
 public class RepeatingSuite extends Suite {
   /**
-   * Called reflectively on classes annotated with {@code @RunWith(Suite.class)}.
+   * Called reflectively on classes annotated with {@code @RunWith(RepeatingSuite.class)}.
    * @param suiteClass the root class.
    * @throws InitializationError if any error occurs.
    */
@@ -68,7 +68,7 @@ public class RepeatingSuite extends Suite {
     List<Runner> runners = new ArrayList<>(repeat * classes.size());
     // compute the max number of digits for the iteration numbers
     int nbDigits = (repeat > 1) ? (int) Math.ceil(Math.log10(repeat)) : 1;
-    // iteration numbers are 0-padded up to the max nuber of digits
+    // iteration numbers are 0-padded up to the max number of digits
     String format = "[%0" + nbDigits + "d]";
     for (int i=0; i<repeat; i++) {
       final String suffix = String.format(format, i);
@@ -122,5 +122,10 @@ public class RepeatingSuite extends Suite {
      * @return the number of times to repeat.
      */
     public int repeat() default 1;
+  }
+
+  @Override
+  protected List<Runner> getChildren() {
+    return super.getChildren();
   }
 }

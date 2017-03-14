@@ -320,6 +320,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   @SuppressWarnings("deprecation")
   public void loadTaskReturnListeners() {
+    if (debugEnabled) log.debug("loading task return listeners");
     List<JobTasksListener> list2 = new ServiceFinder().findProviders(JobTasksListener.class);
     for (JobTasksListener listener: list2) addJobTasksListener(listener);
   }

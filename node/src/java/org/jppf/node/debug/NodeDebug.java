@@ -19,6 +19,7 @@
 package org.jppf.node.debug;
 
 import org.jppf.node.NodeRunner;
+import org.jppf.scripting.*;
 import org.jppf.server.node.JPPFNode;
 import org.slf4j.*;
 
@@ -43,5 +44,17 @@ public class NodeDebug implements NodeDebugMBean {
   public void cancel() {
     JPPFNode node = (JPPFNode) NodeRunner.getNode();
     node.getExecutionManager().cancelAllTasks(true, false);
+  }
+
+  @Override
+  public Object executeScript(final String language, final String script) throws JPPFScriptingException {
+    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
+    ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
+    if (runner == null) throw new IllegalStateException("Could not instantiate a script runner for language = " + language);
+    try {
+      return runner.evaluate(script, null);
+    } finally {
+      ScriptRunnerFactory.releaseScriptRunner(runner);
+    }
   }
 }

@@ -411,7 +411,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       else jmx = peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
       jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this));
       jmx.connect();
-      if (debugEnabled && (jmxConnection == null)) log.debug("could not establish JMX connection for " + info);
     }
   }
 

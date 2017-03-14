@@ -144,7 +144,24 @@ public class BaseTest {
    * @return the timestamp formatted according to {@link #SDF}.
    */
   public static String getFormattedTimestamp() {
-    Date date = new Date();
+     return getFormattedTimestamp(new Date());
+  }
+
+  /**
+   * Get the current timestamp as a formatted string.
+   * @param timestamp the timestamp to format.
+   * @return the timestamp formatted according to {@link #SDF}.
+   */
+  public static String getFormattedTimestamp(final long timestamp) {
+     return getFormattedTimestamp(new Date(timestamp));
+  }
+
+  /**
+   * Get the current timestamp as a formatted string.
+   * @param date the date to format.
+   * @return the timestamp formatted according to {@link #SDF}.
+   */
+  public static String getFormattedTimestamp(final Date date) {
     synchronized(SDF) {
       return SDF.format(date);
     }

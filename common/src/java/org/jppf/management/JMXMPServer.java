@@ -81,7 +81,6 @@ public class JMXMPServer extends AbstractJMXServer {
       Thread.currentThread().setContextClassLoader(cl);
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties config = JPPFConfiguration.getProperties();
-      managementHost = NetworkUtils.getManagementHost();
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
       Map<String, Object> env = new HashMap<>();
@@ -95,14 +94,13 @@ public class JMXMPServer extends AbstractJMXServer {
       env.put("jmx.remote.object.wrapping", newObjectWrapping());
       boolean found = false;
       JMXServiceURL url = null;
-      InetAddress addr = InetAddress.getByName(managementHost);
-      String host = String.format((addr instanceof Inet6Address) ? "[%s]" : "%s", addr.getHostAddress());
       while (!found) {
         try {
-          url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + managementPort);
+          url = new JMXServiceURL("jmxmp",  null, managementPort);
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
           found = true;
+          managementHost = url.getHost();
           forwarder = createMBeanServerForwarder();
           if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
         } catch(Exception e) {

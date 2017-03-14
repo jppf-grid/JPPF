@@ -70,7 +70,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * An optional statistics object from which events can be received so the corresponding properties can be kept up to date.
    */
-  private final transient JPPFStatistics stats;
+  private transient JPPFStatistics stats;
 
   /**
    * Initialize this system information object with the specified uuid.
@@ -297,6 +297,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("stats", statsProperties);
     if (stats != null) {
       for (JPPFSnapshot snapshot: stats) JPPFStatisticsHelper.toProperties(statsProperties, snapshot);
+      stats = null;
     }
     return this;
   }

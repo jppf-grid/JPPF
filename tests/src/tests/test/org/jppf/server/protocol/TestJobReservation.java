@@ -104,8 +104,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   public void tearDown() throws Exception {
     if ((jobNotificationListener != null) && !jobNotificationListener.isListenerRemoved()) jmx.getJobManager().removeNotificationListener(jobNotificationListener);
     jobNotificationListener = null;
-    myNodeListener.map.clear();
-    myNodeListener.total.set(0);
+    myNodeListener.reset();
   }
 
   /**
@@ -130,11 +129,12 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
+    Thread.sleep(500L);
     while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
-    assertTrue(n.get() >= BaseSetup.nbNodes());
+    assertTrue(String.format("expected at least <%d> but was <%d>", BaseSetup.nbNodes(), n.get()), n.get() >= BaseSetup.nbNodes());
   }
 
   /**
@@ -171,6 +171,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertEquals(nbTasksPerNode, nbSuccessful);
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
@@ -218,6 +219,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertEquals(nbTasksPerNode, nbSuccessful);
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
@@ -259,6 +261,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     }
     assertFalse(actualNodes.isEmpty());
     assertTrue(expectedNodes.containsAll(actualNodes));
+    Thread.sleep(500L);
     while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertFalse(myNodeListener.map.isEmpty());
     assertTrue(expectedNodes.containsAll(myNodeListener.map.keySet()));
@@ -287,26 +290,11 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
+    Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
-  }
-
-  /**
-   * Task which resets the node configuration.
-   */
-  public static class BroadcastTask extends AbstractTask<String> {
-    @Override
-    public void run() {
-      try {
-        JPPFConfiguration.reset();
-        ((JPPFNode) NodeRunner.getNode()).triggerConfigChanged();
-        printOut("reset configuration on node %s", NodeRunner.getUuid());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
   }
 
   /**
@@ -323,22 +311,42 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final AtomicInteger total = new AtomicInteger(0);
 
     @Override
-    public synchronized void handleNotification(final Notification notif, final Object handback) {
+    public void handleNotification(final Notification notif, final Object handback) {
       JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
-      switch (notif.getType()) {
-        case JPPFNodeConnectionNotifierMBean.CONNECTED:
-          String uuid = info.getUuid();
+      if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(notif.getType())) {
+        String uuid = info.getUuid();
+        synchronized (this) {
           AtomicInteger n = map.get(uuid);
-          if (n == null) {
-            n = new AtomicInteger(0);
-            map.put(uuid, n);
-          }
+          if (n == null) map.put(uuid, n = new AtomicInteger(0));
           n.incrementAndGet();
           total.incrementAndGet();
-          break;
+          BaseTest.print(false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
+        }
+      }
+    }
 
-        case JPPFNodeConnectionNotifierMBean.DISCONNECTED:
-          break;
+    /**
+     * Reset the state of this listener.
+     */
+    public synchronized void reset() {
+      BaseTest.print(false, "resetting node connection listener");
+      map.clear();
+      total.set(0);
+    }
+  }
+
+  /**
+   * Task which resets the node configuration.
+   */
+  public static class BroadcastTask extends AbstractTask<String> {
+    @Override
+    public void run() {
+      try {
+        JPPFConfiguration.reset();
+        ((JPPFNode) NodeRunner.getNode()).triggerConfigChanged();
+        System.out.println("reset configuration on node " + NodeRunner.getUuid());
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
   }
@@ -350,12 +358,15 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     @Override
     protected void starting(final Description description) {
       try {
-        BaseSetup.checkDriverAndNodesInitialized(1, 3);
+        int n = BaseSetup.nbNodes();
+        BaseSetup.checkDriverAndNodesInitialized(1, n);
         JPPFJob job = new JPPFJob();
         job.setName("broadcast reset node config");
         job.getSLA().setBroadcastJob(true);
         job.add(new BroadcastTask());
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** before resetting nodes configurations *****");
         client.submitJob(job);
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** after resetting nodes configurations *****");
         while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
         myNodeListener.map.clear();
       } catch (Exception e) {
