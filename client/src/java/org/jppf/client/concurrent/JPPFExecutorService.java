@@ -88,8 +88,18 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param client the {@link JPPFClient} to use for job submission.
    */
   public JPPFExecutorService(final JPPFClient client) {
+    this(client, 0, 0L);
+  }
+
+  /**
+   * Initialize this executor service with the specified JPPF client, batch size and batch tiemout.
+   * @param client the {@link JPPFClient} to use for job submission.
+   * @param batchSize the minimum number of tasks that must be submitted before they are sent to the server.
+   * @param batchTimeout the maximum time to wait before the next batch of tasks is to be sent for execution.
+   */
+  public JPPFExecutorService(final JPPFClient client, final int batchSize, final long batchTimeout) {
     this.client = client;
-    batchHandler = new BatchHandler(this);
+    batchHandler = new BatchHandler(this, batchSize, batchTimeout);
     new Thread(batchHandler, "BatchHandler").start();
   }
 
@@ -339,7 +349,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
     shuttingDown.set(true);
     synchronized (jobMap) {
       if (debugEnabled) log.debug("immediate shutdown requested, " + jobMap.size() + " jobs pending");
-      //terminated.compareAndSet(false, jobMap.isEmpty());
       jobMap.clear();
     }
     setTerminated();
@@ -352,7 +361,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Submit the specified job for execution on the grid.
    * @param job the job to submit.
    * @throws Exception if any error occurs.
-   * @exclude
    */
   void submitJob(final JPPFJob job) throws Exception {
     if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getJobTasks().size() + " tasks");
@@ -368,8 +376,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   private void waitForTerminated(final long timeout) {
     long elapsed = 0L;
+    long maxWait = timeout <= 0L ? Long.MAX_VALUE : timeout;
     long start = System.nanoTime();
-    while (!isTerminated() && (elapsed < timeout)) {
+    while (!isTerminated() && (elapsed < maxWait)) {
       synchronized (this) {
         try {
           wait(timeout - elapsed);
@@ -407,9 +416,11 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Set the minimum number of tasks that must be submitted before they are sent to the server.
    * @param batchSize the batch size as an int.
+   * @return this executor service, for method chaining.
    */
-  public void setBatchSize(final int batchSize) {
+  public JPPFExecutorService setBatchSize(final int batchSize) {
     batchHandler.setBatchSize(batchSize);
+    return this;
   }
 
   /**
@@ -423,9 +434,11 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
    * @param batchTimeout the timeout as a long.
+   * @return this executor service, for method chaining.
    */
-  public void setBatchTimeout(final long batchTimeout) {
+  public JPPFExecutorService setBatchTimeout(final long batchTimeout) {
     batchHandler.setBatchTimeout(batchTimeout);
+    return this;
   }
 
   /**

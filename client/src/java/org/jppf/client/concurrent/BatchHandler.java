@@ -50,48 +50,48 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   /**
    * Count of jobs created by this executor service.
    */
-  private static AtomicLong jobCount = new AtomicLong(0);
+  private static final AtomicLong JOB_COUNT = new AtomicLong(0);
   /**
    * The minimum number of tasks that must be submitted before they are sent to the server.
    */
-  private int batchSize = 0;
+  private int batchSize;
   /**
    * The maximum time to wait before the next batch of tasks is to be sent for execution.
    */
-  private long batchTimeout = 0L;
+  private long batchTimeout;
   /**
    * The JPPFExecutorService whose tasks are batched.
    */
-  private JPPFExecutorService executor = null;
+  private final JPPFExecutorService executor;
   /**
    * The job to send for execution. If the reference is ont null, then the job is sent immediately.
    */
-  private AtomicReference<JPPFJob> currentJobRef = new AtomicReference<>(null);
+  private final AtomicReference<JPPFJob> currentJobRef = new AtomicReference<>(null);
   /**
    * The next job being prepared. It will be assigned to <code>currentJobRef</code> when it is ready for execution,
    * depending on the batching parameters.
    */
-  private AtomicReference<JPPFJob> nextJobRef = new AtomicReference<>(null);
+  private final AtomicReference<JPPFJob> nextJobRef = new AtomicReference<>(null);
   /**
    * The time at which we started to count for the the timeout.
    */
-  private long start = 0L;
+  private long start;
   /**
    * Time elapsed since the start.
    */
-  private long elapsed = 0L;
+  private long elapsed;
   /**
    * Used to synchronize access to <code>currentJobRef</code> and <code>nextJobRef</code>
    */
-  private ReentrantLock lock = new ReentrantLock(true);
+  private final ReentrantLock lock = new ReentrantLock(true);
   /**
    * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
    */
-  private Condition jobReady = lock.newCondition();
+  private final Condition jobReady = lock.newCondition();
   /**
    * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
    */
-  private Condition submittingJob = lock.newCondition();
+  private final Condition submittingJob = lock.newCondition();
   /**
    * The configuration for this batch handler.
    */
@@ -102,7 +102,19 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * @param executor the JPPFExecutorService whose tasks are batched.
    */
   BatchHandler(final JPPFExecutorService executor) {
+    this(executor, 0, 0L);
+  }
+
+  /**
+   * Initialize with the specified executor service, batch size and batch tiemout.
+   * @param executor the JPPFExecutorService whose tasks are batched.
+   * @param batchSize the minimum number of tasks that must be submitted before they are sent to the server.
+   * @param batchTimeout the maximum time to wait before the next batch of tasks is to be sent for execution.
+   */
+  BatchHandler(final JPPFExecutorService executor, final int batchSize, final long batchTimeout) {
     this.executor = executor;
+    this.batchSize = batchSize;
+    this.batchTimeout = batchTimeout;
     nextJobRef.set(createJob());
   }
 
@@ -331,7 +343,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private JPPFJob createJob() {
     JPPFJob job = new JPPFJob();
-    job.setName(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
+    job.setName(getClass().getSimpleName() + " job " + JOB_COUNT.incrementAndGet());
     job.setBlocking(false);
     job.addJobListener(executor);
     if (debugEnabled) log.debug("created job " + job);

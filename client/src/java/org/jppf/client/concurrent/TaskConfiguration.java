@@ -32,8 +32,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * </ul>
  * @author Laurent Cohen
  */
-public interface TaskConfiguration
-{
+public interface TaskConfiguration {
   /**
    * Get the delegate for the <code>onCancel()</code> method.
    * @return a {@link JPPFTaskCallback} instance.
@@ -43,8 +42,9 @@ public interface TaskConfiguration
   /**
    * Set the delegate for the <code>onCancel()</code> method.
    * @param cancelCallback a {@link JPPFTaskCallback} instance.
+   * @return this task configuration, for method chaining.
    */
-  void setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback);
+  TaskConfiguration setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback);
 
   /**
    * Get the delegate for the <code>onTimeout()</code> method.
@@ -55,8 +55,9 @@ public interface TaskConfiguration
   /**
    * Set the delegate for the <code>onTimeout()</code> method.
    * @param timeoutCallback a {@link JPPFTaskCallback} instance.
+   * @return this task configuration, for method chaining.
    */
-  void setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback);
+  TaskConfiguration setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback);
 
   /**
    * Get the timeout set on the task.
@@ -67,6 +68,7 @@ public interface TaskConfiguration
   /**
    * Set the timeout set on the task.
    * @param timeoutSchedule a {@link JPPFSchedule} instance.
+   * @return this task configuration, for method chaining.
    */
-  void setTimeoutSchedule(final JPPFSchedule timeoutSchedule);
+  TaskConfiguration setTimeoutSchedule(final JPPFSchedule timeoutSchedule);
 }

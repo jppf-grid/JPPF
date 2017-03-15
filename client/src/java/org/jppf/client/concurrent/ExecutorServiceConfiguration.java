@@ -26,8 +26,7 @@ package org.jppf.client.concurrent;
  * explicitly breaking the semantics of the {@link java.util.concurrent.ExecutorService ExecutorService} interface.
  * @author Laurent Cohen
  */
-public interface ExecutorServiceConfiguration
-{
+public interface ExecutorServiceConfiguration {
   /**
    * Get the configuration to use for the jobs submitted by the executor service.
    * @return a {@link JobConfiguration} instance.

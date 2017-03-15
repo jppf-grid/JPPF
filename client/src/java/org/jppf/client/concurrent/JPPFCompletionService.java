@@ -98,7 +98,7 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
    */
   private JPPFTaskFuture<V> processFuture(final JPPFTaskFuture<V> future) {
     JPPFJob job = future.getJob();
-    String uuid = future.getJob().getUuid();
+    String uuid = job.getUuid();
     synchronized(futureMap) {
       Map<Integer, JPPFTaskFuture<V>> map = futureMap.get(uuid);
       if (map == null) {

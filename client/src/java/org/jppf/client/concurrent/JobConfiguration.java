@@ -42,10 +42,26 @@ public interface JobConfiguration {
   JobSLA getSLA();
 
   /**
+   * Get the service level agreement between the job and the server.
+   * @param jobSLA an instance of <code>JPPFJobSLA</code>.
+   * @return this job configuration, for method chaining.
+   * @exclude
+   */
+  JobConfiguration setSLA(final JobSLA jobSLA);
+
+  /**
    * Get the service level agreement between the job and the client.
    * @return an instance of {@link JobClientSLA}.
    */
   JobClientSLA getClientSLA();
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param jobClientSLA an instance of <code>JPPFJobSLA</code>.
+   * @return this job configuration, for method chaining.
+   * @exclude
+   */
+  JobConfiguration setClientSLA(final JobClientSLA jobClientSLA);
 
   /**
    * Get the user-defined metadata associated with this job.
@@ -64,8 +80,9 @@ public interface JobConfiguration {
    * Set the persistence manager that enables saving and restoring the state of this job.
    * @param persistenceManager a {@link JobPersistence} instance.
    * @param <T> the type of the keys used by the persistence manager.
+   * @return this job configuration, for method chaining.
    */
-  <T> void setPersistenceManager(final JobPersistence<T> persistenceManager);
+  <T> JobConfiguration setPersistenceManager(final JobPersistence<T> persistenceManager);
 
   /**
    * Get the job's data provider.
@@ -76,20 +93,23 @@ public interface JobConfiguration {
   /**
    * Set the job's data provider.
    * @param dataProvider a {@link DataProvider} instance.
+   * @return this job configuration, for method chaining.
    */
-  void setDataProvider(DataProvider dataProvider);
+  JobConfiguration setDataProvider(DataProvider dataProvider);
 
   /**
    * Add a listener to the list of job listeners.
    * @param listener a {@link JobListener} instance.
+   * @return this job configuration, for method chaining.
    */
-  void addJobListener(JobListener listener);
+  JobConfiguration addJobListener(JobListener listener);
 
   /**
    * Remove a listener from the list of job listeners.
    * @param listener a {@link JobListener} instance.
+   * @return this job configuration, for method chaining.
    */
-  void removeJobListener(JobListener listener);
+  JobConfiguration removeJobListener(JobListener listener);
 
   /**
    * Get all the job listeners added to this job configuration. 

@@ -18,14 +18,12 @@
 
 package org.jppf.client.concurrent;
 
-
 /**
  * Concrete implementation of the {@link ExecutorServiceConfiguration} interface.
  * @author Laurent Cohen
  * @exclude
  */
-class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration
-{
+class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration {
   /**
    * The configuration to use for the jobs submitted by the executor service.
    */
@@ -38,31 +36,18 @@ class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration
   /**
    * Initialize this executor service configuration.
    */
-  ExecutorServiceConfigurationImpl()
-  {
-    this(new JobConfigurationImpl(), new TaskConfigurationImpl());
-  }
-
-  /**
-   * Initialize this executor service configuration.
-   * @param jobConfiguration the job configuration to use.
-   * @param taskConfiguration he configuration to use.
-   */
-  ExecutorServiceConfigurationImpl(final JobConfiguration jobConfiguration, final TaskConfiguration taskConfiguration)
-  {
-    this.jobConfiguration = jobConfiguration;
-    this.taskConfiguration = taskConfiguration;
+  ExecutorServiceConfigurationImpl() {
+    this.jobConfiguration = new JobConfigurationImpl();
+    this.taskConfiguration = new TaskConfigurationImpl();
   }
 
   @Override
-  public JobConfiguration getJobConfiguration()
-  {
+  public JobConfiguration getJobConfiguration() {
     return jobConfiguration;
   }
 
   @Override
-  public TaskConfiguration getTaskConfiguration()
-  {
+  public TaskConfiguration getTaskConfiguration() {
     return taskConfiguration;
   }
 }

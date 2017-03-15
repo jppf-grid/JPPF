@@ -24,6 +24,7 @@ import org.jppf.scheduling.JPPFSchedule;
 /**
  * Configuration for tasks submitted by a <code>JPPFExecutorService</code> which do not extend <code>JPPFTask</code>.
  * @author Laurent Cohen
+ * @exclude
  */
 class TaskConfigurationImpl implements TaskConfiguration {
   /**
@@ -51,8 +52,9 @@ class TaskConfigurationImpl implements TaskConfiguration {
   }
 
   @Override
-  public void setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback) {
+  public TaskConfiguration setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback) {
     this.cancelCallback = cancelCallback;
+    return this;
   }
 
   @Override
@@ -61,8 +63,9 @@ class TaskConfigurationImpl implements TaskConfiguration {
   }
 
   @Override
-  public void setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback) {
+  public TaskConfiguration setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback) {
     this.timeoutCallback = timeoutCallback;
+    return this;
   }
 
   @Override
@@ -71,7 +74,8 @@ class TaskConfigurationImpl implements TaskConfiguration {
   }
 
   @Override
-  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
+  public TaskConfiguration setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
     this.timeoutSchedule = timeoutSchedule;
+    return this;
   }
 }
