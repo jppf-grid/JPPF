@@ -343,7 +343,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   public String submitJob(final JPPFJob job, final JobStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this jobmanager was closed");
     List<Task<?>> pendingTasks = new ArrayList<>();
-    if (listener != null) job.getResultCollector().addJobStatusListener(listener);
+    if (listener != null) job.addJobStatusListener(listener);
     List<Task<?>> tasks = job.getJobTasks();
     for (Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
     queue.addBundle(new ClientJob(job, pendingTasks));

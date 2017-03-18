@@ -18,22 +18,31 @@
 
 package org.jppf.client;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
-import org.jppf.client.event.JobListener;
+import org.jppf.client.event.*;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent a JPPF job and hold all the required elements:
  * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJob {
+public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJob, JobStatusHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractJPPFJob.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Explicit serialVersionUID.
    */
@@ -91,6 +100,18 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * Whether this job has been cancelled.
    */
   transient final AtomicBoolean cancelled = new AtomicBoolean(false);
+  /**
+   * The status of this job.
+   */
+  private AtomicReference<JobStatus> status = new AtomicReference<>(JobStatus.SUBMITTED);
+  /**
+   * List of listeners registered to receive this job's status change notifications.
+   */
+  private transient List<JobStatusListener> statusListeners = new ArrayList<>();
+  /**
+   * 
+   */
+  private transient Object resultsReceivedLock = new Object();
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -108,6 +129,31 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   public AbstractJPPFJob(final String jobUuid) {
     this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
     name = this.uuid;
+  }
+
+  @Override
+  public String getUuid() {
+    return uuid;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Set the user-defined display name for this job.
+   * @param name the display name as a string.
+   * @return this job, for method chaining.
+   */
+  public AbstractJPPFJob setName(final String name) {
+    this.name = name;
+    return this;
+  }
+
+  @Override
+  public int getTaskCount() {
+    return tasks.size();
   }
 
   @Override
@@ -129,6 +175,78 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    */
   public JobResults getResults() {
     return results;
+  }
+
+  /**
+   * Get the count of the tasks in this job that haven completed.
+   * @return the number of executed tasks in this job.
+   * @since 4.2
+   */
+  public int executedTaskCount() {
+    return results.size();
+  }
+
+  /**
+   * Get the count of the tasks in this job that haven't yet been executed.
+   * @return the number of unexecuted tasks in this job.
+   * @since 4.2
+   */
+  public int unexecutedTaskCount() {
+    return tasks.size() - results.size();
+  }
+
+  /**
+   * Get the container for data shared between tasks.
+   * @return a <code>DataProvider</code> instance.
+   */
+  public DataProvider getDataProvider() {
+    return dataProvider;
+  }
+
+  /**
+   * Set the container for data shared between tasks.
+   * @param dataProvider a <code>DataProvider</code> instance.
+   * @return this job, for method chaining.
+   */
+  public AbstractJPPFJob setDataProvider(final DataProvider dataProvider) {
+    this.dataProvider = dataProvider;
+    return this;
+  }
+
+  /**
+   * Determine whether the execution of this job is blocking on the client side.
+   * @return true if the execution is blocking, false otherwise.
+   */
+  public boolean isBlocking() {
+    return blocking;
+  }
+
+  /**
+   * Specify whether the execution of this job is blocking on the client side.
+   * @param blocking true if the execution is blocking, false otherwise.
+   * @return this job, for method chaining.
+   */
+  public AbstractJPPFJob setBlocking(final boolean blocking) {
+    this.blocking = blocking;
+    return this;
+  }
+
+  @Override
+  public JobSLA getSLA() {
+    return jobSLA;
+  }
+
+  /**
+   * Get the job SLA for the client side.
+   * @return an instance of <code>JobSLA</code>.
+   */
+  public JobClientSLA getClientSLA() {
+    return jobClientSLA;
+  }
+
+  @Override
+  public JobMetadata getMetadata() {
+    return jobMetadata;
   }
 
   /**
@@ -189,5 +307,89 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    */
   public AtomicBoolean getCancelledFlag() {
     return cancelled;
+  }
+
+
+  @Override
+  public JobStatus getStatus() {
+    return status.get();
+  }
+
+  @Override
+  public void setStatus(final JobStatus newStatus) {
+    if (status.get() != newStatus) {
+      if (debugEnabled) log.debug("job [" + uuid + "] status changing from '" + this.status + "' to '" + newStatus + "'");
+      this.status.set(newStatus);
+      fireStatusChangeEvent(newStatus);
+    }
+  }
+
+  /**
+   * Add a listener to the list of status listeners.
+   * @param listener the listener to add.
+   * @excluded
+   */
+  public void addJobStatusListener(final JobStatusListener listener) {
+    synchronized(statusListeners) {
+      if (debugEnabled) log.debug("job [" + uuid + "] adding status listener " + listener);
+      if (listener != null) statusListeners.add(listener);
+    }
+  }
+
+  /**
+   * Remove a listener from the list of status listeners.
+   * @param listener the listener to remove.
+   * @excluded
+   */
+  public void removeJobStatusListener(final JobStatusListener listener) {
+    synchronized(statusListeners) {
+      if (debugEnabled) log.debug("job [" + uuid + "] removing status listener " + listener);
+      if (listener != null) statusListeners.remove(listener);
+    }
+  }
+
+  /**
+   * Notify all listeners of a change of status for this job.
+   * @param newStatus the status for job event.
+   * @exclude
+   */
+  protected void fireStatusChangeEvent(final JobStatus newStatus) {
+    synchronized(statusListeners) {
+      if (debugEnabled) log.debug("job [" + uuid + "] fire status changed event for '" + newStatus + "'");
+      if (!statusListeners.isEmpty()) {
+        JobStatusEvent event = new JobStatusEvent(uuid, newStatus);
+        for (JobStatusListener listener: statusListeners) listener.jobStatusChanged(event);
+      }
+    }
+  }
+
+  /**
+   * @return a lock object used to synchronize on the {@code resultsReceived()} method calls.
+   * @exclude
+   */
+  public Object getResultsReceivedLock() {
+    return resultsReceivedLock;
+  }
+
+  /**
+   * Save the state of the {@code AbstractJPPFJob} instance to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write the job. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.defaultWriteObject();
+  }
+
+  /**
+   * Reconstitute the {@code AbstractJPPFJob} instance from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the job. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    statusListeners = new ArrayList<>();
+    resultsReceivedLock = new Object();
+    listeners = new CopyOnWriteArrayList<>();
   }
 }

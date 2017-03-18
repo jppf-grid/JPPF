@@ -18,17 +18,17 @@
 
 package org.jppf.client;
 
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.event.*;
-import org.jppf.client.persistence.JobPersistence;
+import org.jppf.client.event.JobEvent.Type;
+import org.jppf.client.persistence.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -46,13 +46,13 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   private static Logger log = LoggerFactory.getLogger(JPPFJob.class);
   /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The listener that receives notifications of completed tasks.
-   */
-  transient JPPFResultCollector resultCollector;
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -69,36 +69,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   public JPPFJob(final String jobUuid) {
     super(jobUuid);
-    resultCollector = new JPPFResultCollector(this);
-  }
-
-  /**
-   * Get the listener that receives notifications of completed tasks.
-   * @return a <code>TaskCompletionListener</code> instance.
-   * @exclude
-   */
-  public JPPFResultCollector getResultCollector() {
-    return resultCollector;
-  }
-
-  @Override
-  public String getUuid() {
-    return uuid;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Set the user-defined display name for this job.
-   * @param name the display name as a string.
-   * @return this job, for method chaining.
-   */
-  public JPPFJob setName(final String name) {
-    this.name = name;
-    return this;
   }
 
   /**
@@ -182,60 +152,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
-   * Get the container for data shared between tasks.
-   * @return a <code>DataProvider</code> instance.
-   */
-  public DataProvider getDataProvider() {
-    return dataProvider;
-  }
-
-  /**
-   * Set the container for data shared between tasks.
-   * @param dataProvider a <code>DataProvider</code> instance.
-   * @return this job, for method chaining.
-   */
-  public JPPFJob setDataProvider(final DataProvider dataProvider) {
-    this.dataProvider = dataProvider;
-    return this;
-  }
-
-  /**
-   * Determine whether the execution of this job is blocking on the client side.
-   * @return true if the execution is blocking, false otherwise.
-   */
-  public boolean isBlocking() {
-    return blocking;
-  }
-
-  /**
-   * Specify whether the execution of this job is blocking on the client side.
-   * @param blocking true if the execution is blocking, false otherwise.
-   * @return this job, for method chaining.
-   */
-  public JPPFJob setBlocking(final boolean blocking) {
-    this.blocking = blocking;
-    return this;
-  }
-
-  @Override
-  public JobSLA getSLA() {
-    return jobSLA;
-  }
-
-  /**
-   * Get the job SLA for the client side.
-   * @return an instance of <code>JobSLA</code>.
-   */
-  public JobClientSLA getClientSLA() {
-    return jobClientSLA;
-  }
-
-  @Override
-  public JobMetadata getMetadata() {
-    return jobMetadata;
-  }
-
-  /**
    * Add a listener to the list of job listeners.
    * @param listener a {@link JobListener} instance.
    */
@@ -300,24 +216,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
-   * Get the count of the tasks in this job that haven completed.
-   * @return the number of executed tasks in this job.
-   * @since 4.2
-   */
-  public int executedTaskCount() {
-    return results.size();
-  }
-
-  /**
-   * Get the count of the tasks in this job that haven't yet been executed.
-   * @return the number of unexecuted tasks in this job.
-   * @since 4.2
-   */
-  public int unexecutedTaskCount() {
-    return tasks.size() - results.size();
-  }
-
-  /**
    * Wait until all execution results of the tasks in this job have been collected.
    * This method is equivalent to {@code get()}, except that it doesn't raise an exception.
    * @return the list of resulting tasks.
@@ -350,15 +248,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   public List<Task<?>> getAllResults() {
     return results.getResultsList();
-  }
-
-  /**
-   * Get the execution status of this job.
-   * @return a {@link JobStatus} enum value, or {@code null} isd the status could not be determined.
-   * @since 4.2
-   */
-  public JobStatus getStatus() {
-    return resultCollector.getStatus();
   }
 
   /**
@@ -442,29 +331,38 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
-   * Save the state of the {@code JPPFJob} instance to a stream (i.e.,serialize it).
-   * @param out the output stream to which to write the job. 
-   * @throws IOException if any I/O error occurs.
-   * @since 5.0
+   * Called to notify that the results of a number of tasks have been received from the server.
+   * @param tasks the list of tasks whose results have been received from the server.
+   * @param throwable the throwable that was raised while receiving the results.
+   * @param sendJobEvent whether to emit a {@link org.jppf.client.event.JobEvent JobEvent} notification.
+   * @excluded
    */
-  private void writeObject(final ObjectOutputStream out) throws IOException {
-    out.defaultWriteObject();
-  }
-
-  /**
-   * Reconstitute the {@code JPPFJob} instance from a stream (i.e., deserialize it).
-   * @param in the input stream from which to read the job. 
-   * @throws IOException if any I/O error occurs.
-   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
-   * @since 5.0
-   */
-  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    resultCollector = new JPPFResultCollector(this);
-  }
-
-  @Override
-  public int getTaskCount() {
-    return tasks.size();
+  public void resultsReceived(final List<Task<?>> tasks, final Throwable throwable, final boolean sendJobEvent) {
+    synchronized(getResultsReceivedLock()) {
+      int unexecutedTaskCount = 0;
+      if (tasks != null) {
+        results.addResults(tasks);
+        unexecutedTaskCount = this.unexecutedTaskCount();
+        if (debugEnabled) log.debug(String.format("Received results for %d tasks, pendingCount=%d, count=%d, jobResults=%s", tasks.size(), unexecutedTaskCount, tasks.size(), results));
+        if (persistenceManager != null) {
+          try {
+            @SuppressWarnings("unchecked")
+            JobPersistence<Object> pm = (JobPersistence<Object>) persistenceManager;
+            pm.storeJob(pm.computeKey(this), this, tasks);
+          } catch (JobPersistenceException e) {
+            log.error(e.getMessage(), e);
+          }
+        }
+      } else {
+        if (debugEnabled) log.debug("received throwable '{}'", ExceptionUtils.getMessage(throwable));
+      }
+      if (sendJobEvent) {
+        fireJobEvent(JobEvent.Type.JOB_RETURN, null, tasks);
+        if (unexecutedTaskCount <= 0) fireJobEvent(Type.JOB_END, null, tasks);
+      }
+      client.unregisterClassLoaders(uuid);
+      results.wakeUp();
+      notifyAll();
+    }
   }
 }

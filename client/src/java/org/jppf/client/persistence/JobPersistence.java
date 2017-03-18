@@ -20,7 +20,7 @@ package org.jppf.client.persistence;
 
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 
 /**
@@ -32,8 +32,7 @@ import org.jppf.node.protocol.Task;
  * @param <K> the type of the keys used to identify and locate jobs in the persistence store.
  * @author Laurent Cohen
  */
-public interface JobPersistence<K>
-{
+public interface JobPersistence<K> {
   /**
    * Compute the key for the specified job. The contract for this method is that
    * it is idempotent, meaning that calling this method for the same job instance

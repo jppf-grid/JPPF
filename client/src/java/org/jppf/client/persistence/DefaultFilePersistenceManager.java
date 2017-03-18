@@ -21,7 +21,7 @@ package org.jppf.client.persistence;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.*;

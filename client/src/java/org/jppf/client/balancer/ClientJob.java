@@ -62,10 +62,6 @@ public class ClientJob extends AbstractClientJob {
    */
   private JobStatus jobStatus;
   /**
-   * The listener that receives notifications of completed tasks.
-   */
-  private final JPPFResultCollector resultCollector;
-  /**
    * Map of all dispatched broadcast jobs.
    */
   private final Map<String, ClientJob> broadcastMap;
@@ -115,10 +111,8 @@ public class ClientJob extends AbstractClientJob {
     if (broadcastUUID == null) {
       if (job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<>();
       else this.broadcastMap = Collections.emptyMap();
-      this.resultCollector = this.job.getResultCollector();
     } else {
       this.broadcastMap = Collections.emptyMap();
-      this.resultCollector = null;
     }
     JobStatus s = job.getStatus();
     this.jobStatus = s == null ? JobStatus.SUBMITTED : s;
@@ -298,11 +292,10 @@ public class ClientJob extends AbstractClientJob {
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-257">JPPF-257 Better exception handling for overriden or custom TaskResultListener implementations</a>
    */
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
-    JPPFResultCollector listener = resultCollector;
-    if (listener != null) {
+    if (job != null) {
       try {
-        synchronized (listener) {
-          listener.resultsReceived(results, throwable, !isParentBroadcastJob());
+        synchronized (job.getResultsReceivedLock()) {
+          job.resultsReceived(results, throwable, !isParentBroadcastJob());
         }
       } catch(Exception e) {
         log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
@@ -416,7 +409,7 @@ public class ClientJob extends AbstractClientJob {
   public void setJobStatus(final JobStatus jobStatus) {
     if (this.jobStatus == jobStatus) return;
     this.jobStatus = jobStatus;
-    if (resultCollector != null) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
+    if (job != null) job.setStatus(this.jobStatus);
     else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, tasks);
   }
 
