@@ -22,13 +22,23 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
+import org.slf4j.*;
+
 /**
- * 
+ *
  * @author Laurent Cohen
  * @since 5.1
  * @exclude
  */
 public final class JPPFNodeConnectionNotifier extends NotificationBroadcasterSupport implements JPPFNodeConnectionNotifierMBean {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFNodeConnectionNotifier.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Singleton instance of this class.
    */
@@ -49,6 +59,7 @@ public final class JPPFNodeConnectionNotifier extends NotificationBroadcasterSup
    * @param info information about the connected node.
    */
   public void onNodeConnected(final JPPFManagementInfo info) {
+    if (debugEnabled) log.debug("sending node connected notification for {}", info);
     notify(info, true);
   }
 
@@ -57,6 +68,7 @@ public final class JPPFNodeConnectionNotifier extends NotificationBroadcasterSup
    * @param info information about the disconnected node.
    */
   public void onNodeDisconnected(final JPPFManagementInfo info) {
+    if (debugEnabled) log.debug("sending node disconnected notification for {}", info);
     notify(info, false);
   }
 
@@ -77,5 +89,23 @@ public final class JPPFNodeConnectionNotifier extends NotificationBroadcasterSup
    */
   public static JPPFNodeConnectionNotifier getInstance() {
     return instance;
+  }
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    if (debugEnabled) log.debug("adding notification listener");
+    super.addNotificationListener(listener, filter, handback);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug("removing notification listener");
+    super.removeNotificationListener(listener);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug("removing notification listener with filter");
+    super.removeNotificationListener(listener, filter, handback);
   }
 }

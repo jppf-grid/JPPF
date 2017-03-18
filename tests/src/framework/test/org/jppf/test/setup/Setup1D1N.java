@@ -18,6 +18,7 @@
 
 package test.org.jppf.test.setup;
 
+import org.jppf.client.JPPFClient;
 import org.junit.*;
 
 
@@ -33,6 +34,10 @@ public class Setup1D1N extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
+    // make sure the driver is initialized
+    try (JPPFClient client = new JPPFClient()) {
+      client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    }
   }
 
   /**

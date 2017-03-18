@@ -92,7 +92,8 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    if (((JPPFManagementInfo) notification.getUserData()).isMasterNode()) return;
+    JPPFManagementInfo info = (JPPFManagementInfo) notification.getUserData();
+    if (info.isMasterNode()) return;
     synchronized(notifList) {
       notifList.add(notification);
     }
