@@ -161,29 +161,23 @@ public class TestConnectionPool extends Setup1D1N {
     String methodName = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = new JPPFClient()) {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
-      JobManagerClient jmc = null;
-      while ((jmc = (JobManagerClient) client.getJobManager()) == null) Thread.sleep(10L);
       SimpleDiscovery discovery = new SimpleDiscovery();
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
-      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
-      while (jmc.nbAvailableConnections() < 2)  Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
       // trigger close of pool1
       JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
       JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.awaitWorkingConnection();
       AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
-      BaseTest.printOut("closing pool1");
       csd.getSocketInitializer().close();
       csd.getSocketClient().close();
-      while (client.awaitWorkingConnectionPools().size() >= 2) Thread.sleep(10L);
-      while (jmc.nbAvailableConnections() >= 2)  Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
       discovery.emitPool("pool1", 10);
-      while (client.awaitWorkingConnectionPools().size() < 2) Thread.sleep(10L);
-      while (jmc.nbAvailableConnections() < 2)  Thread.sleep(10L);
+      awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
     }
   }
