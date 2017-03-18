@@ -111,7 +111,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception
   {
     job.setBlocking(false);
-    if (listener != null) job.getResultCollector().addJobStatusListener(listener);
+    if (listener != null) job.addJobStatusListener(listener);
     managedConnection.retrieveJppfClient().submitJob(job);
     return job.getUuid();
   }
@@ -120,14 +120,14 @@ public class JPPFConnectionImpl implements JPPFConnection
   public void addJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
     JPPFJob res = getJob(jobUuid);
-    if (res != null) res.getResultCollector().addJobStatusListener(listener);
+    if (res != null) res.addJobStatusListener(listener);
   }
 
   @Override
   public void removeJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
     JPPFJob res = getJob(jobUuid);
-    if (res != null) res.getResultCollector().removeJobStatusListener(listener);
+    if (res != null) res.removeJobStatusListener(listener);
   }
 
   @Override
