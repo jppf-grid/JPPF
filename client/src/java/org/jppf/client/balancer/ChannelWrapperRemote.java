@@ -123,9 +123,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    Runnable task = new RemoteRunnable(bundle, channel);
-    bundle.jobDispatched(this);
-    executor.execute(task);
+    executor.execute(new RemoteRunnable(bundle, channel));
     return null;
   }
 
@@ -169,7 +167,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   }
 
   /**
-   *
+   * Sends the tasks to the drivr and gets the results back.
+   * Also handles exceptions and failover and recovery scenarios when the driver connection breaks.
    */
   private class RemoteRunnable implements Runnable {
     /**
@@ -211,6 +210,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
           ObjectSerializer ser = connection.makeHelper(cl).getSerializer();
           List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
+          clientBundle.jobDispatched(ChannelWrapperRemote.this);
           if (!notSerializableTasks.isEmpty()) {
             if (debugEnabled) log.debug(String.format("%s got %d non-serializable tasks", ChannelWrapperRemote.this, notSerializableTasks.size()));
             count += notSerializableTasks.size();
