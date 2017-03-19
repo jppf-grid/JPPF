@@ -95,12 +95,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     Set<AbstractNodeContext> result = new HashSet<>();
     for (AbstractNodeContext ctx : fullSet) {
-      if (forForwarding && !hasWorkingJmxConnection(ctx)) continue;
-      if (ctx.isPeer() && !includePeers) continue;
-      JPPFManagementInfo info = getManagementInfo(ctx);
-      if (traceEnabled) log.trace(String.format("node '%s', info = %s", ctx.getUuid(), info));
-      if (info == null) continue;
-      if (selector.accepts(info)) result.add(ctx);
+      if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result.add(ctx);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
     return result;
@@ -120,12 +115,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
-      if (forForwarding && !hasWorkingJmxConnection(context)) continue;
-      if (!includePeers && context.isPeer()) continue;
-      JPPFManagementInfo info = getManagementInfo(context);
-      if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
-      if (info == null) continue;
-      if (selector.accepts(info)) result.add(context);
+      if (nodeAccepted(selector, context, includePeers, forForwarding)) result.add(context);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
     return result;
@@ -161,12 +151,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     int result = 0;
     for (AbstractNodeContext ctx : fullSet) {
-      if (forForwarding && !hasWorkingJmxConnection(ctx)) continue;
-      if (!includePeers && ctx.isPeer()) continue;
-      JPPFManagementInfo info = getManagementInfo(ctx);
-      if (traceEnabled) log.trace(String.format("node '%s', info = %s", ctx.getUuid(), info));
-      if (info == null) continue;
-      if (selector.accepts(info)) result++;
+      if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result++;
     }
     return result;
   }
@@ -185,12 +170,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
-      if (forForwarding && !hasWorkingJmxConnection(context)) continue;
-      if (!includePeers && context.isPeer()) continue;
-      JPPFManagementInfo info = getManagementInfo(context);
-      if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
-      if (info == null) continue;
-      if (selector.accepts(info)) result++;
+      if (nodeAccepted(selector, context, includePeers, forForwarding)) result++;
     }
     return result;
   }
@@ -207,11 +187,32 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   /**
    * Determine whether the specified node has a working JMX ocnnection.
    * @param ctx the context associated witht he node.
-   * @return true if node has a working JMX connection, false otherwise.
+   * @return {@code true} if node has a working JMX connection, {@code false} otherwise.
    */
   private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx) {
     if (ctx.isPeer()) return false;
     JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
     return (jmx != null) && jmx.isConnected();
+  }
+
+  /**
+   * Determine whether a node is accepted for inclusion in a query result.
+   * @param selector a node selector to apply.
+   * @param context represent the node.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
+   * @return {@code true} if the node is accepted, {@code false} otherwise.
+   */
+  private boolean nodeAccepted(final NodeSelector selector, final AbstractNodeContext context, final boolean includePeers, final boolean forForwarding) {
+    if (!includePeers && context.isPeer()) return false;
+    boolean hasJmx = hasWorkingJmxConnection(context);
+    if (forForwarding && !hasJmx) return false;
+    boolean offline = false;
+    if (context instanceof RemoteNodeContext) offline = ((RemoteNodeContext) context).isOffline();
+    if (!forForwarding && !hasJmx && !offline) return false;
+    JPPFManagementInfo info = getManagementInfo(context);
+    if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
+    if (info == null) return false;
+    return selector.accepts(info);
   }
 }

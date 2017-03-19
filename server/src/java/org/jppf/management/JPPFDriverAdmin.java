@@ -76,7 +76,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbNodes(final NodeSelector selector) throws Exception {
-    return selectionHelper.getNbChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, true);
+    return selectionHelper.getNbChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector, final boolean includePeers) {
     try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, true);
+      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
       List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
       for (AbstractNodeContext context : nodes) {
         JPPFManagementInfo info = context.getManagementInfo();
@@ -112,7 +112,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, true);
+    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
     if (nodes == null) return -1;
     int result = 0;
     for (AbstractNodeContext node: nodes) {
@@ -129,7 +129,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) {
     try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, true);
+      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
       List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
       for (AbstractNodeContext context : nodes) {
         if (getNodeNioServer().isIdle(context.getChannel())) {
