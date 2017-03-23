@@ -81,7 +81,6 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     }
   }
 
-
   /**
    * Test that we can add a {@link org.jppf.discovery.PeerDriverDiscovery PeerDriverDiscovery} to each driver, allowing them to discover each other.
    * @throws Exception if any error occurs.
@@ -89,14 +88,14 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testServerSide() throws Exception {
     for (int i=0; i<2; i++) {
-      assertEquals("ok", executeScriptOnServer(JMX[i], resourcePath + "/SetPeerDiscovery.js"));
+      assertEquals("ok", executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/SetPeerDiscovery.js")));
     }
     String[] results = new String[2];
     boolean good = false;
     while (!good) {
       good = true;
       for (int i=0; i<2; i++) {
-        String result = (String) executeScriptOnServer(JMX[i], resourcePath + "/RetrievePeerDiscovery.js");
+        String result = (String) executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/RetrievePeerDiscovery.js"));
         if (result.startsWith("ko")) {
           good = false;
           BaseTest.printOut("driver response: %s", result);
@@ -174,19 +173,6 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
       }
     }
     assertTrue(discovery.shutdownFlag);
-  }
-
-  /**
-   * Execute a script on the specified driver.
-   * @param driver JMX wrapper for the driver.
-   * @param scriptPath path to the script in the classpath.
-   * @return whatever the script returns.
-   * @throws Exception if any error occurs.
-   */
-  private Object executeScriptOnServer(final JMXDriverConnectionWrapper driver, final String scriptPath) throws Exception {
-    String script = FileUtils.readTextFile(scriptPath);
-    String className = String.class.getName();
-    return driver.invoke("org.jppf:name=debug,type=driver", "executeScript", new Object[] { "javascript", script}, new String[] { className, className });
   }
 
   /** */

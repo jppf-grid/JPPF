@@ -73,10 +73,9 @@ public final class FileUtils {
   public static List<String> textFileAsLines(final Reader aReader) throws IOException {
     List<String> lines = new ArrayList<>();
     try (BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader)) {
-      String s = "";
-      while (s != null) {
-        s = reader.readLine();
-        if ((s != null) && !"".equals(s.trim())) lines.add(s);
+      String s;
+      while ((s = reader.readLine()) != null) {
+        if (!"".equals(s.trim())) lines.add(s);
       }
     }
     return lines;

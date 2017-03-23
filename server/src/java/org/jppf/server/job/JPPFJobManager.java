@@ -294,6 +294,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   @Override
   public void addJobTasksListener(final JobTasksListener listener) {
+    if (debugEnabled) log.debug("adding JobTasksListener {}", listener);
     taskReturnListeners.add(listener);
   }
 
@@ -303,7 +304,22 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   @Override
   public void removeJobTasksListener(final JobTasksListener listener) {
+    if (debugEnabled) log.debug("removing JobTasksListener {}", listener);
     taskReturnListeners.remove(listener);
+  }
+
+  /**
+   * Called when final tasks results have been received and are about to be sent back to the client.
+   * @param channel the node to which the job is dispatched.
+   * @param job the job for which results are received.
+   * @param tasks the job's tasks for which there are results.
+   */
+  public synchronized void jobResultsReceived(final ExecutorChannel channel, final ServerJob job, final Collection<ServerTask> tasks) {
+    if (!taskReturnListeners.isEmpty()) {
+      if (debugEnabled) log.debug(String.format("results received with channel=%s, job=%s, nb Tasks=%d", channel, job, tasks.size()));
+      JobTasksEvent event = createJobTasksEvent(channel, job, tasks);
+      for (JobTasksListener listener: taskReturnListeners) listener.resultsReceived(event);
+    }
   }
 
   /**
@@ -315,9 +331,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private void fireJobTasksEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle, final boolean isDispatch) {
     if (!taskReturnListeners.isEmpty()) {
       JobTasksEvent event = createJobTasksEvent(channel, nodeBundle);
-      for (JobTasksListener listener: taskReturnListeners) {
-        if (isDispatch) listener.tasksDispatched(event);
-        else listener.tasksReturned(event);
+      if (isDispatch) {
+        for (JobTasksListener listener: taskReturnListeners) listener.tasksDispatched(event);
+      } else {
+        for (JobTasksListener listener: taskReturnListeners) listener.tasksReturned(event);
       }
     }
   }
@@ -332,9 +349,23 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     List<ServerTask> tasks = nodeBundle.getTaskList();
     List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
     for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
-        task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount()));
+      task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
     TaskBundle job = nodeBundle.getJob();
-    return new JobTasksEvent(job.getUuid(), job.getName(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
+    return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
+  }
+
+  /**
+   * Fire a job dispatch event.
+   * @param channel the node to which the job is dispatched.
+   * @param job the job for which results are received.
+   * @param tasks the job's tasks for which there are results.
+   * @return an instance of {@link TaskReturnEvent}.
+   */
+  private JobTasksEvent createJobTasksEvent(final ExecutorChannel channel, final ServerJob job, final Collection<ServerTask> tasks) {
+    List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
+    for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
+      task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
+    return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, JobReturnReason.RESULTS_RECEIVED, channel.getManagementInfo());
   }
 
   /**
@@ -399,6 +430,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     @Override
     public void tasksReturned(final JobTasksEvent event) {
       delegate.tasksReturned(event);
+    }
+
+    @Override
+    public void resultsReceived(final JobTasksEvent event) {
     }
 
     @Override

@@ -21,6 +21,7 @@ package org.jppf.job;
 import java.util.List;
 
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.protocol.*;
 
 /**
  * Instances of this class encapsulate information on job dispatches to nodes.
@@ -30,7 +31,16 @@ import org.jppf.management.JPPFManagementInfo;
 @SuppressWarnings("deprecation")
 public class JobTasksEvent extends TaskReturnEvent {
   /**
-   * Intialize this job dispatch event with the specified information.
+   * The job SLA.
+   */
+  private final JobSLA jobSLA;
+  /**
+   * The job metadata.
+   */
+  private final JobMetadata jobMetadata;
+
+  /**
+   * Initialize this job dispatch event with the specified information.
    * @param jobUuid the uuid of the job whose tasks were dispatched.
    * @param jobName the name of the job whose tasks were dispatched.
    * @param serverTasks the list of tasks that were disptached.
@@ -39,7 +49,25 @@ public class JobTasksEvent extends TaskReturnEvent {
    * @exclude
    */
   public JobTasksEvent(final String jobUuid, final String jobName, final List<ServerTaskInformation> serverTasks, final JobReturnReason returnReason, final JPPFManagementInfo nodeInfo) {
+    this(jobUuid, jobName, null, null, serverTasks, returnReason, nodeInfo);
+  }
+
+  /**
+   * Initialize this job dispatch event with the specified information.
+   * @param jobUuid the uuid of the job whose tasks were dispatched.
+   * @param jobName the name of the job whose tasks were dispatched.
+   * @param jobSLA the job SLA.
+   * @param jobMetadata the job metadata.
+   * @param serverTasks the list of tasks that were disptached.
+   * @param returnReason the reason why the set of tasks wass returned by a node.
+   * @param nodeInfo info on the node to which the job was dispatched.
+   * @exclude
+   */
+  public JobTasksEvent(final String jobUuid, final String jobName, final JobSLA jobSLA, final JobMetadata jobMetadata,
+    final List<ServerTaskInformation> serverTasks, final JobReturnReason returnReason, final JPPFManagementInfo nodeInfo) {
     super(jobUuid, jobName, serverTasks, returnReason, nodeInfo);
+    this.jobSLA = jobSLA;
+    this.jobMetadata = jobMetadata;
   }
 
   @Override
@@ -68,5 +96,21 @@ public class JobTasksEvent extends TaskReturnEvent {
   @Override
   public JPPFManagementInfo getNodeInfo() {
     return super.getNodeInfo();
+  }
+
+  /**
+   * Get the job SLA from this event.
+   * @return an instance of {@link JobSLA}.
+   */
+  public JobSLA getJobSLA() {
+    return jobSLA;
+  }
+
+  /**
+   * Get the job metadata from this event.
+   * @return an instance of {@link JobMetadata}.
+   */
+  public JobMetadata getJobMetadata() {
+    return jobMetadata;
   }
 }

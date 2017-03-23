@@ -36,4 +36,10 @@ public interface JobTasksListener extends EventListener {
    * @param event encapsulates information on the job dispatch.
    */
   void tasksReturned(JobTasksEvent event);
+
+  /**
+   * Called when tasks results are about to be sent back to the client.
+   * @param event encapsulates information on the tasks results.
+   */
+  void resultsReceived(JobTasksEvent event);
 }
