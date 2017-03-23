@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jppf.location.FileLocation;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.ExceptionUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
@@ -165,6 +166,17 @@ public class BaseTest {
     synchronized(SDF) {
       return SDF.format(date);
     }
+  }
+
+  /**
+   * Execute a script on the specified driver.
+   * @param jmx JMX wrapper for the driver.
+   * @param script the script to execute.
+   * @return whatever the script returns.
+   * @throws Exception if any error occurs.
+   */
+  public static Object executeScriptOnServer(final JMXDriverConnectionWrapper jmx, final String script) throws Exception {
+    return jmx.invoke("org.jppf:name=debug,type=driver", "executeScript", new Object[] { "javascript", script}, new String[] {"java.lang.String", "java.lang.String"});
   }
 
   /** */

@@ -195,6 +195,7 @@ public class ServerTaskBundleNode {
   public void resultsReceived(final List<DataLocation> results) {
     taskCompleted(null);
     job.resultsReceived(this, results);
+    this.channel = null;
   }
 
   /**
@@ -204,6 +205,7 @@ public class ServerTaskBundleNode {
   public void resultsReceived(final Throwable throwable) {
     job.resultsReceived(this, throwable);
     taskCompleted(throwable);
+    this.channel = null;
   }
 
   /**
@@ -216,8 +218,6 @@ public class ServerTaskBundleNode {
     try {
       job.jobReturned(this);
     } finally {
-      //job.taskCompleted(this, exception);
-      this.channel = null;
       this.future = null;
     }
   }

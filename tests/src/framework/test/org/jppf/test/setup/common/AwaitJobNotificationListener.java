@@ -22,6 +22,7 @@ import javax.management.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.job.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.slf4j.*;
 
@@ -57,7 +58,32 @@ public class AwaitJobNotificationListener implements NotificationListener {
   private boolean listenerRemoved;
 
   /**
-   * 
+   * @param jobManager the mbean proxy to which to add a listener.
+   * @param eventType the type of event to wait for.
+   * @throws Exception if any error occurs.
+   */
+  public AwaitJobNotificationListener(final DriverJobManagementMBean jobManager, final JobEventType eventType) throws Exception {
+    this.expectedEvent = eventType;
+    this.eventReceived = false;
+    this.listenerRemoved = false;
+    this.jobManager = jobManager;
+    this.jobManager.addNotificationListener(this, null, null);
+  }
+
+  /**
+   * @param jmx represents the connection to the mbean proxy to which to add a listener.
+   * @param eventType the type of event to wait for.
+   * @throws Exception if any error occurs.
+   */
+  public AwaitJobNotificationListener(final JMXDriverConnectionWrapper jmx, final JobEventType eventType) throws Exception {
+    this.expectedEvent = eventType;
+    this.eventReceived = false;
+    this.listenerRemoved = false;
+    this.jobManager = jmx.getJobManager();
+    this.jobManager.addNotificationListener(this, null, null);
+  }
+
+  /**
    * @param client the JPPF client.
    * @param eventType the type of event to wait for.
    * @throws Exception if any error occurs.

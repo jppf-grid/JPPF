@@ -27,6 +27,7 @@ import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
@@ -131,7 +132,10 @@ public class ServerJob extends AbstractServerJobBase {
       lock.unlock();
     }
     if (debugEnabled) log.debug("client bundle map has {} entries: {}", map.size(), map.keySet());
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) entry.getKey().resultReceived(entry.getValue());
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
+      entry.getKey().resultReceived(entry.getValue());
+      ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
+    }
     taskCompleted(bundle, null);
   }
 
@@ -155,6 +159,7 @@ public class ServerJob extends AbstractServerJobBase {
     }
     for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
       entry.getKey().resultReceived(entry.getValue(), throwable);
+      ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
     }
     taskCompleted(bundle, throwable);
   }

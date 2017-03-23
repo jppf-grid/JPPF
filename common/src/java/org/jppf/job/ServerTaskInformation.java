@@ -18,7 +18,10 @@
 
 package org.jppf.job;
 
-import java.io.Serializable;
+import java.io.*;
+
+import org.jppf.io.*;
+import org.jppf.node.protocol.Task;
 
 /**
  * Instances of this class provide information about tasks that were dispatched to a node,
@@ -51,6 +54,10 @@ public class ServerTaskInformation implements Serializable {
    * Number of times the task was resubmitted.
    */
   private final int resubmitCount;
+  /**
+   * Holds the result of the task.
+   */
+  private transient final DataLocation result;
 
   /**
    * Initialize this object.
@@ -62,11 +69,26 @@ public class ServerTaskInformation implements Serializable {
    * @exclude
    */
   public ServerTaskInformation(final int jobPosition, final Throwable throwable, final int expirationCount, final int maxResubmits, final int resubmitCount) {
+    this(jobPosition, throwable, expirationCount, maxResubmits, resubmitCount, null);
+  }
+
+  /**
+   * Initialize this object.
+   * @param jobPosition the position of this task within the job submitted by the client.
+   * @param throwable the throwble rraised during execution.
+   * @param expirationCount number of times a dispatch of this task has expired.
+   * @param maxResubmits maximum number of times the task can be resubmitted.
+   * @param resubmitCount number of times the task was resubmitted.
+   * @param result holds the result of the task.
+   * @exclude
+   */
+  public ServerTaskInformation(final int jobPosition, final Throwable throwable, final int expirationCount, final int maxResubmits, final int resubmitCount, final DataLocation result) {
     this.jobPosition = jobPosition;
     this.throwable = throwable;
     this.expirationCount = expirationCount;
     this.maxResubmits = maxResubmits;
     this.resubmitCount = resubmitCount;
+    this.result = result;
   }
 
   /**
@@ -107,6 +129,26 @@ public class ServerTaskInformation implements Serializable {
    */
   public int getResubmitCount() {
     return resubmitCount;
+  }
+
+  /**
+   * Get an input stream of the task's result data, which can be desrialized as a {@link Task}.
+   * @return an {@link InputStream}, or {@code null} if no result could be obtained.
+   * @throws Exception if any error occurs getting the stream.
+   */
+  public InputStream getResultAsStream() throws Exception {
+    if (result == null) return null;
+    return result.getInputStream();
+  }
+
+  /**
+   * Deserialize the result into a Task object.
+   * @return a {@link Task}, or {@code null} if no result could be obtained.
+   * @throws Exception if any error occurs deserializing the result.
+   */
+  public Task<?> getResultAsTask() throws Exception {
+    if (result == null) return null;
+    return (Task<?>) IOHelper.unwrappedData(result);
   }
 
   @Override
