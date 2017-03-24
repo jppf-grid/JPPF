@@ -257,12 +257,28 @@
 
   <target name="rar.all" depends="compile, build.util.jar" description="generate the ear files">
     <echo message="creating the RAR files..." />
-    <rar appserver="${jboss}" logging="log4j12" />
-    <rar appserver="${jboss7}" />
-    <rar appserver="${wildfly8}" />
-    <rar appserver="${sunas}" />
-    <rar appserver="${was}" />
-    <rar appserver="${weblogic}" />
+    <rar appserver="${jboss}" logging="log4j12"/>
+    <rar appserver="${jboss7}">
+      <manifest-additions>
+        <attribute name="Dependencies" value="org.slf4j,org.slf4j.impl"/>
+      </manifest-additions>
+      <jppflibs-patterns>
+        <exclude name="slf4j*.jar" />
+        <exclude name="log4j*.jar" />
+      </jppflibs-patterns>
+    </rar>
+    <rar appserver="${wildfly8}">
+      <manifest-additions>
+        <attribute name="Dependencies" value="org.slf4j,org.slf4j.impl"/>
+      </manifest-additions>
+      <jppflibs-patterns>
+        <exclude name="slf4j*.jar" />
+        <exclude name="log4j*.jar" />
+      </jppflibs-patterns>
+    </rar>
+    <rar appserver="${sunas}"/>
+    <rar appserver="${was}"/>
+    <rar appserver="${weblogic}"/>
     <!-- ***** add RAR generation for other application servers here  ***** -->
     <!-- ***** end of add other                                       ***** -->
     <echo message="RAR files created" />
@@ -275,8 +291,10 @@
     - logging: type of slf4j binding, either "log4j12" or "jdk14", defaults to "jdk14"
   -->
   <macrodef name="rar">
-    <attribute name="appserver" />
-    <attribute name="logging" default="jdk14" />
+    <attribute name="appserver"/>
+    <attribute name="logging" default="jdk14"/>
+    <element name="manifest-additions" optional="true"/>
+    <element name="jppflibs-patterns" optional="true"/>
     <sequential>
       <echo message="creating the RAR file for @{appserver} ..." />
       <delete dir="${build.dir}/@{appserver}" quiet="true" />
@@ -300,6 +318,7 @@
           <attribute name="JPPF-Version" value="${version.number}" />
           <attribute name="JPPF-Build" value="${build.number}" />
           <attribute name="JPPF-BuildDate" value="${readable.now}" />
+          <manifest-additions/>
         </manifest>
         <zipfileset dir="${build.dir}/@{appserver}">
           <include name="*.*" />
@@ -320,6 +339,7 @@
           <include name="lz4-1.3.0.jar" />
           <include name="slf4j-api-1.6.1.jar" />
           <include name="slf4j-${logging}-1.6.1.jar" />
+          <jppflibs-patterns/>
         </zipfileset>
       </jar>
       <delete dir="${build.dir}/@{appserver}" quiet="true" />
