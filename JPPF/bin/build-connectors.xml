@@ -38,7 +38,7 @@
 
   <target name="j2ee.connector.build">
     <copy todir="${jca-client}" file="${basedir}/CheckStyle_JPPF_config.xml"/>
-    <delete dir="${basedir}/lib" quiet="true" includes="jppf-client*.jar,jppf-common*.jar"/>
+    <delete dir="${jca-client}/lib" quiet="true" includes="jppf-client*.jar,jppf-common*.jar"/>
     <copy todir="${jca-client}/lib">
       <fileset dir="${build}">
         <include name="jppf-client*.jar"/>
@@ -51,9 +51,6 @@
         <include name="build.number"/>
       </fileset>
     </copy>
-    <!--
-    <ant antfile="${basedir}/../jca-client/build.xml" target="build.util.jar" inheritall="false"/>
-    -->
   </target>
 
 </project> 
