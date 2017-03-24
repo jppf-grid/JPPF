@@ -42,13 +42,30 @@ public final class ConcurrentUtils {
    * @throws IllegalArgumentException if the millis or nanos are negative, or if the nanos are greater than 999999.
    */
   public static boolean awaitCondition(final ThreadSynchronization monitor, final Condition condition, final long millis) throws IllegalArgumentException {
+    return awaitCondition(monitor, condition, millis, 1L);
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * The specified monitor may be notified at any time during the execution of this method, at which time it will check the condition again.
+   * @param monitor the monitor to wait for.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param sleepInterval how long to wait between evaluations of the condition, in millis.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis or nanos are negative, or if the nanos are greater than 999999.
+   */
+  public static boolean awaitCondition(final ThreadSynchronization monitor, final Condition condition, final long millis, final long sleepInterval) throws IllegalArgumentException {
     if (monitor == null) throw new IllegalArgumentException("monitor cannot be null");
+    if (sleepInterval < 0L) throw new IllegalArgumentException("sleepInterval must be > 0");
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
     long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
     boolean fulfilled = false;
     final long start = System.nanoTime();
-    while (!(fulfilled = condition.evaluate()) && ((System.nanoTime() - start) / 1_000_000L < timeout)) monitor.goToSleep(1L);
+    synchronized(monitor) {
+      while (!(fulfilled = condition.evaluate()) && ((System.nanoTime() - start) / 1_000_000L < timeout)) monitor.goToSleep(sleepInterval);
+    }
     return fulfilled;
   }
 

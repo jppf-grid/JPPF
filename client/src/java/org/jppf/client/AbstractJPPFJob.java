@@ -108,10 +108,6 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * List of listeners registered to receive this job's status change notifications.
    */
   private transient List<JobStatusListener> statusListeners = new ArrayList<>();
-  /**
-   * 
-   */
-  private transient Object resultsReceivedLock = new Object();
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -361,14 +357,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
         for (JobStatusListener listener: statusListeners) listener.jobStatusChanged(event);
       }
     }
-  }
-
-  /**
-   * @return a lock object used to synchronize on the {@code resultsReceived()} method calls.
-   * @exclude
-   */
-  public Object getResultsReceivedLock() {
-    return resultsReceivedLock;
+    results.wakeUp();
   }
 
   /**
@@ -389,7 +378,6 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
     statusListeners = new ArrayList<>();
-    resultsReceivedLock = new Object();
     listeners = new CopyOnWriteArrayList<>();
   }
 }

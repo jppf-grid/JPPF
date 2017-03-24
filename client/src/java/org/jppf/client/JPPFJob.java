@@ -326,7 +326,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
         JobStatus status = getStatus();
         return (results.size() >= tasks.size()) && ((status == JobStatus.FAILED) || (status == JobStatus.COMPLETE));
       }
-    }, timeout);
+    }, timeout, 1000L);
     if (!fullfilled && raiseTimeoutException) throw new TimeoutException("timeout expired");
   }
 
@@ -338,7 +338,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @excluded
    */
   public void resultsReceived(final List<Task<?>> tasks, final Throwable throwable, final boolean sendJobEvent) {
-    synchronized(getResultsReceivedLock()) {
+    synchronized(results) {
       int unexecutedTaskCount = 0;
       if (tasks != null) {
         results.addResults(tasks);
@@ -361,8 +361,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
         if (unexecutedTaskCount <= 0) fireJobEvent(Type.JOB_END, null, tasks);
       }
       client.unregisterClassLoaders(uuid);
-      results.wakeUp();
-      notifyAll();
     }
+    results.wakeUp();
   }
 }

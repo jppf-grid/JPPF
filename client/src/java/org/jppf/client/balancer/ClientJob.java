@@ -294,9 +294,7 @@ public class ClientJob extends AbstractClientJob {
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
     if (job != null) {
       try {
-        synchronized (job.getResultsReceivedLock()) {
-          job.resultsReceived(results, throwable, !isParentBroadcastJob());
-        }
+        job.resultsReceived(results, throwable, !isParentBroadcastJob());
       } catch(Exception e) {
         log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
       }
