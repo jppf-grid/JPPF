@@ -72,7 +72,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     int connectedCount = 0;
     int disconnectedCount = 0;
     for (Notification notif: notifList) {
-      System.out.printf("notifList[%d] = %s, %s%n", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
+      printOut("notifList[%d] = %s, %s", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
       assertEquals(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, notif.getSource());
       switch(notif.getType()) {
         case JPPFNodeConnectionNotifierMBean.CONNECTED:

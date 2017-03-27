@@ -300,11 +300,16 @@ public class GenericProcessLauncher implements Runnable {
         startProcess();
         int exitCode = process.waitFor();
         if (debugEnabled) log.debug(name + "exited with code " + exitCode);
+        /*
+        synchronized(getClass()) {
+          File file = new File(getName() + ".tmp");
+          if (!file.exists()) file.createNewFile();
+          else Runtime.getRuntime().halt(3);
+        }
+        */
         end = onProcessExit(exitCode);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } catch (Error e) {
+    } catch (Throwable e) {
       e.printStackTrace();
     }
     if (process != null) process.destroy();
@@ -340,7 +345,6 @@ public class GenericProcessLauncher implements Runnable {
     command.add("-Djppf.config=" + jppfConfig);
     command.add("-Dlog4j.configuration=" + log4j);
     if (logging != null) command.add("-Djava.util.logging.config.file=" + logging);
-    //command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
     command.add(mainClass);
     if (processPort > 0) command.add(Integer.toString(processPort));
     else command.add("noLauncher");
@@ -358,6 +362,7 @@ public class GenericProcessLauncher implements Runnable {
         if (stderr != null) stderr.print(formatPrologue() + event.getContent());
       }
     });
+    if (debugEnabled) log.debug("{} about to start with command {}", name, command);
     wrapper.setProcess(builder.start());
     process = wrapper.getProcess();
     if (debugEnabled) log.debug(name + "starting process " + process);
