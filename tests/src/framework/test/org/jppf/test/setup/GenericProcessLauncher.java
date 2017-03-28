@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.socket.*;
 import org.jppf.process.*;
@@ -108,18 +107,6 @@ public class GenericProcessLauncher implements Runnable {
    * The driver or node number
    */
   protected int n = 0;
-  /**
-   * The output stream where the stdout of the started process is to be redirected.
-   */
-  protected static PrintStream stdout = System.out;
-  /**
-   * The output stream where the stdout of the started process is to be redirected.
-   */
-  protected static PrintStream stderr = System.out;
-  /**
-   * 
-   */
-  protected static AtomicBoolean streamsConfigured = new AtomicBoolean(false);
   /**
    * 
    */
@@ -300,13 +287,6 @@ public class GenericProcessLauncher implements Runnable {
         startProcess();
         int exitCode = process.waitFor();
         if (debugEnabled) log.debug(name + "exited with code " + exitCode);
-        /*
-        synchronized(getClass()) {
-          File file = new File(getName() + ".tmp");
-          if (!file.exists()) file.createNewFile();
-          else Runtime.getRuntime().halt(3);
-        }
-        */
         end = onProcessExit(exitCode);
       }
     } catch (Throwable e) {
@@ -355,17 +335,18 @@ public class GenericProcessLauncher implements Runnable {
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        if (stdout != null) stdout.print(formatPrologue() + event.getContent());
+        System.out.print(formatPrologue() + event.getContent());
       }
+
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        if (stderr != null) stderr.print(formatPrologue() + event.getContent());
+        System.err.print(formatPrologue() + event.getContent());
       }
     });
     if (debugEnabled) log.debug("{} about to start with command {}", name, command);
     wrapper.setProcess(builder.start());
     process = wrapper.getProcess();
-    if (debugEnabled) log.debug(name + "starting process " + process);
+    if (debugEnabled) log.debug("{} starting process {}", name, process);
   }
 
   /**
@@ -374,7 +355,7 @@ public class GenericProcessLauncher implements Runnable {
   public void stopProcess() {
     if ((wrapper != null) && (wrapper.getProcess() != null)) {
       Process process = wrapper.getProcess();
-      if (debugEnabled) log.debug(name + "stopping process " + process);
+      if (debugEnabled) log.debug("{} stopping process {}", name, process);
       if (socketClient != null) {
         try {
             socketClient.close();
