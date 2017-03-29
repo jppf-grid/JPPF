@@ -401,7 +401,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
           goToSleep(50L);
         }
       }
-      if (!terminated) log.warn(String.format("%s did not terminate in the %,d ms timeout. Call stack:%n", name, TERMINATION_TIMEOUT, ExceptionUtils.getCallStack()));
+      if (!terminated) log.warn(String.format("%s did not terminate in the %,d ms timeout. Call stack:%n%s", name, TERMINATION_TIMEOUT, ExceptionUtils.getCallStack()));
     }
   }
 
