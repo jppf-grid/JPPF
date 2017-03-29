@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Super class for launching a JPPF driver or node.
  * @author Laurent Cohen
  */
-public class GenericProcessLauncher implements Runnable {
+public class GenericProcessLauncher extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -51,6 +51,10 @@ public class GenericProcessLauncher implements Runnable {
    * Default directory.
    */
   public static final String DEFAULT_DIR = System.getProperty("user.dir");
+  /**
+   * Maximum time to wait in millis for a driver or node process to be terminated.
+   */
+  private static final long TERMINATION_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.test.process.termination.timeout", 10_000L);
   /**
    * List of files to have in the classpath.
    */
@@ -278,6 +282,30 @@ public class GenericProcessLauncher implements Runnable {
     arguments.add(arg);
   }
 
+  /**
+   * Get the path to the JDK logging configuration file.
+   * @return the path as a string.
+   */
+  public String getLogging() {
+    return logging;
+  }
+
+  /**
+   * Set the path to the JDK logging configuration file.
+   * @param logging the path as a string.
+   */
+  public void setLogging(final String logging) {
+    this.logging = logging;
+  }
+
+  /**
+   * Get the name given to this process launcher.
+   * @return the name as a string
+   */
+  public String getName() {
+    return name;
+  }
+
   @Override
   public void run() {
     boolean end = false;
@@ -362,13 +390,18 @@ public class GenericProcessLauncher implements Runnable {
           } catch (Exception ignore) {
           }
       }
-      synchronized(this) {
+      process.destroy();
+      boolean terminated = false;
+      long start = System.nanoTime();
+      while (!terminated && ((System.nanoTime() - start) / 1_000_000L < TERMINATION_TIMEOUT)) {
         try {
-          wait(100L);
-        } catch (Exception e) {
+          int n = process.exitValue();
+          terminated = true;
+        } catch (Exception ignore) {
+          goToSleep(50L);
         }
       }
-      process.destroy();
+      if (!terminated) log.warn(String.format("%s did not terminate in the %,d ms timeout. Call stack:%n", name, TERMINATION_TIMEOUT, ExceptionUtils.getCallStack()));
     }
   }
 
@@ -392,6 +425,7 @@ public class GenericProcessLauncher implements Runnable {
           try {
             socketClient = new SocketClient(processServer.accept());
             int n = socketClient.readInt();
+            if (debugEnabled) log.debug("{} socketClient recieved {}", name, n);
             if (n == -1) throw new EOFException();
           } catch(Exception ioe) {
             if (debugEnabled) log.debug(name, ioe);
@@ -422,30 +456,6 @@ public class GenericProcessLauncher implements Runnable {
       throw new RuntimeException(e);
     }
     return url.toString();
-  }
-
-  /**
-   * Get the path to the JDK logging configuration file.
-   * @return the path as a string.
-   */
-  public String getLogging() {
-    return logging;
-  }
-
-  /**
-   * Set the path to the JDK logging configuration file.
-   * @param logging the path as a string.
-   */
-  public void setLogging(final String logging) {
-    this.logging = logging;
-  }
-
-  /**
-   * Get the name given to this process launcher.
-   * @return the name as a string
-   */
-  public String getName() {
-    return name;
   }
 
   /**
