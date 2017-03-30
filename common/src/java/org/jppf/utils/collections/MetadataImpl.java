@@ -26,6 +26,10 @@ import java.util.*;
  */
 public class MetadataImpl implements Metadata {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The map holding the mapping of keys to values.
    */
   protected final Map<Object, Object> parameters = new Hashtable<>();

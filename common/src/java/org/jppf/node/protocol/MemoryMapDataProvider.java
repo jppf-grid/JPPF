@@ -25,6 +25,9 @@ import org.jppf.utils.collections.MetadataImpl;
  * @see org.jppf.node.protocol.DataProvider
  * @author Laurent Cohen
  */
-public class MemoryMapDataProvider extends MetadataImpl implements DataProvider
-{
+public class MemoryMapDataProvider extends MetadataImpl implements DataProvider {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 }
