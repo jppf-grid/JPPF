@@ -158,8 +158,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     try {
       JPPFClientConnectionStatus status = wrapper.getStatus();
+      if (!status.isTerminatedStatus()) updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
+      /*
       if (status.isTerminatedStatus()) updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, status);
       else updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
+      */
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);
@@ -304,8 +307,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
+    if (debugEnabled) log.debug(String.format("updating status from %s to %s for %s", oldStatus, newStatus, wrapper));
     if (wrapper == null || oldStatus == newStatus) return;
-
     boolean bNew = newStatus.isWorkingStatus();
     boolean bOld = oldStatus.isWorkingStatus();
     int priority = wrapper.getPriority();

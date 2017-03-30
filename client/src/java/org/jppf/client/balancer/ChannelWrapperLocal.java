@@ -90,12 +90,16 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
-    ExecutorStatus oldExecutionStatus = getExecutionStatus();
-    JPPFClientConnectionStatus oldValue = this.status;
-    this.status = status;
-    fireStatusChanged(oldValue, this.status);
-    ExecutorStatus newExecutionStatus = getExecutionStatus();
-    fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
+    synchronized(getMonitor()) {
+      ExecutorStatus oldExecutionStatus = getExecutionStatus();
+      JPPFClientConnectionStatus oldValue = this.status;
+      if (oldValue.isTerminatedStatus()) return;
+      if (debugEnabled) log.debug(String.format("status changing from %s to %s for %s", oldValue, status, this));
+      this.status = status;
+      fireStatusChanged(oldValue, this.status);
+      ExecutorStatus newExecutionStatus = getExecutionStatus();
+      fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
+    }
   }
 
   @Override
@@ -190,7 +194,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     if (debugEnabled) log.debug("closing " + this);
     super.close();
     try {
-      setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+      if (!status.isTerminatedStatus()) setStatus(JPPFClientConnectionStatus.CLOSED);
       executionManager.shutdown();
     } finally {
       listeners.clear();

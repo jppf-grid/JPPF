@@ -20,6 +20,7 @@ package org.jppf.test.setup;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.*;
@@ -53,6 +54,18 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    * A map of variable names to their value, which can be used in a groovy expression.
    */
   protected final Map<String, Object> variables = new HashMap<>();
+  /**
+   * The output stream where the stdout of the started process is to be redirected.
+   */
+  protected static PrintStream stdout = System.out;
+  /**
+   * The output stream where the stdout of the started process is to be redirected.
+   */
+  protected static PrintStream stderr = System.out;
+  /**
+   * 
+   */
+  protected static AtomicBoolean streamsConfigured = new AtomicBoolean(false);
 
   /**
    * Default constructor.
