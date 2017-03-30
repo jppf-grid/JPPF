@@ -149,6 +149,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
         lock.lock();
         try {
           while (!isStopped() && (currentJobRef.get() == null)) {
+            long batchTimeout = getBatchTimeout();
             if (batchTimeout > 0) {
               long n = batchTimeout - elapsed;
               if (n > 0) jobReady.await(n, TimeUnit.MILLISECONDS);
@@ -180,6 +181,8 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   private void updateNextJob(final boolean sendSignal) {
     JPPFJob job = nextJobRef.get();
     int size = job.getJobTasks().size();
+    long batchTimeout = getBatchTimeout();
+    int batchSize = getBatchSize();
     if (batchTimeout > 0L) elapsed = (System.nanoTime() - start) / 1_000_000L;
     if (size == 0) {
       if ((batchTimeout > 0L) && (elapsed >= batchTimeout)) resetTimeout();

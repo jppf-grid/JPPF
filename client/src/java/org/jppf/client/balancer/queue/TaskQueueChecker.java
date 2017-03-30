@@ -170,10 +170,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @return a reference to the removed channel.
    */
   public ChannelWrapper removeIdleChannel(final ChannelWrapper channel) {
-    if (traceEnabled) log.trace("Removing idle channel " + channel);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
+        if (traceEnabled) log.trace("Removing idle channel " + channel);
         synchronized (idleChannels) {
           idleChannels.removeValue(channel.getPriority(), channel);
         }
@@ -213,7 +213,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       queue.processPendingBroadcasts();
       synchronized (idleChannels) {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
-        if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
+        if (debugEnabled) {
+          int size = idleChannels.size();
+          if (size == 1) log.debug("1 channel idle: {}", idleChannels.getValues(idleChannels.firstKey()));
+          else log.debug("{} channels idle", size);
+        }
         ChannelWrapper channel = null;
         ClientJob selectedBundle = null;
         queueLock.lock();

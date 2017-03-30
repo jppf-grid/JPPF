@@ -74,6 +74,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   @After
   public void cleanupTest() throws IOException {
     if ((executor != null) && !executor.isShutdown()) executor.shutdownNow();
+    executor = null;
   }
 
   /**
