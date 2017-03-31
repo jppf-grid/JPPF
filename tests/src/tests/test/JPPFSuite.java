@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=2, shuffleClasses=false, shuffleMethods=true, classes = { TestJPPFNodeConnectionNotifierMBean.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=1000, shuffleClasses=false, shuffleMethods=true, classes = { TestJPPFNodeConnectionNotifierMBean.class })
 public class JPPFSuite {
 }

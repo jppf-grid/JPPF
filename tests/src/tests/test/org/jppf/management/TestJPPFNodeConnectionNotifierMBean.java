@@ -26,6 +26,8 @@ import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.node.policy.Equal;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -58,13 +60,18 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   public void testConnectionNotifications() throws Exception {
     int nbSlaves = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    while (driver.nbNodes() < 1) Thread.sleep(10L);
+    printOut("waiting for master node");
+    while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
-    forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
-    while (driver.nbNodes() < nbSlaves + 1) Thread.sleep(10L);
-    forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
-    while (driver.nbNodes() > 1) Thread.sleep(10L);
+    NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
+    forwarder.provisionSlaveNodes(selector, nbSlaves);
+    printOut("waiting for %d slave nodes", nbSlaves);
+    while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);
+    forwarder.provisionSlaveNodes(selector, 0);
+    printOut("waiting for slave nodes termination");
+    while (driver.nbIdleNodes() > 1) Thread.sleep(10L);
+    printOut("waiting for %d notifications", 2 * nbSlaves);
     synchronized(notifList) {
       while (notifList.size() < 2 * nbSlaves) notifList.wait(10L);
     }

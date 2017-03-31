@@ -94,6 +94,7 @@ public class JMXMPServer extends AbstractJMXServer {
       env.put("jmx.remote.object.wrapping", newObjectWrapping());
       boolean found = false;
       JMXServiceURL url = null;
+      int nbTries = 0;
       while (!found) {
         try {
           url = new JMXServiceURL("jmxmp", null, managementPort);
@@ -104,8 +105,9 @@ public class JMXMPServer extends AbstractJMXServer {
           forwarder = createMBeanServerForwarder();
           if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
         } catch(Exception e) {
-          String s = e.getMessage();
-          if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind")))) {
+          nbTries++;
+          if (nbTries > 65530 - 1024) throw e;
+          if ((e instanceof BindException) || StringUtils.hasOneOf(e.getMessage(), true, "bind", "address already in use")) {
             if (managementPort >= 65530) managementPort = 1024;
             managementPort++;
           }

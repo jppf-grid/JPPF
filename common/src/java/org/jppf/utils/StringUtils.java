@@ -318,6 +318,24 @@ public final class StringUtils {
     return false;
   }
 
+
+  /**
+   * Determine whether the specified source string contains one of the specified values.
+   * @param source the string to match with the values.
+   * @param ignoreCase specifies whether case should be ignore in the string matching.
+   * @param values the values to match the source with.
+   * @return true if the source matches one of the values, false otherwise.
+   */
+  public static boolean hasOneOf(final String source, final boolean ignoreCase, final String...values) {
+    if ((source == null) || (values == null)) return false;
+    String s = ignoreCase ? source.toLowerCase(): source;
+    for (String val: values) {
+      if (val == null) continue;
+      String s2 = ignoreCase ? val.toLowerCase() : val;
+      if (s.contains(s2)) return true;
+    }
+    return false;
+  }
   /**
    * Create an instance of the UTF-8 charset.
    * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
