@@ -24,7 +24,8 @@ import java.util.Date;
 
 import org.jppf.location.FileLocation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -194,6 +195,10 @@ public class BaseTest {
           }
         }
       }
+      File slavesDir = new File(dir, "slave_nodes");
+      if (slavesDir.exists()) {
+        if (!FileUtils.deletePath(slavesDir)) print("Could not delete '%s'", slavesDir);
+      }
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       // redirect System.out and System.err to files
       stdOut = System.out;
@@ -224,6 +229,31 @@ public class BaseTest {
         }
       } catch (Exception e) {
         print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
+      }
+      File dir = new File(System.getProperty("user.dir"));
+      File slavesDir = new File(dir, "slave_nodes");
+      if (slavesDir.exists() && slavesDir.isDirectory()) {
+        File[] subdirs = slavesDir.listFiles(new FileFilter() {
+          @Override
+          public boolean accept(final File file) {
+            return file.isDirectory();
+          }
+        });
+        if (subdirs != null) {
+          for (File subdir: subdirs) {
+            File[] logFiles = subdir.listFiles(logFileFilter);
+            if (logFiles != null) {
+              for (File logFile: logFiles) {
+                String path = subdir.getName() + "_" + logFile.getName();
+                try {
+                  StreamUtils.copyFile(logFile, new File(dir, path));
+                } catch (IOException e) {
+                  print("Error copying '%s' to '%s': %s", ExceptionUtils.getStackTrace(e));
+                }
+              }
+            }
+          }
+        }
       }
       zipLogs(description.getClassName());
     }
