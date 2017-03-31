@@ -318,7 +318,6 @@ public final class StringUtils {
     return false;
   }
 
-
   /**
    * Determine whether the specified source string contains one of the specified values.
    * @param source the string to match with the values.
@@ -336,6 +335,7 @@ public final class StringUtils {
     }
     return false;
   }
+
   /**
    * Create an instance of the UTF-8 charset.
    * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.

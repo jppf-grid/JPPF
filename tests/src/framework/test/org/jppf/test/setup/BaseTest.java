@@ -199,7 +199,7 @@ public class BaseTest {
       }
       File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists()) {
-        if (!FileUtils.deletePath(slavesDir)) print("COuld not delete '%s'", slavesDir);
+        if (!FileUtils.deletePath(slavesDir)) print("Could not delete '%s'", slavesDir);
       }
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       // redirect System.out and System.err to files
