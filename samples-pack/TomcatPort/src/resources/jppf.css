@@ -1,0 +1,86 @@
+/*
+	JPPF
+	Copyright (C) 2005-2013 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+/*
+body { font-size:10pt; font-family: Arial, Verdana, Sans-serif; background-image: url("images/bkg_new.jpg"); background-repeat: repeat; background-attachment: fixed; margin: 0px }
+D9DAEC
+*/
+body { font-size:10pt; font-family: Arial, Verdana, Sans-serif; background-color: #E2E4F0; margin-top: 20px }
+a { text-decoration: none; font-weight: normal }
+a:hover { text-decoration: underline; color: red; font-weight: normal }
+
+.gwrapper { width: 900px; max-width: 900px; background: white; }
+.sidebar   { width:  90px; float: left; padding-left: 5px; background-color: white; }
+.content   { width: 766px; float: right; padding-left: 15px; padding-right: 5px; margin-bottom: 5px; background-color: white; }
+/*
+.column1   { width: 250px; float: left; }
+.column2   { width: 456px; float: right; padding-left: 20px; padding-right: 20px }
+*/
+.column1   { width: 300px; float: right; }
+.column2   { width: 406px; float: left; padding-left: 20px; padding-right: 20px }
+/*.jppfheader { background: url('images/header_new.jpg'); background-repeat: no-repeat; background-attachment: scroll; background-position: left top; }*/
+.jppfheader { background: #E8EAFD; }
+.jppffooter { background: #E8EAFD; border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6; border-top: 8px solid #6D78B6 }
+.headerMenuItem, .headerMenuItem2 { font-famil: Arial, Helvetica, sans-serif }
+.headerMenuItem, a.headerMenuItem:visited { color: white; font-size: 12pt; }
+.headerMenuItem2, a.headerMenuItem2, a.headerMenuItem2:visited { color: #6D78B6; font-size: 12pt; }
+/*.headerMenuItem, a.headerMenuItem:visited { font-weight: bold; }*/
+td.headerMenuItem { background-color: transparent; background-image: url('images/menu_bkg1.jpg'); background-repeat: repeat; }
+/*td.headerMenuItem, td.headerMenuItem2 { border-right: 1px solid #B5C0E0; margin-top: 2px; margin-bottom: 2px; }*/
+
+.quickstart_sidebar   { width:  180px; float: left; padding-left: 5px; }
+.quickstart_content   { width: 690px; float: right; padding-left: 5px; padding-right: 5px; margin-bottom: 5px; border-left: 1px solid #6D78B6 }
+
+ 
+.u_link {}
+div.u_link > a { text-decoration: underline; font-weight: normal }
+
+.navlink { color: #6D78B6; text-decoration: none; font-size: 95% }
+
+.tablewidth { width: 900px }
+
+.pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
+            color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
+
+.noborder_        { border: 0px }
+
+h1, h2, h3 , h4  { font-family: Arial, Helvetica, sans-serif;  color: #6D78B6 } /* 109, 120, 182 */
+h1 { font-family: Arial Black, Arial, Helvetica, Sans-serif; font-weight: 900 }
+h1.header {	font-family: Arial Black, Arial, Helvetica, sans-serif;  color: #6D78B6; font-size: 24pt }
+h2,h3 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
+h3 { font-size: 14pt; }
+h4 { font-size: 12pt; font-weight: bold }
+table  {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; margin: 0px }
+.blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
+.simpleList { list-style: none; text-indent: -20 }
+
+.news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #6D78B6 }
+.links { color: #000060; font-size: 10pt; font-family: Arial, Helvetica, sans-serif }
+.linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
+/*.newsTitle { color: #7678BE; font-size: 11pt; font-family: Comic Sans MS, Arial, Helvetica, sans-serif; font-weight: bold }*/
+.newsTitle { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #6D78B6; font-weight: bold }
+
+.download { font-size: 18pt; font-weight: bolder; font-family: Arial Black, Arial, Verdana, sans-serif }
+/*.download:hover { color: red }*/
+
+.aboutMenuItem, .aboutMenuItem2 { text-decoration: none; white-space: nowrap }
+.aboutMenuItem { color: #6D78B6; background-image: url('images/menu_bkg1.jpg'); background-repeat: repeat; }
+.aboutMenuItem2 { color: #6D78B6; }
+div.aboutMenuItem { background-color: #6D78B6;}
+
+.codeBlock { font-family: Courrier New, Courrier, Console; border: 1px dashed blue }

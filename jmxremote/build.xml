@@ -1,0 +1,254 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2016 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='JMX Remote - modified' basedir="." default="build" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<!-- ========================================================================= -->
+	<!-- Property definitions                                                      -->
+	<!-- ========================================================================= -->
+
+  <property name="build.properties.file" value="${basedir}/build.properties"/>
+  <property file="${build.properties.file}"/>
+	<property name="classes.dir"           value="${basedir}/classes"/>
+  <property name="src.dir"               value="${basedir}/src"/>
+  <property name="javadoc"               value="${basedir}/javadoc"/>
+  <property name="build"                 value="${basedir}/build"/>
+  <property name="jppf"                  value="${basedir}/../JPPF"/>
+  <property name="app"                   value="jppf-jmxremote_optional"/>
+  <property name="app.ver"               value="${app}-${jmx.version.number}"/>
+  <property name="build.sysclasspath"    value="last"/>
+
+	<!-- ========================================================================= -->
+	<!-- Classpath definitions                                                     -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}"/>
+	</path>
+
+  <!-- ========================================================================= -->
+  <!-- Main targets                                                              -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="jar" description=""/>
+
+	<!-- ========================================================================= -->
+	<!-- Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true" includes="**/*.*"/>
+    <delete dir="${build}" quiet="true" includes="**/*.*"/>
+    <delete dir="${javadoc}" quiet="true" includes="**/*.*"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!-- Init                                                                      -->
+	<!-- ========================================================================= -->
+
+	<target name="init">
+ 		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!-- Compile                                                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" depends="clean, init">
+		<javac srcdir="" destdir="${classes.dir}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src.dir}"/>
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java"/>
+				<exclude name="**/package.html"/>
+			</fileset>
+		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!-- Jar                                                                       -->
+	<!-- ========================================================================= -->
+
+	<target name="jar" depends="compile, javadoc">
+    <tstamp><format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/></tstamp>
+    <jar.all type=""         dir="${classes.dir}"/>
+    <jar.all type="-sources" dir="${src.dir}"/>
+    <jar.all type="-javadoc" dir="${javadoc}"/>
+  </target>
+
+  <macrodef name="jar.all">
+    <attribute name="type"/>
+    <attribute name="dir"/>
+    <sequential>
+      <jar jarfile="${build}/${app.ver}@{type}.jar" index="true">
+        <fileset dir="@{dir}"/>
+        <manifest>
+          <attribute name="Version" value="${jmx.version.number}"/>
+          <attribute name="BuildDate" value="${readable.now}"/>
+        </manifest>
+      </jar>
+      <echo message="*** ${build}/${app.ver}@{type}.jar ready ***"/>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the Javadoc                                                      -->
+  <!-- ========================================================================= -->
+
+  <target name="javadoc">
+    <delete dir="${javadoc}" quiet="true" includes="**/*.*"/>
+    <mkdir dir="${javadoc}"/>
+    <exec executable="java">
+      <arg value="-version"/>
+    </exec>
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF-JMX-Remote"
+      packagenames="**/*.*" classpathref="project.classpath" stylesheetfile="${jppf}/bin/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
+      doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${jppf}/classes"
+    >
+      <arg value="-J-Xmx512m"/>
+      <packageset dir="${src.dir}"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="http://junit.sourceforge.net/javadoc"/>
+      <link href="http://xstream.codehaus.org/javadoc"/>
+      <doctitle><![CDATA[JPPF-jmxremote_optional v${version.number}]]></doctitle>
+      <header>
+        <![CDATA[
+          <table>
+          <tr>
+            <td valign="center">
+              <a href="http://www.jppf.org" target="_top">
+                <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+              </a>
+            </td>
+          </tr>
+          </table>
+        ]]>
+      </header>
+      <bottom>
+        <![CDATA[
+          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2014 JPPF Team.</i></font>
+        ]]>
+      </bottom>
+    </javadoc>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${jppf}/bin">
+        <include name="*.gif"/>
+        <include name="*.jpg"/>
+      </fileset>
+    </copy>
+    <property name="javadoc.file" value="${jppf}/build/${app.ver}-api.zip"/>
+    <delete file="${javadoc.file}" quiet="true"/>
+    <zip destfile="${javadoc.file}">
+      <zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-javadoc"/>
+    </zip>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the Maven artifacts                                              -->
+  <!-- ========================================================================= -->
+
+  <target name="maven" depends="maven.init, maven.generate" description=""/>
+
+  <target name="maven.init" depends="">
+    <property name="maven.dist" value="${build}"/>
+    <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
+    <!-- defined maven snapshots and staging repository id and url -->
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+    <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+    <property name="pom.file" value="${maven.dist}/pom.xml"/>
+    <condition property="maven.snapshot">
+      <contains string="${jmx.maven.version}" substring="SNAPSHOT" casesensitive="false"/>
+    </condition>
+  </target>
+
+  <target name="maven.generate" depends="">
+    <property name="artifactId" value="jppf-jmxremote_optional"/>
+    <property name="artifact.prefix" value="${artifactId}-${jmx.version.number}"/>
+    <delete dir="${maven.dist}" quiet="true" excludes="**/*.jar"/>
+    <copy file="${basedir}/pom.xml" toFile="${pom.file}"/>
+    <replace file="${pom.file}" token="@version@" value="${jmx.maven.version}"/>
+    <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
+    <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+    <antcall target="maven.staging"> <param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+  </target>
+
+  <target name="maven.snapshot" depends="" if="maven.snapshot">
+    <echo message="deploying to SNAPSHOT repository !!!"/>
+    <copy file="${maven-jar}.jar" toFile="${maven-jar}-SNAPSHOT.jar"/>
+    <copy file="${maven-jar}-sources.jar" toFile="${maven-jar}-SNAPSHOT-sources.jar"/>
+    <copy file="${maven-jar}-javadoc.jar" toFile="${maven-jar}-SNAPSHOT-javadoc.jar"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-snapshots-repository-url}" />
+      <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.jar"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+    <delete dir="${maven.dist}" quiet="true" includes="**/*SNAPSHOT*.*"/>
+  </target>
+
+  <target name="maven.staging" depends="" unless="maven.snapshot">
+    <echo message="deploying to STAGING repository !!!"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-staging-repository-url}" />
+      <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.jar"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+  </target>
+
+  <target name="gpg.sign" depends="">
+    <exec executable="gpg">
+      <arg value="--yes"/>
+      <arg value="--passphrase"/>
+      <arg value="${gpg.pass}"/>
+      <arg value="--armor"/>
+      <arg value="--detach-sign"/>
+      <arg value="${file.sign}"/>
+    </exec>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Copy the jars to JPPF/lib/jmxremote                                       -->
+  <!-- ========================================================================= -->
+
+  <target name="copy.jars" description="">
+    <copy toDir="../JPPF/lib/jmxremote">
+      <fileset dir="${build}" includes="${app.ver}*.jar"/>
+    </copy>
+    <copy toDir="../samples-packa/shared/lib">
+      <fileset dir="${build}" includes="${app.ver}.jar"/>
+    </copy>
+    <copy toDir="../jca-client/lib">
+      <fileset dir="${build}" includes="${app.ver}.jar"/>
+    </copy>
+  </target>
+</project> 
