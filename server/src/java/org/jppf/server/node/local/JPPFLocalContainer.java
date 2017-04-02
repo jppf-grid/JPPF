@@ -33,8 +33,7 @@ import org.slf4j.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-public class JPPFLocalContainer extends JPPFContainer
-{
+public class JPPFLocalContainer extends JPPFContainer {
   /**
    * Logger for this class.
    */
@@ -54,8 +53,7 @@ public class JPPFLocalContainer extends JPPFContainer
    * @param classLoader the class loader for this container.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
-  {
+  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
     super(uuidPath, classLoader);
   }
 
@@ -68,23 +66,23 @@ public class JPPFLocalContainer extends JPPFContainer
    * @throws Exception if an error occurs while deserializing.
    */
   @Override
-  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Exception
-  {
+  public int deserializeObjects(final Object[] list, final int count, final ExecutorService executor) throws Exception {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    try
-    {
+    try {
       Thread.currentThread().setContextClassLoader(classLoader);
+      CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
       List<DataLocation> locations = currentMessage.getLocations();
-      List<Future<Object>> futureList = new ArrayList<>(count);
-      for (int i=0; i<count; i++)
-      {
-        futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i+1), i)));
+      for (int i = 0; i < count; i++) {
+        completionService.submit(new ObjectDeserializationTask(locations.get(i + 1), i));
+        //futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i + 1), i)));
       }
-      for (Future<Object> f: futureList) list.add(f.get());
+      for (int i=0; i<count; i++) {
+        Future<ObjectDeserializationTask> f = completionService.take();
+        ObjectDeserializationTask task = f.get();
+        list[task.getIndex() + 1] = task.getObject();
+      }
       return 0;
-    }
-    finally
-    {
+    } finally {
       currentMessage = null;
       Thread.currentThread().setContextClassLoader(cl);
     }
@@ -94,53 +92,62 @@ public class JPPFLocalContainer extends JPPFContainer
    * Instances of this class are used to deserialize objects from an
    * incoming message in parallel.
    */
-  protected class ObjectDeserializationTask implements Callable<Object>
-  {
+  protected class ObjectDeserializationTask implements Callable<ObjectDeserializationTask> {
     /**
-     * The data to send over the network connection.
+     * The data received over the network connection.
      */
-    private DataLocation location = null;
+    private final DataLocation dl;
     /**
      * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
      */
-    private int index = 0;
+    private final int index;
+    /**
+     * The deserialized object.
+     */
+    private Object object;
 
     /**
      * Initialize this task with the specified data buffer.
      * @param location the data read from the network connection.
      * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
      */
-    public ObjectDeserializationTask(final DataLocation location, final int index)
-    {
-      this.location = location;
+    public ObjectDeserializationTask(final DataLocation location, final int index) {
+      this.dl = location;
       this.index = index;
     }
 
     /**
      * Execute this task.
-     * @return a deserialized object.
-     * @see java.util.concurrent.Callable#call()
+     * @return this task, holding a deserialized object.
      */
     @Override
-    public Object call()
-    {
+    public ObjectDeserializationTask call() {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      try
-      {
+      try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
-        Object o = IOHelper.unwrappedData(location, helper.getSerializer());
+        object = IOHelper.unwrappedData(dl, helper.getSerializer());
         if (traceEnabled) log.debug("deserialized object index = " + index);
-        return o;
-      }
-      catch(Throwable t)
-      {
+      } catch (Throwable t) {
         log.error(t.getMessage() + " [object index: " + index + ']', t);
-        return t;
-      }
-      finally
-      {
+        object = t;
+      } finally {
         Thread.currentThread().setContextClassLoader(cl);
       }
+      return this;
+    }
+
+    /**
+     * @return the index of the object to deserialize in the incoming IO message; used for debugging purposes.
+     */
+    public int getIndex() {
+      return index;
+    }
+
+    /**
+     * @return the deserialized object.
+     */
+    public Object getObject() {
+      return object;
     }
   }
 
@@ -148,8 +155,7 @@ public class JPPFLocalContainer extends JPPFContainer
    * Set the message to deserialize.
    * @param currentMessage a <code>LocalNodeMessage</code> instance.
    */
-  void setCurrentMessage(final LocalNodeMessage currentMessage)
-  {
+  void setCurrentMessage(final LocalNodeMessage currentMessage) {
     this.currentMessage = currentMessage;
   }
 }

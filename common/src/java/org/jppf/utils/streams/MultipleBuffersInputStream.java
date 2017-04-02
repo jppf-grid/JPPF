@@ -41,7 +41,7 @@ public class MultipleBuffersInputStream extends InputStream {
   /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */
-  private JPPFBuffer[] list;
+  private final JPPFBuffer[] list;
   /**
    * The JPPFBuffer currently being read from.
    */
@@ -88,7 +88,6 @@ public class MultipleBuffersInputStream extends InputStream {
     currentBuffer.pos++;
     if (traceEnabled) log.trace("read one byte '" + b + "' from " + this);
     return b & 0xff;
-    //return b < 0 ? b + 256 : b;
   }
 
   /**
@@ -137,16 +136,6 @@ public class MultipleBuffersInputStream extends InputStream {
     }
     currentBuffer = list[bufferIndex];
     currentBuffer.pos = 0;
-  }
-
-  /**
-   * Get the JPPFBuffer currently being read from.
-   * @return a {@link JPPFBuffer} instance.
-   */
-  public JPPFBuffer getCurrentBuffer() {
-    if (eofReached) return null;
-    if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
-    return currentBuffer;
   }
 
   @Override

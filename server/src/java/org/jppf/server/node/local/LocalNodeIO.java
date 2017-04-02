@@ -97,8 +97,9 @@ public class LocalNodeIO extends AbstractNodeIO {
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
     int count = bundle.getTaskCount();
-    List<Object> list = new ArrayList<>(count + 1);
-    list.add(bundle);
+    //List<Object> list = new ArrayList<>(count + 1);
+    Object[] list = new Object[count + 2];
+    list[0] = bundle;
     try {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
@@ -120,7 +121,7 @@ public class LocalNodeIO extends AbstractNodeIO {
     } finally {
       currentMessage = null;
     }
-    return list.toArray(new Object[list.size()]);
+    return list;
   }
 
   @Override

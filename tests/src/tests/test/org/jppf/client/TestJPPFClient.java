@@ -75,7 +75,7 @@ public class TestJPPFClient extends Setup1D1N {
   @Test(timeout=10000)
   public void testSubmit() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
-      int nbTasks = 10;
+      int nbTasks = 50;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
@@ -88,6 +88,8 @@ public class TestJPPFClient extends Setup1D1N {
         Throwable t = task.getThrowable();
         assertNull("task " + i +" has an exception " + t, t);
         assertEquals("result of task " + i + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
+        assertEquals(job.getJobTasks().get(i).getId(), task.getId());
+        assertEquals(i, task.getPosition());
       }
     }
   }

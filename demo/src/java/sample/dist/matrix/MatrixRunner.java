@@ -172,17 +172,19 @@ public class MatrixRunner {
     // initialize the resulting matrix
     Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results
-    int rowIdx = 0;
+    int rowIdx = 0, pos = 0;
     for (Task<?> matrixTask : results) {
       if (matrixTask.getThrowable() != null) {
         StreamUtils.printf(log, "got exception: " + ExceptionUtils.getStackTrace(matrixTask.getThrowable()));
         throw new JPPFException(matrixTask.getThrowable());
       }
+      if (pos != matrixTask.getPosition()) throw new JPPFException(String.format("pos=%d is different from task.getPosition()=%d", pos, matrixTask.getPosition()));
       double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
       }
       rowIdx += rows.length;
+      pos++;
     }
     return (System.nanoTime() - start) / 1_000_000L;
   }

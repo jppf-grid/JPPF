@@ -82,8 +82,9 @@ public class RemoteNodeIO extends AbstractNodeIO {
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
     int count = bundle.getTaskCount();
-    List<Object> list = new ArrayList<>(count + 2);
-    list.add(bundle);
+    //List<Object> list = new ArrayList<>(count + 2);
+    Object[] list = new Object[count + 2];
+    list[0] = bundle;
     try {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
@@ -102,7 +103,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
     }
-    return list.toArray(new Object[list.size()]);
+    return list;
   }
 
   /**

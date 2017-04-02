@@ -103,7 +103,8 @@ public abstract class JPPFContainer {
    * @return the new position in the source data after deserialization.
    * @throws Throwable if an error occurs while deserializing.
    */
-  public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable;
+  public abstract int deserializeObjects(Object[] list, int count, ExecutorService executor) throws Throwable;
+  //public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable;
 
   /**
    * Get the main class loader for this container.
@@ -156,15 +157,19 @@ public abstract class JPPFContainer {
    * Instances of this class are used to deserialize objects from an
    * incoming message in parallel.
    */
-  protected class ObjectDeserializationTask implements Callable<Object> {
+  protected class ObjectDeserializationTask implements Callable<ObjectDeserializationTask> {
     /**
      * The data received over the network connection.
      */
-    DataLocation dl = null;
+    private final DataLocation dl;
     /**
      * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
      */
-    private int index = 0;
+    private final int index;
+    /**
+     * The deserialized object.
+     */
+    private Object object;
 
     /**
      * Initialize this task with the specified data buffer.
@@ -181,14 +186,14 @@ public abstract class JPPFContainer {
      * @return a deserialized object.
      */
     @Override
-    public Object call() {
+    public ObjectDeserializationTask call() {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
         if (traceEnabled) log.debug("deserializing object index = " + index);
         if (sequentialDeserialization) lock.lock();
         try {
-          return IOHelper.unwrappedData(dl, serializer);
+          object = IOHelper.unwrappedData(dl, serializer);
         } finally {
           if (sequentialDeserialization) lock.unlock();
         }
@@ -196,12 +201,25 @@ public abstract class JPPFContainer {
         String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
         if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
         else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
-        Object result = null;
-        if (index > 0) result = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
-        return result;
+        if (index > 0) object = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
       } finally {
         Thread.currentThread().setContextClassLoader(cl);
       }
+      return this;
+    }
+
+    /**
+     * @return the index of the object to deserialize in the incoming IO message; used for debugging purposes.
+     */
+    public int getIndex() {
+      return index;
+    }
+
+    /**
+     * @return the deserialized object.
+     */
+    public Object getObject() {
+      return object;
     }
   }
 

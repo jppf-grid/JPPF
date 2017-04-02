@@ -81,7 +81,7 @@ public abstract class AbstractNodeIO implements NodeIO {
   public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
     Object[] result = readObjects();
     currentBundle = (TaskBundle) result[0];
-    List<Task<?>> taskList = new LinkedList<>();
+    List<Task<?>> taskList = new ArrayList<>(result.length - 2);
     if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
       DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++) {

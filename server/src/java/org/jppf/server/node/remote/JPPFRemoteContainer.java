@@ -17,7 +17,7 @@
  */
 package org.jppf.server.node.remote;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -68,22 +68,24 @@ public class JPPFRemoteContainer extends JPPFContainer {
    * @throws Throwable if an error occurs while deserializing.
    */
   @Override
-  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable {
+  public int deserializeObjects(final Object[] list, final int count, final ExecutorService executor) throws Throwable {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(classLoader);
-      List<Future<Object>> futureList = new ArrayList<>(count);
+      CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
       InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
       for (int i = 0; i < count; i++) {
         DataLocation dl = IOHelper.readData(is);
         if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
-        futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
+        completionService.submit(new ObjectDeserializationTask(dl, i));
       }
       Throwable t = null;
-      for (Future<Object> f : futureList) {
-        Object o = f.get();
+      for (int i=0; i<count; i++) {
+        Future<ObjectDeserializationTask> f = completionService.take();
+        ObjectDeserializationTask task = f.get();
+        Object o = task.getObject();
         if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
-        if (t == null) list.add(o);
+        list[task.getIndex() + 1] = o;
       }
       if (t != null) throw t;
       return 0;
