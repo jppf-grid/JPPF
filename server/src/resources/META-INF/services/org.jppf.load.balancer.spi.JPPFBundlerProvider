@@ -1,0 +1,5 @@
+org.jppf.load.balancer.spi.RLBundlerProvider
+org.jppf.load.balancer.spi.ProportionalBundlerProvider
+org.jppf.load.balancer.spi.AutoTunedBundlerProvider
+org.jppf.load.balancer.spi.FixedSizeBundlerProvider
+org.jppf.load.balancer.spi.NodeThreadsLoadBalancerProvider

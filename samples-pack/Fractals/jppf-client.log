@@ -1,0 +1,10 @@
+2015-10-03 10:38:18,152 [INFO ][org.jppf.utils.ManagementUtils.<clinit>(153)]: management successfully initialized
+2015-10-03 10:38:18,158 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(80)]: --------------------------------------------------------------------------------
+2015-10-03 10:38:18,158 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(81)]: JPPF Version: 5.1-beta, Build number: 1723, Build date: 2015-09-20 08:37 CEST
+2015-10-03 10:38:18,159 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(82)]: starting client with PID=13376, UUID=18862D68-CADD-3777-1DDD-2F166FFB69E8
+2015-10-03 10:38:18,159 [INFO ][org.jppf.utils.VersionUtils.logVersionInformation(83)]: --------------------------------------------------------------------------------
+2015-10-03 10:38:19,005 [INFO ][org.jppf.client.AbstractGenericClient.newConnection(281)]: connection [jppf_discovery-1-1] created
+2015-10-03 10:38:19,012 [INFO ][org.jppf.client.ClassServerDelegateImpl.init(76)]: [client: jppf_discovery-1-1 - ClassServer] Attempting connection to the class server at lcohen-CSL:11111
+2015-10-03 10:38:20,014 [INFO ][org.jppf.client.ClassServerDelegateImpl.init(84)]: [client: jppf_discovery-1-1 - ClassServer] Reconnected to the class server
+2015-10-03 10:38:20,015 [INFO ][org.jppf.client.TaskServerConnectionHandler.init(78)]: [client: jppf_discovery-1-1 - TasksServer] Attempting connection to the task server at lcohen-CSL:11111
+2015-10-03 10:38:21,062 [INFO ][org.jppf.client.TaskServerConnectionHandler.init(91)]: [client: jppf_discovery-1-1 - TasksServer] Reconnected to the JPPF task server
