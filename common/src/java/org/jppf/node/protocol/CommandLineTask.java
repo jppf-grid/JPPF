@@ -227,6 +227,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulates the output stream's content.
+   * @exclude
    */
   @Override
   public void outputStreamAltered(final ProcessWrapperEvent event) {
@@ -236,7 +237,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * Notification that the process has written to its error stream.
    * @param event encapsulate the error stream's content.
-   * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
+   * @exclude
    */
   @Override
   public void errorStreamAltered(final ProcessWrapperEvent event) {

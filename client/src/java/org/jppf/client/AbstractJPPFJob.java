@@ -323,7 +323,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Add a listener to the list of status listeners.
    * @param listener the listener to add.
-   * @excluded
+   * @exclude
    */
   public void addJobStatusListener(final JobStatusListener listener) {
     synchronized(statusListeners) {
@@ -335,7 +335,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Remove a listener from the list of status listeners.
    * @param listener the listener to remove.
-   * @excluded
+   * @exclude
    */
   public void removeJobStatusListener(final JobStatusListener listener) {
     synchronized(statusListeners) {

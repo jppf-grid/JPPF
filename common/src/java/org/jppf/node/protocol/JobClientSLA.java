@@ -52,7 +52,7 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
   /**
    * Set the maximum number of channels, including the local execution channel if it is enabled, this job can be sent on.
    * @param maxChannels the number of channels as an int value. A value <= 0 means no limit on the number of channels.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method chaining.
    */
   public JobClientSLA setMaxChannels(final int maxChannels) {
     this.maxChannels = maxChannels > 0 ? maxChannels : Integer.MAX_VALUE;
@@ -61,7 +61,7 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
 
   /**
    * Create a copy of this job SLA.
-   * @return a {@link JPPFJobClientSLA} instance.
+   * @return a {@link JobClientSLA} instance.
    */
   public JobClientSLA copy() {
     JobClientSLA sla = new JobClientSLA();

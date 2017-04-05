@@ -335,7 +335,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @param tasks the list of tasks whose results have been received from the server.
    * @param throwable the throwable that was raised while receiving the results.
    * @param sendJobEvent whether to emit a {@link org.jppf.client.event.JobEvent JobEvent} notification.
-   * @excluded
+   * @exclude
    */
   public void resultsReceived(final List<Task<?>> tasks, final Throwable throwable, final boolean sendJobEvent) {
     synchronized(results) {
