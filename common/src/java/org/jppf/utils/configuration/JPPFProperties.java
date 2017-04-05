@@ -382,6 +382,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> NODE_RESERVED_UUID = new StringProperty("jppf.node.reserved.uuid", null);
   /** Whether debug mbean is enabled, defaults to false */
   public static final JPPFProperty<Boolean> DEBUG_ENABLED = new BooleanProperty("jppf.debug.enabled", false);
+  /** Interval in seconds between 2 refreshes of a page in the web admin console */
+  public static final JPPFProperty<Integer> WEB_ADMIN_REFRESH_INTERVAL = new IntProperty("jppf.web.admin.refresh.interval", 3);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 
