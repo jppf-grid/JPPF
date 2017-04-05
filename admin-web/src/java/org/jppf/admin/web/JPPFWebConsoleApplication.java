@@ -179,6 +179,20 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     return persistence;
   }
 
+  /**
+   * @return the JPPF client configuration properties.
+   */
+  public TypedProperties getClientConfig() {
+    return getTopologyManager().getJPPFClient().getConfig();
+  }
+
+  /**
+   * @return the JPPF client configuration properties.
+   */
+  public int getRefreshInterval() {
+    return getClientConfig().get(JPPFProperties.WEB_ADMIN_REFRESH_INTERVAL);
+  }
+
   @Override
   protected void onDestroy() {
     if (persistence != null) persistence.close();
@@ -187,9 +201,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
       topologyManager.close();
       client = topologyManager.getJPPFClient();
     }
-    if (jobMonitor != null) {
-      jobMonitor.close();
-    }
+    if (jobMonitor != null) jobMonitor.close();
     if (client != null) client.close();
   }
 

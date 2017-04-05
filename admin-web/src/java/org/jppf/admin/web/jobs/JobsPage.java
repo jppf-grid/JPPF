@@ -99,7 +99,7 @@ public class JobsPage extends AbstractTableTreePage {
   }
 
   /**
-   * This class renders cells of the first column as tree.
+   * This class renders cells of the first column as a tree.
    */
   public class JobTreeColumn extends TreeColumn<DefaultMutableTreeNode, String> {
     /** Explicit serialVersionUID. */
@@ -118,27 +118,27 @@ public class JobsPage extends AbstractTableTreePage {
       super.populateItem(cellItem, componentId, rowModel);
       DefaultMutableTreeNode node = rowModel.getObject();
       AbstractJobComponent comp = (AbstractJobComponent) node.getUserObject();
-      String cssClass = null;
+      String cssClass = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
       if (comp instanceof Job) {
         Job data = (Job) comp;
         inactive = data.getJobInformation().isSuspended();
-        if (inactive) cssClass = (selected) ? "tree_inactive_selected" : "tree_inactive";
-        else cssClass = (selected) ? "tree_selected" : "node_up";
+        if (inactive) cssClass += (selected) ? "tree_inactive_selected " : "tree_inactive ";
+        else cssClass = (selected) ? "tree_selected " : "node_up ";
       } else if (comp instanceof JobDriver) {
         TopologyDriver driver = ((JobDriver) comp).getTopologyDriver();
-        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass = (selected) ? "tree_selected" : "driver_up";
-        else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
+        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
+        else cssClass = (selected) ? "tree_inactive_selected " : "driver_down ";
       } else if (comp instanceof JobDispatch) {
-        cssClass = "node_up";
+        cssClass += "node_up ";
       }
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+      cellItem.add(new AttributeModifier("class", cssClass));
     }
   }
 
   /**
-   * This class renders cells of each columns except the first.
+   * This class renders cells of each columns except for the first.
    */
   public class JobColumn extends AbstractColumn<DefaultMutableTreeNode, String> {
     /** Explicit serialVersionUID. */
@@ -166,15 +166,12 @@ public class JobsPage extends AbstractTableTreePage {
       String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
-      String cssClass = null;
+      String cssClass = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
-      if ((comp instanceof Job) || (comp instanceof JobDispatch)) cssClass = "node_up " + getCssClass();
-      else if (!selected) cssClass = "empty";
-      if (selected) {
-        if (cssClass == null) cssClass = "tree_selected";
-        else cssClass += " tree_selected";
-      }
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+      if ((comp instanceof Job) || (comp instanceof JobDispatch)) cssClass += "node_up " + getCssClass();
+      else if (!selected) cssClass += "empty";
+      if (selected) cssClass += "tree_selected";
+      cellItem.add(new AttributeModifier("class", cssClass));
     }
 
     @Override
@@ -184,9 +181,9 @@ public class JobsPage extends AbstractTableTreePage {
         case JobTreeTableModel.TASK_COUNT:
         case JobTreeTableModel.MAX_NODES:
         case JobTreeTableModel.PRIORITY:
-          return "number";
+          return "default_cursor number ";
       }
-      return "string";
+      return "default_cursor string ";
     }
   }
 }

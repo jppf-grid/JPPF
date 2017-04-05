@@ -98,7 +98,8 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
         item.add(new StatisticsTablePanel("stats.table", item.getModelObject().name, item.getModelObject().fields));
       }
     };
-    tablesContainer.add(statsRefreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5)));
+    int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
+    tablesContainer.add(statsRefreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(interval)));
     tablesContainer.add(listView);
     add(tablesContainer);
   }

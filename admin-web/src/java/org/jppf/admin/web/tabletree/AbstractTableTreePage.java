@@ -65,7 +65,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   /**
    * The behavior that periodically refreshes the toolbar and table tree.
    */
-  protected final transient AjaxSelfUpdatingTimerBehavior refreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(5));
+  protected final transient AjaxSelfUpdatingTimerBehavior refreshTimer;
   /**
    * The type of tree this page holds.
    */
@@ -93,6 +93,8 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
     selectionHandler = data.getSelectionHandler();
     tableTree = createTableTree("jppf." + namePrefix + ".visible.columns");
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
+    int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
+    refreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(interval));
     tableTree.add(refreshTimer);
     tableTree.addUpdateTarget(toolbar);
     data.selectionChanged(selectionHandler);

@@ -128,25 +128,25 @@ public class TopologyPage extends AbstractTableTreePage {
       super.populateItem(cellItem, componentId, rowModel);
       DefaultMutableTreeNode node = rowModel.getObject();
       AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
-      String cssClass = null;
+      String cssClass = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
-      if (comp.isPeer()) cssClass = "peer";
+      if (comp.isPeer()) cssClass += "peer ";
       else if (comp.isNode()) {
         TopologyNode data = (TopologyNode) node.getUserObject();
         if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
-          if (inactive) cssClass = (selected) ? "tree_inactive_selected" : "tree_inactive";
-          else cssClass = (selected) ? "tree_selected" : "node_up";
+          if (inactive) cssClass += (selected) ? "tree_inactive_selected " : "tree_inactive ";
+          else cssClass += (selected) ? "tree_selected " : "node_up ";
         }
-        else cssClass = (selected) ? "tree_inactive_selected" : "node_tree_down";
+        else cssClass += (selected) ? "tree_inactive_selected " : "node_tree_down ";
       } else if (comp.isDriver()) {
         TopologyDriver driver = (TopologyDriver) node.getUserObject();
-        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass = (selected) ? "tree_selected" : "driver_up";
-        else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
+        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
+        else cssClass += (selected) ? "tree_inactive_selected " : "driver_down ";
       }
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+      cellItem.add(new AttributeModifier("class", cssClass));
     }
   }
 
@@ -179,17 +179,14 @@ public class TopologyPage extends AbstractTableTreePage {
       String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
-      String cssClass = null;
+      String cssClass = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
       if (comp.isNode()) {
         TopologyNode data = (TopologyNode) treeNode.getUserObject();
-        if (data.isNode()) cssClass = ((data.getStatus() == TopologyNodeStatus.UP) ? "node_up " : "node_down ") + getCssClass();
-      } else if (!selected) cssClass = "empty";
-      if (selected && !comp.isPeer()) {
-        if (cssClass == null) cssClass = "tree_selected";
-        else cssClass += " tree_selected";
-      }
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+        if (data.isNode()) cssClass += ((data.getStatus() == TopologyNodeStatus.UP) ? "node_up " : "node_down ") + getCssClass();
+      } else if (!selected) cssClass += "empty ";
+      if (selected && !comp.isPeer()) cssClass += "tree_selected ";
+      cellItem.add(new AttributeModifier("class", cssClass));
     }
 
     @Override
@@ -197,9 +194,9 @@ public class TopologyPage extends AbstractTableTreePage {
       switch (index) {
         case NodeTreeTableModel.NB_SLAVES:
         case NodeTreeTableModel.NB_TASKS:
-          return "number";
+          return "default_cursor number ";
       }
-      return "string";
+      return "default_cursor string ";
     }
   }
 }

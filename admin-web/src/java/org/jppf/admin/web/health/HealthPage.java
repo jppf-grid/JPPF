@@ -115,25 +115,25 @@ public class HealthPage extends AbstractTableTreePage {
       super.populateItem(cellItem, componentId, rowModel);
       DefaultMutableTreeNode node = rowModel.getObject();
       AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
-      String cssClass = null;
+      String cssClass = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
-      if (comp.isPeer()) cssClass = "peer";
+      if (comp.isPeer()) cssClass += "peer ";
       else if (comp.isNode()) {
         TopologyNode data = (TopologyNode) node.getUserObject();
         //if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
-          if (inactive) cssClass = selected ? "tree_inactive_selected" : "tree_inactive";
-          else cssClass = selected ? "tree_selected" : "node_up";
+          if (inactive) cssClass += selected ? "tree_inactive_selected " : "tree_inactive ";
+          else cssClass += selected ? "tree_selected " : "node_up ";
         }
-        else cssClass = selected ? "tree_inactive_selected" : "node_tree_down";
+        else cssClass += selected ? "tree_inactive_selected " : "node_tree_down ";
       } else if (comp.isDriver()) {
         TopologyDriver driver = (TopologyDriver) node.getUserObject();
-        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass = (selected) ? "tree_selected" : "driver_up";
+        if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
         else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
       }
-      if (cssClass != null) cellItem.add(new AttributeModifier("class", cssClass));
+      cellItem.add(new AttributeModifier("class", cssClass));
     }
   }
 
@@ -165,10 +165,10 @@ public class HealthPage extends AbstractTableTreePage {
       AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
-      String css = null;
+      String css = "default_cursor ";
       boolean selected = selectionHandler.isSelected(comp.getUuid());
-      if (!comp.isPeer()) css = (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
-      if (css != null) cellItem.add(new AttributeModifier("class", css));
+      if (!comp.isPeer()) css += (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
+      cellItem.add(new AttributeModifier("class", css));
       if (traceEnabled && (index == 1)) log.trace(String.format("index=%d, value=%s, css=%s, comp=%s", index, value, css, comp));
     }
 
@@ -184,9 +184,9 @@ public class HealthPage extends AbstractTableTreePage {
         case JVMHealthTreeTableModel.RAM_PCT:
         case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
         case JVMHealthTreeTableModel.THREADS:
-          return "number";
+          return "default_cursor number";
       }
-      return "string";
+      return "default_cursor string";
     }
 
     /**

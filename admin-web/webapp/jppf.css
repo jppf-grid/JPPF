@@ -375,6 +375,13 @@ textarea {
   text-align: center;
 }
 
+.default_cursor {
+  cusor: default;
+}
+
+td.default_cursor div {
+  cursor: default;
+}
 .peer {
   font-weight: bold;
   font-style: italic;
