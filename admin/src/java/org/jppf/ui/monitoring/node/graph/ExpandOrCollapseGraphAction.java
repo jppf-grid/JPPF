@@ -42,9 +42,7 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction {
    */
   public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse) {
     super(panel);
-    this.collapse = collapse;
-    //String s = collapse ? "collapse" : "expand";
-    if (collapse) {
+    if (this.collapse = collapse) {
       setupIcon("/org/jppf/ui/resources/collapse.gif");
       setupNameAndTooltip("graph.button.collapse");
     } else {
@@ -55,21 +53,22 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction {
 
   @Override
   public void actionPerformed(final ActionEvent e) {
+    GraphTopologyHandler handler = panel.getGraphHandler();
     synchronized(panel) {
       VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-      Set<AbstractTopologyComponent> sel = viewer.getPickedVertexState().getPicked();
+      Set<AbstractTopologyComponent> selection = viewer.getPickedVertexState().getPicked();
       int count = 0;
       if (collapse) {
-        for (AbstractTopologyComponent data: sel) {
-          if (data.isDriver() && !((TopologyDriver) data).isCollapsed()) {
-            panel.getGraphHandler().collapse((TopologyDriver) data);
+        for (AbstractTopologyComponent comp: selection) {
+          if (comp.isDriver() && !handler.isCollapsed(comp)) {
+            handler.collapse((TopologyDriver) comp);
             count++;
           }
         }
       } else {
-        for (AbstractTopologyComponent data: sel) {
-          if (data.isDriver() && ((TopologyDriver) data).isCollapsed()) {
-            panel.getGraphHandler().expand((TopologyDriver) data);
+        for (AbstractTopologyComponent comp: selection) {
+          if (comp.isDriver() && !handler.isExpanded(comp)) {
+            handler.expand((TopologyDriver) comp);
             count++;
           }
         }

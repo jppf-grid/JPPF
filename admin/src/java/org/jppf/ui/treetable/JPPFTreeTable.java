@@ -103,4 +103,22 @@ public class JPPFTreeTable extends JTreeTable {
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
     for (int i = 0; i < root.getChildCount(); i++) getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
   }
+
+  /**
+   * Determine whether the specified node is collapsed.
+   * @param node the tree node to check.
+   * @return {@code true} if the node is collapsed, {@code false} otherwise.
+   */
+  public boolean isCollapsed(final DefaultMutableTreeNode node) {
+    return getTree().isCollapsed(new TreePath(node.getPath()));
+  }
+
+  /**
+   * Determine whether the specified node is expanded.
+   * @param node the tree node to check.
+   * @return {@code true} if the node is expanded, {@code false} otherwise.
+   */
+  public boolean isExpanded(final DefaultMutableTreeNode node) {
+    return getTree().isExpanded(new TreePath(node.getPath()));
+  }
 }

@@ -33,10 +33,6 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
  */
 public class TopologyDriver extends AbstractTopologyComponent {
   /**
-   * Determines whether the corresponding driver is collapsed in the visualization panel.
-   */
-  private boolean collapsed = false;
-  /**
    * A driver connection.
    */
   private transient final JPPFClientConnection connection;
@@ -75,24 +71,6 @@ public class TopologyDriver extends AbstractTopologyComponent {
    */
   public JPPFClientConnection getConnection() {
     return connection;
-  }
-
-  /**
-   * Determine whether the corresponding driver is collapsed in the visualization panel.
-   * @return <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
-   * @exclude
-   */
-  public boolean isCollapsed() {
-    return collapsed;
-  }
-
-  /**
-   * Specify whether the corresponding driver is collapsed in the visualization panel.
-   * @param collapsed <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
-   * @exclude
-   */
-  public void setCollapsed(final boolean collapsed) {
-    this.collapsed = collapsed;
   }
 
   /**

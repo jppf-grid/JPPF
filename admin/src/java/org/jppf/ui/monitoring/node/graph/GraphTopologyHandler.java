@@ -76,6 +76,23 @@ public class GraphTopologyHandler implements TopologyListener {
    * Manages the topology updates.
    */
   private final TopologyManager manager;
+  /**
+   * Collapsed or expanded state of the vertices.
+   */
+  enum CollapsedState {
+    /**
+     * Collapsed state.
+     */
+    COLLAPSED,
+    /**
+     * Expanded state.
+     */
+    EXPANDED
+  }
+  /**
+   * Holds the collapsed/expanded states of the vertices.
+   */
+  private final Map<String, CollapsedState> collapsedMap = new HashMap<>();
 
   /**
    * Initialize this graph handler.
@@ -136,11 +153,12 @@ public class GraphTopologyHandler implements TopologyListener {
           if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
           List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
           if (list != null) {
-            for (TopologyDriver tmpDriver: list) {
-              insertPeerVertex(driver, tmpDriver);
-            }
+            for (TopologyDriver tmpDriver: list) insertPeerVertex(driver, tmpDriver);
             driversAsNodes.remove(driver.getUuid());
           }
+        }
+        synchronized(collapsedMap) {
+          collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
         }
         insertDriverVertex(driver);
         graphOption.repaintGraph(graphOption.isAutoLayout());
@@ -159,6 +177,9 @@ public class GraphTopologyHandler implements TopologyListener {
         synchronized(drivers) {
           drivers.remove(driver.getUuid());
           driversAsNodes.remove(driver.getUuid());
+        }
+        synchronized(collapsedMap) {
+          collapsedMap.remove(driver.getUuid());
         }
         removeVertex(driver);
         graphOption.repaintGraph(graphOption.isAutoLayout());
@@ -189,6 +210,9 @@ public class GraphTopologyHandler implements TopologyListener {
         TopologyDriver driver = event.getDriver();
         TopologyNode node = event.getNodeOrPeer();
         removeVertex(node);
+        synchronized(collapsedMap) {
+          collapsedMap.remove(node.getUuid());
+        }
         graphOption.repaintGraph(graphOption.isAutoLayout());
         if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
       }
@@ -238,7 +262,7 @@ public class GraphTopologyHandler implements TopologyListener {
       edge = edgeCount.incrementAndGet();
       fullGraph.addEdge(edge, driver, node);
     }
-    if (!driver.isCollapsed()) {
+    if (isExpanded(driver)) {
       displayGraph.addVertex(node);
       if (displayGraph.findEdge(driver, node) == null && (edge != null)) displayGraph.addEdge(edge, driver, node);
     }
@@ -276,9 +300,11 @@ public class GraphTopologyHandler implements TopologyListener {
    * @param driver the driver to collapse.
    */
   public void collapse(final TopologyDriver driver) {
-    if (!driver.isCollapsed() && !driver.isNode())
-    {
-      driver.setCollapsed(true);
+    if (!isCollapsed(driver) && !driver.isNode()) {
+      //driver.setCollapsed(true);
+      synchronized(collapsedMap) {
+        collapsedMap.put(driver.getUuid(),  CollapsedState.COLLAPSED);
+      }
       Collection<AbstractTopologyComponent> neighbors = displayGraph.getNeighbors(driver);
       for (AbstractTopologyComponent data: neighbors) {
         if (data.isNode()) displayGraph.removeVertex(data);
@@ -291,8 +317,11 @@ public class GraphTopologyHandler implements TopologyListener {
    * @param driver the driver to expand.
    */
   public void expand(final TopologyDriver driver) {
-    if (driver.isCollapsed() && !driver.isNode()) {
-      driver.setCollapsed(false);
+    if (!isExpanded(driver) && !driver.isNode()) {
+      //driver.setCollapsed(false);
+      synchronized(collapsedMap) {
+        collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
+      }
       Collection<AbstractTopologyComponent> neighbors = fullGraph.getNeighbors(driver);
       for (AbstractTopologyComponent data: neighbors) {
         if (data.isNode()) {
@@ -301,6 +330,28 @@ public class GraphTopologyHandler implements TopologyListener {
           if (edge != null) displayGraph.addEdge(edge, driver, data);
         }
       }
+    }
+  }
+
+  /**
+   * Determine whether the specified component is collapsed.
+   * @param comp the topology component to check.
+   * @return {@code true} if the node is collapsed, {@code false} otherwise.
+   */
+  public boolean isCollapsed(final AbstractTopologyComponent comp) {
+    synchronized(collapsedMap) {
+      return collapsedMap.get(comp.getUuid()) == CollapsedState.COLLAPSED;
+    }
+  }
+
+  /**
+   * Determine whether the specified component is expanded.
+   * @param comp the topology component to check.
+   * @return {@code true} if the node is expanded, {@code false} otherwise.
+   */
+  public boolean isExpanded(final AbstractTopologyComponent comp) {
+    synchronized(collapsedMap) {
+      return collapsedMap.get(comp.getUuid()) == CollapsedState.EXPANDED;
     }
   }
 
@@ -339,6 +390,9 @@ public class GraphTopologyHandler implements TopologyListener {
             list.add(driver);
           }
         } else  insertNodeVertex(driver, node);
+      }
+      synchronized(collapsedMap) {
+        collapsedMap.put(node.getUuid(),  CollapsedState.EXPANDED);
       }
       graphOption.repaintGraph(graphOption.isAutoLayout());
       if (debugEnabled) log.debug(String.format("added %s %s to driver %s ", (node.isNode() ? "node" : "peer"), node, driver));
