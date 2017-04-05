@@ -47,6 +47,7 @@ public class DeadlockRunner {
    */
   public static void main(final String[] args) {
     try {
+      //StreamUtils.waitKeyPressed("Please press [Enter]");
       DeadlockRunner runner = new DeadlockRunner();
       runner.jobStreaming();
       //runner.testNodes();

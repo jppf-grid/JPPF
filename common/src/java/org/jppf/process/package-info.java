@@ -19,6 +19,7 @@
 /**
  * Classes supporting the creation of client, driver and node processes.
  * <p>Found in: <b>jppf-common.jar</b>
+ * @exclude
 */
 package org.jppf.process;
 

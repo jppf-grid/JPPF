@@ -149,6 +149,7 @@ public class ServerTaskInformation implements Serializable {
   public Task<?> getResultAsTask() throws Exception {
     if (result == null) return null;
     return (Task<?>) IOHelper.unwrappedData(result);
+    //return (Task<?>) JPPFSerialization.Factory.getSerialization().deserialize(result.getInputStream());
   }
 
   @Override

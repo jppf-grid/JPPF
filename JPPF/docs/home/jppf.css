@@ -181,6 +181,9 @@ ol.samplesList { margin-left: 15px; padding-left: 10px; }
 ul.samplesNestedList { margin-top: 1px; margin-bottom: 1px; list-style-type: disc }
 pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
 
+ul.list_nomargin { margin-left: 5px; margin-top: 0px; padding-left: 10px; }
+
+
 .like {
   border: none;
   overflow: hidden;
@@ -327,9 +330,9 @@ a.yellow_highlight:hover {
   font-size: 16pt;
   font-style: italic;
   font-weight: bold;
-  padding: 20px;
+  padding: 5px 10px;
   margin: 0px;
-  border-radius: 20px;
+  border-radius: 10px;
   box-shadow: 4px 4px 4px #222;
 
   animation-name: glow_effect;
@@ -342,11 +345,17 @@ a.yellow_highlight:hover {
 
 @keyframes glow_effect {
   from {
-    /*background-color: #6D78B6;*/
+    /*
+    */
+    background-color: #6D78B6;
     color: white;
   }
   to {
-    /*background-color: #7590B0;*/
+    /*
+    background-color: #7590B0;
+    background-color: #B5C0E0;
+    */
+    background-color: #95A0E0;
     color: #DDD;
   }
 }
@@ -355,7 +364,7 @@ a.yhd:hover {
   text-decoration: none;
   color: #E8EAFD;
   box-shadow: inset 2px 2px 2px #444;
-  padding-left: 19px;
+  /*padding-left: 19px;*/
 }
 
 div#bodyContent div h2 {

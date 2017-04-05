@@ -22,7 +22,7 @@ $title = "JPPF " . $version . " Release Notes";
     <meta name="description" content="The open source grid computing solution">
     <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
   </head>
 	<body>
