@@ -73,7 +73,6 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
     pool.setDriverUuid(uuid);
     this.name = name;
     displayName = name;
-    this.taskServerConnection = new TaskServerConnectionHandler(this, getHost(), getPort());
   }
 
   /**

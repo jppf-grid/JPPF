@@ -105,8 +105,16 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
           if (!isClosed()) {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
-            init();
-            if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
+            JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) owner;
+            TaskServerConnectionHandler handler = c.getTaskServerConnection();
+            if (handler.getStatus() == ACTIVE) {
+              handler.setStatus(DISCONNECTED);
+              c.getClient().getExecutor().submit(new ConnectionInitializer(c));
+              break;
+            } else {
+              init();
+              if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
+            }
           }
         }
       }
