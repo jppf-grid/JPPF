@@ -76,6 +76,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     long maxTime = JPPFConfiguration.get(JPPFProperties.RECONNECT_MAX_TIME);
     long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
     long period = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INTERVAL);
+    if (period <= 0L) period = 1000L;
     goToSleep(delay);
     long elapsed = 0L;
     long start = System.nanoTime();
