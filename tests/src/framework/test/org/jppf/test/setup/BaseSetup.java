@@ -26,6 +26,7 @@ import javax.management.remote.JMXServiceURL;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -208,6 +209,8 @@ public class BaseSetup {
    * @throws Exception if a process could not be stopped.
    */
   private static void close() throws Exception {
+    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
+    FileUtils.writeTextFile("client_thread_dump.log", text);
     if (client != null) {
       client.close();
       client = null;
