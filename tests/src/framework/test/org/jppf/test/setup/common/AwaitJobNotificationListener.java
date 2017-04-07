@@ -45,7 +45,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    */
   private final JobEventType expectedEvent;
   /**
-   * Whether the epxcted event has been received.
+   * Whether the expected event has been received.
    */
   private boolean eventReceived;
   /**

@@ -259,7 +259,7 @@ public class JPPFClient extends AbstractGenericClient {
 
   /**
    * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE}
-   * or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status, or the specified tiemoput expires, whichever happens first.
+   * or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status, or the specified timeout expires, whichever happens first.
    * This is a shorthand for {@code awaitConnectionPools(tiemout, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
    * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
