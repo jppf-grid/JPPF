@@ -208,6 +208,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
   public void setupActions() {
     synchronized(actionHandler) {
       actionHandler.putAction("graph.shutdown.restart.driver", new ServerShutdownRestartAction());
+      actionHandler.putAction("graph.load.balancing.settings", new LoadBalancingAction());
       actionHandler.putAction("graph.driver.reset.statistics", new ServerStatisticsResetAction());
       actionHandler.putAction("graph.update.configuration", new NodeConfigurationAction());
       actionHandler.putAction("graph.show.information", new SystemInformationAction());

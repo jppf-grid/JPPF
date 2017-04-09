@@ -36,6 +36,7 @@
     <property name="layoutConstraints" value="insets 4 2 0 2"/>
 
     <child name="graph.shutdown.restart.driver" type="Button"/>
+    <child name="graph.load.balancing.settings" type="Button"/>
     <child name="graph.driver.reset.statistics" type="Button"/>
 
     <child name="sep1" type="ToolbarSeparator"/>
