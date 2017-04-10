@@ -1,0 +1,36 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2017 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<resources>
+  <!-- Strings for the default feedback view -->
+
+  <string name="execution_state_executing">executing</string>
+  <string name="execution_state_idle">idle</string>
+  <string name="node_state_online">online</string>
+  <string name="node_state_offline">offline</string>
+
+  <string name="node_state_label">Connection</string>
+  <string name="execution_state_label">Execution</string>
+  <string name="current_job_label">Current job</string>
+  <string name="current_tasks_label">Current tasks</string>
+  <string name="total_tasks_label">Total tasks</string>
+
+  <string name="int_zero">0</string>
+  <string name="n_slash_a">N/A</string>
+
+</resources>

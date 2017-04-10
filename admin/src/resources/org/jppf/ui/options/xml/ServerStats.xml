@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the server statistcs view in the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatsPage" type="page" i18n="org.jppf.ui.i18n.StatsPage">
+	<!-- test comment for save -->
+	<property name="label" value="Node Data"/>
+	<property name="scrollable" value="false"/>
+  <property name="icon" value="/org/jppf/ui/resources/kspread.png"/>
+	<property name="layoutConstraints" value="flowy, fill"/>
+	<property name="componentConstraints" value="grow"/>
+
+	<!-- ===================================================================== -->
+	<!--                        Buttons area                                   -->
+	<!-- ===================================================================== -->
+
+	<child name="Actions" type="page">
+    <property name="label" value="Actions"/>
+		<property name="componentConstraints" value="growy 0"/>
+	
+    <child name="RefreshBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().requestUpdate()</script>
+      </listener>
+    </child>
+
+    <child name="fillerb0" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="ResetStatsBtn" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/server_reset_stats.gif"/>
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().resetCurrentStats()</script>
+      </listener>
+    </child>
+
+    <child name="fillerb1" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="CopyAsLabel" type="Label">
+      <property name="componentConstraints" value="growx 0"/>
+    </child>
+
+    <!--
+    <child name="fillerb2" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+    -->
+
+    <child name="CopyAsTextBtn" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/text-2.png"/>
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().copyStatsToClipboard(StatsExporter.TEXT)</script>
+      </listener>
+    </child>
+
+    <!--
+    -->
+
+    <child name="CopyAsCsvBtn" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/calc.png"/>
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().copyStatsToClipboard(StatsExporter.CSV)</script>
+      </listener>
+    </child>
+
+    <child name="fillerb3" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+    <child name="fillerb4" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="SelectVisibleStatsBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <property name="icon" value="/org/jppf/ui/resources/table-column-hide.png"/>
+      <listener type="script">
+        <script language="groovy">
+          def tables = option.findFirstWithName("/Tables");
+          tables.getInstance().selectStats(option.getUIComponent());
+        </script>
+      </listener>
+    </child>
+  
+  </child>
+
+	<!-- ===================================================================== -->
+	<!--                      Tables area                                      -->
+	<!-- ===================================================================== -->
+
+	<child name="Tables" type="Java">
+    <property name="scrollable" value="true"/>
+    <property name="horizontalScrollbar" value="false"/>
+		<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
+    <property name="layoutConstraints" value=""/>
+    <property name="componentConstraints" value="grow, push"/>
+		<property name="value" value=""/>
+    <initializer type="script">
+      <script language="groovy">option.getInstance().loadVisibleStats()</script>
+    </initializer>
+    <finalizer type="script">
+      <script language="groovy">option.getInstance().storeVisibleStats()</script>
+    </finalizer>
+	</child>
+
+	<child name="filler" type="Page">
+		<property name="componentConstraints" value="pushy"/>
+	</child>
+
+</opt:main>

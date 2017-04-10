@@ -1,0 +1,335 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='dotnet-bridge' basedir="." default="build">
+
+	<!-- ========================================================================= -->
+	<!-- Property definitions                                                      -->
+	<!-- ========================================================================= -->
+
+	<property name="config.dir"        value="${basedir}/config"/>
+  <property name="classes.dir"       value="${basedir}/classes"/>
+	<property name="classes-node.dir"  value="${basedir}/classes-node"/>
+	<property name="src.dir"           value="${basedir}/src"/>
+  <property name="build.dir"         value="${basedir}/build"/>
+  <property name="lib.dir"           value="${basedir}/lib"/>
+  <property name="jni4net.dir"       value="${basedir}/jni4net"/>
+  <property name="work.dir"          value="${jni4net.dir}/work"/>
+  <property name="javadoc"           value="${basedir}/javadoc"/>
+  <property name="csdoc"             value="${basedir}/csdoc"/>
+  <property name="jni4net.dll"       value="${build.dir}\\jni4net.n-${jni4net.version}.dll"/>
+  <property name="jppf.dotnet"       value="JPPFDotnet"/>
+  <property name="exe.name"          value="${jppf.dotnet}Demo"/>
+
+  <property file="${basedir}/build.properties"/>
+
+	<!-- ========================================================================= -->
+	<!-- Classpath definitions                                                     -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${classes-node.dir}"/>
+    <pathelement location="${config.dir}"/>
+    <fileset dir="${jni4net.home}/lib" includes="*.jar"/>
+    <pathelement location="${basedir}/../common/classes"/>
+    <pathelement location="${basedir}/../node/classes"/>
+    <pathelement location="${basedir}/../client/classes"/>
+    <pathelement location="${basedir}/../JPPF/lib/LZ4/lz4-1.3.0.jar"/>
+    <pathelement location="${basedir}/../JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
+    <pathelement location="${basedir}/../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
+	</path>
+
+	<!-- ========================================================================= -->
+	<!-- Clean                                                                     -->
+	<!-- ========================================================================= -->
+
+  <target name="clean.main">
+    <delete quiet="true" dir="${classes.dir}" includes="**/*.*"/>
+    <delete quiet="true" dir="${build.dir}" includes="**/*.*"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!-- Init                                                                      -->
+	<!-- ========================================================================= -->
+
+	<target name="init">
+    <condition property="doxygen.present">
+      <available file="${doxygen.home}/bin/doxygen.exe" property=""/>
+    </condition>
+	</target>
+
+  <!-- ========================================================================= -->
+  <!-- Compile / Jar                                                             -->
+  <!-- ========================================================================= -->
+
+  <target name="compile" depends="clean.main, init">
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7"
+      debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+      <classpath refid="project.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${src.dir}"/>
+    </javac>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!-- Build                                                                     -->
+	<!-- ========================================================================= -->
+
+  <target name="build" depends="build.nodoc, doxygen" description="build all"/>
+  <target name="build.nodoc" depends="build.apis, build.demo" description="build all except C# doc"/>
+
+  <target name="build.init" depends="">
+    <delete quiet="true" dir="${work.dir}"/>
+    <mkdir dir="${work.dir}"/>
+    <copy todir="${build.dir}" overwrite="true">
+      <fileset dir="${basedir}/lib" includes="*.*"/> 
+    </copy>
+    <copy todir="${build.dir}" file="${config.dir}/JPPFDotnetDemo.exe.config" overwrite="true"/>
+  </target>
+
+  <target name="build.apis" depends="build.apis.multiple, merge.dlls, merge.jars" description="build the JPPF Java and .Net APIs"/>
+
+  <target name="build.apis.multiple" depends="compile, build.init">
+    <!-- build the .Net proxies for the JPPF Java APIs -->
+    <clean outdir="${jni4net.dir}/fromjava" libname="jppf.api"/>
+    <proxygen outdir="${jni4net.dir}/fromjava" libname="jppf.api"/>
+    <csc srcdir="${jni4net.dir}/fromjava" libname="jppf.api" refs="${jni4net.dll}"/>
+    <build outdir="${jni4net.dir}/fromjava" libname="jppf.api"/>
+
+    <!-- build the DLL for the .Net JPPF APIs -->
+    <csc srcdir="${jni4net.dir}/cs/jppf.dotnet.api" libname="jppf.dotnet.api" refs="${jni4net.dll};${build.dir}/jppf.api.dll;System.Configuration.dll" doc="true"/>
+ 
+    <!-- build the Java proxies for the JPPF .Net APIs -->
+    <clean outdir="${jni4net.dir}/fromclr" libname="jppf.dotnet.api.generated"/>
+    <proxygen outdir="${jni4net.dir}/fromclr" libname="jppf.dotnet.api.generated"/>
+    <csc srcdir="${jni4net.dir}/fromclr" libname="jppf.dotnet.api.generated" refs="${jni4net.dll};${build.dir}/jppf.api.dll;${build.dir}/jppf.dotnet.api.dll"/>
+    <build outdir="${jni4net.dir}/fromclr" libname="jppf.dotnet.api.generated"/>
+  </target>
+
+  <target name="build.demo" depends="build.init" description="build the demo application">
+    <!-- Generate the DLL for the .Net task and accompanying code that will be executed on the nodes -->
+    <csc srcdir="${jni4net.dir}/cs/jppf.dotnet.demo.tasks" libname="jppf.dotnet.demo.tasks" refs="${jni4net.dll};${build.dir}/${jppf.dotnet}.dll"/>
+
+    <!-- Generate the demo .Net application executable -->
+    <csc srcdir="${jni4net.dir}/cs/jppf.dotnet.demo" libname="${exe.name}" refs="${jni4net.dll};${build.dir}/${jppf.dotnet}.dll;${build.dir}/jppf.dotnet.demo.tasks.dll" target="exe"/>
+    <copy file="${config.dir}/${exe.name}.exe.config" todir="${build.dir}"/>
+  </target>
+
+  <!-- merge all JPPF API dlls into a single dll -->
+  <target name="merge.dlls">
+    <script language="javascript">
+      var buildDir = new java.io.File(project.getProperty("build.dir"));
+      project.setProperty("build.path", buildDir.getAbsolutePath());
+    </script>
+    <!-- format the assemblies paths before calling ILMerge -->
+    <property name="assemblies.before" value="${build.path}/jppf.dotnet.api.dll ${build.path}/jppf.api.dll ${build.path}/jppf.dotnet.api.generated.dll"/>
+    <script language="javascript">
+      var before = project.getProperty("assemblies.before");
+      project.setProperty("assemblies", before.replace("/", "\\"));
+    </script>
+    <mergeAssemblies assemblies="${assemblies}" libname="${build.path}\\${jppf.dotnet}.dll"/>
+    <delete file="${build.path}/jppf.dotnet.api.dll" quiet="true"/>
+    <delete file="${build.path}/jppf.dotnet.api.xml" quiet="true"/>
+    <delete file="${build.path}/jppf.api.dll" quiet="true"/>
+    <delete file="${build.path}/jppf.dotnet.api.generated.dll" quiet="true"/>
+  </target>
+
+  <!-- merge all JPPF Dotnet API jars into a single jar -->
+  <target name="merge.jars">
+    <copy todir="${work.dir}"><fileset dir="${classes.dir}"/></copy>
+    <copy todir="${work.dir}"><fileset dir="${classes-node.dir}"/></copy>
+    <extract.jar jar="${build.dir}/jppf.api.jar"/>
+    <extract.jar jar="${build.dir}/jppf.dotnet.api.generated.jar"/>
+    <jar jarfile="${build.dir}/${jppf.dotnet}.jar" index="true">
+      <fileset dir="${work.dir}"/>
+    </jar>
+    <delete dir="${work.dir}" includeemptydirs="true" quiet="true" includes="**/*.*,**/*"/>
+  </target>
+
+
+  <!-- ========================================================================= -->
+  <!-- Macrodefs                                                                 -->
+  <!-- ========================================================================= -->
+
+  
+  <!-- =============================================================================
+    Cleanup the build folders
+    Attributes:
+    - outdir: the base directory where files are generated
+    - libname: suffix of the generated jars and dlls to delete
+  ============================================================================== -->
+  <macrodef name="clean">
+    <attribute name="outdir"/>
+    <attribute name="libname"/>
+    <sequential>
+      <delete quiet="true" dir="@{outdir}/java/src"/>
+      <delete quiet="true" dir="@{outdir}/java/classes"/>
+      <delete quiet="true" dir="@{outdir}/cs"/>
+      <delete quiet="true" dir="${jni4net.dir}" includes="@{libname}.dll,@{libname}.jar"/>
+      <mkdir dir="@{outdir}/cs"/>
+      <mkdir dir="@{outdir}/java"/>
+      <mkdir dir="@{outdir}/java/src"/>
+      <mkdir dir="@{outdir}/java/classes"/>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Generate Java and/or CLR proxies with proxygen.exe
+    Attributes:
+    - outdir: the base directory where files are generated
+    - libname: suffix of the proxygen config file
+  ============================================================================== -->
+  <macrodef name="proxygen">
+    <attribute name="outdir"/>
+    <attribute name="libname"/>
+    <sequential>
+      <local name="proxygen.file"/>
+      <property name="proxygen.file" value="${work.dir}/@{libname}.proxygen.xml"/>
+      <copy toFile="${proxygen.file}" file="${jni4net.dir}/@{libname}.proxygen.xml"/>
+      <replace file="${proxygen.file}">
+        <replacefilter token="@outdir@"          value="@{outdir}"/>
+        <replacefilter token="@jni4net.version@" value="${jni4net.version}"/>
+        <replacefilter token="@jni4net.home@"    value="${jni4net.home}"/>
+      </replace>
+      <exec executable="${jni4net.home}/bin/proxygen.exe" failonerror="true">
+        <arg value="${proxygen.file}"/>
+      </exec>
+      <delete file="${proxygen.file}"/>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Compile the C# files and build an assembly dll or executable
+    Attributes:
+    - srcdir: the root directory where the .cs files are
+    - libname: suffix given to generated dll or exe
+    - refs: optional semicolumn-separated list of assembly references
+            defaults to an empty string
+    - target: type of target to generate: "library" or "exe". Default is "library"
+    - doc: if "true", generate the XML doc for the C# code. Default is "false"
+  ============================================================================== -->
+  <macrodef name="csc">
+    <attribute name="srcdir"/>
+    <attribute name="libname"/>
+    <attribute name="refs" default=""/>
+    <attribute name="target" default="library"/>
+    <attribute name="doc" default="false"/>
+    <sequential>
+      <local name="ext"/>
+      <condition property="ext" value="dll" else="exe">
+        <equals arg1="@{target}" arg2="library"/>
+      </condition>
+      <local name="doc.arg"/>
+      <condition property="doc.arg" value="/doc:${build.dir}\\@{libname}.xml" else="">
+        <istrue value="@{doc}"/>
+      </condition>
+      <exec executable="${jni4net.dir}/runcsc.bat" failonerror="true" searchpath="true">
+        <env key="VS_TOOLS_DIR" path="${vs.tools.dir}"/>
+        <arg value="/nologo"/>
+        <arg value="/warn:0"/>
+        <arg value="/reference:@{refs}"/>
+        <arg value="/out:${build.dir}\\@{libname}.${ext}"/>
+        <arg value="${doc.arg}"/>
+        <arg value="/target:@{target}"/>
+        <arg value="/recurse:@{srcdir}\\cs\\*.cs"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Compile and jar the Java proxies
+    Attributes:
+    - outdir: the base directory where java files were generated
+    - libname: suffix given to generated jar file
+  ============================================================================== -->
+  <macrodef name="build">
+    <attribute name="outdir"/>
+    <attribute name="libname"/>
+    <sequential>
+      <javac srcdir="" destdir="@{outdir}/java/classes" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+        <classpath refid="project.classpath"/>
+        <compilerarg line="-Xlint:-unchecked"/>
+        <src path="@{outdir}/java/src"/>
+      </javac>
+      <jar jarfile="${build.dir}/@{libname}.jar" index="true">
+        <fileset dir="@{outdir}/java/classes"/>
+      </jar>
+      <echo message="*** The file @{libname}.jar is now ready to be deployed ***"/>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Merge specified assemblies into a single assembly
+    Attributes:
+    - assemblies: the assemblies to merge, space-separated list
+    - libname: the name of the merged aseembly
+    - target: type of target to generate: "library" or "exe". Default is "library"
+  ============================================================================== -->
+  <macrodef name="mergeAssemblies">
+    <attribute name="assemblies"/>
+    <attribute name="libname"/>
+    <attribute name="target" default="library"/>
+    <sequential>
+      <local name="ext"/>
+      <condition property="ext" value="dll" else="exe">
+        <equals arg1="@{target}" arg2="library"/>
+      </condition>
+      <delete file="@{libname}" quiet="true"/>
+      <exec executable="${ilmerge.cmd}" failonerror="true" searchpath="true">
+        <arg value="/out:@{libname}"/>
+        <arg value="/t:@{target}"/>
+        <arg value="/xmldocs"/>
+        <arg value="/ndebug"/>
+        <arg line="@{assemblies}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Extract a jar to a folder, then delete it
+    Attributes:
+    - jar: the jar file to extract
+    - dest: the destination folder. Defaults to "${work.dir}".
+  ============================================================================== -->
+  <macrodef name="extract.jar">
+    <attribute name="jar"/>
+    <attribute name="dest" default="${work.dir}"/>
+    <sequential>
+      <unjar src="@{jar}" dest="@{dest}">
+        <patternset>
+          <exclude name="META-INF"/>
+        </patternset>
+      </unjar>
+      <delete file="@{jar}" quiet="true"/>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the C# code documentation with Doxygen                           -->
+  <!-- ========================================================================= -->
+
+  <target name="doxygen" depends="init" if="doxygen.present" description="CS documentation with Doxygen">
+    <mkdir dir="${csdoc}"/>
+    <delete quiet="true" dir="${csdoc}/html"/>
+    <exec executable="${doxygen.home}/bin/doxygen.exe" failonerror="true" searchpath="true">
+      <arg value="${config.dir}/doxygen.properties"/>
+    </exec>
+  </target>
+
+</project> 

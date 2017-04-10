@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+  <body>
+    <wicket:extend>
+      <form wicket:id="jobs.toolbar" class="jppf_toolbar">
+        <a wicket:id="jobs.terminate" class="button_link"></a>
+        <a wicket:id="jobs.suspend" class="button_link"></a>
+        <a wicket:id="jobs.suspend_requeue" class="button_link"></a>
+        <a wicket:id="jobs.resume" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="jobs.update_max_nodes" class="button_link"></a><div wicket:id="jobs.update_max_nodes.dialog"></div>
+        <a wicket:id="jobs.update_priority" class="button_link"></a><div wicket:id="jobs.update_priority.dialog"></div>
+        <div class="separator"/>
+        <a wicket:id="jobs.select_jobs" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="jobs.expand" class="button_link"></a>
+        <a wicket:id="jobs.collapse" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="visible.items" class="button_link"></a><div wicket:id="visible.items.dialog"></div>
+      </form>
+      <div wicket:id="jobs.table.tree" style="min-height: 300px">[jobs_tree]</div>
+    </wicket:extend>
+  </body>
+</html>

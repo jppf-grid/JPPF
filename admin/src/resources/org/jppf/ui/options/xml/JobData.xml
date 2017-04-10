@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!-- 
+  XML descriptor for the jobs data view in the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page" i18n="org.jppf.ui.i18n.JobDataPage">
+	<!-- test comment for save -->
+	<property name="label" value="Job Data"/>
+  <property name="icon" value="/org/jppf/ui/resources/preferences-contact-list.png"/>
+	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+
+	<!-- ===================================================================== -->
+	<!--                        Buttons area                                   -->
+	<!-- ===================================================================== -->
+
+	<child name="job.toolbar" type="page">
+		<property name="componentConstraints" value="gap rel"/>
+		<property name="layoutConstraints" value="insets 4 2 0 2"/>
+	
+		<child name="cancel.job" type="Button"/>
+		<child name="suspend.job" type="Button"/>
+		<child name="suspend_requeue.job" type="Button"/>
+		<child name="resume.job" type="Button"/>
+
+		<child name="sep1" type="ToolbarSeparator"/>
+		<child name="max.nodes.job" type="Button"/>
+		<child name="update.priority.job" type="Button"/>
+
+		<child name="sep2" type="ToolbarSeparator"/>
+		<child name="job.refresh.toggle" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/synch.gif"/>
+      <property name="toggle" value="true"/>
+			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
+			<property name="value" value="true"/>
+			<property name="persistent" value="true"/>
+      <initializer type="script">
+        <script language="groovy">option.getUIComponent().setSelected(true)</script>
+      </initializer>
+			<listener type="script">
+				<script language="groovy"><![CDATA[
+          def b = option.getUIComponent().isSelected()
+					option.findFirstWithName("/JobTreetable").setSuspended(!b)
+				]]></script>
+			</listener>
+		</child>
+
+		<child name="job.button.refresh" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").refresh()</script>
+			</listener>
+		</child>
+
+    <child name="sep4" type="ToolbarSeparator"/>
+    <child name="job.select.jobs" type="Button"/>
+
+		<child name="sep3" type="ToolbarSeparator"/>
+
+		<child name="job.button.expand" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().expandAll()</script>
+			</listener>
+		</child>
+
+		<child name="job.button.collapse" type="Button">
+			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
+			<listener type="script">
+				<script language="groovy">option.findFirstWithName("/JobTreetable").getTreeTable().collapseAll()</script>
+			</listener>
+		</child>
+
+    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="job.show.hide" type="Button"/>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                      Tree table area                                  -->
+	<!-- ===================================================================== -->
+
+	<child name="jobTreeTableContainer" type="page">
+		<property name="layoutConstraints" value="fill, nogrid"/>
+		<property name="componentConstraints" value="grow, span, push, cell 0 1, width 0"/>
+	
+    <child name="JobTreetable" type="Custom">
+      <property name="impl.class" value="org.jppf.ui.monitoring.job.JobDataPanel"/>
+			<property name="componentConstraints" value="grow, width 0"/>
+			<property name="value" value=""/>
+			<initializer type="script">
+				<script language="groovy">
+					option.setupActions();
+					option.setupTableColumns();
+				</script>
+			</initializer>
+			<finalizer type="script">
+				<script language="groovy">option.saveTableColumnsWidth();</script>
+			</finalizer>
+		</child>
+
+	</child>
+	
+</opt:main>

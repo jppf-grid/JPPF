@@ -1,0 +1,297 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="WebAdminConsole" default="build" basedir=".">
+
+  <!-- ==================================================================== -->
+  <!-- Property definitions                                                 -->
+  <!-- ==================================================================== -->
+
+  <property name="build.sysclasspath" value="last" />
+  <property name="config.dir"         value="${basedir}/config"/>
+  <property name="classes.dir"        value="${basedir}/classes"/>
+  <property name="src.dir"            value="${basedir}/src" />
+  <property name="build.dir"          value="${basedir}/build"/>
+  <property name="lib.dir"            value="${basedir}/lib"/>
+  <property name="web.dir"            value="${basedir}/webapp"/>
+  <property name="war.name"           value="JPPFWebAdmin"/>
+  <property file="${basedir}/bin/build.properties"/>
+  <property file="${basedir}/build.properties"/>
+  <property file="${basedir}/bin/build.number"/>
+
+
+  <!-- ==================================================================== -->
+  <!-- Classpath definitions                                                -->
+  <!-- ==================================================================== -->
+
+  <path id="project.classpath">
+    <pathelement location="${classes.dir}"/>
+    <fileset dir="${lib.dir}" includes="*.jar"/>
+  </path>
+
+  <!-- ==================================================================== -->
+  <!-- Clean                                                                -->
+  <!-- ==================================================================== -->
+
+  <target name="clean">
+    <delete quiet="false">
+      <fileset dir="${classes.dir}" includes="**/*.*"/>
+    </delete>
+    <delete quiet="true">
+      <fileset dir="${build.dir}" includes="**/*.*"/>
+    </delete>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Init                                                                 -->
+  <!-- ==================================================================== -->
+
+  <target name="init" depends="clean, prep">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${build.dir}"/>
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Prep                                                                 -->
+  <!-- ==================================================================== -->
+  
+  <target name="prep">
+    <condition property="cmd.ext" value=".bat" else=".sh">
+      <os family="windows"/>
+    </condition>
+    <condition property="wls.ext" value=".cmd" else=".sh">
+      <os family="windows"/>
+    </condition>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Compile the application                                              -->
+  <!-- ==================================================================== -->
+
+  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${lib.dir}/checkstyle-6.19-all.jar" />
+
+  <target name="compile" depends="init">
+    <echo message="compiling the JPPFWebAdmin classes ..." />
+    <checkstyle config="${basedir}/bin/CheckStyle_JPPF_config.xml">
+      <fileset dir="${src.dir}" includes="**/*.java" />
+    </checkstyle>
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+      <classpath refid="project.classpath" />
+      <compilerarg line="-Xlint:none" />
+      <src path="${src.dir}/java" />
+    </javac>
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}/java">
+        <exclude name="**/*.java" />
+      </fileset>
+      <fileset dir="${src.dir}/resources">
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- =====================================================================-->
+  <!-- Generate the WAR file                                                -->
+  <!-- =====================================================================-->
+
+  <target name="war" depends="compile">
+    <echo message="creating the ${war.name}.war WAR file..."/>
+    <war warfile="${build.dir}/${war.name}.war" webxml="${web.dir}/WEB-INF/web.xml">
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}" />
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+      <classes dir="${classes.dir}"/>
+      <lib dir="${lib.dir}">
+        <include name="*.jar"/>
+        <exclude name="checkstyle*.jar"/>
+        <exclude name="hibernate*.jar"/>
+        <exclude name="*jetty*.jar"/>
+        <exclude name="*spring*.jar"/>
+        <exclude name="*atmosphere*.jar"/>
+        <exclude name="*guice*.jar"/>
+        <exclude name="javax.servlet*.jar"/>
+      </lib>
+      <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
+    </war>
+    <echo message="${war.name}.war file created in '${build.dir}' directory"/>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Build everything                                                     -->
+  <!-- ==================================================================== -->
+
+  <target name="build" depends="war"/>
+  <target name="build.deploy.tomcat" depends="build, tomcat.deploy"/>
+  <target name="tomcat.build.deploy.start" depends="build, tomcat.deploy, tomcat.start" description="generate and deploy the war file and start Tomcat"/>
+  <target name="wildfly.build.deploy.start" depends="build, wildfly.deploy, wildfly.start" description="generate and deploy the war file and start Wildfly"/>
+  <target name="glassfish.build.deploy.start" depends="build, glassfish.start, glassfish.deploy" description="generate and deploy the war file and start Glassfish"/>
+  <target name="liberty.build.deploy.start" depends="build, liberty.deploy, liberty.start" description="generate and deploy the war file and start Liberty"/>
+  <target name="weblogic.build.deploy.start" depends="build, weblogic.deploy, weblogic.start" description="generate and deploy the war file and start Weblogic"/>
+
+  <!-- =====================================================================-->
+  <!-- Deployment and start/stop of various servers                         -->
+  <!-- =====================================================================-->
+
+  <!-- Tomcat deployment -->
+
+  <target name="tomcat.deploy">
+    <property name="tomcat.deploy.dir" value="${tomcat.dir}/webapps"/>
+    <copy todir="${tomcat.deploy.dir}" file="${build.dir}/${war.name}.war"/>
+  </target>
+
+  <target name="tomcat.start" depends="prep">
+    <exec executable="${tomcat.dir}/bin/startup${cmd.ext}" dir="${tomcat.dir}/bin" failonerror="true" searchpath="true">
+    </exec>
+  </target>
+
+  <!-- Glassfish deployment -->
+  
+  <target name="glassfish.deploy" depends="prep">
+    <exec executable="${glassfish.dir}/bin/asadmin${cmd.ext}" dir="${glassfish.dir}/bin" failonerror="true" searchpath="true">
+      <arg value="deploy"/>
+      <arg value="--force=true"/>
+      <arg value="${build.dir}/${war.name}.war"/>
+    </exec>
+    <echo message="waiting for JPPFWebAdmin to be ready" />
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
+      <http url="http://localhost:8080/JPPFWebAdmin"/>
+    </waitfor>
+  </target>
+  
+  <target name="glassfish.start" depends="prep">
+    <delete quiet="true">
+      <fileset dir="${glassfish.domain.dir}/config" includes="*.log" />
+    </delete>
+    <delete quiet="true">
+      <fileset dir="${glassfish.domain.dir}/logs" includes="*.log" />
+    </delete>
+    <glassfish action="start"/>
+    <echo message="waiting for web container to be ready" />
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1" checkeveryunit="second">
+      <http url="http://localhost:8080/index.html"/>
+    </waitfor>
+  </target>
+  
+  <target name="glassfish.stop" depends="prep" description="stop glassfish">
+    <glassfish action="stop"/>
+  </target>
+
+  <!-- Wildfly deployment -->
+  
+  <target name="wildfly.deploy" depends="prep">
+    <copy todir="${wildfly.deploy.dir}" file="${build.dir}/${war.name}.war" />
+  </target>
+  
+  <target name="wildfly.start" depends="prep">
+    <exec executable="${wildfly.dir}/bin/${wildfly.server}${cmd.ext}" dir="${wildfly.dir}/bin" failonerror="true" searchpath="true" vmlauncher="false" spawn="true"/>
+  </target>
+  
+  <target name="wildfly.stop" description="stop wildfly" depends="prep">
+    <exec executable="${wildfly.dir}/bin/jboss-cli${cmd.ext}" dir="${wildfly.dir}/bin" failonerror="true" searchpath="true">
+      <arg value="--connect"/>
+      <arg value="controller=127.0.0.1:9990"/>
+      <arg value="command=:shutdown"/>
+    </exec>
+  </target>
+
+  <!-- Liberty deployment -->
+
+  <target name="liberty.deploy" depends="prep">
+    <copy todir="${liberty.server.dir}/apps" file="${build.dir}/${war.name}.war" />
+  </target>
+
+  <target name="liberty.start" depends="prep">
+    <delete quiet="true">
+      <fileset dir="${liberty.server.dir}" includes="**/*.log" />
+    </delete>
+    <liberty action="start"/>
+  </target>
+
+  <target name="liberty.stop" description="stop liberty" depends="prep">
+    <liberty action="stop"/>
+  </target>
+
+  <!-- Weblogic deployment -->
+  
+  <target name="weblogic.deploy" depends="prep">
+    <copy todir="${weblogic.domain.dir}/autodeploy" file="${build.dir}/${war.name}.war" />
+  </target>
+  
+  <target name="weblogic.start" depends="prep">
+    <delete quiet="true">
+      <fileset dir="${weblogic.domain.dir}" includes="**/*.log,**/logs/*.log*"/>
+    </delete>
+    <weblogic action="start"/>
+  </target>
+  
+  <target name="weblogic.stop" description="stop Weblogic" depends="prep">
+    <weblogic action="stop"/>
+  </target>
+
+  <!-- =============================================================================
+    Start or stop the Liberty server
+    Attributes:
+    - action: either "start" or "stop"
+    - servername: name of the liberty server, defaults to "jppf"
+  ============================================================================== -->
+  <macrodef name="liberty">
+    <attribute name="action"/>
+    <attribute name="servername" default="jppf"/>
+    <sequential>
+      <exec executable="${liberty.dir}/bin/server${cmd.ext}" dir="${liberty.dir}/bin" failonerror="true" searchpath="true">
+        <arg value="@{action}"/>
+        <arg value="@{servername}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+  
+  <!-- =============================================================================
+    Start or stop the Glassfish server
+    Attributes:
+    - action: either "start" or "stop"
+    - domain: name of the glassfish domain, defaults to "jppf"
+  ============================================================================== -->
+  <macrodef name="glassfish">
+    <attribute name="action"/>
+    <attribute name="domain" default="jppf"/>
+    <sequential>
+      <exec executable="${glassfish.dir}/bin/asadmin${cmd.ext}" dir="${glassfish.dir}/bin" failonerror="true" searchpath="true">
+        <arg value="@{action}-domain"/>
+        <arg value="@{domain}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!-- =============================================================================
+    Start or stop the Weblogic server
+    Attributes:
+    - action: either "start" or "stop"
+  ============================================================================== -->
+  <macrodef name="weblogic">
+    <attribute name="action"/>
+    <sequential>
+      <exec executable="${weblogic.domain.dir}/bin/@{action}Weblogic${wls.ext}" dir="${weblogic.domain.dir}/bin" failonerror="true" searchpath="true"/>
+    </sequential>
+  </macrodef>
+
+</project>

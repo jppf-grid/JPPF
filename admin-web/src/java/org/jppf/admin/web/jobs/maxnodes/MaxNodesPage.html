@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title><wicket:message key="max_nodes.title"></wicket:message></title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body onload="updateState(); document.getElementsByClassName('default_focus')[0].focus()">
+    <script>
+    function updateState() {
+      var disabled = document.getElementById('c1').checked;
+      document.getElementById('t1').disabled = disabled;
+      var style = document.getElementById('tl1').style;
+      if (disabled) {
+        style.color = "#8D98D6";
+        style.fontStyle = "italic";
+      } else {
+        style.color = "6D78B6";
+        style.fontStyle = "normal";
+      }
+    }
+    </script>
+	  <form wicket:id="max_nodes.form" class="modal_form">
+      <input id="c1" type="checkbox" wicket:id="max_nodes.unlimited.field" onclick="updateState()" class="default_focus"/>
+      <wicket:message key="max_nodes.unlimited.label"></wicket:message><br/>
+
+      <span id="tl1"><wicket:message key="max_nodes.nb_nodes.label"></wicket:message></span>&nbsp;
+      <input id="t1" type="text" wicket:id="max_nodes.nb_nodes.field" value="0"/><br/>
+
+      <p><a wicket:id="max_nodes.ok" class="button_link button_ok"><wicket:message key="max_nodes.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="max_nodes.cancel" class="button_link"><wicket:message key="max_nodes.cancel.label"></wicket:message></a>
+		</form>
+	</body>
+</html>

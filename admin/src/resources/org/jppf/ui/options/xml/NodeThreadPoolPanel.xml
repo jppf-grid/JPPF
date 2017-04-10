@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the thread pool size and priority update dialog.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeThreadPoolPanel" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
+	<property name="label" value="Update number of threads and priority"/>
+	<property name="layoutConstraints" value="flowy"/>
+	<property name="componentConstraints" value=""/>
+
+	<!-- ===================================================================== -->
+	<!--              Threads number and priority panel                        -->
+	<!-- ===================================================================== -->
+	
+	<child name="threadFields" type="page">
+		<property name="label" value=""/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value=""/>
+		<property name="tooltip" value="Settings of the node's execution thread pool"/>
+
+		<child name="nbThreads" type="SpinnerNumber">
+			<property name="label" value="Number of threads"/>
+			<property name="tooltip" value="Number of threads in the node's execution thread pool"/>
+			<property name="value" value="1"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="10000"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="threadPriority" type="SpinnerNumber">
+			<property name="label" value="Threads priority (1 - 10)"/>
+			<property name="tooltip" value="Priority of the threads in the node's execution thread pool"/>
+			<property name="value" value="1"/>
+			<property name="minValue" value="1"/>
+			<property name="maxValue" value="10"/>
+			<property name="persistent" value="true"/>
+		</child>
+
+	</child>
+
+	<child name="threadButtons" type="page">
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value=""/>
+		<property name="tooltip" value="Validate or cancel the update"/>
+
+		<child name="nodeThreadsOK" type="Button">
+			<property name="label" value="OK"/>
+			<property name="tooltip" value="Apply new settings by sending them to the node"/>
+		</child>
+
+		<child name="nodeThreadsCancel" type="Button">
+			<property name="label" value="Cancel"/>
+			<property name="tooltip" value="Close this dialog without applying any settings"/>
+			<property name="componentConstraints" value="gap unrel"/>
+		</child>
+
+	</child>
+
+</opt:main>

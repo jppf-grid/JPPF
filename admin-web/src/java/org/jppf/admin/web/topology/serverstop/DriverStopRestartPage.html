@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title><wicket:message key="server_stop_restart.title"></wicket:message></title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body onload="updateState('c1', 't1'); document.getElementsByClassName('default_focus')[0].focus()">
+    <script>
+    function updateState(src, dest) {
+      var disabled = !document.getElementById(src).checked;
+      document.getElementById(dest).disabled = disabled;
+      var style = document.getElementById('tl1').style;
+      if (disabled) {
+        style.color = "#8D98D6";
+        style.fontStyle = "italic";
+      } else {
+        style.color = "6D78B6";
+        style.fontStyle = "normal";
+      }
+    }
+    </script>
+	  <form wicket:id="server_stop_restart.form" class="modal_form">
+      <table class="modal_form">
+        <tr>
+          <td><wicket:message key="server_stop_restart.shutdown_delay.label"></wicket:message>&nbsp;</td>
+    	    <td><input type="text" wicket:id="server_stop_restart.shutdown_delay.field" value="0" class="default_focus"/><br/></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input id="c1" type="checkbox" wicket:id="server_stop_restart.restart.field" onclick="updateState('c1', 't1')"/>
+            <wicket:message key="server_stop_restart.restart.label"></wicket:message><br/>
+          </td>
+        </tr>
+        <tr>
+          <td><span id="tl1"><wicket:message key="server_stop_restart.restart_delay.label"></wicket:message></span>&nbsp;</td>
+          <td><input id="t1" type="text" wicket:id="server_stop_restart.restart_delay.field" value="0"/><br/></td>
+        </tr>
+      </table>
+
+      <p><a wicket:id="server_stop_restart.ok" class="button_link button_ok"><wicket:message key="server_stop_restart.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="server_stop_restart.cancel" class="button_link"><wicket:message key="server_stop_restart.cancel.label"></wicket:message></a>
+    </form>
+	</body>
+</html>

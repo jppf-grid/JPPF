@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the load-balancing settings view of the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="FilterPanel" type="page" i18n="org.jppf.ui.i18n.FilterPanel">
+	<property name="scrollable" value="true"/>
+  <property name="icon" value="/org/jppf/ui/resources/filter.png"/>
+	<property name="layoutConstraints" value="fill, flowy, insets 0"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/FilterPanel.groovy"/>
+	<initializer type="script">
+		<script language="groovy">init()</script>
+	</initializer>
+
+	<!-- ===================================================================== -->
+	<!-- Filter actions bar                                                    -->
+	<!-- ===================================================================== -->
+
+	<child name="node.filter.actions" type="page">
+		<property name="label" value="Filter actions"/>
+		<property name="layoutConstraints" value="fill, flowx, insets 4 2 0 2"/>
+		<property name="componentConstraints" value="growx"/>
+		<property name="bordered" value="false"/>
+
+    <child name="node.filter.apply" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <property name="icon" value="/org/jppf/ui/resources/run-rebuild.png"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/node.filter.activate").setValue(true)</script>
+      </listener>
+    </child>
+
+    <child name="node.filter.activate" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/toggle_active.gif"/>
+      <property name="toggle" value="true"/>
+      <property name="persistent" value="true"/>
+      <initializer type="script">
+        <script language="groovy">apply()</script>
+      </initializer>
+      <listener type="script">
+        <script language="groovy">apply()</script>
+      </listener>
+    </child>
+
+    <child name="sep1" type="ToolbarSeparator"/>
+
+    <child name="node.filter.validate" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/checkbox.png"/>
+      <listener type="script">
+        <script language="groovy">validate()</script>
+      </listener>
+    </child>
+
+    <child name="sep2" type="ToolbarSeparator"/>
+
+    <child name="node.filter.load" type="FileChooser">
+      <property name="icon" value="/org/jppf/ui/resources/import.png"/>
+      <property name="type" value="open"/>
+      <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
+      <property name="value" value="./NodeFilteringPolicy.xml"/>
+      <listener type="script">
+        <script language="groovy">loadOrSave(true)</script>
+      </listener>
+    </child>
+  
+    <child name="node.filter.save" type="FileChooser">
+      <property name="icon" value="/org/jppf/ui/resources/export.png"/>
+      <property name="type" value="save"/>
+      <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
+      <property name="value" value="./NodeFilteringPolicy.xml"/>
+      <listener type="script">
+        <script language="groovy">loadOrSave(false)</script>
+      </listener>
+    </child>
+
+		<child name="filler" type="page">
+			<property name="componentConstraints" value="growx, pushx"/>
+		</child>
+
+	</child>
+
+  <!-- ===================================================================== -->
+  <!-- Code editor area                                                      -->
+  <!-- ===================================================================== -->
+
+  <child name="node.filter.policy" type="CodeEditor">
+    <property name="scrollable" value="true"/>
+    <property name="value" value=""/>
+    <property name="language" value="text/xml"/>
+    <property name="editable" value="true"/>
+    <property name="componentConstraints" value="grow, pushx, pushy 3"/>
+    <property name="persistent" value="true"/>
+  </child>
+
+</opt:main>

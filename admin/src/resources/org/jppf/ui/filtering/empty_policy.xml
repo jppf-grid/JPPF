@@ -1,0 +1,12 @@
+<!--
+When this filter is active, only the nodes matching the
+execution policy will be displayed in the admin console
+-->
+<jppf:ExecutionPolicy xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd">
+  <!-- Add your filters here. Example: filter out slave nodes
+  <Equal valueType="boolean">
+    <Property>jppf.node.provisioning.slave</Property>
+    <Value>false</Value>
+  </Equal>
+  -->
+</jppf:ExecutionPolicy>

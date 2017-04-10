@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title><wicket:message key="provisioning.title"></wicket:message></title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>
+	<body onload="updateState('c1', 't1'); document.getElementsByClassName('default_focus')[0].focus()">
+    <script>
+      function updateState(src, dest) {
+        var disabled = !document.getElementById(src).checked;
+        document.getElementById(dest).disabled = disabled;
+        var style = document.getElementById('tl1').style;
+        if (disabled) {
+          style.color = "#8D98D6";
+          style.fontStyle = "italic";
+        } else {
+          style.color = "6D78B6";
+          style.fontStyle = "normal";
+        }
+      }
+    </script>
+    <form wicket:id="provisioning.form" class="modal_form">
+      <wicket:message key="provisioning.nb_slaves.label"></wicket:message>&nbsp;
+	    <input type="text" wicket:id="provisioning.nb_slaves.field" value="0" class="default_focus"/><br/>
+
+      <input type="checkbox" wicket:id="provisioning.interrupt.field"/>
+      <wicket:message key="provisioning.interrupt.label"></wicket:message><br/>
+
+      <input id="c1" type="checkbox" wicket:id="provisioning.use_overrides.field" onclick="updateState('c1', 't1')"/>
+      <wicket:message key="provisioning.use_overrides.label"></wicket:message><br/>
+
+      <span id="tl1"><wicket:message key="provisioning.overrides.label"></wicket:message></span><br/>
+	    <textarea id="t1" wicket:id="provisioning.overrides.field" rows="10" cols="80"></textarea><br/>
+
+      <p><a wicket:id="provisioning.ok" class="button_link button_ok"><wicket:message key="provisioning.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="provisioning.cancel" class="button_link"><wicket:message key="provisioning.cancel.label"></wicket:message></a>
+		</form>
+	</body>
+</html>

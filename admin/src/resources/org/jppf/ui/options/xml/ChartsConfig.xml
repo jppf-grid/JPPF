@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the chart configuration view of the admin console.
+-->
+<opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd" i18n="org.jppf.ui.i18n.ChartsConfigPage">
+	<property name="label" value="Charts Configuration"/>
+	<property name="scrollable" value="true"/>
+  <property name="icon" value="/org/jppf/ui/resources/chart-curve-edit.png"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/ChartsConfig.groovy"/>
+	<initializer type="script">
+		<script language="groovy">initMain()</script>
+	</initializer>
+
+	<!-- ===================================================================== -->
+	<!--                   Top Panels                                          -->
+	<!-- ===================================================================== -->
+
+	<child name="Top" type="page">
+		<property name="label" value="Top"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="growx"/>
+
+		<child name="TabsBtnPanel" type="page">
+			<property name="label" value="Monitor"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0"/>
+
+			<child name="TabNew" type="Button">
+				<property name="label" value="New"/>
+				<property name="tooltip" value="Create a new tab"/>
+				<listener type="script">
+					<script language="groovy">doTabNew()</script>
+				</listener>
+			</child>
+
+			<child name="TabRemove" type="Button">
+				<property name="label" value="Remove"/>
+				<property name="tooltip" value="Remove the tab"/>
+				<listener type="script">
+					<script language="groovy">doTabRemove()</script>
+				</listener>
+			</child>
+
+			<child name="TabUp" type="Button">
+				<property name="label" value="Up"/>
+				<property name="tooltip" value="Move the tab one position up"/>
+				<listener type="script">
+					<script language="groovy">tabMoved()</script>
+				</listener>
+			</child>
+
+			<child name="TabDown" type="Button">
+				<property name="label" value="Down"/>
+				<property name="tooltip" value="Move the tab one position down"/>
+				<listener type="script">
+					<script language="groovy">tabMoved()</script>
+				</listener>
+			</child>
+
+		</child>
+
+		<child name="TabsList" type="List">
+			<property name="label" value="Tabs"/>
+			<property name="tooltip" value="The list of active tabs"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<property name="componentConstraints" value="growx, push, w 200"/>
+			<property name="value" value=""/>
+			<property name="selection" value="single"/>
+			<listener type="script">
+				<script language="groovy">doTabsList()</script>
+			</listener>
+		</child>
+
+		<child name="ChartsBtnPanel" type="page">
+			<property name="label" value="Monitor"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0"/>
+
+			<child name="ChartRemove" type="Button">
+				<property name="label" value="Remove"/>
+				<property name="tooltip" value="Remove the chart"/>
+				<listener type="script">
+					<script language="groovy">doChartRemove()</script>
+				</listener>
+			</child>
+
+			<child name="ChartUp" type="Button">
+				<property name="label" value="Up"/>
+				<property name="tooltip" value="Move the chart one position up"/>
+				<listener type="script">
+					<script language="groovy">chartMoved()</script>
+				</listener>
+			</child>
+
+			<child name="ChartDown" type="Button">
+				<property name="label" value="Down"/>
+				<property name="tooltip" value="Move the chart one position down"/>
+				<listener type="script">
+					<script language="groovy">chartMoved()</script>
+				</listener>
+			</child>
+
+		</child>
+
+		<child name="ChartsList" type="List">
+			<property name="label" value="Charts"/>
+			<property name="tooltip" value="The list of active charts in the selected tab"/>
+			<property name="value" value=""/>
+			<property name="selection" value="single"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<property name="componentConstraints" value="growx, push, w 200"/>
+			<listener type="script">
+				<script language="groovy">doChartsList()</script>
+			</listener>
+		</child>
+
+    <child name="filler_0" type="page">
+      <property name="componentConstraints" value="flowy, grow 1000, push"/>
+    </child>
+
+	</child>
+	
+	<!-- ===================================================================== -->
+	<!--                 Bottom Panels                                         -->
+	<!-- ===================================================================== -->
+
+	<child name="Bottom" type="page">
+		<property name="label" value="Bottom"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="growx"/>
+
+		<child name="ConfigFields" type="page">
+			<property name="label" value="Configuration"/>
+			<property name="scrollable" value="false"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+      <property name="componentConstraints" value="aligny top"/>
+			<property name="bordered" value="true"/>
+
+			<child name="TabName" type="ComboBox">
+				<property name="label" value="Tab name"/>
+				<property name="tooltip" value="Select the name of the tab this chart will be displayed in"/>
+				<property name="value" value="Some tab name"/>
+				<item name="Some tab name" selected="true"/>
+			</child>
+	
+			<child name="ChartName" type="PlainText">
+				<property name="label" value="Chart Name"/>
+				<property name="tooltip" value="Name of this chart"/>
+				<property name="value" value=""/>
+				<property name="orientation" value="horizontal"/>
+			</child>
+	
+			<child name="ChartType" type="ComboBox">
+				<property name="label" value="Chart type"/>
+				<property name="tooltip" value="Select the type of chart"/>
+				<property name="value" value="3D Bar Chart"/>
+				<listener type="script">
+					<script language="groovy">changePreview(getPopulatedConfiguration())</script>
+				</listener>
+			</child>
+	
+			<child name="Precision" type="SpinnerNumber">
+				<property name="label" value="Precision"/>
+				<property name="tooltip" value="Decimal number precision used in the chart labels"/>
+				<property name="value" value="0"/>
+				<property name="minValue" value="0"/>
+				<property name="maxValue" value="5"/>
+			</child>
+
+			<child name="Unit" type="PlainText">
+				<property name="label" value="Unit"/>
+				<property name="tooltip" value="Unit used in the chart labels"/>
+				<property name="value" value=""/>
+			</child>
+	
+		</child>
+
+		<child name="FieldsList" type="List">
+			<property name="label" value="Fields"/>
+			<property name="tooltip" value="The list of active charts in the selected tab"/>
+			<property name="value" value=""/>
+			<property name="selection" value="multiple"/>
+			<property name="scrollable" value="true"/>
+			<property name="bordered" value="true"/>
+			<listener type="script">
+				<script language="groovy">changePreview(getPopulatedConfiguration())</script>
+			</listener>
+      <property name="componentConstraints" value="aligny top"/>
+		</child>
+
+		<child name="ChartActionsPanel" type="page">
+			<property name="label" value="Actions"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
+			<property name="bordered" value="true"/>
+
+			<child name="SaveNewChart" type="Button">
+				<property name="label" value="Save new"/>
+				<property name="tooltip" value="Save the chart configuration as a new chart"/>
+				<listener type="script">
+					<script language="groovy">doSaveNewChart()</script>
+				</listener>
+			</child>
+
+			<child name="UpdateChart" type="Button">
+				<property name="label" value="Update"/>
+				<property name="tooltip" value="Update the chart with the new configuration"/>
+				<listener type="script">
+					<script language="groovy">doUpdateChart()</script>
+				</listener>
+			</child>
+
+		</child>
+
+	</child>
+
+  <child name="ChartPreviewContainer" type="page">
+    <property name="layoutConstraints" value="width 99%, flowy"/>
+
+    <child name="ChartPreview" type="page">
+      <property name="label" value="Preview"/>
+      <property name="componentConstraints" value="width 99%, h 250"/>
+      <property name="bordered" value="true"/>
+      <property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
+    </child>
+
+  </child>
+
+  <child name="filler_1" type="page">
+    <property name="componentConstraints" value="flowy, grow 1000, pushy"/>
+  </child>
+
+</opt:main>

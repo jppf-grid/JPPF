@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the load-balancing settings view of the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="LoadBalancingPanel" type="page" i18n="org.jppf.ui.i18n.BundleSizeTuningPage">
+	<property name="scrollable" value="true"/>
+  <property name="icon" value="/org/jppf/ui/resources/configure-2.png"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+  <!--
+	<script language="groovy" source="org/jppf/ui/options/xml/LoadBalancingSettings.groovy"/>
+	<initializer type="script">
+		<script language="groovy">refresh()</script>
+	</initializer>
+	-->
+
+	<child name="AlgorithmPanel" type="page">
+		<property name="componentConstraints" value="growx"/>
+
+		<child name="Algorithm" type="ComboBox">
+			<property name="label" value="Algorithm"/>
+			<property name="tooltip" value="Choose the load-balancing algorithm"/>
+			<property name="value" value=""/>
+			<property name="persistent" value="true"/>
+		</child>
+
+		<child name="filler" type="page">
+			<property name="componentConstraints" value="growx, pushx"/>
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Server messages area                                -->
+	<!-- ===================================================================== -->
+
+	<child name="LoadBalancingParameters" type="CodeEditor">
+		<property name="label" value="Parameters"/>
+		<property name="tooltip" value="Parameters of the load-balancing algorithm"/>
+		<property name="value" value=""/>
+    <property name="editable" value="true"/>
+    <property name="language" value="text/properties"/>
+		<property name="componentConstraints" value="grow, pushx, pushy 3"/>
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--           Server bundle size manual configuration area                -->
+	<!-- ===================================================================== -->
+
+	<child name="LoadBalancingActions" type="page">
+		<property name="label" value="Load-balancing actions"/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="growx"/>
+		<property name="bordered" value="true"/>
+
+		<child name="ConfigBtn" type="page">
+			<property name="label" value="Configuration Buttons"/>
+
+      <child name="Refresh" type="Button">
+        <property name="label" value="Refresh Settings"/>
+        <property name="tooltip" value="Refreshes the settings from the values in the server"/>
+        <property name="componentConstraints" value="growx 0"/>
+        <!--
+				<listener type="script">
+					<script language="groovy">refresh()</script>
+				</listener>
+				-->
+			</child>
+
+			<child name="Apply" type="Button">
+				<property name="label" value="Apply Settings"/>
+				<property name="tooltip" value="Send the new settings to the server"/>
+				<property name="componentConstraints" value="growx 0"/>
+        <!--
+				<listener type="script">
+					<script language="groovy">apply()</script>
+				</listener>
+        -->
+			</child>
+
+			<child name="filler" type="page">
+				<property name="componentConstraints" value="growx, pushx"/>
+			</child>
+
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Server messages area                                -->
+	<!-- ===================================================================== -->
+
+	<child name="LoadBalancingMessages" type="TextArea">
+		<property name="label" value="Server Messages"/>
+		<property name="tooltip" value="Feedback messages received from the server"/>
+    <property name="bordered" value="true"/>
+    <property name="scrollable" value="true"/>
+    <property name="timestamp.format" value="[yyyy-MM-dd HH:mm:ss.SSS]"/>
+		<property name="componentConstraints" value="grow, pushx, pushy 1"/>
+	</child>
+
+</opt:main>

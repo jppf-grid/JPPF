@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.tigris.subversion.subclipse.core.svnnature">
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/admin,admin"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/application-template,application-template"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/client,client"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/common,common"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/demo,demo"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/jca-client,jca-client"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/jdk7-addons,jdk7-addons"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/JPPF,JPPF"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/JPPF-GigaSpaces,JPPF-GigaSpaces"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/node,node"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/samples-pack,samples-pack"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/server,server"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/stress-tests,stress-tests"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/branches/b_3_3/tests,tests"/>
+</provider>
+</psf>

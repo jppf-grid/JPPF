@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns:wicket="http://wicket.apache.org">
+	<head>
+    <title><wicket:message key="node_config.title"></wicket:message></title>
+    <wicket:head>
+      <link rel="stylesheet" href="jppf.css" type="text/css" />
+    </wicket:head>
+	</head>	
+	<body onload="updateState('c1', 'c2'); document.getElementsByClassName('default_focus')[0].focus()">
+    <script>
+    function updateState(src, dest) {
+      var disabled = !document.getElementById(src).checked;
+      document.getElementById(dest).disabled = disabled;
+      var style = document.getElementById('cl2').style;
+      if (disabled) {
+        style.color = "#8D98D6";
+        style.fontStyle = "italic";
+      } else {
+        style.color = "6D78B6";
+        style.fontStyle = "normal";
+      }
+    }
+    </script>
+	  <form wicket:id="node_config.form" class="modal_form">
+      <input id="c1" type="checkbox" wicket:id="node_config.force_restart.field" onclick="updateState('c1', 'c2')" class="default_focus"/>
+      <wicket:message key="node_config.force_restart.label"></wicket:message><br/>
+
+      <input id="c2" type="checkbox" wicket:id="node_config.interrupt.field"/>
+      <span id="cl2"><wicket:message key="node_config.interrupt.label"></wicket:message><br/></span><br/>
+
+      <wicket:message key="node_config.config.label"></wicket:message><br/>
+	    <textarea wicket:id="node_config.config.field" rows="20" cols="80" style="width: 100%"></textarea><br/>
+
+      <p><a wicket:id="node_config.ok" class="button_link button_ok"><wicket:message key="node_config.ok.label"></wicket:message></a>&nbsp;
+      <a wicket:id="node_config.cancel" class="button_link"><wicket:message key="node_config.cancel.label"></wicket:message></a>
+		</form>
+	</body>
+</html>

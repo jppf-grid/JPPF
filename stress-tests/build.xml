@@ -1,0 +1,154 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-stress-tests" basedir="." default="build">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="build.sysclasspath" value="last"/>
+  <property name="jppf"               value="${basedir}/../JPPF"/>
+  <property name="lib"                value="${jppf}/lib"/>
+  <property name="src"                value="${basedir}/src"/>
+  <property name="framework.src"      value="${src}/framework"/>
+  <property name="scenarios.src"      value="${src}/scenarios"/>
+  <property name="addons.src"         value="${src}/addons"/>
+  <property name="classes"            value="${basedir}/classes"/>
+  <property name="framework.classes"  value="${classes}/framework"/>
+  <property name="scenarios.classes"  value="${classes}/scenarios"/>
+  <property name="addons.classes"     value="${classes}/addons"/>
+  <property name="build"              value="${basedir}/build"/>
+
+  <!-- JPPF modules -->
+  <property name="client"             value="${basedir}/../client"/>
+  <property name="common"             value="${basedir}/../common"/>
+  <property name="node"               value="${basedir}/../node"/>
+  <property name="tests"              value="${basedir}/../tests"/>
+
+  <property file="${jppf}/bin/build.properties"/>
+  <property file="${jppf}/bin/build.number"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="tests.classpath">
+    <pathelement location="${framework.classes}"/>
+    <pathelement location="${scenarios.classes}"/>
+    <pathelement location="${addons.classes}"/>
+    <pathelement location="${tests}/classes/framework"/>
+    <pathelement location="${client}/classes"/>
+    <pathelement location="${common}/classes"/>
+    <pathelement location="${node}/classes"/>
+    <pathelement location="${lib}/Groovy/groovy-all-1.6.5.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-api-1.6.1.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
+    <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
+    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                     Build and run the JUnit tests                         -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="compile"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Init                                            -->
+  <!-- ========================================================================= -->
+
+  <target name="init" depends="" description="Initialize ressources">
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${framework.classes}"/>
+    <mkdir dir="${addons.classes}"/>
+    <mkdir dir="${scenarios.classes}"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                           Compile                                         -->
+  <!-- ========================================================================= -->
+
+  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/../JPPF/lib/Checkstyle/checkstyle-6.19-all.jar" />
+
+  <target name="compile" depends="init" description="compile the junit tests classes">
+    <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
+      <fileset dir="${framework.src}" includes="**/*.java"/>
+      <fileset dir="${scenarios.src}" includes="**/*.java"/>
+      <fileset dir="${addons.src}" includes="**/*.java"/>
+    </checkstyle>
+    <delete dir="${framework.classes}" quiet="true" includes="**/*.*"/>
+    <delete dir="${scenarios.classes}" quiet="true" includes="**/*.*"/>
+    <delete dir="${addons.classes}" quiet="true" includes="**/*.*"/>
+    <echo message="compiling addons classes : addons.classes=${addons.classes}"/>
+    <javac destdir="${addons.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${addons.src}"/>
+    </javac>
+    <echo message="compiling framework classes"/>
+    <javac destdir="${framework.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${framework.src}"/>
+    </javac>
+    <echo message="compiling scenarios classes : scenarios.classes=${scenarios.classes}"/>
+    <javac destdir="${scenarios.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${scenarios.src}"/>
+    </javac>
+    <copy todir="${addons.classes}">
+      <fileset dir="${addons.src}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                    Create the test framework jar file                     -->
+  <!-- ========================================================================= -->
+
+  <target name="jar">
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <jar jarfile="${build}/jppf-test-framework.jar" index="true">
+      <fileset dir="${framework.classes}"/>
+      <fileset file="${jppf}/bin/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Description" value="JPPF Test Framework"/>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                           Run the JUnit tests                             -->
+  <!-- ========================================================================= -->
+
+  <target name="run" depends="build" description="run a scenario">
+    <echo message="Running the tests"/>
+    <java fork="yes" classname="org.jppf.test.scenario.Scenario" classpathref="tests.classpath" failonerror="true">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx256m"/>
+      <arg value="scenarios/s1"/>
+    </java>
+  </target>
+
+</project> 

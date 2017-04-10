@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+  <body>
+    <wicket:panel xmlns:wicket="http://wicket.apache.org">
+      <form wicket:id="admin.config.form" class="jppf_toolbar">
+        <a wicket:id="admin.config.sort_asc" class="button_link"></a>
+        <a wicket:id="admin.config.sort_desc" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="admin.config.save" class="button_link"></a>
+        <a wicket:id="admin.config.revert" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="admin.config.reset_client" class="button_link"></a>
+        <div class="separator"/>
+        <a wicket:id="admin.config.download" class="button_link"></a>
+        <!-- Upload button is hidden and triggered via javascript -->
+        <a id="config_upload_link" wicket:id="admin.config.upload" class="button_link" style="display:none"></a>
+        <label>
+          <input type="file" name="jppf-admin.properties" size="40" wicket:id="admin.config.upload.browse" style="display:none" onchange="updateFileName('config_upload_link')"/>
+          <a class="button_link">
+            <img wicket:id="admin.config.upload.img" src="images/toolbar/upload.png"/>
+          </a>
+        </label>
+        <br/>&nbsp;
+        <h4 style="margin: 0px"><wicket:message key="admin.config.properties.label"></wicket:message></h4><br/>
+        <textarea wicket:id="admin.config.properties.field" id="editor" rows="20" cols="100"></textarea><br/>
+      </form>
+    </wicket:panel>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry kind="lib" path="lib/wicket-auth-roles-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-auth-roles"/>
+	<classpathentry kind="lib" path="lib/wicket-bean-validation-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-cdi-1.1-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-cdi-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-core-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-core/src/main/java"/>
+	<classpathentry kind="lib" path="lib/wicket-datetime-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-devutils-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-extensions-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-extensions/src/main/java"/>
+	<classpathentry kind="lib" path="lib/wicket-ioc-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jmx-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-js-tests-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-metrics-0.2.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-native-websocket-core-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-native-websocket-javax-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-native-websocket-tomcat-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-objectsizeof-agent-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-request-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-request/src/main/java"/>
+	<classpathentry kind="lib" path="lib/wicket-util-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-velocity-7.4.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
+	<classpathentry kind="lib" path="/JPPF/lib/log4j/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/LZ4/lz4-1.3.0.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
+	<classpathentry kind="lib" path="lib/commons-fileupload-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet-3.0.0.v201112011016.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://tomcat.apache.org/tomcat-7.0-doc/servletapi/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/wicketstuff-servlet3-auth-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/core-wicketstuff-core-7.4.0/wicket-servlet3-parent/wicket-servlet3-auth/src/main/java"/>
+	<classpathentry kind="lib" path="lib/wicket-mount-core-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-core-7.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/wicket-jquery-ui-theme-start-7.4.0.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>

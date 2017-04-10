@@ -1,0 +1,83 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2017 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="J2EE Connector Tests JBoss" default="build" basedir=".">
+
+  <property name="jboss.name" value="JBoss-5.1.0.GA"/>
+  <property name="jboss.dir"  value="${user.home}/jboss"/>
+
+  <!-- ==================================================================== -->
+  <!-- Download and install JBoss 5.1                                       -->
+  <!-- ==================================================================== -->
+
+  <target name="jboss.install" depends="">
+    <echo message="downloading jboss 5.1 ..." />
+    <mkdir dir="${jboss.dir}"/>
+    <get src="http://sourceforge.net/projects/jboss/files/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA.zip/download" dest="${jboss.dir}/${jboss.name}.zip" verbose="true" skipexisting="true"/>
+    <delete dir="${jboss.dir}/${jboss.name}" quiet="true"/>
+    <unzip src="${jboss.dir}/${jboss.name}.zip" dest="${jboss.dir}"/>
+    <copy tofile="${jboss.dir}/${jboss.name}/server/default/conf/jboss-log4j.xml" file="${basedir}/bin/jboss-log4j.xml" overwrite="true"/>
+    <copy tofile="${jboss.dir}/${jboss.name}/server/default/conf/bootstrap/profile.xml" file="${basedir}/bin/jboss-profile.xml" overwrite="true"/>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Deploy/undeploy modules to JBoss 5.1                                 -->
+  <!-- ==================================================================== -->
+
+  <target name="jboss.deploy" depends="">
+    <copy toDir="${jboss.dir}/${jboss.name}/server/default/deploy">
+      <fileset dir="${j2e.dir}" includes="jppf_ra_JBoss.rar"/>
+      <fileset dir="${build.dir}" includes="${war.prefix}.war"/>
+      <fileset dir="${basedir}/../config/JBoss-4.0" includes="jppf-ra-JBoss-4.0-ds.xml"/>
+    </copy>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Start and stop JBoss 5.1                                             -->
+  <!-- ==================================================================== -->
+
+  <target name="jboss.start" depends="">
+    <echo message="starting JBoss 5.1 ..." />
+    <exec dir="${jboss.dir}/${jboss.name}/bin" executable="cmd" spawn="true">
+      <arg value="/c"/>
+      <arg value="run"/>
+      <arg value="-b"/>
+      <arg value="0.0.0.0"/>
+      <arg value="-c"/>
+      <arg value="default"/>
+    </exec>
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1000">
+      <http url="http://localhost:8080/"/>
+    </waitfor>
+  </target>
+
+  <target name="jboss.stop" depends="">
+    <echo message="stopping JBoss 5.1 ..." />
+    <exec dir="${jboss.dir}/${jboss.name}/bin" executable="cmd">
+      <arg value="/c"/>
+      <arg value="shutdown"/>
+      <arg value="-S"/>
+    </exec>    
+    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1000">
+      <not>
+        <http url="http://localhost:8080/"/>
+      </not>
+    </waitfor>
+  </target>
+
+</project>

@@ -1,0 +1,86 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2017 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-dotnet" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!-- Package the .Net integration for deployment                               -->
+  <!-- ========================================================================= -->
+
+  <target name="dotnet" depends="dotnet.init, dotnet.build, dotnet.package, dotnet.package.node" description="build and package the .Net integration"/>
+
+  <target name="dotnet.init">
+    <available type="file" file="${vs.tools.dir}/vsvars32.bat" property="csc.present" value="true"/>
+    <condition property="dotnet.node.dist.ready">
+      <and>
+        <istrue value="${csc.present}"/>
+        <available type="file" file="${build}/${app.ver}-node.zip"/>
+      </and>
+    </condition>
+    <property name="dotnet.node.dist.file" value="${build}/${app.ver}-node-dotnet.zip"/>
+  </target>
+
+  <!-- package the .Net client -->
+  <target name="dotnet.package" if="csc.present">
+    <package-module module="dotnet-bridge" zip-prefix="dotnet">
+      <module-elements>
+        <zipfileset dir="${basedir}/config/dotnet-bridge/config/client" prefix="${dotnet-bridge.prefix}" includes="*.config"/>
+        <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}" includes="JPPFDotnetDemo.exe,*.dll"/>
+        <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib" includes="jppf-client-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar"/>
+        <zipfileset dir="${dotnet-bridge}/jni4net/cs" prefix="${dotnet-bridge.prefix}/src" includes="jppf.dotnet.demo.tasks/**/*.*,jppf.dotnet.demo/**/*.*"/>
+      </module-elements>
+    </package-module>
+  </target>
+
+  <!-- package a .Net-capable node -->
+  <target name="dotnet.package.node" if="dotnet.node.dist.ready">
+    <delete file="${dotnet.node.dist.file}" quiet="true"/>
+    <delete quiet="true" dir="${build}/temp"/>
+    <mkdir dir="${build}/temp"/>
+    <unzip src="${build}/${app.ver}-node.zip" dest="${build}/temp">
+      <patternset>
+        <exclude name="**/jppf-node.properties"/>
+        <exclude name="**/*.conf"/>
+      </patternset>
+    </unzip>
+    <copy todir="${build}/temp/${app.ver}-node/config" overwrite="true">
+      <fileset dir="${build}/config/dotnet-bridge/config/node" includes="*.properties,*.conf"/>
+    </copy>
+    <zip destfile="${dotnet.node.dist.file}">
+      <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*,**/JPPFNode"/>
+      <zipfileset dir="${dotnet-bridge}/build" prefix="${app.ver}-node-dotnet/lib" includes="*.dll,*.jar"/>
+      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib" includes="jppf-client-${version.number}.jar"/>
+      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib-src" includes="jppf-client-src-${version.number}.jar"/>
+    </zip>
+    <delete quiet="true" dir="${build}/temp"/>
+  </target>
+
+  <!-- build the .Net bridge -->
+  <target name="dotnet.build" if="csc.present">
+    <ant antfile="${dotnet-bridge}/build.xml" target="build" inheritall="false"/>
+    <property name="csdoc.dir" value="${home}/csdoc/6.0"/>
+    <delete quiet="true" dir="${csdoc.dir}"/>
+    <mkdir dir="${csdoc.dir}"/>
+    <copy todir="${csdoc.dir}">
+      <fileset dir="${dotnet-bridge}/csdoc/html"/>
+    </copy>
+  </target>
+
+</project> 

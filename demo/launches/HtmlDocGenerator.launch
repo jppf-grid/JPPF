@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/common/src/java/org/jppf/doc/HtmlDocGenerator.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.doc.HtmlDocGenerator"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-s C:\Workspaces\SourceForgeSVN\JPPF/docs/home/doc-source/home -d C:\Workspaces\SourceForgeSVN\JPPF/docs/home/ -t C:\Workspaces\SourceForgeSVN\JPPF/docs/home/doc-source/templates/ -r"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="common"/>
+</launchConfiguration>
