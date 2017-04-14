@@ -167,6 +167,7 @@ public class TestConnectionPool extends Setup1D1N {
       discovery.emitPool("pool2", 1);
       awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
+      while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
       // trigger close of pool1
       JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
@@ -176,6 +177,7 @@ public class TestConnectionPool extends Setup1D1N {
       csd.getSocketClient().close();
       awaitConnections(client, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
+      while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
       awaitConnections(client, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
@@ -234,6 +236,7 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
+    BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
     JobManagerClient mgr = (JobManagerClient) client.getJobManager();
     while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
@@ -264,10 +267,10 @@ public class TestConnectionPool extends Setup1D1N {
       while (!stopped) {
         ClientConnectionPoolInfo info;
         while ((info = queue.poll()) != null) {
-          BaseTest.print(true, false, "found new connection pool %s", info);
+          BaseTest.print(false, false, "found new connection pool %s", info);
           newConnection(info);
         }
-        BaseTest.print(true, false, "SimpleDiscovery  about to wait in discover()");
+        BaseTest.print(false, false, "SimpleDiscovery  about to wait in discover()");
         wait();
       }
     }
@@ -278,7 +281,7 @@ public class TestConnectionPool extends Setup1D1N {
      * @param priority the connection pool priority.
      */
     public synchronized void emitPool(final String name, final int priority) {
-      BaseTest.print(true, false, "emitting %s with priority %d", name, priority);
+      BaseTest.print(false, false, "emitting %s with priority %d", name, priority);
       queue.offer(new ClientConnectionPoolInfo(name, false, "localhost", 11101, priority, 1, 1));
       notifyAll();
     }
