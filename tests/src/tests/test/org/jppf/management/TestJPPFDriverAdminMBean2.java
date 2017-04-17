@@ -42,7 +42,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    * Test restarting the driver via JMX when the client is idle (not executing any job).
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  //@Test(timeout = 10000)
   public void testRestartDriverWhenIdle() throws Exception {
     int nbTasks = 1;
     long duration = 1L;
@@ -91,13 +91,13 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     int nbTasks = 1;
     long duration = 1000L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    print(false, false, "submitting job");
+    BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
     AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
     client.submitJob(job);
-    print(false, false, "waiting for JOB_DISPATCH notification");
+    BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
-    print(false, false, "restarting driver");
+    BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver");
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -109,7 +109,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
       }
     }).start();
     Thread.sleep(100L);
-    print(false, false, "getting job results");
+    BaseTestHelper.printToAll(client, true, true, true, false, "getting job results");
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(nbTasks, results.size());

@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.client.concurrent.TestExecutorServiceConfiguration;
+import test.org.jppf.management.TestJPPFDriverAdminMBean2;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,6 +28,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes={ TestExecutorServiceConfiguration.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true, classes={ TestJPPFDriverAdminMBean2.class })
 public class JPPFSuite {
 }

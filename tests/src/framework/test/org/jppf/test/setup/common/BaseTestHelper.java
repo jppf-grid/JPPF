@@ -208,6 +208,23 @@ public class BaseTestHelper {
    */
   public static void printToAll(final JPPFClient client, final boolean toClient, final boolean toServers, final boolean toNodes,
     final boolean decorate, final String format, final Object...params) {
+    printToAll(client, true, toClient, toServers, toNodes, decorate, format, params);
+  }
+
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param client JPPF client holding the server connections.
+   * @param toStdout whether to print to {@code System.out}.
+   * @param toClient whether to log to the client log.
+   * @param toServers whether to log to the discovered servers.
+   * @param toNodes whether to log to the nodes attached to the discovered servers.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToAll(final JPPFClient client, final boolean toStdout, final boolean toClient, final boolean toServers, final boolean toNodes,
+    final boolean decorate, final String format, final Object...params) {
     if (!toServers && !toNodes) return;
     List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
@@ -219,6 +236,9 @@ public class BaseTestHelper {
     if (decorate) {
       String s = sb.append(' ').append(STARS).toString();
       messages = new String[] { s, msg, s };
+    }
+    if (toStdout) {
+      for (String s: messages) System.out.println(s);
     }
     if (toClient) {
       for (String s: messages) log.info(s);
