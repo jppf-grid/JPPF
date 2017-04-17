@@ -109,7 +109,7 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
             TaskServerConnectionHandler handler = c.getTaskServerConnection();
             if (handler.getStatus() == ACTIVE) {
               handler.setStatus(DISCONNECTED);
-              c.getClient().getExecutor().submit(new ConnectionInitializer(c));
+              c.submitInitialization();;
               break;
             } else {
               init();

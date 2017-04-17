@@ -23,9 +23,9 @@ import org.slf4j.*;
 
 /**
  * Wrapper class for the initialization of a client connection.
+ * @exclude
  */
-class ConnectionInitializer implements Runnable
-{
+public class ConnectionInitializer implements Runnable {
   /**
    * Logger for this class.
    */
@@ -37,22 +37,24 @@ class ConnectionInitializer implements Runnable
   /**
    * The client connection to initialize.
    */
-  private BaseJPPFClientConnection connection = null;
+  private AbstractJPPFClientConnection connection = null;
 
   /**
    * Instantiate this connection initializer with the specified client connection.
    * @param connection the client connection to initialize.
    */
-  public ConnectionInitializer(final BaseJPPFClientConnection connection)
-  {
+  public ConnectionInitializer(final AbstractJPPFClientConnection connection) {
     this.connection = connection;
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     if (debugEnabled) log.debug("initializing driver connection '" + connection + '\'');
+    try {
     connection.setStatus(JPPFClientConnectionStatus.NEW);
     connection.init();
+    } finally {
+      connection.initializing.set(false);
+    }
   }
 }

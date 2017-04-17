@@ -322,7 +322,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
-    executor.execute(new ConnectionInitializer(c));
+    c.submitInitialization();
+    //executor.execute(new ConnectionInitializer(c));
     fireConnectionAdded(c);
     if (debugEnabled) log.debug("end of of newConnection({})", c.getName());
   }

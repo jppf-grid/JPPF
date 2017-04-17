@@ -131,7 +131,7 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   }
 
   @Override
-  public synchronized void close() {
+  public void close() {
     List<E> connections = getConnections();
     for (E connection: connections) {
       try {
@@ -142,7 +142,9 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
         else log.warn(format, connection, ExceptionUtils.getStackTrace(e));
       }
     }
-    this.connections.clear();
+    synchronized(this) {
+      this.connections.clear();
+    }
   }
 
   @Override

@@ -54,7 +54,11 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   /**
    * Whether this connection is closed.
    */
-  private AtomicBoolean closed = new AtomicBoolean(false);
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * Whether this connection is initializing.
+   */
+  final AtomicBoolean initializing = new AtomicBoolean(false);
 
   /**
    * Initialize this connection with a parent pool.
@@ -165,6 +169,42 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
    * @param taskConnectionStatus status of the task server connection.
    */
   void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus) {
+    final boolean trace = log.isTraceEnabled();
+    if (delegateStatus.isTerminatedStatus()) {
+      if (trace) log.trace(String.format("trace 1 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, delegateStatus));
+      setStatus(delegateStatus);
+    } else if (delegateStatus == ACTIVE) {
+      if ((taskConnectionStatus == ACTIVE) && (this.getStatus() != ACTIVE)) {
+        if (trace) log.trace(String.format("trace 2 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, ACTIVE));
+        setStatus(ACTIVE);
+      } else if (taskConnectionStatus != this.getStatus()) {
+        if (trace) log.trace(String.format("trace 3 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, taskConnectionStatus));
+        setStatus(taskConnectionStatus);
+      }
+    } else {
+      if (taskConnectionStatus == ACTIVE) {
+        if (trace) log.trace(String.format("trace 4 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, delegateStatus));
+        setStatus(delegateStatus);
+      } else {
+        int n = delegateStatus.compareTo(taskConnectionStatus);
+        if ((n < 0) && (delegateStatus != this.getStatus())) {
+          if (trace) log.trace(String.format("trace 5 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, delegateStatus));
+          setStatus(delegateStatus);
+        } else if (taskConnectionStatus != this.getStatus()) {
+          if (trace) log.trace(String.format("trace 6 (delegate=%s, task=%s): setting status to %s", delegateStatus, taskConnectionStatus, taskConnectionStatus));
+          setStatus(taskConnectionStatus);
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle a status change from either the class server delegate or the task server connection
+   * and determine whether it triggers a status change for the client connection.
+   * @param delegateStatus status of the class server delegate connection.
+   * @param taskConnectionStatus status of the task server connection.
+   */
+  void processStatusChanged2(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus) {
     if (delegateStatus.isTerminatedStatus()) setStatus(delegateStatus);
     else if (delegateStatus == ACTIVE) {
       if ((taskConnectionStatus == ACTIVE) && (this.getStatus() != ACTIVE)) setStatus(ACTIVE);
@@ -233,5 +273,15 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   @Override
   public JPPFConnectionPool getConnectionPool() {
     return pool;
+  }
+
+  /**
+   * Submit the initialization of this connetion, some time in the future.
+   * @exclude
+   */
+  public void submitInitialization() {
+    if (initializing.compareAndSet(false, true)) {
+      getClient().getExecutor().submit(new ConnectionInitializer(this));
+    }
   }
 }
