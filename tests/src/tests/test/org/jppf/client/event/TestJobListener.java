@@ -111,10 +111,13 @@ public class TestJobListener extends BaseTest {
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
       job.addJobListener(listener);
+      print(false, false, "submitting job");
       client.submitJob(job);
+      print(false, false, "waiting for task start notification");
       taskListener.await();
       client.reset();
       //client = BaseSetup.createClient(null, false);
+      print(false, false, "getting job results");
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
@@ -141,6 +144,7 @@ public class TestJobListener extends BaseTest {
     BaseTestHelper.printToServers(client, "start of %s()", name);
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
+    print(false, false, "submitting job %s", job.getName());
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());

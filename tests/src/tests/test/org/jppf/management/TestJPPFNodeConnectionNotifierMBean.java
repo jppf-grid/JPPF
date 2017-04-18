@@ -60,18 +60,18 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   public void testConnectionNotifications() throws Exception {
     int nbSlaves = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    printOut("waiting for master node");
+    print(false, false, "waiting for master node");
     while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
     NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
     forwarder.provisionSlaveNodes(selector, nbSlaves);
-    printOut("waiting for %d slave nodes", nbSlaves);
+    print(false, false, "waiting for %d slave nodes", nbSlaves);
     while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);
     forwarder.provisionSlaveNodes(selector, 0);
-    printOut("waiting for slave nodes termination");
+    print(false, false, "waiting for slave nodes termination");
     while (driver.nbIdleNodes() > 1) Thread.sleep(10L);
-    printOut("waiting for %d notifications", 2 * nbSlaves);
+    print(false, false, "waiting for %d notifications", 2 * nbSlaves);
     synchronized(notifList) {
       while (notifList.size() < 2 * nbSlaves) notifList.wait(10L);
     }
@@ -79,7 +79,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     int connectedCount = 0;
     int disconnectedCount = 0;
     for (Notification notif: notifList) {
-      printOut("notifList[%d] = %s, %s", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
+      print(false, false, "notifList[%d] = %s, %s", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
       assertEquals(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, notif.getSource());
       switch(notif.getType()) {
         case JPPFNodeConnectionNotifierMBean.CONNECTED:
