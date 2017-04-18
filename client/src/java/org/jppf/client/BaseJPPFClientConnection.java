@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.CREATED;
+import static org.jppf.client.JPPFClientConnectionStatus.NEW;
 
 import java.io.NotSerializableException;
 import java.nio.channels.AsynchronousCloseException;
@@ -82,7 +82,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Status of the connection.
    */
-  AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(CREATED);
+  AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
   /**
    * The connection pool this connection belongs to.
    */

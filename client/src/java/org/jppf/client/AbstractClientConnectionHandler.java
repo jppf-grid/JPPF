@@ -18,13 +18,6 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.NEW;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -73,14 +66,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * The name given to this connection handler.
    */
   String name = null;
-  /**
-   * Status of the connection.
-   */
-  final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
-  /**
-   * List of status listeners for this connection.
-   */
-  private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize this connection with the specified owner.
@@ -92,58 +77,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     this.name = name;
     long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
-  }
-
-  /**
-   * Get the status of this connection.
-   * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-   * @see org.jppf.client.ClientConnectionHandler#getStatus()
-   */
-  @Override
-  public JPPFClientConnectionStatus getStatus()
-  {
-    return status.get();
-  }
-
-  /**
-   * Set the status of this connection.
-   * @param newStatus a <code>JPPFClientConnectionStatus</code> enumerated value.
-   * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
-   */
-  @Override
-  public void setStatus(final JPPFClientConnectionStatus newStatus) {
-    JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
-    if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + newStatus);
-    if (newStatus != oldStatus) fireStatusChanged(oldStatus);
-  }
-
-  /**
-   * Add a connection status listener to this connection's list of listeners.
-   * @param listener the listener to add to the list.
-   * @see org.jppf.client.ClientConnectionHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-   */
-  @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove a connection status listener from this connection's list of listeners.
-   * @param listener the listener to remove from the list.
-   * @see org.jppf.client.ClientConnectionHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-   */
-  @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
-    listeners.remove(listener);
-  }
-
-  /**
-   * Notify all listeners that the status of this connection has changed.
-   * @param oldStatus the connection status before the change.
-   */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
-    ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   /**
@@ -173,7 +106,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void close() {
     if (debugEnabled) log.debug("closing " + name);
-    listeners.clear();
     try {
       if (socketInitializer != null) socketInitializer.close();
       //socketInitializer = null;

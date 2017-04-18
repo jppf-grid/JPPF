@@ -17,8 +17,6 @@
  */
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
-
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.utils.*;
@@ -63,13 +61,11 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
    */
   @Override
   public final void init() throws Exception {
-    try {
       if (owner.isClosed()) {
         log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
         return;
       }
       handshakeDone = false;
-      setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
       String msg = String.format("[client: %s] Attempting connection to the class server at %s:%d", getName(), host, port);
       System.out.println(msg);
@@ -81,13 +77,7 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
         msg = "[client: " + getName() + "] Reconnected to the class server";
         System.out.println(msg);
         log.info(msg);
-        setStatus(ACTIVE);
       }
-    } catch(Exception e) {
-      if (debugEnabled) log.debug(ExceptionUtils.getMessage(e));
-      setStatus(FAILED);
-      throw e;
-    }
   }
 
   /**
@@ -106,15 +96,9 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
             JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) owner;
-            TaskServerConnectionHandler handler = c.getTaskServerConnection();
-            if (handler.getStatus() == ACTIVE) {
-              handler.setStatus(DISCONNECTED);
-              c.submitInitialization();;
-              break;
-            } else {
-              init();
-              if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
-            }
+            c.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+            c.submitInitialization();;
+            break;
           }
         }
       }

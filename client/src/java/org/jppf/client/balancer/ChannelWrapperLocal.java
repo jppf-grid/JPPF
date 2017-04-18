@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
-import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.execute.*;
 import org.jppf.management.*;
@@ -60,12 +60,17 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * List of status listeners for this connection.
    */
   private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * Reference to the client 's executor.
+   */
+  private final JPPFClient client;
 
   /**
    * Default initializer for local channel wrapper.
+   * @param client reference to the JPPF client.
    */
-  public ChannelWrapperLocal() {
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
+  public ChannelWrapperLocal(final JPPFClient client) {
+    this.client = client;
     executionManager = new ClientExecutionManager(JPPFProperties.LOCAL_EXECUTION_THREADS);
     priority = JPPFConfiguration.get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
@@ -129,7 +134,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     Runnable task = new LocalRunnable(bundle);
     bundle.jobDispatched(this);
-    executor.execute(task);
+    client.getExecutor().execute(task);
     return null;
   }
 

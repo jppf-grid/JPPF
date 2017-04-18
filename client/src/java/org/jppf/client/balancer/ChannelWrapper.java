@@ -56,10 +56,6 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    */
   JPPFManagementInfo managementInfo = null;
   /**
-   * Executor for submitting bundles for processing.
-   */
-  ExecutorService executor;
-  /**
    * List of execution status listeners for this channel.
    */
   private final List<ExecutorChannelStatusListener> listenerList = new CopyOnWriteArrayList<>();
@@ -183,7 +179,6 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
 
   @Override
   public void close() {
-    if (executor != null) executor.shutdownNow();
     if (bundler != null) bundler.dispose();
   }
 

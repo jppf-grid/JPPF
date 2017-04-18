@@ -18,10 +18,9 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFError;
-import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -70,25 +69,11 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
         log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
         return;
       }
-      if (delegate == null) {
-        delegate = new ClassServerDelegateImpl(this, pool.getClient().getUuid(), getHost(), getPort());
-        delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-          @Override
-          public void statusChanged(final ClientConnectionStatusEvent event) {
-            delegateStatusChanged(event);
-          }
-        });
-      }
-      if (taskServerConnection == null) {
-        taskServerConnection = new TaskServerConnectionHandler(this, getHost(), getPort());
-        taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-          @Override
-          public void statusChanged(final ClientConnectionStatusEvent event) {
-            taskServerConnectionStatusChanged(event);
-          }
-        });
-      }
+      if (delegate == null) delegate = new ClassServerDelegateImpl(this, pool.getClient().getUuid(), getHost(), getPort());
+      if (taskServerConnection == null) taskServerConnection = new TaskServerConnectionHandler(this, getHost(), getPort());
+      setStatus(CONNECTING);
       connect();
+      setStatus(ACTIVE);
       JPPFClientConnectionStatus status = getStatus();
       if (debugEnabled) log.debug("connection [" + name + "] status=" + status);
       if (pool.getClient().isClosed()) close();

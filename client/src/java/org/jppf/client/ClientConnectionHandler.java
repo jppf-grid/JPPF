@@ -18,7 +18,6 @@
 
 package org.jppf.client;
 
-import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.comm.socket.SocketWrapper;
 
 /**
@@ -26,8 +25,7 @@ import org.jppf.comm.socket.SocketWrapper;
  * @author Laurent Cohen
  * @author Jeff Rosen
  */
-interface ClientConnectionHandler extends ClientConnectionStatusHandler, AutoCloseable
-{
+interface ClientConnectionHandler extends AutoCloseable {
   /**
    * Initialize the connection.
    * @throws Exception if an error is raised while initializing the connection.

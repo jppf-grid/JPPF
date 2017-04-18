@@ -18,8 +18,6 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
-
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.SocketClient;
@@ -60,39 +58,32 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
    */
   @Override
   public void init() throws Exception {
-    try {
-      boolean done = false;
-      while (!done && !isClosed()) {
-        setStatus(CONNECTING);
-        if (socketClient == null) initSocketClient();
-        String msg = String.format("[client: %s] Attempting connection to the task server at %s:%d", name, host, port);
+    boolean done = false;
+    while (!done && !isClosed()) {
+      if (socketClient == null) initSocketClient();
+      String msg = String.format("[client: %s] Attempting connection to the task server at %s:%d", name, host, port);
+      System.out.println(msg);
+      log.info(msg);
+      socketInitializer.initializeSocket(socketClient);
+      if (!socketInitializer.isSuccessful()) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server", name));
+      if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server due to interceptor failure", name));
+      try {
+        if (debugEnabled) log.debug("sending JPPF identifier");
+        socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
+        if (owner.isSSLEnabled()) createSSLConnection();
+        TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+        int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
+        int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
+        owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);
+        msg = "[client: " + name + "] Reconnected to the JPPF task server";
         System.out.println(msg);
         log.info(msg);
-        socketInitializer.initializeSocket(socketClient);
-        if (!socketInitializer.isSuccessful()) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server", name));
-        if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server due to interceptor failure", name));
-        try {
-          if (debugEnabled) log.debug("sending JPPF identifier");
-          socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
-          if (owner.isSSLEnabled()) createSSLConnection();
-          TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
-          int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
-          int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
-          owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);
-          msg = "[client: " + name + "] Reconnected to the JPPF task server";
-          System.out.println(msg);
-          log.info(msg);
-          if (!isClosed()) setStatus(ACTIVE);
-          done = true;
-        } catch (Exception e) {
-          String format = "error initializing connection to job server: {}";
-          if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
-          else log.warn(format, ExceptionUtils.getMessage(e));
-        }
+        done = true;
+      } catch (Exception e) {
+        String format = "error initializing connection to job server: {}";
+        if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
+        else log.warn(format, ExceptionUtils.getMessage(e));
       }
-    } catch (Exception e) {
-      setStatus(FAILED);
-      throw e;
     }
   }
 

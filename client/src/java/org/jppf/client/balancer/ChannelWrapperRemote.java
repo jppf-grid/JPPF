@@ -68,7 +68,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", "remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
     managementInfo.setSystemInfo(systemInfo);
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName()));
   }
 
   @Override
@@ -97,7 +96,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
-    channel.getTaskServerConnection().setStatus(status);
+    channel.setStatus(status);
   }
 
   /**
@@ -122,6 +121,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
+    ExecutorService executor = channel.getClient().getExecutor();
     executor.execute(new RemoteRunnable(bundle, channel));
     return null;
   }
@@ -136,22 +136,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    */
   public void reconnect() {
     if (channel.isClosed()) return;
-    channel.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-    channel.submitInitialization();;
-    /*
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-        try {
-          channel.getTaskServerConnection().init();
-        } catch (Exception e2) {
-          log.error(e2.getMessage(), e2);
-        }
-      }
-    };
-    new Thread(r, "connecting " + channel).start();
-    */
+    channel.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+    channel.submitInitialization();
   }
 
   @Override

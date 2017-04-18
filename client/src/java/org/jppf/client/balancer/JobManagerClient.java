@@ -103,6 +103,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Counts the number of connections for each priority value.
    */
   private final SortedMap<Integer, Integer> priorityCounts = new TreeMap<>();
+  /**
+   * The JPPF client.
+   */
+  private final JPPFClient client;
 
   /**
    * Instantiates client job manager.
@@ -111,6 +115,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    */
   public JobManagerClient(final JPPFClient client) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
+    this.client = client;
     this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
     this.queue = new JPPFPriorityQueue(this);
     taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
@@ -389,7 +394,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   private void updateLocalExecution(final boolean localExecutionEnabled) {
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     if (localExecutionEnabled) {
-      wrapperLocal = new ChannelWrapperLocal();
+      wrapperLocal = new ChannelWrapperLocal(client);
       wrapperLocal.addClientConnectionStatusListener(statusListener);
       addConnection(wrapperLocal);
     } else if (wrapperLocal != null) {
