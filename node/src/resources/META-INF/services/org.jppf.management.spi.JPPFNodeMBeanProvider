@@ -4,3 +4,4 @@ org.jppf.management.diagnostics.spi.NodeDiagnosticsMBeanProvider # node JVM diag
 org.jppf.server.node.spi.JPPFNodeMaintenanceMBeanProvider        # node maintenance operations
 org.jppf.node.provisioning.JPPFNodeProvisioningMBeanProvider     # node provisioning facility
 org.jppf.management.NodeConfigNotifierMBeanProvider              # notifies of changes to the number of processing threads
+org.jppf.node.debug.NodeDebugMBeanProvider                       # debug mbean

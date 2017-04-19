@@ -18,10 +18,7 @@
 package org.jppf.server.node;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.List;
-
-import javax.management.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -30,7 +27,6 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
-import org.jppf.node.debug.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.SlaveNodeManager;
@@ -280,16 +276,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) {
         ClassLoader cl = getClass().getClassLoader();
         if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
-        if (JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED)) {
-          try {
-            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            NodeDebug nodeDebug = new NodeDebug();
-            StandardMBean mbean = new StandardMBean(nodeDebug, NodeDebugMBean.class);
-            server.registerMBean(mbean, new ObjectName(NodeDebugMBean.MBEAN_NAME));
-          } catch (Exception e) {
-            log.error(e.getMessage(), e);
-          }
-        }
       }
     } catch (Exception e) {
       log.error("Error registering the MBeans", e);
