@@ -115,6 +115,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
+    int coreThreads = Runtime.getRuntime().availableProcessors();
+    BlockingQueue<Runnable> queue = new SynchronousQueue<>();
+    executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
+    executor.allowCoreThreadTimeOut(true);
     if (jobManager == null) jobManager = createJobManager();
     Runnable r = new Runnable() {
       @Override
@@ -151,10 +155,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
-    int coreThreads = Runtime.getRuntime().availableProcessors();
-    BlockingQueue<Runnable> queue = new SynchronousQueue<>();
-    executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
-    executor.allowCoreThreadTimeOut(true);
     if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) setLocalExecutionEnabled(true);
     if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) initRemotePools(config);
     discoveryHandler.register(discoveryListener.open()).start();
