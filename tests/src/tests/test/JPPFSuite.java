@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.management.TestJPPFDriverAdminMBean2;
+import test.org.jppf.server.peer.TestMultiServerWithSSLSetup;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,6 +28,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes={ TestJPPFDriverAdminMBean2.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true, classes={ TestMultiServerWithSSLSetup.class })
 public class JPPFSuite {
 }

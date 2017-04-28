@@ -59,17 +59,17 @@ public class MyJobTasksListener implements JobTasksListener {
 
   @Override
   public void tasksDispatched(final JobTasksEvent event) {
-    printEventToFIle(DISPATCHED_FILE, event);
+    printEventToFile(DISPATCHED_FILE, event);
   }
 
   @Override
   public void tasksReturned(final JobTasksEvent event) {
-    printEventToFIle(RETURNED_FILE, event);
+    printEventToFile(RETURNED_FILE, event);
   }
 
   @Override
   public void resultsReceived(final JobTasksEvent event) {
-    printEventToFIle(RESULTS_FILE, event);
+    printEventToFile(RESULTS_FILE, event);
   }
 
   /**
@@ -86,7 +86,7 @@ public class MyJobTasksListener implements JobTasksListener {
    * @param file the file to write to.
    * @param event contains the information to write.
    */
-  private void printEventToFIle(final File file, final JobTasksEvent event) {
+  private void printEventToFile(final File file, final JobTasksEvent event) {
     if ((file == null) || (event == null)) return;
     List<ServerTaskInformation> tasksInfo = event.getTasks();
     String name = event.getJobName();

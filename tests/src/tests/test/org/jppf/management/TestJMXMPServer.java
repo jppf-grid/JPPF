@@ -101,7 +101,7 @@ public class TestJMXMPServer extends BaseTest {
     JMXConnectionWrapper client = null;
     try {
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
-      .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder1.class.getName()}, PARAMS));
+        .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder1.class.getName()}, PARAMS));
       server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
@@ -152,8 +152,7 @@ public class TestJMXMPServer extends BaseTest {
    * Test an MBeanServerForwarder with a no-arg constructor and a {@code setParameters(String[])} method.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout = 10000)
-  @Test
+  @Test(timeout = 10000)
   public void testMBeanForwarderWithSetParameters() throws Exception {
     JMXServer server = null;
     JMXConnectionWrapper client = null;
