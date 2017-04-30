@@ -81,7 +81,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JobMaxNodesPanel.xml");
+      panel = loadWithPreferences("org/jppf/ui/options/xml/JobMaxNodesPanel.xml");
       maxNodes = Integer.MAX_VALUE;
       for (Job data: jobDataArray) {
         int n = data.getJobInformation().getMaxNodes();
@@ -126,6 +126,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
    * Perform the action.
    */
   private void doOK() {
+    savePreferences(panel);
     AbstractOption noLimitOption = (AbstractOption) panel.findFirstWithName("job.nolimit.toggle");
     AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
     boolean noLimit = (Boolean) noLimitOption.getValue();

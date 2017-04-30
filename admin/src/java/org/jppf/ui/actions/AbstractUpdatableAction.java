@@ -26,6 +26,7 @@ import javax.swing.*;
 
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.event.ValueChangeEvent;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LocalizationUtils;
 
@@ -168,5 +169,36 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   public static void setOkCancelKeys(final JComponent option, final Action okAction, final Action cancelAction) {
     if (okAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
     if (cancelAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
+  }
+
+  /**
+   * Load the persisted preferences for the specified element and all of its descendants.
+   * @param xmlPath path to the xml resource to load.
+   * @return elt, for method chaining.
+   */
+  protected OptionElement loadWithPreferences(final String xmlPath) {
+    return loadPreferences(OptionsHandler.loadPageFromXml(xmlPath));
+  }
+
+  /**
+   * Load the persisted preferences for the specified element and all of its descendants.
+   * @param elt the root of element for which preferences are loaded.
+   * @return elt, for method chaining.
+   */
+  protected OptionElement loadPreferences(final OptionElement elt) {
+    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
+    OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
+    return elt;
+  }
+
+  /**
+   * Save the persisted preferences for the specified element and all of its descendants.
+   * @param elt the root element for which preferences are saved.
+   * @return elt, for method chaining.
+   */
+  protected OptionElement savePreferences(final OptionElement elt) {
+    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
+    OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
+    return elt;
   }
 }

@@ -19,7 +19,6 @@ package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.prefs.*;
 
@@ -206,12 +205,10 @@ public final class OptionsHandler {
       for (OptionNode child: node.children) savePreferences(child, p);
     } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
-      log.trace("persisting option {}", option);
       if (option.isPersistent()) {
         Object value = option.getValue();
-        String s = null;
-        if (value instanceof Number) s = NumberFormat.getInstance().format(value);
-        else s = String.valueOf(value);
+        log.trace("persisting option {} = {}", option.getStringPath(), value);
+        String s = String.valueOf(value);
         prefs.put(option.getName(), s);
       }
     } else log.trace("persisting node {}", node.elt.getName());
@@ -234,11 +231,13 @@ public final class OptionsHandler {
    */
   public static void loadPreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
+      log.trace("loading node {}", node.elt.getName());
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) loadPreferences(child, p);
     } else if (node.elt instanceof AbstractOption) {
       AbstractOption option = (AbstractOption) node.elt;
       Object def = option.getValue();
+      log.trace("loading option {} = {}", option.getStringPath(), def);
       String val = prefs.get(option.getName(), def == null ? null : def.toString());
       option.setValue(val);
     }
@@ -260,16 +259,15 @@ public final class OptionsHandler {
   public static OptionNode buildPersistenceGraph(final OptionElement elt) {
     OptionNode node = null;
     if (elt instanceof OptionContainer) {
+      log.trace("processing container {}", elt.getStringPath());
       node = new OptionNode(elt);
       OptionContainer page = (OptionContainer) elt;
       for (OptionElement child: page.getChildren()) {
         OptionNode childNode = buildPersistenceGraph(child);
-        if (childNode != null) {
-          node = new OptionNode(elt);
-          node.children.add(childNode);
-        }
+        if (childNode != null) node.children.add(childNode);
       }
     } else if (elt instanceof AbstractOption) {
+      log.trace("processing option {}", elt.getStringPath());
       if (((AbstractOption) elt).isPersistent()) node = new OptionNode(elt);
     }
     return node;

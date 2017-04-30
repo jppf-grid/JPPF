@@ -101,7 +101,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml");
+      panel = loadWithPreferences("org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml");
       OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
       OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
       JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
@@ -141,6 +141,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
    * @param driverConnections - the list of driver jmx connections to send the shutdown or restart command to.
    */
   private void doOK(final List<JMXDriverConnectionWrapper> driverConnections) {
+    savePreferences(panel);
     AbstractOption option = (AbstractOption) panel.findFirstWithName("Shutdown_delay");
     shutdownDelay = ((Number) option.getValue()).longValue();
     option = (AbstractOption) panel.findFirstWithName("Restart");

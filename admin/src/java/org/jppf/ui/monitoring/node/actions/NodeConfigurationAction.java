@@ -49,7 +49,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */
-  private OptionElement thisPanel = null;
+  private OptionElement panel = null;
   /**
    * Location at which to display the entry dialog.
    */
@@ -83,12 +83,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
-    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
+    panel = loadWithPreferences("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
+    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
     AbstractTopologyComponent data = dataArray[0];
     textArea.setValue(getPropertiesAsString(data));
-    JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
-    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
+    JButton okBtn = (JButton) panel.findFirstWithName("/updateConfigOK").getUIComponent();
+    JButton cancelBtn = (JButton) panel.findFirstWithName("/updateConfigCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(),
       localize("nodeConfigurationUpdatePanel.label") + " " + TopologyUtils.getDisplayName(data, StatsHandler.getInstance().getShowIPHandler().isShowIP()), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
@@ -109,8 +109,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
       }
     };
     cancelBtn.addActionListener(cancelAction);
-    setOkCancelKeys(thisPanel, okAction, cancelAction);
-    dialog.getContentPane().add(thisPanel.getUIComponent());
+    setOkCancelKeys(panel, okAction, cancelAction);
+    dialog.getContentPane().add(panel.getUIComponent());
     dialog.pack();
     dialog.setLocationRelativeTo(null);
     if (location != null) dialog.setLocation(location);
@@ -121,10 +121,11 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
-    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
+    savePreferences(panel);
+    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
-    final Boolean restart = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceRestart")).getValue();
-    final Boolean interrupt = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("nodeConfig.interruptIfRunning")).getValue();
+    final Boolean restart = (Boolean) ((BooleanOption) panel.findFirstWithName("forceRestart")).getValue();
+    final Boolean interrupt = (Boolean) ((BooleanOption) panel.findFirstWithName("nodeConfig.interruptIfRunning")).getValue();
     Runnable r = new Runnable() {
       @Override
       public void run() {

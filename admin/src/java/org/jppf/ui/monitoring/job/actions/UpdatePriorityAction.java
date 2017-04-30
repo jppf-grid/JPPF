@@ -80,7 +80,7 @@ public class UpdatePriorityAction extends AbstractJobAction {
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JobPriorityPanel.xml");
+      panel = loadWithPreferences("org/jppf/ui/options/xml/JobPriorityPanel.xml");
       priority = Integer.MAX_VALUE;
       for (Job joba: jobDataArray) {
         int n = joba.getJobInformation().getPriority();
@@ -124,6 +124,7 @@ public class UpdatePriorityAction extends AbstractJobAction {
    * Perform the action.
    */
   private void doOK() {
+    savePreferences(panel);
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
     priority = ((Number) priorityOption.getValue()).intValue();
     final CollectionMap<JobDriver, String> map = new SetHashMap<>();

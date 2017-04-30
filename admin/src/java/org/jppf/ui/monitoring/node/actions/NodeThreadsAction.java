@@ -87,7 +87,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
+      panel = loadWithPreferences("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
       if (dataArray.length == 1) {
         nbThreads = ((TopologyNode) dataArray[0]).getNodeState().getThreadPoolSize();
         priority = ((TopologyNode) dataArray[0]).getNodeState().getThreadPriority();
@@ -132,6 +132,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
+    savePreferences(panel);
     AbstractOption nbThreadsOption = (AbstractOption) panel.findFirstWithName("nbThreads");
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
     nbThreads = ((Number) nbThreadsOption.getValue()).intValue();

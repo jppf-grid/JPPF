@@ -72,7 +72,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     try {
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JVMHealthThresholdsPanel.xml");
+      panel = loadWithPreferences("org/jppf/ui/options/xml/JVMHealthThresholdsPanel.xml");
       Map<Name, Double> values = healthPanel.getThresholds().getValues();
       for (Map.Entry<Name, Double> entry: values.entrySet()) {
         AbstractOption option = (AbstractOption) panel.findFirstWithName(entry.getKey().getName());
@@ -149,6 +149,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
+    savePreferences(panel);
     final Map<Thresholds.Name, Double> values = healthPanel.getThresholds().getValues();
     final List<Thresholds.Name> list = new ArrayList<>(values.keySet());
     Runnable r = new Runnable() {

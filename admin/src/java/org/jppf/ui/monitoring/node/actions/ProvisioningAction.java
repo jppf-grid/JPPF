@@ -48,7 +48,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
   /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */
-  private OptionElement thisPanel = null;
+  private OptionElement panel = null;
   /**
    * 
    */
@@ -91,11 +91,9 @@ public class ProvisioningAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml");
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
-    OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
-    JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
-    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
+    panel = loadWithPreferences("org/jppf/ui/options/xml/ProvisioningPanel.xml");
+    JButton okBtn = (JButton) panel.findFirstWithName("/provisioningOK").getUIComponent();
+    JButton cancelBtn = (JButton) panel.findFirstWithName("/provisioningCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("provisioning.frame.caption"), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
     AbstractAction okAction = new AbstractAction() {
@@ -107,7 +105,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
     };
     AbstractAction cancelAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
+        CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
         overrides = (String) textArea.getValue();
         dialog.setVisible(false);
         dialog.dispose();
@@ -115,8 +113,8 @@ public class ProvisioningAction extends AbstractTopologyAction {
     };
     okBtn.addActionListener(okAction);
     cancelBtn.addActionListener(cancelAction);
-    setOkCancelKeys(thisPanel, okAction, cancelAction);
-    dialog.getContentPane().add(thisPanel.getUIComponent());
+    setOkCancelKeys(panel, okAction, cancelAction);
+    dialog.getContentPane().add(panel.getUIComponent());
     dialog.pack();
     dialog.setLocationRelativeTo(null);
     if (location != null) dialog.setLocation(location);
@@ -127,14 +125,13 @@ public class ProvisioningAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
-    OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
-    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
-    final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("useOverrides")).getValue();
+    savePreferences(panel);
+    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
+    final Boolean b = (Boolean) ((BooleanOption) panel.findFirstWithName("useOverrides")).getValue();
     overrides = (String) textArea.getValue();
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;
-    nbSlaves = ((Number) ((SpinnerNumberOption) thisPanel.findFirstWithName("nbSlaves")).getValue()).intValue();
-    final Boolean interruptIfRunning = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("interruptIfRunning")).getValue();
+    nbSlaves = ((Number) ((SpinnerNumberOption) panel.findFirstWithName("nbSlaves")).getValue()).intValue();
+    final Boolean interruptIfRunning = (Boolean) ((BooleanOption) panel.findFirstWithName("interruptIfRunning")).getValue();
     final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
     for (AbstractTopologyComponent data: dataArray) {
       if (data.getParent() == null) continue;
