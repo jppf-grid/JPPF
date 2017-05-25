@@ -54,6 +54,10 @@ public class ServerTaskBundleClient {
    */
   private final TaskBundle job;
   /**
+   * The serialized job header.
+   */
+  private DataLocation jobDataLocation;
+  /**
    * The shared data provider for this task bundle.
    */
   private final DataLocation dataProvider;
@@ -90,30 +94,32 @@ public class ServerTaskBundleClient {
    */
   private long jobReceivedTime = 0L;
   /**
-   * The strategy to use to send the results back tot he client.
+   * The strategy to use to send the results back to the client.
    */
-  //private SendResultsStrategy strategy = new SendAllResultsStrategy();
   final SendResultsStrategy strategy;
 
   /**
    * Initialize this task bundle and set its build number.
-   * @param job   the job to execute.
+   * @param job the job to execute.
+   * @param jobDataLocation the serialized job header.
    * @param dataProvider the shared data provider for this task bundle.
    */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider) {
-    this(job, dataProvider, Collections.<DataLocation>emptyList());
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider) {
+    this(job, jobDataLocation, dataProvider, Collections.<DataLocation>emptyList());
   }
 
   /**
    * Initialize this task bundle and set its build number.
-   * @param job   the job to execute.
+   * @param job the job to execute.
+   * @param jobDataLocation the serialized job header.
    * @param dataProvider the shared data provider for this task bundle.
    * @param taskList the tasks to execute.
    */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider, final List<DataLocation> taskList) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
+    this.jobDataLocation = jobDataLocation;
     this.dataProvider = dataProvider;
     if (!job.isHandshake() && !job.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
       int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
@@ -138,6 +144,27 @@ public class ServerTaskBundleClient {
   }
 
   /**
+   * Initialize this task bundle and set its build number.
+   * @param tasks the tasks to execute.
+   * @param job the job to execute.
+   * @param jobDataLocation the serialized job header.
+   * @param dataProvider the shared data provider for this task bundle.
+   */
+  public ServerTaskBundleClient(final Collection<ServerTask> tasks, final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider) {
+    if (job == null) throw new IllegalArgumentException("job is null");
+    if (taskList == null) throw new IllegalArgumentException("taskList is null");
+    this.job = job;
+    this.jobDataLocation = jobDataLocation;
+    this.dataProvider = dataProvider;
+    this.taskList.addAll(tasks);
+    for (ServerTask task: tasks) {
+      task.setBundle(this);
+    }
+    this.pendingTasksCount.set(tasks.size());
+    this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
+  }
+
+  /**
    * Initialize task bundle as copy as source bundle.
    * @param source the source bundle.
    * @param taskList the tasks to return.
@@ -146,6 +173,7 @@ public class ServerTaskBundleClient {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     int size = taskList.size();
+    this.jobDataLocation = null;
     //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
     this.job.setTaskCount(size);
@@ -228,11 +256,14 @@ public class ServerTaskBundleClient {
     synchronized (this) {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
+      int count = 0;
       for (ServerTask task: tasks) {
         if (task.getState() != TaskState.PENDING) {
           tasksToSendList.add(task);
-          pendingTasksCount.decrementAndGet();
+          count++;
+          //pendingTasksCount.decrementAndGet();
         }
+        if (count > 0) pendingTasksCount.addAndGet(-count);
         task.resultReceived(exception);
       }
       done = pendingTasksCount.get() <= 0;
@@ -267,13 +298,16 @@ public class ServerTaskBundleClient {
       if (!cancelled && !done) {
         if (debugEnabled) log.debug("cancelling client job " + this);
         this.cancelled = true;
+        int count = 0;
         for (ServerTask task: taskList) {
           if (task.getState() == TaskState.PENDING) {
             task.cancel();
             tasksToSendList.add(task);
-            pendingTasksCount.decrementAndGet();
+            count++;
+            //pendingTasksCount.decrementAndGet();
           }
         }
+        if (count > 0) pendingTasksCount.addAndGet(-count);
         this.done = true;
         completedTasks = getAndClearCompletedTasks();
       }
@@ -366,6 +400,7 @@ public class ServerTaskBundleClient {
    * Notifies that bundle is completely executed.
    */
   public void bundleEnded() {
+    if (debugEnabled) log.debug("bundle ended {}", this);
     for (CompletionListener listener : listenerList) listener.bundleEnded(this);
   }
 
@@ -375,6 +410,7 @@ public class ServerTaskBundleClient {
    */
   public void addCompletionListener(final CompletionListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
+    if (debugEnabled) log.debug("adding CompletionListener {} to {}", listener, this);
     listenerList.add(listener);
   }
 
@@ -406,6 +442,21 @@ public class ServerTaskBundleClient {
    */
   public long getId() {
     return id;
+  }
+
+  /**
+   * @return the serialized job header.
+   */
+  public DataLocation getJobDataLocation() {
+    return jobDataLocation;
+  }
+
+  /**
+   * Set the serialized job header.
+   * @param jobDataLocation the value to set.
+   */
+  public void setJobDataLocation(final DataLocation jobDataLocation) {
+    this.jobDataLocation = jobDataLocation;
   }
 
   /**

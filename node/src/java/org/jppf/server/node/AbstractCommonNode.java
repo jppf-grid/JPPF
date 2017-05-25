@@ -253,4 +253,13 @@ public abstract class AbstractCommonNode extends AbstractNode {
   public void setReading(final boolean suspended) {
     this.reading.set(suspended);
   }
+
+  /**
+   * Get the service that manages the class loaders and how they are used.
+   * @return an {@link AbstractClassLoaderManager} instance.
+   * @exclude
+   */
+  public AbstractClassLoaderManager getClassLoaderManager() {
+    return classLoaderManager;
+  }
 }

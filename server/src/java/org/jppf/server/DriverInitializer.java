@@ -33,6 +33,7 @@ import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.management.spi.*;
+import org.jppf.persistence.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.classloader.ClassCache;
@@ -388,37 +389,37 @@ public class DriverInitializer {
   }
 
   /**
-  *
-  */
- void registerNodeConfigListener() {
-   if (debugEnabled) log.debug("registering NodeConfigListener");
-   JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
-   jmx.connect();
-   try {
-     NotificationListener listener = new NotificationListener() {
-       @SuppressWarnings("deprecation")
-       @Override
-       public void handleNotification(final Notification notification, final Object handback) {
-         Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
-         String nodeUuid = (String) notif.getSource();
-         TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
-         if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
-         AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
-         if (node == null) return;
-         synchronized(node.getMonitor()) {
-           TypedProperties oldConfig = node.getSystemInformation().getJppf();
-           oldConfig.clear();
-           oldConfig.putAll(nodeConfig);
-           if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
-         }
-       }
-     };
-     jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
-   } catch (Exception e) {
-     if (debugEnabled) log.debug(e.getMessage(), e);
-     else log.warn(ExceptionUtils.getMessage(e));
-   }
- }
+   *
+   */
+  void registerNodeConfigListener() {
+    if (debugEnabled) log.debug("registering NodeConfigListener");
+    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
+    jmx.connect();
+    try {
+      NotificationListener listener = new NotificationListener() {
+        @SuppressWarnings("deprecation")
+        @Override
+        public void handleNotification(final Notification notification, final Object handback) {
+          Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
+          String nodeUuid = (String) notif.getSource();
+          TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
+          if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
+          AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
+          if (node == null) return;
+          synchronized(node.getMonitor()) {
+            TypedProperties oldConfig = node.getSystemInformation().getJppf();
+            oldConfig.clear();
+            oldConfig.putAll(nodeConfig);
+            if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
+          }
+        }
+      };
+      jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+    }
+  }
 
   /**
    * Parse an array of port numbers from a string containing a list of space-separated port numbers.
@@ -450,5 +451,15 @@ public class DriverInitializer {
    */
   public Set<DriverConnectionInfo> getDiscoveredPeers() {
     return discoveryListener.getDiscoveredPools();
+  }
+
+  /**
+   * Create and initialize the datasources found inthe configurarion.
+   */
+  void initDatasources() {
+    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    TypedProperties config = JPPFConfiguration.getProperties();
+    factory.configure(config, JPPFDatasourceFactory.Scope.LOCAL);
+    //factory.configure(config, JPPFDatasourceFactory.Scope.ANY);
   }
 }

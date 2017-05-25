@@ -25,6 +25,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.serialization.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -72,18 +73,24 @@ public abstract class JPPFContainer {
   /**
    * Determines whether tasks deserialization should be sequential rather than parallel.
    */
-  private final boolean sequentialDeserialization = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
+  private final boolean sequentialDeserialization = JPPFConfiguration.get(JPPFProperties.SEQUENTIAL_SERIALiZATION);
+  /**
+   * Whether the node has access to the client that submitted the job.
+   */
+  private final boolean clientAccess;
 
   /**
    * Initialize this container with a specified application uuid.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
+   * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
-    if (debugEnabled) log.debug("new JPPFContainer with uuidPath=" + uuidPath + ", classLoader=" + classLoader);
+  public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+    if (debugEnabled) log.debug(String.format("new JPPFContainer with uuidPath=%s, classLoader=%s, clientAccess=%b", uuidPath, classLoader, clientAccess));
     this.uuidPath = uuidPath;
     this.classLoader = classLoader;
+    this.clientAccess = clientAccess;
     init();
   }
 
@@ -104,7 +111,6 @@ public abstract class JPPFContainer {
    * @throws Throwable if an error occurs while deserializing.
    */
   public abstract int deserializeObjects(Object[] list, int count, ExecutorService executor) throws Throwable;
-  //public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable;
 
   /**
    * Get the main class loader for this container.
@@ -132,7 +138,11 @@ public abstract class JPPFContainer {
    * @throws Exception if an error occurs while instantiating the class loader.
    */
   protected void initHelper() throws Exception {
-    Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
+    AbstractJPPFClassLoader cl = getClassLoader();
+    if (!clientAccess) cl = (AbstractJPPFClassLoader) cl.getParent();
+    String name = "org.jppf.utils.SerializationHelperImpl";
+    if (debugEnabled) log.debug("loading class {} with classloader {}", name, cl);
+    Class<?> c = cl.loadJPPFClass(name);
     helper = (SerializationHelper) c.newInstance();
     serializer = helper.getSerializer();
   }

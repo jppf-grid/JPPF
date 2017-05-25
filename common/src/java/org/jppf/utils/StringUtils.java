@@ -274,6 +274,28 @@ public final class StringUtils {
   }
 
   /**
+   * Get a String representation of an array of any type.
+   * @param array the array from which to build a string representation.
+   * @param sep the separator to use for values. If null, no separator is used.
+   * @param prefix the prefix to use at the start of the resulting string. If null, no prefix is used.
+   * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
+   * @return the array's content as a string.
+   */
+  public static String buildString(final String sep, final String prefix, final String suffix, final int[] array) {
+    StringBuilder sb = new StringBuilder();
+    if (array == null) sb.append("null");
+    else {
+      if (prefix != null) sb.append(prefix);
+      for (int i=0; i<array.length; i++) {
+        if ((i > 0) && (sep != null)) sb.append(sep);
+        sb.append(array[i]);
+      }
+      if (suffix != null) sb.append(suffix);
+    }
+    return sb.toString();
+  }
+
+  /**
    * Build a string made of the specified tokens.
    * @param args the tokens composing the string.
    * @return the concatenation of the string values of the tokens.

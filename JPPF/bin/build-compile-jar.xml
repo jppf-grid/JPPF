@@ -55,6 +55,7 @@ limitations under the License.
         <src path="@{path}/src/resources"/>
       </javac>
       <copy todir="@{path}/classes">
+        <fileset dir="@{path}/src/java" excludes="**/*.java,**/package.html"/>
         <fileset dir="@{path}/src/resources" excludes="**/package.html"/>
       </copy>
     </sequential>

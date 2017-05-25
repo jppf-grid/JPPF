@@ -88,14 +88,16 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   private boolean remoteClassLoadingEnabled = true;
   /**
    * The global execution policy which applies to the driver only.
-   * @since 5.2
    */
   private ExecutionPolicy gridExecutionPolicy;
   /**
    * The configuration of the node(s) this job should be executed on.
-   * @since 5.2
    */
   private JPPFNodeConfigSpec nodeConfigurationSpec;
+  /**
+   * Whether this job is persisted by the driver.
+   */
+  private boolean persistent;
 
   /**
    * Default constructor.
@@ -374,7 +376,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
 
   /**
    * Get the configuration of the node(s) this job should be executed on,
-   * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
+   * forcing a restart of the node with appropriate configuration overrides if there is no such node.
    * @return the desired configuration as a {@link JPPFNodeConfigSpec} object.
    * @since 5.2
    */
@@ -384,13 +386,33 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
 
   /**
    * Set the configuration of the node(s) this job should be executed on,
-   * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
+   * forcing a restart of the node with appropriate configuration overrides if there is no such node.
    * @param nodeConfigurationSpec the desired configuration as a {@link JPPFNodeConfigSpec} object.
    * @return this SLA, for mathod chaining.
    * @since 5.2
    */
   public JobSLA setDesiredNodeConfiguration(final JPPFNodeConfigSpec nodeConfigurationSpec) {
     this.nodeConfigurationSpec = nodeConfigurationSpec;
+    return this;
+  }
+
+  /**
+   * Determine whether the job is persisted by the driver. The default value is {@code false}.
+   * @return {@code true} if the job is persisted, {@code false} otherwise.
+   * @since 6.0
+   */
+  public boolean isPersistent() {
+    return persistent;
+  }
+
+  /**
+   * Specify whether the job is persisted by the driver. The default value is {@code false}.
+   * @param persistent {@code true} to make the job persistent, {@code false} otherwise.
+   * @return this SLA, for mathod chaining.
+   * @since 6.0
+   */
+  public JobSLA setPersistent(final boolean persistent) {
+    this.persistent = persistent;
     return this;
   }
 
@@ -409,6 +431,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
     sla.setClassPath(classPath);
     sla.setDispatchExpirationSchedule(dispatchExpirationSchedule);
     sla.setMaxDispatchExpirations(maxDispatchExpirations);
+    sla.setPersistent(persistent);
     return sla;
   }
 }

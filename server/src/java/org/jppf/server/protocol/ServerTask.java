@@ -18,6 +18,8 @@
 
 package org.jppf.server.protocol;
 
+import java.io.*;
+
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskState;
 import org.slf4j.*;
@@ -27,7 +29,7 @@ import org.slf4j.*;
  * @author Martin JANDA
  * @exclude
  */
-public class ServerTask {
+public class ServerTask implements Serializable {
   /**
    * Logger for this class.
    */
@@ -39,19 +41,19 @@ public class ServerTask {
   /**
    * Client bundle that owns this task.
    */
-  private final ServerTaskBundleClient bundle;
+  private transient ServerTaskBundleClient bundle;
   /**
    * The position of this task within the job submitted by the client.
    */
-  private final int jobPosition;
+  private int jobPosition;
   /**
    * The initial serialized task.
    */
-  private final DataLocation initialTask;
+  private DataLocation initialTask;
   /**
    * The serialized execution result.
    */
-  private DataLocation result = null;
+  private transient DataLocation result;
   /**
    * The exception thrown during execution.
    */
@@ -63,15 +65,15 @@ public class ServerTask {
   /**
    * Number of times a dispatch of this task has expired.
    */
-  private int expirationCount = 0;
+  private int expirationCount;
   /**
    * Maximum number of times a task can be resubmitted.
    */
-  private final int maxResubmits;
+  private int maxResubmits;
   /**
    * Number of times a task resubmitted itself.
    */
-  private int resubmitCount = 0;
+  private int resubmitCount;
 
   /**
    *
@@ -94,6 +96,14 @@ public class ServerTask {
    */
   public ServerTaskBundleClient getBundle() {
     return bundle;
+  }
+
+  /**
+   * Get the client bundle that owns this task.
+   * @param bundle a {@link ServerTaskBundleClient} instance.
+   */
+  public void setBundle(final ServerTaskBundleClient bundle) {
+    this.bundle = bundle;
   }
 
   /**
@@ -122,10 +132,18 @@ public class ServerTask {
 
   /**
    * Get the result of the task execution.
-   * @return the result as <code>DataLocation</code>.
+   * @return the result as a {@link DataLocation}.
    */
   public DataLocation getResult() {
     return (result == null) ? initialTask : result;
+  }
+
+  /**
+   * Set the result of the task execution.
+   * @param result the result as a {@link DataLocation}.
+   */
+  public void setResult(final DataLocation result) {
+    this.result = result;
   }
 
   /**
@@ -163,6 +181,7 @@ public class ServerTask {
     this.result = result;
     this.throwable = null;
     this.state = (result == initialTask) ? TaskState.CANCELLED : TaskState.RESULT;
+    if (traceEnabled) log.trace("result received for {}", this);
   }
 
   /**
@@ -186,16 +205,14 @@ public class ServerTask {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("ServerTask[");
-    sb.append("state=").append(getState());
-    sb.append(", jobPosition=").append(jobPosition);
-    sb.append(", expirationCount=").append(expirationCount);
-    sb.append(", dataLocation=").append(initialTask);
-    sb.append(", result=").append(result);
-    sb.append(", exception=").append(throwable);
-    sb.append('}');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("state=").append(getState())
+      .append(", jobPosition=").append(jobPosition)
+      .append(", expirationCount=").append(expirationCount)
+      .append(", dataLocation=").append(initialTask)
+      .append(", result=").append(result)
+      .append(", exception=").append(throwable)
+      .append(']').toString();
   }
 
   /**
@@ -253,5 +270,46 @@ public class ServerTask {
    */
   public int getMaxResubmits() {
     return maxResubmits;
+  }
+
+  /**
+   * Save the state of the {@code ServerTask} instance to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write the task.
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.writeInt(jobPosition);
+    out.writeInt(expirationCount);
+    out.writeInt(maxResubmits);
+    out.writeInt(resubmitCount);
+    out.writeObject(state);
+    out.writeObject(throwable);
+    try {
+      IOHelper.writeData(initialTask, new StreamOutputDestination(out));
+    } catch(Exception e) {
+      throw (e instanceof IOException) ? (IOException) e : new IOException(e);
+    }
+  }
+
+  /**
+   * Reconstitute the {@code ServerTask} instance from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the task.
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    jobPosition = in.readInt();
+    expirationCount = in.readInt();
+    maxResubmits = in.readInt();
+    resubmitCount = in.readInt();
+    state = (TaskState) in.readObject();
+    throwable = (Throwable) in.readObject();
+    try {
+      initialTask = IOHelper.readData(new StreamInputSource(in));
+    } catch(IOException | ClassNotFoundException e) {
+      throw  e;
+    } catch(Exception e) {
+      throw new IOException(e);
+    }
   }
 }

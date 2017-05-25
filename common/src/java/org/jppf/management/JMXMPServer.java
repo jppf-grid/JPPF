@@ -19,8 +19,7 @@
 package org.jppf.management;
 
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.*;
-import java.net.*;
+import java.net.BindException;
 import java.util.*;
 
 import javax.management.remote.*;
@@ -102,7 +101,7 @@ public class JMXMPServer extends AbstractJMXServer {
           connectorServer.start();
           found = true;
           managementHost = url.getHost();
-          forwarder = createMBeanServerForwarder();
+          forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
           if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
         } catch(Exception e) {
           nbTries++;
@@ -120,72 +119,6 @@ public class JMXMPServer extends AbstractJMXServer {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);
     }
-  }
-
-  /**
-   * Create an MBeanServerForwarder to associate witht he remote connector server,
-   * based on the JPPF configuration.
-   * @return an {@link MBeanServerForwarder} instance, or {@code null} if none is defined in the configuration or if it couldn't be created.
-   */
-  private MBeanServerForwarder createMBeanServerForwarder() {
-    String[] configDef = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
-    if ((configDef == null) || (configDef.length <= 0)) return null;
-    Class<?> clazz = null;
-    try {
-      clazz = Class.forName(configDef[0]);
-    } catch (ClassNotFoundException e) {
-      log.error(String.format("The MBeanServerForwarder class %s was not found, no fowrader will be set. Error is: %s", configDef[0], ExceptionUtils.getStackTrace(e)));
-      return null;
-    }
-    if (!MBeanServerForwarder.class.isAssignableFrom(clazz)) {
-      log.error(String.format("The configured class '%s' for property '%s' does not implement %s, no forwarder will be set.",
-        clazz.getName(), JPPFProperties.MANAGEMENT_SERVER_FORWARDER.getName(), MBeanServerForwarder.class.getName()));
-      return null;
-    }
-    MBeanServerForwarder forwarder = null;
-    Object[] params = null;
-    if (configDef.length > 1) {
-      params = new String[configDef.length - 1];
-      for (int i=1; i<configDef.length; i++) {
-        params[i-1] = configDef[i];
-      }
-    }
-    Constructor<?> c = null;
-    if (params != null) {
-      try {
-        c = clazz.getConstructor(String[].class);
-      } catch (@SuppressWarnings("unused") NoSuchMethodException ignore) {
-      }
-      if (c != null) {
-        try {
-          return (MBeanServerForwarder) c.newInstance((Object) params);
-        } catch (Exception e) {
-          log.error(String.format("The constructor '%s.<init>(String[])' raised an exception: %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
-          return null;
-        }
-      }
-    }
-    try {
-      forwarder = (MBeanServerForwarder) clazz.newInstance();
-    } catch (Exception e) {
-      log.error(String.format("Could not instantiate '%s' : %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
-      return null;
-    }
-    if (params != null) {
-      Method m = null;
-      try {
-        m = clazz.getMethod("setParameters", String[].class);
-      } catch (@SuppressWarnings("unused") Exception ignore) {
-      }
-      if (m != null) {
-        try {
-          m.invoke(forwarder, (Object) params);
-        } catch (Exception e) {
-          log.error(String.format("Invoking %s.setParameters(String[]) failed : %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
-        }
-      }
-    }
-    return forwarder;
   }
 
   @Override

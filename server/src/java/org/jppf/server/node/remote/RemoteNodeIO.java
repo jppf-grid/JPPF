@@ -18,7 +18,7 @@
 
 package org.jppf.server.node.remote;
 
-import static org.jppf.node.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
+import static org.jppf.node.protocol.BundleParameter.*;
 
 import java.net.SocketException;
 import java.util.*;
@@ -89,7 +89,9 @@ public class RemoteNodeIO extends AbstractNodeIO {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
-        JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
+        //JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
+        boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
+        JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);

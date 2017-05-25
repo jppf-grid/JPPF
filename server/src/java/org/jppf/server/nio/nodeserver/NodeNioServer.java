@@ -30,6 +30,7 @@ import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.queue.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.serialization.*;
@@ -338,6 +339,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       bundle.getUuidPath().add(driver.getUuid());
       bundle.setTaskCount(0);
       bundle.setHandshake(true);
+      JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+      TypedProperties config = JPPFConfiguration.getProperties();
+      Map<String, TypedProperties> defMap = new HashMap<>();
+      defMap.putAll(factory.extractDefinitions(config, JPPFDatasourceFactory.Scope.REMOTE));
+      bundle.setParameter(BundleParameter.DATASOURCE_DEFINITIONS, defMap);
       return new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(lengthBytes), buf));
     } catch(Exception e) {
       log.error(e.getMessage(), e);

@@ -53,6 +53,7 @@ public class RestartableDriverProcessLauncher extends RestartableProcessLauncher
     setMainClass("org.jppf.server.JPPFDriver");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../server/classes");
+    addClasspathElement("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");
     //addJvmOption("-Xrunjdwp:transport=dt_socket,address=localhost:800" + n +",server=y,suspend=y");
   }

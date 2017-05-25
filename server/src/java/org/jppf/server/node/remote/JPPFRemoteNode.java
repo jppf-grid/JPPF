@@ -18,6 +18,8 @@
 package org.jppf.server.node.remote;
 
 import org.jppf.node.connection.DriverConnectionInfo;
+import org.jppf.persistence.JPPFDatasourceFactory;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -35,5 +37,12 @@ public class JPPFRemoteNode extends AbstractRemoteNode {
   @Override
   protected void initClassLoaderManager() {
     classLoaderManager = new RemoteClassLoaderManager(this);
+  }
+
+  @Override
+  protected synchronized void init() throws Exception {
+    super.init();
+    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    factory.configure(JPPFConfiguration.getProperties(), JPPFDatasourceFactory.Scope.LOCAL, getSystemInformation());
   }
 }

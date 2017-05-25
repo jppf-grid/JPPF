@@ -36,8 +36,8 @@ import java.util.concurrent.Callable;
  */
 public class AndroidClassLoaderManager extends AbstractClassLoaderManager {
   @Override
-  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception {
-    return new JPPFRemoteContainer(null, uuidPath, cl);
+  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl, final boolean clientAccess) throws Exception {
+    return new JPPFRemoteContainer(null, uuidPath, cl, false);
   }
 
   @Override

@@ -88,13 +88,11 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="jppf-common-5.2-beta" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="jppf-server" level="project" />
     <orderEntry type="library" exported="" name="jppf-common" level="project" />
     <orderEntry type="library" exported="" name="jppf-node-android" level="project" />
     <orderEntry type="library" exported="" name="lz4-1.3.0" level="project" />
-    <orderEntry type="library" exported="" name="jppf-server-5.2-beta" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="jppf-fractals-android" level="project" />
     <orderEntry type="module" module-name="events" exported="" />

@@ -99,8 +99,7 @@ public final class ExceptionUtils {
    * @return a formatted message from the <code>Throwable</code>.
    */
   public static String getMessage(final Throwable t) {
-    if (t == null) return "null";
-    return t.getClass().getName() + ": " + t.getMessage();
+    return (t == null) ? "null" : t.getClass().getName() + ": " + t.getMessage();
   }
 
   /**

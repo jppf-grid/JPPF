@@ -20,13 +20,14 @@ package org.jppf.server;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.createServerStatistics;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.discovery.PeerDriverDiscovery;
-import org.jppf.job.*;
+import org.jppf.job.JobTasksListenerManager;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
 import org.jppf.nio.*;
@@ -117,7 +118,7 @@ public class JPPFDriver {
   /**
    * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
    */
-  private boolean shuttingDown = false;
+  private AtomicBoolean shuttingDown = new AtomicBoolean(false);
   /**
    * Holds the statistics monitors.
    */
@@ -159,9 +160,10 @@ public class JPPFDriver {
     statistics = createServerStatistics();
     systemInformation = new JPPFSystemInformation(uuid, false, true, statistics);
     statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
+    initializer = new DriverInitializer(this, config);
+    initializer.initDatasources();
     jobManager = new JPPFJobManager();
     taskQueue = new JPPFPriorityQueue(this, jobManager);
-    initializer = new DriverInitializer(this, config);
   }
 
   /**
@@ -204,6 +206,7 @@ public class JPPFDriver {
     }
     initializer.initBroadcaster();
     initializer.initPeers(clientClassServer);
+    taskQueue.getPersistenceHandler().loadPersistedJobs();
     if (debugEnabled) log.debug("JPPF Driver initialization complete");
     System.out.println("JPPF Driver initialization complete");
   }
@@ -271,15 +274,6 @@ public class JPPFDriver {
   }
 
   /**
-   * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
-   * @return true if a shutdown is initiated, false otherwise.
-   * @exclude
-   */
-  public boolean isShuttingDown() {
-    return shuttingDown;
-  }
-
-  /**
    * Get this driver's unique identifier.
    * @return the uuid as a string.
    */
@@ -310,16 +304,14 @@ public class JPPFDriver {
    * @exclude
    */
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
-    log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
-    shuttingDown = true;
-    if (acceptorServer != null) acceptorServer.shutdown();
-    if (clientClassServer != null) clientClassServer.shutdown();
-    if (nodeClassServer != null) nodeClassServer.shutdown();
-    if (nodeNioServer != null) nodeNioServer.shutdown();
-    if (clientNioServer != null) clientNioServer.shutdown();
-    Timer timer = new Timer();
-    ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay, this);
-    timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
+    if (shuttingDown.compareAndSet(false, true)) {
+      log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
+      Timer timer = new Timer();
+      ShutdownRestartTask task = new ShutdownRestartTask(restart, restartDelay, this);
+      timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
+    } else {
+      log.info("shutdown/restart request ignored because a previous request is already scheduled");
+    }
   }
 
   /**
@@ -328,6 +320,11 @@ public class JPPFDriver {
    */
   public void shutdown() {
     log.info("Shutting down");
+    if (acceptorServer != null) acceptorServer.shutdown();
+    if (clientClassServer != null) clientClassServer.shutdown();
+    if (nodeClassServer != null) nodeClassServer.shutdown();
+    if (nodeNioServer != null) nodeNioServer.shutdown();
+    if (clientNioServer != null) clientNioServer.shutdown();
     StateTransitionManager.shutdown(true);
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();

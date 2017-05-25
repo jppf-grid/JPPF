@@ -19,8 +19,10 @@
 package org.jppf.utils;
 
 import java.lang.reflect.*;
+import java.util.Arrays;
 
 import org.jppf.JPPFException;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -33,6 +35,10 @@ public final class ReflectionHelper {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Invoke a method using reflection.
@@ -269,7 +275,7 @@ public final class ReflectionHelper {
    * @return a method that matches the name and parameters.
    * @throws Exception if any erorr occurs.
    */
-  public Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception {
+  public static Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception {
     Method[] methods = clazz.getMethods();
     Object[] p = params == null ? new Object[0] : params;
     for (Method m: methods) {
@@ -286,5 +292,140 @@ public final class ReflectionHelper {
       }
     }
     return null;
+  }
+
+  /**
+   * Find the specified public method in the specified class or one of its implemented interfaces or in its super class hierarchy.
+   * @param clazz the class for which to find the method.
+   * @param methodName the name of the method to find.
+   * @param paramTypes the types of the parameters of the method, if any.
+   * @return the matching method, or {@code null} or null if no method matches.
+   */
+  public static Method findMethod(final Class<?> clazz, final String methodName, final Class<?>...paramTypes) {
+    try {
+      Method[] methods = clazz.getMethods();
+      for (Method m: methods) {
+        Class<?>[] types = m.getParameterTypes();
+        if (!methodName.equals(m.getName()) || (paramTypes.length != types.length)) continue;
+        boolean found = true;
+        for (int i=0; i<paramTypes.length; i++) {
+          if (paramTypes[i] != types[i]) {
+            found = false;
+            break;
+          }
+        }
+        if (found) return m;
+      }
+    } catch (@SuppressWarnings("unused") Exception e) {
+    }
+    return null;
+  }
+
+  /**
+   * Find the specified public constructor in the specified class.
+   * @param clazz the class for which to find the constructor.
+   * @param paramTypes the types of the parameters of the constructor, if any.
+   * @return the matching method, or {@code null} or null if no method matches.
+   */
+  public static Constructor<?> findConstructor(final Class<?> clazz, final Class<?>...paramTypes) {
+    try {
+      Constructor<?>[] constructors = clazz.getConstructors();
+      for (Constructor<?> c: constructors) {
+        Class<?>[] types = c.getParameterTypes();
+        if (paramTypes.length != types.length) continue;
+        boolean found = true;
+        for (int i=0; i<paramTypes.length; i++) {
+          if (paramTypes[i] != types[i]) {
+            found = false;
+            break;
+          }
+        }
+        if (found) return c;
+      }
+    } catch (@SuppressWarnings("unused") Exception e) {
+    }
+    return null;
+  }
+
+  /**
+   * Instantiate an object that implements the specified interface, whose class name is given by the specified property,
+   * by calling either its default constructor or a oonstrcutor that take a String[].
+   * @param inf the interface that must be implemented by the class.
+   * @param prop the property that provides the class name and optional parameters for its String[] constructor,
+   * along with an optional default implementation of the interface. 
+   * @param <T> the type of the interface.
+   * @return an instance of the specified interface.
+   * @throws Exception if any error occurs.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T invokeDefaultOrStringArrayConstructor(final Class<T> inf, final JPPFProperty<String[]> prop) {
+    return invokeDefaultOrStringArrayConstructor(inf, prop.getName(), JPPFConfiguration.get(prop));
+  }
+
+  /**
+   * Instantiate an object that implements the specified interface, whose class name is given by the specified property,
+   * by calling either its default constructor or a oonstrcutor that take a String[].
+   * @param inf the interface that must be implemented by the class.
+   * @param prop the name of the property that provides the class name and optional parameters for its String[] constructor, along with an optional default implementation of the interface. 
+   * @param value the value of the property.
+   * @param <T> the type of the interface.
+   * @return an instance of the specified interface.
+   * @throws Exception if any error occurs.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T invokeDefaultOrStringArrayConstructor(final Class<T> inf, final String prop, final String[] value) {
+    String propName = (prop == null) ? "<unknown_property>" : prop;
+    if (debugEnabled) log.debug("found {} = {}", propName, value == null ? "null" : Arrays.asList(value));
+    if ((value == null) || (value.length <= 0)) return null;
+    String className = value[0];
+    String[] params = null;
+    if (value.length > 1) {
+      params = new String[value.length - 1];
+      for (int i=1; i<value.length; i++) params[i - 1] = value[i];
+    }
+    Class<?> clazz = null;
+    try {
+      clazz = Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      log.error(String.format("The implementation of %s, class %s, was not found. Error is: %s", inf.getName(), className, ExceptionUtils.getStackTrace(e)));
+      return null;
+    }
+    if (!inf.isAssignableFrom(clazz)) {
+      log.error(String.format("The configured class '%s' for property '%s' does not implement or extend %s.", clazz.getName(), propName, inf.getName()));
+      return null;
+    }
+    Object result = null;
+    Constructor<?> stringArrayConstructor = findConstructor(clazz, String[].class);
+    if (stringArrayConstructor != null) {
+      try {
+        result = stringArrayConstructor.newInstance(new Object[] {params});
+      } catch (Exception e) {
+        log.error(String.format("Error invoking %s(String[]) with params=%s for property '%s': %s", clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
+        return null;
+      }
+    } else {
+      Constructor<?> defaultConstructor = findConstructor(clazz);
+      if (defaultConstructor != null) {
+        try {
+          result = defaultConstructor.newInstance();
+        } catch (Exception e) {
+          log.error(String.format("Error invoking default constructor of configured class '%s' for property '%s': %s", clazz.getName(), propName, ExceptionUtils.getStackTrace(e)));
+          return null;
+        }
+        if (params != null) {
+          Method setParamsMethod = findMethod(clazz, "setParameters", String[].class);
+          if (setParamsMethod != null) {
+            try {
+              setParamsMethod.invoke(result, new Object[] {params});
+            } catch (Exception e) {
+              log.error(String.format("Error invoking %s.setParameters(%s) for property '%s': %s",
+                clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
+              return null;
+            }
+          }
+        }
+      }
+    }
+    return (T) result;
   }
 }

@@ -170,6 +170,17 @@ public class BaseTest {
   }
 
   /**
+   * Throw the specified {@link Throwable} by either casting to its real type or wrapping it in a {@link RuntimeException}.
+   * @param t the {@link Throwable} to handle.
+   * @throws Exception if {@code t} is not null.
+   */
+  public static void throwUnknown(final Throwable t) throws Exception {
+    if (t instanceof Exception) throw (Exception) t;
+    else if (t instanceof Error) throw (Error) t;
+    else if (t != null) throw new RuntimeException(t);
+  }
+
+  /**
    * Execute a script on the specified driver.
    * @param jmx JMX wrapper for the driver.
    * @param script the script to execute.

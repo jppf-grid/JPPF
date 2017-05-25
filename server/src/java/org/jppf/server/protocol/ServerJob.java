@@ -105,12 +105,10 @@ public class ServerJob extends AbstractServerJobBase {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received {} results from {}", (results == null ? "null" : results.size()), bundle);
     if ((results != null) && results.isEmpty()) return;
-    //boolean offline = bundle.getJob().getSLA().i
     CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
       List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
-      //if (isJobExpired() || isCancelled() || bundle.isExpired()) {
       if (isJobExpired() || isCancelled() || (bundle.isExpired() && bundle.isOffline())) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else if (results != null) {
@@ -131,12 +129,7 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
-    if (debugEnabled) log.debug("client bundle map has {} entries: {}", map.size(), map.keySet());
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-      entry.getKey().resultReceived(entry.getValue());
-      ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
-    }
-    taskCompleted(bundle, null);
+    postResultsReceived(map, bundle, null);
   }
 
   /**
@@ -157,11 +150,29 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
+    postResultsReceived(map, bundle, throwable);
+  }
+
+  /**
+   * 
+   * @param map .
+   * @param bundle .
+   * @param throwable .
+   */
+  private void postResultsReceived(final CollectionMap<ServerTaskBundleClient, ServerTask> map, final ServerTaskBundleNode bundle, final Throwable throwable) {
+    if (debugEnabled) log.debug("client bundle map has {} keys: {}", map.keySet().size(), map.keySet());
     for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-      entry.getKey().resultReceived(entry.getValue(), throwable);
+      if (throwable == null) entry.getKey().resultReceived(entry.getValue());
+      else entry.getKey().resultReceived(entry.getValue(), throwable);
       ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
     }
     taskCompleted(bundle, throwable);
+    if (getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) {
+      for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
+        ServerTaskBundleClient clientBundle = entry.getKey();
+        if (clientBundle.getPendingTasksCount() <= 0) clientBundle.bundleEnded();
+      }
+    }
   }
 
   /**
@@ -217,6 +228,7 @@ public class ServerJob extends AbstractServerJobBase {
       updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
     if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
+    if (debugEnabled) log.debug("submission status = {} for {}", getSubmissionStatus(), this);
   }
 
   /**

@@ -26,7 +26,7 @@ import javax.management.loading.ClassLoaderRepository;
 import javax.management.remote.MBeanServerForwarder;
 
 /**
- * This class is an adapter for the {@link MBeanServerForwarder} interface. It implements all th emethods of the interface
+ * This class is an adapter for the {@link MBeanServerForwarder} interface. It implements all the methods of the interface
  * and merely delegates to the underlying {@link MBeanServer} if it has been set. When the {@link MBeanServer} is not set
  * the methods do nothing and/or return {@code null}.
  * <p>This class is provided as a convenience for when only a few methods need to be overriden in a subclass.

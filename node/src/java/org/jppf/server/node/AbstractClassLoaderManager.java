@@ -114,13 +114,25 @@ public abstract class AbstractClassLoaderManager {
    * @return a <code>JPPFContainer</code> instance.
    * @throws Exception if an error occurs while getting the container.
    */
-  public synchronized JPPFContainer getContainer(final List<String> uuidPath, final Object...params) throws Exception {
+  public JPPFContainer getContainer(final List<String> uuidPath, final Object...params) throws Exception {
+    return getContainer(uuidPath, true, params);
+  }
+
+  /**
+   * Get a reference to the JPPF container associated with an application uuid.
+   * @param uuidPath the uuid path containing the key to the container.
+   * @param clientAccess whether the node has access to the client that submitted the job.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
+   * @return a {@code JPPFContainer} instance.
+   * @throws Exception if an error occurs while getting the container.
+   */
+  public synchronized JPPFContainer getContainer(final List<String> uuidPath, final boolean clientAccess, final Object...params) throws Exception {
     String uuid = uuidPath.get(0);
     JPPFContainer container = containerMap.get(uuid);
     if (container == null) {
       if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
       AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath, params);
-      container = newJPPFContainer(uuidPath, cl);
+      container = newJPPFContainer(uuidPath, cl, clientAccess);
       if (containerList.size() >= maxContainers) {
         JPPFContainer toRemove = containerList.removeFirst();
         try {
@@ -178,7 +190,6 @@ public abstract class AbstractClassLoaderManager {
     AbstractJPPFClassLoader loader = container.getClassLoader();
     if (loader != null) {
       loader.close();
-      //leakPrevention.clearReferences(loader);
     }
   }
 
@@ -186,10 +197,11 @@ public abstract class AbstractClassLoaderManager {
    * Create a new container based on the uuid path and class loader.
    * @param uuidPath uuid path for the corresponding client.
    * @param cl the class loader to use.
+   * @param clientAccess whether the node has access to the client that submitted the job.
    * @return a {@link JPPFContainer} instance.
    * @throws Exception if any error occurs.
    */
-  protected abstract JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception;
+  protected abstract JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl, final boolean clientAccess) throws Exception;
 
   /**
    * Instantiate the callback used to create the class loader in each {@link JPPFContainer}.

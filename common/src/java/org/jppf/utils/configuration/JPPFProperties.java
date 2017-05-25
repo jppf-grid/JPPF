@@ -23,6 +23,7 @@ import java.lang.reflect.*;
 import java.security.KeyStore;
 import java.util.*;
 
+import org.jppf.job.persistence.impl.DefaultFilePersistence;
 import org.slf4j.*;
 
 /**
@@ -384,6 +385,10 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> DEBUG_ENABLED = new BooleanProperty("jppf.debug.enabled", false);
   /** Interval in seconds between 2 refreshes of a page in the web admin console */
   public static final JPPFProperty<Integer> WEB_ADMIN_REFRESH_INTERVAL = new IntProperty("jppf.web.admin.refresh.interval", 3);
+  /** Class name of the implementation of the job persistence in the driver */
+  public static final JPPFProperty<String[]> JOB_PERSISTENCE = new StringArrayProperty("jppf.job.persistence", " ", new String[] {DefaultFilePersistence.class.getName()});
+  /** Whether object graphs should be serialized or deserialized sequentially instead of in parallel */
+  public static final JPPFProperty<Boolean> SEQUENTIAL_SERIALiZATION = new BooleanProperty("jppf.sequential.serialization", false, "jppf.sequential.deserialization");
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 

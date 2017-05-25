@@ -51,10 +51,11 @@ public class JPPFLocalContainer extends JPPFContainer {
    * Initialize this container with a specified application uuid.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
+   * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
-    super(uuidPath, classLoader);
+  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+    super(uuidPath, classLoader, clientAccess);
   }
 
   /**
@@ -74,7 +75,6 @@ public class JPPFLocalContainer extends JPPFContainer {
       List<DataLocation> locations = currentMessage.getLocations();
       for (int i = 0; i < count; i++) {
         completionService.submit(new ObjectDeserializationTask(locations.get(i + 1), i));
-        //futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i + 1), i)));
       }
       for (int i=0; i<count; i++) {
         Future<ObjectDeserializationTask> f = completionService.take();

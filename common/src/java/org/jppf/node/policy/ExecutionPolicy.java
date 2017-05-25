@@ -234,6 +234,18 @@ public abstract class ExecutionPolicy implements Serializable {
   }
 
   /**
+   * Convert this execution policy to XML.
+   * @return an XML representation of this policy, fully compliant with the JPPF execution policy XML schema
+   * at <a href="http://www.jppf.org/schemas/ExecutionPolicy.xsd">http://www.jppf.org/schemas/ExecutionPolicy.xsd</a>.
+   */
+  public String toXML() {
+    return new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
+      .append(toString())
+      .append("</jppf:ExecutionPolicy>\n")
+      .toString();
+  }
+
+  /**
    * An execution policy that realizes a binary logical combination of the policies specified as operands.
    */
   public abstract static class LogicalRule extends ExecutionPolicy {

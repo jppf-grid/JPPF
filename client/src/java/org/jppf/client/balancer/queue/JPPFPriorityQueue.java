@@ -72,7 +72,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * @param clientJob the object to add to the queue.
    */
   @Override
-  public void addBundle(final ClientJob clientJob) {
+  public ClientJob addBundle(final ClientJob clientJob) {
     JobSLA sla = clientJob.getSLA();
     final String jobUuid = clientJob.getUuid();
     if (sla.isBroadcastJob() && (clientJob.getBroadcastUUID() == null)) {
@@ -97,6 +97,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         lock.unlock();
       }
     }
+    return clientJob;
   }
 
   /**

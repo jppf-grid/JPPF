@@ -51,10 +51,11 @@ public class JPPFRemoteContainer extends JPPFContainer {
    * @param nodeConnection the connection to the job server.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
+   * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
-    super(uuidPath, classLoader);
+  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+    super(uuidPath, classLoader, clientAccess);
     this.nodeConnection = nodeConnection;
     //init();
   }

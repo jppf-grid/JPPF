@@ -431,23 +431,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * This comparator defines a descending value order for integers.
-   * @exclude
-   */
-  public static class DescendingIntegerComparator implements Comparator<Integer> {
-    /**
-     * Compare two integers. This comparator defines a descending order for integers.
-     * @param o1 first integer to compare.
-     * @param o2 second integer to compare.
-     * @return -1 if o1 > o2, 0 if o1 == o2, 1 if o1 < o2
-     */
-    @Override
-    public int compare(final Integer o1, final Integer o2) {
-      return -o1.compareTo(o2);
-    }
-  }
-
-  /**
    * Determine whether this client is resetting. 
    * @return {@code true} if this client is resetting, {@code false} otherwise.
    * @exclude

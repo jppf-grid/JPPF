@@ -30,8 +30,9 @@ public interface JPPFQueue<T, U, V> extends Iterable<T>
   /**
    * Add an object to the queue, and notify all listeners about it.
    * @param bundleWrapper the object to add to the queue.
+   * @return the job the bundle is a part of.
    */
-  void addBundle(U bundleWrapper);
+  T addBundle(U bundleWrapper);
 
   /**
    * Get the next object in the queue.

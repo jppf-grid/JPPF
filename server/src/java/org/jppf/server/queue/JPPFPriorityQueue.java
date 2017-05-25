@@ -25,7 +25,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
@@ -71,6 +71,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Manages operations on broadcast jobs.
    */
   private final BroadcastManager broadcastManager;
+  /**
+   * Handles the persistence of jobs.
+   */
+  final PersistenceHandler persistenceHandler;
 
   /**
    * Initialize this queue.
@@ -81,14 +85,16 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     this.driver = driver;
     this.jobManager = jobManager;
     broadcastManager = new BroadcastManager(this);
+    this.persistenceHandler = new PersistenceHandler(this);
   }
 
   @Override
-  public void addBundle(final ServerTaskBundleClient clientBundle) {
+  public ServerJob addBundle(final ServerTaskBundleClient clientBundle) {
     if (debugEnabled) log.debug("adding bundle=" + clientBundle);
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
     JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
+    ServerJob serverJob = null;
     lock.lock();
     try {
       if (sla.isBroadcastJob()) {
@@ -96,7 +102,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         broadcastManager.processBroadcastJob(clientBundle);
       } else {
         boolean queued;
-        ServerJob serverJob = jobMap.get(jobUuid);
+        serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
           int n = clientBundle.getJob().getTaskCount();
           clientBundle.getJob().setDriverQueueTaskCount(n);
@@ -119,7 +125,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
         if (serverJob.addBundle(clientBundle)) {
           if (!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
-        } else return;
+        } else return serverJob;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           priorityMap.putValue(sla.getPriority(), serverJob);
@@ -129,6 +135,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (!queued) {
           driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         }
+        if (!clientBundle.getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) persistenceHandler.storeJob(serverJob, clientBundle, !queued);
         fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap));
@@ -137,6 +144,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
+    return serverJob;
   }
 
   /**
@@ -266,7 +274,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       scheduleManager.close();
-      synchronized (queueListeners) {
+      synchronized(queueListeners) {
         queueListeners.clear();
       }
       priorityMap.clear();
@@ -376,7 +384,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * 
    * @return the job map.
    */
   Map<String, ServerJob> getJobMap() {
@@ -384,7 +391,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * 
    * @return the priority map.
    */
   LinkedListSortedMap<Integer, ServerJob> getPriorityMap() {
@@ -444,5 +450,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     scheduleManager.clearSchedules(job.getUuid());
     if (sla.getJobSchedule() != null) scheduleManager.handleStartJobSchedule(job);
     if (sla.getJobExpirationSchedule() != null) scheduleManager.handleExpirationJobSchedule(job);
+  }
+
+  /**
+   * @return the persistence handler.
+   */
+  public PersistenceHandler getPersistenceHandler() {
+    return persistenceHandler;
   }
 }

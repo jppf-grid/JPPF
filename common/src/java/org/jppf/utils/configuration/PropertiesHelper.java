@@ -24,6 +24,7 @@ import java.util.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class PropertiesHelper {
   /**

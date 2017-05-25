@@ -23,6 +23,7 @@ import java.util.*;
 
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.log4j.Level;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -203,7 +204,7 @@ public class BaseSetup {
    */
   public static void cleanup() throws Exception {
     close();
-    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
 
   /**
@@ -211,8 +212,7 @@ public class BaseSetup {
    * @throws Exception if a process could not be stopped.
    */
   private static void close() throws Exception {
-    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
-    FileUtils.writeTextFile("client_thread_dump.log", text);
+    generateClientThreadDump();
     if (client != null) {
       client.close();
       client = null;
@@ -221,6 +221,15 @@ public class BaseSetup {
     System.gc();
     stopProcesses();
     ConfigurationHelper.cleanup();
+  }
+
+  /**
+   * Generates a thread dump of the local JVM.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateClientThreadDump() throws Exception {
+    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
+    FileUtils.writeTextFile("client_thread_dump.log", text);
   }
 
   /**
@@ -465,5 +474,15 @@ public class BaseSetup {
    */
   public static JPPFClient getClient() {
     return client;
+  }
+
+  /**
+   * Set the specified Log4j logger to the specified level.
+   * @param name the name of the log4j logger.
+   * @param level the level to set.
+   */
+  public static void setLoggerLevel(final String name, final Level level) {
+    org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
+    if (logger != null) logger.setLevel(level);
   }
 }

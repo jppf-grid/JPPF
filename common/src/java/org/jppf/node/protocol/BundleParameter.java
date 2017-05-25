@@ -23,6 +23,10 @@ package org.jppf.node.protocol;
  * @author Laurent Cohen
  * @exclude
  */
+/**
+ * 
+ * @author Laurent Cohen
+ */
 public enum  BundleParameter
 {
   /**
@@ -124,5 +128,13 @@ public enum  BundleParameter
   /**
    * An indicator from the remote peer that the channel should be closed.
    */
-  CLOSE_COMMAND
+  CLOSE_COMMAND,
+  /**
+   * Whther the job was submitted directly by a client or loaded from a persistence store.
+   */
+  FROM_PERSISTENCE,
+  /**
+   * Datasources definitions passed on to a node from a server.
+   */
+  DATASOURCE_DEFINITIONS
 }

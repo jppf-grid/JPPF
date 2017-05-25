@@ -19,11 +19,20 @@
 package org.jppf.server.queue;
 
 import org.jppf.server.protocol.ServerJob;
+import org.slf4j.*;
 
 /**
  * @author Martin JANDA
  */
 class RemoveBundleAction implements Runnable {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(RemoveBundleAction.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Reference to the job queue.
    */
@@ -41,12 +50,15 @@ class RemoveBundleAction implements Runnable {
   public RemoveBundleAction(final JPPFPriorityQueue queue, final ServerJob serverJob) {
     if (queue == null) throw new IllegalArgumentException("queue is null");
     if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
+    if (debugEnabled) log.debug("new RemoveBundleAction for job {}", serverJob);
     this.queue = queue;
     this.serverJob = serverJob;
   }
 
   @Override
   public void run() {
+    if (debugEnabled) log.debug("removing job {}", serverJob);
     queue.removeBundle(serverJob, true);
+    queue.getPersistenceHandler().deleteJob(serverJob);
   }
 }

@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 
-import org.jppf.utils.collections.LinkedListSortedMap;
+import org.jppf.utils.collections.*;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -52,14 +52,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    * Comparator for job priority.
    */
-  private static final Comparator<Integer> PRIORITY_COMPARATOR = new Comparator<Integer>() {
-    @Override
-    public int compare(final Integer o1, final Integer o2) {
-      if (o1 == null) return (o2 == null) ? 0 : 1;
-      else if (o2 == null) return -1;
-      return o2.compareTo(o1);
-    }
-  };
+  private static final Comparator<Integer> PRIORITY_COMPARATOR = new DescendingIntegerComparator();
   /**
    * A map of task bundles, ordered by descending priority.
    */

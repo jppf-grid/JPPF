@@ -62,7 +62,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * The list of idle node channels.
    */
-  private final AbstractCollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new AbstractJPPFClient.DescendingIntegerComparator());
+  private final AbstractCollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new DescendingIntegerComparator());
   /**
    * Holds information about the execution context.
    */

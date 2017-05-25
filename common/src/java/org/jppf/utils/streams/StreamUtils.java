@@ -89,11 +89,12 @@ public final class StreamUtils {
    * This method closes both streams before terminating.
    * @param src the input stream to read from.
    * @param dest the output stream to write to.
+   * @return the number of bytes copied.
    * @throws IOException if an I/O error occurs.
    */
-  public static void copyFile(final File src, final File dest) throws IOException {
+  public static long copyFile(final File src, final File dest) throws IOException {
     try (InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) {
-      copyStream(is, os);
+      return copyStream(is, os);
     }
   }
 
@@ -102,10 +103,11 @@ public final class StreamUtils {
    * This method closes both streams before terminating.
    * @param is the input stream to read from.
    * @param os the output stream to write to.
+   * @return the number of bytes copied.
    * @throws IOException if an I/O error occurs.
    */
-  public static void copyStream(final InputStream is, final OutputStream os) throws IOException {
-    copyStream(is, os, true);
+  public static long copyStream(final InputStream is, final OutputStream os) throws IOException {
+    return copyStream(is, os, true);
   }
 
   /**
@@ -114,16 +116,18 @@ public final class StreamUtils {
    * @param is the input stream to read from.
    * @param os the output stream to write to.
    * @param closeStreams <code>true</code> to cause the streams to be closed at the end of the copy, <code>false</code> otherwise.
+   * @return the number of bytes copied.
    * @throws IOException if an I/O error occurs.
    */
-  public static void copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
-    //byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
+  public static long copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
     byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
+    long count = 0L;
     try {
       while(true) {
         int n = is.read(bytes);
         if (n <= 0) break;
         os.write(bytes, 0, n);
+        count += n;
       }
       os.flush();
     } finally {
@@ -136,6 +140,7 @@ public final class StreamUtils {
         }
       }
     }
+    return count;
   }
 
   /**

@@ -62,8 +62,8 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager {
   }
 
   @Override
-  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception {
-    return new JPPFRemoteContainer((RemoteNodeConnection) node.getNodeConnection(), uuidPath, cl);
+  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl, final boolean clientAccess) throws Exception {
+    return new JPPFRemoteContainer((RemoteNodeConnection) node.getNodeConnection(), uuidPath, cl, clientAccess);
   }
 
   @Override

@@ -83,6 +83,7 @@
   <target name="runtime.driver">
     <package-module module="driver">
       <module-elements>
+        <zipfileset dir="${lib}/HikariCP" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node-${version.number}.jar,jppf-server-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar,jppf-server-src-${version.number}.jar"/>

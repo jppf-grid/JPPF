@@ -20,19 +20,16 @@ package test.org.jppf.test.setup;
 
 import java.util.List;
 
-
 /**
  * Used to launch a driver.
  * @author Laurent Cohen
  */
-public class DriverProcessLauncher extends GenericProcessLauncher
-{
+public class DriverProcessLauncher extends GenericProcessLauncher {
   /**
    * Initialize the driver launcher.
    * @param n the id of the driver, used to determine which configuration files to use.
    */
-  public DriverProcessLauncher(final int n)
-  {
+  public DriverProcessLauncher(final int n) {
     super(n, "driver", "classes/tests/config/driver.template.properties", "classes/tests/config/log4j-driver.template.properties");
     setupCommon();
   }
@@ -45,23 +42,23 @@ public class DriverProcessLauncher extends GenericProcessLauncher
    * @param classpath the classpath elements for the driver.
    * @param jvmOptions additional JVM options for the driver.
    */
-  public DriverProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions)
-  {
+  public DriverProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions) {
     super(n, "driver", driverConfig, log4jConfig, classpath, jvmOptions);
+    addClasspathElement("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
     setMainClass("org.jppf.server.JPPFDriver");
   }
 
   /**
    * Perform setup common to all ocnfigurations.
    */
-  private void setupCommon()
-  {
+  private void setupCommon() {
     setMainClass("org.jppf.server.JPPFDriver");
     addClasspathElement("classes/addons");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../server/classes");
     addClasspathElement("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
+    addClasspathElement("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
+    addClasspathElement("lib/h2.jar");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");
-    //addJvmOption("-Xrunjdwp:transport=dt_socket,address=localhost:800" + n +",server=y,suspend=y");
   }
 }

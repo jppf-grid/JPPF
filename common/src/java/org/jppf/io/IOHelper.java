@@ -106,10 +106,21 @@ public final class IOHelper {
    * @throws Exception if an error occurs while reading the data.
    */
   public static DataLocation readData(final InputSource source) throws Exception {
-    int n = source.readInt();
-    if (n == 0) return null;
-    if (traceEnabled) log.trace("read data size = {}", nf.format(n));
-    DataLocation dl = createDataLocationMemorySensitive(n);
+    return readData(source, source.readInt());
+  }
+
+  /**
+   * Read a provider or task data from an input source with a known data size.
+   * The data may be stored in memory or on another medium depending on its size and the available memory.
+   * @param source the input source from which to read the data.
+   * @param size the size of the data to read.
+   * @return A data location containing the data provider or task data.
+   * @throws Exception if an error occurs while reading the data.
+   */
+  public static DataLocation readData(final InputSource source, final int size) throws Exception {
+    if (size <= 0) return null;
+    if (traceEnabled) log.trace("read data size = {}", nf.format(size));
+    DataLocation dl = createDataLocationMemorySensitive(size);
     dl.transferFrom(source, true);
     return dl;
   }

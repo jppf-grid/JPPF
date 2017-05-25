@@ -370,3 +370,7 @@ a.yhd:hover {
 div#bodyContent div h2 {
   margin-top: 0.6em;
 }
+
+.wiki_note {
+  background-color: #FFF990;
+}

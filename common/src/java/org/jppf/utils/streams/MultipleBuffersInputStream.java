@@ -77,7 +77,7 @@ public class MultipleBuffersInputStream extends InputStream {
 
   /**
    * Read a single byte from this input stream.
-   * @return the data to write.
+   * @return the data read.
    * @throws IOException if any error occurs.
    */
   @Override

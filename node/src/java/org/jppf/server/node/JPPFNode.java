@@ -18,7 +18,7 @@
 package org.jppf.server.node;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -30,6 +30,7 @@ import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.SlaveNodeManager;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
 import org.jppf.startup.JPPFNodeStartupSPI;
@@ -238,6 +239,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
     }
     if (isJmxEnabled()) setupBundleParameters(bundle);
+    Map<String, TypedProperties> defMap = bundle.getParameter(BundleParameter.DATASOURCE_DEFINITIONS, null);
+    if (defMap != null) {
+      if (debugEnabled) log.debug("got datasource definitions from server: {}", defMap.keySet());
+      JPPFDatasourceFactory.getInstance().configure(defMap, this.getSystemInformation());
+      bundle.removeParameter(BundleParameter.DATASOURCE_DEFINITIONS);
+    }
   }
 
   /**
@@ -267,8 +274,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
+   * @exclude
    */
-  private synchronized void init() throws Exception {
+  protected synchronized void init() throws Exception {
     checkStopped();
     if (debugEnabled) log.debug("start node initialization");
     initHelper();

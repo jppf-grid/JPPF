@@ -87,7 +87,8 @@ public class ConfigurationHelper {
       TypedProperties props = new TypedProperties();
       reader = FileUtils.getFileReader(templatePath);
       if (reader == null) throw new FileNotFoundException("could not load config file '" + templatePath + '\'');
-      props.load(reader);
+      //props.load(reader);
+      props.loadAndResolve(reader);
       for (Map.Entry<Object, Object> entry : props.entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
           String key = (String) entry.getKey();
@@ -153,7 +154,8 @@ public class ConfigurationHelper {
     Reader reader = null;
     try {
       reader = new BufferedReader(new FileReader(path));
-      properties.load(reader);
+      //properties.load(reader);
+      properties.loadAndResolve(reader);
     } catch (Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);

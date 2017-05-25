@@ -83,10 +83,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   public MultipleBuffersLocation(final List<JPPFBuffer> buffers) {
     this.list = buffers;
     this.size = 0;
-    for (JPPFBuffer buf : buffers) {
-      this.list.add(buf);
-      this.size += buf.length;
-    }
+    for (JPPFBuffer buf : buffers) this.size += buf.length;
   }
 
   /**
@@ -238,10 +235,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
         log.error(e.getMessage(), e);
       }
     }
-    if (traceEnabled) {
-      log.trace("count/size=" + count + '/' + size + ", n/remaining=" + n + '/' + remaining + ", currentBufferIndex/listSize=" + currentBufferIndex + '/' + list.size() + ", pos=" + currentBuffer.pos
-          + " (" + this + ')');
-    }
+    if (traceEnabled) log.trace(String.format("count/size=%d/%d, n/remaining=%d/%d, currentBufferIndex/listSize=%d/%d, pos=%d (%s)",
+      count, size, n, remaining, currentBufferIndex, list.size(), currentBuffer.pos, this));
     if (n > 0) {
       count += n;
       if (n < remaining) currentBuffer.pos += n;
@@ -270,9 +265,17 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
 
   @Override
   public DataLocation copy() {
-    List<JPPFBuffer> copyList = new ArrayList<>();
-    for (JPPFBuffer buf : list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));
-    return new MultipleBuffersLocation(copyList, size);
+    return new MultipleBuffersLocation(copyList(), size);
+  }
+
+  /**
+   * Make a shallow copy of the list of buffers. The internal byte[] are not copied, they are merely referenced.
+   * @return a list of {@link JPPFBuffer} instances.
+   */
+  private List<JPPFBuffer> copyList() {
+    List<JPPFBuffer> copy = new ArrayList<>();
+    for (JPPFBuffer buf : list) copy.add(new JPPFBuffer(buf.buffer, buf.length));
+    return copy;
   }
 
   /**
