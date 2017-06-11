@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
 import org.jppf.client.event.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
@@ -58,6 +59,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * The bundler factory.
    */
   private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT);
+  /**
+   * The latest load-balancing information.
+   */
+  private LoadBalancingInformation currentLoadBalancingInformation;
+  /**
+   * Synchronization lock.
+   */
+  private final Object loadBalancingInformationLock = new Object();
   /**
    * Task that dispatches queued jobs to available nodes.
    */
@@ -113,6 +122,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (client == null) throw new IllegalArgumentException("client is null");
     this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
     this.queue = new JPPFPriorityQueue(this);
+    currentLoadBalancingInformation = bundlerFactory.getCurrentInfo();
     taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
       @Override
@@ -162,7 +172,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       /*
       if (status.isTerminatedStatus()) updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, status);
       else updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
-      */
+       */
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);
@@ -455,6 +465,29 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     synchronized(allConnections) {
       for (ChannelWrapper channel: allConnections) channel.close();
       allConnections.clear();
+    }
+  }
+
+  @Override
+  public LoadBalancingInformation getLoadBalancerSettings() {
+    synchronized(loadBalancingInformationLock) {
+      if (currentLoadBalancingInformation == null) {
+        LoadBalancingInformation info = bundlerFactory.getCurrentInfo();
+        List<String> algorithmsList = bundlerFactory.getBundlerProviderNames();
+        currentLoadBalancingInformation =  new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), algorithmsList);
+      }
+      return currentLoadBalancingInformation;
+    }
+  }
+
+  @Override
+  public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception {
+    if (algorithm == null) throw new IllegalArgumentException("Error: no algorithm specified (null value)");
+    if (!bundlerFactory.getBundlerProviderNames().contains(algorithm)) throw new IllegalArgumentException("Error: unknown algorithm '" + algorithm + '\'');
+    TypedProperties props = (parameters== null) ? new TypedProperties() : new TypedProperties(parameters);
+    synchronized(loadBalancingInformationLock) {
+      LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
+      currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
   }
 }
