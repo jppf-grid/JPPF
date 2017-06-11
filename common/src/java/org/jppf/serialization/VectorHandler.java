@@ -18,7 +18,7 @@
 
 package org.jppf.serialization;
 
-import java.util.Vector;
+import java.util.*;
 
 import org.slf4j.*;
 
@@ -46,7 +46,8 @@ public class VectorHandler extends AbstractSerializationHandler {
       serializer.currentClassDescriptor = cd;
       synchronized(vector) {
         serializer.writeInt(vector.size());
-        for (Object o: vector) serializer.writeObject(o);
+        List<Object> list = new ArrayList<>(vector);
+        for (Object o: list) serializer.writeObject(o);
       }
     } finally {
       serializer.currentClassDescriptor = tmpDesc;
