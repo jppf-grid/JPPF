@@ -18,9 +18,10 @@
 
 package org.jppf.client;
 
-import java.util.Vector;
+import java.util.*;
 
 import org.jppf.client.event.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 
 /**
  * Interface for an asynchronous job submission manager.
@@ -97,4 +98,18 @@ public interface JobManager {
    * @throws Exception if any error occurs.
    */
   boolean cancelJob(String jobId) throws Exception;
+
+  /**
+   * Get the current load-balancer settings.
+   * @return a {@link LoadBalancingInformation} instance, which encapsulates a load-balancing alfgorithm name, along with its parameters.
+   */
+  public LoadBalancingInformation getLoadBalancerSettings();
+
+  /**
+   * Change the load balancer settings for the client.
+   * @param algorithm the name of load-balancing alogrithm to use.
+   * @param parameters the algorithm's parameters, if any. The parmeter names are assumed no to be prefixed.
+   * @throws Exception if any error occurs or if the algorithm name is {@code null} or not known.
+   */
+  public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception;
 }

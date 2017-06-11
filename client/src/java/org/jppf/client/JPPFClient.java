@@ -23,6 +23,7 @@ import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.discovery.ClientDriverDiscovery;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -330,5 +331,27 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public void removeDriverDiscovery(final ClientDriverDiscovery discovery) {
     discoveryHandler.removeDiscovery(discovery);
+  }
+
+  /**
+   * Get the current load-balancer settings.
+   * @return a {@link LoadBalancingInformation} instance, which encapsulates a load-balancing alfgorithm name, along with its parameters.
+   * @since 5.2.7
+   */
+  public LoadBalancingInformation getLoadBalancerSettings() {
+    JobManager manager = getJobManager();
+    return (manager == null) ? null : manager.getLoadBalancerSettings();
+  }
+
+  /**
+   * Change the load balancer settings.
+   * @param algorithm the name of load-balancing alogrithm to use.
+   * @param parameters the algorithm's parameters, if any. The parmeter names are assumed no to be prefixed.
+   * @throws Exception if any error occurs or if the algorithm name is {@code null} or not known.
+   * @since 5.2.7
+   */
+  public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception {
+    JobManager manager = getJobManager();
+    if (manager != null) manager.setLoadBalancerSettings(algorithm, parameters);
   }
 }

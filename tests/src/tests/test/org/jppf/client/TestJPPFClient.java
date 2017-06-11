@@ -24,11 +24,15 @@ import static org.junit.Assert.*;
 import java.io.NotSerializableException;
 import java.lang.management.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
 import org.jppf.job.JobEventType;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
@@ -250,6 +254,75 @@ public class TestJPPFClient extends Setup1D1N {
   }
 
   /**
+   * Test that new load-balancing settings are applied as expected.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testChangeLoadBalancerSettings() throws Exception {
+    MyJobListener listener = null;
+    JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true);
+    int nbTasks = 20;
+    try (JPPFClient client = new JPPFClient()) {
+      client.awaitWorkingConnectionPool();
+      // try with "manual" algo
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      job.addJobListener(listener = new MyJobListener());
+      job.getClientSLA().setMaxChannels(10);
+      TypedProperties props = new TypedProperties().setInt("size", 1);
+      client.setLoadBalancerSettings("manual", props);
+      client.submitJob(job);
+      assertEquals(nbTasks, listener.dispatchCount.get());
+      assertEquals(nbTasks, listener.tasksPerDispatch.size());
+      for (int i=1; i<=listener.tasksPerDispatch.size(); i++) {
+        Integer n = listener.tasksPerDispatch.get(i);
+        assertNotNull(n);
+        assertEquals(1, n.intValue());
+      }
+      // try with "proportional" algo
+      job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "2", true, false, nbTasks, LifeCycleTask.class, 10L);
+      job.addJobListener(listener = new MyJobListener());
+      job.getClientSLA().setMaxChannels(10);
+      props = new TypedProperties().setInt("initialSize", 5).setInt("proportionalityFactor", 1);
+      client.setLoadBalancerSettings("proportional", props);
+      client.submitJob(job);
+      assertTrue(listener.dispatchCount.get() >= 3);
+      assertTrue(listener.tasksPerDispatch.size() >= 3);
+      for (int i=1; i<=listener.tasksPerDispatch.size(); i++) assertNotNull(listener.tasksPerDispatch.get(i));
+      assertEquals(5, listener.tasksPerDispatch.get(1).intValue());
+      assertEquals(5, listener.tasksPerDispatch.get(2).intValue());
+    } finally {
+      JPPFConfiguration.reset();
+    }
+  }
+
+  /**
+   * Test that the last load-balancing settings can be retrieved.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testGetLoadBalancerSettings() throws Exception {
+    JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true);
+    try (JPPFClient client = new JPPFClient()) {
+      client.awaitWorkingConnectionPool();
+      // try with "manual" algo
+      TypedProperties props = new TypedProperties().setInt("size", 2);
+      client.setLoadBalancerSettings("manual", props);
+      LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+      assertEquals("manual", lbi.getAlgorithm());
+      assertEquals(2, lbi.getParameters().getInt("size"));
+      // try with "proportional" algo
+      props = new TypedProperties().setInt("initialSize", 5).setInt("proportionalityFactor", 1);
+      client.setLoadBalancerSettings("proportional", props);
+      lbi = client.getLoadBalancerSettings();
+      assertEquals("proportional", lbi.getAlgorithm());
+      assertEquals(5, lbi.getParameters().getInt("initialSize"));
+      assertEquals(1, lbi.getParameters().getInt("proportionalityFactor"));
+    } finally {
+      JPPFConfiguration.reset();
+    }
+  }
+
+  /**
    * A task that checks the current thread context class loader during its execution.
    */
   public static class ThreadContextClassLoaderTask extends AbstractTask<String> {
@@ -268,6 +341,20 @@ public class TestJPPFClient extends Setup1D1N {
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
       setResult(cl.toString());
+    }
+  }
+
+  /** */
+  static class MyJobListener extends JobListenerAdapter {
+    /** */
+    AtomicInteger dispatchCount = new AtomicInteger(0);
+    /** */
+    ConcurrentHashMap<Integer, Integer> tasksPerDispatch = new ConcurrentHashMap<>();
+
+    @Override
+    public void jobDispatched(final JobEvent event) {
+      int n = dispatchCount.incrementAndGet();
+      tasksPerDispatch.put(n, event.getJobTasks().size());
     }
   }
 }
