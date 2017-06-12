@@ -1,0 +1,2 @@
+org.jppf.serialization.ZLIBSerialization
+org.jppf.serialization.LZ4Serialization
