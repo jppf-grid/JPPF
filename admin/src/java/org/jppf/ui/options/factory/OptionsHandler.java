@@ -212,11 +212,6 @@ public final class OptionsHandler {
       if (option.isPersistent()) {
         Object value = option.getValue();
         String s = String.valueOf(value);
-        /*
-        String s = null;
-        if (value instanceof Number) s = NumberFormat.getInstance().format(value);
-        else s = String.valueOf(value);
-        */
         prefs.put(option.getName(), s);
         if (traceEnabled) log.trace("persisted option {}, value={}", option, s);
       }
@@ -272,10 +267,7 @@ public final class OptionsHandler {
       OptionContainer page = (OptionContainer) elt;
       for (OptionElement child: page.getChildren()) {
         OptionNode childNode = buildPersistenceGraph(child);
-        if (childNode != null) {
-          if (node == null) node = new OptionNode(elt);
-          node.children.add(childNode);
-        }
+        if (childNode != null) node.children.add(childNode);
       }
     } else if (elt instanceof AbstractOption) {
       if (((AbstractOption) elt).isPersistent()) node = new OptionNode(elt);

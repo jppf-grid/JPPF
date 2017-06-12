@@ -21,7 +21,7 @@ package test.org.jppf.serialization;
 import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
-import java.util.Arrays;
+import java.util.*;
 
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.ObjectSerializerImpl;

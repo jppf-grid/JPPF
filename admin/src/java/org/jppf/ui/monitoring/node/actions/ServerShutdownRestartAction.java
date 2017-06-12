@@ -158,10 +158,6 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
             log.error(e.getMessage(), e);
           }
         }
-        /*
-        OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
-        OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
-        */
       }
     };
     runAction(r);
