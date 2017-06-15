@@ -106,9 +106,19 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testSimpleJob(final ExecutionPolicy policy) throws Exception {
-    BaseTest.printOut("driver load balancing config: %s%n", BaseSetup.getJMXConnection().loadBalancerInformation());
+    testSimpleJob(policy, "n");
+  }
+
+  /**
+   * Test that a simple job is normally executed.
+   * @param policy the client execution policy to set onto the job, may be null.
+   * @param nodePrefix the prefix for the node uuid.
+   * @throws Exception if any error occurs
+   */
+  protected void testSimpleJob(final ExecutionPolicy policy, final String nodePrefix) throws Exception {
+    System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection(client).loadBalancerInformation());
     int tasksPerNode = 5;
-    int nbNodes = BaseSetup.nbNodes();
+    int nbNodes = getNbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 250L);
@@ -126,10 +136,10 @@ public class AbstractNonStandardSetup extends BaseTest {
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
     }
-    BaseTest.printOut("%s map = %s", name, CollectionUtils.prettyPrint(map));
+    BaseTest.printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
-      String key = "n" + (i+1);
+      String key = nodePrefix + (i+1);
       assertTrue(map.containsKey(key));
       assertEquals(tasksPerNode, map.getValues(key).size());
     }
@@ -141,7 +151,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testMultipleJobs() throws Exception {
     int tasksPerNode = 5;
-    int nbNodes = BaseSetup.nbNodes();
+    int nbNodes = getNbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     int nbJobs = 3;
     try {
@@ -176,7 +186,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testCancelJob() throws Exception {
     int tasksPerNode = 5;
-    int nbNodes = BaseSetup.nbNodes();
+    int nbNodes = getNbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
     client.submitJob(job);
@@ -200,7 +210,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testNotSerializableExceptionFromNode() throws Exception {
     int tasksPerNode = 5;
-    int nbNodes = BaseSetup.nbNodes();
+    int nbNodes = getNbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
     List<Task<?>> results = client.submitJob(job);
@@ -220,7 +230,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testNotSerializableWorkingInNode() throws Exception {
     int tasksPerNode = 5;
-    int nbNodes = BaseSetup.nbNodes();
+    int nbNodes = getNbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
     List<Task<?>> results = client.submitJob(job);
@@ -250,7 +260,7 @@ public class AbstractNonStandardSetup extends BaseTest {
       try {
         Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
         assertNotNull(result);
-        assertEquals(BaseSetup.nbNodes(), result.size());
+        assertEquals(getNbNodes(), result.size());
         for (Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
         ready = true;
       } catch (@SuppressWarnings("unused") Exception|AssertionError e) {
@@ -279,5 +289,12 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }, 5000L, true);
     }
+  }
+
+  /**
+   * @return the number of nodes in the topology.
+   */
+  protected int getNbNodes() {
+    return BaseSetup.nbNodes();
   }
 }

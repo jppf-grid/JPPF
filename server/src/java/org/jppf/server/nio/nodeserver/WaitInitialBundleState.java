@@ -224,6 +224,8 @@ class WaitInitialBundleState extends NodeServerState {
       SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
       SocketChannel ch = (SocketChannel) skw.getChannel().channel();
       return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
+    } else if (channel.isLocal()) {
+      return "localhost";
     }
     return null;
   }
