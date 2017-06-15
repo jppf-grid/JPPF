@@ -18,6 +18,9 @@
 
 package org.jppf.utils;
 
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jppf.JPPFTimeoutException;
 
 /**
@@ -93,6 +96,52 @@ public final class ConcurrentUtils {
   }
 
   /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   * @throws JPPFTimeoutException if the timeout expires.
+   */
+  public static boolean awaitInterruptibleCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout)
+    throws IllegalArgumentException, JPPFTimeoutException {
+    if (condition == null) return true;
+    if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    final long timeout = millis > 0L ? millis : Long.MAX_VALUE;
+    final CountDownLatch countDown = new CountDownLatch(1);
+    final ThreadSynchronization monitor = new ThreadSynchronization() { };
+    final AtomicBoolean fulfilled = new AtomicBoolean(false);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        boolean interrupted = false;
+        synchronized(monitor) {
+          try {
+            while (!condition.evaluate() && !(interrupted = Thread.interrupted())) monitor.wait(1L);
+          } catch (Exception e) {
+            interrupted = true;
+          }
+          countDown.countDown();
+          fulfilled.set(!interrupted);
+        }
+      }
+    };
+    Thread thread = new Thread(r);
+    thread.start();
+    try {
+      countDown.await(timeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      thread.interrupt();
+      countDown.countDown();
+    }
+    if (fulfilled.get()) return true;
+    if (throwExceptionOnTImeout) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", timeout));
+    return false;
+  }
+
+  /**
    * Wait until the specified condition is fulfilled.
    * @param condition the condition to check.
    * @return true whenever the condition is {@code null} or gets fulfilled, {@code false} otherwise.
@@ -104,7 +153,7 @@ public final class ConcurrentUtils {
   /**
    * This interface represents a condition to evaluate to either {@code true} or {@code false}.
    */
-  public interface Condition {
+  public static interface Condition {
     /**
      * Evaluate this condition.
      * @return {@code true} if the condition is fulfilled, {@code false} otherwise.
