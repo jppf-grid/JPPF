@@ -56,7 +56,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
         return false;
       }
     };
-    assertTrue(ConcurrentUtils.awaitInterruptibleCondition(cond, 5_000L, true));
+    assertTrue(ConcurrentUtils.awaitInterruptibleCondition(cond, 10_000L, true));
   }
 
   @Override
@@ -93,7 +93,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
    * Test there there are 2 distinct connection pools, with 1 driver connection each.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = 10000)
   public void testServerConnections() throws Exception {
     List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
