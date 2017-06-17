@@ -21,6 +21,7 @@ package test.org.jppf.server;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -45,6 +46,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
     Configuration config = createConfig("localnode");
     config.driverLog4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
+    final AtomicReference<Exception> ref = new AtomicReference<>(null);
     ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
       @Override
       public boolean evaluate() {
@@ -52,11 +54,18 @@ public class TestLocalNode extends AbstractNonStandardSetup {
           JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
           return jmx.nbNodes() > 0;
         } catch (Exception e) {
+          ref.set(e);
         }
         return false;
       }
     };
-    assertTrue(ConcurrentUtils.awaitInterruptibleCondition(cond, 10_000L, true));
+    try {
+      print(false, false, "before wait for interruptible condition");
+      assertTrue(ConcurrentUtils.awaitInterruptibleCondition(cond, 10_000L, true));
+    } finally {
+      if (ref.get() != null) print(false, false, "last exception from condition: %s", ExceptionUtils.getStackTrace(ref.get()));
+      else print(false, false, "wait for interruptible condition successful");
+    }
   }
 
   @Override

@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.client.TestJPPFClient;
+import test.org.jppf.server.TestLocalNode;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 
@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=20, shuffleClasses=false, shuffleMethods=true, classes = { TestJPPFClient.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true, classes = { TestLocalNode.class })
 public class JPPFSuite {
 }

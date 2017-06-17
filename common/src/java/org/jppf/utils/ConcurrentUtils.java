@@ -116,15 +116,15 @@ public final class ConcurrentUtils {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        boolean interrupted = false;
+        boolean ok = false;
         synchronized(monitor) {
           try {
-            while (!condition.evaluate() && !(interrupted = Thread.interrupted())) monitor.wait(1L);
+            while (!(ok = condition.evaluate())) monitor.wait(1L);
           } catch (Exception e) {
-            interrupted = true;
+            ok = false;
           }
+          fulfilled.set(ok);
           countDown.countDown();
-          fulfilled.set(!interrupted);
         }
       }
     };
