@@ -389,6 +389,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String[]> JOB_PERSISTENCE = new StringArrayProperty("jppf.job.persistence", " ", new String[] {DefaultFilePersistence.class.getName()});
   /** Whether object graphs should be serialized or deserialized sequentially instead of in parallel */
   public static final JPPFProperty<Boolean> SEQUENTIAL_SERIALiZATION = new BooleanProperty("jppf.sequential.serialization", false, "jppf.sequential.deserialization");
+  /** Whether bias towards local node for scheduling is enabled in the driver */
+  public static final JPPFProperty<Boolean> LOCAL_NODE_BIAS = new BooleanProperty("jppf.local.node.bias", true);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 
