@@ -48,6 +48,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * Determines whether DEBUG logging level is enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Whether bias towards local node is enabled.
+   */
+  private final boolean localNodeBiasEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.node.bias", true);
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -244,7 +248,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           if (debugEnabled) log.debug(String.format("nodeUuid=%s, readyJobUuid=%s, jobUuid=%s, b=%b", channel.getUuid(), readyJobUuid, job.getUuid(), b));
           if (!b && (nbReservedNodes >= sla.getMaxNodes())) continue;
         }
-        if (channel.isLocal()) { // add a bias toward local node
+        if (channel.isLocal() && localNodeBiasEnabled) { // add a bias toward local node
           if (desiredConfiguration != null) continue;
           else return channel;
         }
