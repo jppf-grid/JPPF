@@ -23,8 +23,9 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.node.policy.Equal;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
@@ -37,6 +38,9 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * @author Laurent Cohen
  */
 public class TestMultiServer extends AbstractNonStandardSetup {
+  /** */
+  private static final int TIMEOUT = 10_000;
+
   /**
    * Launches 2 drivers with 1 node attached to each and start the client.
    * @throws Exception if a process could not be started.
@@ -99,7 +103,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    * Test there there are 2 distinct connection pools, with 1 driver connection each.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = 10000)
   public void testServerConnections() throws Exception {
     List<JPPFConnectionPool> pools = client.getConnectionPools();
     Collections.sort(pools, new Comparator<JPPFConnectionPool>() {
@@ -125,5 +129,32 @@ public class TestMultiServer extends AbstractNonStandardSetup {
         assertTrue(c.getStatus().isWorkingStatus());
       }
     }
+  }
+
+  /**
+   * Test that the topology monuitoring API detects the peer conenctions.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = TIMEOUT)
+  public void testTopologyMonitoring() throws Exception {
+    while (client.awaitConnectionPools(Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING).size() != 2) Thread.sleep(10L);
+    final TopologyManager mgr = new TopologyManager(client);
+    ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
+      @Override
+      public boolean evaluate() {
+        List<TopologyDriver> drivers = mgr.getDrivers();
+        if ((drivers != null) && (drivers.size() == 2)) {
+          for (TopologyDriver driver: drivers) {
+            List<TopologyPeer> peers = driver.getPeers();
+            if ((peers == null) || (peers.size() != 1)) return false;
+          }
+          return true;
+        }
+        return false;
+      }
+    };
+    do {
+      Thread.sleep(50L);
+    } while (!cond.evaluate());
   }
 }

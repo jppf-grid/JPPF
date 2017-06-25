@@ -204,7 +204,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @return {@code true} if node has a working JMX connection, {@code false} otherwise.
    */
   private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx) {
-    if (ctx.isPeer()) return false;
+    if (ctx.isPeer()) return true;
     JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
     return (jmx != null) && jmx.isConnected();
   }
