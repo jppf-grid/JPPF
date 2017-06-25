@@ -58,7 +58,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * The bundler factory.
    */
-  private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT);
+  private final JPPFBundlerFactory bundlerFactory;
   /**
    * The latest load-balancing information.
    */
@@ -122,6 +122,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (client == null) throw new IllegalArgumentException("client is null");
     this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
     this.queue = new JPPFPriorityQueue(this);
+    this.bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT, client.getConfig());
     currentLoadBalancingInformation = bundlerFactory.getCurrentInfo();
     taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
