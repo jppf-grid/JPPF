@@ -105,19 +105,25 @@ public class JPPFBundlerFactory {
    * The fallback bundler.
    */
   private final Bundler<?> fallback = createFallbackBundler();
+  /**
+   * The configuration used to extract the load-balancer settings.
+   */
+  private final TypedProperties config;
 
   /**
    * Default constructor.
    */
   public JPPFBundlerFactory() {
-    this(Defaults.SERVER);
+    this(Defaults.SERVER, JPPFConfiguration.getProperties());
   }
 
   /**
    * Default constructor.
    * @param def the default values to use if nothing is specified in the JPPF configuration.
+   * @param config he configuration used to extract the load-balancer settings.
    */
-  public JPPFBundlerFactory(final Defaults def) {
+  public JPPFBundlerFactory(final Defaults def, final TypedProperties config) {
+    this.config = config;
     defaultConfig = def;
     loadProviders();
     algorithmNames = Collections.unmodifiableList(new ArrayList<>(providerMap.keySet()));
@@ -143,7 +149,6 @@ public class JPPFBundlerFactory {
    * @return the created {@link LoadBalancingInformation} instance.
    */
   public LoadBalancingInformation updateCurrentConfiguration() {
-    TypedProperties config = JPPFConfiguration.getProperties();
     String algorithm = config.getString(JPPFProperties.LOAD_BALANCING_ALGORITHM.getName(), null);
     if (algorithm == null) algorithm = defaultConfig.config().get(JPPFProperties.LOAD_BALANCING_ALGORITHM);
     String profileName = config.getString(JPPFProperties.LOAD_BALANCING_PROFILE.getName(), null);
