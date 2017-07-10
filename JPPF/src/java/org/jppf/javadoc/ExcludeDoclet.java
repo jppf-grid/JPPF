@@ -32,8 +32,7 @@ import com.sun.tools.javadoc.Main;
  * <a href="http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html">http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html</a>.
  * @author Laurent Cohen
  */
-public class ExcludeDoclet
-{
+public class ExcludeDoclet {
   /**
    * Name of the javadoc tag processed by this doclet.
    */
@@ -43,8 +42,7 @@ public class ExcludeDoclet
    * Entry point for this doclet.
    * @param args the command line options.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     String name = ExcludeDoclet.class.getName();
     Main.execute(name, name, args);
   }
@@ -57,8 +55,7 @@ public class ExcludeDoclet
    * @return true if the options are valid, false otherwise.
    * @throws java.io.IOException if an I/O exception occurs while processing the options.
    */
-  public static boolean validOptions(final String[][] options, final DocErrorReporter reporter) throws java.io.IOException
-  {
+  public static boolean validOptions(final String[][] options, final DocErrorReporter reporter) throws java.io.IOException {
     return Standard.validOptions(options, reporter);
   }
 
@@ -68,8 +65,7 @@ public class ExcludeDoclet
    * @param option the option to check.
    * @return the expected number of arguments for the option.
    */
-  public static int optionLength(final String option)
-  {
+  public static int optionLength(final String option) {
     return Standard.optionLength(option);
   }
 
@@ -80,8 +76,7 @@ public class ExcludeDoclet
    * @return true if javadoc generation was succesful, false otherwise.
    * @throws java.io.IOException if an I/O exception occurs while generating the javadoc.
    */
-  public static boolean start(final RootDoc root) throws java.io.IOException
-  {
+  public static boolean start(final RootDoc root) throws java.io.IOException {
     return Standard.start((RootDoc) process(root, RootDoc.class));
   }
 
@@ -89,8 +84,7 @@ public class ExcludeDoclet
    * Enable Java 1.5 language features.
    * @return <code>LanguageVersion.JAVA_1_5</code>.
    */
-  public static LanguageVersion languageVersion()
-  {
+  public static LanguageVersion languageVersion() {
     return LanguageVersion.JAVA_1_5;
   }
 
@@ -100,10 +94,8 @@ public class ExcludeDoclet
    * @param doc the element to check for eclude tag.
    * @return true if the element should be excluded, false otherwise.
    */
-  private static boolean exclude(final Doc doc)
-  {
-    if (doc instanceof ProgramElementDoc)
-    {
+  private static boolean exclude(final Doc doc) {
+    if (doc instanceof ProgramElementDoc) {
       if (((ProgramElementDoc) doc).containingPackage().tags(TAG_NAME).length > 0) return true;
     }
     return doc.tags(TAG_NAME).length > 0;
@@ -115,31 +107,23 @@ public class ExcludeDoclet
    * @param expect the expected class of the element.
    * @return a proxy to the element to process, if the element is a javadoc element (implementing the <code>Doc</code> interface).
    */
-  private static Object process(final Object obj, final Class<?> expect)
-  {
+  private static Object process(final Object obj, final Class<?> expect) {
     if (obj == null) return null;
     Class<?> cls = obj.getClass();
-    if (cls.getName().startsWith("com.sun."))
-    {
+    if (cls.getName().startsWith("com.sun.")) {
       return Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), new ExcludeHandler(obj));
-    }
-    else if (obj instanceof Object[])
-    {
+    } else if (obj instanceof Object[]) {
       Class<?> componentType = expect.getComponentType();
       Object[] array = (Object[]) obj;
       List<Object> list = new ArrayList<>(array.length);
-      for (int i = 0; i < array.length; i++)
-      {
+      for (int i = 0; i < array.length; i++) {
         Object entry = array[i];
         if ((entry instanceof Doc) && exclude((Doc) entry)) continue;
         list.add(process(entry, componentType));
       }
-      try
-      {
+      try {
         return list.toArray((Object[]) Array.newInstance(componentType, list.size()));
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         System.err.println(e.getClass().getName() + (e.getMessage() == null ? "" : ": " + e.getMessage()) + " for obj=" + obj + ", expect=" + expect);
         return null;
       }
@@ -150,8 +134,7 @@ public class ExcludeDoclet
   /**
    * Invocation handler used by dynamic proxies generated for javadoc elements processing.
    */
-  private static class ExcludeHandler implements InvocationHandler
-  {
+  private static class ExcludeHandler implements InvocationHandler {
     /**
      * The actual javadoc element.
      */
@@ -161,28 +144,21 @@ public class ExcludeDoclet
      * Initialize this invocation handler with the specified javadoc element.
      * @param target the actual javadoc element to process.
      */
-    public ExcludeHandler(final Object target)
-    {
+    public ExcludeHandler(final Object target) {
       this.target = target;
     }
 
     @Override
-    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-    {
-      if (args != null)
-      {
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+      if (args != null) {
         String methodName = method.getName();
-        if (methodName.equals("compareTo") || methodName.equals("equals") || methodName.equals("overrides") || methodName.equals("subclassOf"))
-        {
+        if (methodName.equals("compareTo") || methodName.equals("equals") || methodName.equals("overrides") || methodName.equals("subclassOf")) {
           args[0] = unwrap(args[0]);
         }
       }
-      try
-      {
+      try {
         return process(method.invoke(target, args), method.getReturnType());
-      }
-      catch (InvocationTargetException e)
-      {
+      } catch (InvocationTargetException e) {
         throw e.getTargetException();
       }
     }
@@ -192,8 +168,7 @@ public class ExcludeDoclet
      * @param proxy a dynamic proxy to the element.
      * @return the actual javadoc element to process.
      */
-    private Object unwrap(final Object proxy)
-    {
+    private Object unwrap(final Object proxy) {
       if (proxy instanceof Proxy) return ((ExcludeHandler) Proxy.getInvocationHandler(proxy)).target;
       return proxy;
     }
