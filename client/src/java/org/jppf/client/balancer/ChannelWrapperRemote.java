@@ -170,7 +170,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
     /**
      * Initialize this runnable for remote execution.
-     * @param clientBundle     the execution to perform.
+     * @param clientBundle  the execution to perform.
      * @param connection the connection to the driver to use.
      */
     public RemoteRunnable(final ClientTaskBundle clientBundle, final JPPFClientConnectionImpl connection) {
@@ -182,7 +182,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
-      String uuid = clientBundle.getClientJob().getUuid();
       try {
         long start = System.nanoTime();
         int count = 0;

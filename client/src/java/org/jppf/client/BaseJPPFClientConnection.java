@@ -240,7 +240,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
       Thread.currentThread().setContextClassLoader(loader);
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      //ObjectSerializer ser = makeHelper(loader, helperClassName).getSerializer();
       bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
       int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);

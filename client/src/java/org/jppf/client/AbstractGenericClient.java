@@ -362,9 +362,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void close(final boolean reset) {
-    if (closed.get()) return;
-    if (debugEnabled) log.debug("closing JPPF client");
-    closed.set(true);
+    log.info("closing JPPF client with uuid={}, PID={}", getUuid(), SystemUtils.getPID());
+    if (!closed.compareAndSet(false, true)) return;
     if (debugEnabled) log.debug("closing discovery handler");
     discoveryListener.close();
     discoveryHandler.stop();
