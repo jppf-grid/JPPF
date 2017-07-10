@@ -65,7 +65,7 @@
 	<!--                                    Init                                   -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
  		<!--<mkdir dir="${classes.dir}"/>-->
 	</target>
 
@@ -110,7 +110,7 @@
 	<!--                     Run the sample application                            -->
 	<!-- ========================================================================= -->
 
-	<target name="run">
+	<target name="run" description="Run the sample application">
 		<echo message="Running the Node Life Cycle sample application"/>
 		<java fork="yes" classname="org.jppf.example.nodelifecycle.client.DBRunner" classpathref="project.classpath">
 			<jvmarg value="-server"/>
@@ -124,7 +124,7 @@
 	<!--      Create the H2 database and table (DB server must be started)         -->
 	<!-- ========================================================================= -->
 
-	<target name="reset.db">
+	<target name="reset.db" description="Reset the database">
 		<echo message="Deleting the database file"/>
 		<delete file="${db.dir}/jppf_samples.h2.db" quiet="true"/>
 		<parallel>
