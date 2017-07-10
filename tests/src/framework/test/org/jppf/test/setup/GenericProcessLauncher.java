@@ -341,7 +341,8 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * @throws IOException if the process fails to start.
    */
   public void startProcess() throws IOException {
-    startDriverSocket();
+    int processPort = startDriverSocket();
+    if (debugEnabled) log.debug("process port = {}", processPort);
     List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
@@ -372,8 +373,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
         System.err.print(formatPrologue() + event.getContent());
       }
     });
-    wrapper.setProcess(builder.start());
-    process = wrapper.getProcess();
+    wrapper.setProcess(process = builder.start());
     if (debugEnabled) log.debug(name + "starting process " + process);
   }
 
@@ -417,27 +417,49 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    */
   protected int startDriverSocket() {
     try {
-      if (processServer == null) processServer = new ServerSocket(0);
+      processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
-      Runnable r = new Runnable() {
+      /** */
+      class MyRunnable extends ThreadSynchronization implements Runnable {
+        /** */
+        private boolean started = false;
+
         @Override
         public void run() {
           try {
+            synchronized(this) {
+              started = true;
+              wakeUp();
+            }
             socketClient = new SocketClient(processServer.accept());
             int n = socketClient.readInt();
             if (n == -1) throw new EOFException();
-          } catch(Exception ioe) {
-            if (debugEnabled) log.debug(name, ioe);
+          } catch(Exception e) {
+            if (debugEnabled) log.debug(name, e);
             if (socketClient != null) StreamUtils.closeSilent(socketClient);
+            if (processServer != null) {
+              StreamUtils.closeSilent(processServer);
+              processServer = null;
+            }
           }
         }
+
+        /** */
+        public synchronized void await() {
+          if (started) return;
+          goToSleep();
+        }
       };
+      MyRunnable r = new MyRunnable();
       Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
+      r.await();
     } catch(@SuppressWarnings("unused") Exception e) {
-      if (processServer != null) StreamUtils.closeSilent(processServer);
-      processServer = null;
+      if (processServer != null) {
+        StreamUtils.closeSilent(processServer);
+        processServer = null;
+      }
     }
     return processPort;
   }

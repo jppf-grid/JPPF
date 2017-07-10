@@ -41,86 +41,48 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean, AutoCloseable {
-  /**
-   * Logger for this class.
-   */
+  /** Logger for this class. */
   private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
+  /** Determines whether debug log statements are enabled. */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Prefix for the name given to the connection thread.
-   */
+  /** Prefix for the name given to the connection thread. */
   public static String CONNECTION_NAME_PREFIX = "jmx@";
-  /**
-   * The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout.
-   */
+  /** The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout. */
   private static final long CONNECTION_TIMEOUT = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_CONNECTION_TIMEOUT);
-  /**
-   * URL of the MBean server, in a JMX-compliant format.
-   */
+  /** URL of the MBean server, in a JMX-compliant format. */
   protected JMXServiceURL url = null;
-  /**
-   * The JMX client.
-   */
+  /** The JMX client. */
   protected JMXConnector jmxc = null;
-  /**
-   * A connection to the MBean server.
-   */
+  /** A connection to the MBean server. */
   protected AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<>(null);
-  /**
-   * The host the server is running on.
-   */
+  /** The host the server is running on. */
   protected String host = null;
-  /**
-   * The RMI port used by the server.
-   */
+  /** The RMI port used by the server. */
   protected int port = 0;
-  /**
-   * The connection thread that performs the connection to the management server.
-   */
+  /** The connection thread that performs the connection to the management server. */
   protected AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<>(null);
-  /**
-   * A string representing this connection, used for logging purposes.
-   */
+  /** A string representing this connection, used for logging purposes. */
   protected String idString = null;
-  /**
-   * A string representing this connection, used for displaying in the admin conosle.
-   */
+  /** A string representing this connection, used for displaying in the admin conosle. */
   protected String displayName = null;
-  /**
-   * Determines whether the connection to the JMX server has been established.
-   */
+  /** Determines whether the connection to the JMX server has been established. */
   protected AtomicBoolean connected = new AtomicBoolean(false);
-  /**
-   * Determines whether this connection has been closed by a all to the {@link #close()} method.
-   */
+  /** Determines whether this connection has been closed by a all to the {@link #close()} method. */
   protected AtomicBoolean closed = new AtomicBoolean(false);
-  /**
-   * Determines whether the connection to the JMX server has been established.
-   */
+  /** Determines whether the connection to the JMX server has been established. */
   protected boolean local = false;
-  /**
-   * JMX properties used for establishing the connection.
-   */
+  /** JMX properties used for establishing the connection. */
   protected Map<String, Object> env = new HashMap<>();
-  /**
-   * Determines whether the JMX connection should be secure or not.
-   */
+  /** Determines whether the JMX connection should be secure or not. */
   protected boolean sslEnabled = false;
-  /**
-   *
-   */
+  /**  */
   private final Object connectionLock = new Object();
-  /**
-   * The list of listeners to this connection wrapper.
-   */
+  /** The list of listeners to this connection wrapper. */
   private final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>();
-  /**
-   * The time at which connection attempts started.
-   */
+  /** The time at which connection attempts started. */
   private long connectionStart = 0L;
+  /** */
+  private boolean reconnectOnError = true;
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -231,10 +193,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
 
-  /**
-   * Close the connection to the remote MBean server.
-   * @throws Exception if the connection could not be closed.
-   */
   @Override
   public void close() throws Exception {
     connected.compareAndSet(true, false);
@@ -282,11 +240,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
       } catch(IOException e) {
         String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
-        if (debugEnabled) {
-          log.debug(msg);
-        } else {
-          log.error(msg);
-        }
+        if (debugEnabled) log.debug(msg);
         reset();
       }
       return result;
@@ -369,7 +323,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
       jmxc = null;
     }
-    connect();
+    if (isReconnectOnError()) connect();
   }
 
   /**
@@ -544,10 +498,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 
   @Override
   public String toString() {
-    return  new StringBuilder().append(getClass().getSimpleName()).append('[')
-      .append("url=").append(url).append(", connected=").append(connected)
-      .append(", local=").append(local).append(", secure=").append(sslEnabled)
-      .append(']').toString();
+    return  new StringBuilder(getClass().getSimpleName()).append('[').append("url=").append(url).append(", connected=").append(connected)
+      .append(", local=").append(local).append(", secure=").append(sslEnabled).append(']').toString();
   }
 
   /**
@@ -594,5 +546,22 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public JMXConnector getJmxconnector() {
     return jmxc;
+  }
+
+  /**
+   * @return Whether this connection wrapper reconnects on error.
+   * @exclude
+   */
+  public synchronized boolean isReconnectOnError() {
+    return reconnectOnError;
+  }
+
+  /**
+   * Specifiy whether this connection wrapper reconnects on error.
+   * @param reconnectOnError {@code true} to reconnect, {@code false} otherwise.
+   * @exclude
+   */
+  public synchronized void setReconnectOnError(final boolean reconnectOnError) {
+    this.reconnectOnError = reconnectOnError;
   }
 }

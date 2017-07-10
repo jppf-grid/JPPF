@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 
 import org.jppf.job.persistence.*;
 import org.jppf.utils.*;
-import org.jppf.utils.collections.DescendingIntegerComparator;
 import org.slf4j.*;
 
 /**
@@ -36,27 +35,26 @@ import org.slf4j.*;
  * <span style="color: green"># shorten the configuration value for clarity</span>
  * wrapper = org.jppf.job.persistence.impl.AsynchronousPersistence
  * <span style="color: green"># asynchronous persistence with default thread pool size</span>
- * jppf.job.persistence = ${wrapper} &lt;actual_persistence&gt; param1 ... paramN
+ * jppf.job.persistence = ${wrapper} &lt;actual_persistence&gt; &lt;param1&gt; ... &lt;paramN&gt;
  * <span style="color: green"># asynchronous persistence with a specified thread pool size</span>
- * jppf.job.persistence = ${wrapper} pool_size &lt;actual_persistence&gt; param1 ... paramN</pre>
+ * jppf.job.persistence = ${wrapper} &lt;pool_size&gt; &lt;actual_persistence&gt; &lt;param1&gt; ... &lt;paramN&gt;</pre>
  * <p>Here is an example configuration for an asynchronous database persistence:
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
  * pkg = org.jppf.job.persistence.impl
  * <span style="color: green"># asynchronous database persistence with pool of 4 threads,</span>
- * <span style="color: green"># a tabke name 'JPPF_TEST' and datasource name 'JobDS'</span>
- * jppf.job.persistence = ${pkg}.AsynchronousPersistence 4 ${pkg}.DatabasePersistence JPPF_TEST JobDS</pre>
+ * <span style="color: green"># a table name 'JPPF_TEST' and datasource name 'JobDS'</span>
+ * jppf.job.persistence = ${pkg}.AsynchronousPersistence 4 ${pkg}.DefaultDatabasePersistence JPPF_TEST JobDS</pre>
  * @author Laurent Cohen
  */
 public class AsynchronousPersistence implements JobPersistence {
   /**
-   * Assigns priorities for the types of persisted objects.
+   * Logger for this class.
    */
-  private static final Map<PersistenceObjectType, Integer> PRIORITIES = new EnumMap<PersistenceObjectType, Integer>(PersistenceObjectType.class) {{
-    put(PersistenceObjectType.JOB_HEADER, 400);
-    put(PersistenceObjectType.DATA_PROVIDER, 300);
-    put(PersistenceObjectType.TASK, 200);
-    put(PersistenceObjectType.TASK_RESULT, 100);
-  }};
+  private static Logger log = LoggerFactory.getLogger(AsynchronousPersistence.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The actual persistence implementation to which operations are delegated.
    */
@@ -65,6 +63,10 @@ public class AsynchronousPersistence implements JobPersistence {
    * Performs asycnhronous operations.
    */
   private final ExecutorService executor;
+  /**
+   * 
+   */
+  private static final double MEMORY_THRESHOLD = 70d;
 
   /**
    *
@@ -74,7 +76,7 @@ public class AsynchronousPersistence implements JobPersistence {
   public AsynchronousPersistence(final JobPersistence delegate) throws JobPersistenceException {
     if (delegate == null) throw new JobPersistenceException("could not create write-behind job persistence from null persistence");
     this.delegate = delegate;
-    executor = createExecutor(Runtime.getRuntime().availableProcessors());
+    executor = createExecutor(1);
   }
 
   /**
@@ -84,7 +86,7 @@ public class AsynchronousPersistence implements JobPersistence {
    */
   public AsynchronousPersistence(final String...params) throws JobPersistenceException {
     if ((params == null) || (params.length < 1) || (params[0] == null)) throw new JobPersistenceException("too few parameters");
-    int n = Runtime.getRuntime().availableProcessors();
+    int n = 1;
     String[] forwardParams = null;
     try {
       n = Integer.valueOf(params[0]);
@@ -100,29 +102,35 @@ public class AsynchronousPersistence implements JobPersistence {
   }
 
   @Override
-  public void store(final PersistenceInfo info) throws JobPersistenceException {
-    execute(new PersistenceTask<Void>(PRIORITIES.get(info.getType()), false) {
-      @Override
-      public Void execute() throws JobPersistenceException {
-          delegate.store(info);
+  public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    if (debugEnabled) log.debug("storing {}", infos);
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) delegate.store(infos);
+    else {
+      execute(new PersistenceTask<Void>(false) {
+        @Override
+        public Void execute() throws JobPersistenceException {
+          delegate.store(infos);
           return null;
-      }
-    });
+        }
+      });
+    }
   }
 
   @Override
-  public InputStream load(final PersistenceInfo info) throws JobPersistenceException {
-    return submit(new PersistenceTask<InputStream>(PRIORITIES.get(info.getType()), true) {
+  public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) return delegate.load(infos);
+    return submit(new PersistenceTask<List<InputStream>>(true) {
       @Override
-      public InputStream execute() throws JobPersistenceException {
-        return delegate.load(info);
+      public List<InputStream> execute() throws JobPersistenceException {
+        return delegate.load(infos);
       }
     });
   }
 
   @Override
   public List<String> getPersistedJobUuids() throws JobPersistenceException {
-    return submit(new PersistenceTask<List<String>>(1000, true) {
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) return delegate.getPersistedJobUuids();
+    return submit(new PersistenceTask<List<String>>(true) {
       @Override
       public List<String> execute() throws JobPersistenceException {
         return delegate.getPersistedJobUuids();
@@ -148,7 +156,8 @@ public class AsynchronousPersistence implements JobPersistence {
    * @throws JobPersistenceException if any error occurs.
    */
   private int[] getPositions(final String jobUuid, final PersistenceObjectType type) throws JobPersistenceException {
-    return submit(new PersistenceTask<int[]>(900, true) {
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) return (type == PersistenceObjectType.TASK) ? delegate.getTaskPositions(jobUuid) : delegate.getTaskResultPositions(jobUuid);
+    return submit(new PersistenceTask<int[]>(true) {
       @Override
       public int[] execute() throws JobPersistenceException {
         return (type == PersistenceObjectType.TASK) ? delegate.getTaskPositions(jobUuid) : delegate.getTaskResultPositions(jobUuid);
@@ -158,11 +167,23 @@ public class AsynchronousPersistence implements JobPersistence {
 
   @Override
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
-    execute(new PersistenceTask<Void>(0, false) {
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) delegate.deleteJob(jobUuid);
+    else execute(new PersistenceTask<Void>(false) {
       @Override
       public Void execute() throws JobPersistenceException {
-          delegate.deleteJob(jobUuid);
-          return null;
+        delegate.deleteJob(jobUuid);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
+    if (SystemUtils.heapUsagePct() >= MEMORY_THRESHOLD) return delegate.isJobPersisted(jobUuid);
+    return submit(new PersistenceTask<Boolean>(true) {
+      @Override
+      public Boolean execute() throws JobPersistenceException {
+        return delegate.isJobPersisted(jobUuid);
       }
     });
   }
@@ -172,8 +193,17 @@ public class AsynchronousPersistence implements JobPersistence {
    * @return an {@link ExecutorService}.
    */
   private ExecutorService createExecutor(final int max) {
-    PriorityBlockingQueue<Runnable> queue = new PriorityBlockingQueue<>(100, new PersistenceTaskComparator());
+    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncPersistence"));
+    /*
+    // workaround for JDK bug JDK-6539720 at http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6539720.
+    return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncPersistence")) {
+      @Override
+      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
+        return new MyFutureTask<>(runnable, value);
+      }
+    };
+    */
   }
 
   /**
@@ -184,11 +214,15 @@ public class AsynchronousPersistence implements JobPersistence {
    * @throws JobPersistenceException if any error occurs.
    */
   private <T> T submit(final PersistenceTask<T> task) throws JobPersistenceException {
-    Future<PersistenceTask<T>> f = executor.submit(task, task);
     try {
+      Future<PersistenceTask<T>> f = executor.submit(task, task);
       PersistenceTask<T> t = f.get();
       if (t.exception != null) throw t.exception;
+      if (debugEnabled) log.debug("got result = {}", t.result);
       return t.result;
+    } catch (ClassCastException e) {
+      log.error(e.getMessage(), e);
+      throw new JobPersistenceException(e);
     } catch (InterruptedException | ExecutionException e) {
       throw new JobPersistenceException(e);
     }
@@ -204,24 +238,6 @@ public class AsynchronousPersistence implements JobPersistence {
   }
 
   /**
-   * Compares {@link PersistenceInfo} objects in descending order of their type's priority.
-   */
-  private static class PersistenceTaskComparator implements Comparator<Runnable> {
-    /**
-     * Compares the priorities.
-     */
-    private final DescendingIntegerComparator priorityComparator = new DescendingIntegerComparator();
-
-    @Override
-    public int compare(final Runnable r1, final Runnable r2) {
-      final PersistenceTask<?> o1 = (PersistenceTask<?>) r1, o2 = (PersistenceTask<?>) r2;
-      if (o1 == null) return (o2 == null) ? 0 : 1;
-      else if (o2 == null) return -1;
-      return priorityComparator.compare(o1.priority, o2.priority);
-    }
-  }
-
-  /**
    * A Runnable task that performs asynchronous delegation of a single operation
    * of a concrete, sequential synchronous persistence implementation.
    * @param <T> the type of result this task returns.
@@ -231,10 +247,6 @@ public class AsynchronousPersistence implements JobPersistence {
      * Logger for this class.
      */
     private static Logger log = LoggerFactory.getLogger(AsynchronousPersistence.PersistenceTask.class);
-    /**
-     * This task's priority.
-     */
-    private final int priority;
     /**
      * The optional result of this task's execution.
      */
@@ -249,11 +261,9 @@ public class AsynchronousPersistence implements JobPersistence {
     private final boolean hasResult;
 
     /**
-     * @param priority the persistence information.
      * @param hasResult whether this task is expected to have a result.
      */
-    private PersistenceTask(final int priority, final boolean hasResult) {
-      this.priority = priority;
+    private PersistenceTask(final boolean hasResult) {
       this.hasResult = hasResult;
     }
 
@@ -273,5 +283,34 @@ public class AsynchronousPersistence implements JobPersistence {
      * @throws JobPersistenceException if any error occurs.
      */
     protected abstract T execute() throws JobPersistenceException;
+  }
+
+  /**
+   * Used as part of a workaround for JDK bug <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6539720">JDK-6539720</a>.
+   * @param <T> the type of result for this task.
+   */
+  static class MyFutureTask<T> extends FutureTask<T> {
+    /**
+     * The result (a {@link PersistenceTask}).
+     */
+    private final T myResult;
+
+    /**
+     *
+     * @param runnable the task to execute.
+     * @param result the execution result.
+     */
+    MyFutureTask(final Runnable runnable, final T result) {
+      super(runnable, result);
+      this.myResult = result;
+
+    }
+
+    /**
+     * @return the result.
+     */
+    T getMyResult() {
+      return myResult;
+    }
   }
 }

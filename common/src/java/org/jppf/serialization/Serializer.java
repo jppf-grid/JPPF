@@ -42,7 +42,7 @@ class Serializer {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * The stream header ('JPPF' in ascii).
+   * The stream header ('JPPF' in ascii, '4A 50 50 46' in hexadecimal).
    */
   static final byte[] HEADER = { 74, 80, 80, 70 };
   /**

@@ -391,6 +391,10 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> SEQUENTIAL_SERIALiZATION = new BooleanProperty("jppf.sequential.serialization", false, "jppf.sequential.deserialization");
   /** Whether bias towards local node for scheduling is enabled in the driver */
   public static final JPPFProperty<Boolean> LOCAL_NODE_BIAS = new BooleanProperty("jppf.local.node.bias", true);
+  /** Location of the file that contains the DDL statements to create the database table for the databse job persistence */
+  public static final JPPFProperty<String> JOB_PERSISTENCE_DDL_LOCATION = new StringProperty("jppf.job.persistence.ddl.location", "org/jppf/job/persistence/impl/job_persistence.sql");
+  /** Percentage of used heap above which async job persistence switches to sequential mode, until the used heap decreases below the threshold */
+  public static final JPPFProperty<Double> JOB_PERSISTENCE_MEMORY_THRESHOLD = new DoubleProperty("jppf.job.persistence.memory.threshold", 70d);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 

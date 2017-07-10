@@ -136,5 +136,9 @@ public enum  BundleParameter
   /**
    * Datasources definitions passed on to a node from a server.
    */
-  DATASOURCE_DEFINITIONS
+  DATASOURCE_DEFINITIONS,
+  /**
+   * Wheteht a job has already been persisted.
+   */
+  ALREADY_PERSISTED
 }

@@ -90,7 +90,7 @@ public class ServerJob extends AbstractServerJobBase {
         return new ServerTaskBundleNode(this, newTaskBundle, subList);
       } finally {
         subList.clear();
-        fireJobUpdated();
+        fireJobUpdated(false);
       }
     } finally {
       lock.unlock();
@@ -340,6 +340,6 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
-    if (updated) fireJobUpdated();
+    if (updated) fireJobUpdated(true);
   }
 }

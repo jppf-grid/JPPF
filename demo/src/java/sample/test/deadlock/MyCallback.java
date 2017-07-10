@@ -52,7 +52,7 @@ class MyCallback extends JobStreamingCallback.Adapter {
   public void jobCreated(final JPPFJob job) {
     //job.getSLA().setBroadcastJob(true);
     //job.getSLA().setCancelUponClientDisconnect(false);
-    addToClassPath(job, "dx-demo.jar");
+    //addToClassPath(job, "dx-demo.jar");
   }
 
   @Override
@@ -64,7 +64,7 @@ class MyCallback extends JobStreamingCallback.Adapter {
    * @param job the job whose classpath to set.
    * @param filename the name of the dexed jar file.
    */
-  private void addToClassPath(final JPPFJob job, final String filename) {
+  void addToClassPath(final JPPFJob job, final String filename) {
     ClassPath cp = job.getSLA().getClassPath();
     File file = new File(filename);
     try {

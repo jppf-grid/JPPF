@@ -152,8 +152,8 @@ public class ClientContext extends AbstractNioContext<ClientState> {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
     TaskBundle bundle = ((ClientMessage) message).getBundle();
     this.jobUuid = bundle.getUuid();
-    if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(0), locations.get(1));
-    return new ServerTaskBundleClient(bundle, locations.get(0), locations.get(1), locations.subList(2, locations.size()));
+    if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
+    return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
   }
 
   /**

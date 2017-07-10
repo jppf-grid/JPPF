@@ -48,7 +48,7 @@ public class TestJobTasksListener extends Setup1D1N {
   /**
    * JMX connection to the driver.
    */
-  private static JMXDriverConnectionWrapper JMX;
+  private static JMXDriverConnectionWrapper jmx;
 
   /**
    * Launches 2 drivers with 1 node attached to each.
@@ -58,9 +58,9 @@ public class TestJobTasksListener extends Setup1D1N {
   public static void setupClass() throws Exception {
     long timeout = 60_000L;
     long start = System.currentTimeMillis();
-    JMX = new JMXDriverConnectionWrapper("localhost", 11201);
-    JMX.connectAndWait(timeout - (System.currentTimeMillis() - start));
-    assertTrue("failed to connect to " + JMX, JMX.isConnected());
+    jmx = new JMXDriverConnectionWrapper("localhost", 11201);
+    jmx.connectAndWait(timeout - (System.currentTimeMillis() - start));
+    assertTrue("failed to connect to " + jmx, jmx.isConnected());
     String script = new StringBuilder()
       .append("function addListener() {\n")
       .append("  var driver = org.jppf.server.JPPFDriver.getInstance();\n")
@@ -69,8 +69,8 @@ public class TestJobTasksListener extends Setup1D1N {
       .append("  return \"ok\";\n")
       .append("}\n")
       .append("addListener();").toString();
-    assertEquals("ok", executeScriptOnServer(JMX, script));
-    while (JMX.nbNodes() < 1) Thread.sleep(10L);
+    assertEquals("ok", executeScriptOnServer(jmx, script));
+    while (jmx.nbNodes() < 1) Thread.sleep(10L);
   }
 
   /**
@@ -79,7 +79,7 @@ public class TestJobTasksListener extends Setup1D1N {
    */
   @AfterClass
   public static void teardownClass() throws Exception {
-    if (JMX != null) {
+    if (jmx != null) {
       String script = new StringBuilder()
         .append("function removeListener() {\n")
         .append("  var driver = org.jppf.server.JPPFDriver.getInstance();\n")
@@ -88,9 +88,9 @@ public class TestJobTasksListener extends Setup1D1N {
         .append("  return \"ok\";\n")
         .append("}\n")
         .append("removeListener();").toString();
-      executeScriptOnServer(JMX, script);
+      executeScriptOnServer(jmx, script);
       Thread.sleep(100L);
-      JMX.close();
+      jmx.close();
     }
   }
 
@@ -110,7 +110,7 @@ public class TestJobTasksListener extends Setup1D1N {
   }
 
   /**
-   * Test that we receive notifications of takss results on the server side and that they can be processed for retrieval by the client application,
+   * Test that we receive notifications of taks results on the server side and that they can be processed for retrieval by the client application,
    * even when the JPPF client disocnnects before the job has completed.
    * @throws Exception if any error occurs.
    */
@@ -118,7 +118,7 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testResultsReceived() throws Exception {
     int nbTasks = 10;
     configure();
-    AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(JMX, JobEventType.JOB_ENDED);
+    AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (JPPFClient client = new JPPFClient()) {
       job.setName(ReflectionUtils.getCurrentMethodName());
@@ -160,7 +160,7 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testWithDispatchExpiration() throws Exception {
     int nbTasks = 1, maxExpirations = 2, nbRuns = maxExpirations + 1;
     configure();
-    AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(JMX, JobEventType.JOB_ENDED);
+    AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (JPPFClient client = new JPPFClient()) {
       job.setName(ReflectionUtils.getCurrentMethodName());

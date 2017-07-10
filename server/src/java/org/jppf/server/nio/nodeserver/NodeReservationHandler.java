@@ -109,10 +109,13 @@ public class NodeReservationHandler {
    */
   synchronized void removeReservation(final AbstractNodeContext node) {
     if (debugEnabled) log.debug(String.format("removing reservation for node %s", node));
-    String jobUuid = pendingMap.remove(node.getUuid());
-    if (jobUuid != null) jobPendingMap.removeValue(jobUuid, node.getUuid());
-    jobUuid = readyMap.remove(node.getUuid());
-    if (jobUuid != null) jobReadyMap.removeValue(jobUuid, node.getUuid());
+    String uuid = node.getUuid();
+    if (uuid != null) {
+      String jobUuid = pendingMap.remove(uuid);
+      if (jobUuid != null) jobPendingMap.removeValue(jobUuid, node.getUuid());
+      jobUuid = readyMap.remove(node.getUuid());
+      if (jobUuid != null) jobReadyMap.removeValue(jobUuid, node.getUuid());
+    }
     node.reservationTansition = Transition.REMOVE;
   }
 

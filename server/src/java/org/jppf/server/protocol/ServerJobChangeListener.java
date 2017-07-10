@@ -31,8 +31,9 @@ public interface ServerJobChangeListener
   /**
    * Called when a job is added to the server queue.
    * @param source the updated job.
+   * @param headerUpdated whether the job header(a {@link org.jppf.node.protocol.TaskBundle TaskBundle} instance) has been updated.
    */
-  void jobUpdated(final AbstractServerJob source);
+  void jobUpdated(final AbstractServerJob source, boolean headerUpdated);
   /**
    * Called when job submission status is changed.
    * @param source the updated job.

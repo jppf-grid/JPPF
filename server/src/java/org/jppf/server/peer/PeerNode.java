@@ -222,7 +222,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
       tasks.add(dl);
       if (traceEnabled) log.trace(getName() + " received task #"+ i + " from peer driver, data length = " + dl.getSize());
     }
-    return new ServerTaskBundleClient(header, headerData, dataProvider, tasks);
+    return new ServerTaskBundleClient(header, dataProvider, tasks);
   }
 
   /**

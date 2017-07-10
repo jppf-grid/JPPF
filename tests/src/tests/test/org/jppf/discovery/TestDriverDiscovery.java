@@ -157,7 +157,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         assertFalse(pool.isSslEnabled());
         assertEquals(2 - i, pool.getPriority());
         assertEquals(1, pool.getSize());
-        assertEquals(1, pool.getJMXPoolMaxSize());
+        assertEquals(1, pool.getJMXPoolSize());
       }
       int tasksPerNode = 5;
       int nbNodes = BaseSetup.nbNodes();

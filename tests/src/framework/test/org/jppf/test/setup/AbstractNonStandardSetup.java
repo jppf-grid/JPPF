@@ -54,7 +54,7 @@ public class AbstractNonStandardSetup extends BaseTest {
 
   /**
    * Create the drivers and nodes configuration.
-   * @param prefix prefix to use to locate the configuration files
+   * @param prefix prefix to use to locate the configuration files.
    * @return a {@link Configuration} instance.
    * @throws Exception if a process could not be started.
    */

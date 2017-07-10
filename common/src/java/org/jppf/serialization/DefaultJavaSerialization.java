@@ -38,7 +38,7 @@ public class DefaultJavaSerialization implements JPPFSerialization
       @Override
       protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null)  return super.resolveClass(desc);
+        if (cl == null) return super.resolveClass(desc);
         return Class.forName(desc.getName(), false, cl);
       }
     };

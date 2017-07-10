@@ -252,7 +252,17 @@ public final class IOHelper {
   }
 
   /**
-   * Serialize an object and send it to the server.
+   * Serialize an object into a {@link DataLocation}.
+   * @param o the object to serialize.
+   * @return a {@link DataLocation} instance.
+   * @throws Exception if any error occurs.
+   */
+  public static DataLocation serializeData(final Object o) throws Exception {
+    return serializeData(o, IOHelper.DEFAULT_SERIALIZER);
+  }
+
+  /**
+   * Serialize an object into a {@link DataLocation}.
    * @param o the object to serialize.
    * @param ser the object serializer.
    * @return a {@link DataLocation} instance.

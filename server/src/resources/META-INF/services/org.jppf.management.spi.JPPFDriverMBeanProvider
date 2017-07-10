@@ -4,3 +4,4 @@ org.jppf.server.spi.JPPFNodeForwardingMBeanProvider                # Nodes manag
 org.jppf.management.diagnostics.spi.DriverDiagnosticsMBeanProvider # driver JVM diagnostics
 org.jppf.management.spi.PeerDriverMBeanProvider                    # notifications of peer drivers attributes
 org.jppf.management.spi.JPPFNodeConnectionNotifierMBeanProvider    # notifications of nodes connecting or disconnecting
+org.jppf.job.persistence.PersistedJobsManagerMBeanProvider         # management of jobs persisted in the driver

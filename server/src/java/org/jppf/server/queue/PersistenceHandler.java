@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 import org.jppf.io.*;
@@ -30,7 +30,7 @@ import org.jppf.utils.streams.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class is a facade to the job persistence service defined in the configuration. 
  * @author Laurent Cohen
  */
 public class PersistenceHandler {
@@ -43,7 +43,7 @@ public class PersistenceHandler {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The perisistence service.
+   * The persistence service.
    */
   private final JobPersistence persistence;
   /**
@@ -66,18 +66,41 @@ public class PersistenceHandler {
    * @param clientBundle contains the tasks to store.
    * @param tasksOnly whether to ony store the tasks and not the header and data provider.
    */
-  public void storeJob(final ServerJob job, final ServerTaskBundleClient clientBundle, final boolean tasksOnly) {
-    if ((persistence == null) || !job.getSLA().isPersistent()) return;
+  void storeJob(final ServerJob job, final ServerTaskBundleClient clientBundle, final boolean tasksOnly) {
+    if (!isPersistent(job)) return;
+    long start = System.nanoTime();
     try {
       if (debugEnabled) log.debug("persisting {} job {}", tasksOnly ? "existing" : "new", job);
+      List<ServerTask> taskList = clientBundle.getTaskList();
+      List<PersistenceInfo> infos = new ArrayList<>(taskList.size() + (tasksOnly ? 0 : 2));
       if (!tasksOnly) {
-        persistence.store(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, clientBundle.getJobDataLocation()));
-        persistence.store(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.DATA_PROVIDER, -1, clientBundle.getDataProvider()));
+        job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, IOHelper.serializeData(job.getJob())));
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.DATA_PROVIDER, -1, clientBundle.getDataProvider()));
       }
-      for (ServerTask task: clientBundle.getTaskList()) {
-        DataLocation dl = IOHelper.serializeData(task, IOHelper.getDefaultserializer());
-        persistence.store(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK, task.getJobPosition(), dl));
+      for (ServerTask task: taskList) {
+        DataLocation dl = IOHelper.serializeData(task);
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK, task.getJobPosition(), dl));
       }
+      persistence.store(infos);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    if (debugEnabled) log.debug(String.format("took %,d ms to store job %s", elapsed, job.getName()));
+  }
+
+  /**
+   * Store the specified job upon initial queuing.
+   * @param job the job to store.
+   */
+  public void updateJobHeader(final ServerJob job) {
+    if (!isPersistent(job)) return;
+    try {
+      if (debugEnabled) log.debug("updating header for job {}", job);
+      job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
+      DataLocation data = IOHelper.serializeData(job.getJob());
+      persistence.store(Arrays.asList((PersistenceInfo) new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, data)));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -89,12 +112,14 @@ public class PersistenceHandler {
    * @param tasks the task results to store.
    */
   public void storeResults(final ServerJob job, final Collection<ServerTask> tasks) {
-    if ((persistence == null) || !job.getSLA().isPersistent()) return;
+    if (!isPersistent(job)) return;
     try {
       if (debugEnabled) log.debug("persisting {} results for job {}", tasks.size(), job);
+      List<PersistenceInfo> infos = new ArrayList<>(tasks.size());
       for (ServerTask task: tasks) {
-        persistence.store(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK_RESULT, task.getJobPosition(), task.getResult()));
+        infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK_RESULT, task.getJobPosition(), task.getResult()));
       }
+      persistence.store(infos);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -104,8 +129,8 @@ public class PersistenceHandler {
    * Remove the specified job from the persistence store.
    * @param job the job to remove.
    */
-  public void deleteJob(final ServerJob job) {
-    if ((persistence == null) || !job.getSLA().isPersistent()) return;
+  void deleteJob(final ServerJob job) {
+    if (!isPersistent(job)) return;
     if (debugEnabled) log.debug("removing job {} from persistence store", job);
     try {
       persistence.deleteJob(job.getUuid());
@@ -117,57 +142,49 @@ public class PersistenceHandler {
   /**
    * Load the job with the specified uuid from the persistence store.
    * @param jobUuid uuid of the job to load.
+   * @param useAutoExecuteOnRestart whether o use the {@code autoExecuteOnRestart} attribute in the job SLA's peristence spec.
    * @return a reconstituted {@link ServerJob} instance.
    */
-  public ServerTaskBundleClient loadJob(final String jobUuid) {
+  private ServerTaskBundleClient loadJob(final String jobUuid, final boolean useAutoExecuteOnRestart) {
     if (persistence == null) return null;
     if (debugEnabled) log.debug("loading job with uuid = {}", jobUuid);
     try {
-      DataLocation headerData = load(new PersistenceInfoImpl(jobUuid, null, PersistenceObjectType.JOB_HEADER, -1, null));
-      TaskBundle header = (TaskBundle) IOHelper.unwrappedData(headerData);
+      TaskBundle header = loadHeader(jobUuid);
+      if (header == null) return null;
+      if (useAutoExecuteOnRestart && !header.getSLA().getPersistenceSpec().isAutoExecuteOnRestart()) {
+        if (debugEnabled) log.debug("job with uuid = {} has autoExecuteOnRestart=false, it will not be loaded", jobUuid);
+        return null;
+      }
       header.setParameter(BundleParameter.FROM_PERSISTENCE, true);
-      DataLocation dataProvider = load(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.DATA_PROVIDER, -1, null)); 
       int[] taskPositions = persistence.getTaskPositions(jobUuid);
       Arrays.sort(taskPositions);
       int[] resultPositions = persistence.getTaskResultPositions(jobUuid);
       Arrays.sort(resultPositions);
-      if (Arrays.equals(taskPositions, resultPositions)) {
+      if (Arrays.equals(taskPositions, resultPositions) && header.getSLA().getPersistenceSpec().isDeleteOnCompletion()) {
         if (debugEnabled) log.debug("job already has completed: {}", header);
         persistence.deleteJob(jobUuid);
         return null;
       }
-
       int[] positionsToLoad = new int[taskPositions.length - resultPositions.length];
       int i = 0;
       for (int pos: taskPositions) {
         if (Arrays.binarySearch(resultPositions, pos) < 0) positionsToLoad[i++] = pos;
       }
-      /*
-      Map<Integer, ServerTask> tasks = new HashMap<>();
-      for (int pos: taskPositions) {
-        DataLocation taskData = load(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.TASK, pos, null));
-        ServerTask task = (ServerTask) IOHelper.unwrappedData(taskData);
-        tasks.put(pos, task);
-      }
-      for (int pos: resultPositions) {
-        DataLocation result = load(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.TASK_RESULT, pos, null));
-        tasks.get(pos).setResult(result);
-      }
-      List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
-      for (ServerTask task: tasks.values()) {
-        if (Arrays.binarySearch(resultPositions, task.getJobPosition()) < 0) {
-          task.setState(TaskState.RESULT);
-          pendingTasks.add(task);
-        }
-      }
-      */
-      List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
+      List<PersistenceInfo> infos = new ArrayList<>(positionsToLoad.length + 1);
+      infos.add(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.DATA_PROVIDER, -1, null));
       for (int pos: positionsToLoad) {
-        DataLocation taskData = load(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.TASK, pos, null));
+        infos.add(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.TASK, pos, null));
+      }
+      List<InputStream> streams = persistence.load(infos);
+      DataLocation dataProvider = load(streams.get(0)); 
+      List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
+      i = 1;
+      for (i=1; i<streams.size(); i++) {
+        DataLocation taskData = load(streams.get(i));
         ServerTask task = (ServerTask) IOHelper.unwrappedData(taskData);
         pendingTasks.add(task);
       }
-      return new ServerTaskBundleClient(pendingTasks, header, headerData, dataProvider);
+      return new ServerTaskBundleClient(pendingTasks, header, dataProvider);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -178,11 +195,13 @@ public class PersistenceHandler {
    * Load all jobs in the persistence store.
    */
   public void loadPersistedJobs() {
+    if (persistence == null) return;
     try {
+      if (debugEnabled) log.debug("loading persisted jobs");
       List<String> uuids = persistence.getPersistedJobUuids();
       for (String uuid: uuids) {
         try {
-          ServerTaskBundleClient bundle = loadJob(uuid);
+          ServerTaskBundleClient bundle = loadJob(uuid, true);
           if (bundle != null) queue.addBundle(bundle);
         } catch (Exception e) {
           log.error(e.getMessage(), e);
@@ -199,17 +218,98 @@ public class PersistenceHandler {
    * @return the job element as a {@link DataLocation} object.
    * @throws Exception if any error occurs.
    */
-  private DataLocation load(final PersistenceInfo info) throws Exception {
+  public DataLocation load(final PersistenceInfo info) throws Exception {
+    List<DataLocation> list = load(Arrays.asList(info));
+    return (list == null) || list.isEmpty() ? null : list.get(0);
+  }
+
+  /**
+   * Load the specified job elements from the persistence store.
+   * @param infos information on the elements to load.
+   * @return the job element as a {@link DataLocation} object.
+   * @throws Exception if any error occurs.
+   */
+  public List<DataLocation> load(final Collection<PersistenceInfo> infos) throws Exception {
+    long start = System.nanoTime();
+    List<DataLocation> result = null;
+    List<InputStream> list = persistence.load(infos);
+    if ((list != null) && !list.isEmpty()) {
+      result = new ArrayList<>(infos.size());
+      for (InputStream is: list) result.add(load(is));
+    }
+    long elapsed = System.nanoTime() - start;
+    if (debugEnabled) log.debug("took {} ms to load {} job elements", elapsed / 1_000_000L, infos.size());
+    return result;
+  }
+
+  /**
+   * Load the specified job element from the persistence store.
+   * @param stream information on the element to load.
+   * @return the job element as a {@link DataLocation} object.
+   * @throws Exception if any error occurs.
+   */
+  private DataLocation load(final InputStream stream) throws Exception {
     List<JPPFBuffer> buffers = null;
-    try (InputStream is = persistence.load(info); MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
+    try (InputStream is = stream; MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
+      if (is == null) return null;
       StreamUtils.copyStream(is, os, false);
       buffers = os.toBufferList();
     }
-    /*
-    try (InputSource source = new StreamInputSource(is)) {
-      return IOHelper.readData(source, info.getSize());
-    }
-    */
     return new MultipleBuffersLocation(buffers);
+  }
+
+  /**
+   * Load and deserialize the header of the job with the sdpecified uuid.
+   * @param jobUuid the uuid of the job whose header to load.
+   * @return the deserialized header as  a {@link TaskBundle}.
+   * @throws Exception if any error occurs.
+   */
+  public TaskBundle loadHeader(final String jobUuid) throws Exception {
+    if (!isJobPersisted(jobUuid)) return null;
+    return (TaskBundle) IOHelper.unwrappedData(load(new PersistenceInfoImpl(jobUuid, null, PersistenceObjectType.JOB_HEADER, -1, null)));
+  }
+
+  /**
+   * Load the specified job element from the persistence store.
+   * @param info information on the element to load.
+   * @return the job element as a {@link DataLocation} object.
+   * @throws Exception if any error occurs.
+   */
+  public DataLocation loadToDisk(final PersistenceInfo info) throws Exception {
+    File dir = FileUtils.getJPPFTempDir();
+    File file = File.createTempFile(info.getType().name(), ".tmp", dir);
+    List<InputStream> list = persistence.load(Arrays.asList(info));
+    if ((list == null) || list.isEmpty()) return null;
+    try (InputStream is = list.get(0); BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+      StreamUtils.copyStream(is, os, false);
+    }
+    return new FileDataLocation(file);
+  }
+
+  /**
+   * Determine whether the specified job should be persisted.
+   * @param job the job to check.
+   * @return {@code true} if the job is persistence and job persistence is active, {@code false} otherwise.
+   */
+  private boolean isPersistent(final ServerJob job) {
+    return (persistence != null) && job.isPersistent();
+  }
+
+  /**
+   * Determine whether the specified job is persisted.
+   * @param uuid the uuid of the job to check.
+   * @return {@code true} if the job is persisted, {@code false} otherwise.
+   * @throws JobPersistenceException if any error occurs while accessing the persistence store.
+   */
+  public boolean isJobPersisted(final String uuid) throws JobPersistenceException {
+    return (persistence != null) && persistence.isJobPersisted(uuid);
+  }
+
+  /**
+   * Get the persistence service.
+   * @return a {@link JobPersistence} instance.
+   */
+  public JobPersistence getPersistence() {
+    return persistence;
   }
 }

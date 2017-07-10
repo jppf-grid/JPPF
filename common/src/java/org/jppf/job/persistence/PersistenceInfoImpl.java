@@ -40,7 +40,7 @@ public class PersistenceInfoImpl implements PersistenceInfo {
   /**
    * The job information, if applicable.
    */
-  private final JPPFDistributedJob job;
+  private final transient JPPFDistributedJob job;
   /**
    * The type of persisted object.
    */
@@ -52,7 +52,7 @@ public class PersistenceInfoImpl implements PersistenceInfo {
   /**
    * The location of the persisted object's data.
    */
-  private final DataLocation dataLocation;
+  private final transient DataLocation dataLocation;
 
   /**
    * Initialize this persistence information object.

@@ -172,8 +172,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public void jobUpdated(final AbstractServerJob job) {
+  public void jobUpdated(final AbstractServerJob job, final boolean headerUpdated) {
     //if (debugEnabled) log.debug("jobId '{}' updated", job.getName());
+    if (headerUpdated) JPPFDriver.getInstance().getQueue().getPersistenceHandler().updateJobHeader((ServerJob) job);
     submitEvent(JobEventType.JOB_UPDATED, (ServerJob) job, null);
   }
 

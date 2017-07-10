@@ -25,13 +25,14 @@ import java.util.*;
 import javax.sql.DataSource;
 
 import org.jppf.job.persistence.*;
-import org.jppf.persistence.*;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
  * A job persistence implementation which stores jobs in a single database table. The table has the following structure:<br>
- * 
+ *
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; margin: 0px; background-color: #E0E0F0">
  * CREATE TABLE &lt;table_name&gt; (
  *   UUID varchar(250) NOT NULL,
@@ -40,7 +41,7 @@ import org.slf4j.*;
  *   CONTENT blob NOT NULL,
  *   PRIMARY KEY (UUID, TYPE, POSITION)
  * );</pre>
- * 
+ *
  * <p>Where:
  * <ul style="margin-top: 0px">
  *   <li>the UUID column represents the job uuid</li>
@@ -48,22 +49,22 @@ import org.slf4j.*;
  *   <li>the POSITION column represents the object's position in the job if {@code TYPE} is 'task' or 'task_result', otherwise -1</li>
  *   <li>the CONTENT column represents the serialized object</li>
  * </ul>
- * 
+ *
  * <p>The table name is specified in the JPPF configuration like this:<br>
  * {@code jppf.job.persistence = org.jppf.job.persistence.impl.DefaultDatabasePersistence <table_name>}<br>
  * If unspecified, it defaults to the {@linkplain #DEFAULT_TABLE default table name} 'JOB_PERSISTENCE'.
  * If the table does not exist, JPPF will attempt to create it. If this fails for any reason, for instance if the user does not have sufficient privileges,
  * then persistene will be disabled.
- * 
+ *
  * <p>This database persistence implementation uses a <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool and datasource.
  * The datasource is specified by name in the configuration:<br>
  * {@code jppf.job.persistence = org.jppf.job.persistence.impl.DefaultDatabasePersistence <table_name> <datasource_name>}<br>
  * If unspecified, it defaults to 'job_persistence'. The datasource properties <b>must</b> be defined in the JPPF configuration like so:
- * 
+ *
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; margin: 0px; background-color: #E0E0F0">
  * jppf.datasource.&lt;configId&gt;.name = &lt;datasource_name&gt;
  * jppf.datasource.&lt;configId&gt;.&lt;hikaricp_property&gt; = &lt;value&gt;</pre>
- * 
+ *
  * <p>Where:
  *   <ul style="margin-top: 0px">
  *   <li>{@code configId} is used to distinguish the datasource properties when multiple datasources are defined</li>
@@ -72,12 +73,12 @@ import org.slf4j.*;
  *   <li>{@code hikaricp_property} desginates any valid <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">HikariCP configuration property</a>.
  *       Properties not supported by HikariCP are simply ignored</li>
  * </ul>
- * 
+ *
  * <p>Here is a full example configuration:
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; margin: 0px; background-color: #E0E0F0">
  * <span style="color: green"># persistence definition</span>
  * jppf.job.persistence = org.jppf.job.persistence.impl.DefaultDatabasePersistence MY_TABLE <b>jobDS</b>
- * 
+ *
  * <span style="color: green"># datsource definition</span>
  * jppf.datasource.jobs.name = <b>jobDS</b>
  * jppf.datasource.jobs.driverClassName = com.mysql.jdbc.Driver
@@ -127,7 +128,7 @@ public class DefaultDatabasePersistence implements JobPersistence {
    * Whether to wrap input streams into buffered input streams.
    */
   private final boolean bufferStreams = JPPFConfiguration.getProperties().getBoolean("jppf.job.persistence.bufferStreams", true);
-  
+
   /**
    * Intialize this persistence with the {@linkplain #DEFAULT_TABLE default table name}.
    * @throws JobPersistenceException if any error occurs.
@@ -156,7 +157,7 @@ public class DefaultDatabasePersistence implements JobPersistence {
       TypedProperties props = new TypedProperties();
       String path = getClass().getPackage().getName().replace('.', '/') + "/sql_statements.properties";
       ClassLoader cl = getClass().getClassLoader();
-      if (debugEnabled) log.debug("loading SQL statements from path={}, with classloader={}", path, cl); 
+      if (debugEnabled) log.debug("loading SQL statements from path={}, with classloader={}", path, cl);
       try (Reader reader = new InputStreamReader(cl.getResourceAsStream(path), "utf-8")) {
         props.load(reader);
       }
@@ -171,16 +172,17 @@ public class DefaultDatabasePersistence implements JobPersistence {
   }
 
   @Override
-  public void store(final PersistenceInfo info) throws JobPersistenceException {
-    if (debugEnabled) log.debug("storing {}", info);
+  public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    if (debugEnabled) log.debug("storing {}", infos);
     try (Connection connection = getDataSource().getConnection()) {
       boolean autocommit = connection.getAutoCommit();
-      // Here we have 2 sql operations, which we want to commit as a single transaction:
-      // - a query to determine whether the object is already stored
-      // - either an update if the object is already stored, or an insert otherwise
       connection.setAutoCommit(false);
-      try (PreparedStatement ps = prepareStoreStatement(connection, info)) {
-        ps.executeUpdate();
+      try {
+        for (PersistenceInfo info: infos) {
+          try (PreparedStatement ps = prepareStoreStatement(connection, info)) {
+            ps.executeUpdate();
+          }
+        }
         connection.commit();
       } catch(Exception e) {
         connection.rollback();
@@ -196,20 +198,33 @@ public class DefaultDatabasePersistence implements JobPersistence {
   }
 
   @Override
-  public InputStream load(final PersistenceInfo info) throws JobPersistenceException {
-    if (debugEnabled) log.debug("loading {}", info);
+  public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    if (debugEnabled) log.debug("loading {}", infos);
     try (Connection connection = getDataSource().getConnection()) {
-      try (PreparedStatement ps = prepareLoadStatement(connection, info)) {
-        try (ResultSet rs= ps.executeQuery()) {
-          if (rs.next()) return getInputStream(rs.getBinaryStream(1));
+      boolean autocommit = connection.getAutoCommit();
+      connection.setAutoCommit(false);
+      try {
+        List<InputStream> result = new ArrayList<>(infos.size());
+        for (PersistenceInfo info: infos) {
+          try (PreparedStatement ps = prepareLoadStatement(connection, info)) {
+            try (ResultSet rs= ps.executeQuery()) {
+              if (rs.next()) result.add(getInputStream(rs.getBinaryStream(1)));
+            }
+          }
         }
+        connection.commit();
+        return result;
+      } catch(Exception e) {
+        connection.rollback();
+        throw e;
+      } finally {
+        connection.setAutoCommit(autocommit);
       }
     } catch(JobPersistenceException e) {
       throw e;
     } catch(Exception e) {
       throw new JobPersistenceException(e);
     }
-    return null;
   }
 
   @Override
@@ -272,12 +287,31 @@ public class DefaultDatabasePersistence implements JobPersistence {
     if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
     try (Connection connection = getDataSource().getConnection();
       PreparedStatement ps = prepareDeleteJobStatement(connection, jobUuid)) {
-        ps.executeUpdate();
+      ps.executeUpdate();
     } catch(JobPersistenceException e) {
       throw e;
     } catch(Exception e) {
       throw new JobPersistenceException(e);
     }
+  }
+
+  @Override
+  public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
+    try (Connection connection = getDataSource().getConnection()) {
+      try (PreparedStatement ps = prepareJobHeaderCountStatement(connection, jobUuid)) {
+        try (ResultSet rs= ps.executeQuery()) {
+          if (rs.next()) {
+            int n = rs.getInt(1);
+            return n > 0;
+          }
+        }
+      }
+    } catch(JobPersistenceException e) {
+      throw e;
+    } catch(Exception e) {
+      throw new JobPersistenceException(e);
+    }
+    return false;
   }
 
   /**
@@ -389,6 +423,20 @@ public class DefaultDatabasePersistence implements JobPersistence {
   }
 
   /**
+   * Create a prepared statement which counts the headers of the job with the specified uuid.
+   * @param connection the JDBC connection with which to create and execute the statement.
+   * @param uuid the uuid of the job to delete.
+   * @return a {@link PreparedStatement}.
+   * @throws Exception if any error occurs.
+   */
+  private PreparedStatement prepareJobHeaderCountStatement(final Connection connection, final String uuid) throws Exception {
+    PreparedStatement ps = connection.prepareStatement(getSQL("exists.job.sql"));
+    ps.setString(1, uuid);
+    ps.setString(2, PersistenceObjectType.JOB_HEADER.name());
+    return ps;
+  }
+
+  /**
    * Get the SQL statement or query for the specified key.
    * @param key the key for the sqkl to retrieve.
    * @return a string containing an SQL statement or query, opr {@code null} if the key could not be found.
@@ -414,7 +462,8 @@ public class DefaultDatabasePersistence implements JobPersistence {
         }
       }
       if (debugEnabled) log.debug("table '{}' does not exist in the database, creating it", tableName);
-      String path = DefaultDatabasePersistence.class.getPackage().getName().replace('.', '/') + "/job_persistence.sql";
+      String path = JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE_DDL_LOCATION);
+      if (debugEnabled) log.debug("Read DDL file from {}", path);
       String sql = FileUtils.readTextFile(path).replace("${" + TABLE_PROP + "}", tableName);
       try (PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.executeUpdate();

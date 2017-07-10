@@ -54,10 +54,6 @@ public class ServerTaskBundleClient {
    */
   private final TaskBundle job;
   /**
-   * The serialized job header.
-   */
-  private DataLocation jobDataLocation;
-  /**
    * The shared data provider for this task bundle.
    */
   private final DataLocation dataProvider;
@@ -101,25 +97,22 @@ public class ServerTaskBundleClient {
   /**
    * Initialize this task bundle and set its build number.
    * @param job the job to execute.
-   * @param jobDataLocation the serialized job header.
    * @param dataProvider the shared data provider for this task bundle.
    */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider) {
-    this(job, jobDataLocation, dataProvider, Collections.<DataLocation>emptyList());
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider) {
+    this(job, dataProvider, Collections.<DataLocation>emptyList());
   }
 
   /**
    * Initialize this task bundle and set its build number.
    * @param job the job to execute.
-   * @param jobDataLocation the serialized job header.
    * @param dataProvider the shared data provider for this task bundle.
    * @param taskList the tasks to execute.
    */
-  public ServerTaskBundleClient(final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider, final List<DataLocation> taskList) {
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
-    this.jobDataLocation = jobDataLocation;
     this.dataProvider = dataProvider;
     if (!job.isHandshake() && !job.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
       int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
@@ -147,14 +140,12 @@ public class ServerTaskBundleClient {
    * Initialize this task bundle and set its build number.
    * @param tasks the tasks to execute.
    * @param job the job to execute.
-   * @param jobDataLocation the serialized job header.
    * @param dataProvider the shared data provider for this task bundle.
    */
-  public ServerTaskBundleClient(final Collection<ServerTask> tasks, final TaskBundle job, final DataLocation jobDataLocation, final DataLocation dataProvider) {
+  public ServerTaskBundleClient(final Collection<ServerTask> tasks, final TaskBundle job, final DataLocation dataProvider) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
-    this.jobDataLocation = jobDataLocation;
     this.dataProvider = dataProvider;
     this.taskList.addAll(tasks);
     for (ServerTask task: tasks) {
@@ -173,7 +164,6 @@ public class ServerTaskBundleClient {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     int size = taskList.size();
-    this.jobDataLocation = null;
     //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
     this.job.setTaskCount(size);
@@ -207,8 +197,7 @@ public class ServerTaskBundleClient {
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<ServerTask> getTaskList()
-  {
+  public List<ServerTask> getTaskList() {
     return taskList;
   }
 
@@ -379,8 +368,7 @@ public class ServerTaskBundleClient {
    * Get the number of tasks that remain to execute.
    * @return the number of tasks as an int.
    */
-  public int getPendingTasksCount()
-  {
+  public int getPendingTasksCount() {
     return pendingTasksCount.get();
   }
 
@@ -442,21 +430,6 @@ public class ServerTaskBundleClient {
    */
   public long getId() {
     return id;
-  }
-
-  /**
-   * @return the serialized job header.
-   */
-  public DataLocation getJobDataLocation() {
-    return jobDataLocation;
-  }
-
-  /**
-   * Set the serialized job header.
-   * @param jobDataLocation the value to set.
-   */
-  public void setJobDataLocation(final DataLocation jobDataLocation) {
-    this.jobDataLocation = jobDataLocation;
   }
 
   /**

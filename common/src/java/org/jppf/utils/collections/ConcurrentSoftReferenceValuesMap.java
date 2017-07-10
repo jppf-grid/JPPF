@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConcurrentSoftReferenceValuesMap<K, V> extends SoftReferenceValuesMap<K, V> {
   @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap() {
+  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
     return new ConcurrentHashMap<>();
   }
 }

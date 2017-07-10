@@ -27,25 +27,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <V> the type of the objects in the map's collection values.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractCollectionMap<K, V>
-{
+public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractCollectionMap<K, V> {
   /**
    * Default constructor.
    */
-  public AbstractCollectionConcurrentMap()
-  {
+  public AbstractCollectionConcurrentMap() {
     this.map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new ConcurrentHashMap<>();
   }
 
   @Override
-  public void putValue(final K key, final V value)
-  {
+  public void putValue(final K key, final V value) {
     Collection<V> newColl = newCollection();
     Collection<V> coll = ((ConcurrentHashMap<K, Collection<V>>) map).putIfAbsent(key, newColl);
     if (coll == null) coll = newColl;
@@ -53,11 +49,11 @@ public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractColl
   }
 
   @Override
-  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values)
-  {
+  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values) {
     Collection<V> newColl = newCollection();
     Collection<V> coll = ((ConcurrentHashMap<K, Collection<V>>) map).putIfAbsent(key, newColl);
     if (coll == null) coll = newColl;
-    for (V value: values) coll.add(value);
+    for (V value : values)
+      coll.add(value);
   }
 }

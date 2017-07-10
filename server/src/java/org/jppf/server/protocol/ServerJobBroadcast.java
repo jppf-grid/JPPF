@@ -229,7 +229,7 @@ public class ServerJobBroadcast extends ServerJob {
     else {
       broadcastJob.clientBundles.add(bundle);
       broadcastJob.tasks.addAll(bundle.getTaskList());
-      fireJobUpdated();
+      fireJobUpdated(false);
       broadcastJob.pendingTasksCount += bundle.getTaskCount();
     }
   }

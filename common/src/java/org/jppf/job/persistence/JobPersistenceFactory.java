@@ -18,8 +18,10 @@
 
 package org.jppf.job.persistence;
 
-import org.jppf.utils.ReflectionHelper;
+import org.jppf.job.persistence.impl.DefaultFilePersistence;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.slf4j.*;
 
 /**
  * Factory class which instantites persistence implementations based on the JPPF configuration.
@@ -27,6 +29,10 @@ import org.jppf.utils.configuration.JPPFProperties;
  * @exclude
  */
 public final class JobPersistenceFactory {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JobPersistenceFactory.class);
   /**
    * Singleton instance of this class.
    */
@@ -37,10 +43,22 @@ public final class JobPersistenceFactory {
   private final JobPersistence persistence;
 
   /**
-   * 
+   * Not instantiable from another class.
    */
   private JobPersistenceFactory() {
-    persistence = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, JPPFProperties.JOB_PERSISTENCE);
+    JobPersistence tmp = null;
+    try {
+      tmp = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, JPPFProperties.JOB_PERSISTENCE);
+    } catch (Exception e) {
+      log.error(String.format("error creating JobPersisitence configured as %s = %s, falling back to %s%n%s", JPPFProperties.JOB_PERSISTENCE.getName(),
+        JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e)));
+      try {
+        tmp = new DefaultFilePersistence();
+      } catch (Exception e2) {
+        log.error(String.format("fallback to %s failed, job persistence is disabled%n%s", DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e2)));
+      }
+    }
+    persistence = tmp;
   }
 
   /**

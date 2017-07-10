@@ -82,13 +82,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception {
-    ServerJob bundleWrapper = getServerJob(jobUuid);
-    if (bundleWrapper == null) {
+    ServerJob job = getServerJob(jobUuid);
+    if (job == null) {
       if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
       return;
     }
-    if (debugEnabled) log.debug("Request to suspend jobId = '{}'", bundleWrapper.getJob().getName());
-    bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
+    if (debugEnabled) log.debug("Request to suspend jobId = '{}'", job.getJob().getName());
+    job.setSuspended(true, Boolean.TRUE.equals(requeue));
   }
 
   /**
@@ -98,13 +98,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public void resumeJob(final String jobUuid) throws Exception {
-    ServerJob bundleWrapper = getServerJob(jobUuid);
-    if (bundleWrapper == null) {
+    ServerJob job = getServerJob(jobUuid);
+    if (job == null) {
       if (debugEnabled) log.debug("Could not find job with uuid = '{}'", jobUuid);
       return;
     }
-    if (debugEnabled) log.debug("Request to resume jobId = '{}'", bundleWrapper.getJob().getName());
-    bundleWrapper.setSuspended(false, false);
+    if (debugEnabled) log.debug("Request to resume jobId = '{}'", job.getJob().getName());
+    job.setSuspended(false, false);
     driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 

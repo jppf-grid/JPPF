@@ -237,7 +237,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
         clientBundles.add(bundle);
         this.tasks.addAll(bundle.getTaskList());
         bundle.addCompletionListener(bundleCompletionListener);
-        fireJobUpdated();
+        fireJobUpdated(false);
         return true;
       }
     } finally {

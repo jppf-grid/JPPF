@@ -22,7 +22,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.io.*;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -108,6 +110,10 @@ public abstract class AbstractServerJob {
    * List of bundles added after submission status set to <code>COMPLETE</code>.
    */
   protected List<ServerTaskBundleClient> completionBundles = null;
+  /**
+   * The serialized job header.
+   */
+  DataLocation jobDataLocation;
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
@@ -231,7 +237,7 @@ public abstract class AbstractServerJob {
     boolean oldValue = isPending();
     this.pending = pending;
     boolean newValue = isPending();
-    if (oldValue != newValue) fireJobUpdated();
+    if (oldValue != newValue) fireJobUpdated(true);
   }
 
   /**
@@ -251,7 +257,7 @@ public abstract class AbstractServerJob {
     JobSLA sla = getJob().getSLA();
     if (sla.isSuspended() == suspended) return;
     sla.setSuspended(suspended);
-    fireJobUpdated();
+    fireJobUpdated(true);
   }
 
   /**
@@ -260,8 +266,9 @@ public abstract class AbstractServerJob {
    */
   public void setMaxNodes(final int maxNodes) {
     if (maxNodes <= 0) return;
+    if (getJob().getSLA().getMaxNodes() == maxNodes) return;
     getJob().getSLA().setMaxNodes(maxNodes);
-    fireJobUpdated();
+    fireJobUpdated(true);
   }
 
   /**
@@ -453,9 +460,11 @@ public abstract class AbstractServerJob {
 
   /**
    * The current number of tasks in a job was updated.
+   * @param headerUpdated whether the job header(a {@link org.jppf.node.protocol.TaskBundle TaskBundle} instance) has been updated.
    */
-  public void fireJobUpdated() {
-    if (notificationEmitter != null) notificationEmitter.jobUpdated(this);
+  public void fireJobUpdated(final boolean headerUpdated) {
+    if (headerUpdated) updateJobDataLocation();
+    if (notificationEmitter != null) notificationEmitter.jobUpdated(this, headerUpdated);
   }
 
   /**
@@ -482,5 +491,35 @@ public abstract class AbstractServerJob {
    */
   public Lock getLock() {
     return lock;
+  }
+
+  /**
+   * Serialize the updated job header and cache the resulting serialized representation.
+   */
+  public void updateJobDataLocation() {
+    if (!isPersistent()) return;
+    DataLocation dl = null;
+    try {
+      lock.lock();
+      int size = (jobDataLocation == null) ? -1 : jobDataLocation.getSize();
+      ObjectSerializer ser = IOHelper.getDefaultserializer();
+      if (size <= 0) dl = IOHelper.serializeData(job, ser);
+      else {
+        if (IOHelper.fitsInMemory(size)) dl = IOHelper.serializeDataToMemory(job, ser);
+        else dl = IOHelper.serializeDataToFile(job, ser);
+      }
+      jobDataLocation = dl;
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * @return whether this job is persisted in the driver.
+   */
+  public boolean isPersistent() {
+    return sla.getPersistenceSpec().isPersistent();
   }
 }

@@ -224,7 +224,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     JPPFConnectionPool pool = null;
     try {
       while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
-      pool.setJMXPoolMaxSize(nbJobs);
+      pool.setJMXPoolSize(nbJobs);
       JPPFJob[] jobs = new JPPFJob[nbJobs];
       ExecutionPolicy policy = new Equal("jppf.node.uuid", false, "n1");
       for (int i=0; i<nbJobs; i++) {
@@ -244,7 +244,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       assertNotNull(t2);
       assertTrue("3rd job (start=" + t2.getStart() + ") should have started before the 2nd (start=" + t1.getStart() + ")", t2.getStart() < t1.getStart());
     } finally {
-      if (pool != null) pool.setJMXPoolMaxSize(1);
+      if (pool != null) pool.setJMXPoolSize(1);
     }
   }
 

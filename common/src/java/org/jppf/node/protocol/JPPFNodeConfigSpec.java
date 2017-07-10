@@ -28,6 +28,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class JPPFNodeConfigSpec implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The desired JPPF configuration of each node.
    */
   private final TypedProperties configuration;

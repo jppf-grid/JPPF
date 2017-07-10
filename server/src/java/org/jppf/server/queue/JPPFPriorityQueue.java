@@ -135,7 +135,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (!queued) {
           driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         }
-        if (!clientBundle.getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) persistenceHandler.storeJob(serverJob, clientBundle, !queued);
+        TaskBundle header = clientBundle.getJob();
+        if (!header.getParameter(BundleParameter.FROM_PERSISTENCE, false) && !header.getParameter(BundleParameter.ALREADY_PERSISTED, false))
+          persistenceHandler.storeJob(serverJob, clientBundle, !queued);
         fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap));
@@ -244,7 +246,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         job.getJob().getSLA().setPriority(newPriority);
         priorityMap.removeValue(oldPriority, job);
         priorityMap.putValue(newPriority, job);
-        job.fireJobUpdated();
+        job.fireJobUpdated(true);
       }
     } finally {
       lock.unlock();

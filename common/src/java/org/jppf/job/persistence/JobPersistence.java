@@ -19,10 +19,10 @@
 package org.jppf.job.persistence;
 
 import java.io.InputStream;
-import java.util.List;
+import java.util.*;
 
 /**
- * This interface must be implemnted by services that perform jobs persistence in the driver.
+ * This interface must be implemented by services that perform jobs persistence in the driver.
  * The configuration of an implementation is performed in the JPPF configuration as follows:<br/>
  * {@code jppf.job.persistence = <persistence_implementation_class_name> [param1 ... paramN]}
  * <p>The implementation class must declare either a no-arg constructor or a constructor that takes a {@code String[]} or {@code String...} parameter, or both.
@@ -34,19 +34,19 @@ import java.util.List;
  */
 public interface JobPersistence {
   /**
-   * Store the specified job elemen.
-   * @param info information on the persisted object to load.
+   * Store the specified job elements.
+   * @param infos collection of infor;qtion objects on the job ele;ents to store..
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */
-  void store(PersistenceInfo info) throws JobPersistenceException;
+  void store(Collection<PersistenceInfo> infos) throws JobPersistenceException;
 
   /**
-   * Load the specified job element.
-   * @param info information on the persisted object to store.
+   * Load the specified job elements.
+   * @param infos information on the persisted objects to load.
    * @return an input stream providing the serialized job header.
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */
-  InputStream load(PersistenceInfo info) throws JobPersistenceException;
+  List<InputStream> load(Collection<PersistenceInfo> infos) throws JobPersistenceException;
 
   /**
    * Get the UUIDs of all persisted job.
@@ -77,4 +77,12 @@ public interface JobPersistence {
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */
   void deleteJob(String jobUuid) throws JobPersistenceException;
+
+  /**
+   * Determien whether a job is persisted, that is, present in the persistence store.
+   * @param jobUuid the UUID of the job to check.
+   * @return {@code true} if the job is in the persistence store, {@code false} otherwise.
+   * @throws JobPersistenceException if any error occurs while accessing the persistence store.
+   */
+  boolean isJobPersisted(String jobUuid) throws JobPersistenceException;
 }

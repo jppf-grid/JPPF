@@ -95,9 +95,9 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    */
   private JPPFNodeConfigSpec nodeConfigurationSpec;
   /**
-   * Whether this job is persisted by the driver.
+   * Whether this job is persisted by the driver and behavior upon recovery.
    */
-  private boolean persistent;
+  private PersistenceSpec persistenceSpec = new PersistenceSpec();
 
   /**
    * Default constructor.
@@ -397,23 +397,20 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   }
 
   /**
-   * Determine whether the job is persisted by the driver. The default value is {@code false}.
-   * @return {@code true} if the job is persisted, {@code false} otherwise.
+   * Get the specification of the job persistence in the driver.
+   * @return a {@link PersistenceSpec} instance.
    * @since 6.0
    */
-  public boolean isPersistent() {
-    return persistent;
+  public PersistenceSpec getPersistenceSpec() {
+    return persistenceSpec;
   }
 
   /**
-   * Specify whether the job is persisted by the driver. The default value is {@code false}.
-   * @param persistent {@code true} to make the job persistent, {@code false} otherwise.
-   * @return this SLA, for mathod chaining.
-   * @since 6.0
+   * Set the specification of the job persistence in the driver.
+   * @param persistenceSpec a {@link PersistenceSpec} instance.
    */
-  public JobSLA setPersistent(final boolean persistent) {
-    this.persistent = persistent;
-    return this;
+  void setPersistenceSpec(final PersistenceSpec persistenceSpec) {
+    this.persistenceSpec = persistenceSpec;
   }
 
   /**
@@ -423,15 +420,22 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   public JobSLA copy() {
     JobSLA sla = new JobSLA();
     copyTo(sla);
+    sla.setApplyMaxResubmitsUponNodeError(applyMaxResubmitsUponNodeError);
     sla.setBroadcastJob(broadcastJob);
-    sla.setMaxNodes(maxNodes);
-    sla.setSuspended(suspended);
     sla.setCancelUponClientDisconnect(cancelUponClientDisconnect);
-    sla.setResultsStrategy(resultsStrategy);
     sla.setClassPath(classPath);
+    sla.setDesiredNodeConfiguration(nodeConfigurationSpec);
     sla.setDispatchExpirationSchedule(dispatchExpirationSchedule);
+    sla.setGridExecutionPolicy(gridExecutionPolicy);
     sla.setMaxDispatchExpirations(maxDispatchExpirations);
-    sla.setPersistent(persistent);
+    sla.setMaxNodeProvisioningGroups(maxNodeProvisioningGroups);
+    sla.setMaxNodes(maxNodes);
+    sla.setMaxTaskResubmits(maxTaskResubmits);
+    sla.setPersistenceSpec(persistenceSpec);
+    sla.setPriority(priority);
+    sla.setRemoteClassLoadingEnabled(remoteClassLoadingEnabled);
+    sla.setResultsStrategy(resultsStrategy);
+    sla.setSuspended(suspended);
     return sla;
   }
 }

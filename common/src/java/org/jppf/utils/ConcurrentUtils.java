@@ -85,6 +85,15 @@ public final class ConcurrentUtils {
   }
 
   /**
+   * Wait until the specified condition is fulfilled.
+   * @param condition the condition to check.
+   * @return true whenever the condition is {@code null} or gets fulfilled, {@code false} otherwise.
+   */
+  public static boolean awaitCondition(final Condition condition) {
+    return awaitCondition(condition, 0L);
+  }
+
+  /**
    * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
    * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
    * @param condition the condition to check.
@@ -92,7 +101,7 @@ public final class ConcurrentUtils {
    * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
    * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
    * @throws IllegalArgumentException if the millis are negative.
-   * @throws JPPFTimeoutException if the timeout expires.
+   * @throws JPPFTimeoutException if the timeout expires and {@code throwExceptionOnTImeout} is {@code true}.
    */
   public static boolean awaitCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout) throws IllegalArgumentException, JPPFTimeoutException {
     if (condition == null) return true;
@@ -117,7 +126,7 @@ public final class ConcurrentUtils {
    * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
    * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
    * @throws IllegalArgumentException if the millis are negative.
-   * @throws JPPFTimeoutException if the timeout expires.
+   * @throws JPPFTimeoutException if the timeout expires and {@code throwExceptionOnTImeout} is {@code true}.
    */
   public static boolean awaitInterruptibleCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout)
     throws IllegalArgumentException, JPPFTimeoutException {
@@ -153,16 +162,6 @@ public final class ConcurrentUtils {
     if (fulfilled.get()) return true;
     if (throwExceptionOnTImeout) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", timeout));
     return false;
-  }
-
-
-  /**
-   * Wait until the specified condition is fulfilled.
-   * @param condition the condition to check.
-   * @return true whenever the condition is {@code null} or gets fulfilled, {@code false} otherwise.
-   */
-  public static boolean awaitCondition(final Condition condition) {
-    return awaitCondition(condition, 0L);
   }
 
   /**

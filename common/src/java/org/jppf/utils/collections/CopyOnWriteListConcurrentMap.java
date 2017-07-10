@@ -27,25 +27,21 @@ import java.util.concurrent.*;
  * @param <V> the type of the objects in the map"'s collection values.
  * @author Laurent Cohen
  */
-public class CopyOnWriteListConcurrentMap<K, V> extends AbstractCollectionConcurrentMap<K, V>
-{
+public class CopyOnWriteListConcurrentMap<K, V> extends AbstractCollectionConcurrentMap<K, V> {
   /**
    * Default constructor.
    */
-  public CopyOnWriteListConcurrentMap()
-  {
+  public CopyOnWriteListConcurrentMap() {
     this.map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new ConcurrentHashMap<>();
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new CopyOnWriteArrayList<>();
   }
 }

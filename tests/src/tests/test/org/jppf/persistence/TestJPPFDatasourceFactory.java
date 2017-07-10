@@ -21,25 +21,23 @@ package test.org.jppf.persistence;
 import static org.jppf.persistence.JPPFDatasourceFactory.Scope.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.sql.*;
 import java.util.*;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Level;
-import org.h2.tools.*;
+import org.h2.tools.Script;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
-import org.jppf.persistence.*;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
 import org.junit.*;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -47,78 +45,16 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Unit test {@link JPPFDatasourceFactory}.
  * @author Laurent Cohen
  */
-public class TestJPPFDatasourceFactory extends AbstractNonStandardSetup {
-  /**
-   * Database name.
-   */
-  public static final String DB_NAME = "tests_jppf";
-  /**
-   * Connection URL.
-   */
-  public static final String DB_URL = "jdbc:h2:tcp://localhost:9092/./root/" + DB_NAME;
-  /**
-   * Database user.
-   */
-  public static final String DB_USER = "sa";
-  /**
-   * Database password.
-   */
-  public static final String DB_PWD = "";
-  /**
-   * JDBC driver class name.
-   */
-  public static final String DB_DRIVER_CLASS = "org.h2.Driver";
-  /**
-   * Name of the test table.
-   */
-  public static final String TABLE_NAME = "TEST_TABLE";
-  /**
-   * The database server.
-   */
-  private static Server h2Server;
-
+public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   /**
    * Starts the DB server and create the database with a test table.
    * @throws Exception if any error occurs.
    */
   @BeforeClass
   public static void setup() throws Exception {
-    BaseSetup.setLoggerLevel("org.jppf.persistence", Level.DEBUG);
-    print(false, false, "starting H2 server");
-    h2Server = Server.createTcpServer().start();
-    print(false, false, "H2 server started, creating table");
-    // create the test table
-    Class.forName(DB_DRIVER_CLASS);
-    try (Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD)) {
-      String sql = FileUtils.readTextFile(TestJPPFDatasourceFactory.class.getPackage().getName().replace('.', '/') + "/create_table.sql");
-      try (PreparedStatement ps = c.prepareStatement(sql)) {
-        ps.executeUpdate();
-      }
-    }
-    print(false, false, "table created");
-    Configuration config = createConfig("persistence");
-    config.driverClasspath.add("lib/h2.jar");
+    Configuration config = dbSetup("persistence");
     config.nodeLog4j = "classes/tests/config/persistence/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
-  }
-
-  /**
-   * Stops the DB server and delete the database.
-   * @throws Exception if the server could not be started.
-   */
-  @AfterClass
-  public static void teardown() throws Exception {
-    BaseSetup.generateClientThreadDump();
-    JPPFDatasourceFactory.getInstance().clear();
-    // generate sql dump file of the database
-    print(false, false, "generating SQL dump");
-    Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "h2dump.log");
-    print(false, false, "stopping H2 server");
-    if (h2Server != null) h2Server.stop();
-    print(false, false, "H2 server stopped, deleting database");
-    // delete the entire database
-    FileUtils.deletePath(new File("./root"), true);
-    print(false, false, "database deleted");
   }
 
   /**

@@ -25,8 +25,7 @@ import org.slf4j.*;
  * A simple JPPF task for unit-testing.
  * @author Laurent Cohen
  */
-public class SimpleTask extends AbstractTask<String>
-{
+public class SimpleTask extends AbstractTask<String> {
   /**
    * Logger for this class.
    */
@@ -39,16 +38,14 @@ public class SimpleTask extends AbstractTask<String>
   /**
    * Initialize this task.
    */
-  public SimpleTask()
-  {
+  public SimpleTask() {
   }
 
   /**
    * Initialize this task.
    * @param duration specifies the duration of this task.
    */
-  public SimpleTask(final long duration)
-  {
+  public SimpleTask(final long duration) {
     this.duration = duration;
   }
 
@@ -56,16 +53,12 @@ public class SimpleTask extends AbstractTask<String>
    * {@inheritDoc}
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (duration > 0) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
     }
   }

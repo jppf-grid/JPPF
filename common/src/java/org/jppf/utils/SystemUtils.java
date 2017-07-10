@@ -83,6 +83,14 @@ public final class SystemUtils {
    * Holds and manages the shutdown hooks set on the JVM.
    */
   private static Map<String, Thread> shutdownHooks = new Hashtable<>();
+  /**
+   * This process id.
+   */
+  private static final int PID = determinePID();
+  /**
+   * The runtime for the current JVM.
+   */
+  private static final Runtime RUNTIME = Runtime.getRuntime();
 
   /**
    * Instantiation of this class is not permitted.
@@ -256,8 +264,23 @@ public final class SystemUtils {
    * @return the maximum number of free bytes in the heap.
    */
   public static long maxFreeHeap() {
-    Runtime rt = Runtime.getRuntime();
-    return rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
+    return RUNTIME.maxMemory() - (RUNTIME.totalMemory() - RUNTIME.freeMemory());
+  }
+
+  /**
+   * Compute the used heap.
+   * @return the heap memory used in bytes.
+   */
+  public static long heapUsage() {
+    return RUNTIME.totalMemory() - RUNTIME.freeMemory();
+  }
+
+  /**
+   * Compute the percentage of used heap as compared to the maximum heap size of the JVM.
+   * @return the percentage of heap memory used.
+   */
+  public static double heapUsagePct() {
+    return 100d * (RUNTIME.totalMemory() - RUNTIME.freeMemory()) / RUNTIME.maxMemory();
   }
 
   /**
@@ -298,13 +321,12 @@ public final class SystemUtils {
   }
 
   /**
-   * Return the current process ID.
+   * Determine the current process ID.
    * @return the pid as an int, or -1 if the pid could not be obtained.
    */
-  public static int getPID() {
+  private static int determinePID() {
     int pid = -1;
     // we expect the name to be in '<pid>@hostname' format - this is JVM dependent
-    //String name = ManagementFactory.getRuntimeMXBean().getName();
     try {
       if (ManagementUtils.isManagementAvailable()) {
         String name = String.valueOf(ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=Runtime", "Name"));
@@ -326,6 +348,13 @@ public final class SystemUtils {
       else log.warn(e.getMessage());
     }
     return pid;
+  }
+
+  /**
+   * @return the current process pid as an int, or -1 if the pid could not be obtained.
+   */
+  public synchronized static int getPID() {
+    return PID;
   }
 
   /**

@@ -42,25 +42,34 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   /**
    * The soft references queue.
    */
-  private ReferenceQueue<V> refQueue;
+  private final ReferenceQueue<V> refQueue;
   /**
    * The underlying map that backs this soft map.
    */
-  private Map<K, SoftValue<K, V>> map;
+  private final Map<K, SoftValue<K, V>> map;
 
   /**
    * Default constructor.
    */
   public SoftReferenceValuesMap() {
+    this(0);
+  }
+
+  /**
+   * Default constructor.
+   * @param capacity an optional maximum capacity.
+   */
+  public SoftReferenceValuesMap(final int capacity) {
     refQueue = new ReferenceQueue<>();
-    map = createMap();
+    map = createMap(capacity);
   }
 
   /**
    * Create the underlying map of soft references.
+   * @param capacity an optional maximum capacity.
    * @return a new {@code Map} instance.
    */
-  Map<K, SoftValue<K, V>> createMap() {
+  Map<K, SoftValue<K, V>> createMap(final int capacity) {
     return new HashMap<>();
   }
 

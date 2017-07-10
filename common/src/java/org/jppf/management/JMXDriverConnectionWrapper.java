@@ -23,6 +23,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.job.JobInformation;
+import org.jppf.job.persistence.PersistedJobsManagerMBean;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.*;
@@ -282,6 +283,17 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   public DriverJobManagementMBean getJobManager() throws Exception {
     return getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean which manages persisted jobs.
+   * It is equivalent to calling the more cumbersome {@code getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class)}.
+   * @return an instance of {@link PersistedJobsManagerMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @exclude
+   */
+  public PersistedJobsManagerMBean getPersistedJobsManager() throws Exception {
+    return getProxy(PersistedJobsManagerMBean.MBEAN_NAME, PersistedJobsManagerMBean.class);
   }
 
   /**

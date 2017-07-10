@@ -50,10 +50,6 @@ public class DefaultFilePersistence implements JobPersistence {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
-   */
-  //private static boolean traceEnabled = log.isDebugEnabled();
-  /**
    * The default root path if none is specified.
    */
   private static final String DEFAULT_ROOT = "persistence";
@@ -104,37 +100,38 @@ public class DefaultFilePersistence implements JobPersistence {
     if (debugEnabled) log.debug("initializing {} with rootPath={}", getClass().getSimpleName(), rootPath);
   }
 
-  /**
-   * This implementation writes first to a tempprary file, then moves the file to its expected name and location.
-   * This covers cases when the driver dies while storing data and avoids ending with a corrupted file.
-   * @param info information on the persisted object to load.
-   * @throws JobPersistenceException if any erorr occurs during the persistence operation.
-   */
   @Override
-  public void store(final PersistenceInfo info) throws JobPersistenceException {
+  public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     try {
-      if (debugEnabled) log.debug("storing {}", info);
-      Path jobDir = getJobDir(info.getJobUuid());
+      if (debugEnabled) log.debug("storing {}", infos);
+      Path jobDir = getJobDir(infos.iterator().next().getJobUuid());
       checkDirectory(jobDir);
-      Path path = getPathFor(jobDir, info, false);
-      Path tmpPath = getPathFor(jobDir, info, true);
-      try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(tmpPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
-        InputStream in = info.getInputStream()) {
-        StreamUtils.copyStream(in, out, false);
+      for (PersistenceInfo info: infos) {
+        Path path = getPathFor(jobDir, info, false);
+        Path tmpPath = getPathFor(jobDir, info, true);
+        try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(tmpPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
+          InputStream in = info.getInputStream()) {
+          StreamUtils.copyStream(in, out, false);
+        }
+        Files.move(tmpPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
       }
-      Files.move(tmpPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     } catch (Exception e) {
       throw new JobPersistenceException(e);
     }
   }
 
   @Override
-  public InputStream load(final PersistenceInfo info) throws JobPersistenceException {
+  public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
+    if ((infos == null) || infos.isEmpty()) return null;
     try {
-      if (debugEnabled) log.debug("loading {}", info);
-      Path jobDir = getJobDir(info.getJobUuid());
-      Path path = getPathFor(jobDir, info, false);
-      return new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ));
+      if (debugEnabled) log.debug("loading {}", infos);
+      Path jobDir = getJobDir(infos.iterator().next().getJobUuid());
+      List<InputStream> result = new ArrayList<>(infos.size());
+      for (PersistenceInfo info: infos) {
+        Path path = getPathFor(jobDir, info, false);
+        result.add(new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)));
+      }
+      return result;
     } catch (Exception e) {
       throw new JobPersistenceException(e);
     }
@@ -184,6 +181,16 @@ public class DefaultFilePersistence implements JobPersistence {
     }
   }
 
+  @Override
+  public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
+    try {
+      Path path = getPathFor(getJobDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
+      return (path != null) && Files.exists(path);
+    } catch (IOException e) {
+      throw new JobPersistenceException(e);
+    }
+  }
+
   /**
    * Get the positions of the specified types of files.
    * @param jobUuid the job uuid for which to get the tasks positions.
@@ -228,13 +235,26 @@ public class DefaultFilePersistence implements JobPersistence {
    * @throws IOException if any I/O error occurs.
    */
   private Path getPathFor(final Path jobDir, final PersistenceInfo info, final boolean isTemp) throws IOException {
+    return getPathFor(jobDir, info.getType(), info.getTaskPosition(), isTemp);
+  }
+
+  /**
+   *
+   * @param jobDir the path of the job's directory.
+   * @param type the type of object to find.
+   * @param position the task or task result position when applicable.
+   * @param isTemp whether to return a temp file path.
+   * @return a list of the matching paths in the specified directory.
+   * @throws IOException if any I/O error occurs.
+   */
+  private Path getPathFor(final Path jobDir, final PersistenceObjectType type, final int position, final boolean isTemp) throws IOException {
     String dir = pathname(jobDir);
     String ext = isTemp ? TEMP_EXTENSION : DEFAULT_EXTENSION;
-    switch (info.getType()) {
+    switch (type) {
       case JOB_HEADER:    return Paths.get(dir, HEADER_PREFIX + ext);
       case DATA_PROVIDER: return Paths.get(dir, DATA_PROVIDER_PREFIX + ext);
-      case TASK:          return Paths.get(dir, TASK_PREFIX + info.getTaskPosition() + ext);
-      case TASK_RESULT:   return Paths.get(dir, RESULT_PREFIX + info.getTaskPosition() + ext);
+      case TASK:          return Paths.get(dir, TASK_PREFIX + position + ext);
+      case TASK_RESULT:   return Paths.get(dir, RESULT_PREFIX + position + ext);
     }
     return null;
   }
