@@ -109,7 +109,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.2.6";
+        $ver1 = "5.2.7";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>

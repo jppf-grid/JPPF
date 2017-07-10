@@ -311,7 +311,7 @@ div#mw-content-text li a {
 
 .yh {
   color: white;
-  background-color: 6D78B6;
+  background-color: #6D78B6;
   font-weight: bold;
   font-style: italic;
   padding: 10px 10px;
@@ -326,7 +326,7 @@ a.yellow_highlight:hover {
 
 .yhd {
   color: white;
-  background-color: 6D78B6;
+  background-color: #6D78B6;
   font-size: 16pt;
   font-style: italic;
   font-weight: bold;
@@ -373,4 +373,6 @@ div#bodyContent div h2 {
 
 .wiki_note {
   background-color: #FFF990;
+  border: solid 1px #8D98D6;
+  padding: 0px 5px;
 }
