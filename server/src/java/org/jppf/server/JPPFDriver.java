@@ -116,9 +116,13 @@ public class JPPFDriver {
    */
   private AcceptorNioServer acceptorServer = null;
   /**
+   * Determines whether this server has scheduled a shutdown.
+   */
+  private final AtomicBoolean shutdownSchduled = new AtomicBoolean(false);
+  /**
    * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
    */
-  private AtomicBoolean shuttingDown = new AtomicBoolean(false);
+  final AtomicBoolean shuttingDown = new AtomicBoolean(false);
   /**
    * Holds the statistics monitors.
    */
@@ -304,7 +308,7 @@ public class JPPFDriver {
    * @exclude
    */
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
-    if (shuttingDown.compareAndSet(false, true)) {
+    if (shutdownSchduled.compareAndSet(false, true)) {
       log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
       Timer timer = new Timer();
       ShutdownRestartTask task = new ShutdownRestartTask(restart, restartDelay, this);
@@ -500,5 +504,13 @@ public class JPPFDriver {
    */
   public void removeDriverDiscovery(final PeerDriverDiscovery discovery) {
     initializer.discoveryHandler.removeDiscovery(discovery);
+  }
+
+  /**
+   * Determine whether this server has initiated a shutdown, in which case it does not accept connections anymore.
+   * @return {@code true} if a shutdown is initiated, {@code false} otherwise.
+   */
+  public boolean isShuttingDown() {
+    return shuttingDown.get();
   }
 }

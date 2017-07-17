@@ -417,6 +417,11 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    */
   protected int startDriverSocket() {
     try {
+      if (processServer != null) {
+        StreamUtils.closeSilent(processServer);
+        processServer = null;
+      }
+      if (socketClient != null) StreamUtils.closeSilent(socketClient);
       processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
       /** */
@@ -436,11 +441,6 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
             if (n == -1) throw new EOFException();
           } catch(Exception e) {
             if (debugEnabled) log.debug(name, e);
-            if (socketClient != null) StreamUtils.closeSilent(socketClient);
-            if (processServer != null) {
-              StreamUtils.closeSilent(processServer);
-              processServer = null;
-            }
           }
         }
 

@@ -74,21 +74,23 @@ class ShutdownRestartTask extends TimerTask {
    */
   @Override
   public void run() {
-    log.info("Initiating shutdown");
     cancel();
-    driver.shutdown();
-    if (JPPFConfiguration.get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
-      if (!restart) {
-        log.info("Performing requested exit");
-        System.exit(0);
-      } else {
-        try {
-          lock.goToSleep(restartDelay);
-          log.info("Initiating restart");
-          System.exit(2);
-        } catch (Exception e) {
-          log.error(e.getMessage(), e);
-          throw new JPPFError("Could not restart the JPPFDriver");
+    if (driver.shuttingDown.compareAndSet(false, true)) {
+      log.info("Initiating shutdown");
+      driver.shutdown();
+      if (JPPFConfiguration.get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
+        if (!restart) {
+          log.info("Performing requested exit");
+          System.exit(0);
+        } else {
+          try {
+            lock.goToSleep(restartDelay);
+            log.info("Initiating restart");
+            System.exit(2);
+          } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new JPPFError("Could not restart the JPPFDriver");
+          }
         }
       }
     }

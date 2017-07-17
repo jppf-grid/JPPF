@@ -79,7 +79,7 @@ public interface JobPersistence {
   void deleteJob(String jobUuid) throws JobPersistenceException;
 
   /**
-   * Determien whether a job is persisted, that is, present in the persistence store.
+   * Determine whether a job is persisted, that is, present in the persistence store.
    * @param jobUuid the UUID of the job to check.
    * @return {@code true} if the job is in the persistence store, {@code false} otherwise.
    * @throws JobPersistenceException if any error occurs while accessing the persistence store.

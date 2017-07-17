@@ -69,6 +69,7 @@ public class JPPFDriverJobPersistenceManager {
     this.jmx = jmx;
     try {
       this.persistedJobsManager = this.jmx.getPersistedJobsManager();
+      if (this.persistedJobsManager == null) throw new IllegalStateException("persistedJobsManager is null");
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

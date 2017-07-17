@@ -24,7 +24,7 @@ import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 
 /**
- * Test database job persistence. 
+ * Test database job persistence.
  * @author Laurent Cohen
  */
 public class TestDefaultDatabasePersistence extends AbstractJobPersistenceTest {

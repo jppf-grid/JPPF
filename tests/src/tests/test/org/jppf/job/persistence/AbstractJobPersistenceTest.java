@@ -47,7 +47,7 @@ public class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, false, "start of method %s()", description.getMethodName());
     }
   };
 
@@ -58,8 +58,12 @@ public class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void tearDownInstance() throws Exception {
     try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
       jmx.connectAndWait(5_000L);
-      JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
-      mgr.deleteJobs(JobSelector.ALL_JOBS);
+      boolean b = jmx.isConnected();
+      print(false, false, "tearDownInstance() : jmx connected = %b", b);
+      if (b) {
+        JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+        mgr.deleteJobs(JobSelector.ALL_JOBS);
+      }
     }
   }
 
@@ -145,23 +149,25 @@ public class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 100L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
-    client.submitJob(job);
-    Thread.sleep(1000L);
     try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
       jmx.setReconnectOnError(false);
-      jmx.restartShutdown(200L, 1L);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
+      client.submitJob(job);
+      listener.await();
+      jmx.restartShutdown(500L, 1L);
     }
-    Thread.sleep(200L);
+    Thread.sleep(500L);
     List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
-    JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
-    List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
-    assertNotNull(persistedUuids);
-    assertEquals(1, persistedUuids.size());
-    assertNotNull(persistedUuids.get(0));
-    assertEquals(job.getUuid(), persistedUuids.get(0));
-    assertTrue(mgr.deleteJob(job.getUuid()));
+    try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
+      JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+      List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
+      assertNotNull(persistedUuids);
+      assertEquals(1, persistedUuids.size());
+      assertNotNull(persistedUuids.get(0));
+      assertEquals(job.getUuid(), persistedUuids.get(0));
+      assertTrue(mgr.deleteJob(job.getUuid()));
+    }
   }
 
   /**
@@ -217,7 +223,7 @@ public class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       Throwable t = task.getThrowable();
       assertNull(String.format("task '%s' has a throwable: %s", task.getId(), (t == null) ? "none" : ExceptionUtils.getMessage(t)), t);
       if (!cancelled) {
-        assertNotNull(task.getResult());
+        assertNotNull(String.format("task %s has a null result", task.getId()), task.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       }
     }

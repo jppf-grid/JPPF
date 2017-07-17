@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.io.*;
 import org.jppf.job.persistence.*;
 import org.jppf.node.protocol.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.*;
@@ -50,7 +51,7 @@ public class PersistenceHandler {
    * The jobs queue.
    */
   private final JPPFPriorityQueue queue;
-
+ 
   /**
    * Initialize this persistence handler.
    * @param queue the jobs queue.
@@ -130,12 +131,20 @@ public class PersistenceHandler {
    * @param job the job to remove.
    */
   void deleteJob(final ServerJob job) {
-    if (!isPersistent(job)) return;
-    if (debugEnabled) log.debug("removing job {} from persistence store", job);
+    if (isPersistent(job)) deleteJob(job.getUuid());
+  }
+
+  /**
+   * Remove the specified job from the persistence store.
+   * @param jobUuid uuid of the job to remove.
+   */
+  public void deleteJob(final String jobUuid) {
+    if (!isPersistenceReady()) return;
+    if (debugEnabled) log.debug("removing job {} from persistence store", jobUuid);
     try {
-      persistence.deleteJob(job.getUuid());
+      persistence.deleteJob(jobUuid);
     } catch (JobPersistenceException e) {
-      log.error("error deleting persistent job {} : {}", job, ExceptionUtils.getStackTrace(e));
+      log.error("error deleting persistent job {} : {}", jobUuid, ExceptionUtils.getStackTrace(e));
     }
   }
 
@@ -170,6 +179,7 @@ public class PersistenceHandler {
       for (int pos: taskPositions) {
         if (Arrays.binarySearch(resultPositions, pos) < 0) positionsToLoad[i++] = pos;
       }
+      if (debugEnabled) log.debug("positions to load for jobUuid={} : {}", jobUuid, StringUtils.buildString(positionsToLoad));
       List<PersistenceInfo> infos = new ArrayList<>(positionsToLoad.length + 1);
       infos.add(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.DATA_PROVIDER, -1, null));
       for (int pos: positionsToLoad) {
@@ -178,7 +188,6 @@ public class PersistenceHandler {
       List<InputStream> streams = persistence.load(infos);
       DataLocation dataProvider = load(streams.get(0)); 
       List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
-      i = 1;
       for (i=1; i<streams.size(); i++) {
         DataLocation taskData = load(streams.get(i));
         ServerTask task = (ServerTask) IOHelper.unwrappedData(taskData);
@@ -289,10 +298,10 @@ public class PersistenceHandler {
   /**
    * Determine whether the specified job should be persisted.
    * @param job the job to check.
-   * @return {@code true} if the job is persistence and job persistence is active, {@code false} otherwise.
+   * @return {@code true} if the job is persistent and job persistence is active, {@code false} otherwise.
    */
   private boolean isPersistent(final ServerJob job) {
-    return (persistence != null) && job.isPersistent();
+    return isPersistenceReady() && job.isPersistent();
   }
 
   /**
@@ -302,7 +311,15 @@ public class PersistenceHandler {
    * @throws JobPersistenceException if any error occurs while accessing the persistence store.
    */
   public boolean isJobPersisted(final String uuid) throws JobPersistenceException {
-    return (persistence != null) && persistence.isJobPersisted(uuid);
+    return isPersistenceReady() && persistence.isJobPersisted(uuid);
+  }
+
+  /**
+   * Determine whether the persistence is available.
+   * @return {@code true} if the persistence is available, {@code false} otherwise.
+   */
+  private boolean isPersistenceReady() {
+    return (persistence != null) && !JPPFDriver.getInstance().isShuttingDown();
   }
 
   /**
@@ -311,5 +328,33 @@ public class PersistenceHandler {
    */
   public JobPersistence getPersistence() {
     return persistence;
+  }
+
+  /**
+   * Get the positions of all tasks and task results for the specified persisted job.
+   * @param uuid the uuid of the persisted job to lookup.
+   * @return an array of int arrays, where the first array represents the positions of all tasks before execution,
+   * and the second array represents the positions of all task results. The second array may be empty if no task result was received.
+   * @throws Exception if any error occurs.
+   */
+  public int[][] getPersistedJobPositions(final String uuid) throws Exception {
+    if (!isPersistenceReady()) return null;
+    if (debugEnabled) log.debug("requesting positions for uuid={}", uuid);
+    int[] taskPositions = persistence.getTaskPositions(uuid);
+    if (taskPositions == null) taskPositions = new int[0];
+    else Arrays.sort(taskPositions);
+    int[] resultPositions = persistence.getTaskResultPositions(uuid);
+    if (resultPositions == null) resultPositions = new int[0];
+    Arrays.sort(resultPositions);
+    return new int[][] { taskPositions, resultPositions };
+  }
+
+  /**
+   * Get the uuids of all persisted jobs.
+   * @return a list of persisted job uuids, possibly emtpy if no job is persisted or persistence is not avaialble.
+   * @throws JobPersistenceException if any error occurs while searching for persisted jobs.
+   */
+  public List<String> getPersistedJobUuids() throws JobPersistenceException {
+    return isPersistenceReady() ? persistence.getPersistedJobUuids() : new ArrayList<String>();
   }
 }

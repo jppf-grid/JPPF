@@ -1,4 +1,8 @@
 #! /bin/sh
 
 rm -f logs/*.zip
-ant test.pattern -Dpattern=$1
+pattern=$1
+if [ -z "$pattern" ]
+then pattern=**/JPPFSuite.java
+fi 
+ant test.pattern -Dpattern=$pattern

@@ -48,13 +48,13 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The persistence handler held by the driver queue.
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
    */
-  private final PersistenceHandler handler;
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * The persistence handler held by the driver queue.
    */
-  private final JobPersistence persistence;
+  private final PersistenceHandler handler;
   /**
    *
    */
@@ -69,8 +69,6 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
    */
   public PersistedJobsManager() {
     handler = JPPFDriver.getInstance().getQueue().getPersistenceHandler();
-    persistence = handler.getPersistence();
-    if (debugEnabled) log.debug("got persistence = {}", persistence);
   }
 
   @Override
@@ -91,14 +89,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public int[][] getPersistedJobPositions(final String uuid) throws Exception {
-    if (debugEnabled) log.debug("requesting positions for uuid={}", uuid);
-    int[] taskPositions = persistence.getTaskPositions(uuid);
-    if (taskPositions == null) taskPositions = new int[0];
-    else Arrays.sort(taskPositions);
-    int[] resultPositions = persistence.getTaskResultPositions(uuid);
-    if (resultPositions == null) resultPositions = new int[0];
-    Arrays.sort(resultPositions);
-    return new int[][] { taskPositions, resultPositions };
+    return handler.getPersistedJobPositions(uuid);
   }
 
   @Override
@@ -107,7 +98,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
     List<String> result = new ArrayList<>();
     for (String uuid: persisted) {
       try {
-        persistence.deleteJob(uuid);
+        handler.deleteJob(uuid);
         result.add(uuid);
       } catch (Exception e) {
         if (debugEnabled) log.debug("error deleting job with uuid={} : {}", uuid, ExceptionUtils.getStackTrace(e));
@@ -145,7 +136,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
    */
   private List<String> getMatchingUuids(final JobSelector selector) throws Exception {
     JobSelector sel = (selector == null) ? JobSelector.ALL_JOBS : selector;
-    List<String> uuids = persistence.getPersistedJobUuids();
+    List<String> uuids = handler.getPersistedJobUuids();
     List<String> result = new ArrayList<>(uuids.size());
     for (String uuid: uuids) {
       if ((sel instanceof AllJobsSelector) || ((sel instanceof JobUuidSelector) && ((JobUuidSelector) sel).getUuids().contains(uuid))) result.add(uuid);
@@ -172,15 +163,15 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public Object getPersistedJobObject(final long requestId, final String uuid, final PersistenceObjectType type, final int position) throws Exception {
-    if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d", uuid, type, position));
+    if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d, requestId=%d", uuid, type, position, requestId));
     Map<PersistenceInfoKey, DataLocation> map = loadRequests.get(requestId);
     if (map == null) return null;
     PersistenceInfoKey key = new PersistenceInfoKey(uuid, type, position);
     DataLocation data = map.remove(key);
     if (map.isEmpty()) loadRequests.remove(requestId);
-    if (debugEnabled) {
-      if (data != null) log.debug(String.format("got object=%s for uuid=%s, type=%s, pos=%d", data, uuid, type, position));
-      else log.debug(String.format("could not find persisted object for uuid=%s, type=%s, pos=%d", uuid, type, position));
+    if (traceEnabled) {
+      if (data != null) log.trace(String.format("got object=%s for uuid=%s, type=%s, pos=%d, requestId=%d", data, uuid, type, position, requestId));
+      else log.trace(String.format("could not find persisted object for uuid=%s, type=%s, pos=%d, requestId=%d", uuid, type, position, requestId));
     }
     return deserialize(data, type);
   }
