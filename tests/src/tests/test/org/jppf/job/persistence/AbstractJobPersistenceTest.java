@@ -41,7 +41,7 @@ import test.org.jppf.test.setup.common.*;
  *
  * @author Laurent Cohen
  */
-public class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
+public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   /** */
   @Rule
   public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
