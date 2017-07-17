@@ -225,6 +225,7 @@ public class BaseTestHelper {
    */
   public static void printToAll(final JPPFClient client, final boolean toStdout, final boolean toClient, final boolean toServers, final boolean toNodes,
     final boolean decorate, final String format, final Object...params) {
+    if (client == null) return;
     if (!toServers && !toNodes) return;
     List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
