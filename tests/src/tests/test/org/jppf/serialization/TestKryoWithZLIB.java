@@ -25,7 +25,6 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 
 /**
  * Unit tests for the Kryo serialization scheme.
@@ -40,7 +39,7 @@ public class TestKryoWithZLIB extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = true;
-    Configuration config = createConfig("serialization/kryo_zlib");
+    TestConfiguration config = createConfig("serialization/kryo_zlib");
     List<String> commonCP = new ArrayList<>();
     commonCP.add("../samples-pack/KryoSerializer/classes");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar");

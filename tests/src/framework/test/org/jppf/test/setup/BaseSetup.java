@@ -18,7 +18,6 @@
 
 package test.org.jppf.test.setup;
 
-import java.io.*;
 import java.util.*;
 
 import javax.management.remote.JMXServiceURL;
@@ -43,7 +42,7 @@ public class BaseSetup {
   /**
    * The default configuratin used when none is specified.
    */
-  public static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
+  public static final TestConfiguration DEFAULT_CONFIG = createDefaultConfiguration();
   /**
    * The jppf client to use.
    */
@@ -109,7 +108,7 @@ public class BaseSetup {
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final Configuration config) throws Exception {
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final TestConfiguration config) throws Exception {
     return setup(nbDrivers, nbNodes, createClient, true, config);
   }
 
@@ -125,9 +124,9 @@ public class BaseSetup {
    * @throws Exception if a process could not be started.
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes,
-    final Configuration config, final ConnectionPoolListener... listeners) throws Exception {
+    final TestConfiguration config, final ConnectionPoolListener... listeners) throws Exception {
     BaseTest.printOut("performing setup with %d drivers, %d nodes %s", nbDrivers, nbNodes, (createClient ? " and 1 client" : ""));
-    ConfigSource.setClientConfig(config.clientConfig);
+    TestConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
@@ -179,8 +178,8 @@ public class BaseSetup {
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config, final ConnectionPoolListener... listeners) throws Exception {
-    ConfigSource.setClientConfig(config.clientConfig);
+  public static JPPFClient createClient(final String uuid, final boolean reset, final TestConfiguration config, final ConnectionPoolListener... listeners) throws Exception {
+    TestConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
     else SSLHelper.resetConfig();
     if ((listeners == null) || (listeners.length <= 0)) client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
@@ -194,7 +193,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void resetClientConfig() throws Exception {
-    ConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
+    TestConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
     JPPFConfiguration.reset();
   }
 
@@ -350,10 +349,10 @@ public class BaseSetup {
 
   /**
    * Create the default configuratin used when none is specified.
-   * @return a {@link Configuration} instance.
+   * @return a {@link TestConfiguration} instance.
    */
-  public static Configuration createDefaultConfiguration() {
-    Configuration config = new Configuration();
+  public static TestConfiguration createDefaultConfiguration() {
+    TestConfiguration config = new TestConfiguration();
     List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
     commonCP.add("classes/tests/config");
@@ -380,92 +379,6 @@ public class BaseSetup {
     config.nodeJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-node1.properties");
     config.clientConfig = dir + "/client.properties";
     return config;
-  }
-
-  /** */
-  public static class Configuration {
-    /**
-     * Path to the driver JPPF config
-     */
-    public String driverJppf = "";
-    /**
-     * Path to the driver log4j config
-     */
-    public String driverLog4j = "";
-    /**
-     * Driver classpath elements.
-     */
-    public List<String> driverClasspath = new ArrayList<>();
-    /**
-     * Driver JVM options.
-     */
-    public List<String> driverJvmOptions = new ArrayList<>();
-    /**
-     * Path to the node JPPF config
-     */
-    public String nodeJppf = "";
-    /**
-     * Path to the node log4j config
-     */
-    public String nodeLog4j = "";
-    /**
-     * Node classpath elements.
-     */
-    public List<String> nodeClasspath = new ArrayList<>();
-    /**
-     * Node JVM options.
-     */
-    public List<String> nodeJvmOptions = new ArrayList<>();
-    /** */
-    public String clientConfig = "classes/tests/config/client.properties";
-
-    /**
-     * Copy this configuration to a new instance.
-     * @return a {@link Configuration} instance.
-     */
-    public Configuration copy() {
-      Configuration copy = new Configuration();
-      copy.driverJppf = driverJppf;
-      copy.driverLog4j = driverLog4j;
-      copy.driverClasspath = new ArrayList<>(driverClasspath);
-      copy.driverJvmOptions = new ArrayList<>(driverJvmOptions);
-      copy.nodeJppf = nodeJppf;
-      copy.nodeLog4j = nodeLog4j;
-      copy.nodeClasspath = new ArrayList<>(nodeClasspath);
-      copy.nodeJvmOptions = new ArrayList<>(nodeJvmOptions);
-      copy.clientConfig = clientConfig;
-      return copy;
-    }
-  }
-
-  /** */
-  public static class ConfigSource implements JPPFConfiguration.ConfigurationSourceReader {
-    /**
-     * Path to the client configuration file.
-     */
-    private static String clientConfig = null;
-
-    @Override
-    public Reader getPropertyReader() throws IOException {
-      if (clientConfig == null) return null;
-      return FileUtils.getFileReader(clientConfig);
-    }
-
-    /**
-     * Get the path to the client configuration file.
-     * @return the path as a string.
-     */
-    public static String getClientConfig() {
-      return clientConfig;
-    }
-
-    /**
-     * Set the path to the client configuration file.
-     * @param clientConfig the path as a string.
-     */
-    public static void setClientConfig(final String clientConfig) {
-      ConfigSource.clientConfig = clientConfig;
-    }
   }
 
   /**

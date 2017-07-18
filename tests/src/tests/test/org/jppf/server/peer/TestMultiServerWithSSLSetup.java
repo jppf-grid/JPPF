@@ -21,7 +21,6 @@ package test.org.jppf.server.peer;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 
 /**
  * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client,
@@ -35,7 +34,7 @@ public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testSetup() throws Exception {
-    Configuration cfg = createConfig("ssl2_p2p");
+    TestConfiguration cfg = createConfig("ssl2_p2p");
     cfg.driverLog4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
     client = BaseSetup.setup(2, 2, true, cfg);
     awaitPeersInitialized();

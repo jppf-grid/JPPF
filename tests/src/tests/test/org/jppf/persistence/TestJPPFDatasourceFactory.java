@@ -37,8 +37,7 @@ import org.junit.*;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import test.org.jppf.test.setup.BaseSetup;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
@@ -52,7 +51,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = dbSetup("persistence");
+    TestConfiguration config = dbSetup("persistence");
     config.nodeLog4j = "classes/tests/config/persistence/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
   }

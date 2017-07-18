@@ -35,7 +35,6 @@ import org.jppf.utils.collections.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
 
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -50,17 +49,17 @@ public class AbstractNonStandardSetup extends BaseTest {
   /**
    * 
    */
-  protected static Configuration testConfig = null;
+  protected static TestConfiguration testConfig = null;
 
   /**
    * Create the drivers and nodes configuration.
    * @param prefix prefix to use to locate the configuration files.
-   * @return a {@link Configuration} instance.
+   * @return a {@link TestConfiguration} instance.
    * @throws Exception if a process could not be started.
    */
-  protected static Configuration createConfig(final String prefix) throws Exception {
+  protected static TestConfiguration createConfig(final String prefix) throws Exception {
     SSLHelper.resetConfig();
-    testConfig = new Configuration();
+    testConfig = new TestConfiguration();
     List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
     commonCP.add("classes/tests/config");

@@ -34,7 +34,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -57,7 +56,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration testConfig = createConfig("offline_node");
+    TestConfiguration testConfig = createConfig("offline_node");
     testConfig.nodeClasspath.add("../server/classes");
     testConfig.driverLog4j = "classes/tests/config/offline_node/log4j-driver.properties";
     client = BaseSetup.setup(1, 2, true, false, testConfig);

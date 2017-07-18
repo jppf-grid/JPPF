@@ -28,7 +28,6 @@ import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
@@ -42,7 +41,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = createConfig("classloader");
+    TestConfiguration config = createConfig("classloader");
     config.driverClasspath.add("test-resources/driver1");
     client = BaseSetup.setup(1, 1, true, config);
   }

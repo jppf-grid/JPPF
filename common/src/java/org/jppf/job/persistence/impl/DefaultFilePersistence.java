@@ -23,7 +23,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import org.jppf.job.persistence.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -209,7 +209,12 @@ public class DefaultFilePersistence implements JobPersistence {
         String s = pathname(path.getFileName());
         String prefix = getPrefixForType(type);
         String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
-        positions[count++] = Integer.valueOf(s2);
+        try {
+          positions[count++] = Integer.valueOf(s2);
+        } catch (Exception e) {
+          if (debugEnabled) log.debug(String.format("positions of %s for job %s (path=%s, s=%s, prefix=%s, s2=%s) : %s", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e)));
+          throw e;
+        }
       }
     } catch (Exception e) {
       throw new JobPersistenceException(e);
@@ -273,7 +278,7 @@ public class DefaultFilePersistence implements JobPersistence {
       public boolean accept(final Path entry) throws IOException {
         String fileName = pathname(entry.getFileName());
         String prefix = getPrefixForType(type);
-        return fileName.startsWith(prefix);
+        return fileName.startsWith(prefix) && fileName.endsWith(DEFAULT_EXTENSION);
       }
     });
     for (Path path : ds) {

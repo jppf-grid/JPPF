@@ -32,7 +32,6 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -55,7 +54,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = createConfig("discovery");
+    TestConfiguration config = createConfig("discovery");
     config.driverLog4j = "classes/tests/config/discovery/log4j-driver.properties";
     BaseSetup.setup(2, 2, false, true, config);
     long start = System.currentTimeMillis();

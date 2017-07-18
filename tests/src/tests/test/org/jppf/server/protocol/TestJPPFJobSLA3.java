@@ -28,7 +28,6 @@ import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -50,7 +49,7 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = BaseSetup.createDefaultConfiguration();
+    TestConfiguration config = BaseSetup.createDefaultConfiguration();
     List<String> cp = new ArrayList<>();
     cp.add("../common/classes");
     cp.add("../server/classes");

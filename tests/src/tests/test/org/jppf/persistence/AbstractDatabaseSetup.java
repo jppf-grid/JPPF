@@ -28,7 +28,6 @@ import org.jppf.utils.FileUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 
 /**
  * Base test class for unit tests using a database.
@@ -67,10 +66,10 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   /**
    * Create and start a H2 server, and create the configuration for the test.
    * @param prefix prefix to use to locate the configuration files.
-   * @return a {@link Configuration} instance.
+   * @return a {@link TestConfiguration} instance.
    * @throws Exception if a process could not be started.
    */
-  protected static Configuration dbSetup(final String prefix) throws Exception {
+  protected static TestConfiguration dbSetup(final String prefix) throws Exception {
     BaseSetup.setLoggerLevel("org.jppf.persistence", Level.DEBUG);
     print(false, false, "starting H2 server");
     h2Server = Server.createTcpServer().start();
@@ -84,7 +83,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
       }
     }
     print(false, false, "table created");
-    Configuration config = createConfig(prefix);
+    TestConfiguration config = createConfig(prefix);
     config.driverClasspath.add("lib/h2.jar");
     return config;
   }

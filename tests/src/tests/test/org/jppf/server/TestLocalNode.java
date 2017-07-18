@@ -29,7 +29,6 @@ import org.jppf.utils.*;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
@@ -43,7 +42,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = createConfig("localnode");
+    TestConfiguration config = createConfig("localnode");
     config.driverLog4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     final AtomicReference<Exception> ref = new AtomicReference<>(null);

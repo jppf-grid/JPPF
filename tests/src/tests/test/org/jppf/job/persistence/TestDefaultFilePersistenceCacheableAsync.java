@@ -20,8 +20,7 @@ package test.org.jppf.job.persistence;
 
 import org.junit.BeforeClass;
 
-import test.org.jppf.test.setup.BaseSetup;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
+import test.org.jppf.test.setup.*;
 
 /**
  * Test asynchronous database job persistence. 
@@ -35,7 +34,7 @@ public class TestDefaultFilePersistenceCacheableAsync extends AbstractJobPersist
   @BeforeClass
   public static void setup() throws Exception {
     String prefix = "job_persistence";
-    Configuration config = dbSetup(prefix);
+    TestConfiguration config = dbSetup(prefix);
     config.driverJppf = "classes/tests/config/" + prefix + "/driver_cacheable_async_file.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 2, true, true, config);

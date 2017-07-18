@@ -39,7 +39,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -66,7 +65,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration cfg = createConfig("job_reservation");
+    TestConfiguration cfg = createConfig("job_reservation");
     cfg.driverLog4j = "classes/tests/config/job_reservation/log4j-driver.properties";
     cfg.nodeLog4j = "classes/tests/config/job_reservation/log4j-node.properties";
     client = BaseSetup.setup(1, 3, true, cfg);

@@ -31,5 +31,5 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tests"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m -Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=classes/test/config/logging-client.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m -Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=classes/test/config/logging-client.properties"/>
 </launchConfiguration>

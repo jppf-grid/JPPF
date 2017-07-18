@@ -175,7 +175,7 @@
     <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <arg value="-s"/>
@@ -195,7 +195,7 @@
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
       <jvmarg value="-Duser.dir=${basedir}"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <formatter type="xml"/>
@@ -227,7 +227,7 @@
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
       <jvmarg value="-Duser.dir=${basedir}"/>
-      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <formatter type="xml"/>

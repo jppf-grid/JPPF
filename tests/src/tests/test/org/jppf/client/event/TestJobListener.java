@@ -29,7 +29,6 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -49,7 +48,7 @@ public class TestJobListener extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration cfg = BaseSetup.DEFAULT_CONFIG.copy();
+    TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driverLog4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
     BaseSetup.setup(1, 1, false, cfg);
   }

@@ -25,7 +25,7 @@ import java.util.*;
 import org.jppf.utils.FileUtils;
 import org.junit.runner.JUnitCore;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 
 /**
  * This class is intended to run the JPPF JUnit tests, either as a standalone application,
@@ -93,7 +93,7 @@ public class JPPFTestRunner {
    */
   public ResultHolder sendTestRequest(final URL webAppUrl) throws Exception {
     try {
-      BaseSetup.Configuration config = new BaseSetup.Configuration();
+      TestConfiguration config = new TestConfiguration();
       List<String> commonCP = new ArrayList<>();
       commonCP.add("../jmxremote/classes");
       commonCP.add("../lib/jppf-common.jar");

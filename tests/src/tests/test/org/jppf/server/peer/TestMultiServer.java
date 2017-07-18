@@ -30,7 +30,6 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
@@ -47,7 +46,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration config = createConfig("p2p");
+    TestConfiguration config = createConfig("p2p");
     config.driverLog4j = "classes/tests/config/p2p/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }

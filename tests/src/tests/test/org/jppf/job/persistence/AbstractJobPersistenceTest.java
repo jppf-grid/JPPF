@@ -47,7 +47,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToAll(client, false, false, true, true, false, "start of method %s()", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
     }
   };
 
