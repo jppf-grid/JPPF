@@ -141,14 +141,16 @@ public class DefaultFilePersistence implements JobPersistence {
   public List<String> getPersistedJobUuids() throws JobPersistenceException {
     try {
       List<String> result = new ArrayList<>();
-      DirectoryStream<Path> ds = Files.newDirectoryStream(rootPath, new DirectoryStream.Filter<Path>() {
-        @Override
-        public boolean accept(final Path entry) throws IOException {
-          return Files.isDirectory(entry);
+      if (Files.exists(rootPath)) {
+        DirectoryStream<Path> ds = Files.newDirectoryStream(rootPath, new DirectoryStream.Filter<Path>() {
+          @Override
+          public boolean accept(final Path entry) throws IOException {
+            return Files.isDirectory(entry);
+          }
+        });
+        for (Path path : ds) {
+          if (path != null) result.add(path.getFileName().toString());
         }
-      });
-      for (Path path : ds) {
-        if (path != null) result.add(path.getFileName().toString());
       }
       if (debugEnabled) log.debug("uuids of persisted jobs: {}", result);
       return result;
