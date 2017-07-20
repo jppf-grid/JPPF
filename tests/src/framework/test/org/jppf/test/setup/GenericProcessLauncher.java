@@ -417,28 +417,49 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    */
   protected int startDriverSocket() {
     try {
-      if (processServer == null) processServer = new ServerSocket(0);
+      if (processServer != null) {
+        StreamUtils.closeSilent(processServer);
+        processServer = null;
+      }
+      if (socketClient != null) StreamUtils.closeSilent(socketClient);
+      processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
-      Runnable r = new Runnable() {
+      /** */
+      class MyRunnable extends ThreadSynchronization implements Runnable {
+        /** */
+        private boolean started = false;
+
         @Override
         public void run() {
           try {
+            synchronized(this) {
+              started = true;
+              wakeUp();
+            }
             socketClient = new SocketClient(processServer.accept());
             int n = socketClient.readInt();
-            if (debugEnabled) log.debug("{} socketClient recieved {}", name, n);
             if (n == -1) throw new EOFException();
-          } catch(Exception ioe) {
-            if (debugEnabled) log.debug(name, ioe);
-            if (socketClient != null) StreamUtils.closeSilent(socketClient);
+          } catch(Exception e) {
+            if (debugEnabled) log.debug(name, e);
           }
         }
+
+        /** */
+        public synchronized void await() {
+          if (started) return;
+          goToSleep();
+        }
       };
+      MyRunnable r = new MyRunnable();
       Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    } catch(Exception e) {
-      if (processServer != null) StreamUtils.closeSilent(processServer);
-      processServer = null;
+      r.await();
+    } catch(@SuppressWarnings("unused") Exception e) {
+      if (processServer != null) {
+        StreamUtils.closeSilent(processServer);
+        processServer = null;
+      }
     }
     return processPort;
   }
