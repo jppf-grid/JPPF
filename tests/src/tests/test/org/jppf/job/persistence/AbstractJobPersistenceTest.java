@@ -61,7 +61,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
       if (b) {
-        JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+        JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
         mgr.deleteJobs(JobSelector.ALL_JOBS);
       }
     }
@@ -82,7 +82,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
     JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+    JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
@@ -100,10 +100,10 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
     client.submitJob(job);
     List<Task<?>> results = job.awaitResults();
-    Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "test1h2dump.log");
+    if (h2Server != null) Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "test1h2dump.log");
     checkJobResults(nbTasks, results, false);
     JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+    JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
     List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
     assertNotNull(persistedUuids);
@@ -132,7 +132,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, true);
     JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+    JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
@@ -160,7 +160,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
     try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
-      JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+      JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
       List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
       assertEquals(1, persistedUuids.size());
@@ -193,7 +193,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     Thread.sleep(500L);
     client = BaseSetup.createClient(null);
     try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
-      JPPFDriverJobPersistenceManager mgr = new JPPFDriverJobPersistenceManager(jmx);
+      JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
       assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
       List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
@@ -208,64 +208,15 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     }
   }
 
-  /**
-   * Check the results of a job's execution.
-   * @param nbTasks the number of tasks in the job.
-   * @param results the execution results to check.
-   * @param cancelled whether the job was cancelled.
-   * @throws Exception if any error occurs.
-   */
-  protected void checkJobResults(final int nbTasks, final Collection<Task<?>> results, final boolean cancelled) throws Exception {
-    assertNotNull(results);
-    assertEquals(nbTasks, results.size());
-    for (Task<?> task: results) {
-      assertNotNull(task);
-      Throwable t = task.getThrowable();
-      assertNull(String.format("task '%s' has a throwable: %s", task.getId(), (t == null) ? "none" : ExceptionUtils.getMessage(t)), t);
-      if (!cancelled) {
-        assertNotNull(String.format("task %s has a null result", task.getId()), task.getResult());
-        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-      }
-    }
-  }
-
-  /**
-   * Create a jmx connection not independent of the specified client.
-   * @param client .
-   * @return a {@link JMXDriverConnectionWrapper}.
-   * @throws Exception if any error occurs.
-   */
-  protected JMXDriverConnectionWrapper newJmx(final JPPFClient client) throws Exception {
-    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverHost(), pool.getJmxPort(), pool.isSslEnabled());
-    jmx.connectAndWait(10_000L);
-    return jmx;
-  }
-
-  /**
-   * @param job .
-   * @param job2 .
-   * @param checkResults .
-   * @throws Exception if any error occurs.
-   */
-  private void compareJobs(final JPPFJob job, final JPPFJob job2, final boolean checkResults) throws Exception {
-    assertNotNull(job);
-    assertNotNull(job2);
-    assertEquals(job.getUuid(), job2.getUuid());
-    assertEquals(job.getName(), job2.getName());
-    assertEquals(job.getTaskCount(), job2.getTaskCount());
-    if (checkResults) assertEquals(job.getResults().size(), job2.getResults().size());
-  }
-
   /** */
   static class EmptyPersistedUuids implements ConcurrentUtils.Condition {
     /** */
-    final JPPFDriverJobPersistenceManager mgr;
+    final JPPFDriverJobPersistence mgr;
 
     /**
      * @param mgr .
      */
-    EmptyPersistedUuids(final JPPFDriverJobPersistenceManager mgr) {
+    EmptyPersistedUuids(final JPPFDriverJobPersistence mgr) {
       this.mgr = mgr;
     }
 
@@ -283,7 +234,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   /** */
   static class PersistedJobCompletion implements ConcurrentUtils.Condition {
     /** */
-    final JPPFDriverJobPersistenceManager mgr;
+    final JPPFDriverJobPersistence mgr;
     /** */
     final String uuid;
 
@@ -291,7 +242,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
      * @param mgr .
      * @param uuid .
      */
-    PersistedJobCompletion(final JPPFDriverJobPersistenceManager mgr, final String uuid) {
+    PersistedJobCompletion(final JPPFDriverJobPersistence mgr, final String uuid) {
       this.mgr = mgr;
       this.uuid = uuid;
     }
