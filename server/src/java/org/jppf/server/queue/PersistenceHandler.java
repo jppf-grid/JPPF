@@ -75,7 +75,6 @@ public class PersistenceHandler {
       List<ServerTask> taskList = clientBundle.getTaskList();
       List<PersistenceInfo> infos = new ArrayList<>(taskList.size() + (tasksOnly ? 0 : 2));
       if (!tasksOnly) {
-        job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, IOHelper.serializeData(job.getJob())));
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.DATA_PROVIDER, -1, clientBundle.getDataProvider()));
       }
@@ -99,7 +98,7 @@ public class PersistenceHandler {
     if (!isPersistent(job)) return;
     try {
       if (debugEnabled) log.debug("updating header for job {}", job);
-      job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
+      //job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
       DataLocation data = IOHelper.serializeData(job.getJob());
       persistence.store(Arrays.asList((PersistenceInfo) new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, data)));
     } catch (Exception e) {
@@ -301,7 +300,8 @@ public class PersistenceHandler {
    * @return {@code true} if the job is persistent and job persistence is active, {@code false} otherwise.
    */
   private boolean isPersistent(final ServerJob job) {
-    return isPersistenceReady() && job.isPersistent();
+    return isPersistenceReady() && job.isPersistent() && job.getJob().getParameter(BundleParameter.ALREADY_PERSISTED, false)
+      && !job.getJob().getParameter(BundleParameter.ALREADY_PERSISTED_P2P, false);
   }
 
   /**

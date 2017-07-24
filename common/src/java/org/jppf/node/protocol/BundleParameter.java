@@ -138,7 +138,11 @@ public enum  BundleParameter
    */
   DATASOURCE_DEFINITIONS,
   /**
-   * Wheteht a job has already been persisted.
+   * Whether a job has already been persisted.
    */
-  ALREADY_PERSISTED
+  ALREADY_PERSISTED,
+  /**
+   * Whether a job has already been persisted in another driver.
+   */
+  ALREADY_PERSISTED_P2P
 }

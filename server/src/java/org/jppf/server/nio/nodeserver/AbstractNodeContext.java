@@ -256,6 +256,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (!taskBundle.isHandshake()) {
       taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
+      else {
+        if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
+      }
     }
     message.addLocation(IOHelper.serializeData(taskBundle, JPPFDriver.getSerializer()));
     message.addLocation(bundle.getDataProvider());

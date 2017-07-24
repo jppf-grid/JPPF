@@ -18,16 +18,23 @@
 
 package test.org.jppf.persistence;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.sql.*;
+import java.util.Collection;
 
 import org.apache.log4j.Level;
 import org.h2.tools.*;
+import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.node.protocol.Task;
 import org.jppf.persistence.JPPFDatasourceFactory;
-import org.jppf.utils.FileUtils;
-import org.junit.*;
+import org.jppf.utils.*;
+import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Base test class for unit tests using a database.
@@ -108,4 +115,54 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
       print(false, false, "database deleted");
     }
   }
+
+  /**
+   * Check the results of a job's execution.
+   * @param nbTasks the number of tasks in the job.
+   * @param results the execution results to check.
+   * @param cancelled whether the job was cancelled.
+   * @throws Exception if any error occurs.
+   */
+  protected void checkJobResults(final int nbTasks, final Collection<Task<?>> results, final boolean cancelled) throws Exception {
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    for (Task<?> task: results) {
+      assertNotNull(task);
+      Throwable t = task.getThrowable();
+      assertNull(String.format("task '%s' has a throwable: %s", task.getId(), (t == null) ? "none" : ExceptionUtils.getMessage(t)), t);
+      if (!cancelled) {
+        assertNotNull(String.format("task %s has a null result", task.getId()), task.getResult());
+        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+      }
+    }
+  }
+
+  /**
+   * Create a jmx connection not independent of the specified client.
+   * @param client .
+   * @return a {@link JMXDriverConnectionWrapper}.
+   * @throws Exception if any error occurs.
+   */
+  protected JMXDriverConnectionWrapper newJmx(final JPPFClient client) throws Exception {
+    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverHost(), pool.getJmxPort(), pool.isSslEnabled());
+    jmx.connectAndWait(10_000L);
+    return jmx;
+  }
+
+  /**
+   * @param job .
+   * @param job2 .
+   * @param checkResults .
+   * @throws Exception if any error occurs.
+   */
+  protected void compareJobs(final JPPFJob job, final JPPFJob job2, final boolean checkResults) throws Exception {
+    assertNotNull(job);
+    assertNotNull(job2);
+    assertEquals(job.getUuid(), job2.getUuid());
+    assertEquals(job.getName(), job2.getName());
+    assertEquals(job.getTaskCount(), job2.getTaskCount());
+    if (checkResults) assertEquals(job.getResults().size(), job2.getResults().size());
+  }
+
 }
