@@ -59,7 +59,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Initialize the connection to the remote MBean server.
+   * Initialize a plain connection to the remote MBean server.
    * @param host the host the server is running on.
    * @param port the port used by the server.
    */

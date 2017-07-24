@@ -100,6 +100,12 @@ public class DefaultFilePersistence implements JobPersistence {
     if (debugEnabled) log.debug("initializing {} with rootPath={}", getClass().getSimpleName(), rootPath);
   }
 
+  /**
+   * In this implementation, job elements are first stored in a temporary file, then moved to a "normal" file once the atomic store operation is complete.
+   * This addresses the situation where the store operation is interrupted (because the driver dies or any other reason) and would leave an incomplete or corrupted file.
+   * @param infos collection of information objects on the job elements to store.
+   * @throws JobPersistenceException if any erorr occurs during the persistence operation.
+   */
   @Override
   public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     try {
@@ -127,9 +133,11 @@ public class DefaultFilePersistence implements JobPersistence {
       if (debugEnabled) log.debug("loading {}", infos);
       Path jobDir = getJobDir(infos.iterator().next().getJobUuid());
       List<InputStream> result = new ArrayList<>(infos.size());
-      for (PersistenceInfo info: infos) {
-        Path path = getPathFor(jobDir, info, false);
-        result.add(new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)));
+      if (Files.exists(jobDir)) {
+        for (PersistenceInfo info: infos) {
+          Path path = getPathFor(jobDir, info, false);
+          result.add(new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)));
+        }
       }
       return result;
     } catch (Exception e) {
@@ -177,7 +185,8 @@ public class DefaultFilePersistence implements JobPersistence {
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
     try {
       if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
-      Files.walkFileTree(getJobDir(jobUuid), new DeleteFileVisitor());
+      Path jobDir = getJobDir(jobUuid);
+      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new DeleteFileVisitor());
     } catch (Exception e) {
       throw new JobPersistenceException(e);
     }
@@ -204,18 +213,22 @@ public class DefaultFilePersistence implements JobPersistence {
   private int[] getPositions(final String jobUuid, final PersistenceObjectType type) throws JobPersistenceException {
     int[] positions = null;
     try {
-      List<Path> list = getPathsFor(getJobDir(jobUuid), type);
-      positions = new int[list.size()];
-      int count = 0;
-      for (Path path : list) {
-        String s = pathname(path.getFileName());
-        String prefix = getPrefixForType(type);
-        String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
-        try {
-          positions[count++] = Integer.valueOf(s2);
-        } catch (Exception e) {
-          if (debugEnabled) log.debug(String.format("positions of %s for job %s (path=%s, s=%s, prefix=%s, s2=%s) : %s", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e)));
-          throw e;
+      Path jobDir = getJobDir(jobUuid);
+      if (!Files.exists(jobDir)) positions = new int[0];
+      else {
+        List<Path> list = getPathsFor(jobDir, type);
+        positions = new int[list.size()];
+        int count = 0;
+        for (Path path : list) {
+          String s = pathname(path.getFileName());
+          String prefix = getPrefixForType(type);
+          String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
+          try {
+            positions[count++] = Integer.valueOf(s2);
+          } catch (Exception e) {
+            if (debugEnabled) log.debug(String.format("positions of %s for job %s (path=%s, s=%s, prefix=%s, s2=%s) : %s", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e)));
+            throw e;
+          }
         }
       }
     } catch (Exception e) {
@@ -234,10 +247,10 @@ public class DefaultFilePersistence implements JobPersistence {
   }
 
   /**
-   *
+   * Get the file path for the specified job element.
    * @param jobDir tthe path of the job's directory.
-   * @param info the information on the file to find.
-   * @param isTemp whether to return a temp file path.
+   * @param info the information on the file element for which to find a path.
+   * @param isTemp whether to return a temporary file path.
    * @return a list of the matching paths in the specified directory.
    * @throws IOException if any I/O error occurs.
    */
@@ -310,16 +323,15 @@ public class DefaultFilePersistence implements JobPersistence {
    * @return the full path name.
    */
   private String pathname(final Path path) {
-    //return path.toString();
     return path.toFile().getPath();
   }
 
   /**
    * Check the specified directory and create it if it doesn't exist.
    * @param dir the directory to check.
-   * @throws Exception if any error occurs.
+   * @throws JobPersistenceException if any error occurs.
    */
-  private synchronized void checkDirectory(final Path dir) throws Exception {
+  private synchronized void checkDirectory(final Path dir) throws JobPersistenceException {
     if (!Files.exists(dir)) {
       try {
         Files.createDirectories(dir);

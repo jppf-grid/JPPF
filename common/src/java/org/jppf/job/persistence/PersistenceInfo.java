@@ -41,7 +41,7 @@ public interface PersistenceInfo extends Serializable {
   JPPFDistributedJob getJob();
 
   /**
-   * Get the type of perssted object.
+   * Get the type of persisted object.
    * @return one of the possible values of the {@link PersistenceObjectType} enum.
    */
   PersistenceObjectType getType();

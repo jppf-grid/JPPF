@@ -30,7 +30,7 @@ import org.slf4j.*;
 
 /**
  * A caching wrapper for any other implementation of {@link JobPersistence}.
- * <p>The cached artifacts are those handled by the {@link #load(PersistenceInfo) load()} and {@link #store(PersistenceInfo) store()} methods,
+ * <p>The cached artifacts are those handled by the {@link #load(Collection) load()} and {@link #store(Collection) store()} methods,
  * that is, job headers, data providers, tasks and task results. The cache is an LRU cache of soft references to the artifacts.
  * It guarantees that all its entries will be cleared before an out of memory error is raised. Additionally the cache has a capacity which can be
  * specified in the configuration and which defaults to 1024.
@@ -47,7 +47,7 @@ import org.slf4j.*;
  * <span style="color: green"># shortcut for the package name</span>
  * pkg = org.jppf.job.persistence.impl
  * <span style="color: green"># cacheable database persistence with a capacity of 10000,</span>
- * <span style="color: green"># a table name 'JPPF_TEST' and datasource name 'JobDS'</span>
+ * <span style="color: green"># a table named 'JPPF_TEST' and datasource named 'JobDS'</span>
  * jppf.job.persistence = ${pkg}.CacheablePersistence 10000 ${pkg}.DefaultDatabasePersistence JPPF_TEST JobDS</pre>
  * @author Laurent Cohen
  */
@@ -70,8 +70,9 @@ public class CacheablePersistence implements JobPersistence {
   private final JobPersistence delegate;
 
   /**
-   * 
-   * @param params .
+   * Initialize this persistence with the specified parameters.
+   * @param params if the first parameter is a number, then it represents the cache size, and the remaining parameters represent the wrapped
+   * persistence implementation. Otherwise it represents the wrapped persistence and the remaining parameters are those of the wrapped persistence. 
    * @throws JobPersistenceException if any error occurs.
    */
   public CacheablePersistence(final String... params) throws JobPersistenceException {

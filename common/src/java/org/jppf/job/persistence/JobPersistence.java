@@ -34,15 +34,15 @@ import java.util.*;
  */
 public interface JobPersistence {
   /**
-   * Store the specified job elements.
-   * @param infos collection of infor;qtion objects on the job ele;ents to store..
+   * Store the specified job elements. All elements are assumed to be part of the same job.
+   * @param infos collection of information objects on the job elements to store.
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */
   void store(Collection<PersistenceInfo> infos) throws JobPersistenceException;
 
   /**
-   * Load the specified job elements.
-   * @param infos information on the persisted objects to load.
+   * Load the specified job elements. All elements are assumed to be part of the same job.
+   * @param infos information on the persisted job elements to load.
    * @return an input stream providing the serialized job header.
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */
@@ -72,7 +72,7 @@ public interface JobPersistence {
   int[] getTaskResultPositions(String jobUuid) throws JobPersistenceException;
 
   /**
-   * Delete the persisted jobs with the psecified UUID.
+   * Delete the persisted job with the psecified UUID.
    * @param jobUuid the UUID of the job to load.
    * @throws JobPersistenceException if any erorr occurs during the persistence operation.
    */

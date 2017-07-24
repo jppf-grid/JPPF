@@ -29,7 +29,7 @@ public enum PersistenceObjectType {
    */
   JOB_HEADER,
   /**
-   * The {@link DataProvider}.
+   * The {@link org.jppf.node.protocol.DataProvider data provider}.
    */
   DATA_PROVIDER,
   /**

@@ -24,12 +24,13 @@ import java.util.concurrent.*;
 
 import org.jppf.job.persistence.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
  * An asynchronous wrapper for any other job persistence implementation. The methods of {@link JobPersistence} that do not return a result
  * ({@code void} return type) are non-blocking and return immediately. All other methods will block until they are executed and their result is available.
- * The execution of the interface's methods are delegated to a thread pool, whose size can be defined in the configuration or defaults to {@link Runtime.getRuntime().availableProcessors()}.
+ * The execution of the interface's methods are delegated to a thread pool, whose size can be defined in the configuration or defaults to {@link Runtime#availableProcessors() Runtime.getRuntime().availableProcessors()}.
  * <p>This asynchronous persistence can be configured in two forms:
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
  * <span style="color: green"># shorten the configuration value for clarity</span>
@@ -42,7 +43,7 @@ import org.slf4j.*;
  * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
  * pkg = org.jppf.job.persistence.impl
  * <span style="color: green"># asynchronous database persistence with pool of 4 threads,</span>
- * <span style="color: green"># a table name 'JPPF_TEST' and datasource name 'JobDS'</span>
+ * <span style="color: green"># a table named 'JPPF_TEST' and datasource named 'JobDS'</span>
  * jppf.job.persistence = ${pkg}.AsynchronousPersistence 4 ${pkg}.DefaultDatabasePersistence JPPF_TEST JobDS</pre>
  * @author Laurent Cohen
  */
@@ -64,24 +65,15 @@ public class AsynchronousPersistence implements JobPersistence {
    */
   private final ExecutorService executor;
   /**
-   * 
+   * Percentage of used heap above which asynchronous mode is switched off, to prevent out of memory conditions.
+   * When the used heap passes below this threshold, the asynchronous mode resumes.
    */
-  private static final double MEMORY_THRESHOLD = 70d;
+  private static final double MEMORY_THRESHOLD = JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE_MEMORY_THRESHOLD);
 
   /**
-   *
-   * @param delegate the persisitence to delegate to.
-   * @throws JobPersistenceException if any error occurs.
-   */
-  public AsynchronousPersistence(final JobPersistence delegate) throws JobPersistenceException {
-    if (delegate == null) throw new JobPersistenceException("could not create write-behind job persistence from null persistence");
-    this.delegate = delegate;
-    executor = createExecutor(1);
-  }
-
-  /**
-   *
-   * @param params .
+   * Initialize this persistence with the specified parameters.
+   * @param params if the first parameter is a number, then it represents the number of threads that perform the asynchronous processing, and the remaining parameters
+   * represent the wrapped persistence implementation. Otherwise it represents the wrapped persistence and the remaining parameters are those of the wrapped persistence. 
    * @throws JobPersistenceException if any error occurs.
    */
   public AsynchronousPersistence(final String...params) throws JobPersistenceException {
@@ -195,15 +187,6 @@ public class AsynchronousPersistence implements JobPersistence {
   private ExecutorService createExecutor(final int max) {
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncPersistence"));
-    /*
-    // workaround for JDK bug JDK-6539720 at http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6539720.
-    return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncPersistence")) {
-      @Override
-      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
-        return new MyFutureTask<>(runnable, value);
-      }
-    };
-    */
   }
 
   /**
@@ -283,34 +266,5 @@ public class AsynchronousPersistence implements JobPersistence {
      * @throws JobPersistenceException if any error occurs.
      */
     protected abstract T execute() throws JobPersistenceException;
-  }
-
-  /**
-   * Used as part of a workaround for JDK bug <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6539720">JDK-6539720</a>.
-   * @param <T> the type of result for this task.
-   */
-  static class MyFutureTask<T> extends FutureTask<T> {
-    /**
-     * The result (a {@link PersistenceTask}).
-     */
-    private final T myResult;
-
-    /**
-     *
-     * @param runnable the task to execute.
-     * @param result the execution result.
-     */
-    MyFutureTask(final Runnable runnable, final T result) {
-      super(runnable, result);
-      this.myResult = result;
-
-    }
-
-    /**
-     * @return the result.
-     */
-    T getMyResult() {
-      return myResult;
-    }
   }
 }
