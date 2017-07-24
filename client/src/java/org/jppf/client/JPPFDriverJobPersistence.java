@@ -38,11 +38,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 6.0
  */
-public class JPPFDriverJobPersistenceManager {
+public class JPPFDriverJobPersistence {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFDriverJobPersistenceManager.class);
+  private static Logger log = LoggerFactory.getLogger(JPPFDriverJobPersistence.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -65,7 +65,7 @@ public class JPPFDriverJobPersistenceManager {
    * @param jmx a JMX connection wrapper to a JPPF driver.
    * @throws IllegalStateException if the connection to the driver isn't working for any reason. The actual exception is set as root cause.
    */
-  public JPPFDriverJobPersistenceManager(final JMXDriverConnectionWrapper jmx) {
+  public JPPFDriverJobPersistence(final JMXDriverConnectionWrapper jmx) {
     this.jmx = jmx;
     try {
       this.persistedJobsManager = this.jmx.getPersistedJobsManager();
@@ -73,16 +73,6 @@ public class JPPFDriverJobPersistenceManager {
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  /**
-   * Initialize this persisted job manager with the specified driver connection pool.
-   * The connection pool is used to obtain a {@link JMXDriverConnectionWrapper} instance representing a JMX connection tot he driver.
-   * @param pool a {@link JPPFconnectionPool} initialized by a {@link JPPFClient}.
-   * @throws IllegalStateException if the connection to the driver isn't working for any reason. The actual exception is set as root cause.
-   */
-  public JPPFDriverJobPersistenceManager(final JPPFConnectionPool pool) {
-    this(pool.awaitWorkingJMXConnection());
   }
 
   /**
@@ -172,46 +162,6 @@ public class JPPFDriverJobPersistenceManager {
     if (delete) {
       List<String> res = persistedJobsManager.deletePersistedJobs(new JobUuidSelector(uuid));
       if (debugEnabled) log.debug("deleted job with uuid='{}' as requested", res);
-    }
-    return job;
-  }
-
-  /**
-   * Retrieve the persisted job with the specified uuid, and optionally delete it from the remote persistence store.
-   * @param uuid the UUID of the job to retrieve.
-   * @param delete whether to delete the job from the persistence store once it has been successfully retrieved.
-   * @return a {@link JPPFJob} instance, or {@code null} if the job could not be found.
-   * @throws Exception if any error occurs while communicating with the driver.
-   */
-  public JPPFJob retrieveJob2(final String uuid, final boolean delete) throws Exception {
-    TaskBundle header = load(uuid, PersistenceObjectType.JOB_HEADER, -1);
-    if (debugEnabled) log.debug("got job header for uuid={} : {}", uuid, header);
-    JPPFJob job = new JPPFJob(header.getUuid());
-    job.setName(header.getName());
-    job.setSLA(header.getSLA());
-    job.setMetadata(header.getMetadata());
-    DataProvider dataProvider = load(uuid, PersistenceObjectType.DATA_PROVIDER, -1);
-    if (traceEnabled) log.trace("got dataprovider for uuid={} : {}", uuid, dataProvider);
-    job.setDataProvider(dataProvider);
-    int[][] positions = persistedJobsManager.getPersistedJobPositions(uuid);
-    for (int i=0; i<2; i++) Arrays.sort(positions[i]);
-    if (debugEnabled) log.debug("got task positions for uuid={} : {}", uuid, StringUtils.buildString(", ", "{", "}", positions[0]));
-    if (debugEnabled) log.debug("got result positions for uuid={} : {}", uuid, StringUtils.buildString(", ", "{", "}", positions[1]));
-    for (int i=0; i<positions[0].length; i++) {
-      Task<?> task = load(uuid, PersistenceObjectType.TASK, positions[0][i]);
-      if (traceEnabled) log.trace(String.format("got task at position %d for uuid=%s : %s", positions[0][i], uuid, task));
-      job.add(task);
-    }
-    List<Task<?>> results = new ArrayList<>(positions[1].length);
-    for (int i=0; i<positions[1].length; i++) {
-      Task<?> task = load(uuid, PersistenceObjectType.TASK_RESULT, positions[1][i]);
-      if (traceEnabled) log.trace(String.format("got task result at position %d for uuid=%s : %s", positions[1][i], uuid, task));
-      results.add(task);
-    }
-    job.getResults().addResults(results);
-    if (delete) {
-      List<String> res = persistedJobsManager.deletePersistedJobs(new JobUuidSelector(uuid));
-      if (debugEnabled) log.debug("deleted jobs with uuids='{}' as requested", res);
     }
     return job;
   }
