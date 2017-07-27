@@ -76,11 +76,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public AwaitJobNotificationListener(final JMXDriverConnectionWrapper jmx, final JobEventType eventType) throws Exception {
-    this.expectedEvent = eventType;
-    this.eventReceived = false;
-    this.listenerRemoved = false;
-    this.jobManager = jmx.getJobManager();
-    this.jobManager.addNotificationListener(this, null, null);
+    this(jmx.getJobManager(), eventType);
   }
 
   /**
@@ -89,11 +85,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public AwaitJobNotificationListener(final JPPFClient client, final JobEventType eventType) throws Exception {
-    this.expectedEvent = eventType;
-    this.eventReceived = false;
-    this.listenerRemoved = false;
-    jobManager = BaseSetup.getJobManagementProxy(client);
-    jobManager.addNotificationListener(this, null, null);
+    this(BaseSetup.getJobManagementProxy(client), eventType);
   }
 
   @Override
@@ -103,7 +95,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
     if (debugEnabled) log.debug("job {} received event {}", jobInfo.getJobName(), jobNotif.getEventType());
     try {
       synchronized(this) {
-        if (jobNotif.getEventType() == expectedEvent) {
+        if (!eventReceived && (jobNotif.getEventType() == expectedEvent)) {
           if (debugEnabled) log.debug("job {} received expected event {}", jobInfo.getJobName(), expectedEvent);
           eventReceived = true;
           notifyAll();
@@ -119,6 +111,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public synchronized void await() throws Exception {
+    if (listenerRemoved) return;
     while (!eventReceived) wait(100L);
     if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
     jobManager.removeNotificationListener(this);
@@ -130,7 +123,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * Determine whether this listener was unregistered from the {@code await()} method.
    * @return {@code true} if this listener was unregistered, {@code false} otherwise.
    */
-  public boolean isListenerRemoved() {
+  public synchronized boolean isListenerRemoved() {
     return listenerRemoved;
   }
 }
