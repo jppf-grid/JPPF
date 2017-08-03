@@ -20,11 +20,14 @@ package test.org.jppf.job.persistence;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.h2.tools.Script;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.job.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.test.addons.common.AddonSimpleTask;
@@ -111,6 +114,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     JPPFJob job2 = mgr.retrieveJob(job.getUuid());
     compareJobs(job, job2, true);
     checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
+    assertEquals(JobStatus.COMPLETE, job2.getStatus());
     assertTrue(mgr.deleteJob(job.getUuid()));
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
   }
@@ -205,6 +209,58 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       print(true, false, "job2 results: " + job2.getResults());
       checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
       assertTrue(mgr.deleteJob(job.getUuid()));
+    }
+  }
+
+  /**
+   * Test that a persisted job executes and is persisted normally when submittd over two connections to the same driver.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testJobSubmittedOnTwoChannels() throws Exception {
+    int nbTasks = 2 * 10;
+    String method = ReflectionUtils.getCurrentMethodName();
+    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    try {
+      client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", nbTasks / 2));
+      pool.setSize(2);
+      pool.awaitActiveConnections(Operator.EQUAL, 2);
+      JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 100L);
+      job.getSLA().setCancelUponClientDisconnect(false);
+      job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
+      job.getClientSLA().setMaxChannels(2);
+      final List<String> dispatchList = new CopyOnWriteArrayList<>();
+      JobListener listener = new JobListenerAdapter() {
+        @Override
+        public void jobDispatched(final JobEvent event) {
+          dispatchList.add(event.getConnection().getConnectionUuid());
+        }
+      };
+      job.addJobListener(listener);
+      List<Task<?>> results = client.submitJob(job);
+      assertEquals(2, dispatchList.size());
+      print(false, false, "dispatch list: %s", dispatchList);
+      assertNotSame(dispatchList.get(0), dispatchList.get(1));
+      checkJobResults(nbTasks, results, false);
+      JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+      JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
+      List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
+      assertNotNull(persistedUuids);
+      assertEquals(1, persistedUuids.size());
+      JPPFJob job2 = mgr.retrieveJob(job.getUuid());
+      compareJobs(job, job2, true);
+      checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
+      assertEquals(JobStatus.COMPLETE, job2.getStatus());
+      assertTrue(mgr.deleteJob(job.getUuid()));
+      assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
+    } finally {
+      if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
+      if (pool != null) {
+        pool.setSize(1);
+        pool.awaitActiveConnections(Operator.EQUAL, 1);
+      }
     }
   }
 

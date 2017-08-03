@@ -19,13 +19,13 @@
 package org.jppf.job.persistence;
 
 /**
- * An enumeration of the possible types of objects that are persisted.
+ * An enumeration of the possible types of objects  or job elements that are persisted.
  * @author Laurent Cohen
  * @since 6.0
  */
 public enum PersistenceObjectType {
   /**
-   * The job header.
+   * The job header, which includes the job's uuid, name, SLA and metadata, but also the information required for job routing and scheduling.
    */
   JOB_HEADER,
   /**
@@ -37,7 +37,7 @@ public enum PersistenceObjectType {
    */
   TASK,
   /**
-   * The execution result of a task.
+   * An executed task returned by a node, also known as task execution result.
    */
   TASK_RESULT
 }

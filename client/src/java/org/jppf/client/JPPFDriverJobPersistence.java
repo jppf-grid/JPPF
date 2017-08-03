@@ -33,8 +33,7 @@ import org.slf4j.*;
  * Instances of this class allow monitoring and managing, on the client side, the jobs persisted in a remote driver.
  * In particular, it allows to retrieve jobs from the driver's persistence store and either process their results if they have completed,
  * or resubmit them vith a {@link JPPFClient}.
- * <p>The communication with the driver is performed via JMX, thus a working JMX connection to the driver, or a JPPF connection pool used to obtain one,
- * must be provided in one of the constructors.
+ * <p>The communication with the driver is performed via JMX, thus a working JMX connection to the driver must be provided in the constructor.
  * @author Laurent Cohen
  * @since 6.0
  */
@@ -107,25 +106,15 @@ public class JPPFDriverJobPersistence {
   }
 
   /**
-   * Retieve and rebuild the persisted job with the specified uuid. This method is equivalent to calling {@link #retrieveJob(String, boolean) retrieveJob(uuid, false)}.
+   * Retieve and rebuild the persisted job with the specified uuid.
    * @param uuid the UUID of the job to delete.
    * @return a {@link JPPFJob} instance, or {@code null} if the job could not be found.
    * @throws Exception if any error occurs while communicating with the driver.
    */
   public JPPFJob retrieveJob(final String uuid) throws Exception {
-    return retrieveJob(uuid, false);
-  }
-
-  /**
-   * Retrieve the persisted job with the specified uuid, and optionally delete it from the remote persistence store.
-   * @param uuid the UUID of the job to retrieve.
-   * @param delete whether to delete the job from the persistence store once it has been successfully retrieved.
-   * @return a {@link JPPFJob} instance, or {@code null} if the job could not be found.
-   * @throws Exception if any error occurs while communicating with the driver.
-   */
-  public JPPFJob retrieveJob(final String uuid, final boolean delete) throws Exception {
     TaskBundle header = load(uuid, PersistenceObjectType.JOB_HEADER, -1);
     if (debugEnabled) log.debug("got job header for uuid={} : {}", uuid, header);
+    if (header == null) return null;
     JPPFJob job = new JPPFJob(header.getUuid());
     job.setName(header.getName());
     job.setSLA(header.getSLA());
@@ -138,7 +127,7 @@ public class JPPFDriverJobPersistence {
     toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.DATA_PROVIDER, -1, null));
     for (int i=0; i<positions[0].length; i++) toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.TASK, positions[0][i], null));
     for (int i=0; i<positions[1].length; i++) toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.TASK_RESULT, positions[1][i], null));
-    long requestId = -1;
+    long requestId = -1L;
     try {
       requestId = persistedJobsManager.requestLoad(toLoad);
       DataProvider dataProvider = load(requestId, uuid, PersistenceObjectType.DATA_PROVIDER, -1);
@@ -156,18 +145,15 @@ public class JPPFDriverJobPersistence {
         results.add(task);
       }
       job.getResults().addResults(results);
+      if (job.unexecutedTaskCount() <= 0) job.setStatus(JobStatus.COMPLETE);
     } finally {
       if (requestId >= 0L) persistedJobsManager.deleteLoadRequest(requestId);
-    }
-    if (delete) {
-      List<String> res = persistedJobsManager.deletePersistedJobs(new JobUuidSelector(uuid));
-      if (debugEnabled) log.debug("deleted job with uuid='{}' as requested", res);
     }
     return job;
   }
 
   /**
-   * Get the descriotion of the job with the specified uuid. This method retrieves the job's uuid, name, number of tasks, SLA and metadata.
+   * Get the description of the job with the specified uuid. This method retrieves the job's uuid, name, number of tasks, SLA and metadata.
    * @param uuid the uuid of the job to retrieve.
    * @return the job descirption as a {@link JPPFDistributedJob} instance.
    * @throws Exception if any error occurs while communicating with the driver.

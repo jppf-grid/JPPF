@@ -190,9 +190,9 @@ public class AsynchronousPersistence implements JobPersistence {
   }
 
   /**
-   * Submit the specified persistence task for asynchronus execution and return the results once they are available.
+   * Submit the specified persistence task for asynchronous execution and return the results once they are available.
    * @param task the task to execute.
-   * @param <T> the type o result to return.
+   * @param <T> the type of result to return.
    * @return the expected result form the task.
    * @throws JobPersistenceException if any error occurs.
    */
@@ -214,7 +214,7 @@ public class AsynchronousPersistence implements JobPersistence {
   /**
    * Submit the specified persistence task for execution some time in the future.
    * @param task the task to execute.
-   * @param <T> the type o result the task returns.
+   * @param <T> the type of result the task returns.
    */
   private <T> void execute(final PersistenceTask<T> task) {
     executor.execute(task);

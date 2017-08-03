@@ -54,7 +54,7 @@ import org.slf4j.*;
  * {@code jppf.job.persistence = org.jppf.job.persistence.impl.DefaultDatabasePersistence <table_name>}<br>
  * If unspecified, it defaults to the {@linkplain #DEFAULT_TABLE default table name} 'JOB_PERSISTENCE'.
  * If the table does not exist, JPPF will attempt to create it. If this fails for any reason, for instance if the user does not have sufficient privileges,
- * then persistene will be disabled.
+ * then persistence will be disabled.
  *
  * <p>This database persistence implementation uses a <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a> connection pool and datasource.
  * The datasource is specified by name in the configuration:<br>

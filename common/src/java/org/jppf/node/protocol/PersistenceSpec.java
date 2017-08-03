@@ -35,7 +35,7 @@ public class PersistenceSpec implements Serializable {
    */
   private boolean persistent = false;
   /**
-   * Whether the driver should automatically execute the job, then delete it from the persistence store, after a restart.
+   * Whether the driver should automatically execute the job after a restart.
    */
   private boolean autoExecuteOnRestart = false;
   /**
@@ -63,7 +63,7 @@ public class PersistenceSpec implements Serializable {
   }
 
   /**
-   * Determine whether the driver should automatically execute the job, then delete it from the persistence store, after a restart.
+   * Determine whether the driver should automatically execute the persisted job after a restart.
    * The default value of this attribute is {@code false}.
    * @return {@code true} if the job is automatically executed upon recovery, {@code false} otherwise.
    */
@@ -72,7 +72,7 @@ public class PersistenceSpec implements Serializable {
   }
 
   /**
-   * Specify whether the driver should automatically execute the job, then delete it from the persistence store, after a restart.
+   * Specify whether the driver should automatically execute the persisted job after a restart.
    * @param autoExecuteOnRestart {@code true} if the job is to be automatically executed upon recovery, {@code false} otherwise.
    * @return this {@code PersistenceSpec} instance, for method call chaining.
    */
@@ -82,7 +82,7 @@ public class PersistenceSpec implements Serializable {
   }
 
   /**
-   * Determine whether the persisteed job should be deleted from the persistence store when it terminates.
+   * Determine whether the persisted job should be deleted from the persistence store when it terminates.
    * The default value of this attribute is {@code true}.
    * @return {@code true} if the job should be deleted from persistence, {@code false} otherwise.
    */
@@ -91,7 +91,7 @@ public class PersistenceSpec implements Serializable {
   }
 
   /**
-   * Determine whether the persisteed job should be deleted from the persistence store when it terminates.
+   * Determine whether the persisted job should be deleted from the persistence store when it terminates.
    * @param deleteOnCompletion {@code true} if the job should be deleted from persistence, {@code false} otherwise.
    * @return this {@code PersistenceSpec} instance, for method call chaining.
    */
