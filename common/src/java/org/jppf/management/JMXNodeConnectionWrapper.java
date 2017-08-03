@@ -27,8 +27,8 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
- * and management of the node.
+ * Node-specific JMX connection wrapper, implementing a user-friendly interface for the monitoring and management of a node.
+ *  Note that this class implements the interface {@link org.jppf.management.JPPFNodeAdminMBean JPPFNodeAdminMBean}.
  * @author Laurent Cohen
  */
 public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JPPFNodeAdminMBean {

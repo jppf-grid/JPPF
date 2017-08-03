@@ -32,9 +32,8 @@ import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
- * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
- * and management of the node. Note that this class implements the interface
- * {@link org.jppf.server.job.management.DriverJobManagementMBean DriverJobManagementMBean}.
+ * Driver-specific JMX connection wrapper, implementing a user-friendly interface for the monitoring
+ * and management of a JPPF driver. Note that this class implements the interface {@link org.jppf.management.JPPFDriverAdminMBean JPPFDriverAdminMBean}.
  * @author Laurent Cohen
  */
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean {
@@ -59,7 +58,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Initialize a plain connection to the remote MBean server.
+   * Initialize a plain (non-secure) connection to the remote MBean server.
    * @param host the host the server is running on.
    * @param port the port used by the server.
    */
