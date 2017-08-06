@@ -103,9 +103,9 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * Determine whether the current job dispatch is sent to the local executor.
+   * Determine whether the current job dispatch is sent to a remote driver.
    * Note that this method is only useful in the scope of the {@link JobListener#jobDispatched(JobEvent)} and {@link JobListener#jobReturned(JobEvent)} notifications.
-   * @return {@code true} if the current job dispatch is executed locally or the job has not yet been dispatched, {@code false} otherwise.
+   * @return {@code true} if the current job dispatch is executed remotely or the job has not yet been dispatched, {@code false} if the job dispatch is executed locally.
    * @since 4.2
    */
   public boolean isRemoteExecution() {
