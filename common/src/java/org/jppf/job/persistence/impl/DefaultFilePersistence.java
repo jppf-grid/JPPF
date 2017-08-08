@@ -255,7 +255,7 @@ public class DefaultFilePersistence implements JobPersistence {
    * @throws IOException if any I/O error occurs.
    */
   private Path getPathFor(final Path jobDir, final PersistenceInfo info, final boolean isTemp) throws IOException {
-    return getPathFor(jobDir, info.getType(), info.getTaskPosition(), isTemp);
+    return getPathFor(jobDir, info.getType(), info.getPosition(), isTemp);
   }
 
   /**

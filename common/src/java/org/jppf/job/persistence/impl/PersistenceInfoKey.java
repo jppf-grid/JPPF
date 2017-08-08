@@ -55,7 +55,7 @@ public class PersistenceInfoKey {
    * @param info the info from which to initialize.
    */
   public PersistenceInfoKey(final PersistenceInfo info) {
-    this(info.getJobUuid(), info.getType(), info.getTaskPosition());
+    this(info.getJobUuid(), info.getType(), info.getPosition());
   }
 
   @Override

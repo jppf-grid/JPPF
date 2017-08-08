@@ -101,6 +101,10 @@ public class DefaultDatabasePersistence implements JobPersistence {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * The default persistence table name.
    */
   protected static final String DEFAULT_TABLE = "JOB_PERSISTENCE";
@@ -176,19 +180,19 @@ public class DefaultDatabasePersistence implements JobPersistence {
     if (debugEnabled) log.debug("storing {}", infos);
     try (Connection connection = getDataSource().getConnection()) {
       boolean autocommit = connection.getAutoCommit();
+      int isolation  = connection.getTransactionIsolation();
       connection.setAutoCommit(false);
       try {
-        for (PersistenceInfo info: infos) {
-          try (PreparedStatement ps = prepareStoreStatement(connection, info)) {
-            ps.executeUpdate();
-          }
-        }
+        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        for (PersistenceInfo info: infos) storeElement(connection, info);
         connection.commit();
+        if (debugEnabled) log.debug("commit done");
       } catch(Exception e) {
         connection.rollback();
         throw new JobPersistenceException(e);
       } finally {
         connection.setAutoCommit(autocommit);
+        connection.setTransactionIsolation(isolation);
       }
     } catch(JobPersistenceException e) {
       throw e;
@@ -320,53 +324,56 @@ public class DefaultDatabasePersistence implements JobPersistence {
    * @throws SQLException if any error occurs.
    */
   protected synchronized DataSource getDataSource() throws SQLException {
-    //if (dataSource == null) dataSource = new JDBCDataSource();
     if (dataSource == null) dataSource = JPPFDatasourceFactory.getInstance().getDataSource(dataSourceName);
     return dataSource;
   }
 
   /**
-   * Determine whether an object is already s
+   * Lock the specified row for update, if it exists
    * @param connection the JDBC connection with which to create an dexecute the query.
-   * @param info the information on the object to check.
-   * @return a {@link PreparedStatement}.
+   * @param info the job element corresponding to the SQL row to lock.
+   * @return {@code true} if the row already exists (and therefore a lock is acquired), {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean alreadyExists(final Connection connection, final PersistenceInfo info) throws Exception {
-    try (PreparedStatement ps = connection.prepareStatement(getSQL("already.exists.sql"))) {
+  private boolean lockForUpdate(final Connection connection, final PersistenceInfo info) throws Exception {
+    try (PreparedStatement ps = connection.prepareStatement(getSQL("store.select.for.update"))) {
       ps.setString(1, info.getJobUuid());
       ps.setString(2, info.getType().name());
-      ps.setInt(3, info.getTaskPosition());
+      ps.setInt(3, info.getPosition());
       try (ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) return rs.getInt(1) == 1;
+        return rs.next();
       }
     }
-    return false;
   }
 
   /**
    * Create a prepared statement which will insert or update an object n the database.
    * @param connection the JDBC connection with which to create an dexecute the statement.
    * @param info the information on the object to persist.
-   * @return a {@link PreparedStatement}.
    * @throws Exception if any error occurs.
    */
-  private PreparedStatement prepareStoreStatement(final Connection connection, final PersistenceInfo info) throws Exception {
-    boolean exists = alreadyExists(connection, info);
-    PreparedStatement ps = connection.prepareStatement(getSQL(exists ? "store.update.sql" : "store.insert.sql"));
-    InputStream is = getInputStream(info.getInputStream());
-    if (exists) {
-      ps.setBlob(1, is);
-      ps.setString(2, info.getJobUuid());
-      ps.setString(3, info.getType().name());
-      ps.setInt(4, info.getTaskPosition());
-    } else {
+  private void storeElement(final Connection connection, final PersistenceInfo info) throws Exception {
+    lockForUpdate(connection, info);
+    try (PreparedStatement ps = connection.prepareStatement(getSQL("store.insert.sql"))) {
+      InputStream is = getInputStream(info.getInputStream());
       ps.setString(1, info.getJobUuid());
       ps.setString(2, info.getType().name());
-      ps.setInt(3, info.getTaskPosition());
+      ps.setInt(3, info.getPosition());
       ps.setBlob(4, is);
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      if ((e instanceof SQLIntegrityConstraintViolationException) || ((e.getMessage() != null) && e.getMessage().toLowerCase(Locale.US).contains("violation"))) {
+        if (traceEnabled) log.trace("Insert of element failed with constraint violation, attempt update instead, element={}", info);
+        try (PreparedStatement ps2 = connection.prepareStatement(getSQL("store.update.sql"))) {
+          InputStream is = getInputStream(info.getInputStream());
+          ps2.setBlob(1, is);
+          ps2.setString(2, info.getJobUuid());
+          ps2.setString(3, info.getType().name());
+          ps2.setInt(4, info.getPosition());
+          ps2.executeUpdate();
+        }
+      } else throw e;
     }
-    return ps;
   }
 
   /**
@@ -380,7 +387,7 @@ public class DefaultDatabasePersistence implements JobPersistence {
     PreparedStatement ps = connection.prepareStatement(getSQL("load.sql"));
     ps.setString(1, info.getJobUuid());
     ps.setString(2, info.getType().name());
-    ps.setInt(3, info.getTaskPosition());
+    ps.setInt(3, info.getPosition());
     return ps;
   }
 
@@ -451,24 +458,42 @@ public class DefaultDatabasePersistence implements JobPersistence {
    * @throws Exception if any error occurs.
    */
   private void checkTable(final String tableName) throws Exception {
-    try (Connection conn = getDataSource().getConnection()) {
-      try (ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null)) {
+    try (Connection connection = getDataSource().getConnection()) {
+      String catalog = null, schema = null;
+      try {
+        catalog = connection.getCatalog();
+      } catch (@SuppressWarnings("unused") Exception ignore) {
+      }
+      try {
+        schema = connection.getSchema();
+      } catch (@SuppressWarnings("unused") Exception ignore) {
+      }
+      try (ResultSet rs = connection.getMetaData().getTables(catalog, schema, tableName, null)) {
         while (rs.next()) {
           String name = rs.getString("TABLE_NAME");
           if ((name != null) && name.equalsIgnoreCase(tableName)) {
-            if (debugEnabled) log.debug("table '{}' exists in the database", tableName);
+            if (debugEnabled) log.debug(String.format("table '%s' already exist in the database for catalog=%s, schema=%s", tableName, catalog, schema));
             return;
           }
         }
       }
-      if (debugEnabled) log.debug("table '{}' does not exist in the database, creating it", tableName);
-      String path = JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE_DDL_LOCATION);
-      if (debugEnabled) log.debug("Read DDL file from {}", path);
-      String sql = FileUtils.readTextFile(path).replace("${" + TABLE_PROP + "}", tableName);
-      try (PreparedStatement ps = conn.prepareStatement(sql)) {
+      if (debugEnabled) log.debug(String.format("table '%s' does not exist in the database for catalog=%s, schema=%s, creating it", tableName, catalog, schema));
+      try (PreparedStatement ps = connection.prepareStatement(getTableDDL(tableName))) {
         ps.executeUpdate();
       }
     }
+  }
+
+  /**
+   * Get the DDL to create the table for jobs persistence.
+   * @param tableName the name of the persistence table.
+   * @return a (set of) DDL statement(s) to create the DDL as a single string.
+   * @throws Exception if any error occurs.
+   */
+  public static String getTableDDL(final String tableName) throws Exception {
+    String path = JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE_DDL_LOCATION);
+    if (debugEnabled) log.debug("Read DDL file from {}", path);
+    return FileUtils.readTextFile(path).replace("${" + TABLE_PROP + "}", tableName);
   }
 
   /**

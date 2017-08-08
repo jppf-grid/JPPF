@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.job.persistence.TestDefaultFilePersistenceAsync;
+import test.org.jppf.job.persistence.TestDefaultDatabasePersistenceMultiServer;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,7 +28,7 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestDefaultFilePersistenceAsync.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
+  classes={ TestDefaultDatabasePersistenceMultiServer.class })
 public class JPPFSuite {
 }

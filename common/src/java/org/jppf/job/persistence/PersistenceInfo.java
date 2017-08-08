@@ -51,7 +51,7 @@ public interface PersistenceInfo extends Serializable {
    * @return the position of the task in the job, starting at {@code 0},
    * or {@code -1} if the persisted object is neither a {@link PersistenceObjectType#TASK task} nor a {@link PersistenceObjectType#TASK_RESULT task result}.
    */
-  int getTaskPosition();
+  int getPosition();
 
   /**
    * Get an input stream for the persisted object. 

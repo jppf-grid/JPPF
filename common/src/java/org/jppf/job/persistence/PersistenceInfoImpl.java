@@ -86,7 +86,7 @@ public class PersistenceInfoImpl implements PersistenceInfo {
   }
 
   @Override
-  public int getTaskPosition() {
+  public int getPosition() {
     return taskPosition;
   }
 
@@ -100,7 +100,7 @@ public class PersistenceInfoImpl implements PersistenceInfo {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("type=").append(type)
       .append(", taskPosition=").append(taskPosition)
-      .append(", job=").append(job)
+      .append(", job=").append(job == null ? "null" : job.getName())
       .append(", jobUuid=").append(jobUuid)
       .append(']').toString();
   }
