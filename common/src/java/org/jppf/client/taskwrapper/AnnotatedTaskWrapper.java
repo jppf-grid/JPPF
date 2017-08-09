@@ -32,8 +32,7 @@ import org.jppf.node.protocol.JPPFRunnable;
  * @author Laurent Cohen
  * @exclude
  */
-class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
-{
+class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper {
   /**
    * Explicit serialVersionUID.
    */
@@ -57,27 +56,20 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @param args the arguments of the method to execute.
    * @throws JPPFException if an error is raised while initializing this task wrapper.
    */
-  public AnnotatedTaskWrapper(final Object taskObject, final Object...args) throws JPPFException
-  {
+  public AnnotatedTaskWrapper(final Object taskObject, final Object... args) throws JPPFException {
     boolean isClass = taskObject instanceof Class;
     Class<?> clazz = isClass ? (Class<?>) taskObject : taskObject.getClass();
     AnnotatedElement elt = getJPPFAnnotatedElement(clazz);
     if (elt == null) throw new JPPFException("object '" + taskObject + "' is not a JPPFTask nor JPPF-annotated");
-    if (elt instanceof Method)
-    {
-      if (isClass)
-      {
+    if (elt instanceof Method) {
+      if (isClass) {
         methodType = STATIC;
         className = clazz.getName();
-      }
-      else
-      {
+      } else {
         methodType = INSTANCE;
         this.taskObject = taskObject;
       }
-    }
-    else
-    {
+    } else {
       methodType = CONSTRUCTOR;
       className = clazz.getName();
     }
@@ -91,13 +83,11 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
    */
   @Override
-  public Object execute() throws Exception
-  {
-    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
+  public Object execute() throws Exception {
+    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : getTaskobjectClass(className);
     Object result = null;
     AbstractPrivilegedAction<?> action = null;
-    switch(methodType)
-    {
+    switch (methodType) {
       case CONSTRUCTOR:
         Constructor<?> c = (Constructor<?>) getJPPFAnnotatedElement(clazz);
         action = new PrivilegedConstructorAction(c, args);
@@ -111,6 +101,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
         break;
     }
     result = AccessController.doPrivileged(action);
+    if (methodType == CONSTRUCTOR) taskObject = result;
     if (action.getException() != null) throw action.getException();
     return result;
   }
@@ -121,8 +112,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
    */
   @Override
-  public Object getTaskObject()
-  {
+  public Object getTaskObject() {
     return taskObject;
   }
 
@@ -131,15 +121,12 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @param clazz the class to check.
    * @return true if the class can be executed as a task, false otherwise.
    */
-  private AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz)
-  {
+  private AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz) {
     if (clazz == null) return null;
-    for (Method m: clazz.getDeclaredMethods())
-    {
+    for (Method m : clazz.getDeclaredMethods()) {
       if (isJPPFAnnotated(m)) return m;
     }
-    for (Constructor<?> c: clazz.getDeclaredConstructors())
-    {
+    for (Constructor<?> c : clazz.getDeclaredConstructors()) {
       if (isJPPFAnnotated(c)) return c;
     }
     return null;
@@ -150,14 +137,29 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @param annotatedElement the method to check.
    * @return true if the method can be executed as a task, false otherwise.
    */
-  private boolean isJPPFAnnotated(final AnnotatedElement annotatedElement)
-  {
+  private boolean isJPPFAnnotated(final AnnotatedElement annotatedElement) {
     if (annotatedElement == null) return false;
     Annotation[] annotations = annotatedElement.getAnnotations();
-    for (Annotation a: annotations)
-    {
+    for (Annotation a : annotations) {
       if (JPPFRunnable.class.equals(a.annotationType())) return true;
     }
     return false;
+  }
+
+  /**
+   * Load the class witht ht epsecified name.
+   * @param classname name of the class ot laod.
+   * @return a {@code Class} object if the class is found.
+   * @throws Exception if any error occurs.
+   */
+  private Class<?> getTaskobjectClass(final String classname) throws Exception {
+    ClassLoader[] loaders = { Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
+    for (ClassLoader cl : loaders) {
+      try {
+        return Class.forName(classname, true, cl);
+      } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+      }
+    }
+    throw new ClassNotFoundException(classname);
   }
 }
