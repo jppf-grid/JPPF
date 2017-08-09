@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
@@ -31,7 +30,8 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
- *
+ * This class collects the total number of nodes and total number of threads in these nodes and sends them as
+ * JMX notifications to the peer drivers that are connected to the curtrent driver.
  * @author Laurent Cohen
  */
 public class PeerAttributesHandler implements NotificationListener {
@@ -48,37 +48,13 @@ public class PeerAttributesHandler implements NotificationListener {
    */
   public static final String PEER_TOTAL_NODES = "jppf.peer.total.nodes";
   /**
-   * Property for total nodes attached to a peer driver.
+   * Property for total threads for the nodes attached to a peer driver.
    */
   public static final String PEER_TOTAL_THREADS = JPPFProperties.PEER_PROCESSING_THREADS.getName();
-  /**
-   * Property for how often the timer task runs.
-   */
-  private static final long PERIOD = JPPFConfiguration.get(JPPFProperties.PEER_HANDLER_PERIOD);
-  /**
-   * The peers to manage.
-   */
-  private final List<AbstractNodeContext> peers = new ArrayList<>();
   /**
    * Executes tasks that fetch the number of nodes and total threads for a single peer driver.
    */
   private final ExecutorService executor;
-  /**
-   * Completion service used to fetch the results of the tasks submitted tot he executor.
-   */
-  private CompletionService<Void> completer;
-  /**
-   * Whether the timer task is currently running.
-   */
-  private final AtomicBoolean updating = new AtomicBoolean(false);
-  /**
-   * Executes a task periodically to update the number of nodes and total threads of all the peer drivers.
-   */
-  private Timer timer;
-  /**
-   * The task which updates the number of nodes and total threads of all the peer drivers.
-   */
-  private TimerTask timerTask;
   /**
    * Total number of fully connected nodes.
    */
@@ -91,47 +67,13 @@ public class PeerAttributesHandler implements NotificationListener {
    * Notification sequence number.
    */
   private final AtomicLong notifCount = new AtomicLong(0L);
-  /**
-   * Polling vs. notifications flag.
-   */
-  private final boolean pollingMode = false;
 
   /**
    * Initialize this handler.
    */
   public PeerAttributesHandler() {
-    executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new JPPFThreadFactory("PeerHandler"));
-    if (pollingMode) {
-      completer = new ExecutorCompletionService<>(executor);
-      timer = new Timer("PeerHandlerTimer", true);
-      this.timerTask = new TimerTask() {
-        @Override
-        public void run() {
-          updatePeers();
-        }
-      };
-      timer.schedule(timerTask, 1000L, PERIOD);
-    }
-  }
-
-  /**
-   * Add the specified peer to the list.
-   * @param peer the peer to add.
-   */
-  void addPeer(final AbstractNodeContext peer) {
-    synchronized(peers) {
-      peers.add(peer);
-    }
-  }
-
-  /**
-   * Remove the specified peer from the list.
-   * @param peer the peer to remove.
-   */
-  void removePeer(final AbstractNodeContext peer) {
-    synchronized(peers) {
-      peers.remove(peer);
-    }
+    int nbThreads = Math.max(1, JPPFConfiguration.getProperties().getInt("jppf.peer.handler.threads", 1));
+    executor = Executors.newFixedThreadPool(nbThreads, new JPPFThreadFactory("PeerHandler"));
   }
 
   /**
@@ -148,56 +90,6 @@ public class PeerAttributesHandler implements NotificationListener {
    */
   public int getTotalThreads() {
     return totalThreads.get();
-  }
-
-  /**
-   * Update all the registered peers.
-   */
-  private void updatePeers() {
-    if (updating.compareAndSet(false, true)) {
-      try {
-        List<AbstractNodeContext> temp;
-        synchronized(peers) {
-          if (peers.isEmpty()) return;
-          temp = new ArrayList<>(peers);
-        }
-        int count = temp.size();
-        for (final AbstractNodeContext peer: temp) {
-          completer.submit(new Runnable() {
-            @Override
-            public void run() {
-              updatePeer(peer);
-            }
-          }, null);
-        }
-        try {
-          while (count > 0) {
-            completer.take();
-            count--;
-          }
-        } catch(Exception e) {
-          if (debugEnabled) log.debug("error updating peers", e);
-        }
-      } finally {
-        updating.set(false);
-      }
-    }
-  }
-
-  /**
-   * Update the specified peer.
-   * @param peer the peer to update.
-   */
-  private void updatePeer(final AbstractNodeContext peer) {
-    JMXDriverConnectionWrapper jmx = peer.getPeerJmxConnection();
-    if ((jmx != null) && jmx.isConnected()) {
-      try {
-        TypedProperties props = (TypedProperties) jmx.getAttribute(PeerDriverMBean.MBEAN_NAME, "PeerProperties");
-        updatePeer(peer, props);
-      } catch(Exception e) {
-        if (debugEnabled) log.debug("error getting attributes of " + peer, e);
-      }
-    }
   }
 
   /**
@@ -239,7 +131,6 @@ public class PeerAttributesHandler implements NotificationListener {
       sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
-      removePeer(context);
       JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
       if (jmx != null) {
         try {
@@ -265,7 +156,6 @@ public class PeerAttributesHandler implements NotificationListener {
       sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
-      addPeer(context);
       JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
       if (jmx != null) {
         try {
@@ -292,15 +182,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Close and cleanup this handler.
    */
   void close() {
-    if (pollingMode) {
-      timer.cancel();
-      timerTask.cancel();
-      timer.purge();
-    }
     executor.shutdownNow();
-    synchronized(peers) {
-      peers.clear();
-    }
   }
 
   @Override
