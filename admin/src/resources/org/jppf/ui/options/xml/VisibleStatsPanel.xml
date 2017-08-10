@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2016 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the show/hide columns dialog.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="visible.stats.panel" type="page" i18n="org.jppf.ui.i18n.StatsPage">
+	<property name="label" value="Select the statistics to display"/>
+  <property name="layoutConstraints" value="flowy"/>
+	<property name="componentConstraints" value=""/>
+
+  <child name="visible.stats.selection" type="PickList">
+    <property name="bordered" value="true"/>
+    <property name="layoutConstraints" value="flowy, fill, insets 1"/>
+    <property name="componentConstraints" value="grow, push"/>
+    <property name="leftTitle" value="visible.stats.leftTitle"/>
+    <property name="rightTitle" value="visible.stats.rightTitle"/>
+
+  </child>
+
+  <!-- Apply and Close buttons -->
+	<child name="visible.stats.buttons" type="page">
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value="growx 0, growy 0"/>
+
+    <child name="visible.stats.apply" type="Button"/>
+    <child name="visible.stats.close" type="Button"/>
+
+	</child>
+
+  <!--
+  <child name="filler" type="page">
+    <property name="layoutConstraints" value="fill"/>
+    <property name="componentConstraints" value="growy 0, growx 0, push, w 1, h 1"/>
+  </child>
+  -->
+
+</opt:main>

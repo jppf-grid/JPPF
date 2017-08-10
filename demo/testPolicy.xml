@@ -1,0 +1,9 @@
+<!-- When this filter is active, only the nodes matching the
+execution policy will be displayed in the admin console
+-->
+<ExecutionPolicy>
+  <Equal valueType="boolean">
+    <Property>jppf.node.provisioning.slave</Property>
+    <Value>false</Value>
+  </Equal>
+</ExecutionPolicy>
