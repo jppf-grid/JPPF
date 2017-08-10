@@ -24,6 +24,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.slf4j.*;
 
 /**
  * This class performs cleanup and preferences storing actions when the admin console is closed.
@@ -31,11 +32,17 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
  */
 public class WindowClosingListener extends WindowAdapter {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(WindowClosingListener.class);
+
+  /**
    * Process the closing of the main frame.
    * @param event the event we're interested in.
    */
   @Override
   public void windowClosing(final WindowEvent event) {
+    log.info("closing the JPPF administration console");
     if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
     OptionElement elt = OptionsHandler.getTopPage();
     if (elt != null) {
