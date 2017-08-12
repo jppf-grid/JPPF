@@ -112,7 +112,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
       ClassPath classpath = sla.getClassPath();
       AbstractJPPFClassLoader cl = null;
       Log.v(LOG_TAG, String.format("jobHeaderLoaded(job='%s') classpath=%s", event.getJob().getName(), classpath));
-      if ((classpath != null) && !classpath.isEmpty()) cl = event.getNode().resetTaskClassLoader(classpath);
+      if ((classpath != null) && !classpath.isEmpty()) cl = (AbstractJPPFClassLoader) event.getNode().resetTaskClassLoader(classpath);
       else cl = event.getTaskClassLoader();
       JobMetadata metadata = event.getJob().getMetadata();
       String s = metadata.getParameter("jppf.node.integration.class");
