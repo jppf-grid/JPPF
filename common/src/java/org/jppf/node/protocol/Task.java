@@ -20,6 +20,7 @@ package org.jppf.node.protocol;
 
 import java.io.Serializable;
 
+import org.jppf.node.Node;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.JPPFCallable;
 
@@ -211,4 +212,19 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
    * @exclude
    */
   ClassLoader getTaskClassLoader();
+
+  /**
+   * Get the node this task is executing in, if any.
+   * @return A {@link Node} instance, or {@code null} if this task is not running in a node, e.g. in a client local executor.
+   * @since 6.0
+   */
+  Node getNode();
+
+  /**
+   * Set the node in which this task is executing, if any.
+   * @param node the JPPF node instance.
+   * @return this task, for method chaining.
+   * @exclude
+   */
+  public Task<T> setNode(final Node node);
 }

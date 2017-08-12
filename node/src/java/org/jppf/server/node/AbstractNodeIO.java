@@ -86,8 +86,7 @@ public abstract class AbstractNodeIO implements NodeIO {
       DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++) {
         Task<?> task = (Task<?>) result[2 + i];
-        task.setDataProvider(dataProvider);
-        task.setInNode(true);
+        task.setDataProvider(dataProvider).setInNode(true).setNode(node);
         taskList.add(task);
       }
     }

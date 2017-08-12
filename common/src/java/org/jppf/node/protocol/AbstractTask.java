@@ -21,6 +21,7 @@ package org.jppf.node.protocol;
 import java.lang.reflect.*;
 
 import org.jppf.JPPFException;
+import org.jppf.node.Node;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.JPPFCallable;
 
@@ -89,6 +90,10 @@ public class AbstractTask<T> implements Task<T> {
    * The max number of times a task can resubmit itself.
    */
   private transient int maxResubmits = -1;
+  /**
+   * The node in which this task is executing, if any.
+   */
+  private transient Node node;
 
   /**
    *
@@ -290,5 +295,20 @@ public class AbstractTask<T> implements Task<T> {
   @Override
   public boolean isInterruptible() {
     return true;
+  }
+
+  @Override
+  public Node getNode() {
+    return node;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
+  public Task<T> setNode(final Node node) {
+    this.node = node;
+    return this;
   }
 }

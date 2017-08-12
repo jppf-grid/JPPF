@@ -115,7 +115,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
         // the same client, which will now be used by the node; this will cause the old class loader to be discarded
         boolean isNewCl = false;
         if ((currentURLs != null) && (currentURLs.length > 0)) {
-          cl = event.getNode().resetTaskClassLoader();
+          cl = (AbstractJPPFClassLoader) event.getNode().resetTaskClassLoader();
           isNewCl = true;
         }
         // add all requested jar files to the class loader's classpath

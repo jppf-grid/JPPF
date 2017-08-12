@@ -197,6 +197,9 @@ public class TestJPPFTask extends Setup1D1N1C {
     MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
     assertNotNull(task.getResult());
     assertTrue((Boolean) task.getResult());
+    assertNotNull(task.nodeUuid);
+    assertNotNull(task.uuidFromNode);
+    assertEquals(task.nodeUuid, task.uuidFromNode);
   }
 
   /**
@@ -215,6 +218,9 @@ public class TestJPPFTask extends Setup1D1N1C {
       MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
       assertNotNull(task.getResult());
       assertFalse((Boolean) task.getResult());
+      assertNotNull(task.nodeUuid);
+      assertEquals("local_client", task.nodeUuid);
+      assertNull(task.uuidFromNode);
     } finally {
       reset();
     }
@@ -349,9 +355,13 @@ public class TestJPPFTask extends Setup1D1N1C {
      * The class name for the callable to invoke.
      */
     private final String callableClassName;
+    /**
+     * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
+     */
+    public String uuidFromNode = null, nodeUuid = null;
 
     /**
-     * Iitialize this task.
+     * Initialize this task.
      */
     public MyComputeCallableTask() {
       this.callableClassName = null;
@@ -381,6 +391,9 @@ public class TestJPPFTask extends Setup1D1N1C {
           printOut("isInNode() = %b", b);
           setResult(b);
         }
+        nodeUuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid");
+        if (isInNode()) uuidFromNode = getNode().getUuid();
+        printOut("this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
       } catch (Exception e) {
         setThrowable(e);
       }
@@ -448,9 +461,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   public static class NotifyingTask extends AbstractTask<Object> {
     @Override
     public void run() {
@@ -467,9 +478,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   public static class NotifyingTask2 extends AbstractTask<Object> {
     @Override
     public void run() {
