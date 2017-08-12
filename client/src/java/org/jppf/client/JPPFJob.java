@@ -101,8 +101,8 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   /**
    * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
    * or a class for a static method or for a constructor.
+   * @param method the name of the method to execute. For a constructor, this should be identical to the simple name of the class as per {@code Class.getSimpleName()}.
    * @param taskObject the task to add to this job.
-   * @param method the name of the method to execute.
    * @param args arguments to use with a JPPF-annotated class.
    * @return an instance of <code>Task</code> that is a wrapper around the input task object.
    * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.

@@ -19,7 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
