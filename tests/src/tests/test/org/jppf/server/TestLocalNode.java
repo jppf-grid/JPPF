@@ -104,6 +104,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testServerConnections() throws Exception {
+    Thread.sleep(200L);
     List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
     assertEquals(1, pools.size());
