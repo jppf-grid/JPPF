@@ -79,6 +79,10 @@ public class LifeCycleTask extends AbstractTask<String> {
    * A message to send via JMX.
    */
   protected String startNotification;
+  /**
+   * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
+   */
+  protected String uuidFromNode = null;
 
   /**
    * Initialize this task.
@@ -120,7 +124,6 @@ public class LifeCycleTask extends AbstractTask<String> {
     // System.nanoTime() has a different origin on different JVM instances, thus it can't be used to compute the start time
     long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
-    //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
     start *= ONE_MILLION;
     if (startNotification != null) fireNotification(startNotification, true);
     try {
@@ -133,12 +136,12 @@ public class LifeCycleTask extends AbstractTask<String> {
           config.setProperty("jppf.node.uuid", nodeUuid);
         }
       }
+      if (isInNode()) uuidFromNode = getNode().getUuid();
       if (duration > 0L) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       displayTask("successful");
     } catch(Exception e) {
       setThrowable(e);
-      //e.printStackTrace();
     } finally {
       elapsed = System.nanoTime() - nanoStart;
     }
@@ -246,5 +249,13 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   public boolean isInterrupted() {
     return interrupted;
+  }
+
+  /**
+   * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
+   * @return the node uuid, of {@code null} if the task did not execute in a node.
+   */
+  public String getUuidFromNode() {
+    return uuidFromNode;
   }
 }

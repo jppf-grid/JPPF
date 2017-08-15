@@ -31,10 +31,6 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    */
   private final int priority;
   /**
-   * The connection pool size.
-   */
-  private final int poolSize;
-  /**
    * The associated JMX connection pool size.
    */
   private final int jmxPoolSize;
@@ -78,9 +74,8 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    * @param jmxPoolSize the associated JMX connection pool size.
    */
   public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize) {
-    super(name, secure, host, port);
+    super(name, secure, host, port, poolSize);
     this.priority = priority;
-    this.poolSize = poolSize;
     this.jmxPoolSize = jmxPoolSize;
   }
 
@@ -90,14 +85,6 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    */
   public int getPriority() {
     return priority;
-  }
-
-  /**
-   * Get the connection pool size.
-   * @return the connection pool size as an int value.
-   */
-  public int getPoolSize() {
-    return poolSize;
   }
 
   /**

@@ -150,7 +150,7 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append(", maxSize=").append(size);
+    sb.append(", size=").append(size);
     sb.append(", connectionCount=").append(connectionCount());
     sb.append(']');
     return sb.toString();

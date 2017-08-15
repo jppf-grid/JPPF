@@ -42,12 +42,16 @@ public class DriverConnectionInfo {
    * The driver port to connect to.
    */
   final int port;
+  /**
+   * The connection pool size.
+   */
+  final int poolSize;
 
   /**
    * Initialize a plain connection with default name("driver"), host ("localhost") and port (11111).
    */
   public DriverConnectionInfo() {
-    this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue());
+    this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue(), 1);
   }
 
   /**
@@ -57,7 +61,7 @@ public class DriverConnectionInfo {
    * @param port the driver port to connect to.
    */
   public DriverConnectionInfo(final String name, final String host, final int port) {
-    this(name, false, host, port);
+    this(name, false, host, port, 1);
   }
 
   /**
@@ -68,10 +72,23 @@ public class DriverConnectionInfo {
    * @param port the driver port to connect to.
    */
   public DriverConnectionInfo(final String name, final boolean secure, final String host, final int port) {
+    this(name, secure, host, port, 1);
+  }
+
+  /**
+   * Initialize a connection.
+   * @param name the name given to this connection.
+   * @param secure whether SSL/TLS should be used.
+   * @param host the driver host name or IP address.
+   * @param port the driver port to connect to.
+   * @param poolSize the number of driver connections in the pool.
+   */
+  public DriverConnectionInfo(final String name, final boolean secure, final String host, final int port, final int poolSize) {
     this.name = name;
     this.secure = secure;
     this.host = host;
     this.port = port;
+    this.poolSize = poolSize >= 1 ? poolSize : 1;
   }
 
   /**
@@ -104,6 +121,14 @@ public class DriverConnectionInfo {
    */
   public int getPort() {
     return port;
+  }
+
+  /**
+   * Get the connection pool size.
+   * @return the connection pool size as an int value.
+   */
+  public int getPoolSize() {
+    return poolSize;
   }
 
   @Override

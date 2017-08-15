@@ -119,10 +119,6 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
         } catch(Exception e) {
-          /*
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.warn(ExceptionUtils.getMessage(e));
-          */
           close();
           throw new JPPFRuntimeException(e);
         } catch(Error e) {
