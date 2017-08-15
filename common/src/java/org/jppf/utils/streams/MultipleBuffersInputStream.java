@@ -39,6 +39,10 @@ public class MultipleBuffersInputStream extends InputStream {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Min data length for which to call {@code System.arraycopy()} instead of copying in a loop.
+   */
+  private static final int ARRAYCOPY_MIN_LENGTH = 10;
+  /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */
   private final JPPFBuffer[] list;
@@ -106,7 +110,11 @@ public class MultipleBuffersInputStream extends InputStream {
       if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
       if (eofReached) break;
       int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
-      System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
+      int bPos = off + count;
+      if (n >= ARRAYCOPY_MIN_LENGTH) System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, bPos, n);
+      else {
+        for (int i=currentBuffer.pos; i<currentBuffer.pos + n; i++) b[bPos++] = currentBuffer.buffer[i];
+      }
       count += n;
       currentBuffer.pos += n;
     }
