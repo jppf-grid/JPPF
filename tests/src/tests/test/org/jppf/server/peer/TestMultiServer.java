@@ -128,7 +128,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @Test(timeout = TIMEOUT)
   public void testTopologyMonitoring() throws Exception {
-    while (client.awaitConnectionPools(Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING).size() != 2) Thread.sleep(10L);
+    client.awaitConnectionPools(Operator.EQUAL, 2, Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.workingStatuses());
     final TopologyManager mgr = new TopologyManager(client);
     ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
       @Override

@@ -26,11 +26,10 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.ConcurrentUtils.Condition;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
@@ -42,6 +41,8 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class AbstractNonStandardSetup extends BaseTest {
+  /** */
+  private static final NodeSelector SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
   /**
    * The jppf client to use.
    */
@@ -274,14 +275,14 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {
-    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     for (JPPFConnectionPool pool: pools) {
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      ConcurrentUtils.awaitCondition(new Condition() {
+      ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
           try {
-            return jmx.nbIdleNodes() == 1;
+            return jmx.nbIdleNodes(SELECTOR) == 1;
           } catch (@SuppressWarnings("unused") Exception e) {
             return false;
           }

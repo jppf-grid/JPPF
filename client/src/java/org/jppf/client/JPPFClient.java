@@ -266,6 +266,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final Operator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    /*
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
     final ConnectionPoolFilter<JPPFConnectionPool> filter = new ConnectionPoolFilter<JPPFConnectionPool>() {
       @Override
@@ -283,6 +284,38 @@ public class JPPFClient extends AbstractGenericClient {
         }
         boolean empty = ref.setSynchronized(result, pools).isEmpty();
         return !empty || (empty && (expectedConnections <= 0));
+      }
+    }, timeout);
+    return ref.get();
+    */
+    return awaitConnectionPools(Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
+  }
+
+  /**
+   * Wait until there is at least the specified expected connection pools satisfy the condition where where the number of connections with the specified statuses
+   * satisfy the specified connection operator, or until the specified timeout expires, whichever happens first.
+   * @param poolOperator the condition on the number of expected pools to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param expectedPools the expected number of pools to wait for.
+   * @param connectionOperator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param expectedConnections the expected number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
+   * @param statuses the possible statuses of the connections in the pools to wait for.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
+   * @since 6.0
+   */
+  public List<JPPFConnectionPool> awaitConnectionPools(final Operator poolOperator, final int expectedPools, final Operator connectionOperator, final int expectedConnections,
+    final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        List<JPPFConnectionPool> result = new ArrayList<>();
+        List<JPPFConnectionPool> temp = findConnectionPools(statuses);
+        for (JPPFConnectionPool pool: temp) {
+          List<JPPFClientConnection> list = pool.getConnections(statuses);
+          if (connectionOperator.evaluate(list.size(), expectedConnections)) result.add(pool);
+        }
+        ref.setSynchronized(result, pools);
+        return poolOperator.evaluate(result.size(), expectedPools);
       }
     }, timeout);
     return ref.get();
