@@ -22,10 +22,12 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.ConcurrentUtils.Condition;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -54,9 +56,21 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
-    printOut("before awaitPeersInitialized()");
-    awaitPeersInitialized();
-    printOut("after awaitPeersInitialized()");
+    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    for (JPPFConnectionPool pool: pools) {
+      final int expectedNodes = "driver1".equals(pool.getName()) ? 1 : 0;
+      final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+      ConcurrentUtils.awaitCondition(new Condition() {
+        @Override
+        public boolean evaluate() {
+          try {
+            return jmx.nbIdleNodes() == expectedNodes;
+          } catch (@SuppressWarnings("unused") Exception e) {
+            return false;
+          }
+        }
+      }, 5000L, true);
+    }
     int nbTasks = 20;
     String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
