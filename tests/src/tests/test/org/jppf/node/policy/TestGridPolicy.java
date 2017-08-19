@@ -186,7 +186,7 @@ public class TestGridPolicy extends Setup1D2N1C {
       Thread.sleep(1000L);
       // a static node uuid is already assigned in the master's config file and must be overriden
       TypedProperties overrides = new TypedProperties();
-      overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString() }$");
+      overrides.setString("jppf.node.uuid", "$script{ java.util.UUID.randomUUID().toString(); }$");
       // start 1 slave node for each master
       jmx.getNodeForwarder().provisionSlaveNodes(masterSelector, 1, overrides);
       List<Task<?>> results = job.awaitResults();

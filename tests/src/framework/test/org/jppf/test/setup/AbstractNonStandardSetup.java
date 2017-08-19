@@ -275,7 +275,8 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {
-    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    List<JPPFConnectionPool> pools = null;
+    while((pools = client.awaitConnectionPools(Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses())).size() != 2) Thread.sleep(10L);
     for (JPPFConnectionPool pool: pools) {
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
       ConcurrentUtils.awaitCondition(new Condition() {
