@@ -18,13 +18,11 @@
 
 package org.jppf.server.nio.client;
 
-
 /**
  * Enumeration of the possible states for a client job channel.
  * @author Laurent Cohen
  */
-public enum ClientState
-{
+public enum ClientState {
   /**
    * Waiting for the handshake bundle to be received from the client.
    */
@@ -44,5 +42,13 @@ public enum ClientState
   /**
    * Idle state for a client channel.
    */
-  IDLE
+  IDLE,
+  /**
+   * State of sending handshake to a peer driver.
+   */
+  SENDING_PEER_HANDSHAKE,
+  /**
+   * State of receiving a handshake response from a peer driver.
+   */
+  WAITING_PEER_HANDSHAKE_RESULTS
 }

@@ -20,12 +20,18 @@ package org.jppf.nio;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.*;
+
 /**
  * Context associated with an open communication channel.
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
 public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
   /**
    * The current state of the channel this context is associated with.
    */
@@ -66,6 +72,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Whether this context has been closed.
    */
   protected final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * An optional action to perform upon closing this context or its associated channel.
+   */
+  protected Runnable onCloseAction;
 
   @Override
   public S getState() {
@@ -223,5 +233,26 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   public void setClosed(final boolean closed) {
     this.closed.set(closed);
+  }
+
+  /**
+   * Set an optional action to perform upon closing this context or its associated channel.
+   * @param onCloseAction a {@link Runnable} instance.
+   */
+  public void setOnCloseAction(final Runnable onCloseAction) {
+    this.onCloseAction = onCloseAction;
+  }
+
+  /**
+   * Callback that can be invoked upon closing this context or its associated channel.
+   */
+  protected void onClose() {
+    if (onCloseAction != null) {
+      try {
+        onCloseAction.run();
+      } catch (Exception e) {
+        log.error(String.format("error in onClose action for %s", this), e);
+      }
+    }
   }
 }

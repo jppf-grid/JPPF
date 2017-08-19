@@ -54,7 +54,6 @@ class WaitingJobState extends ClientServerState {
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
@@ -86,7 +85,7 @@ class WaitingJobState extends ClientServerState {
         return TO_WAITING_JOB;
       }
       JPPFDriver.getInstance().getQueue().addBundle(clientBundle);
-      return TO_IDLE;
+      return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
     }
     return TO_WAITING_JOB;
   }

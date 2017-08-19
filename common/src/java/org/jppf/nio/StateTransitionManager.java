@@ -262,17 +262,22 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @return true or false.
    */
   public boolean checkSubmitTransition(final ChannelWrapper<?> channel, final T transition) {
-    if (channel.isLocal()) return false;
-    int interestOps = factory.getTransition(transition).getInterestOps();
-    int readyOps = channel.getReadyOps();
-    // TODO: investigate why this is necessary, why when stress-testing offline nodes, one of the node channels
-    // gets stuck with readyOps=4 and interestOps=5 (for state SENDING_BUNDLE) but the selector doesn't select the corresponding key.
-    if (isNodeServer && ((interestOps & OP_WRITE) != 0) && ((readyOps & OP_WRITE) != 0)) return true;
-    SSLHandler sslHandler = channel.getContext().getSSLHandler();
-    if (sslHandler == null) return false;
-    boolean b = (interestOps != readyOps) && (interestOps != 0) && !server.isIdle(channel) &&
-        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
-    return b;
+    try {
+      if (channel.isLocal()) return false;
+      int interestOps = factory.getTransition(transition).getInterestOps();
+      int readyOps = channel.getReadyOps();
+      // TODO: investigate why this is necessary, why when stress-testing offline nodes, one of the node channels
+      // gets stuck with readyOps=4 and interestOps=5 (for state SENDING_BUNDLE) but the selector doesn't select the corresponding key.
+      if (isNodeServer && ((interestOps & OP_WRITE) != 0) && ((readyOps & OP_WRITE) != 0)) return true;
+      SSLHandler sslHandler = channel.getContext().getSSLHandler();
+      if (sslHandler == null) return false;
+      boolean b = (interestOps != readyOps) && (interestOps != 0) && !server.isIdle(channel) &&
+          ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
+      return b;
+    } catch (RuntimeException e) {
+      log.error(String.format("error for transition=%s, channel=%s, exception=%s", transition, channel, e));
+      throw e;
+    }
   }
 
   /**

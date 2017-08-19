@@ -50,10 +50,6 @@ public enum ClientClassTransition
   /**
    * Sending of the initial request by a peer server.
    */
-  TO_SENDING_PEER_CHANNEL_IDENTIFIER,
-  /**
-   * Sending of the initial request by a peer server.
-   */
   TO_SENDING_PEER_INITIATION_REQUEST,
   /**
    * Waiting for the initial response from a peer server

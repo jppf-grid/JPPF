@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.client;
 
-import static org.jppf.server.nio.client.ClientTransition.TO_IDLE;
+import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.net.ConnectException;
 
@@ -30,8 +30,7 @@ import org.slf4j.*;
  * This class represents an idle state for a client connection (job data channel).
  * @author Laurent Cohen
  */
-class IdleState extends ClientServerState
-{
+class IdleState extends ClientServerState {
   /**
    * Logger for this class.
    */
@@ -40,12 +39,12 @@ class IdleState extends ClientServerState
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public IdleState(final ClientNioServer server)
-  {
+  public IdleState(final ClientNioServer server) {
     super(server);
   }
 
@@ -57,13 +56,12 @@ class IdleState extends ClientServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     if (debugEnabled) log.debug("exec() for " + channel);
-    if (channel.isReadable())
-    {
+    if (channel.isReadable()) {
       throw new ConnectException("client " + channel + " has been disconnected");
     }
-    return TO_IDLE;
+    ClientContext context = (ClientContext) channel.getContext();
+    return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
   }
 }

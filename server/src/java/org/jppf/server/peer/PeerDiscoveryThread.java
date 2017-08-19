@@ -34,7 +34,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(PeerNode.class);
+  private static Logger log = LoggerFactory.getLogger(PeerDiscoveryThread.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */

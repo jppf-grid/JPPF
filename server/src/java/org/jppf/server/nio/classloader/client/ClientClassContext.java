@@ -19,7 +19,6 @@
 package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.utils.StringUtils.build;
-import static org.jppf.utils.stats.JPPFStatisticsHelper.PEER_OUT_TRAFFIC;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,12 +27,10 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.classloader.JPPFResourceWrapper.State;
-import org.jppf.io.*;
 import org.jppf.nio.*;
-import org.jppf.serialization.SerializationUtils;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.node.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -211,33 +208,6 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
     } catch (Exception e) {
       log.error("error while trying to send response to node {}, this node may be unavailable : {}", e);
     }
-  }
-
-  /**
-   * Write the peer initiation message when first connecting to a remote server.
-   * The message is made of the JPPF identifier {@link JPPFIdentifiers#NODE_CLASSLOADER_CHANNEL} plus
-   * an initial resource wrapper (preceded by its serialized length).
-   * @param channel the channel to which to write the message.
-   * @return <code>true</code> if the message was fully written, <code>false</code> otherwise.
-   * @throws Exception if any error occurs.
-   */
-  public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception {
-    int id = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
-    if (nioObject == null) {
-      byte[] bytes = SerializationUtils.writeInt(id);
-      DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
-      nioObject = new PlainNioObject(channel, dl);
-    }
-    boolean b = false;
-    try {
-      b = nioObject.write();
-    } catch(Exception e) {
-      driver.getStatistics().addValue(PEER_OUT_TRAFFIC, nioObject.getChannelCount());
-      throw e;
-    }
-    if (b  && debugEnabled) log.debug("sent channel identifier {} to peer server", JPPFIdentifiers.asString(id));
-    if (b) driver.getStatistics().addValue(PEER_OUT_TRAFFIC, nioObject.getChannelCount());
-    return b;
   }
 
   @Override

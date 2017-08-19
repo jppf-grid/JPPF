@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.*;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.peer.JPPFPeerInitializer;
 
 /**
@@ -31,10 +30,6 @@ import org.jppf.server.peer.JPPFPeerInitializer;
  * @author Laurent Cohen
  */
 class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConnectionInfo> {
-  /**
-   * The client that handles new connection notifications.
-   */
-  private final ClientClassNioServer classServer;
   /**
    * The set of discovered pools. Used to determine whether a connection pool request has already bee made.
    */
@@ -46,10 +41,8 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
 
   /**
    * Initialize this listener with the specified client.
-   * @param classServer JPPF class server
    */
-  PeerDriverDiscoveryListener(final ClientClassNioServer classServer) {
-    this.classServer = classServer;
+  PeerDriverDiscoveryListener() {
   }
 
   @Override
@@ -62,7 +55,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
     }
     if (!hasPool) {
       JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);
-      new JPPFPeerInitializer(info.getName(), connectionInfo, classServer, info.isSecure()).start();
+      new JPPFPeerInitializer(info.getName(), connectionInfo, info.isSecure()).start();
     }
     return !hasPool;
   }

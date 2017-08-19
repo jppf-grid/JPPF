@@ -18,13 +18,11 @@
 
 package org.jppf.server.nio.client;
 
-
 /**
  * Enumeration of the possible state transitions for a client job channel.
  * @author Laurent Cohen
  */
-public enum ClientTransition
-{
+public enum ClientTransition {
   /**
    * Transition from a state to WAITING_HANDSHAKE.
    */
@@ -44,5 +42,17 @@ public enum ClientTransition
   /**
    * Transition from a state to IDLE.
    */
-  TO_IDLE
+  TO_IDLE,
+  /**
+   * Transition from a state to IDLE.
+   */
+  TO_IDLE_PEER,
+  /**
+   * Transition to {@link ClientState#SENDING_PEER_HANDSHAKE}.
+   */
+  TO_SENDING_PEER_HANDSHAKE,
+  /**
+   * Transition to {@link ClientState#WAITING_PEER_HANDSHAKE_RESULTS}.
+   */
+  TO_WAITING_PEER_HANDSHAKE_RESULTS
 }

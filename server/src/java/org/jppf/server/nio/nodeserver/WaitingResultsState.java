@@ -24,6 +24,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
+import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
@@ -144,7 +145,10 @@ class WaitingResultsState extends NodeServerState {
           }
           if (count > 0) context.updateStatsUponTaskResubmit(count);
         } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
-        nodeBundle.resultsReceived(received.data());
+        List<DataLocation> data = received.data();
+        if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
+        if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
+        nodeBundle.resultsReceived(data);
         long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
         updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
         if (bundler instanceof BundlerEx) {

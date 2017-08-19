@@ -110,6 +110,17 @@ public class ServerTaskBundleClient {
    * @param taskList the tasks to execute.
    */
   public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
+    this(job, dataProvider, taskList, false);
+  }
+
+  /**
+   * Initialize this task bundle and set its build number.
+   * @param job the job to execute.
+   * @param dataProvider the shared data provider for this task bundle.
+   * @param taskList the tasks to execute.
+   * @param forPeer whether the job comes from a peer driver.
+   */
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList, final boolean forPeer) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
@@ -132,7 +143,8 @@ public class ServerTaskBundleClient {
         }
       }
       this.pendingTasksCount.set(this.taskList.size() + nullTasks.size());
-      this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
+      if (forPeer) this.strategy = new SendResultsStrategy.SendAllResultsStrategy();
+      else this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
     } else this.strategy = SendResultsStrategyManager.getStrategy(null);
   }
 
@@ -148,9 +160,7 @@ public class ServerTaskBundleClient {
     this.job = job;
     this.dataProvider = dataProvider;
     this.taskList.addAll(tasks);
-    for (ServerTask task: tasks) {
-      task.setBundle(this);
-    }
+    for (ServerTask task: tasks) task.setBundle(this);
     this.pendingTasksCount.set(tasks.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
   }
@@ -420,6 +430,7 @@ public class ServerTaskBundleClient {
     sb.append(", cancelled=").append(cancelled);
     sb.append(", done=").append(done);
     sb.append(", job=").append(job);
+    sb.append("; strategy=").append(strategy == null ? "null" : strategy.getName());
     sb.append(']');
     return sb.toString();
   }

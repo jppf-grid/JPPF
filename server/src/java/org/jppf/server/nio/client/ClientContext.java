@@ -119,6 +119,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
         }
       }
       cancelJobOnClose();
+      onClose();
     }
   }
 
@@ -153,7 +154,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
     TaskBundle bundle = ((ClientMessage) message).getBundle();
     this.jobUuid = bundle.getUuid();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
-    return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
+    return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()), isPeer());
   }
 
   /**

@@ -19,7 +19,7 @@
 package org.jppf.nio;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -481,6 +481,25 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
    */
   public abstract boolean isIdle(ChannelWrapper<?> channel);
+
+
+  /**
+   * Configure the SSL options for the specified channel.
+   * @param channel the channel for which to configure SSL.
+   * @throws Exception if any error occurs.
+   */
+  public void configureSSL(final ChannelWrapper<?> channel) throws Exception {
+    SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
+    NioContext<?> context = channel.getContext();
+    SSLContext sslContext = getSSLContext();
+    Socket socket = socketChannel.socket();
+    SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
+    SSLParameters params = SSLHelper.getSSLParameters();
+    engine.setUseClientMode(true);
+    engine.setSSLParameters(params);
+    SSLHandler sslHandler = new SSLHandler(channel, engine);
+    context.setSSLHandler(sslHandler);
+  }
 
   /**
    * This task performs the processing of a newly accepted channel.

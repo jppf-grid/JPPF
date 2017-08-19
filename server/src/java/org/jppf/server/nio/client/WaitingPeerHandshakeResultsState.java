@@ -20,31 +20,34 @@ package org.jppf.server.nio.client;
 
 import static org.jppf.server.nio.client.ClientTransition.*;
 
-import java.net.ConnectException;
+import java.util.List;
 
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for some action.
+ * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
-class SendingResultsState extends ClientServerState {
+class WaitingPeerHandshakeResultsState extends ClientServerState {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingResultsState.class);
+  private static Logger log = LoggerFactory.getLogger(WaitingPeerHandshakeResultsState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public SendingResultsState(final ClientNioServer server) {
+  public WaitingPeerHandshakeResultsState(final ClientNioServer server) {
     super(server);
   }
 
@@ -53,38 +56,35 @@ class SendingResultsState extends ClientServerState {
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    if (channel.isReadable()) throw new ConnectException("client {}" + channel + " has been disconnected");
     ClientContext context = (ClientContext) channel.getContext();
-    ServerTaskBundleClient clientBundle = context.getBundle();
-    if (clientBundle == null) {
-      clientBundle = context.pollCompletedBundle();
-      if (clientBundle == null) {
-        if (debugEnabled) log.debug("*** clientBundle = null for {}", channel);
-        return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+    if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
+    if (context.readMessage(channel)) {
+      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
+      TaskBundle header = bundleWrapper.getJob();
+      if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
+      //context.setConnectionUuid((String) header.getParameter("connection.uuid"));
+      header.getUuidPath().incPosition();
+      String uuid = header.getUuidPath().getCurrentElement();
+      context.setUuid(uuid);
+      // wait until a class loader channel is up for the same client uuid
+      ClientClassNioServer classServer = driver.getClientClassServer();
+      List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+      while ((list == null) || list.isEmpty()) {
+        Thread.sleep(1L);
+        list = classServer.getProviderConnections(uuid);
       }
-      context.setBundle(clientBundle);
-      context.serializeBundle();
-    }
-    if (context.writeMessage(channel)) {
-      if (debugEnabled) log.debug("*** sent entire bundle {} to {}", clientBundle, context);
-      context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
-      if (debugEnabled) log.debug("*** NbTasksToSend={}, sent tasks count={}, CompletedBundlesEmpty={}", new Object[] {context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty()});
-      context.setBundle(null);
+      String driverUUID = driver.getUuid();
+      header.getUuidPath().add(driverUUID);
+      if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
+
       context.setClientMessage(null);
-      if (context.isCompletedBundlesEmpty()) {
-        if (context.getNbTasksToSend() <= 0) {
-          if (debugEnabled) log.debug("*** client bundle ended " + context.getInitialBundleWrapper());
-          context.jobEnded();
-          context.setInitialBundleWrapper(null);
-          return TO_WAITING_JOB;
-        }
-        return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
-      }
+      context.setBundle(bundleWrapper);
+      header.clear();
+      return TO_WAITING_JOB;
     }
-    return TO_SENDING_RESULTS;
+    return TO_WAITING_PEER_HANDSHAKE_RESULTS;
   }
 }

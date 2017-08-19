@@ -222,7 +222,7 @@ public class DriverInitializer {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
           peerDiscoveryThread.addConnectionInformation(info);
-          new JPPFPeerInitializer(name, info, classServer, ssl, true).start();
+          new JPPFPeerInitializer(name, info, ssl, true).start();
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
@@ -247,14 +247,14 @@ public class DriverInitializer {
             if (ssl) info.sslServerPorts = ports;
             else info.serverPorts = ports;
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
-            new JPPFPeerInitializer(name, info, classServer, ssl).start();
+            new JPPFPeerInitializer(name, info, ssl).start();
           }
         }
       }
     }
     if (peerDiscoveryThread != null) new Thread(peerDiscoveryThread, "PeerDiscovery").start();
 
-    discoveryListener = new PeerDriverDiscoveryListener(classServer);
+    discoveryListener = new PeerDriverDiscoveryListener();
     discoveryHandler.register(discoveryListener.open()).start();
   }
 
