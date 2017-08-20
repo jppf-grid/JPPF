@@ -84,7 +84,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper {
    */
   @Override
   public Object execute() throws Exception {
-    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : getTaskobjectClass(className);
+    Class<?> clazz = (INSTANCE == methodType) ? taskObject.getClass() : getTaskobjectClass(className);
     Object result = null;
     AbstractPrivilegedAction<?> action = null;
     switch (methodType) {
@@ -144,22 +144,5 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper {
       if (JPPFRunnable.class.equals(a.annotationType())) return true;
     }
     return false;
-  }
-
-  /**
-   * Load the class witht ht epsecified name.
-   * @param classname name of the class ot laod.
-   * @return a {@code Class} object if the class is found.
-   * @throws Exception if any error occurs.
-   */
-  private Class<?> getTaskobjectClass(final String classname) throws Exception {
-    ClassLoader[] loaders = { Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
-    for (ClassLoader cl : loaders) {
-      try {
-        return Class.forName(classname, true, cl);
-      } catch (ClassNotFoundException e) {
-      }
-    }
-    throw new ClassNotFoundException(classname);
   }
 }

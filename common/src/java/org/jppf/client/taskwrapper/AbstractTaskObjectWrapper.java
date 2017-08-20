@@ -23,8 +23,7 @@ package org.jppf.client.taskwrapper;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
-{
+public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper {
   /**
    * Explicit serialVersionUID.
    */
@@ -40,8 +39,24 @@ public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
    * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
    */
   @Override
-  public MethodType getMethodType()
-  {
+  public MethodType getMethodType() {
     return null;
+  }
+
+  /**
+   * Load the class witht ht epsecified name.
+   * @param classname name of the class ot laod.
+   * @return a {@code Class} object if the class is found.
+   * @throws Exception if any error occurs.
+   */
+  Class<?> getTaskobjectClass(final String classname) throws Exception {
+    ClassLoader[] loaders = { Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
+    for (ClassLoader cl : loaders) {
+      try {
+        return Class.forName(classname, true, cl);
+      } catch (ClassNotFoundException e) {
+      }
+    }
+    throw new ClassNotFoundException(classname);
   }
 }
