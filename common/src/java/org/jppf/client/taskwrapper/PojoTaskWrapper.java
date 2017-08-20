@@ -30,8 +30,7 @@ import org.jppf.utils.ReflectionUtils;
  * @author Laurent Cohen
  * @exclude
  */
-public class PojoTaskWrapper extends AbstractTaskObjectWrapper
-{
+public class PojoTaskWrapper extends AbstractTaskObjectWrapper {
   /**
    * Explicit serialVersionUID.
    */
@@ -60,18 +59,14 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
    * @param taskObject the runnable object to execute.
    * @param args the arguments of the method to execute.
    */
-  public PojoTaskWrapper(final String method, final Object taskObject, final Object...args)
-  {
+  public PojoTaskWrapper(final String method, final Object taskObject, final Object... args) {
     this.method = method;
-    if (taskObject instanceof Class)
-    {
+    if (taskObject instanceof Class) {
       Class<?> clazz = (Class<?>) taskObject;
       if (method.equals(clazz.getSimpleName())) methodType = CONSTRUCTOR;
       else methodType = STATIC;
       this.className = clazz.getName();
-    }
-    else
-    {
+    } else {
       this.taskObject = taskObject;
       methodType = INSTANCE;
     }
@@ -82,16 +77,13 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
    * Execute the run method of this runnable task.
    * @return the result of the execution.
    * @throws Exception if an error occurs during the execution.
-   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
    */
   @Override
-  public Object execute() throws Exception
-  {
-    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
+  public Object execute() throws Exception {
+    Class<?> clazz = (INSTANCE == methodType) ? taskObject.getClass() : getTaskobjectClass(className);
     Object result = null;
     AbstractPrivilegedAction<Object> action = null;
-    switch(methodType)
-    {
+    switch (methodType) {
       case CONSTRUCTOR:
         Constructor<?> c = ReflectionUtils.getMatchingConstructor(clazz, args);
         action = new PrivilegedConstructorAction(c, args);
@@ -105,6 +97,7 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
         break;
     }
     result = AccessController.doPrivileged(action);
+    if (methodType == CONSTRUCTOR) taskObject = result;
     if (action.getException() != null) throw action.getException();
     return result;
   }
@@ -112,11 +105,9 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
   /**
    * Return the object on which a method or constructor is called.
    * @return an object or null if the invoked method is static.
-   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
    */
   @Override
-  public Object getTaskObject()
-  {
+  public Object getTaskObject() {
     return taskObject;
   }
 }

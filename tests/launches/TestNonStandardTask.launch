@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/tests/src/tests/test/org/jppf/server/protocol/TestJPPFRunnable.java"/>
+<listEntry value="/tests/src/tests/test/org/jppf/server/protocol/TestNonStandardTask.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -26,7 +26,7 @@
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/LZ4/lz4-1.3.0.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.org.jppf.server.protocol.TestJPPFRunnable"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.org.jppf.server.protocol.TestNonStandardTask"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tests"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx256m -Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource -Dlog4j.configuration=config/log4j-client.properties -Djava.util.logging.config.file=classes/test/config/logging-client.properties"/>
 </launchConfiguration>
