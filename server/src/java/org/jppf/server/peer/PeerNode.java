@@ -27,7 +27,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Instances of this class encapsulate execution nodes.
+ * Instances of this class represent the initializer for the job data channel of a peer driver connection.
  * @author Laurent Cohen
  * @author Domingos Creado
  * @author Martin JANDA
@@ -44,9 +44,9 @@ class PeerNode extends AbstractPeerConnectionHandler {
   /**
    * The NioServer to which the channel is registered.
    */
-  private ClientNioServer server = null;
+  private final ClientNioServer server;
   /**
-   *
+   * Context attached to the channel.
    */
   private ClientContext context;
 
@@ -59,10 +59,9 @@ class PeerNode extends AbstractPeerConnectionHandler {
    * @param connectionUuid the connection uuid, common to client class server and job server connections.
    */
   public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClientNioServer server, final boolean secure, final String connectionUuid) {
-    super(peerNameBase, connectionInfo, secure, connectionUuid);
+    super(peerNameBase, connectionInfo, secure, connectionUuid, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
     this.server = server;
     printConnectionMessage = true;
-    channelIdentifier = JPPFIdentifiers.NODE_JOB_DATA_CHANNEL;
   }
 
   @Override
@@ -91,6 +90,10 @@ class PeerNode extends AbstractPeerConnectionHandler {
   @Override
   public void close() {
     if (debugEnabled) log.debug("closing {}, context={} ", this, context);
-    if (context != null) context.handleException(context.getChannel(), null);
+    if (context != null) {
+      context.setOnCloseAction(null);
+      context.handleException(context.getChannel(), null);
+      context = null;
+    }
   }
 }

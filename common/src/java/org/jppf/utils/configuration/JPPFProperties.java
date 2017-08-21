@@ -190,7 +190,9 @@ public class JPPFProperties {
   /** Whether to send jobs to orphan peer servers */
   public static final JPPFProperty<Boolean> PEER_ALLOW_ORPHANS = new BooleanProperty("jppf.peer.allow.orphans", false);
   /** Enable/disable peer server discovery */
-  public static final JPPFProperty<Boolean> PEER_DISCOVERY_ENABLED = new BooleanProperty("jppf.peer.discovery.enabled", true);
+  public static final JPPFProperty<Boolean> PEER_DISCOVERY_ENABLED = new BooleanProperty("jppf.peer.discovery.enabled", false);
+  /** Size of discovered peer server connection pools */
+  public static final JPPFProperty<Integer> PEER_POOL_SIZE = new IntProperty("jppf.peer.pool.size", 1);
   /** Toggle secure connections to remote peer servers */
   public static final JPPFProperty<Boolean> PEER_SSL_ENABLED = new BooleanProperty("jppf.peer.ssl.enabled", false);
   /** @exclude */

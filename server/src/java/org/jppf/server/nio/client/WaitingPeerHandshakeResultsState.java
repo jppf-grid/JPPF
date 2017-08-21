@@ -65,7 +65,7 @@ class WaitingPeerHandshakeResultsState extends ClientServerState {
       ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
       TaskBundle header = bundleWrapper.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
-      //context.setConnectionUuid((String) header.getParameter("connection.uuid"));
+      //context.setConnectionUuid((String) header.getParameter(BundleParameter.CONNECTION_UUID));
       header.getUuidPath().incPosition();
       String uuid = header.getUuidPath().getCurrentElement();
       context.setUuid(uuid);

@@ -51,7 +51,6 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
   }
 
   /**
-   *
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)

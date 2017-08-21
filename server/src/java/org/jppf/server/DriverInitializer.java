@@ -115,6 +115,10 @@ public class DriverInitializer {
    * Listens to new connection notifications from {@link PeerDriverDiscovery} instances.
    */
   private PeerDriverDiscoveryListener discoveryListener;
+  /**
+   * Handles the pools of connections to remote peer drivers.
+   */
+  final PeerConnectionPoolHandler peerConnectionPoolHandler = new PeerConnectionPoolHandler();
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -222,7 +226,7 @@ public class DriverInitializer {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
           peerDiscoveryThread.addConnectionInformation(info);
-          new JPPFPeerInitializer(name, info, ssl, true).start();
+          peerConnectionPoolHandler.newPool(name, JPPFConfiguration.get(PEER_POOL_SIZE), info, ssl, false);
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
@@ -230,13 +234,11 @@ public class DriverInitializer {
       peerDiscoveryThread = null;
       initPeers = true;
     }
-
     String discoveryNames = props.get(PEERS);
     if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
       String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-
       if (initPeers) {
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
@@ -246,14 +248,14 @@ public class DriverInitializer {
             int[] ports = StringUtils.parseIntValues(s);
             if (ssl) info.sslServerPorts = ports;
             else info.serverPorts = ports;
+            int size = props.getInt(String.format("jppf.peer.%s.pool.size", name), 1);
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
-            new JPPFPeerInitializer(name, info, ssl).start();
+            peerConnectionPoolHandler.newPool(name, size, info, ssl, false);
           }
         }
       }
     }
     if (peerDiscoveryThread != null) new Thread(peerDiscoveryThread, "PeerDiscovery").start();
-
     discoveryListener = new PeerDriverDiscoveryListener();
     discoveryHandler.register(discoveryListener.open()).start();
   }

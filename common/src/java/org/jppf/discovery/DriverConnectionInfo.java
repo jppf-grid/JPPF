@@ -48,14 +48,14 @@ public class DriverConnectionInfo {
   final int poolSize;
 
   /**
-   * Initialize a plain connection with default name("driver"), host ("localhost") and port (11111).
+   * Initialize a plain connection with default name("driver"), pool size (1), host ("localhost") and port (11111).
    */
   public DriverConnectionInfo() {
     this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue(), 1);
   }
 
   /**
-   * Initialize a plain connection.
+   * Initialize a plain connection with a default pool size of 1.
    * @param name the name given to this connection.
    * @param host the driver host name or IP address.
    * @param port the driver port to connect to.
@@ -65,7 +65,7 @@ public class DriverConnectionInfo {
   }
 
   /**
-   * Initialize a connection.
+   * Initialize a connection with a default pool size of 1.
    * @param name the name given to this connection.
    * @param secure whether SSL/TLS should be used.
    * @param host the driver host name or IP address.

@@ -31,7 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPeerInitializer implements Runnable {
+public class JPPFPeerInitializer implements Runnable, AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -41,7 +41,7 @@ public class JPPFPeerInitializer implements Runnable {
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Sequence number for conenction uuids.
+   * Sequence number for connection uuids.
    */
   static final AtomicInteger SEQUENCE = new AtomicInteger(0);
   /**
@@ -57,21 +57,25 @@ public class JPPFPeerInitializer implements Runnable {
    */
   private final boolean secure;
   /**
-   * 
+   * Whether this connection and its pool were created by the discovery mechanism.
    */
   private final boolean fromDiscovery;
   /**
-   * 
+   * The class loader channel initializer.
    */
   private PeerResourceProvider provider;
   /**
-   * 
+   * The job data channel initializer.
    */
   private PeerNode node;
   /**
    * Whether this initializer is currently attempting to (re)connect to the peer.
    */
   private final AtomicBoolean connecting = new AtomicBoolean(false);
+  /**
+   * 
+   */
+  final String connectionUuid;
 
   /**
    * Initialize this peer initializer from a specified peerName.
@@ -96,55 +100,47 @@ public class JPPFPeerInitializer implements Runnable {
     this.peerName       = peerName;
     this.connectionInfo = connectionInfo;
     this.secure         = secure;
-    this.fromDiscovery = fromDiscovery;
+    this.fromDiscovery  = fromDiscovery;
+    this.connectionUuid = JPPFDriver.getInstance().getUuid() + '-' + SEQUENCE.incrementAndGet();
     log.debug("created new peer initializer {}", this);
   }
 
-  /**
-   * Perform the peer initialization.
-   */
   @Override
   public synchronized void run() {
-    boolean end = false;
-    String connectionUuid = JPPFDriver.getInstance().getUuid() + '-' + SEQUENCE.incrementAndGet();
-    while (!end) {
-      if (debugEnabled) log.debug("start initialization of peer [{}]", peerName);
-      try {
-        if (connecting.compareAndSet(false, true)) {
-          if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, JPPFDriver.getInstance().getClientClassServer(), secure, connectionUuid);
-          provider.init();
-          if (node == null) node = new PeerNode(peerName, connectionInfo, JPPFDriver.getInstance().getClientNioServer(), secure, connectionUuid);
-          node.onCloseAction = new Runnable() {
-            @Override
-            public void run() {
-              start();
-            }
-          };
-          node.init();
-        }
-        end = true;
-      } catch(Exception e) {
-        log.error(e.getMessage(), e);
-        if (provider != null) {
-          provider.close();
-          provider = null;
-        }
-        if (node != null) {
-          node.close();
-          node = null;
-        }
-        if (fromDiscovery) {
-          PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
-          if (pdt != null) {
-            boolean removed = pdt.removeConnectionInformation(connectionInfo);
-            if (debugEnabled) log.debug((removed ? "successfully removed " : "failure to remove ") + "{}", connectionInfo);
+    if (debugEnabled) log.debug("start initialization of peer [{}]", peerName);
+    try {
+      if (connecting.compareAndSet(false, true)) {
+        if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, JPPFDriver.getInstance().getClientClassServer(), secure, connectionUuid);
+        provider.init();
+        if (node == null) node = new PeerNode(peerName, connectionInfo, JPPFDriver.getInstance().getClientNioServer(), secure, connectionUuid);
+        node.onCloseAction = new Runnable() {
+          @Override
+          public void run() {
+            start();
           }
-          end = true;
-        }
-      } finally {
-        connecting.set(false);
-        if (debugEnabled) log.debug("end initialization of peer [{}]", peerName);
+        };
+        node.init();
       }
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+      if (provider != null) {
+        provider.close();
+        provider = null;
+      }
+      if (node != null) {
+        node.close();
+        node = null;
+      }
+      if (fromDiscovery) {
+        PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
+        if (pdt != null) {
+          boolean removed = pdt.removeConnectionInformation(connectionInfo);
+          if (debugEnabled) log.debug((removed ? "successfully removed " : "failure to remove ") + "{}", connectionInfo);
+        }
+      }
+    } finally {
+      connecting.set(false);
+      if (debugEnabled) log.debug("end initialization of peer [{}]", peerName);
     }
   }
 
@@ -153,5 +149,17 @@ public class JPPFPeerInitializer implements Runnable {
    */
   public void start() {
     new Thread(this, String.format("%s[%s]", getClass().getSimpleName(), peerName)).start();
+  }
+
+  @Override
+  public void close() {
+    if (provider != null) {
+      provider.close();
+      provider = null;
+    }
+    if (node != null) {
+      node.close();
+      node = null;
+    }
   }
 }

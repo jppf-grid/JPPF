@@ -36,14 +36,14 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
   private final int jmxPoolSize;
 
   /**
-   * Initialize a pool of plain connections with default name("driver"), host ("localhost"), port (11111), priority (0) and pool sizes (1).
+   * Initialize a pool of plain connections with default name("driver"), host ("localhost"), port (11111), priority (0) and pool size (1).
    */
   public ClientConnectionPoolInfo() {
     this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue());
   }
 
   /**
-   * Initialize a pool of plain connections with default priority (0) and pool sizes (1).
+   * Initialize a pool of plain connections with default priority (0) and pool size (1).
    * @param name the name given to this connection pool, used as numbered prefix for individual connection names.
    * @param host the driver host name or IP address.
    * @param port the driver port to connect to.
@@ -53,7 +53,7 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
   }
 
   /**
-   * Initialize a pool of connections with default priority (0) and pool sizes (1).
+   * Initialize a pool of connections with default priority (0) and pool size (1).
    * @param name the name given to this connection pool, used as numbered prefix for individual connection names.
    * @param secure whether SSL/TLS should be used.
    * @param host the driver host name or IP address.

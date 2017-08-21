@@ -78,7 +78,7 @@ class SendingPeerHandshakeState extends ClientServerState {
       header.setName("handshake job");
       header.setHandshake(true);
       header.setUuid(header.getName());
-      header.setParameter("connection.uuid", context.getConnectionUuid());
+      header.setParameter(BundleParameter.CONNECTION_UUID, context.getConnectionUuid());
       header.setParameter(BundleParameter.IS_PEER, true);
       header.setParameter(BundleParameter.NODE_UUID_PARAM, driver.getUuid());
       JMXServer jmxServer = driver.getInitializer().getJmxServer(context.isSecure());

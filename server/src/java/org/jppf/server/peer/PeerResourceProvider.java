@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * This class represents a connection to the class server of a remote JPPF driver (peer driver).
+ * This class represents an initializer for the connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
  * @author Martin JANDA
  */
@@ -45,11 +45,11 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
   /**
    * The NioServer to which the channel is registered.
    */
-  private ClientClassNioServer server = null;
+  private final ClientClassNioServer server;
   /**
-   *
+   * Context attached to the channel.
    */
-  private ClientClassContext context = null;
+  private ClientClassContext context;
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -60,9 +60,8 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
    * @param connectionUuid the connection uuid, common to client class server and job server connections.
    */
   public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClientClassNioServer server, final boolean secure, final String connectionUuid) {
-    super(peerNameBase, connectionInfo, secure, connectionUuid);
+    super(peerNameBase, connectionInfo, secure, connectionUuid, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
     this.server = server;
-    channelIdentifier = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
   }
 
   @Override
@@ -82,6 +81,7 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
       String uuid = JPPFDriver.getInstance().getUuid();
+      context.setConnectionUuid(connectionUuid);
       resource.setData(ResourceIdentifier.NODE_UUID, uuid);
       resource.setData(ResourceIdentifier.PEER, Boolean.TRUE);
       resource.setProviderUuid(uuid);
@@ -98,6 +98,10 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
   @Override
   public void close() {
     if (debugEnabled) log.debug("closing {}, context={} ", this, context);
-    if (context != null) context.handleException(context.getChannel(), null);
+    if (context != null) {
+      context.setOnCloseAction(null);
+      context.handleException(context.getChannel(), null);
+      context = null;
+    }
   }
 }

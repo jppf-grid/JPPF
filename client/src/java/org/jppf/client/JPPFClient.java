@@ -266,34 +266,18 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final Operator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    /*
-    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
-    final ConnectionPoolFilter<JPPFConnectionPool> filter = new ConnectionPoolFilter<JPPFConnectionPool>() {
-      @Override
-      public boolean accepts(final JPPFConnectionPool pool) {
-        List<JPPFClientConnection> list = pool.getConnections(statuses);
-        return operator.evaluate(list.size(), expectedConnections);
-      }
-    };
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        List<JPPFConnectionPool> result = new ArrayList<>();
-        List<JPPFConnectionPool> temp = findConnectionPools(statuses);
-        for (JPPFConnectionPool pool: temp) {
-          if (filter.accepts(pool)) result.add(pool);
-        }
-        boolean empty = ref.setSynchronized(result, pools).isEmpty();
-        return !empty || (empty && (expectedConnections <= 0));
-      }
-    }, timeout);
-    return ref.get();
-    */
     return awaitConnectionPools(Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
   }
 
   /**
    * Wait until there is at least the specified expected connection pools satisfy the condition where where the number of connections with the specified statuses
    * satisfy the specified connection operator, or until the specified timeout expires, whichever happens first.
+   * <p>As an example, to wait for at least 2 pools having each at least one ACTIVE connection, with a timeout of 5 seconds, one would use:
+   * <pre>
+   * JPPFClient client = new JPPFClient();
+   * client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1,
+   *   5000L, JPPFClientConnectionStatus.ACTIVE);
+   * </pre>
    * @param poolOperator the condition on the number of expected pools to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param expectedPools the expected number of pools to wait for.
    * @param connectionOperator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.

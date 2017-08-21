@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.*;
-import org.jppf.server.peer.JPPFPeerInitializer;
 
 /**
  * Listens to new connectionr equests from {@link DriverDiscovery} instances.
@@ -40,7 +39,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
-   * Initialize this listener with the specified client.
+   * Initialize this listener.
    */
   PeerDriverDiscoveryListener() {
   }
@@ -55,7 +54,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
     }
     if (!hasPool) {
       JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);
-      new JPPFPeerInitializer(info.getName(), connectionInfo, info.isSecure()).start();
+      JPPFDriver.getInstance().getInitializer().peerConnectionPoolHandler.newPool(info.getName(), info.getPoolSize(), connectionInfo, info.isSecure(), false);
     }
     return !hasPool;
   }

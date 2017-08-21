@@ -23,12 +23,7 @@ package org.jppf.node.protocol;
  * @author Laurent Cohen
  * @exclude
  */
-/**
- * 
- * @author Laurent Cohen
- */
-public enum  BundleParameter
-{
+public enum BundleParameter {
   /**
    * To determine whether a node connection is for a peer driver or an actual execution node.
    */
@@ -144,5 +139,9 @@ public enum  BundleParameter
   /**
    * Whether a job has already been persisted in another driver.
    */
-  ALREADY_PERSISTED_P2P
+  ALREADY_PERSISTED_P2P,
+  /**
+   * UUID of a connection to a driver.
+   */
+  CONNECTION_UUID
 }

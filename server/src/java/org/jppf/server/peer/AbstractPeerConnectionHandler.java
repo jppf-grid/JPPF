@@ -28,10 +28,10 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Common super class for the class loader and job data channels of a peer driver connection.
  * @author Laurent Cohen
  */
-abstract class AbstractPeerConnectionHandler {
+abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -65,7 +65,7 @@ abstract class AbstractPeerConnectionHandler {
    */
   Runnable onCloseAction;
   /**
-   * 
+   * Wether to print the start and end of connection messages.
    */
   boolean printConnectionMessage;
   /**
@@ -75,7 +75,7 @@ abstract class AbstractPeerConnectionHandler {
   /**
    * The channel identifier.
    */
-  int channelIdentifier;
+  final int channelIdentifier;
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -83,14 +83,16 @@ abstract class AbstractPeerConnectionHandler {
    * @param connectionInfo peer connection information.
    * @param secure {@code true} if the connection is established over SSL, {@code false} otherwise.
    * @param connectionUuid the connection uuid, common to client class server and job server connections.
+   * @param channelIdentifier the channel identifier value which announces the type of channel to the remote peer.
    */
-  public AbstractPeerConnectionHandler(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure, final String connectionUuid) {
+  public AbstractPeerConnectionHandler(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure, final String connectionUuid, final int channelIdentifier) {
     if (peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
     this.connectionInfo = connectionInfo;
     this.secure = secure;
     this.connectionUuid = connectionUuid;
     this.name = peerNameBase;
+    this.channelIdentifier = channelIdentifier;
   }
 
   /**
@@ -100,9 +102,8 @@ abstract class AbstractPeerConnectionHandler {
   public synchronized void init() throws Exception {
     if (socketClient == null) socketClient = initSocketChannel();
     String cname = String.format("%s@%s:%d", name, socketClient.getHost(), socketClient.getPort());
-    String msg = null;
     if (printConnectionMessage) {
-      msg = "Attempting connection to remote peer " + cname;
+      String msg = "Attempting connection to remote peer " + cname;
       log.info(msg);
       System.out.println(msg);
     }
@@ -112,7 +113,7 @@ abstract class AbstractPeerConnectionHandler {
     if (debugEnabled) log.debug("Connected to peer {}, sending channel identifier", cname);
     socketClient.writeInt(channelIdentifier);
     if (printConnectionMessage) {
-      msg = "Reconnected to remote peer " + cname;
+      String msg = "Reconnected to remote peer " + cname;
       log.info(msg);
       System.out.println("Reconnected to remote peer " + cname);
     }
@@ -136,9 +137,4 @@ abstract class AbstractPeerConnectionHandler {
     int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
     return new SocketChannelClient(host, port, false);
   }
-
-  /**
-   * Close this channel.
-   */
-  public abstract void close();
 }
