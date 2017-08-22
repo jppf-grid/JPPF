@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.job.persistence.TestDefaultDatabasePersistenceMultiServer;
+import test.org.jppf.discovery.TestDriverDiscovery;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  */
 @RunWith(RepeatingSuite.class)
 @RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestDefaultDatabasePersistenceMultiServer.class })
+  classes={ TestDriverDiscovery.class })
 public class JPPFSuite {
 }

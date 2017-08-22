@@ -42,7 +42,7 @@ import test.org.jppf.test.setup.common.*;
  */
 public class AbstractNonStandardSetup extends BaseTest {
   /** */
-  private static final NodeSelector SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
+  protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
   /**
    * The jppf client to use.
    */
@@ -271,26 +271,36 @@ public class AbstractNonStandardSetup extends BaseTest {
   }
 
   /**
-   * Wait for the server with port = 11101 to be initialized.
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {
     List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-    for (JPPFConnectionPool pool: pools) {
-      final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+    for (JPPFConnectionPool pool: pools) awaitNbIdleNodes(pool.awaitWorkingJMXConnection(), Operator.EQUAL, 1, 5000L);
+  }
+
+
+  /**
+   * Wait for the specified driver to have a number of idle nodes that satisfy the specified condition.
+   * @param jmx the JMX connection to the driver.
+   * @param operator the comparison operator that defines the condition to evaluate.
+   * @param nbNodes the expected number of idle nodes to satisfy the comparison.
+   * @param timeout how long to wait for the condtion to be {@link true}.
+   * @throws Exception if any error occurs or the tiemout expires.
+   */
+  protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final Operator operator, final int nbNodes, final long timeout) throws Exception {
       ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
           try {
-            return jmx.nbIdleNodes(SELECTOR) == 1;
+            operator.evaluate(jmx.nbIdleNodes(NON_PEER_SELECTOR), nbNodes);
+            return jmx.nbIdleNodes(NON_PEER_SELECTOR) == 1;
           } catch (@SuppressWarnings("unused") Exception e) {
             return false;
           }
         }
-      }, 5000L, true);
-    }
+      }, timeout, true);
   }
-
   /**
    * @return the number of nodes in the topology.
    */

@@ -143,6 +143,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    */
   @SuppressWarnings("unchecked")
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) throws Exception {
+    if (traceEnabled) log.trace("transition {} for channel {}", transition, channel);
     lock.lock();
     try {
       server.getSelector().wakeup();
@@ -154,7 +155,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
         S s2 = t.getState();
         if (s1 != null) {
           if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
-          //if (debugEnabled && isNodeServer) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
           else if (traceEnabled) log.trace(getTransitionMessage(s1, s2, t, channel, submit));
         }
         if (context.setState(s2)) {
@@ -167,7 +167,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
           }
         }
       }
-    //} catch (RuntimeException e) {
     } catch (Exception e) {
       log.info(e.getMessage(), e);
       throw e;

@@ -18,7 +18,7 @@
 
 package test.org.jppf.server.peer;
 
-import org.junit.Test;
+import org.junit.*;
 
 import test.org.jppf.test.setup.*;
 
@@ -28,6 +28,15 @@ import test.org.jppf.test.setup.*;
  * @author Laurent Cohen
  */
 public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
+  /**
+   * Generates a thread dump for each driver.
+   * @throws Exception if any error occurs.
+   */
+  @AfterClass
+  public static void tearDown() throws Exception {
+    if (client != null) BaseSetup.generateDriverThreadDump(client);
+  }
+
   /**
    * Test a simple job.
    * @throws Exception if any error occurs.

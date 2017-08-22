@@ -79,9 +79,11 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
     try {
-      synchronized(channel) {
-        transitionManager.transitionChannel(channel, ClientClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
-        if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
+      if (!channel.getContext().isPeer()) {
+        synchronized(channel) {
+          transitionManager.transitionChannel(channel, ClientClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
+          if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
+        }
       }
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);

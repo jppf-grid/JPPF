@@ -232,6 +232,33 @@ public class BaseSetup {
   }
 
   /**
+   * Generates a thread dump for each of the drivers the specified client is connected to.
+   * @param client the JPPF client.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
+    List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
+    JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
+    for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();
+    generateDriverThreadDump(jmxArray);
+  }
+
+  /**
+   * Generates a thread dump for each of the specified drivers.
+   * @param jmxConnections JMX connections to the drivers.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
+    for (JMXDriverConnectionWrapper jmx: jmxConnections) {
+      if (jmx != null) {
+        DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+        String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+        FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+      }
+    }
+  }
+
+  /**
    * Check that the driver and all nodes have been started and are accessible.
    * @param nbDrivers the number of drivers that were started.
    * @param nbNodes the number of nodes that were started.

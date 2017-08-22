@@ -69,7 +69,7 @@ class PeerNode extends AbstractPeerConnectionHandler {
     try {
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      ChannelWrapper<?> channel = server.accept(socketChannel, null, secure);
+      ChannelWrapper<?> channel = server.accept(socketChannel, null, secure, true);
       context = (ClientContext) channel.getContext();
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);

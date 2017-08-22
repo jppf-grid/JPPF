@@ -30,6 +30,8 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -47,6 +49,20 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    * JMX connections to all drivers.
    */
   private static final JMXDriverConnectionWrapper[] JMX = new JMXDriverConnectionWrapper[2];
+  /** */
+  @Rule
+  public TestWatcher testDriverDiscoveryInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      try {
+        String msg = String.format( "***** start of method %s() *****", description.getMethodName());
+        String banner = StringUtils.padLeft("", '*', msg.length(), false);
+        for (JMXDriverConnectionWrapper jmx: JMX) logInServer(jmx, banner, msg, banner);
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+  };
 
   /**
    * Launches 2 drivers with 1 node attached to each.
@@ -62,10 +78,12 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     for (int i=0; i<JMX.length; i++) {
       BaseTest.print(false, false, "connecting to server %d", (i + 1));
       JMX[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
-      BaseTest.print(false, false, "connecting to %s", JMX[i]);
-      JMX[i].connectAndWait(timeout - (System.currentTimeMillis() - start));
-      assertTrue("failed to connect to " + JMX[i], JMX[i].isConnected());
-      BaseTest.print(false, false, "connected to %s", JMX[i]);
+      final JMXDriverConnectionWrapper jmx = JMX[i];
+      BaseTest.print(false, false, "connecting to %s", jmx);
+      jmx.connectAndWait(timeout - (System.currentTimeMillis() - start));
+      assertTrue("failed to connect to " + jmx, jmx.isConnected());
+      BaseTest.print(false, false, "connected to %s", jmx);
+      awaitNbIdleNodes(jmx, Operator.EQUAL, 1, 5000L);
     }
   }
 
@@ -75,6 +93,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void teardown() throws Exception {
+    BaseSetup.generateDriverThreadDump(JMX);
     for (int i=0; i<JMX.length; i++) {
       if (JMX[i] != null) JMX[i].close();
     }
@@ -97,17 +116,16 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         String result = (String) executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/RetrievePeerDiscovery.js"));
         if (result.startsWith("ko")) {
           good = false;
-          BaseTest.printOut("driver response: %s", result);
+          BaseTest.print(false, false, "driver response: %s", result);
           Thread.sleep(500L);
           break;
         } else {
           results[i] = result;
         }
       }
-      
     }
     for (int i=0; i<2; i++) {
-      BaseTest.printOut("checking server %d", (i + 1));
+      BaseTest.print(false, false, "checking server %d", (i + 1));
       TypedProperties props = new TypedProperties();
       props.load(new StringReader(results[i]));
       assertEquals("localhost", props.getString("host"));
@@ -172,7 +190,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         assertNotNull(t.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
       }
-      AbstractNonStandardSetup.client = null;
+      //AbstractNonStandardSetup.client = null;
     }
     assertTrue(discovery.shutdownFlag);
   }

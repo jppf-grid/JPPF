@@ -27,12 +27,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
-import org.jppf.JPPFException;
-import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 
@@ -127,7 +124,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param ports the list of ports this server accepts connections from.
    * @param sslPorts the list of SSL ports this server accepts connections from.
    * @param identifier the channel identifier for channels handled by this server.
-   * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
   public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
@@ -164,7 +160,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
-      //server.socket().bind(addr, 100);
       server.socket().bind(addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
@@ -210,7 +205,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        //if (!isStopped() && (n > 0) && !externalStopCondition()) go(selector.selectedKeys());
         if (n > 0) go(selector.selectedKeys());
       }
     } catch (Throwable t) {
@@ -291,9 +285,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
-    Runnable task = new AcceptChannelTask(channel, ssl);
+    Runnable task = new AcceptChannelTask(this, channel, ssl);
     transitionManager.submit(task);
-    //task.run();
   }
 
   /**
@@ -303,16 +296,18 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param channel the socket channel representing the connection.
    * @param sslHandler an sslEngine eventually passed on from a different server.
    * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
+   * @param peer specifiies whether the channel is for a peer driver.
    * @return a wrapper for the newly registered channel.
    */
-  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
+  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer) {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
     NioContext<?> context = createNioContext();
+    context.setPeer(peer);
     SelectionKeyWrapper wrapper = null;
     lock.lock();
     try {
       if (sslHandler != null) context.setSSLHandler(sslHandler);
-      SelectionKey selKey = channel.register(selector.wakeup(),	0, context);
+      SelectionKey selKey = channel.register(selector.wakeup(), 0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       context.setSsl(ssl);
@@ -482,7 +477,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public abstract boolean isIdle(ChannelWrapper<?> channel);
 
-
   /**
    * Configure the SSL options for the specified channel.
    * @param channel the channel for which to configure SSL.
@@ -499,59 +493,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     engine.setSSLParameters(params);
     SSLHandler sslHandler = new SSLHandler(channel, engine);
     context.setSSLHandler(sslHandler);
-  }
-
-  /**
-   * This task performs the processing of a newly accepted channel.
-   */
-  private class AcceptChannelTask implements Runnable {
-    /**
-     * The newly accepted socket channel.
-     */
-    private final SocketChannel channel;
-    /**
-     * Determines whether ssl is enabled for the channel
-     */
-    private final boolean ssl;
-
-    /**
-     * Initialize this task with the specified selection key.
-     * @param channel the newly accepted socket channel.
-     * @param ssl determines whether ssl is enabled for the channel.
-     */
-    public AcceptChannelTask(final SocketChannel channel, final boolean ssl) {
-      this.channel = channel;
-      this.ssl = ssl;
-    }
-
-    @Override
-    public void run() {
-      try {
-        if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
-        channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-        channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-        channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
-        channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
-        intercept();
-        if (channel.isBlocking()) channel.configureBlocking(false);
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-        StreamUtils.close(channel, log);
-        return;
-      }
-      accept(channel, null, ssl);
-    }
-
-    /**
-     * Invoke the interceptors for the channel.
-     * @throws Exception if any error occurs.
-     */
-    private void intercept() throws Exception {
-      if (InterceptorHandler.hasInterceptor()) {
-        channel.configureBlocking(true);
-        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
-      }
-    }
   }
 
   /**

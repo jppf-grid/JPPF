@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class ClientNioServer extends NioServer<ClientState, ClientTransition>
-{
+public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   /**
    * Logger for this class.
    */
@@ -55,36 +54,28 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
-  {
+  public ClientNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
-
     this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   @Override
-  protected NioServerFactory<ClientState, ClientTransition> createFactory()
-  {
+  protected NioServerFactory<ClientState, ClientTransition> createFactory() {
     return new ClientServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper<?> channel)
-  {
-    try
-    {
+  public void postAccept(final ChannelWrapper<?> channel) {
+    try {
       channels.add(channel);
-      transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
-    }
-    catch (Exception e)
-    {
+      if (!channel.getContext().isPeer()) transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeClient(channel);
     }
-    //driver.getStatsManager().newClientConnection();
     driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
   }
 
@@ -108,8 +99,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   public void closeClientConnection(final String connectionUuid) {
     ChannelWrapper<?> channel = null;
     if (debugEnabled) log.debug("closing client channel with connectionUuid=" + connectionUuid);
-    synchronized(channels) {
-      for (ChannelWrapper<?> ch: channels) {
+    synchronized (channels) {
+      for (ChannelWrapper<?> ch : channels) {
         ClientContext context = (ClientContext) ch.getContext();
         if (context.getConnectionUuid().equals(connectionUuid)) {
           channel = ch;
@@ -152,9 +143,9 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   @Override
   public synchronized void removeAllConnections() {
     if (!isStopped()) return;
-    List<ChannelWrapper<?>> list  = new ArrayList<>(channels);
+    List<ChannelWrapper<?>> list = new ArrayList<>(channels);
     channels.clear();
-    for (ChannelWrapper<?> channel: list) {
+    for (ChannelWrapper<?> channel : list) {
       try {
         closeClient(channel);
       } catch (Exception e) {
