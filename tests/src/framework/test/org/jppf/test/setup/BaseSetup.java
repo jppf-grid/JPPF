@@ -222,6 +222,30 @@ public class BaseSetup {
   }
 
   /**
+   * Generates a thread dump of the local JVM.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateClientThreadDump() throws Exception {
+    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
+    FileUtils.writeTextFile("client_thread_dump.log", text);
+  }
+
+  /**
+   * Generates a thread dump for each of the specified drivers.
+   * @param jmxConnections JMX connections to the drivers.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
+    for (JMXDriverConnectionWrapper jmx: jmxConnections) {
+      if (jmx != null) {
+        DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+        String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+        FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+      }
+    }
+  }
+
+  /**
    * Check that the driver and all nodes have been started and are accessible.
    * @param nbDrivers the number of drivers that were started.
    * @param nbNodes the number of nodes that were started.

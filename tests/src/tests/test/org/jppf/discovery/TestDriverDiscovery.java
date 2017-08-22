@@ -30,6 +30,8 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.BaseSetup.Configuration;
@@ -48,6 +50,20 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    * JMX connections to all drivers.
    */
   private static final JMXDriverConnectionWrapper[] JMX = new JMXDriverConnectionWrapper[2];
+  /** */
+  @Rule
+  public TestWatcher testDriverDiscoveryInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      try {
+        String msg = String.format( "***** start of method %s() *****", description.getMethodName());
+        String banner = StringUtils.padLeft("", '*', msg.length(), false);
+        for (JMXDriverConnectionWrapper jmx: JMX) logInServer(jmx, banner, msg, banner);
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+  };
 
   /**
    * Launches 2 drivers with 1 node attached to each.
@@ -76,6 +92,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void teardown() throws Exception {
+    BaseSetup.generateDriverThreadDump(JMX);
     for (int i=0; i<JMX.length; i++) {
       if (JMX[i] != null) JMX[i].close();
     }

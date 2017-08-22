@@ -182,6 +182,28 @@ public class BaseTest {
     return jmx.invoke("org.jppf:name=debug,type=driver", "executeScript", new Object[] { "javascript", script}, new String[] {"java.lang.String", "java.lang.String"});
   }
 
+  /**
+   * Print the specified ùessages in the specified driver's log.
+   * @param jmx JMX connection to the driver.
+   * @param msg the message format to print.
+   * @param params the message parameters.
+   * @throws Exception if any error occurs.
+   */
+  public static void logInServer(final JMXDriverConnectionWrapper jmx, final String msg, final Object...params) throws Exception {
+    String[] messages = { String.format(msg, params) };
+    jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+  }
+
+  /**
+   * Print the specified ùessages in the specified driver's log.
+   * @param jmx JMX connection to the driver.
+   * @param messages the messages to print.
+   * @throws Exception if any error occurs.
+   */
+  public static void logInServer(final JMXDriverConnectionWrapper jmx, final String...messages) throws Exception {
+    jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+  }
+
   /** */
   public static class BaseTestClassWatcher extends TestWatcher {
     @Override
