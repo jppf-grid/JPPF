@@ -192,7 +192,7 @@ public class BaseTest {
   }
 
   /**
-   * Print the specified ùessages in the specified driver's log.
+   * Print the specified messages in the specified driver's log.
    * @param jmx JMX connection to the driver.
    * @param msg the message format to print.
    * @param params the message parameters.
@@ -204,7 +204,7 @@ public class BaseTest {
   }
 
   /**
-   * Print the specified ùessages in the specified driver's log.
+   * Print the specified messages in the specified driver's log.
    * @param jmx JMX connection to the driver.
    * @param messages the messages to print.
    * @throws Exception if any error occurs.
