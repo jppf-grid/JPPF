@@ -8,7 +8,9 @@
     }
     if ($currentPage != "Forums") {
     ?>
-    <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+    <div style="background-color: #E2E4F0">
+      <div class="frame_top"/></div>
+    </div>
     <?php
     }
     ?>

@@ -1,6 +1,6 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "6.0-alpha";
+  $ver1 = "6.0-alpha-2";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -26,7 +26,9 @@
     }
     if ($currentPage != "Forums") {
     ?>
-    <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+    <div style="background-color: #E2E4F0">
+      <div class="frame_top"/></div>
+    </div>
     <?php
     }
     ?>
@@ -109,7 +111,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.0 alpha preview</h1>
+  <h1 align="center">Downloads - JPPF 6.0 alpha 2 preview</h1>
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
@@ -235,7 +237,9 @@
       <tr><td colspan="*" style="height: 10px"></td></tr>
     </table>
   <!--</div>-->
-  <div style="background-color: #E2E4F0; width: 100%;"><img src="/images/frame_bottom.gif" border="0"/></div>
+  <div style="background-color: #E2E4F0">
+  <div class="frame_bottom"/></div>
+  </div>
 		</div>
 		</div>
 	</body>

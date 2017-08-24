@@ -22,7 +22,9 @@
     }
     if ($currentPage != "Forums") {
     ?>
-    <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+    <div style="background-color: #E2E4F0">
+      <div class="frame_top"/></div>
+    </div>
     <?php
     }
     ?>
@@ -188,7 +190,9 @@
       <tr><td colspan="*" style="height: 10px"></td></tr>
     </table>
   <!--</div>-->
-  <div style="background-color: #E2E4F0; width: 100%;"><img src="/images/frame_bottom.gif" border="0"/></div>
+  <div style="background-color: #E2E4F0">
+  <div class="frame_bottom"/></div>
+  </div>
 		</div>
 		</div>
 	</body>

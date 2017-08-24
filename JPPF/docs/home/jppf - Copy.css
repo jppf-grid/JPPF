@@ -27,11 +27,11 @@ a { text-decoration: none; font-weight: normal; }
 a:hover { text-decoration: underline; color: red; }
 div { margin: 0px; padding; 0px; }
 
-.gwrapper { width: 1024px; max-width: 1024px; background: white; }
+.gwrapper { width: 900px; max-width: 900px; background: white; }
 .sidebar  { width:  90px; float: left; padding-left: 0px; background-color: white; }
 
 .jppf_content {
-  width: 890px;
+  width: 766px;
   float: right;
   padding-left: 10px;
   padding-right: 10px;
@@ -40,12 +40,12 @@ div { margin: 0px; padding; 0px; }
 }
 
 .column_right {
-  width: 435px;
+  width: 373px;
   float: right;
 }
 
 .column_left  {
-  width: 435px;
+  width: 373px;
   float: left;
 }
 .jppfheader { background: #E8EAFD; }
@@ -78,7 +78,7 @@ div.u_link > a { text-decoration: underline; font-weight: normal }
 
 .navlink { color: #6D78B6; text-decoration: none; font-size: 95% }
 
-.tablewidth { width: 1024px }
+.tablewidth { width: 900px }
 
 .pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
             color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
@@ -284,22 +284,6 @@ ul.list_nomargin { margin-left: 5px; margin-top: 0px; padding-left: 10px; }
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   padding-right: 3px;
-}
-
-.frame_top {
-  width: 100%;
-  height: 10px;
-  background-color: #6D78B6;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.frame_bottom {
-  width: 100%;
-  height: 10px;
-  background-color: #6D78B6;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
 }
 
 .shadow {

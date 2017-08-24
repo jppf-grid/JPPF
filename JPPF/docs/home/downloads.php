@@ -22,7 +22,9 @@
     }
     if ($currentPage != "Forums") {
     ?>
-    <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
+    <div style="background-color: #E2E4F0">
+      <div class="frame_top"/></div>
+    </div>
     <?php
     }
     ?>
@@ -245,7 +247,7 @@
   <h2 style="${style}">&nbsp;<img src="images/icons/emblem-what.png" class="titleWithIcon"/>Curious or adventurous?</h2>
 </div>
       <div style="height: 5px"></div>
-      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha</a>.<br>
+      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha 2</a>.<br>
       <div style="height: 5px"></div>
       <p align="left"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>
@@ -292,7 +294,9 @@
       <tr><td colspan="*" style="height: 10px"></td></tr>
     </table>
   <!--</div>-->
-  <div style="background-color: #E2E4F0; width: 100%;"><img src="/images/frame_bottom.gif" border="0"/></div>
+  <div style="background-color: #E2E4F0">
+  <div class="frame_bottom"/></div>
+  </div>
 		</div>
 		</div>
 	</body>
