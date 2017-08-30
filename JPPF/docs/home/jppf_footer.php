@@ -36,5 +36,5 @@
     </table>
   <!--</div>-->
   <div style="background-color: #E2E4F0">
-  <div class="frame_bottom"/></div>
+    <div class="frame_bottom"/></div>
   </div>

@@ -32,7 +32,7 @@
       <tr style="height: 80px">
         <td width="15"></td>
         <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
-        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="140" align="center" style="padding-left: 5px; padding-right: 5px"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
         <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
@@ -223,7 +223,7 @@
     </table>
   <!--</div>-->
   <div style="background-color: #E2E4F0">
-  <div class="frame_bottom"/></div>
+    <div class="frame_bottom"/></div>
   </div>
 		</div>
 		</div>
