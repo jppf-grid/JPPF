@@ -376,17 +376,40 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.4 = hello $script:groovy{ return 2 + 3 }$ dear $script:javascript{'' + (2 + 5)}$ world\n");
     sb.append("prop.5 = hello $script{ return '${prop.0} ' + (2 + 3) }$ world\n");
     sb.append("prop.6 = hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
+
+    sb.append("prop.11 = hello $s:javascript{ 2 + 3 }$ world\n");
+    sb.append("prop.12 = hello $S:glouglou:{ 2 + 3 }$ world\n");
+    sb.append("prop.13 = hello $s{ return 2 + 3 }$ world\n");
+    sb.append("prop.14 = hello $S:groovy{ return 2 + 3 }$ dear $script:javascript{'' + (2 + 5)}$ world\n");
+    sb.append("prop.15 = hello $s{ return '${prop.0} ' + (2 + 3) }$ world\n");
+    sb.append("prop.16 = hello $s{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
+
+    sb.append("prop.21 = $s:js:f{ test/org/jppf/utils/test.js }$\n");
+    File file = new File("classes/tests/test/org/jppf/utils/test.js");
+    sb.append("prop.22 = $S:js:U{ ").append(file.toURI().toURL()).append(" }$\n");
+
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "jppf.script.default.language", "groovy");
       checkProperty(props, "prop.0", "hello miscreant world");
+
       checkProperty(props, "prop.1", "hello 5.0 world");
       checkProperty(props, "prop.2", "hello $script:glouglou:{ 2 + 3 }$ world");
       checkProperty(props, "prop.3", "hello 5 world");
       checkProperty(props, "prop.4", "hello 5 dear 7 world");
       checkProperty(props, "prop.5", "hello hello miscreant world 5 world");
       checkProperty(props, "prop.6", "hello hello miscreant world5 universe");
+
+      checkProperty(props, "prop.11", "hello 5.0 world");
+      checkProperty(props, "prop.12", "hello $S:glouglou:{ 2 + 3 }$ world");
+      checkProperty(props, "prop.13", "hello 5 world");
+      checkProperty(props, "prop.14", "hello 5 dear 7 world");
+      checkProperty(props, "prop.15", "hello hello miscreant world 5 world");
+      checkProperty(props, "prop.16", "hello hello miscreant world5 universe");
+
+      checkProperty(props, "prop.21", "groovy");
+      checkProperty(props, "prop.22", "groovy");
     }
   }
 

@@ -21,12 +21,11 @@ package org.jppf.utils;
 import java.io.Serializable;
 
 /**
- * 
+ * A grouping of {@link TypedProperties} objects, representing multiple sets of properties while allowing to retrive vlaues as if it were a single set of properties.
  * @param <E> the type of keys to use.
  * @author Laurent Cohen
  */
-public interface PropertiesCollection<E> extends Serializable
-{
+public interface PropertiesCollection<E> extends Serializable {
   /**
    * Add the specified properties with the specified keys.
    * @param key the key to use.
@@ -46,4 +45,18 @@ public interface PropertiesCollection<E> extends Serializable
    * @return an array of all the sets of properties.
    */
   TypedProperties[] getPropertiesArray();
+
+  /**
+   * Get the value of the property with the specified name.
+   * @param name the name of the property to find.
+   * @return the proerty value, or {@code null} if the property could not be found.
+   */
+  String getProperty(String name);
+
+  /**
+   * Determine whether this properties collection contains a property witht he specified key.
+   * @param name the name of the property to check.
+   * @return {@code true} if the property could be found, {@code false} otherwise.
+   */
+  boolean containsKey(String name);
 }

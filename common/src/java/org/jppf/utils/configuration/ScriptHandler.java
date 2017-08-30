@@ -85,23 +85,11 @@ public class ScriptHandler {
   /**
    * The regex pattern for identifying scripted property values.
    */
-  private static final Pattern SCRIPT_PATTERN = Pattern.compile("\\$script(?:\\:([^:]*?))?(?:\\:(.*?))?\\{(.*?)\\}\\$");
-  /**
-   * Inline script source type.
-   */
-  private static final String INLINE = "inline";
-  /**
-   * File script source type.
-   */
-  private static final String FILE = "file";
-  /**
-   * URL script source type.
-   */
-  private static final String URL = "url";
+  public static final Pattern SCRIPT_PATTERN = Pattern.compile("\\$(?:script|S|s)(?:\\:([^:]*?))?(?:\\:(.*?))?\\{(.*?)\\}\\$");
   /**
    * Name of the property which sets the default script language to use.
    */
-  private static final String DEFAULT_SOURCE_TYPE = INLINE;
+  private static final String DEFAULT_SOURCE_TYPE = "inline";
   /**
    * The properties to evaluate.
    */
@@ -110,10 +98,6 @@ public class ScriptHandler {
    * The default script language.
    */
   private String defaultLanguage = "javascript";
-  /**
-   * The bindings provide variables available to the script engine during execution of the script.
-   */
-  private final Map<String, Object> bindings = new HashMap<>();
 
   /**
    * Default constructor.
@@ -128,11 +112,12 @@ public class ScriptHandler {
    */
   public void process(final TypedProperties props) {
     this.config = props;
+    Map<String, Object> bindings = new HashMap<>();
     bindings.put("thisProperties", config);
 
     boolean hasDefaultScriptLanguage = config.containsKey(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName());
     String value = config.get(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE);
-    value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value).trim();
+    value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value, bindings).trim();
     if ("".equals(value)) value = "javascript";
     if (hasDefaultScriptLanguage) props.set(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE, value);
     defaultLanguage = value;
@@ -140,7 +125,7 @@ public class ScriptHandler {
     for (String name: config.stringPropertyNames()) {
       if (JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName().equals(name)) continue;
       value = config.getString(name);
-      config.setString(name, evaluate(name, value));
+      config.setString(name, evaluate(name, value, bindings));
     }
     bindings.clear();
   }
@@ -149,9 +134,10 @@ public class ScriptHandler {
    * Evaluate the value of the specified property by replacing each script expression with its result.
    * @param name the name of the property to evaluate.
    * @param value the value of the property to evaluate.
+   * @param bindings variable bindings that can be used in the scripts.
    * @return a string where all script expressions are replaced with their value.
    */
-  private String evaluate(final String name, final String value) {
+  public String evaluate(final String name, final String value, final Map<String, Object> bindings) {
     if (value == null) return null;
     Matcher matcher = SCRIPT_PATTERN.matcher(value);
     StringBuilder sb = new StringBuilder();
@@ -214,18 +200,24 @@ public class ScriptHandler {
    */
   private String loadScript(final String name, final String language, final String type, final String source) {
     String script = null;
-    switch(type) {
-      case INLINE:
+    char c = type.charAt(0);
+    switch(c) {
+      case 'i':
+      case 'I':
         script = source;
         break;
-      case FILE:
+
+      case 'f':
+      case 'F':
         try {
           script = FileUtils.readTextFile(source);
         } catch(Exception e) {
           log.warn("property '{}' : a '{}' script could not be read from the file '{}', exception is: {}", new Object[] {name, language, source, ExceptionUtils.getMessage(e)});
         }
         break;
-      case URL:
+
+      case 'u':
+      case 'U':
         try {
           Location<?> location = new URLLocation(source);
           Reader reader = new InputStreamReader(location.getInputStream());
@@ -234,6 +226,7 @@ public class ScriptHandler {
           log.warn("property '{}' : a '{}' script could not be read from the url '{}', exception is: {}", new Object[] {name, language, source, ExceptionUtils.getMessage(e)});
         }
         break;
+
       default:
         log.warn("property '{}' : a '{}' script could not be read from unkown source type '{}'", new Object[] {name, language, type});
         break;

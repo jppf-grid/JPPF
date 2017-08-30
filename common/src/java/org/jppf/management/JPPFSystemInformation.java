@@ -64,7 +64,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    */
   private boolean resolveInetAddressesNow;
   /**
-   * 
+   *
    */
   private transient TypedProperties[] propertiesArray;
   /**
@@ -329,5 +329,23 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     sb.append(", resolveInetAddressesNow=").append(resolveInetAddressesNow);
     sb.append(", map=").append(map);
     return sb.append(']').toString();
+  }
+
+  @Override
+  public String getProperty(final String name) {
+    for (TypedProperties props: getPropertiesArray()) {
+      if (props == null) continue;
+      if (props.containsKey(name)) return props.getProperty(name);
+    }
+    return null;
+  }
+
+  @Override
+  public boolean containsKey(final String name) {
+    for (TypedProperties props: getPropertiesArray()) {
+      if (props == null) continue;
+      if (props.containsKey(name)) return true;
+    }
+    return false;
   }
 }
