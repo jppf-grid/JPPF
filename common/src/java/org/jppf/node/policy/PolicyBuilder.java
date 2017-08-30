@@ -18,6 +18,8 @@
 
 package org.jppf.node.policy;
 
+import java.util.*;
+
 import org.jppf.client.Operator;
 
 /**
@@ -25,7 +27,7 @@ import org.jppf.client.Operator;
  * descriptor parsed from an XML document.
  * @author Laurent Cohen
  */
-public class PolicyBuilder {
+class PolicyBuilder {
   /**
    * Build an execution policy from a parsed policy descriptor.
    * @param desc the descriptor parsed from an XML document.
@@ -116,13 +118,11 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildLessThanPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
-    double value = 0.0d;
     try {
-      value = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
+      return new LessThan(desc.operands.get(0), Double.valueOf(s));
+    } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      return new LessThan(desc.operands.get(0), s);
     }
-    return new LessThan(desc.operands.get(0), value);
   }
 
   /**
@@ -132,13 +132,11 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildAtMostPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
-    double value = 0.0d;
     try {
-      value = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
+      return new AtMost(desc.operands.get(0), Double.valueOf(s));
+    } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      return new AtMost(desc.operands.get(0), s);
     }
-    return new AtMost(desc.operands.get(0), value);
   }
 
   /**
@@ -148,13 +146,11 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildMoreThanPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
-    double value = 0.0d;
     try {
-      value = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
+      return new MoreThan(desc.operands.get(0), Double.valueOf(s));
+    } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      return new MoreThan(desc.operands.get(0), s);
     }
-    return new MoreThan(desc.operands.get(0), value);
   }
 
   /**
@@ -164,13 +160,11 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildAtLeastPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
-    double value = 0.0d;
     try {
-      value = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
+      return new AtLeast(desc.operands.get(0), Double.valueOf(s));
+    } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      return new AtLeast(desc.operands.get(0), s);
     }
-    return new AtLeast(desc.operands.get(0), value);
   }
 
   /**
@@ -179,17 +173,11 @@ public class PolicyBuilder {
    * @return an <code>ExecutionPolicy</code> instance.
    */
   private ExecutionPolicy buildBetweenIIPolicy(final PolicyDescriptor desc) {
-    String s = desc.operands.get(1);
-    double value1 = 0.0d;
-    double value2 = 0.0d;
-    try {
-      value1 = Double.valueOf(s);
-      s = desc.operands.get(2);
-      value2 = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
-    }
-    return new BetweenII(desc.operands.get(0), value1, value2);
+    BetweenArgs args = new BetweenArgs(desc);
+    if ((args.value1 != null) && (args.value2 != null)) return new BetweenII(args.prop, args.value1, args.value2);
+    else if ((args.value1 == null) && (args.value2 != null)) return new BetweenII(args.prop, args.expr1, args.value2);
+    else if ((args.value1 != null) && (args.value2 == null)) return new BetweenII(args.prop, args.value1, args.expr2);
+    return new BetweenII(args.prop, args.expr1, args.expr2);
   }
 
   /**
@@ -198,17 +186,11 @@ public class PolicyBuilder {
    * @return an <code>ExecutionPolicy</code> instance.
    */
   private ExecutionPolicy buildBetweenIEPolicy(final PolicyDescriptor desc) {
-    String s = desc.operands.get(1);
-    double value1 = 0.0d;
-    double value2 = 0.0d;
-    try {
-      value1 = Double.valueOf(s);
-      s = desc.operands.get(2);
-      value2 = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
-    }
-    return new BetweenIE(desc.operands.get(0), value1, value2);
+    BetweenArgs args = new BetweenArgs(desc);
+    if ((args.value1 != null) && (args.value2 != null)) return new BetweenIE(args.prop, args.value1, args.value2);
+    else if ((args.value1 == null) && (args.value2 != null)) return new BetweenIE(args.prop, args.expr1, args.value2);
+    else if ((args.value1 != null) && (args.value2 == null)) return new BetweenIE(args.prop, args.value1, args.expr2);
+    return new BetweenIE(args.prop, args.expr1, args.expr2);
   }
 
   /**
@@ -217,17 +199,11 @@ public class PolicyBuilder {
    * @return an <code>ExecutionPolicy</code> instance.
    */
   private ExecutionPolicy buildBetweenEIPolicy(final PolicyDescriptor desc) {
-    String s = desc.operands.get(1);
-    double value1 = 0.0d;
-    double value2 = 0.0d;
-    try {
-      value1 = Double.valueOf(s);
-      s = desc.operands.get(2);
-      value2 = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
-    }
-    return new BetweenEI(desc.operands.get(0), value1, value2);
+    BetweenArgs args = new BetweenArgs(desc);
+    if ((args.value1 != null) && (args.value2 != null)) return new BetweenEI(args.prop, args.value1, args.value2);
+    else if ((args.value1 == null) && (args.value2 != null)) return new BetweenEI(args.prop, args.expr1, args.value2);
+    else if ((args.value1 != null) && (args.value2 == null)) return new BetweenEI(args.prop, args.value1, args.expr2);
+    return new BetweenEI(args.prop, args.expr1, args.expr2);
   }
 
   /**
@@ -236,17 +212,11 @@ public class PolicyBuilder {
    * @return an <code>ExecutionPolicy</code> instance.
    */
   private ExecutionPolicy buildBetweenEEPolicy(final PolicyDescriptor desc) {
-    String s = desc.operands.get(1);
-    double value1 = 0.0d;
-    double value2 = 0.0d;
-    try {
-      value1 = Double.valueOf(s);
-      s = desc.operands.get(2);
-      value2 = Double.valueOf(s);
-    } catch(NumberFormatException e) {
-      throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
-    }
-    return new BetweenEE(desc.operands.get(0), value1, value2);
+    BetweenArgs args = new BetweenArgs(desc);
+    if ((args.value1 != null) && (args.value2 != null)) return new BetweenEE(args.prop, args.value1, args.value2);
+    else if ((args.value1 == null) && (args.value2 != null)) return new BetweenEE(args.prop, args.expr1, args.value2);
+    else if ((args.value1 != null) && (args.value2 == null)) return new BetweenEE(args.prop, args.value1, args.expr2);
+    return new BetweenEE(args.prop, args.expr1, args.expr2);
   }
 
   /**
@@ -265,11 +235,11 @@ public class PolicyBuilder {
       try {
         value = Double.valueOf(s);
         return new Equal(desc.operands.get(0), value);
-      } catch(NumberFormatException e) {
-        throw new IllegalArgumentException('\'' + s + "' is not a double value", e);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        return new Equal(ValueType.NUMERIC, desc.operands.get(0), s);
       }
     }
-    return new Equal(desc.operands.get(0), Boolean.valueOf(s));
+    return new Equal(ValueType.BOOLEAN, desc.operands.get(0), s);
   }
 
   /**
@@ -289,16 +259,12 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildOneOfPolicy(final PolicyDescriptor desc) {
     if ("numeric".equals(desc.valueType)) {
-      double[] values = new double[desc.operands.size() - 1];
+      int size = desc.operands.size() - 1;
+      List<String> values = new ArrayList<>(size);
       for (int i=1; i<desc.operands.size(); i++) {
-        String s = desc.operands.get(i);
-        try {
-          values[i-1] = Double.valueOf(s);
-        } catch(NumberFormatException e) {
-          throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
-        }
+        values.add(desc.operands.get(i));
       }
-      return new OneOf(desc.operands.get(0), values);
+      return new OneOf(desc.operands.get(0), values.toArray(new String[size]));
     }
     String[] values = new String[desc.operands.size() - 1];
     for (int i=1; i<desc.operands.size(); i++) values[i-1] = desc.operands.get(i);
@@ -360,7 +326,6 @@ public class PolicyBuilder {
     return "IsInIPv4Subnet".equals(desc.type) ? new IsInIPv4Subnet(desc.operands) : new IsInIPv6Subnet(desc.operands);
   }
 
-
   /**
    * Build a global policy.
    * @param desc the descriptor to use.
@@ -371,7 +336,38 @@ public class PolicyBuilder {
   private ExecutionPolicy buildNodesMatchingPolicy(final PolicyDescriptor desc)  throws Exception {
     ExecutionPolicy child = (desc.children != null) && (desc.children.size() > 0) ? buildPolicy(desc.children.get(0)) : null;
     Operator operator = Operator.valueOf(desc.operator.toUpperCase());
-    long expected = Long.valueOf(desc.expected);
-    return new NodesMatching(operator, expected, child);
+    try {
+      long expected = Long.valueOf(desc.expected);
+      return new NodesMatching(operator, expected, child);
+    } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      return new NodesMatching(operator, desc.expected, child);
+    }
+  }
+
+  /** */
+  class BetweenArgs {
+    /** */
+    String prop, expr1, expr2;
+    /** */
+    Double value1, value2;
+
+    /**
+     * @param desc the descriptor to use.
+     */
+    BetweenArgs(final PolicyDescriptor desc) {
+      prop = desc.operands.get(0);
+      String s = desc.operands.get(1);
+      try {
+        value1 = Double.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        expr1 = s;
+      }
+      s = desc.operands.get(2);
+      try {
+        value2 = Double.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        expr2 = s;
+      }
+    }
   }
 }

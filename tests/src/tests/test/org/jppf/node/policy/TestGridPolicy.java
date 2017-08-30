@@ -101,6 +101,30 @@ public class TestGridPolicy extends Setup1D2N1C {
   }
 
   /**
+   * Test the results of an XML grid policy, where the number of expected nodes is definedas an scripted expression with property substitutions.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void tesGridPolicyWithExpression() throws Exception {
+    int nbTasks = 5;
+    String xml = FileUtils.readTextFile(RESOURCES_DIR + "/GridPolicyWithExpression.xml");
+    String name = ReflectionUtils.getCurrentClassAndMethod();
+    ExecutionPolicy p = PolicyParser.parsePolicy(xml);
+    printOut("%s() grid policy:%n%s%n", name, p);
+    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    job.getSLA().setGridExecutionPolicy(p);
+    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(JOB_TIMEOUT)); // to avoid the job being stuck
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    for (int i=0; i<nbTasks; i++) {
+      Task<?> task = results.get(i);
+      assertNotNull(task.getResult());
+      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    }
+  }
+
+  /**
    * Test the results of an XML grid policy expected to prevent the job from executing.
    * @throws Exception if any error occurs.
    */

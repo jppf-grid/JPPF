@@ -229,7 +229,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           boolean b = false;
           try {
             preparePolicy(policy, job, stats, nbJobChannels);
-            b = policy.accepts(info);
+            b = policy.evaluate(info);
           } catch(Exception ex) {
             log.error("An error occurred while running the execution policy to determine node participation.", ex);
           }
@@ -358,7 +358,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     ExecutionPolicy policy = job.getSLA().getGridExecutionPolicy();
     if (policy != null) {
       preparePolicy(policy, job, stats, job.getNbChannels());
-      return policy.accepts(this.driverInfo);
+      return policy.evaluate(this.driverInfo);
     }
     return true;
   }

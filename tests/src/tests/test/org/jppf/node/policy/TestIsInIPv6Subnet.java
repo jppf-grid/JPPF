@@ -84,9 +84,21 @@ public class TestIsInIPv6Subnet extends BaseTest {
   public void testMatches() throws Exception {
     JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv6.addresses", "localhost|0:0:0:0:8888:8888:8888:8888");
+    info.getJppf().setString("string.1", "0:0:0:0:8888");
+    info.getJppf().setString("string.2", ":8888:8888:8888");
+    info.getJppf().setString("string.3", "0:0:0:0:8888:8888:8888:");
+    info.getJppf().setInt("int.8", 8);
+    info.getJppf().setInt("int.8880", 8880);
+
     assertFalse(new IsInIPv6Subnet("::1/80").accepts(info));
     assertTrue(new IsInIPv6Subnet("::1/64").accepts(info));
     assertFalse(new IsInIPv6Subnet("0:aaaa-bbbb:0:0:0:0:0:0").accepts(info));
     assertTrue(new IsInIPv6Subnet("0:0:0:0:-:0-FFFF:7000-9000:400-A000").accepts(info));
+    assertTrue(new IsInIPv6Subnet("$script{ '${string.1}' + '${string.2}'; }$").accepts(info));
+    ExecutionPolicy p = new IsInIPv6Subnet("$script{ '${string.3}' + (${int.8} + ${int.8880}); }$");
+    assertTrue(p.accepts(info));
+    String xml = p.toXML();
+    ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
+    assertEquals(xml, p2.toXML());
   }
 }

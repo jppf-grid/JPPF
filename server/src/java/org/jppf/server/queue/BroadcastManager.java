@@ -198,7 +198,7 @@ public class BroadcastManager {
           JPPFManagementInfo info = connection.getManagementInfo();
           ExecutionPolicy policy = sla.getExecutionPolicy();
           TaskQueueChecker.preparePolicy(policy, broadcastJob, JPPFDriver.getInstance().getStatistics(), 0);
-          if ((policy != null) && !policy.accepts(info.getSystemInfo())) {
+          if ((policy != null) && !policy.evaluate(info.getSystemInfo())) {
             if (debugEnabled) log.debug("node uuid={} refused for broadcast {}", uuid, broadcastJob);
             continue;
           }

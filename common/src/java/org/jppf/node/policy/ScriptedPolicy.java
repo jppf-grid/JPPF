@@ -122,29 +122,17 @@ public class ScriptedPolicy extends ExecutionPolicy {
       }
     } catch (Exception|NoClassDefFoundError e) {
       evaluationError = true;
-      log.error("exception occurred evaluting scripted policy: {}\npolicy is\n{}", ExceptionUtils.getStackTrace(e), this);
+      log.error("exception occurred evaluating scripted policy: {}\npolicy is\n{}", ExceptionUtils.getStackTrace(e), this);
     } finally {
       if (runner != null) ScriptRunnerFactory.releaseScriptRunner(runner);
     }
     return false;
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    synchronized(ExecutionPolicy.class) {
-      if (computedToString == null) {
-        String ind = indent();
-        StringBuilder sb = new StringBuilder().append(ind);
-        sb.append("<Script language=\"").append(language).append("\"><![CDATA[\n");
-        if (script != null) sb.append(script).append('\n');
-        sb.append(ind).append("]]></Script>\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    StringBuilder sb = new StringBuilder(indent(n)).append("<Script language=\"").append(language).append("\"><![CDATA[\n");
+    if (script != null) sb.append(script).append('\n');
+    return sb.append(indent(n)).append("]]></Script>\n").toString();
   }
 }

@@ -64,26 +64,14 @@ public abstract class CustomPolicy extends ExecutionPolicy {
     this.args = args;
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
-        toStringIndent++;
-        if (args != null) {
-          for (String s : args)
-            sb.append(indent()).append("<Arg>").append(s).append("</Arg>\n");
-        }
-        toStringIndent--;
-        sb.append(indent()).append("</CustomRule>\n");
-        computedToString = sb.toString();
-      }
+  public String toString(final int n) {
+    StringBuilder sb = new StringBuilder(indent(n)).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
+    if (args != null) {
+      for (String s : args)
+        sb.append(indent(n + 1)).append("<Arg>").append(s).append("</Arg>\n");
     }
-    return computedToString;
+    sb.append(indent(n)).append("</CustomRule>\n");
+    return sb.toString();
   }
 }

@@ -18,54 +18,65 @@
 
 package org.jppf.node.policy;
 
+import java.util.*;
+
 import org.jppf.utils.PropertiesCollection;
 
 /**
- * An execution policy rule that encapsulates a test of type <i>property_value is one of [value1, &middot;&middot;&middot; , valueN]</i>.
- * The test applies to numeric and string values only.
+ * An execution policy rule that encapsulates a test of type <i>property_value_or_expression is one of [value1, &middot;&middot;&middot; , valueN]</i>.
+ * The test applies to numeric and string values.
  * @author Laurent Cohen
  */
-public class OneOf extends ExecutionPolicy {
+public class OneOf extends LeftOperandRule {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The name of the property to compare.
-   */
-  private String propertyName = null;
-  /**
    * A numeric value to compare with.
    */
-  private double[] numberValues = null;
+  private List<Expression<Double>> numbers;
   /**
    * A string value to compare with.
    */
-  private String[] stringValues = null;
+  private List<Expression<String>> strings;
   /**
    * Determines if the comparison should ignore the string case.
    */
-  private boolean ignoreCase = false;
+  private boolean ignoreCase;
 
   /**
    * Determine whether the value of a property, expressed as a {@code double}, is in the specified array of values.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param values the values to compare with.
    */
-  public OneOf(final String propertyName, final double... values) {
-    this.propertyName = propertyName;
-    this.numberValues = values;
+  public OneOf(final String propertyNameOrExpression, final double... values) {
+    super(ValueType.NUMERIC, propertyNameOrExpression);
+    numbers = new ArrayList<>(values.length);
+    for (double value: values) numbers.add(new NumericExpression(value));
+  }
+
+  /**
+   * Determine whether the value of a property, expressed as a {@code double}, is in the specified array of values.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param values expressions resolving to double values to compare with.
+   */
+  public OneOf(final String propertyNameOrExpression, final String... values) {
+    super(ValueType.NUMERIC, propertyNameOrExpression);
+    numbers = new ArrayList<>(values.length);
+    for (String value: values) numbers.add(new NumericExpression(value));
   }
 
   /**
    * Determine whether the value of a property, expressed as a {@code String}, is in the specified array of values.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param ignoreCase determines if the comparison should ignore the string case.
-   * @param values the values to compare with.
+   * @param values the values or expressions resolving to strings to compare with.
    */
-  public OneOf(final String propertyName, final boolean ignoreCase, final String... values) {
-    this.propertyName = propertyName;
-    this.stringValues = values;
+  public OneOf(final String propertyNameOrExpression, final boolean ignoreCase, final String... values) {
+    super(ValueType.STRING, propertyNameOrExpression);
+    strings = new ArrayList<>(values.length);
+    for (String value: values) strings.add(new StringExpression(value));
     this.ignoreCase = ignoreCase;
   }
 
@@ -76,21 +87,21 @@ public class OneOf extends ExecutionPolicy {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    try {
-      String s = getProperty(info, propertyName);
-      if (numberValues != null) {
-        double value = Double.valueOf(s);
-        for (double d : numberValues) if (d == value) return true;
-      } else if (stringValues != null) {
-        for (String value : stringValues) {
-          if ((value == null) && (s == null)) return true;
-          else if ((value != null) && (s != null)) {
-            if (!ignoreCase && s.equals(value)) return true;
-            else if (ignoreCase && s.equalsIgnoreCase(value)) return true;
-          }
+    Object o = getLeftOperandValue(info);
+    if (numbers != null) {
+      if (o != null) {
+        for (Expression<Double> expr: numbers) {
+          if (o.equals(expr.evaluate(info))) return true;
         }
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } else if (strings != null) {
+      for (Expression<String> expr : strings) {
+        String value = expr.evaluate(info);
+        if ((value == null) && (o == null)) return true;
+        else if ((value != null) && (o != null)) {
+          if (!ignoreCase && o.equals(value) || ignoreCase && ((String) o).equalsIgnoreCase(value)) return true;
+        }
+      }
     }
     return false;
   }
@@ -100,26 +111,15 @@ public class OneOf extends ExecutionPolicy {
    * @return an XML string representation of this object
    */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append("<OneOf valueType=\"");
-        if (stringValues != null) sb.append("string");
-        else if (numberValues != null) sb.append("numeric");
-        sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
-        toStringIndent++;
-        sb.append(indent()).append(xmlElement("Property", propertyName)).append('\n');
-        if (stringValues != null) {
-          for (String s : stringValues) sb.append(indent()).append(xmlElement("Value", s)).append('\n');
-        } else {
-          for (double d : numberValues) sb.append(indent()).append(xmlElement("Value", d)).append('\n');
-        }
-        toStringIndent--;
-        sb.append(indent()).append("</OneOf>\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    StringBuilder sb = new StringBuilder(indent(n)).append("<OneOf valueType=\"");
+    if (strings != null) sb.append("string");
+    else if (numbers != null) sb.append("numeric");
+    sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
+    sb.append(indent(n + 1)).append(xmlElement("Property", leftOperand.getExpression())).append('\n');
+    List<? extends Expression<?>> list = (strings != null) ? strings : numbers;
+    for (Expression<?> expr: list) sb.append(indent(n + 1)).append(xmlElement("Value", expr.getExpression())).append('\n');
+    sb.append(indent(n)).append("</OneOf>\n");
+    return sb.toString();
   }
 }

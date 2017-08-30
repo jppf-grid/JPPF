@@ -175,7 +175,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
 
   /**
    * Send a handshake job to the server.
-   * @return a JPPFTaskBundlesent by the server in response to the handshake job.
+   * @return a {@link TaskBundle} sent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
    */
   TaskBundle sendHandshakeJob() throws Exception {
@@ -189,7 +189,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setName("handshake job");
     header.setHandshake(true);
     header.setUuid(header.getName());
-    header.setParameter("connection.uuid", connectionUuid);
+    header.setParameter(BundleParameter.CONNECTION_UUID, connectionUuid);
     header.setSLA(null);
     header.setMetadata(null);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
@@ -212,7 +212,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     if (debugEnabled) log.debug(toDebugString() + " sending close command job, uuidPath=" + uuidPath);
     header.setName("close command job");
     header.setUuid("close command job");
-    header.setParameter("connection.uuid", connectionUuid);
+    header.setParameter(BundleParameter.CONNECTION_UUID, connectionUuid);
     header.setParameter(BundleParameter.CLOSE_COMMAND, true);
     header.setSLA(null);
     header.setMetadata(null);

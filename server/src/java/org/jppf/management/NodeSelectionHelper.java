@@ -60,7 +60,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     if (selector instanceof ExecutionPolicySelector) {
       ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
       TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-      return policy.accepts(node.getSystemInformation());
+      return policy.evaluate(node.getSystemInformation());
     }
     return selector.accepts(node.getManagementInfo());
   }

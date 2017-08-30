@@ -21,66 +21,87 @@ package org.jppf.node.policy;
 import org.jppf.utils.PropertiesCollection;
 
 /**
- * An execution policy rule that encapsulates a test of type <i>property_value == value</i>.
- * The test applies to numeric, string and boolean values only.
+ * An execution policy rule that encapsulates a test of type <i>{@code property_value_or_expression equals a}</i>.
+ * The test applies to numeric, string or boolean values or expressions.
  * @author Laurent Cohen
  */
-public class Equal extends ExecutionPolicy {
+public class Equal extends LeftOperandRule {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The name of the property to compare.
-   */
-  private String propertyName = null;
-  /**
    * A numeric value to compare with.
    */
-  private Number numberValue = null;
+  private Expression<Double> numberValue;
   /**
    * A string value to compare with.
    */
-  private String stringValue = null;
+  private Expression<String> stringValue;
   /**
    * An object value to compare with.
    */
-  private Boolean booleanValue = null;
+  private Expression<Boolean> booleanValue;
   /**
    * Determines if the comparison should ignore the string case.
    */
-  private boolean ignoreCase = false;
+  private boolean ignoreCase;
+
+  /**
+   * Define an equality comparison between the numeric value of a property and another numeric value.<br>
+   * Note that if the value type is equal to {@link ValueType#STRING}, then the comparison will be case-insensitive.
+   * To specify case sensitivity, use the {@link #Equal(String, boolean, String)} constructor instead.
+   * @param valueType the type of value to which thie equality comparison applies. 
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param a the value to compare with.
+   */
+  public Equal(final ValueType valueType, final String propertyNameOrExpression, final String a) {
+    super(valueType, propertyNameOrExpression);
+    switch(valueType) {
+      case BOOLEAN:
+        this.booleanValue = new BooleanExpression(a);
+        break;
+
+      case NUMERIC:
+        this.numberValue = new NumericExpression(a);
+        break;
+
+      case STRING:
+        this.stringValue = new StringExpression(a);
+        break;
+    }
+  }
 
   /**
    * Define an equality comparison between the numeric value of a property and another numeric value.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final double a) {
-    this.propertyName = propertyName;
-    this.numberValue = a;
+  public Equal(final String propertyNameOrExpression, final double a) {
+    super(ValueType.NUMERIC, propertyNameOrExpression);
+    this.numberValue = new NumericExpression(a);
   }
 
   /**
    * Define an equality comparison between the string value of a property and another string value.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final boolean ignoreCase, final String a) {
-    this.propertyName = propertyName;
-    this.stringValue = a;
+  public Equal(final String propertyNameOrExpression, final boolean ignoreCase, final String a) {
+    super(ValueType.STRING, propertyNameOrExpression);
+    this.stringValue = new StringExpression(a);
     this.ignoreCase = ignoreCase;
   }
 
   /**
    * Define an equality comparison between the boolean value of a property and another boolean value.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final boolean a) {
-    this.propertyName = propertyName;
-    this.booleanValue = a;
+  public Equal(final String propertyNameOrExpression, final boolean a) {
+    super(ValueType.BOOLEAN, propertyNameOrExpression);
+    this.booleanValue = new BooleanExpression(a);
   }
 
   /**
@@ -90,44 +111,27 @@ public class Equal extends ExecutionPolicy {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    try {
-      String s = getProperty(info, propertyName);
-      if (numberValue != null) return Double.valueOf(s).doubleValue() == numberValue.doubleValue();
-      else if (stringValue != null) {
-        return ignoreCase ? stringValue.equalsIgnoreCase(s) : stringValue.equals(s);
-      } else if (booleanValue != null) return Boolean.valueOf(s).booleanValue() == booleanValue.booleanValue();
-      else return s == null;
-    } catch (@SuppressWarnings("unused") Exception e) {
-    }
-    return false;
+    Object o = getLeftOperandValue(info);
+    if (numberValue != null) return (o == null) ? false : o.equals(numberValue.evaluate(info));
+    else if (stringValue != null)return ignoreCase ? stringValue.evaluate(info).equalsIgnoreCase((String) o) : stringValue.equals(o);
+    else if (booleanValue != null) return (o == null) ? false : o.equals(booleanValue.evaluate(info));
+    else return o == null;
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append("<Equal valueType=\"");
-        if (stringValue != null) sb.append("string");
-        else if (numberValue != null) sb.append("numeric");
-        else if (booleanValue != null) sb.append("boolean");
-        sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
-        toStringIndent++;
-        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-        sb.append(indent()).append("<Value>");
-        if (stringValue != null) sb.append(stringValue);
-        else if (numberValue != null) sb.append(numberValue);
-        else if (booleanValue != null) sb.append(booleanValue);
-        sb.append("</Value>\n");
-        toStringIndent--;
-        sb.append(indent()).append("</Equal>\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    StringBuilder sb = new StringBuilder(indent(n)).append("<Equal valueType=\"");
+    if (stringValue != null) sb.append("string");
+    else if (numberValue != null) sb.append("numeric");
+    else if (booleanValue != null) sb.append("boolean");
+    sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
+    sb.append(indent(n + 1)).append("<Property>").append(leftOperand.getExpression()).append("</Property>\n");
+    sb.append(indent(n + 1)).append("<Value>");
+    if (stringValue != null) sb.append(stringValue.getExpression());
+    else if (numberValue != null) sb.append(numberValue.getExpression());
+    else if (booleanValue != null) sb.append(booleanValue.getExpression());
+    sb.append("</Value>\n");
+    sb.append(indent(n)).append("</Equal>\n");
+    return sb.toString();
   }
 }

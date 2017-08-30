@@ -25,7 +25,7 @@ import java.util.*;
  * of an execution policy easier.
  * @author Laurent Cohen
  */
-public class PolicyDescriptor {
+class PolicyDescriptor {
   /**
    * The type of rule, eg AND, NOT, OneOf, Equal, etc.
    */

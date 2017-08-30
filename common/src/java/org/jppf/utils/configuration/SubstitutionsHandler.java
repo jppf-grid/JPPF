@@ -21,13 +21,13 @@ package org.jppf.utils.configuration;
 import java.util.*;
 import java.util.regex.*;
 
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * Handles property substitutions in a properties file, that is resolve all
  * references of the following form in properties values:
- * <pre> property.name = ${other.property.name}
+ * <pre> property.name = ${&lt;other.property.name&gt;}
  * some.property.name = ${env.&lt;environment_variable_name&gt;}
  * other.property.name = ${sys.&lt;system_property_name&gt;}</pre>
  * @author Laurent Cohen
@@ -66,7 +66,7 @@ public class SubstitutionsHandler {
    * The regex pattern for identifying substitutable property references. This pattern uses explicit reluctant quantifiers, as opposed
    * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value.
    */
-  private static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
+  public static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
   /**
    * Stores the properties whose values are fully resolved.
    */
@@ -83,10 +83,6 @@ public class SubstitutionsHandler {
    * Number of properties still resolved at each iteration, used as a stop condition for the resolution loop.
    */
   private int unresolvedCount;
-  /**
-   *
-   */
-  private Matcher matcher = null;
 
   /**
    * Initialize this substitution handler.
@@ -128,7 +124,7 @@ public class SubstitutionsHandler {
    * @return the new value of the property after 0 or more substitutions have been handled.
    */
   private String evaluateProp(final String key, final String value) {
-    matcher = SUBST_PATTERN.matcher(value);
+    Matcher matcher = SUBST_PATTERN.matcher(value);
     StringBuilder sb = new StringBuilder();
     int pos = 0;
     int matches = 0;
@@ -144,7 +140,7 @@ public class SubstitutionsHandler {
       boolean done = false;
       for (PropertyProvider provider: PROPERTY_PROVIDERS) {
         if (name.startsWith(provider.prefix)) {
-          resolvedRefCount += resolveSpecialProperty(provider, name, value, sb);
+          resolvedRefCount += resolveSpecialProperty(provider, name, value, sb, matcher);
           done = true;
           break;
         }
@@ -185,14 +181,61 @@ public class SubstitutionsHandler {
   }
 
   /**
+   * Resolve the substitutions for the specified property value.
+   * @param resolvedProps a set of already resolved properties to evaluate against.
+   * @param value the current value of the property.
+   * @return the new value of the property after 0 or more substitutions have been handled.
+   */
+  public String evaluateProp(final PropertiesCollection<String> resolvedProps, final String value) {
+    Matcher matcher = SUBST_PATTERN.matcher(value);
+    StringBuilder sb = new StringBuilder();
+    int pos = 0;
+    if (traceEnabled) log.trace("evaluating value={}", value);
+    while (matcher.find()) {
+      String resolvedValue = null;
+      sb.append(value.substring(pos, matcher.start()));
+      String name = matcher.group(1);
+      if (traceEnabled) log.trace("  found match [name={}]", name);
+      if (name == null) name = "";
+      boolean done = false;
+      for (PropertyProvider provider: PROPERTY_PROVIDERS) {
+        if (name.startsWith(provider.prefix)) {
+          resolveSpecialProperty(provider, name, value, sb, matcher);
+          done = true;
+          break;
+        }
+      }
+      if (!done) {
+        if (resolvedProps.containsKey(name)) {
+          resolvedValue = resolvedProps.getProperty(name);
+          if (traceEnabled) log.trace("  property already resolved [name={}, value={}]", name, resolvedValue);
+        } else {
+          resolvedValue = value.substring(matcher.start(), matcher.end());
+          if (traceEnabled) {
+            if ("".equals(name.trim()))log.trace("  empty property name [name={}]", name);
+            else log.trace("  unresolved property [name={}, value={}]", name, resolvedValue);
+          }
+        }
+        sb.append(resolvedValue);
+      }
+      pos = matcher.end();
+    }
+    if (pos < value.length()) sb.append(value.substring(pos, value.length()));
+    String s = sb.toString();
+    if (traceEnabled) log.trace("final value = {}", s);
+    return s;
+  }
+
+  /**
    *
    * @param provider used to lookup the property or variable name.
    * @param name the name of the property or variables to look for.
    * @param value the raw, unresolved value.
    * @param valueBuilder an appendable string for the property value being computed.
+   * @param matcher .
    * @return 0 if the variable or property had already been resolved previously, 1 otherwise.
    */
-  private int resolveSpecialProperty(final PropertyProvider provider, final String name, final String value, final StringBuilder valueBuilder) {
+  private int resolveSpecialProperty(final PropertyProvider provider, final String name, final String value, final StringBuilder valueBuilder, final Matcher matcher) {
     String resolvedValue = null;
     int resolvedRefCount = 0;
     if (resolvedProps.containsKey(name)) {

@@ -38,7 +38,7 @@ public class PolicyParser {
    */
   private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
       "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference",
-      "IsinIPv4Subnet", "IsinIPv6Subnet", NodesMatching.XML_ELT);
+      "IsInIPv4Subnet", "IsInIPv6Subnet", NodesMatching.XML_TAG);
   /**
    * The DOM parser used to build the descriptor tree.
    */

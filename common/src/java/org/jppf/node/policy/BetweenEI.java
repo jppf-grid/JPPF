@@ -20,11 +20,11 @@ package org.jppf.node.policy;
 
 
 /**
- * An execution policy rule that encapsulates a test of type <i>a &lt; property_value &lt;= b</i>.
+ * An execution policy rule that encapsulates a test of type <i>{@code a < property_value <= b}</i>.
  * The test applies to numeric values only.
  * @author Laurent Cohen
  */
-public class BetweenEI extends BetweenPolicy {
+public class BetweenEI extends TrinaryNumericRule {
   /**
    * Explicit serialVersionUID.
    */
@@ -32,16 +32,46 @@ public class BetweenEI extends BetweenPolicy {
 
   /**
    * Define a comparison of type value between a and b with a excluded and b included.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param a the lower bound.
    * @param b the upper bound.
    */
-  public BetweenEI(final String propertyName, final double a, final double b) {
-    super(propertyName, a, b, 1);
+  public BetweenEI(final String propertyNameOrExpression, final double a, final double b) {
+    super(propertyNameOrExpression, a, b, 1);
+  }
+
+  /**
+   * Define a comparison of type value between a and b with a excluded and b included.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param a the lower bound expression.
+   * @param b the upper bound.
+   */
+  public BetweenEI(final String propertyNameOrExpression, final String a, final double b) {
+    super(propertyNameOrExpression, a, b, 1);
+  }
+
+  /**
+   * Define a comparison of type value between a and b with a excluded and b included.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param a the lower bound.
+   * @param b the upper bound expression.
+   */
+  public BetweenEI(final String propertyNameOrExpression, final double a, final String b) {
+    super(propertyNameOrExpression, a, b, 1);
+  }
+
+  /**
+   * Define a comparison of type value between a and b with a excluded and b included.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param a the lower bound expression.
+   * @param b the upper bound expression.
+   */
+  public BetweenEI(final String propertyNameOrExpression, final String a, final String b) {
+    super(propertyNameOrExpression, a, b, 1);
   }
 
   @Override
-  boolean accepts(final double value) {
+  boolean accepts(final double value, final double a, final double  b) {
     return (value > a) && (value <= b);
   }
 }

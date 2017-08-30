@@ -102,7 +102,7 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
     if (policy == null) return true;
     JPPFSystemInformation info = node.getManagementInfo().getSystemInfo();
     if (info == null) return true;
-    return policy.accepts(info);
+    return policy.evaluate(info);
   }
 
   /**

@@ -382,7 +382,7 @@ public abstract class AbstractClientJob {
     if (policy != null) {
       JPPFSystemInformation info = channel.getSystemInformation();
       preparePolicy(policy);
-      b = policy.accepts(info);
+      b = policy.evaluate(info);
       if (traceEnabled) log.trace("policy result = " + b);
     }
     return b;

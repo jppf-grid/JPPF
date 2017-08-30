@@ -22,7 +22,9 @@ import java.io.Serializable;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.stats.JPPFStatistics;
+import org.slf4j.*;
 
 /**
  * Interface for all execution policy implementations.
@@ -35,14 +37,13 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Level of indentation used in the toString() method.
+   * Logger for this class.
    */
-  static int toStringIndent = 0;
+  private static Logger log = LoggerFactory.getLogger(ExecutionPolicy.class);
   /**
-   * Stores the XML representation of this object.
-   * Used to avoid doing it more than once.
+   *
    */
-  transient String computedToString = null;
+  private static final ExecutionPolicy[] NO_CHILDREN = new ExecutionPolicy[0];
   /**
    * The children of this rule.
    * @exclude
@@ -51,11 +52,22 @@ public abstract class ExecutionPolicy implements Serializable {
   /**
    * The root of an execution policy graph, set by the queue manager on the client or server side.
    */
-  transient ExecutionPolicy root = null;
+  transient ExecutionPolicy root;
   /**
    * The context for this policy.
    */
-  transient PolicyContext context = null;
+  transient PolicyContext context;
+  /**
+   * Whether an exception was already raised when evaluating this policy.
+   */
+  transient boolean hadException;
+
+  /**
+   * Initialize this policy with the specified children.
+   */
+  protected ExecutionPolicy() {
+    this.children = NO_CHILDREN;
+  }
 
   /**
    * Initialize this policy with the specified children.
@@ -67,6 +79,26 @@ public abstract class ExecutionPolicy implements Serializable {
 
   /**
    * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.*
+   * @exclude
+   */
+  public boolean evaluate(final PropertiesCollection<String> info) {
+    try {
+      return accepts(info);
+    } catch (Exception e) {
+      if (!hadException) {
+        hadException = true;
+        String msg = String.format("exception occurred while evaluating execution policy of type %s%nExecution policy is:%n%s%nException: %s",
+          getClass().getName(), this, ExceptionUtils.getStackTrace(e));
+        log.error(msg);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Determines whether this policy accepts the specified node. This method must be overriden in subclasses.
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
    */
@@ -224,13 +256,27 @@ public abstract class ExecutionPolicy implements Serializable {
 
   /**
    * Get an indented string.
+   * @param indentSize the size of the indent to produce.
    * @return an indented string depending on the value of <code>toStringIndent</code>.
    * @exclude
    */
-  protected static String indent() {
+  protected String indent(final int indentSize) {
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<toStringIndent; i++) sb.append("  ");
+    for (int i=0; i<indentSize; i++) sb.append("  ");
     return sb.toString();
+  }
+
+  /**
+   * Get an xml string representation of this policy with the specified starting indentation level.
+   * @param indent the size of the indent to startwith.
+   * @return an indented string depending on the value of <code>toStringIndent</code>.
+   * @exclude
+   */
+  public abstract String toString(final int indent);
+
+  @Override
+  public String toString() {
+    return toString(0);
   }
 
   /**
@@ -240,40 +286,7 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   public String toXML() {
     return new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
-      .append(toString())
-      .append("</jppf:ExecutionPolicy>\n")
-      .toString();
-  }
-
-  /**
-   * An execution policy that realizes a binary logical combination of the policies specified as operands.
-   */
-  public abstract static class LogicalRule extends ExecutionPolicy {
-    /**
-     * Initialize this binary logical operator with the specified operands.
-     * @param rules the first operand.
-     */
-    public LogicalRule(final ExecutionPolicy...rules) {
-      super(rules);
-    }
-
-    /**
-     * Print this object to a string.
-     * @return an XML string representation of this object
-     */
-    @Override
-    public String toString() {
-      synchronized(ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        toStringIndent++;
-        if (children == null) sb.append(indent()).append("null\n");
-        else {
-          for (ExecutionPolicy ep: children) sb.append(ep.toString());
-        }
-        toStringIndent--;
-        return sb.toString();
-      }
-    }
+      .append(toString()).append("</jppf:ExecutionPolicy>\n").toString();
   }
 
   /**
@@ -298,25 +311,15 @@ public abstract class ExecutionPolicy implements Serializable {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = true;
       for (ExecutionPolicy child: children) {
-        b = b && child.accepts(info);
+        b = b && child.evaluate(info);
         if (!b) return false;
       }
       return b;
     }
 
-    /**
-     * Print this object to a string.
-     * @return an XML string representation of this object
-     * @see java.lang.Object#toString()
-     */
     @Override
-    public String toString() {
-      if (computedToString == null) {
-        synchronized(ExecutionPolicy.class) {
-          computedToString = new StringBuilder().append(indent()).append("<AND>\n").append(super.toString()).append(indent()).append("</AND>\n").toString();
-        }
-      }
-      return computedToString;
+    public String toString(final int n) {
+      return new StringBuilder().append(indent(n)).append("<AND>\n").append(super.toString(n + 1)).append(indent(n)).append("</AND>\n").toString();
     }
   }
 
@@ -332,34 +335,20 @@ public abstract class ExecutionPolicy implements Serializable {
       super(rules);
     }
 
-    /**
-     * Determine if a node is acceptable for this policy.
-     * @param info system information for the node on which the tasks will run if accepted.
-     * @return true if at least one of the operands' accepts() method returns true.
-     */
     @Override
     public boolean accepts(final PropertiesCollection<String> info) {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = false;
       for (ExecutionPolicy child: children) {
-        b = b || child.accepts(info);
+        b = b || child.evaluate(info);
         if (b) return true;
       }
       return b;
     }
 
-    /**
-     * Print this object to a string.
-     * @return an XML string representation of this object
-     */
     @Override
-    public String toString() {
-      if (computedToString == null) {
-        synchronized(ExecutionPolicy.class) {
-          computedToString = new StringBuilder().append(indent()).append("<OR>\n").append(super.toString()).append(indent()).append("</OR>\n").toString();
-        }
-      }
-      return computedToString;
+    public String toString(final int n) {
+      return new StringBuilder().append(indent(n)).append("<OR>\n").append(super.toString(n + 1)).append(indent(n)).append("</OR>\n").toString();
     }
   }
 
@@ -375,16 +364,11 @@ public abstract class ExecutionPolicy implements Serializable {
       super(rules);
     }
 
-    /**
-     * Determine if a node is acceptable for this policy.
-     * @param info system information for the node on which the tasks will run if accepted.
-     * @return true if and only if the operands' accepts() method return different values.
-     */
     @Override
     public boolean accepts(final PropertiesCollection<String> info) {
       if ((children == null) || (children.length <= 0)) return true;
-      boolean b = children[0].accepts(info);
-      if (children.length >= 1) for (int i=1; i<children.length; i++) b = (b != children[i].accepts(info));
+      boolean b = children[0].evaluate(info);
+      if (children.length >= 1) for (int i=1; i<children.length; i++) b = (b != children[i].evaluate(info));
       return b;
     }
 
@@ -393,13 +377,8 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return an XML string representation of this object
      */
     @Override
-    public String toString() {
-      if (computedToString == null) {
-        synchronized(ExecutionPolicy.class) {
-          computedToString = new StringBuilder().append(indent()).append("<XOR>\n").append(super.toString()).append(indent()).append("</XOR>\n").toString();
-        }
-      }
-      return computedToString;
+    public String toString(final int n) {
+      return new StringBuilder(indent(n)).append("<XOR>\n").append(super.toString(n + 1)).append(indent(n)).append("</XOR>\n").toString();
     }
   }
 
@@ -416,34 +395,14 @@ public abstract class ExecutionPolicy implements Serializable {
       if (rule == null) throw new IllegalArgumentException("negated rule cannot be null");
     }
 
-    /**
-     * Determine if a node is acceptable for this policy.
-     * @param info system information for the node on which the tasks will run if accepted.
-     * @return true if and only if the 2 operands' accepts() method return true.
-     */
     @Override
     public boolean accepts(final PropertiesCollection<String> info) {
-      return !children[0].accepts(info);
+      return !children[0].evaluate(info);
     }
 
-    /**
-     * Print this object to a string.
-     * @return an XML string representation of this object.
-     */
     @Override
-    public String toString() {
-      if (computedToString == null) {
-        synchronized(ExecutionPolicy.class) {
-          StringBuilder sb = new StringBuilder();
-          sb.append(indent()).append("<NOT>\n");
-          toStringIndent++;
-          sb.append(children[0].toString());
-          toStringIndent--;
-          sb.append(indent()).append("</NOT>\n");
-          computedToString = sb.toString();
-        }
-      }
-      return computedToString;
+    public String toString(final int n) {
+      return new StringBuilder(indent(n)).append("<NOT>\n").append(children[0].toString(n + 1)).append(indent(n)).append("</NOT>\n").toString();
     }
   }
 
@@ -473,7 +432,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @exclude
    */
   protected String tagEnd(final String name) {
-    return new StringBuilder().append('<').append(name).append('>').toString();
+    return new StringBuilder().append("</").append(name).append('>').toString();
   }
 
   /**
@@ -484,11 +443,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @exclude
    */
   protected String xmlElement(final String tag, final String value) {
-    StringBuilder sb = new StringBuilder();
-    sb.append('<').append(tag).append('>');
-    sb.append(value);
-    sb.append("</").append(tag).append('>');
-    return sb.toString();
+    return new StringBuilder().append('<').append(tag).append('>').append(value).append("</").append(tag).append('>').toString();
   }
 
   /**
@@ -504,7 +459,6 @@ public abstract class ExecutionPolicy implements Serializable {
 
   /**
    * Initialize the root for all the elements in the policy graph for which this is the root.
-   * @since 5.0
    */
   void initializeRoot() {
     if (children != null) {
@@ -515,7 +469,6 @@ public abstract class ExecutionPolicy implements Serializable {
   /**
    * Initialize the specified root for all the elements in the policy sub-graph for which this is the root.
    * @param root the root to set.
-   * @since 5.0
    */
   void initializeRoot(final ExecutionPolicy root) {
     if (this.root != null) return;
@@ -557,5 +510,14 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   public PolicyContext getContext() {
     return root == null ? context : root.context;
+  }
+
+  /**
+   * Determine whther the specified string is an expression or a litteral value.
+   * @param value the value o check.
+   * @return {@code true} if the value is an expression, {@code false} if it is a literal value.
+   */
+  static boolean isExpression(final String value) {
+    return SubstitutionsHandler.SUBST_PATTERN.matcher(value).find() || ScriptHandler.SCRIPT_PATTERN.matcher(value).find();
   }
 }

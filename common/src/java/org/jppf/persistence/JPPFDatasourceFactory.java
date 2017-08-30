@@ -287,7 +287,7 @@ public final class JPPFDatasourceFactory {
         try {
           ExecutionPolicy policy = PolicyParser.parsePolicy(policyText);
           if (policy != null) {
-            if (!policy.accepts(info)) {
+            if (!policy.evaluate(info)) {
               if (debugEnabled) log.debug("datasource '{}' execution policy does not macth for this node, it will be ignored", dsName);
               return null;
             }

@@ -83,10 +83,22 @@ public class TestIsInIPv4Subnet extends BaseTest {
   public void testMatches() throws Exception {
     JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
+    info.getJppf().setString("string.1", "192.168");
+    info.getJppf().setString("string.2", ".1.14");
+    info.getJppf().setString("string.3", "192.168.1.");
+    info.getJppf().setInt("int.1", 1);
+    info.getJppf().setInt("int.13", 13);
+
     assertFalse(new IsInIPv4Subnet("192.168.1.10").accepts(info));
     assertTrue(new IsInIPv4Subnet("192.168.1.0/24").accepts(info));
     assertFalse(new IsInIPv4Subnet("192.160.0.0/13").accepts(info));
     assertTrue(new IsInIPv4Subnet("192.0.0.0/4").accepts(info));
     assertTrue(new IsInIPv4Subnet("192-207.0-255.0-10.0-127").accepts(info));
+    assertTrue(new IsInIPv4Subnet("$script{ '${string.1}' + '${string.2}'; }$").accepts(info));
+    ExecutionPolicy p = new IsInIPv4Subnet("$script{ '${string.3}' + (${int.1} + ${int.13}); }$");
+    assertTrue(p.accepts(info));
+    String xml = p.toXML();
+    ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
+    assertEquals(xml, p2.toXML());
   }
 }

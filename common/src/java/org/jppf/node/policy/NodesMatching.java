@@ -18,10 +18,10 @@
 
 package org.jppf.node.policy;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.client.Operator;
 import org.jppf.management.*;
 import org.jppf.utils.PropertiesCollection;
-import org.slf4j.*;
 
 /**
  * An execution policy rule that checks whether a specified number of nodes match a node execution policy.
@@ -53,13 +53,9 @@ import org.slf4j.*;
  */
 public class NodesMatching extends ExecutionPolicy {
   /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(NodesMatching.class);
-  /**
    * Name of the corresponding XML element.
    */
-  public static final String XML_ELT = NodesMatching.class.getSimpleName();
+  public static final String XML_TAG = NodesMatching.class.getSimpleName();
   /**
    * The comparison operator to use for the number of nodes.
    */
@@ -67,7 +63,7 @@ public class NodesMatching extends ExecutionPolicy {
   /**
    * The expected number of nodes to use in the comparison.
    */
-  private final long expectedNodes;
+  private final Expression<Double> expectedNodes;
   /**
    * The execution policy to match the nodes against.
    */
@@ -81,7 +77,19 @@ public class NodesMatching extends ExecutionPolicy {
    */
   public NodesMatching(final Operator operator, final long expectedNodes, final ExecutionPolicy nodePolicy) {
     this.operator = operator == null ? Operator.EQUAL : operator;
-    this.expectedNodes = expectedNodes;
+    this.expectedNodes = new NumericExpression((double) expectedNodes);
+    this.nodePolicy = nodePolicy;
+  }
+
+  /**
+   * Initialize this execution policy.
+   * @param operator the comparison operator to use for the number of nodes.
+   * @param expectedNodes an expression that evaluates to the number of expected nodes.
+   * @param nodePolicy the execution policy to match the nodes against. If {@code null}, then all the nodes will match.
+   */
+  public NodesMatching(final Operator operator, final String expectedNodes, final ExecutionPolicy nodePolicy) {
+    this.operator = operator == null ? Operator.EQUAL : operator;
+    this.expectedNodes = new NumericExpression(expectedNodes);
     this.nodePolicy = nodePolicy;
   }
 
@@ -91,33 +99,22 @@ public class NodesMatching extends ExecutionPolicy {
     try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
       jmx.connect();
       nbNodes = jmx.nbNodes((nodePolicy == null) ? NodeSelector.ALL_NODES : new ExecutionPolicySelector(nodePolicy));
+      return operator.evaluate(nbNodes, expectedNodes.evaluate(info).longValue());
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
-      log.error("error evaluating global policy", e);
+      throw new JPPFRuntimeException("error evaluating global policy", e);
     }
-    return operator.evaluate(nbNodes, expectedNodes);
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append('<').append(XML_ELT);
-        sb.append(" operator=\"").append(operator.name()).append("\" expected=\"").append(expectedNodes).append("\">\n");
-        if (nodePolicy != null) {
-          toStringIndent++;
-          sb.append(nodePolicy.toString());
-          toStringIndent--;
-        }
-        sb.append(indent()).append("</").append(XML_ELT).append(">\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent(n)).append('<').append(XML_TAG);
+    sb.append(" operator=\"").append(operator.name()).append("\" expected=\"").append(expectedNodes.getExpression().replace("\"", "&quot;")).append("\">\n");
+    if (nodePolicy != null) sb.append(nodePolicy.toString(n + 1));
+    sb.append(indent(n)).append("</").append(XML_TAG).append(">\n");
+    return sb.toString();
   }
 
   @Override

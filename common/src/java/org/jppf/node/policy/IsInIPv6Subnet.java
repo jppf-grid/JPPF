@@ -17,12 +17,9 @@
  */
 package org.jppf.node.policy;
 
-import java.net.*;
-import java.util.*;
+import java.util.Collection;
 
 import org.jppf.net.IPv6AddressNetmask;
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>IPv6 is in Subnet string</i>.
@@ -39,36 +36,11 @@ import org.slf4j.*;
  * @author Daniel Widdis
  * @since 4.2
  */
-public class IsInIPv6Subnet extends ExecutionPolicy {
-
+public class IsInIPv6Subnet extends AbstractIsInIPSubnet<IPv6AddressNetmask> {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(IsInIPv6Subnet.class);
-  /**
-   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Name of the tag used in the XML representation of this policy.
-   */
-  private static final String TAG = IsInIPv6Subnet.class.getSimpleName();
-  /**
-   * Name of the nested subnet mask elements used in the XML representation of this policy.
-   */
-  private static final String SUBNET = "Subnet";
-  /**
-   * String value(s) to test for subnet membership
-   */
-  private String[] subnets = null;
-  /**
-   * Cached list of netmasks, lazily computed.
-   */
-  private transient List<IPv6AddressNetmask> netmasks;
 
   /**
    * Define a membership test using ipv6.addresses property to determine if a
@@ -80,8 +52,7 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
    *        defined in {@link org.jppf.net.IPv6AddressPattern IPv6AddressPattern}
    */
   public IsInIPv6Subnet(final String... subnets) {
-    if ((subnets == null) || (subnets.length <= 0)) throw new IllegalArgumentException("at least one IPv6 subnet must be specified");
-    this.subnets = subnets;
+    super(subnets);
   }
 
   /**
@@ -94,68 +65,16 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
    *        defined in {@link org.jppf.net.IPv6AddressPattern IPv6AddressPattern}
    */
   public IsInIPv6Subnet(final Collection<String> subnets) {
-    if ((subnets == null) || (subnets.size() <= 0)) throw new IllegalArgumentException("at least one IPv6 subnet must be specified");
-    this.subnets = subnets.toArray(new String[subnets.size()]);
+    super(subnets);
   }
 
-  /**
-   * Determines whether this policy accepts the specified node.
-   *
-   * @param info
-   *        system information for the node on which the tasks will run if
-   *        accepted.
-   * @return true if the node is accepted, false otherwise.
-   */
   @Override
-  public boolean accepts(final PropertiesCollection<String> info) {
-    // Build list of subnet netmasks
-    synchronized(this) {
-      if (netmasks == null) {
-        netmasks = new ArrayList<>(subnets.length);
-        for (String subnet : subnets) {
-          netmasks.add(new IPv6AddressNetmask(subnet));
-        }
-      }
-    }
-    // Get IP strings from properties
-    // Returns as "localhost|::1 foo.com|1080::8:800:200C:417A"
-    String ipv6 = getProperty(info, "ipv6.addresses");
-
-    // Iterate and check if any are in subnet
-    for (HostIP hip: NetworkUtils.parseAddresses(ipv6)) {
-      // Check IP against each subnet
-      for (IPv6AddressNetmask netmask : netmasks) {
-        try {
-          if (netmask.matches(InetAddress.getByName(hip.ipAddress()))) {
-            return true;
-          }
-        } catch (UnknownHostException e) {
-          String message = "Unknown host '{}' : {}";
-          if (traceEnabled) log.trace(message, hip.ipAddress(), ExceptionUtils.getStackTrace(e));
-          else log.warn(message, hip.ipAddress(), ExceptionUtils.getMessage(e));
-        }
-      }
-    }
-    return false;
+  IPv6AddressNetmask createNetmask(final String pattern) {
+    return new IPv6AddressNetmask(pattern);
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized(ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append(tagStart(TAG)).append('\n');
-        toStringIndent++;
-        for (String subnet: subnets) sb.append(indent()).append(xmlElement(SUBNET, subnet)).append('\n');
-        toStringIndent--;
-        sb.append(indent()).append(tagEnd(TAG)).append('\n');
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  IPType getIPType() {
+    return IPType.IPV6;
   }
 }

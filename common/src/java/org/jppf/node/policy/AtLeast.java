@@ -18,70 +18,42 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.utils.PropertiesCollection;
-
 /**
- * An execution policy rule that encapsulates a test of type <i>{@literal property_value >= value}</i>.
+ * An execution policy rule that encapsulates a test of type <i>{@code property_value_or_expression >= a}</i>.
  * The test applies to numeric values only.
  * @author Laurent Cohen
  */
-public class AtLeast extends ExecutionPolicy {
+public class AtLeast extends BinaryNumericRule {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The name of the property to compare.
-   */
-  private String propertyName = null;
-  /**
-   * A numeric value to compare with.
-   */
-  private Number numberValue = null;
 
   /**
    * Define a comparison between the numeric value of a property and another numeric value.
-   * @param propertyName the name of the property to compare.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param a the value to compare with.
    */
-  public AtLeast(final String propertyName, final double a) {
-    this.propertyName = propertyName;
-    this.numberValue = a;
+  public AtLeast(final String propertyNameOrExpression, final double a) {
+    super(propertyNameOrExpression, a);
   }
 
   /**
-   * Determines whether this policy accepts the specified node.
-   * @param info system information for the node on which the tasks will run if accepted.
-   * @return true if the node is accepted, false otherwise.
+   * Define a comparison between the numeric value of a property and another numeric value.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param a an expression, possibly a literal, which resolves to a numeric value.
    */
-  @Override
-  public boolean accepts(final PropertiesCollection<String> info) {
-    try {
-      String s = getProperty(info, propertyName);
-      if (numberValue != null) return Double.valueOf(s).doubleValue() >= numberValue.doubleValue();
-    } catch (@SuppressWarnings("unused") Exception e) {
-    }
-    return false;
+  public AtLeast(final String propertyNameOrExpression, final String a) {
+    super(propertyNameOrExpression, a);
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append("<AtLeast>\n");
-        toStringIndent++;
-        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-        sb.append(indent()).append("<Value>").append(numberValue).append("</Value>\n");
-        toStringIndent--;
-        sb.append(indent()).append("</AtLeast>\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  boolean accepts(final double a, final double b) {
+    return a >= b;
+  }
+
+  @Override
+  String getTag() {
+    return "AtLeast";
   }
 }

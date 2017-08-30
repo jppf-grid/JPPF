@@ -17,12 +17,9 @@
  */
 package org.jppf.node.policy;
 
-import java.net.*;
-import java.util.*;
+import java.util.Collection;
 
 import org.jppf.net.IPv4AddressNetmask;
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>IPv4 is in
@@ -35,40 +32,15 @@ import org.slf4j.*;
  * &lt;/IsInIPv4Subnet&gt;</pre>
  * where each <i>subnet-i</i> is a subnet expressed either in <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> notation
  * or in the representation described in {@link org.jppf.net.IPv4AddressPattern IPv4AddressPattern}.
- * 
+ *
  * @author Daniel Widdis
  * @since 4.2
  */
-public class IsInIPv4Subnet extends ExecutionPolicy {
-
+public class IsInIPv4Subnet extends AbstractIsInIPSubnet<IPv4AddressNetmask> {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(IsInIPv6Subnet.class);
-  /**
-   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Name of the tag used in the XML representation of this policy.
-   */
-  private static final String TAG = IsInIPv4Subnet.class.getSimpleName();
-  /**
-   * Name of the nested subnet mask elements used in the XML representation of this policy.
-   */
-  private static final String SUBNET = "Subnet";
-  /**
-   * String value(s) to test for subnet membership
-   */
-  private final String[] subnets;
-  /**
-   * Cached list of netmasks, lazily computed.
-   */
-  private transient List<IPv4AddressNetmask> netmasks;
 
   /**
    * Define a membership test using ipv4.addresses property to determine if a
@@ -79,8 +51,7 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
    *        {@link org.jppf.net.IPv4AddressPattern IPv4AddressPattern}
    */
   public IsInIPv4Subnet(final String... subnets) {
-    if ((subnets == null) || (subnets.length <= 0)) throw new IllegalArgumentException("at least one IPv4 subnet must be specified");
-    this.subnets = subnets;
+    super(subnets);
   }
 
   /**
@@ -92,64 +63,16 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
    *        {@link org.jppf.net.IPv4AddressPattern IPv4AddressPattern}
    */
   public IsInIPv4Subnet(final Collection<String> subnets) {
-    if ((subnets == null) || (subnets.size() <= 0)) throw new IllegalArgumentException("at least one IPv4 subnet must be specified");
-    this.subnets = subnets.toArray(new String[subnets.size()]);
+    super(subnets);
   }
 
-  /**
-   * Determines whether this policy accepts the specified node.
-   * @param info system information for the node on which the tasks will run if accepted.
-   * @return true if the node is accepted, false otherwise.
-   */
   @Override
-  public boolean accepts(final PropertiesCollection<String> info) {
-    // Build list of subnet netmasks
-    synchronized(this) {
-      if (netmasks == null) {
-        netmasks = new ArrayList<>(subnets.length);
-        for (String subnet : subnets) {
-          netmasks.add(new IPv4AddressNetmask(subnet));
-        }
-      }
-    }
-    // Get IP strings from properties
-    // Returns as "foo.com|1.2.3.4 bar.org|5.6.7.8"
-    String ipv4 = getProperty(info, "ipv4.addresses");
-
-    for (HostIP hip: NetworkUtils.parseAddresses(ipv4)) {
-      // Check IP against each subnet
-      for (IPv4AddressNetmask netmask : netmasks) {
-        try {
-          if (netmask.matches(InetAddress.getByName(hip.ipAddress()))) {
-            return true;
-          }
-        } catch (UnknownHostException e) {
-          String message = "Unknown host '{}' : {}";
-          if (traceEnabled) log.trace(message, hip.ipAddress(), ExceptionUtils.getStackTrace(e));
-          else log.warn(message, hip.ipAddress(), ExceptionUtils.getMessage(e));
-        }
-      }
-    }
-    return false;
+  IPv4AddressNetmask createNetmask(final String pattern) {
+    return new IPv4AddressNetmask(pattern);
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized(ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append(tagStart(TAG)).append('\n');
-        toStringIndent++;
-        for (String subnet: subnets) sb.append(indent()).append(xmlElement(SUBNET, subnet)).append('\n');
-        toStringIndent--;
-        sb.append(indent()).append(tagEnd(TAG)).append('\n');
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  IPType getIPType() {
+    return IPType.IPV4;
   }
 }

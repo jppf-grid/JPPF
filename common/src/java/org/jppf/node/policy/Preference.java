@@ -20,7 +20,6 @@ package org.jppf.node.policy;
 
 import java.util.List;
 
-import org.jppf.node.policy.ExecutionPolicy.LogicalRule;
 import org.jppf.utils.PropertiesCollection;
 
 /**
@@ -49,22 +48,13 @@ public class Preference extends LogicalRule {
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
     for (ExecutionPolicy policy: children) {
-      if ((policy == null) || policy.accepts(info)) return true;
+      if ((policy == null) || policy.evaluate(info)) return true;
     }
     return false;
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized(ExecutionPolicy.class) {
-        computedToString = new StringBuilder().append(indent()).append("<Preference>\n").append(super.toString()).append(indent()).append("</Preference>\n").toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    return new StringBuilder().append(indent(n)).append("<Preference>\n").append(super.toString(n)).append(indent(n)).append("</Preference>\n").toString();
   }
 }

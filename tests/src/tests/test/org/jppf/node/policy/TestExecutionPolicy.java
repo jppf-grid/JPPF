@@ -51,7 +51,6 @@ public class TestExecutionPolicy extends BaseTest {
   private static JPPFSystemInformation systemInfo;
 
   /**
-   * 
    * @throws Exception if any error occurs.
    */
   @BeforeClass
@@ -61,11 +60,18 @@ public class TestExecutionPolicy extends BaseTest {
       .setInt("int.1", 1)
       .setInt("int.2", 2)
       .setInt("int.3", 3)
+      .setInt("int.10", 10)
+      .setString("string", "string")
+      .setString("string.tr", "tr")
+      .setString("string.ue", "ue")
       .setString("string.1", "string1")
+      .setString("string.1a", "stri")
+      .setString("string.1b", "ng1")
       .setString("string.2", "string2")
       .setString("string.3", "string3")
       .setString("string.4a", "string4")
       .setString("string.4b", "stRIng4")
+      .setString("string.5", "string1-string2")
       .setBoolean("boolean.1", true)
       .setBoolean("boolean.2", false);
     systemInfo.addProperties("test", test);
@@ -124,8 +130,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new Equal("string.4a", true, "string51"), false);
     checkPolicy(new Equal("string.4b", true, "string4"), true);
     checkPolicy(new Equal("string.4b", false, "string4"), false);
-    checkPolicy(new Equal("string.4b", false, "stRIng4"), true);
+    checkPolicy(new Equal("string.4b", true, "stRIng4"), true);
     checkPolicy(new Equal("string.4b", true, "string51"), false);
+    checkPolicy(new Equal("$script{ '${string}' + 4; }$", true, "string4"), true);
+    checkPolicy(new Equal("$script{ '${string}' + 4; }$", true, "${string.4a}"), true);
   }
 
   /**
@@ -137,12 +145,14 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new Equal("boolean.1", false), false);
     checkPolicy(new Equal("boolean.2", true), false);
     checkPolicy(new Equal("boolean.2", false), true);
+    checkPolicy(new Equal(ValueType.BOOLEAN, "$script{ '${string.tr}' + '${string.ue}'; }$", "${boolean.1}"), true);
   }
 
   /**
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  //@Test(timeout=5000)
+  @Test
   public void testEqualNumeric() throws Exception {
     checkPolicy(new Equal("int.1", 1), true);
     checkPolicy(new Equal("int.1", 2), false);
@@ -152,6 +162,7 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new Equal("int.1", 2f), false);
     checkPolicy(new Equal("int.1", 1d), true);
     checkPolicy(new Equal("int.1", 2d), false);
+    checkPolicy(new Equal(ValueType.NUMERIC, "$script{ ${int.1} + ${int.2}; }$", "${int.3}"), true);
   }
 
   /**
@@ -163,6 +174,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new BetweenII("int.3", 3, 6), true);
     checkPolicy(new BetweenII("int.3", 0, 3), true);
     checkPolicy(new BetweenII("int.3", 4, 6), false);
+    checkPolicy(new BetweenII("int.3", "$script{ ${int.1} + ${int.2}; }$", 6), true);
+    checkPolicy(new BetweenII("int.3", 0, "$script{ ${int.1} + ${int.2}; }$"), true);
+    checkPolicy(new BetweenII("int.3", "$script{ ${int.1} + ${int.2}; }$", "$script{ ${int.10} / 2; }$"), true);
+    checkPolicy(new BetweenII("int.3", "$script{ ${int.1} + ${int.3}; }$", "$script{ ${int.10} / 2; }$"), false);
   }
 
   /**
@@ -174,6 +189,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new BetweenIE("int.3", 3, 6), true);
     checkPolicy(new BetweenIE("int.3", 0, 3), false);
     checkPolicy(new BetweenIE("int.3", 4, 6), false);
+    checkPolicy(new BetweenIE("int.3", "$script{ ${int.1} + ${int.2}; }$", 6), true);
+    checkPolicy(new BetweenIE("int.3", 0, "$script{ ${int.1} + ${int.2}; }$"), false);
+    checkPolicy(new BetweenIE("int.3", "$script{ ${int.1} + ${int.2}; }$", "$script{ ${int.10} / 2; }$"), true);
+    checkPolicy(new BetweenIE("int.3", "$script{ ${int.1} + ${int.3}; }$", "$script{ ${int.10} / 2; }$"), false);
   }
 
   /**
@@ -185,6 +204,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new BetweenEI("int.3", 3, 6), false);
     checkPolicy(new BetweenEI("int.3", 0, 3), true);
     checkPolicy(new BetweenEI("int.3", 4, 6), false);
+    checkPolicy(new BetweenEI("int.3", "$script{ ${int.1} + ${int.2}; }$", 6), false);
+    checkPolicy(new BetweenEI("int.3", 0, "$script{ ${int.1} + ${int.2}; }$"), true);
+    checkPolicy(new BetweenEI("int.3", "$script{ ${int.1} + 1; }$", "$script{ ${int.10} / 2; }$"), true);
+    checkPolicy(new BetweenEI("int.3", "$script{ ${int.1} + ${int.3}; }$", "$script{ ${int.10} / 2; }$"), false);
   }
 
   /**
@@ -196,6 +219,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new BetweenEE("int.3", 3, 6), false);
     checkPolicy(new BetweenEE("int.3", 0, 3), false);
     checkPolicy(new BetweenEE("int.3", 4, 6), false);
+    checkPolicy(new BetweenEE("int.3", "$script{ ${int.1} + ${int.2}; }$", 6), false);
+    checkPolicy(new BetweenEE("int.3", 0, "$script{ ${int.1} + ${int.2}; }$"), false);
+    checkPolicy(new BetweenEE("int.3", "$script{ ${int.1} + 1; }$", "$script{ ${int.10} / 2; }$"), true);
+    checkPolicy(new BetweenEE("int.3", "$script{ ${int.1} + ${int.3}; }$", "$script{ ${int.10} / 2; }$"), false);
   }
 
   /**
@@ -206,6 +233,9 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new AtLeast("int.2", 1), true);
     checkPolicy(new AtLeast("int.2", 2), true);
     checkPolicy(new AtLeast("int.2", 3), false);
+    checkPolicy(new AtLeast("int.3", "$script{ ${int.1} + ${int.2}; }$"), true);
+    checkPolicy(new AtLeast("int.10", "$script{ ${int.3} * 2 + ${int.1}; }$"), true);
+    checkPolicy(new AtLeast("int.3", "$script{ ${int.1} + ${int.2} + 4; }$"), false);
   }
 
   /**
@@ -216,6 +246,9 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new AtMost("int.2", 3), true);
     checkPolicy(new AtMost("int.2", 2), true);
     checkPolicy(new AtMost("int.2", 1), false);
+    checkPolicy(new AtMost("int.3", "$script{ ${int.1} + ${int.2}; }$"), true);
+    checkPolicy(new AtMost("int.3", "$script{ ${int.1} + ${int.2} + 4; }$"), true);
+    checkPolicy(new AtMost("int.3", "$script{ ${int.1} + 1; }$"), false);
   }
 
   /**
@@ -226,6 +259,9 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new MoreThan("int.2", 1), true);
     checkPolicy(new MoreThan("int.2", 2), false);
     checkPolicy(new MoreThan("int.2", 3), false);
+    checkPolicy(new MoreThan("int.3", "$script{ ${int.1} + ${int.2}; }$"), false);
+    checkPolicy(new MoreThan("int.3", "$script{ ${int.1} + ${int.2} + 4; }$"), false);
+    checkPolicy(new MoreThan("int.3", "$script{ ${int.1} + 1; }$"), true);
   }
 
   /**
@@ -236,6 +272,9 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new LessThan("int.2", 3), true);
     checkPolicy(new LessThan("int.2", 2), false);
     checkPolicy(new LessThan("int.2", 1), false);
+    checkPolicy(new LessThan("int.10", "$script{ ${int.3} * 4; }$"), true);
+    checkPolicy(new LessThan("int.10", "$script{ ${int.1} + ${int.2} + 4; }$"), false);
+    checkPolicy(new LessThan("int.3", "$script{ ${int.1} + ${int.2}; }$"), false);
   }
 
   /**
@@ -247,6 +286,10 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new Contains("string.4a", false, "ring"), true);
     checkPolicy(new Contains("string.4b", false, "ring"), false);
     checkPolicy(new Contains("string.4b", false, "RIng"), true);
+    checkPolicy(new Contains("string.1", false, "$script{ '${string.1a}' + '${string.1b}'; }$"), true);
+    checkPolicy(new Contains("string.1", false, "$script{ 'st' + 'ri'; }$"), true);
+    checkPolicy(new Contains("string.1", false, "$script{ 'ST' + 'ri'; }$"), false);
+    checkPolicy(new Contains("string.1", true, "$script{ 'ST' + 'ri'; }$"), true);
   }
 
   /**
@@ -258,6 +301,11 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new OneOf("string.4a", true, "1", "stRING4", "3"), true);
     checkPolicy(new OneOf("string.4a", true, "1", "4", "3"), false);
     checkPolicy(new OneOf("string.4a", false, "1", "stRING4", "3"), false);
+    checkPolicy(new OneOf("string.5", true, "${string.1}", "string1-string2", "4", "3"), true);
+    checkPolicy(new OneOf("string.5", false, "${string.1}", "string1-STRING2", "4", "3"), false);
+    checkPolicy(new OneOf("string.5", true, "${string.1}", "string1-STRING2", "4", "3"), true);
+    checkPolicy(new OneOf("string.5", true, "1", "${string.1}-${string.2}", "3"), true);
+    checkPolicy(new OneOf("string.5", true, "1", "$script{ '${string.1}' + '-' + '${string.2}'; }$", "3"), true);
   }
 
   /**
@@ -270,6 +318,8 @@ public class TestExecutionPolicy extends BaseTest {
     checkPolicy(new OneOf("int.2", 0, 1, 2f, 4), true);
     checkPolicy(new OneOf("int.2", 0, 1, 2d, 4), true);
     checkPolicy(new OneOf("int.2", 0, 1, 3d, 4), false);
+    checkPolicy(new OneOf("int.2", "$script{ ${int.1} + 1; }$", "3", "$script{ ${int.1} + ${int.3}; }$", "5"), true);
+    checkPolicy(new OneOf("int.2", "3", "$script{ ${int.1} + ${int.3}; }$"), false);
   }
 
   /**

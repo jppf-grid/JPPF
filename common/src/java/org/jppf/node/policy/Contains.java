@@ -21,37 +21,33 @@ package org.jppf.node.policy;
 import org.jppf.utils.PropertiesCollection;
 
 /**
- * An execution policy rule that encapsulates a test of type <i>property_value contains string</i>.
+ * An execution policy rule that encapsulates a test of type <i>{@code property_value_or_expression contains a}</i>.
  * The test applies to string values only.
  * @author Laurent Cohen
  */
-public class Contains extends ExecutionPolicy {
+public class Contains extends LeftOperandRule {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The name of the property to compare.
-   */
-  private String propertyName = null;
-  /**
    * A string value to compare with.
    */
-  private String value = null;
+  private Expression<String> value = null;
   /**
    * Determines if the comparison should ignore the string case.
    */
   private boolean ignoreCase = false;
 
   /**
-   * Define an equality comparison between the string value of a property and another string value.
-   * @param propertyName the name of the property to compare.
+   * Define an contains test between the string value of a property and another string value.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
    */
-  public Contains(final String propertyName, final boolean ignoreCase, final String a) {
-    this.propertyName = propertyName;
-    this.value = a;
+  public Contains(final String propertyNameOrExpression, final boolean ignoreCase, final String a) {
+    super(ValueType.STRING, propertyNameOrExpression);
+    this.value = new StringExpression(a);
     this.ignoreCase = ignoreCase;
   }
 
@@ -62,31 +58,19 @@ public class Contains extends ExecutionPolicy {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
+    String value = this.value.evaluate(info);
     if (value == null) return false;
-    String s = getProperty(info, propertyName);
+    String s = (String) getLeftOperandValue(info);
     if (s == null) return false;
     if (ignoreCase) return s.toLowerCase().contains(value.toLowerCase());
     return s.contains(value);
   }
 
-  /**
-   * Print this object to a string.
-   * @return an XML string representation of this object
-   */
   @Override
-  public String toString() {
-    if (computedToString == null) {
-      synchronized (ExecutionPolicy.class) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indent()).append("<Contains ignoreCase=\"").append(ignoreCase).append("\">\n");
-        toStringIndent++;
-        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-        sb.append(indent()).append("<Value>").append(value).append("</Value>\n");
-        toStringIndent--;
-        sb.append(indent()).append("</Contains>\n");
-        computedToString = sb.toString();
-      }
-    }
-    return computedToString;
+  public String toString(final int n) {
+    return new StringBuilder(indent(n)).append("<Contains ignoreCase=\"").append(ignoreCase).append("\">\n")
+      .append(indent(n + 1)).append("<Property>").append(leftOperand.getExpression()).append("</Property>\n")
+      .append(indent(n + 1)).append("<Value>").append(value.getExpression()).append("</Value>\n")
+      .append(indent(n)).append("</Contains>\n").toString();
   }
 }
