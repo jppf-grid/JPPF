@@ -155,6 +155,8 @@
         <include name="*.jpg"/>
       </fileset>
     </copy>
+    <favicon javadoc.dir="${javadoc}"/>
+    <!-- create API doc zip -->
     <property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
     <delete file="${javadoc.file}" quiet="true"/>
     <zip destfile="${javadoc.file}">
@@ -177,6 +179,23 @@
       <tar destfile="${docs}/${filename}.tar.gz" compression="gzip">
         <tarfileset prefix="@{vname}" dir="${home}/@{dir}/@{vname}" includes="**/*.*, package-list"/>
       </tar>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Add a link to JPPF favicon in all javadoc HTML pages.
+    Attributes:
+      "javadoc.dir" the root javadoc folder
+  -->
+  <macrodef name="favicon">
+    <attribute name="javadoc.dir"/>
+    <sequential>
+      <replace dir="@{javadoc.dir}">
+        <include name="**/*.html"/>
+        <replacetoken><![CDATA[</head>]]></replacetoken>
+        <replacevalue><![CDATA[<link rel="shortcut icon" href="http://www.jppf.org/images/jppf-icon.ico" type="image/x-icon">
+      </head>]]></replacevalue>
+      </replace>
     </sequential>
   </macrodef>
 
