@@ -297,31 +297,39 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * @throws Exception if the invocation failed.
    */
   private Map<String, Object> forward(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...otherParams) throws Exception {
-    int size = nodes.size();
-    final Map<String, Object> map = new HashMap<>(size);
-    CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
-    for (AbstractNodeContext node: nodes) {
-      AbstractForwardingTask task = null;
-      switch(type) {
-        case INVOKE_METHOD:
-          task = new InvokeMethodTask(node, mbeanName, memberName, (Object[]) otherParams[0], (String[]) otherParams[1]);
-          break;
-        case GET_ATTRIBUTE:
-          task = new GetAttributeTask(node, mbeanName, memberName);
-          break;
-        case SET_ATTRIBUTE:
-          task = new SetAttributeTask(node, mbeanName, memberName, otherParams[0]);
-          break;
-        default:
-          continue;
+    try {
+      int size = nodes.size();
+      final Map<String, Object> map = new HashMap<>(size);
+      CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
+      for (AbstractNodeContext node: nodes) {
+        AbstractForwardingTask task = null;
+        switch(type) {
+          case INVOKE_METHOD:
+            task = new InvokeMethodTask(node, mbeanName, memberName, (Object[]) otherParams[0], (String[]) otherParams[1]);
+            break;
+          case GET_ATTRIBUTE:
+            task = new GetAttributeTask(node, mbeanName, memberName);
+            break;
+          case SET_ATTRIBUTE:
+            task = new SetAttributeTask(node, mbeanName, memberName, otherParams[0]);
+            break;
+          default:
+            continue;
+        }
+        completionService.submit(task);
       }
-      completionService.submit(task);
+      for (int i=0; i<size; i++) {
+        Future<Pair<String, Object>> f = completionService.take();
+        Pair<String, Object> result = f.get();
+        if (result != null) map.put(result.first(), result.second());
+      }
+      return map;
+    } catch (Exception e) {
+      if (debugEnabled) {
+        log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
+          type, nodes.size(), mbeanName, memberName, Arrays.asList(otherParams), ExceptionUtils.getStackTrace(e)));
+      }
+      throw e;
     }
-    for (int i=0; i<size; i++) {
-      Future<Pair<String, Object>> f = completionService.take();
-      Pair<String, Object> result = f.get();
-      if (result != null) map.put(result.first(), result.second());
-    }
-    return map;
   }
 }

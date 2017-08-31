@@ -125,6 +125,7 @@ public class TestExecutionPolicy extends BaseTest {
   @Test(timeout=5000)
   public void testEqualString() throws Exception {
     checkPolicy(new Equal("string.4a", true, "string4"), true);
+    checkPolicy(new Equal("string.4a", false, "string4"), true);
     checkPolicy(new Equal("string.4a", true, "STRING4"), true);
     checkPolicy(new Equal("string.4a", false, "STRING4"), false);
     checkPolicy(new Equal("string.4a", true, "string51"), false);

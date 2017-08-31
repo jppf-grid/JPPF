@@ -28,8 +28,11 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.TypedProperties;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Unit tests for {@link JPPFDriverAdminMBean}.
@@ -57,6 +60,14 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
    * 
    */
   protected static LoadBalancingInformation oldLbi = null;
+  /** */
+  @Rule
+  public TestWatcher setup1D2N1CWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
 
   /**
    * Launches a driver and node and start the client.

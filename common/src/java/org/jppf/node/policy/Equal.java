@@ -113,7 +113,7 @@ public class Equal extends LeftOperandRule {
   public boolean accepts(final PropertiesCollection<String> info) {
     Object o = getLeftOperandValue(info);
     if (numberValue != null) return (o == null) ? false : o.equals(numberValue.evaluate(info));
-    else if (stringValue != null)return ignoreCase ? stringValue.evaluate(info).equalsIgnoreCase((String) o) : stringValue.equals(o);
+    else if (stringValue != null) return ignoreCase ? stringValue.evaluate(info).equalsIgnoreCase((String) o) : stringValue.evaluate(info).equals(o);
     else if (booleanValue != null) return (o == null) ? false : o.equals(booleanValue.evaluate(info));
     else return o == null;
   }
