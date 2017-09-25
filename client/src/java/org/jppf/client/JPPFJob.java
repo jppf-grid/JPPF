@@ -80,6 +80,18 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
+   * Add the specified tasks to this job in a bulk operation.
+   * @param tasks the list of tasks to add.
+   * @throws JPPFException if any error occurs.
+   * @since 6.0
+   */
+  public void addAll(final List<Task<?>> tasks)  throws JPPFException {
+    int pos = this.tasks.size();
+    for (Task<?> task: tasks) task.setPosition(pos++);
+    this.tasks.addAll(tasks);
+  }
+
+  /**
    * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.node.protocol.Task Task},
    * annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
    * @param taskObject the task to add to this job.
