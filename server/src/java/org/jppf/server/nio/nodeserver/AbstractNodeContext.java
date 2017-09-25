@@ -79,13 +79,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Determines whether the node is active or inactive.
    */
-  private AtomicBoolean active = new AtomicBoolean(true);
+  private final AtomicBoolean active = new AtomicBoolean(true);
   /**
    * Performs all operations that relate to channel states.
    */
   private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
   /**
-   * Provides access to the management functions of the driver.
+   * Provides access to the management functions of the node.
    */
   protected JMXNodeConnectionWrapper jmxConnection = null;
   /**
@@ -107,7 +107,15 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Determines whether the node is idle or not.
    */
-  AtomicBoolean idle = new AtomicBoolean(false);
+  final AtomicBoolean idle = new AtomicBoolean(false);
+  /**
+   * Unique node identfier reusable over node restarts.
+   */
+  Pair<String, String> nodeIdentifier;
+  /**
+   * The algrithm name for the bundler.
+   */
+  String bundlerAlgorithm;
 
   /**
    * Initialized abstract node context.
@@ -147,29 +155,22 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     this.bundler = bundler;
   }
 
-  /**
-   * Check whether the bundler held by this context is up to date by comparison with the specified bundler.<br>
-   * If it is not, then it is replaced with a copy of the specified bundler, with a timestamp taken at creation time.
-   * @param factory the factory obec tthat creates {@link Bundler} instances.
-   * @param jppfContext execution context.
-   * @return true if the bundler is up to date, false if it wasn't and has been updated.
-   */
-  @SuppressWarnings("deprecation")
   @Override
-  public boolean checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
+  public Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
     if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
-    if (this.bundler == null || this.bundler.getTimestamp() < factory.getLastUpdateTime()) {
-      if (this.bundler != null) {
+    if (bundler == null || this.bundler.getTimestamp() < factory.getLastUpdateTime()) {
+      if (bundler != null) {
         this.bundler.dispose();
-        if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
+        if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
       }
-      this.bundler = factory.newBundler();
-      if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
-      this.bundler.setup();
-      if (this.bundler instanceof ChannelAwareness) ((ChannelAwareness) this.bundler).setChannelConfiguration(systemInfo);
-      return true;
+      Pair<String, Bundler<?>> pair = JPPFDriver.getInstance().getNodeNioServer().getBundlerHandler().loadBundler(nodeIdentifier);
+      bundler = pair.second();
+      bundlerAlgorithm = pair.first();
+      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(jppfContext);
+      bundler.setup();
+      if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
     }
-    return false;
+    return bundler;
   }
 
   @Override
@@ -232,7 +233,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   void cleanup() {
     if (debugEnabled) log.debug("handling cleanup for {}", channel);
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
-    //if (shouldRemoveReservation) server.getNodeReservationHandler().removeReservation(this);
     if (reservationTansition == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
     Bundler<?> bundler = getBundler();
     if (bundler != null) {
@@ -256,9 +256,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (!taskBundle.isHandshake()) {
       taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
-      else {
-        if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
-      }
+      else if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
     }
     message.addLocation(IOHelper.serializeData(taskBundle, JPPFDriver.getSerializer()));
     message.addLocation(bundle.getDataProvider());
@@ -385,15 +383,14 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     jmxConnection = null;
     peerJmxConnection = null;
     if (jmx != null) {
-      Runnable r = new Runnable() {
+      new Thread(new Runnable() {
         @Override public void run() {
           try {
             jmx.close();
           } catch (@SuppressWarnings("unused") Exception ignore) {
           }
         }
-      };
-      new Thread(r).start();
+      }).start();
     }
   }
 
@@ -498,10 +495,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
-  /**
-   * Determine whether the node is active or inactive.
-   * @return <code>true</code> if the node is active, <code>false</code> if it is inactive.
-   */
   @Override
   public boolean isActive() {
     return active.get();
@@ -556,5 +549,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void unclose() {
     closed.set(false);
+  }
+
+  /**
+   * @return a unique node identfier reusable over node restarts.
+   */
+  public Pair<String, String> getNodeIdentifier() {
+    return nodeIdentifier;
   }
 }

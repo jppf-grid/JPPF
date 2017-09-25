@@ -42,11 +42,6 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestConnectionPool extends Setup1D1N {
   /**
-   * The JPPF client.
-   */
-  private static JPPFClient client = null;
-
-  /**
    * Reset the confiugration.
    * @throws Exception if any error occurs
    */

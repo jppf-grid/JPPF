@@ -22,6 +22,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jppf.client.JPPFClient;
 import org.jppf.location.FileLocation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
@@ -42,6 +43,8 @@ public class BaseTest {
   private static Logger log = LoggerFactory.getLogger("TEST");
   /** */
   private static PrintStream stdOut, stdErr;
+  /** */
+  protected static JPPFClient client;
   /** */
   private static FileFilter logFileFilter = new FileFilter() {
     @Override
@@ -249,6 +252,7 @@ public class BaseTest {
     protected void finished(final Description description) {
       print("***** finished class %s *****", description.getClassName());
       try {
+        //if (client != null) BaseSetup.generateDriverThreadDump(client);
         // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) {
           PrintStream tmp = System.out;

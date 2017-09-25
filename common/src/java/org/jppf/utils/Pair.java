@@ -71,6 +71,22 @@ public class Pair<U, V> implements Serializable {
     return second;
   }
 
+  /**
+   * Get the left-side value of this pair.
+   * @return an object of type U.
+   */
+  public U left() {
+    return first;
+  }
+
+  /**
+   * Get the right-side value of this pair.
+   * @return an object of type V.
+   */
+  public V right() {
+    return second;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;

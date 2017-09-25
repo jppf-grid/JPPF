@@ -52,10 +52,6 @@ public class TestTaskCancellation extends BaseTest {
    * Used to test JPPFTask.compute(JPPFCallable) in method {@link #testComputeCallable()}.
    */
   static String callableResult = "";
-  /**
-   * The JPPF client to use.
-   */
-  private static JPPFClient client;
   /** */
   private final ExecutionPolicy localPolicy = new Equal("jppf.channel.local", true);
 

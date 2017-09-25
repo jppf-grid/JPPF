@@ -304,13 +304,12 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * Perform the checks on the bundler before submitting a job.
    * @param taskBundle the job.
-   * @param context    the current node context.
+   * @param channel    the current node context.
    */
-  @SuppressWarnings("deprecation")
-  private void updateBundler(final JPPFJob taskBundle, final ChannelWrapper context) {
-    context.checkBundler(bundlerFactory, jppfContext);
-    if (context.getBundler() instanceof JobAwareness) {
-      ((JobAwareness) context.getBundler()).setJob(taskBundle);
+  private void updateBundler(final JPPFJob taskBundle, final ChannelWrapper channel) {
+    channel.checkBundler(bundlerFactory, jppfContext);
+    if (channel.getBundler() instanceof JobAwareness) {
+      ((JobAwareness) channel.getBundler()).setJob(taskBundle);
     }
   }
 

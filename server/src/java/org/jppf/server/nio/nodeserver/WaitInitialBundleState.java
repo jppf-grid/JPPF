@@ -23,11 +23,9 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.net.*;
-import java.nio.channels.SocketChannel;
 
-import org.jppf.load.balancer.*;
 import org.jppf.management.*;
-import org.jppf.nio.*;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
@@ -72,7 +70,6 @@ class WaitInitialBundleState extends NodeServerState {
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception  {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    //if (debugEnabled) log.debug("exec() for " + channel);
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("received handshake response for channel id = {}", context.getChannel().getId());
@@ -84,22 +81,19 @@ class WaitInitialBundleState extends NodeServerState {
       if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
-      Bundler<?> bundler = server.getBundlerFactory().newBundler();
+      JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
+      context.nodeIdentifier = NodeServerUtils.getNodeIdentifier(server.getBundlerFactory(), channel, systemInfo);
+      if (debugEnabled) log.debug("nodeID = {} for node = {}", context.nodeIdentifier, context);
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
-      JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
       if (systemInfo != null) {
         systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
         systemInfo.getJppf().set(JPPFProperties.NODE_IDLE, true);
         context.setNodeInfo(systemInfo, false);
-        if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
-
-      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
-      bundler.setup();
-      context.setBundler(bundler);
+      context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
-      String host = getChannelHost(channel);
+      String host = NodeServerUtils.getChannelHost(channel);
       HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
       boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
       boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
@@ -154,7 +148,7 @@ class WaitInitialBundleState extends NodeServerState {
    * @since 5.0.2
    */
   private HostIP resolveHost(final ChannelWrapper<?> channel) throws Exception {
-    String host = getChannelHost(channel);
+    String host = NodeServerUtils.getChannelHost(channel);
     String ip = host;
     try {
       InetAddress addr = InetAddress.getByName(host);
@@ -211,22 +205,5 @@ class WaitInitialBundleState extends NodeServerState {
       return null;
     }
     return transition;
-  }
-
-  /**
-   * Extract the remote host name from the specified channel.
-   * @param channel the channel that carries the host information.
-   * @return the remote host name as a string.
-   * @throws Exception if any error occurs.
-   */
-  private String getChannelHost(final ChannelWrapper<?> channel) throws Exception {
-    if (channel instanceof SelectionKeyWrapper) {
-      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
-      SocketChannel ch = (SocketChannel) skw.getChannel().channel();
-      return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
-    } else if (channel.isLocal()) {
-      return "localhost";
-    }
-    return null;
   }
 }

@@ -153,8 +153,9 @@ class WaitingResultsState extends NodeServerState {
         updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
         if (bundler instanceof BundlerEx) {
           long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
-          ((BundlerEx<?>) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
-        } else bundler.feedback(newBundle.getTaskCount(), elapsed);
+          BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+        } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
+        server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
       }
     } finally {
       lock.unlock();

@@ -33,7 +33,6 @@ public class JobPersistenceException extends JPPFException {
    */
   public JobPersistenceException(final String message, final Throwable cause) {
     super(message, cause);
-
   }
 
   /**
@@ -42,7 +41,6 @@ public class JobPersistenceException extends JPPFException {
    */
   public JobPersistenceException(final String message) {
     super(message);
-
   }
 
   /**
@@ -51,6 +49,5 @@ public class JobPersistenceException extends JPPFException {
    */
   public JobPersistenceException(final Throwable cause) {
     super(cause);
-
   }
 }

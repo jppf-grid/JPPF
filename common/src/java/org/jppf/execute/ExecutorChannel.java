@@ -53,22 +53,11 @@ public interface ExecutorChannel<T> extends AutoCloseable {
    * with the specified bundler.<br>
    * If it is not, then it is replaced with a copy of the specified bundler, with a
    * timestamp taken at creation time.
-   * @param serverBundler the bundler to compare with.
-   * @param jppfContext execution context.
-   * @return true if the bundler is up to date, false if it wasn't and has been updated.
-   */
-  //boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext);
-
-  /**
-   * Check whether the bundler held by this context is up to date by comparison
-   * with the specified bundler.<br>
-   * If it is not, then it is replaced with a copy of the specified bundler, with a
-   * timestamp taken at creation time.
    * @param bundlerFactory the load-balancer factory.
    * @param jppfContext execution context.
-   * @return true if the bundler is up to date, false if it wasn't and has been updated.
+   * @return the (possibly new) bundle for this executor channel.
    */
-  boolean checkBundler(final JPPFBundlerFactory bundlerFactory, final JPPFContext jppfContext);
+  Bundler<?> checkBundler(final JPPFBundlerFactory bundlerFactory, final JPPFContext jppfContext);
 
   /**
    * Get the system information.

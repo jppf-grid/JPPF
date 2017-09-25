@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.discovery.TestDriverDiscovery;
+import test.org.jppf.load.balancer.persistence.TestClientDatabaseLoadBalancerPersistence;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,7 +28,7 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestDriverDiscovery.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true,
+  classes={ TestClientDatabaseLoadBalancerPersistence.class })
 public class JPPFSuite {
 }

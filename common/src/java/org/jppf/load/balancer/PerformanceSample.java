@@ -17,13 +17,18 @@
  */
 package org.jppf.load.balancer;
 
+import java.io.Serializable;
+
 /**
  * This is a utility class to be used to store the pair of mean and the
  * number of samples this mean is based on.
  * @exclude
  */
-public class BundlePerformanceSample
-{
+public class PerformanceSample implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Mean compute time for server to node round trip.
    */
@@ -37,8 +42,7 @@ public class BundlePerformanceSample
   /**
    * Default constructor.
    */
-  public BundlePerformanceSample()
-  {
+  public PerformanceSample() {
   }
 
   /**
@@ -46,8 +50,7 @@ public class BundlePerformanceSample
    * @param mean Mean compute time for server to node round trip.
    * @param samples Number of samples used to compute the mean value.
    */
-  public BundlePerformanceSample(final double mean, final long samples)
-  {
+  public PerformanceSample(final double mean, final long samples) {
     this.mean = mean;
     this.samples = samples;
   }

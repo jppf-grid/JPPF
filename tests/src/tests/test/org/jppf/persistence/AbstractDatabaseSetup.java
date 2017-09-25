@@ -77,19 +77,32 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @throws Exception if a process could not be started.
    */
   protected static TestConfiguration dbSetup(final String prefix) throws Exception {
+    return dbSetup(prefix, true);
+  }
+
+  /**
+   * Create and start a H2 server, and create the configuration for the test.
+   * @param prefix prefix to use to locate the configuration files.
+   * @param useDB whether to actuallu start and use a DB server.
+   * @return a {@link TestConfiguration} instance.
+   * @throws Exception if a process could not be started.
+   */
+  protected static TestConfiguration dbSetup(final String prefix, final boolean useDB) throws Exception {
     BaseSetup.setLoggerLevel("org.jppf.persistence", Level.DEBUG);
-    print(false, false, "starting H2 server");
-    h2Server = Server.createTcpServer().start();
-    print(false, false, "H2 server started, creating table");
-    // create the test table
-    Class.forName(DB_DRIVER_CLASS);
-    try (Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD)) {
-      String sql = FileUtils.readTextFile(AbstractDatabaseSetup.class.getPackage().getName().replace('.', '/') + "/create_table.sql");
-      try (PreparedStatement ps = c.prepareStatement(sql)) {
-        ps.executeUpdate();
+    if (useDB) {
+      print(false, false, "starting H2 server");
+      h2Server = Server.createTcpServer().start();
+      print(false, false, "H2 server started, creating table");
+      // create the test table
+      Class.forName(DB_DRIVER_CLASS);
+      try (Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD)) {
+        String sql = FileUtils.readTextFile(AbstractDatabaseSetup.class.getPackage().getName().replace('.', '/') + "/create_table.sql");
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+          ps.executeUpdate();
+        }
       }
+      print(false, false, "table created");
     }
-    print(false, false, "table created");
     TestConfiguration config = createConfig(prefix);
     config.driverClasspath.add("lib/h2.jar");
     return config;
@@ -164,5 +177,4 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
     assertEquals(job.getTaskCount(), job2.getTaskCount());
     if (checkResults) assertEquals(job.getResults().size(), job2.getResults().size());
   }
-
 }

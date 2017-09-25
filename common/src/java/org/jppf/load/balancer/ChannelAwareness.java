@@ -21,7 +21,7 @@ package org.jppf.load.balancer;
 import org.jppf.management.JPPFSystemInformation;
 
 /**
- * Bundler implementations should implement this interface if they wish to have access to a node's configuration.
+ * Concrete {@link Bundler}s should implement this interface if they wish to have access to a node's configuration.
  * @author Laurent Cohen
  */
 public interface ChannelAwareness {

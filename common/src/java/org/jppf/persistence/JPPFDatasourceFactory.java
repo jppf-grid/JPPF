@@ -232,22 +232,7 @@ public final class JPPFDatasourceFactory {
         return (name != null) && name.startsWith(DS_PROP_PREFIX);
       }
     });
-    List<String> ids = new ArrayList<>();
-    for (String name: allDSProps.stringPropertyNames()) {
-      Matcher matcher = DS_NAME_PATTERN.matcher(name);
-      if (matcher.matches()) {
-        String id = matcher.group(1);
-        String s = allDSProps.getString(DS_PROP_PREFIX + id + ".scope", Scope.LOCAL.name());
-        Scope actualScope = Scope.LOCAL;
-        for (Scope sc: Scope.values()) {
-          if (sc.name().equalsIgnoreCase(s)) {
-            actualScope = sc;
-            break;
-          }
-        }
-        if ((actualScope == Scope.ANY) || (actualScope == reqScope)) ids.add(id);
-      }
-    }
+    List<String> ids = getConfigIds(allDSProps, reqScope);
     if (debugEnabled) log.debug("found datasource configuration ids with scope={}: {}", reqScope, ids);
     Map<String, TypedProperties> result = new HashMap<>(ids.size());
     for (final String id: ids) {
@@ -265,7 +250,33 @@ public final class JPPFDatasourceFactory {
   }
 
   /**
-   * Create a datasource from the specified configuration properties. The configId is used to build a prefix for
+   * 
+   * @param allDSProps the configuration properties that define the datasources.
+   * @param reqScope in a driver, determines whether the definitions are intended for the nodes ({@code true}) or for the local JVM ({@code false}).
+   * @return a list of datasource configuration ids, possibly empty but never null.
+   */
+  private List<String> getConfigIds(final TypedProperties allDSProps, final Scope reqScope) {
+    List<String> ids = new ArrayList<>();
+    for (String name: allDSProps.stringPropertyNames()) {
+      Matcher matcher = DS_NAME_PATTERN.matcher(name);
+      if (matcher.matches()) {
+        String id = matcher.group(1);
+        String s = allDSProps.getString(DS_PROP_PREFIX + id + ".scope", Scope.LOCAL.name());
+        Scope actualScope = Scope.LOCAL;
+        for (Scope sc: Scope.values()) {
+          if (sc.name().equalsIgnoreCase(s)) {
+            actualScope = sc;
+            break;
+          }
+        }
+        if ((actualScope == Scope.ANY) || (actualScope == reqScope)) ids.add(id);
+      }
+    }
+    return ids;
+  }
+
+  /**
+   * Create a datasource from the specified configuration properties. The {@code configId} is used to build a prefix for
    * the relevant property names, in the format {@code jppf.datasource.<configId>.<property_name> = <value>}.
    * If configId is {@code null}, then no prefix is applied.
    * @param props the datasource properties.
@@ -277,8 +288,10 @@ public final class JPPFDatasourceFactory {
     String prefix = (configId == null) ? null : DS_PROP_PREFIX + configId + ".";
     String start = (prefix == null) ? "" : prefix;
     final String dsName = props.getProperty(start + "name");
-    synchronized(dsMap) {
-      if ((dsName == null) || (dsMap.containsKey(dsName))) return null;
+    if (dsName == null) return null;
+    if (getDataSource(dsName) != null) {
+      log.warn(String.format("ignoring duplicate definition for datasource '%s' : %s", dsName, props));
+      return null;
     }
     if (info != null) {
       String policyDef = props.getProperty(start + "policy");

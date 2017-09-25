@@ -27,8 +27,7 @@ import org.slf4j.*;
  * When no attempt succeeded, a <code>JPPFError</code> is thrown, and the application should normally exit.
  * @author Laurent Cohen
  */
-public class SocketInitializerImpl extends AbstractSocketInitializer
-{
+public class SocketInitializerImpl extends AbstractSocketInitializer {
   /**
    * Logger for this class.
    */
@@ -41,19 +40,24 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
   private boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * The configuration to use.
+   */
+  private final TypedProperties config;
 
   /**
    * Instantiate this SocketInitializer with a specified socket wrapper.
    */
   public SocketInitializerImpl() {
+    this.config = JPPFConfiguration.getProperties();
   }
 
   /**
    * Instantiate this SocketInitializer with a specified socket wrapper.
-   * @param name the name given to this <code>SocketInitializer</code>, for tracing purposes.
+   * @param config the configuration to use.
    */
-  public SocketInitializerImpl(final String name) {
-    this.name = name;
+  public SocketInitializerImpl(final TypedProperties config) {
+    this.config = config;
   }
 
   /**
@@ -65,17 +69,17 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
   public void initializeSocket(final SocketWrapper socketWrapper) {
     successful = false;
     if (closed) return;
-    if ("".equals(name)) name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
+    name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);
       socketWrapper.close();
     } catch(@SuppressWarnings("unused") Exception e) {
     }
-    long delay = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
+    long delay = 1000L * config.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
     if (delay <= 0L) delay = 1L + rand.nextInt(10);
-    long maxTime = JPPFConfiguration.get(JPPFProperties.RECONNECT_MAX_TIME);
+    long maxTime = config.get(JPPFProperties.RECONNECT_MAX_TIME);
     long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
-    long period = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INTERVAL);
+    long period = 1000L * config.get(JPPFProperties.RECONNECT_INTERVAL);
     if (period <= 0L) period = 1000L;
     goToSleep(delay);
     long elapsed = 0L;

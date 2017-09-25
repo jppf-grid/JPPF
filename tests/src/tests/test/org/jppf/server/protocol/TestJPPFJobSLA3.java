@@ -38,11 +38,6 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJPPFJobSLA3 extends BaseTest {
   /**
-   * The client to use.
-   */
-  private static JPPFClient client = null;
-
-  /**
    * Launches a driver and 1 node and start the client.
    * The node has the classes from server and common mpdules in its classpath.
    * @throws Exception if a process could not be started.

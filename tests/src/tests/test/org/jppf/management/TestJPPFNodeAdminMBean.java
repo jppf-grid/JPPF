@@ -49,11 +49,6 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
   private static JMXDriverConnectionWrapper driverJmx = null;
 
   /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
-
-  /**
    * Launches a driver and node and start the client.
    * @throws Exception if a process could not be started.
    */

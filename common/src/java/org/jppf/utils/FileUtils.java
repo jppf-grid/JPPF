@@ -19,6 +19,8 @@ package org.jppf.utils;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import org.jppf.utils.configuration.JPPFProperties;
@@ -269,16 +271,6 @@ public final class FileUtils {
   }
 
   /**
-   * Get the parent folder of a file or directory from its full path.
-   * @param filePath the path from which to get the parent path.
-   * @return the parent folder path.
-   */
-  public static String getParentFolder(final String filePath) {
-    int idx = getLastFileSeparatorPosition(filePath);
-    return idx >= 0 ? filePath.substring(0, idx) : filePath;
-  }
-
-  /**
    * Get the last position of a file separator in a file path.
    * @param path the path to parse.
    * @return the position as an positive integer, or -1 if no separator was found.
@@ -305,7 +297,6 @@ public final class FileUtils {
       while (true) {
         if (writer == null) {
           String name = file + '.' + count;
-          System.out.println("creating file " + name);
           writer = new BufferedWriter(new FileWriter(name));
         }
         s = reader.readLine();
@@ -324,20 +315,6 @@ public final class FileUtils {
   }
 
   /**
-   * Entry point for the splitTextFile() method.
-   * @param args contains the arguments for the splitTextFile() method.
-   */
-  public static void main(final String...args) {
-    try {
-      int size = Integer.valueOf(args[1]).intValue();
-      splitTextFile(args[0], size);
-      System.out.println("Done");
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
    * Get the content of a file or resource on the classpath as an array of bytes.
    * @param path the path of the file to read from as a string.
    * @return a byte array with the file content.
@@ -345,16 +322,6 @@ public final class FileUtils {
    */
   public static byte[] getPathAsByte(final String path) throws IOException {
     return StreamUtils.getInputStreamAsByte(getFileInputStream(path));
-  }
-
-  /**
-   * Get the content of a file as an array of bytes.
-   * @param path the path of the file to read from as a string.
-   * @return a byte array with the file content.
-   * @throws IOException if an IO error occurs.
-   */
-  public static byte[] getFileAsByte(final String path) throws IOException {
-    return getFileAsByte(new File(path));
   }
 
   /**
@@ -396,28 +363,6 @@ public final class FileUtils {
       }
     }
     return urls;
-  }
-
-  /**
-   * Write a byte array into an output stream.
-   * @param data the byte array to write.
-   * @param os the output stream to write to.
-   * @throws IOException if an I/O error occurs.
-   */
-  public static void writeBytesToStream(final byte[] data, final OutputStream os) throws IOException {
-    ByteArrayInputStream bais = new ByteArrayInputStream(data);
-    StreamUtils.copyStream(bais, os);
-    bais.close();
-  }
-
-  /**
-   * Write a byte array into an file.
-   * @param data the byte array to write.
-   * @param path the path to the file to write to.
-   * @throws IOException if an I/O error occurs.
-   */
-  public static void writeBytesToFile(final byte[] data, final String path) throws IOException {
-    writeBytesToFile(data, new File(path));
   }
 
   /**
@@ -561,5 +506,43 @@ public final class FileUtils {
     int idx = imageName.lastIndexOf('.');
     if (idx <= 0) return new Pair<>(imageName, null);
     return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
+  }
+
+  /**
+   * A file walker that deletes a complete file and folder hierarchy.
+   */
+  public static class DeleteFileVisitor extends SimpleFileVisitor<Path> {
+    /**
+     * Optional path matcher to filter the files to delete.
+     */
+    private final PathMatcher matcher;
+
+    /**
+     * Initialize without a matcher.
+     */
+    public DeleteFileVisitor() {
+      this(null);
+    }
+
+    /**
+     * Initialize with the specified path matcher.
+     * @param matcher anoptional path matcher to filter the files to delete.
+     */
+    public DeleteFileVisitor(final PathMatcher matcher) {
+      this.matcher = matcher;
+    }
+
+    @Override
+    public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+      if ((matcher == null) || matcher.matches(file)) Files.delete(file);
+      return FileVisitResult.CONTINUE;
+    }
+  
+    @Override
+    public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
+      if (e != null) throw e;
+      if (dir.toFile().listFiles().length <= 0) Files.delete(dir);
+      return FileVisitResult.CONTINUE;
+    }
   }
 }

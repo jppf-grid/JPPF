@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.JobStatusListener;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 
 /**
  * This task provides asynchronous management of tasks submitted through the resource adapter.
@@ -39,10 +40,11 @@ public class JcaJobManager extends JobManagerClient {
   /**
    * Initialize this job worker with the specified JPPF client.
    * @param client the JPPF client that manages connections to the JPPF drivers.
+   * @param bundlerFactory the factory that creates load-balancer instances.
    * @throws Exception if any error occurs.
    */
-  public JcaJobManager(final JPPFClient client) throws Exception {
-    super(client);
+  public JcaJobManager(final JPPFClient client, final JPPFBundlerFactory bundlerFactory) throws Exception {
+    super(client, bundlerFactory);
   }
 
   /**

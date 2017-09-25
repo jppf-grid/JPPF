@@ -35,7 +35,7 @@ import org.slf4j.*;
  * It guarantees that all its entries will be cleared before an out of memory error is raised. Additionally the cache has a capacity which can be
  * specified in the configuration and which defaults to 1024.
  * <p>This cacheable persistence is configured as follows:
- * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
+ * <pre class="jppf_pre">
  * <span style="color: green"># shorten the configuration value for clarity</span>
  * wrapper = org.jppf.job.persistence.impl.CacheablePersistence
  * <span style="color: green"># cacheable persistence with default capacity of 1024</span>
@@ -43,7 +43,7 @@ import org.slf4j.*;
  * <span style="color: green"># cacheable persistence with a specified capacity</span>
  * jppf.job.persistence = ${wrapper} &lt;capacity&gt; &lt;actual_persistence&gt; &lt;param1&gt; ... &lt;paramN&gt;</pre>
  * <p>Here is a concrete example wrapping a default database persistence:
- * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
+ * <pre class="jppf_pre">
  * <span style="color: green"># shortcut for the package name</span>
  * pkg = org.jppf.job.persistence.impl
  * <span style="color: green"># cacheable database persistence with a capacity of 10000,</span>

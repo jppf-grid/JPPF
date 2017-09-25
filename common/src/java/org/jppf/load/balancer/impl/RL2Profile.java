@@ -27,6 +27,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class RL2Profile extends AbstractLoadBalancingProfile {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The maximum size of the performance samples cache.
    */
   private final int performanceCacheSize;

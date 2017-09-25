@@ -28,11 +28,11 @@ import javax.sql.DataSource;
 import org.jppf.client.*;
 import org.jppf.job.JobSelector;
 import org.jppf.job.persistence.PersistenceObjectType;
-import org.jppf.job.persistence.impl.DefaultDatabasePersistence;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.persistence.AbstractDatabaseSetup;
@@ -62,8 +62,10 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
       .setString("jdbcUrl", DB_URL).setString("username", DB_USER).setString("password", DB_PWD)
       .setInt("minimumIdle", 1).setInt("maximumPoolSize", 5);
     datasource = JPPFDatasourceFactory.getInstance().createDataSource("jobDS", props);
+    String path = JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE_DDL_LOCATION);
+    String ddl = FileUtils.readTextFile(path).replace("${table}", "TEST1");
     try (Connection c = datasource.getConnection()) {
-      try (PreparedStatement ps = c.prepareStatement(DefaultDatabasePersistence.getTableDDL("TEST1"))) {
+      try (PreparedStatement ps = c.prepareStatement(ddl)) {
         ps.executeUpdate();
       }
     }

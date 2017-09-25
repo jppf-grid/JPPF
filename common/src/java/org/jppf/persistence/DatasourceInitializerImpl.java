@@ -118,7 +118,15 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
     try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) cl = DatasourceInitializerImpl.class.getClassLoader();
-      Class<?> hikariConfigClass = Class.forName(HIKARI_CONFIG_CLASS, true, cl);
+      Class<?> hikariConfigClass;
+      try {
+        hikariConfigClass = Class.forName(HIKARI_CONFIG_CLASS, true, cl);
+      } catch(ClassNotFoundException e) {
+        String msg = "HikariCP libraries are not in the classpath, no datasource will be defined";
+        if (debugEnabled) log.debug(msg, e);
+        else log.warn(msg);
+        return;
+      }
       hikariConfigConstructor = ReflectionHelper.findConstructor(hikariConfigClass, Properties.class);
       Class<?> hikariDatasourceClass = cl.loadClass(HIKARI_DS_CLASS);
       hikariDatasourceConstructor = ReflectionHelper.findConstructor(hikariDatasourceClass, hikariConfigClass);
@@ -128,7 +136,7 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
       allowedProperties = (Set<String>) getAllowedPropertiesMethod.invoke(null, hikariConfigClass);
       initSuccess = true;
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
     }      
   }
 }

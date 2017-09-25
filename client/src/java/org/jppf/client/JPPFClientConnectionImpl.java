@@ -100,6 +100,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
 
   @Override
   SocketInitializer createSocketInitializer() {
-    return new SocketInitializerImpl();
+    return new SocketInitializerImpl(getPool().getClient().getConfig());
   }
 }

@@ -18,6 +18,7 @@
 
 package org.jppf.load.balancer;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
@@ -25,11 +26,11 @@ import java.util.LinkedList;
  * @author Laurent Cohen
  * @exclude
  */
-public class BundleDataHolder {
+public class PerformanceCache implements Serializable {
   /**
    * Holds the samples required for calculating the moving average.
    */
-  private final LinkedList<BundlePerformanceSample> samples = new LinkedList<>();
+  private final LinkedList<PerformanceSample> samples = new LinkedList<>();
   /**
    * Current value of the moving average.
    */
@@ -49,23 +50,23 @@ public class BundleDataHolder {
   /**
    * Number of samples required to compute the moving average.
    */
-  private final int performanceCacheSize;
+  private int size;
 
   /**
    * Initialize this data holder with the maximum number of samples in the performance cache.
-   * @param performanceCacheSize the number of samples as an int.
+   * @param size the number of samples as an int.
    */
-  public BundleDataHolder(final int performanceCacheSize) {
-    this.performanceCacheSize = performanceCacheSize;
+  public PerformanceCache(final int size) {
+    this.size = size;
   }
 
   /**
    * Initialize this data holder with the maximum number of samples in the performance cache, and initial mean execution time.
-   * @param performanceCacheSize the number of samples as an int.
+   * @param size the number of samples as an int.
    * @param mean the initial mean execution time.
    */
-  public BundleDataHolder(final int performanceCacheSize, final double mean) {
-    this.performanceCacheSize = performanceCacheSize;
+  public PerformanceCache(final int size, final double mean) {
+    this.size = size;
     this.mean = mean;
   }
 
@@ -73,27 +74,23 @@ public class BundleDataHolder {
    * Add the specified performance sample to the list of samples.
    * @param sample the performance sample to add.
    */
-  public void addSample(final BundlePerformanceSample sample) {
-    boolean b = (sample.samples + nbSamples > performanceCacheSize) || samples.isEmpty();
-    if (b) {
-      while ((sample.samples + nbSamples > performanceCacheSize) && !samples.isEmpty()) {
-        removeHeadSample();
-      }
-    }
+  public void addSample(final PerformanceSample sample) {
+    while ((sample.samples + nbSamples > size) && !samples.isEmpty()) removeHeadSample();
     samples.add(sample);
     totalTime += sample.samples * sample.mean;
     nbSamples += sample.samples;
-
     computeMean();
   }
 
   /**
-   * Add the least recent sample from the list of samples.
+   * Remove the least recent sample from the list of samples.
    */
   private void removeHeadSample() {
-    BundlePerformanceSample sample = samples.removeFirst();
-    nbSamples -= sample.samples;
-    totalTime -= sample.samples * sample.mean;
+    PerformanceSample sample = samples.removeFirst();
+    if (sample != null) {
+      nbSamples -= sample.samples;
+      totalTime -= sample.samples * sample.mean;
+    }
   }
 
   /**
@@ -134,8 +131,17 @@ public class BundleDataHolder {
    * Get the number of samples required to compute the moving average.
    * @return the number of samples as an int.
    */
-  public int getPerformanceCacheSize() {
-    return performanceCacheSize;
+  public int getSize() {
+    return size;
+  }
+
+  /**
+   * Set the maximum number fo samples.
+   * @param size the new maximum number of samples.
+   */
+  public void setSize(final int size) {
+    this.size = size;
+    while ((nbSamples > size) && (samples.size() > 1)) removeHeadSample();
   }
 
   /**
@@ -160,7 +166,7 @@ public class BundleDataHolder {
       .append(", previousMean=").append(previousMean)
       .append(", totalTime=").append(totalTime)
       .append(", nbSamples=").append(nbSamples)
-      .append(", performanceCacheSize=").append(performanceCacheSize)
+      .append(", size=").append(size)
       .append(", samples.size()=").append(samples.size())
       .toString();
   }

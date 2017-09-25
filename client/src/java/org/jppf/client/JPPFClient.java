@@ -24,6 +24,7 @@ import org.jppf.client.debug.Debug;
 import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.discovery.ClientDriverDiscovery;
 import org.jppf.load.balancer.LoadBalancingInformation;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -50,8 +51,7 @@ public class JPPFClient extends AbstractGenericClient {
    * Initialize this client with an automatically generated application UUID.
    */
   public JPPFClient() {
-    super(null, JPPFConfiguration.getProperties());
-    Debug.register(this);
+    this(null, JPPFConfiguration.getProperties());
   }
 
   /**
@@ -59,34 +59,41 @@ public class JPPFClient extends AbstractGenericClient {
    * @param uuid the unique identifier for this local client.
    */
   public JPPFClient(final String uuid) {
-    super(uuid, JPPFConfiguration.getProperties());
-    Debug.register(this);
+    this(uuid, JPPFConfiguration.getProperties());
   }
 
   /**
    * Initialize this client with an automatically generated application UUID.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
    */
   public JPPFClient(final ConnectionPoolListener... listeners) {
-    super(null, JPPFConfiguration.getProperties(), listeners);
-    Debug.register(this);
+    this(null, JPPFConfiguration.getProperties(), listeners);
   }
 
   /**
    * Initialize this client with the specified application UUID and new connection listeners.
    * @param uuid the unique identifier for this local client.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
    */
   public JPPFClient(final String uuid, final ConnectionPoolListener... listeners) {
-    super(uuid, JPPFConfiguration.getProperties(), listeners);
-    Debug.register(this);
+    this(uuid, JPPFConfiguration.getProperties(), listeners);
+  }
+
+  /**
+   * Initialize this client with the specified configuration and connection listeners.
+   * @param config the JPPF configuration to use for this client.
+   * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
+   * @exclude
+   */
+  public JPPFClient(final TypedProperties config, final ConnectionPoolListener... listeners) {
+    this(null, config, listeners);
   }
 
   /**
    * Initialize this client with the specified application UUID and new connection listeners.
    * @param uuid the unique identifier for this local client.
    * @param config the JPPF configuration to use for this client.
-   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @param listeners the optional listeners to add to this JPPF client to receive notifications of new connections.
    * @exclude
    */
   public JPPFClient(final String uuid, final TypedProperties config, final ConnectionPoolListener... listeners) {
@@ -130,7 +137,7 @@ public class JPPFClient extends AbstractGenericClient {
   protected JobManager createJobManager() {
     JobManager jobManager = null;
     try {
-      jobManager = new JobManagerClient(this);
+      jobManager = new JobManagerClient(this, bundlerFactory);
     } catch (Exception e) {
       log.error("Can't initialize job Manager", e);
     }
@@ -370,5 +377,14 @@ public class JPPFClient extends AbstractGenericClient {
   public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception {
     JobManager manager = getJobManager();
     if (manager != null) manager.setLoadBalancerSettings(algorithm, parameters);
+  }
+
+  /**
+   * Get the factory that creates load-balancer instances.
+   * @return an istance of {@link JPPFBundlerFactory}.
+   * @exclude
+   */
+  public JPPFBundlerFactory getBundlerFactory() {
+    return bundlerFactory;
   }
 }

@@ -120,6 +120,10 @@ public class JPPFProperties {
   public static final JPPFProperty<String> LOAD_BALANCING_ALGORITHM = new StringProperty("jppf.load.balancing.algorithm", "proportional");
   /** Load balancing parameters profile name */
   public static final JPPFProperty<String> LOAD_BALANCING_PROFILE = new StringProperty("jppf.load.balancing.profile", "jppf", "jppf.load.balancing.strategy");
+  /** Class name of the implementation of the load-balancer persistence in the driver or client */
+  public static final JPPFProperty<String[]> LOAD_BALANCING_PERSISTENCE = new StringArrayProperty("jppf.load.balancing.persistence", " ", (String[]) null, "jppf.load.balancer.persistence");
+  /** The hash function used to generate load-balancer state identifiers */
+  public static final JPPFProperty<String> LOAD_BALANCING_PERSISTENCE_HASH = new StringProperty("jppf.load.balancing.persistence.hash", "SHA-1", "jppf.load.balancer.persistence.hash");
   /** Enable/disable remote execution (client only) */
   public static final JPPFProperty<Boolean> REMOTE_EXECUTION_ENABLED = new BooleanProperty("jppf.remote.execution.enabled", true);
   /** Enable/disable local execution in the client */
@@ -397,6 +401,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_PERSISTENCE_DDL_LOCATION = new StringProperty("jppf.job.persistence.ddl.location", "org/jppf/job/persistence/impl/job_persistence.sql");
   /** Percentage of used heap above which async job persistence switches to sequential mode, until the used heap decreases below the threshold */
   public static final JPPFProperty<Double> JOB_PERSISTENCE_MEMORY_THRESHOLD = new DoubleProperty("jppf.job.persistence.memory.threshold", 70d);
+  /** Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence */
+  public static final JPPFProperty<String> LOAD_BALANCING_PERSISTENCE_DDL_LOCATION = new StringProperty("jppf.load.balancing.persistence.ddl.location", "org/jppf/load/balancer/persistence/load_balancer_persistence.sql");
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 

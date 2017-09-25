@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.jppf.client.JPPFClient;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
@@ -48,10 +47,6 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
    * The driver mbean which delegates operations to specified nodes.
    */
   protected static JPPFNodeForwardingMBean nodeForwarder = null;
-  /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
   /**
    * The uuids of all nodes.
    */

@@ -44,7 +44,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */
-  private static final boolean FILE_LOOKUP = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
+  private final boolean FILE_LOOKUP;
   /**
    * Indicates whether this socket handler should be terminated and stop processing.
    */
@@ -72,6 +72,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected AbstractClassServerDelegate(final JPPFClientConnection owner) {
     super(owner, owner.getName() + " - ClassServer");
+    FILE_LOOKUP = owner.getConnectionPool().getClient().getConfig().get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
     formattedName = "[" + name + ']';
     if (debugEnabled) log.debug("resourceProvider={}", resourceProvider);
   }

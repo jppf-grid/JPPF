@@ -29,15 +29,6 @@ import test.org.jppf.test.setup.*;
  */
 public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
   /**
-   * Generates a thread dump for each driver.
-   * @throws Exception if any error occurs.
-   */
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (client != null) BaseSetup.generateDriverThreadDump(client);
-  }
-
-  /**
    * Test a simple job.
    * @throws Exception if any error occurs.
    */

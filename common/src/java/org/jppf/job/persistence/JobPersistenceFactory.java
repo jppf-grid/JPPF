@@ -18,7 +18,9 @@
 
 package org.jppf.job.persistence;
 
-import org.jppf.job.persistence.impl.DefaultFilePersistence;
+import java.util.Arrays;
+
+import org.jppf.job.persistence.impl.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -50,8 +52,8 @@ public final class JobPersistenceFactory {
     try {
       tmp = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, JPPFProperties.JOB_PERSISTENCE);
     } catch (Exception e) {
-      log.error(String.format("error creating JobPersisitence configured as %s = %s, falling back to %s%n%s", JPPFProperties.JOB_PERSISTENCE.getName(),
-        JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e)));
+      log.error(String.format("error creating JobPersistence configured as %s = %s, falling back to %s%n%s", JPPFProperties.JOB_PERSISTENCE.getName(),
+        Arrays.toString(JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE)), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e)));
       try {
         tmp = new DefaultFilePersistence();
       } catch (Exception e2) {

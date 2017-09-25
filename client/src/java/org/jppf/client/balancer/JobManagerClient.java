@@ -120,14 +120,15 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Instantiates client job manager.
    * @param client JPPF client that manages connections to the JPPF drivers.
+   * @param bundlerFactory the factory that creates load-balancer instances.
    * @throws Exception if any error occurs.
    */
-  public JobManagerClient(final JPPFClient client) throws Exception {
+  public JobManagerClient(final JPPFClient client, final JPPFBundlerFactory bundlerFactory) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
     this.client = client;
     this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
     this.queue = new JPPFPriorityQueue(this);
-    bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT, client.getConfig());
+    this.bundlerFactory = bundlerFactory;
     currentLoadBalancingInformation = bundlerFactory.getCurrentInfo();
     taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
@@ -478,8 +479,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     synchronized(loadBalancingInformationLock) {
       if (currentLoadBalancingInformation == null) {
         LoadBalancingInformation info = bundlerFactory.getCurrentInfo();
-        List<String> algorithmsList = bundlerFactory.getBundlerProviderNames();
-        currentLoadBalancingInformation =  new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), algorithmsList);
+        currentLoadBalancingInformation = new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), bundlerFactory.getBundlerProviderNames());
       }
       return currentLoadBalancingInformation;
     }
@@ -494,5 +494,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
       currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
+  }
+
+  /**
+   * @return the job dispatcher.
+   */
+  public TaskQueueChecker getTaskQueueChecker() {
+    return taskQueueChecker;
   }
 }

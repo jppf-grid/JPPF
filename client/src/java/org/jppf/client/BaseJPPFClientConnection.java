@@ -58,7 +58,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Determines whether tasks deserialization should be sequential rather than parallel.
    */
-  private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
+  private final boolean SEQUENTIAL_DESERIALIZATION;
   /**
    * A sequence number used as suffix for the {@code connectionUuid}.
    */
@@ -94,6 +94,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   BaseJPPFClientConnection(final JPPFConnectionPool pool) {
     this.pool = pool;
+    SEQUENTIAL_DESERIALIZATION = pool.getClient().getConfig().getBoolean("jppf.sequential.deserialization", false);
   }
 
   /**

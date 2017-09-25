@@ -62,7 +62,6 @@ public abstract class AbstractBundler<T extends LoadBalancingProfile> implements
     return (jppfContext == null || jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
   }
 
-
   /**
    * This implementation does nothing and should be overridden in subclasses that compute the bundle size based on the feedback from the nodes.
    * @param bundleSize the number of tasks retruning from execution on a node.

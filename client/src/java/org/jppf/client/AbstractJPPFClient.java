@@ -81,7 +81,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Fully qualified name of the serilaization helper class to use.
    */
-  private String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
+  private String serializationHelperClassName;
+  /**
+   * The JPPF configuration properties.
+   */
+  protected TypedProperties config;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -92,6 +96,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + this.uuid);
     VersionUtils.logVersionInformation("client", this.uuid);
     SystemUtils.printPidAndUuid("client", this.uuid);
+  }
+
+  /**
+   * Get JPPF configuration properties. These properties are unmodifiable.
+   * @return <code>TypedProperties</code> instance. With JPPF configuration.
+   */
+  public TypedProperties getConfig() {
+    return config;
   }
 
   /**
@@ -273,6 +285,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @exclude
    */
   protected String getSerializationHelperClassName() {
+    if (serializationHelperClassName == null)
+      serializationHelperClassName = getConfig().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
     return serializationHelperClassName;
   }
 

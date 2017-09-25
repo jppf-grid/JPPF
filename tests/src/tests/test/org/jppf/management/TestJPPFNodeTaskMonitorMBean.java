@@ -51,10 +51,6 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    * 
    */
   private static JPPFNodeTaskMonitorMBean nodeMonitorProxy = null;
-  /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
 
   /**
    * Launches a driver and node and start the client.

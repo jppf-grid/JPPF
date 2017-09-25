@@ -378,9 +378,8 @@ public final class ReflectionHelper {
     if (debugEnabled) log.debug("found {} = {}", propName, value == null ? "null" : Arrays.asList(value));
     if ((value == null) || (value.length <= 0)) return null;
     String className = value[0];
-    String[] params = null;
+    String[] params = new String[value.length - 1];
     if (value.length > 1) {
-      params = new String[value.length - 1];
       for (int i=1; i<value.length; i++) params[i - 1] = value[i];
     }
     Class<?> clazz = null;
@@ -412,7 +411,7 @@ public final class ReflectionHelper {
           log.error(String.format("Error invoking default constructor of configured class '%s' for property '%s': %s", clazz.getName(), propName, ExceptionUtils.getStackTrace(e)));
           return null;
         }
-        if (params != null) {
+        if (params.length > 0) {
           Method setParamsMethod = findMethod(clazz, "setParameters", String[].class);
           if (setParamsMethod != null) {
             try {

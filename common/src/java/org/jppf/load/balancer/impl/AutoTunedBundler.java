@@ -17,9 +17,12 @@
  */
 package org.jppf.load.balancer.impl;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.persistence.PersistentState;
 import org.slf4j.*;
 
 /**
@@ -33,7 +36,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfile> {
+public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfile> implements PersistentState {
   /**
    * Logger for this class.
    */
@@ -48,9 +51,13 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
    */
   private Random rnd = new Random(System.nanoTime());
   /**
-   * A map of performance samples, sorted by increasing bundle size.
+   * The state of this undler.
    */
-  private final Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<>();
+  private final BundlerState state;
+  /**
+   * Lock used to synchronize access to the load-balancer state.
+   */
+  private final Lock lock = new ReentrantLock();
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -59,8 +66,29 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
    */
   public AutoTunedBundler(final AnnealingTuneProfile profile) {
     super(profile);
-    bundleSize = profile.size;
-    if (bundleSize < 1) bundleSize = 1;
+    this.state = new BundlerState();
+    state.bundleSize = profile.size;
+    if (state.bundleSize < 1) state.bundleSize = 1;
+  }
+
+  @Override
+  public int getBundleSize() {
+    lock.lock();
+    try {
+      return state.bundleSize;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    lock.lock();
+    try {
+      state.samplesMap.clear();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
@@ -79,27 +107,26 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
   @Override
   public void feedback(final int bundleSize, final double time) {
     if (traceEnabled) {
-      log.trace("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
+      log.trace("Bundler#" + bundlerNumber + ": Got sample with bundleSize=" + bundleSize + " and totalTime=" + time);
     }
-
     // retrieving the record of the bundle size
-    BundlePerformanceSample bundleSample;
-    synchronized (samplesMap) {
-      bundleSample = samplesMap.get(bundleSize);
+    PerformanceSample bundleSample;
+    lock.lock();
+    try {
+      bundleSample = state.samplesMap.get(bundleSize);
       if (bundleSample == null) {
-        bundleSample = new BundlePerformanceSample();
-        samplesMap.put(bundleSize, bundleSample);
+        bundleSample = new PerformanceSample();
+        state.samplesMap.put(bundleSize, bundleSample);
       }
-    }
-
-    long samples = bundleSample.samples + bundleSize;
-    synchronized (bundleSample) {
+      long samples = bundleSample.samples + bundleSize;
       bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
       bundleSample.samples = samples;
-    }
-    if (samples > profile.getMinSamplesToAnalyse()) {
-      performAnalysis();
-      if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
+      if (samples > profile.getMinSamplesToAnalyse()) {
+        performAnalysis();
+        if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
+      }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -108,34 +135,32 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
    */
   private void performAnalysis() {
     double stableMean = 0;
-    synchronized (samplesMap) {
-      int bestSize = searchBestSize();
-      int max = maxSize();
-      if ((max > 0) && (bestSize > max)) bestSize = max;
-      int counter = 0;
-      while (counter < profile.getMaxGuessToStable()) {
-        int diff = profile.createDiff(bestSize, samplesMap.size(), rnd);
-        if (diff < bestSize) {
-          // the second part is there to ensure the size is > 0
-          if (rnd.nextBoolean()) diff = -diff;
-        }
-        bundleSize = bestSize + diff;
-        if (samplesMap.get(bundleSize) == null) {
-          if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
-          return;
-        }
-        counter++;
+    int bestSize = searchBestSize();
+    int max = maxSize();
+    if ((max > 0) && (bestSize > max)) bestSize = max;
+    int counter = 0;
+    while (counter < profile.getMaxGuessToStable()) {
+      int diff = profile.createDiff(bestSize, state.samplesMap.size(), rnd);
+      if (diff < bestSize) {
+        // the second part is there to ensure the size is > 0
+        if (rnd.nextBoolean()) diff = -diff;
       }
-
-      bundleSize = Math.max(1, bestSize);
-      BundlePerformanceSample sample = samplesMap.get(bundleSize);
-      if (sample != null) {
-        stableMean = sample.mean;
-        samplesMap.clear();
-        samplesMap.put(bundleSize, sample);
+      state.bundleSize = bestSize + diff;
+      if (state.samplesMap.get(state.bundleSize) == null) {
+        if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + state.bundleSize);
+        return;
       }
+      counter++;
     }
-    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize + " with the mean execution of " + stableMean);
+
+    state.bundleSize = Math.max(1, bestSize);
+    PerformanceSample sample = state.samplesMap.get(state.bundleSize);
+    if (sample != null) {
+      stableMean = sample.mean;
+      state.samplesMap.clear();
+      state.samplesMap.put(state.bundleSize, sample);
+    }
+    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + state.bundleSize + " with the mean execution of " + stableMean);
   }
 
   /**
@@ -145,8 +170,8 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
   private int searchBestSize() {
     int bestSize = 0;
     double minorMean = Double.POSITIVE_INFINITY;
-    for (Integer size : samplesMap.keySet()) {
-      BundlePerformanceSample sample = samplesMap.get(size);
+    for (Integer size : state.samplesMap.keySet()) {
+      PerformanceSample sample = state.samplesMap.get(size);
       if (sample.mean < minorMean) {
         bestSize = size;
         minorMean = sample.mean;
@@ -154,5 +179,50 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
     }
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
     return bestSize;
+  }
+
+  @Override
+  public Object getState() {
+    lock.lock();
+    try {
+      return state;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public void setState(final Object persistedState) {
+    BundlerState other = (BundlerState) persistedState;
+    lock.lock();
+    try {
+      state.bundleSize = other.bundleSize;
+      state.samplesMap = other.samplesMap;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public Lock getStateLock() {
+    return lock;
+  }
+
+  /**
+   * Holds the state of this bundler for persistence.
+   */
+  private static class BundlerState implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * The current bundle size.
+     */
+    private int bundleSize = 1;
+    /**
+     * A map of performance samples, sorted by increasing bundle size.
+     */
+    private Map<Integer, PerformanceSample> samplesMap = new HashMap<>();
   }
 }

@@ -24,20 +24,17 @@ import java.nio.channels.*;
  * Channel wrapper implementation for a {@link SelectionKey}.
  * @author Laurent Cohen
  */
-public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
-{
+public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey> {
   /**
    * Initialize this channel wrapper with the specified channel.
    * @param channel the channel to wrap.
    */
-  public SelectionKeyWrapper(final SelectionKey channel)
-  {
+  public SelectionKeyWrapper(final SelectionKey channel) {
     super(channel);
   }
 
   @Override
-  public NioContext<?> getContext()
-  {
+  public NioContext<?> getContext() {
     return (NioContext<?>) channel.attachment();
   }
 
@@ -46,8 +43,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
    * @throws Exception if any error occurs while closing the channel.
    */
   @Override
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     SelectableChannel ch = channel.channel();
     channel.cancel();
     ch.close();
@@ -58,19 +54,17 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
    * @return true if the channel is opened, false otherwise.
    */
   @Override
-  public boolean isOpen()
-  {
+  public boolean isOpen() {
     return channel.channel().isOpen();
   }
 
   /**
    * Generate a string that represents this channel wrapper.
    * @return a string that represents this channel wrapper.
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-    if ((channel == null) || !channel.isValid()) {
+    //if ((channel == null) || !channel.isValid()) {
       StringBuilder sb = new StringBuilder(1000);
       sb.append(getClass().getSimpleName());
       sb.append('[');
@@ -80,7 +74,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
       else {
         if (!channel.isValid() || !isOpen()) sb.append("invalid channel");
         else {
-          sb.append(channel);
+          sb.append(channel.channel());
           sb.append(", readyOps=").append(getReadyOps());
           sb.append(", interestOps=").append(getInterestOps());
         }
@@ -88,49 +82,42 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
       sb.append(", context=").append(getContext());
       sb.append(']');
       return sb.toString();
-    }
-    return super.toString();
+    //}
+    //return super.toString();
   }
 
   /**
    * Get the operations enabled for this channel.
    * @return the operations as an int value.
-   * @see org.jppf.nio.AbstractChannelWrapper#getInterestOps()
    */
   @Override
-  public int getInterestOps()
-  {
+  public int getInterestOps() {
     return channel.isValid() ? channel.interestOps() : -1;
   }
 
   /**
    * Get the operations enabled for this channel.
    * @param keyOps the operations as an int value.
-   * @see org.jppf.nio.AbstractChannelWrapper#setInterestOps(int)
    */
   @Override
-  public void setInterestOps(final int keyOps)
-  {
+  public void setInterestOps(final int keyOps) {
     if (channel.isValid()) channel.interestOps(keyOps);
   }
 
   /**
    * Get the operations available for this channel.
    * @return the operations as an int value.
-   * @see org.jppf.nio.AbstractChannelWrapper#getReadyOps()
    */
   @Override
-  public int getReadyOps()
-  {
+  public int getReadyOps() {
     return channel.isValid() ? channel.readyOps() : -1;
   }
 
   /**
-   * @return <code>false</code>.
+   * @return {@code false}.
    */
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return false;
   }
 }

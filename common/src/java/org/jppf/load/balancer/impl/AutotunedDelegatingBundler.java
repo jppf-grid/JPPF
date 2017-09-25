@@ -74,7 +74,8 @@ public class AutotunedDelegatingBundler extends AbstractBundler<AnnealingTunePro
    */
   @Override
   public void feedback(final int bundleSize, final double totalTime) {
-    simpleBundler.feedback(bundleSize, totalTime);
+    //simpleBundler.feedback(bundleSize, totalTime);
+    BundlerHelper.updateBundler(simpleBundler, bundleSize, totalTime);
   }
 
   /**

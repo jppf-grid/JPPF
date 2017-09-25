@@ -145,38 +145,22 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * @param processType the type of process (node or driver).
    * @param jppfTemplate the path to the JPPF configuration template file.
    * @param log4jTemplate the path to the log4j template file.
-   */
-  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
-    this.n = n;
-    this.name = "[" + processType + '-' + n + "] ";
-    addClasspathElement("../jmxremote/classes");
-    addClasspathElement("../common/classes");
-    addClasspathElement("../node/classes");
-    String libDir = "../JPPF/lib/";
-    jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
-    log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
-    addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
-    addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
-    addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
-    addClasspathElement(libDir + "LZ4/lz4-1.3.0.jar");
-    addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
-    updateJvmOptionsFromConfig();
-  }
-
-  /**
-   * Default constructor.
-   * @param n a number ssigned to this process.
-   * @param processType the type of process (node or driver).
-   * @param jppfTemplate the path to the JPPF configuration template file.
-   * @param log4jTemplate the path to the log4j template file.
    * @param classpath the classpath elements for the driver.
    * @param jvmOptions additional JVM options for the driver.
+   * @param bindings variable bindings used in 'expr:' script expressions.
    */
-  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions) {
+  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions,
+    final Map<String, Object> bindings) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
-    jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
-    log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
+    if (bindings == null) {
+      jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
+      log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
+    } else {
+      bindings.put("$n", n);
+      jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, bindings));
+      log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, bindings)));
+    }
     for (String elt: classpath) addClasspathElement(elt);
     for (String option: jvmOptions) addJvmOption(option);
     updateJvmOptionsFromConfig();

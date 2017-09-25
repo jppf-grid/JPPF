@@ -25,8 +25,10 @@ import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.execute.*;
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
+import org.jppf.utils.Pair;
 import org.slf4j.*;
 
 /**
@@ -46,15 +48,15 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
-  Bundler<?> bundler = null;
+  Bundler<?> bundler;
   /**
    * Represents the system information.
    */
-  JPPFSystemInformation systemInfo = null;
+  JPPFSystemInformation systemInfo;
   /**
    * Represents the management information.
    */
-  JPPFManagementInfo managementInfo = null;
+  JPPFManagementInfo managementInfo;
   /**
    * List of execution status listeners for this channel.
    */
@@ -67,6 +69,14 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * Whether the client is resetting.
    */
   boolean resetting = false;
+  /**
+   * A channel id coupled with its hash, resuable over driver/client restarts.
+   */
+  Pair<String, String> channelID;
+  /**
+   * 
+   */
+  String bundlerAlgorithm;
 
   /**
    * Default constructor.
@@ -127,21 +137,27 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    */
   @SuppressWarnings("deprecation")
   @Override
-  public boolean checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
+  public Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
     if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
     if (this.bundler == null || this.bundler.getTimestamp() < factory.getLastUpdateTime()) {
       if (this.bundler != null) {
         this.bundler.dispose();
         if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       }
-      this.bundler = factory.newBundler();
+      Pair<String, Bundler<?>> bp = getLoadBalancerPersistenceManager().loadBundler(channelID);
+      this.bundler = bp.second();
+      this.bundlerAlgorithm = bp.first();
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
       if (this.bundler instanceof ChannelAwareness) ((ChannelAwareness) this.bundler).setChannelConfiguration(systemInfo);
-      return true;
     }
-    return false;
+    return bundler;
   }
+
+  /**
+   * @return the load-balancer persistence manager.
+   */
+  abstract LoadBalancerPersistenceManager getLoadBalancerPersistenceManager();
 
   @Override
   public JPPFSystemInformation getSystemInformation() {

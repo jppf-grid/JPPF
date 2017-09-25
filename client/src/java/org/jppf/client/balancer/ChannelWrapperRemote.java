@@ -19,12 +19,16 @@
 package org.jppf.client.balancer;
 
 import java.io.NotSerializableException;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.load.balancer.BundlerHelper;
+import org.jppf.load.balancer.persistence.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
@@ -60,7 +64,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    */
   public ChannelWrapperRemote(final JPPFClientConnection channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
-
     this.channel = (JPPFClientConnectionImpl) channel;
     JPPFConnectionPool pool = channel.getConnectionPool();
     this.uuid = pool.getDriverUuid();
@@ -75,6 +78,24 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     if (systemInfo != null && uuid == null) {
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
       if (uuid != null && uuid.isEmpty()) uuid = null;
+    }
+    try {
+      TaskServerConnectionHandler handler = channel.getTaskServerConnection();
+      SocketWrapper socketClient = handler.getSocketClient();
+      if (socketClient != null) {
+        StringBuilder sb = new StringBuilder();
+        String ip = NetworkUtils.getNonLocalHostAddress();
+        sb.append(channel.getName());
+        sb.append('[').append(ip == null ? "localhost" : ip).append(']');
+        InetSocketAddress sa = (InetSocketAddress) socketClient.getSocket().getRemoteSocketAddress();
+        sb.append(sa.getAddress().getHostAddress()).append(':').append(socketClient.getPort());
+        sb.append(channel.isSSLEnabled());
+        String s = sb.toString();
+        channelID = new Pair<>(s, CryptoUtils.computeHash(s, channel.getPool().getClient().getBundlerFactory().getHashAlgorithm()));
+        if (debugEnabled) log.debug("computed channelID for {} : {}", this, channelID);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
     super.setSystemInformation(systemInfo);
   }
@@ -123,6 +144,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     ExecutorService executor = channel.getClient().getExecutor();
     executor.execute(new RemoteRunnable(bundle, channel));
+    if (debugEnabled) log.debug("end submitting {} to {}", bundle, this);
     return null;
   }
 
@@ -147,6 +169,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     if (debugEnabled) log.debug("requesting cancel of jobId=" + uuid);
     bundle.cancel();
     return true;
+  }
+
+  @Override
+  LoadBalancerPersistenceManager getLoadBalancerPersistenceManager() {
+    return (LoadBalancerPersistenceManager) channel.getClient().getLoadBalancerPersistenceManagement();
   }
 
   @Override
@@ -212,7 +239,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           completed = true;
         }
         double elapsed = System.nanoTime() - start;
-        bundler.feedback(tasks.size(), elapsed);
+        BundlerHelper.updateBundler(bundler, tasks.size(), elapsed);
+        getLoadBalancerPersistenceManager().storeBundler(channelID, bundler, bundlerAlgorithm);
       } catch (Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));

@@ -43,10 +43,6 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The JPPF configuration.
-   */
-  private static TypedProperties config = JPPFConfiguration.getProperties();
-  /**
    * Mapping of driver uuids to the corresponding {@link TopologyDriver} objects.
    */
   private final Map<String, TopologyDriver> driverMap = new Hashtable<>();
@@ -118,7 +114,8 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {
-    this(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), client, false, listeners);
+    this(client == null ? -1 : client.getConfig().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY),
+      client == null ? -1 : client.getConfig().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), client, false, listeners);
   }
 
   /**
@@ -141,9 +138,18 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param loadSystemInfo whether the system info of the nodes should be loaded.
    */
   public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final JPPFClient client, final boolean loadSystemInfo, final TopologyListener...listeners) {
-    this.refreshHandler = new NodeRefreshHandler(this, topologyRefreshInterval, loadSystemInfo);
-    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this, jvmHealthRefreshInterval);
-    this.client = (client == null) ? new JPPFClient(this) : client;
+    long n1 = 0, n2 = 0;
+    if (client == null) {
+      this.client = new JPPFClient(this);
+      n1 = this.client.getConfig().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY);
+      n2 = this.client.getConfig().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH);
+    } else {
+      this.client = client;
+      n1 = topologyRefreshInterval;
+      n2 = jvmHealthRefreshInterval;
+    }
+    this.refreshHandler = new NodeRefreshHandler(this, n1, loadSystemInfo);
+    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this, n2);
     if (client != null) client.addConnectionPoolListener(this);
     if (listeners != null) for (TopologyListener listener: listeners) addTopologyListener(listener);
     init();

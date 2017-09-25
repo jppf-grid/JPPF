@@ -45,7 +45,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  SocketInitializer socketInitializer = new SocketInitializerImpl();
+  SocketInitializer socketInitializer;
   /**
    * The maximum time the underlying socket may be idle, before it is considered suspect and recycled.
    */
@@ -75,8 +75,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   protected AbstractClientConnectionHandler(final JPPFClientConnection owner, final String name) {
     this.owner = owner;
     this.name = name;
-    long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
+    //long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
+    TypedProperties config = owner.getConnectionPool().getClient().getConfig();
+    long configSocketIdle = config.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
+    socketInitializer = new SocketInitializerImpl(config);
   }
 
   /**

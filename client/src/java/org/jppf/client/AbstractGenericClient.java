@@ -20,11 +20,16 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.sql.DataSource;
+
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.discovery.*;
+import org.jppf.load.balancer.persistence.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
@@ -58,10 +63,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   private ThreadPoolExecutor executor = null;
   /**
-   * The JPPF configuration properties.
-   */
-  private TypedProperties config;
-  /**
    * Performs server discovery.
    */
   private JPPFMulticastReceiverThread receiverThread = null;
@@ -85,7 +86,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * Listens to new connection pool notifications from {@link DriverDiscovery} instances.
    */
-  private final ClientDriverDiscoveryListener discoveryListener;
+  private ClientDriverDiscoveryListener discoveryListener;
+  /**
+   * The factory that creates load-balancer instances.
+   */
+  JPPFBundlerFactory bundlerFactory;
+  /**
+   * Manages the persisted states of the load-balancers.
+   */
+  LoadBalancerPersistenceManager loadBalancerPersistenceManager;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -111,6 +120,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     resetting.set(false);
     this.config = initConfig(configuration);
     try {
+      Map<String, DataSource> result = JPPFDatasourceFactory.getInstance().createDataSources(config);
+      log.info(String.format("created client-side datasources: %s", result.keySet()));
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    this.bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT, config);
+    this.loadBalancerPersistenceManager = new LoadBalancerPersistenceManager(this.bundlerFactory);
+    try {
       HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -127,14 +144,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       }
     };
     new Thread(r, "InitPools").start();
-  }
-
-  /**
-   * Get JPPF configuration properties. These properties are unmodifiable.
-   * @return <code>TypedProperties</code> instance. With JPPF configuration.
-   */
-  public TypedProperties getConfig() {
-    return config;
   }
 
   /**
@@ -258,7 +267,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           pools.putValue(priority, pool);
         }
         HostIP hostIP = new HostIP(info.host, info.host);
-        if (JPPFConfiguration.get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
+        if (getConfig().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
         pool.setDriverHostIP(hostIP);
         fireConnectionPoolAdded(pool);
@@ -286,7 +295,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           pools.putValue(info.getPriority(), pool);
         }
         HostIP hostIP = new HostIP(info.getHost(), info.getHost());
-        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.getHost());
+        if (getConfig().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.getHost());
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.getHost(), hostIP.hostName());
         pool.setDriverHostIP(hostIP);
         fireConnectionPoolAdded(pool);
@@ -525,7 +534,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param qEvent the actual event which occurred in the queue.
    * @param jobAdded {@code true} for a job added event, {@code false} for a job removed event.
    * @exclude
-   * @since 4.1
    */
   protected void fireQueueEvent(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> qEvent, final boolean jobAdded) {
     ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
@@ -539,7 +547,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * {@inheritDoc}
    * @exclude
-   * @since 4.1
    */
   @Override
   public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
@@ -549,10 +556,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * {@inheritDoc}
    * @exclude
-   * @since 4.1
    */
   @Override
   public void bundleRemoved(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
     fireQueueEvent(event, false);
+  }
+
+  /**
+   * Get the object that manages the persisted states of the load-balancers.
+   * @return an instance of {@link LoadBalancerPersistenceManagement}.
+   * @since 6.0
+   */
+  public LoadBalancerPersistenceManagement getLoadBalancerPersistenceManagement() {
+    return loadBalancerPersistenceManager;
   }
 }

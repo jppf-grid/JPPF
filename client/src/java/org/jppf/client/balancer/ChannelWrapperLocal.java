@@ -25,6 +25,8 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.execute.*;
+import org.jppf.load.balancer.BundlerHelper;
+import org.jppf.load.balancer.persistence.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
@@ -72,10 +74,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public ChannelWrapperLocal(final JPPFClient client) {
     this.client = client;
     executionManager = new ClientExecutionManager(JPPFProperties.LOCAL_EXECUTION_THREADS);
-    priority = JPPFConfiguration.get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
+    priority = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", "local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);
+    String s= "client-local-executor";
+    channelID = new Pair<>(s, CryptoUtils.computeHash(s, client.getBundlerFactory().getHashAlgorithm()));
   }
 
   @Override
@@ -135,6 +139,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     Runnable task = new LocalRunnable(bundle);
     bundle.jobDispatched(this);
     client.getExecutor().execute(task);
+    if (debugEnabled) log.debug("end locally submitting {}", bundle);
     return null;
   }
 
@@ -181,7 +186,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         executionManager.execute(bundle, tasks);
         bundle.resultsReceived(tasks);
         double elapsed = System.nanoTime() - start;
-        bundler.feedback(tasks.size(), elapsed);
+        BundlerHelper.updateBundler(bundler, tasks.size(), elapsed);
+        getLoadBalancerPersistenceManager().storeBundler(channelID, bundler, bundlerAlgorithm);
       } catch (Throwable t) {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
@@ -217,5 +223,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
       log.error(e.getMessage(), e);
     }
     return true;
+  }
+
+  @Override
+  LoadBalancerPersistenceManager getLoadBalancerPersistenceManager() {
+    return (LoadBalancerPersistenceManager) client.getLoadBalancerPersistenceManagement();
   }
 }

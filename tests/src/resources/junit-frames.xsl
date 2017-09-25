@@ -195,8 +195,11 @@
 <!-- this is the stylesheet css to use for nearly everything -->
 <xsl:template name="stylesheet.css">
 body {
-    font:normal 100% verdana,arial,helvetica;
-    color:#000000;
+  font-size:11pt;
+  font-family: Arial, Verdana, Sans-serif;
+  background-color: #E2E4F0;
+  margin-top: 20px
+  color:#000000;
 }
 table tr td, table tr th {
     font-size: 100%;
@@ -204,33 +207,15 @@ table tr td, table tr th {
 table.details tr th{
     font-weight: bold;
     text-align:left;
-    background:#a6caf0;
+    background:#6D78B6;
+    color: white;
 }
 table.details tr td{
-    background:#eeeee0;
+    background:#C5D0F0;
 }
-
 p {
     line-height:1.5em;
     margin-top:0.5em; margin-bottom:1.0em;
-}
-h1 {
-    margin: 0px 0px 5px; font: 165% verdana,arial,helvetica
-}
-h2 {
-    margin-top: 1em; margin-bottom: 0.5em; font: bold 125% verdana,arial,helvetica
-}
-h3 {
-    margin-bottom: 0.5em; font: bold 115% verdana,arial,helvetica
-}
-h4 {
-    margin-bottom: 0.5em; font: bold 100% verdana,arial,helvetica
-}
-h5 {
-    margin-bottom: 0.5em; font: bold 100% verdana,arial,helvetica
-}
-h6 {
-    margin-bottom: 0.5em; font: bold 100% verdana,arial,helvetica
 }
 .Error {
     font-weight:bold; color:red;
@@ -241,6 +226,27 @@ h6 {
 .Properties {
   text-align:right;
 }
+a { text-decoration: none; font-weight: normal; }
+a:hover { text-decoration: underline; color: red; }
+div { margin: 0px; padding; 0px; }
+
+h1, h2, h3 , h4, h5  { font-family: Arial, Verdana, sans-serif; color: #6D78B6 }
+h1, h1 a, h1 a:link, h1 a:visited { font-family: Arial Black, Arial, Verdana, sans-serif; font-weight: 900; color: #6D78B6 }
+
+h3 a, h3 a:link, h3 a:visited {
+  font-family: Arial, Verdana, sans-serif;
+  font-weight: 600;
+  font-size: 12pt
+}
+
+h1.header { font-family: Arial Black, Arial, Verdana, sans-serif;  color: #6D78B6; font-size: 24pt }
+h2,h3, h4 { margin-top: 10px; padding-top: 0px; margin-bottom: 10px; padding-bottom: 0px; }
+h2 { font-weight: 900; ; font-size: 18pt }
+h3 { font-size: 14pt; }
+h4 { font-size: 12pt; font-weight: bold }
+h5 { font-size: 10pt; font-weight: bold; margin-top: 10pt; margin-bottom: 10pt }
+table  { font-size: 11pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
+hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: #E2E4F0; }
 </xsl:template>
 
 <!-- Create list of all/failed/errored/skipped tests -->

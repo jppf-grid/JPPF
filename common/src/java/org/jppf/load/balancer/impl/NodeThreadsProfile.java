@@ -27,6 +27,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class NodeThreadsProfile extends AbstractLoadBalancingProfile {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The multiplicator for the number of threads in the node.
    * The max number of tasks sent to the node will be <code>multiplicator * number_of_threads</code>.
    */

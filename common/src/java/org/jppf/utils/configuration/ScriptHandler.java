@@ -172,7 +172,7 @@ public class ScriptHandler {
             } catch(Exception e) {
               String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
               if (debugEnabled) log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
-              else log.warn(message, new Object[] {name, language, type, ExceptionUtils.getMessage(e)});
+              else log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getMessage(e)});
               result = matched;
             } finally {
               ScriptRunnerFactory.releaseScriptRunner(runner);

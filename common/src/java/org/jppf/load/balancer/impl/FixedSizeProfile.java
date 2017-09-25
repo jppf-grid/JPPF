@@ -27,6 +27,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class FixedSizeProfile extends AbstractLoadBalancingProfile {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The bundle size.
    */
   private final int size;

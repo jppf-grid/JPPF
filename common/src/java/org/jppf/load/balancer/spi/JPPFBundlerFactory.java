@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistence;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -84,7 +85,15 @@ public class JPPFBundlerFactory {
   /**
    * Map of all registered providers.
    */
-  private final Map<String, JPPFBundlerProvider<?>> providerMap = new TreeMap<>();
+  private final Map<String, JPPFBundlerProvider<? extends LoadBalancingProfile>> providerMap = new TreeMap<>();
+  /**
+   * Mapping of algorithm names to a hash identifier. The hashes are cached so we don't have to re-compute them each time.
+   */
+  private final Map<String, String> nameToHash = new HashMap<>();
+  /**
+   * Mapping of algorithm hashes to a their name. This is a reverse mapping of {@link #nameToHash}.
+   */
+  private final Map<String, String> hashToName = new HashMap<>();
   /**
    * The default values to use if nothing is specified in the JPPF configuration.
    */
@@ -109,6 +118,14 @@ public class JPPFBundlerFactory {
    * The configuration used to extract the load-balancer settings.
    */
   private final TypedProperties config;
+  /**
+   * The configured persistence.
+   */
+  private final LoadBalancerPersistence persistence;
+  /**
+   * The hash function used to generate bundle state identifiers.
+   */
+  private final String hashAlgorithm;
 
   /**
    * Default constructor.
@@ -125,10 +142,12 @@ public class JPPFBundlerFactory {
   public JPPFBundlerFactory(final Defaults def, final TypedProperties config) {
     this.config = config;
     defaultConfig = def;
+    this.hashAlgorithm = config.get(JPPFProperties.LOAD_BALANCING_PERSISTENCE_HASH);
     loadProviders();
     algorithmNames = Collections.unmodifiableList(new ArrayList<>(providerMap.keySet()));
     updateCurrentConfiguration();
     if (debugEnabled) log.debug("using default properties: " + defaultConfig);
+    persistence = initPersistence();
   }
 
   /**
@@ -172,10 +191,12 @@ public class JPPFBundlerFactory {
    * Get the bundler provider with the specified name.<br>
    * This method will trigger a lazy loading of the providers if they haven't been loaded yet.
    * @param name the name of the bundler provider to retrieve.
-   * @return a <code>JPPFBundlerProvider</code> instance or null if the provider could not be found.
+   * @return a {@link JPPFBundlerProvider} instance or null if the provider could not be found.
+   * @param <T> the type of profile used by the bundlers the returned provider creates.  
    */
-  public JPPFBundlerProvider<?> getBundlerProvider(final String name) {
-    return providerMap.get(name);
+  @SuppressWarnings("unchecked")
+  public <T extends LoadBalancingProfile> JPPFBundlerProvider<T> getBundlerProvider(final String name) {
+    return (JPPFBundlerProvider<T>) providerMap.get(name);
   }
 
   /**
@@ -184,6 +205,24 @@ public class JPPFBundlerFactory {
    */
   public List<String> getBundlerProviderNames() {
     return algorithmNames;
+  }
+
+  /**
+   * Get the hashed identifier for the specified algorithm.
+   * @param name the name of the algorithm for which to get an identifier.
+   * @return a hash of the algorithm name.
+   */
+  public String getAlgorithmHash(final String name) {
+    return nameToHash.get(name);
+  }
+
+  /**
+   * Get the name of an algorithm given its hash.
+   * @param hash the hash of the algorithm name.
+   * @return a the name of the algorithm.
+   */
+  public String getAlgorithmNameFromHash(final String hash) {
+    return hashToName.get(hash);
   }
 
   /**
@@ -200,7 +239,11 @@ public class JPPFBundlerFactory {
       Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, cl);
       while (it.hasNext()) {
         JPPFBundlerProvider<?> provider = it.next();
-        providerMap.put(provider.getAlgorithmName(), provider);
+        String name = provider.getAlgorithmName();
+        providerMap.put(name, provider);
+        String hash = CryptoUtils.computeHash(name, hashAlgorithm);
+        nameToHash.put(name, hash);
+        hashToName.put(hash, name);
         if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
       }
       if (debugEnabled) log.debug("found " + providerMap.size() + " load-balancing algorithms in the classpath");
@@ -317,5 +360,33 @@ public class JPPFBundlerFactory {
   private Bundler<?> createFallbackBundler() {
     FixedSizeProfile profile = new FixedSizeProfile(new TypedProperties().setInt("size", 1));
     return new FixedSizeBundler(profile);
+  }
+
+  /**
+   * Not instantiable from another class.
+   * @return {@link LoadBalancerPersistence} implementation based on the configuration.
+   */
+  private LoadBalancerPersistence initPersistence() {
+    try {
+      return ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, JPPFProperties.LOAD_BALANCING_PERSISTENCE);
+    } catch (Exception e) {
+      log.error(String.format("error creating LoadBalancerPersistence configured as %s = %s, load-balancer persistence is disabled%n%s",
+        JPPFProperties.LOAD_BALANCING_PERSISTENCE.getName(), JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), ExceptionUtils.getStackTrace(e)));
+    }
+    return null;
+  }
+
+  /**
+   * @return the configured persistence, or {@code null} if none is configured or the initialization failed.
+   */
+  public LoadBalancerPersistence getPersistence() {
+    return persistence;
+  }
+
+  /**
+   * @return the hash function used to generate bundle state identifiers.
+   */
+  public String getHashAlgorithm() {
+    return hashAlgorithm;
   }
 }

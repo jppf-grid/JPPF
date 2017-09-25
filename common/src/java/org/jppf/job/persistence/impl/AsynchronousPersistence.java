@@ -32,7 +32,7 @@ import org.slf4j.*;
  * ({@code void} return type) are non-blocking and return immediately. All other methods will block until they are executed and their result is available.
  * The execution of the interface's methods are delegated to a thread pool, whose size can be defined in the configuration or defaults to {@link Runtime#availableProcessors() Runtime.getRuntime().availableProcessors()}.
  * <p>This asynchronous persistence can be configured in two forms:
- * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
+ * <pre class="jppf_pre">
  * <span style="color: green"># shorten the configuration value for clarity</span>
  * wrapper = org.jppf.job.persistence.impl.AsynchronousPersistence
  * <span style="color: green"># asynchronous persistence with default thread pool size</span>
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * <span style="color: green"># asynchronous persistence with a specified thread pool size</span>
  * jppf.job.persistence = ${wrapper} &lt;pool_size&gt; &lt;actual_persistence&gt; &lt;param1&gt; ... &lt;paramN&gt;</pre>
  * <p>Here is an example configuration for an asynchronous database persistence:
- * <pre style="padding: 5px 5px 5px 0px; display: inline-block; background-color: #E0E0F0">
+ * <pre class="jppf_pre">
  * pkg = org.jppf.job.persistence.impl
  * <span style="color: green"># asynchronous database persistence with pool of 4 threads,</span>
  * <span style="color: green"># a table named 'JPPF_TEST' and datasource named 'JobDS'</span>
@@ -265,6 +265,6 @@ public class AsynchronousPersistence implements JobPersistence {
      * @return the execution result.
      * @throws JobPersistenceException if any error occurs.
      */
-    protected abstract T execute() throws JobPersistenceException;
+    abstract T execute() throws JobPersistenceException;
   }
 }

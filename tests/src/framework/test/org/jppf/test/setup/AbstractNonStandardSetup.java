@@ -44,10 +44,6 @@ public class AbstractNonStandardSetup extends BaseTest {
   /** */
   protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
   /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
-  /**
    * 
    */
   protected static TestConfiguration testConfig = null;

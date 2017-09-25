@@ -129,15 +129,18 @@ public class BaseSetup {
     TestConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("$nbDrivers", nbDrivers);
+    bindings.put("$nbNodes", nbNodes);
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++) {
-      drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions);
+      drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", drivers[i].getName());
       new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++) {
-      nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions);
+      nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", nodes[i].getName());
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
@@ -210,16 +213,21 @@ public class BaseSetup {
    * Stops the driver and node and close the client.
    * @throws Exception if a process could not be stopped.
    */
-  private static void close() throws Exception {
-    generateClientThreadDump();
-    if (client != null) {
-      client.close();
-      client = null;
-      Thread.sleep(500L);
+  private static void close() {
+    try {
+      generateClientThreadDump();
+      generateDriverThreadDump(client);
+      if (client != null) {
+        client.close();
+        client = null;
+        Thread.sleep(500L);
+      }
+      System.gc();
+      stopProcesses();
+      ConfigurationHelper.cleanup();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-    System.gc();
-    stopProcesses();
-    ConfigurationHelper.cleanup();
   }
 
   /**
@@ -237,6 +245,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
+    if (client == null) return;
     List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
     JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
     for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();

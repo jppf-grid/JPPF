@@ -35,6 +35,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class AnnealingTuneProfile extends AbstractLoadBalancingProfile {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * A default profile with default parameter values.
    */
   private static AtomicReference<AnnealingTuneProfile> defaultProfile = new AtomicReference<>(new AnnealingTuneProfile());

@@ -26,6 +26,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.nio.*;
@@ -118,6 +119,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Handles reservation of nodes to jobs.
    */
   private final NodeReservationHandler nodeReservationHandler;
+  /**
+   * Handler for th epersistence fo the state of the load-balancers.
+   */
+  private final LoadBalancerPersistenceManager bundlerHandler;
 
   /**
    * Initialize this node server.
@@ -139,6 +144,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       }
     });
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
+    bundlerHandler = new LoadBalancerPersistenceManager(bundlerFactory);
     INITIAL_BUNDLE_UUID = driver.getUuid();
     this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
@@ -526,5 +532,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public TaskQueueChecker<AbstractNodeContext> getTaskQueueChecker() {
     return taskQueueChecker;
+  }
+
+  /**
+   * @return the handler for th epersistence fo the state of the load-balancers.
+   * @exclude
+   */
+  public LoadBalancerPersistenceManager getBundlerHandler() {
+    return bundlerHandler;
   }
 }

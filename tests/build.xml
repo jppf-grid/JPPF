@@ -265,6 +265,7 @@
       </fileset>
       <report format="frames" todir="${report}" styledir="${tests.classes}"/>
     </junitreport>
+    <!--<copy todir="${report}" file="${basedir}/stylesheet.css"/>-->
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
 </project> 

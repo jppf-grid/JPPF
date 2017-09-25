@@ -127,7 +127,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
       protected JobManager createJobManager() {
         JobManager jobManager = null;
         try {
-          jobManager = new JcaJobManager(this);
+          jobManager = new JcaJobManager(this, getBundlerFactory());
         } catch (Exception e) {
           log.error("Can't initialize Job Manager", e);
         }

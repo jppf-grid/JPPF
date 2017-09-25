@@ -44,11 +44,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JDBCDataSource implements DataSource {
+public class JPPFDataSource implements DataSource {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JDBCDataSource.class);
+  private static Logger log = LoggerFactory.getLogger(JPPFDataSource.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -79,7 +79,7 @@ public class JDBCDataSource implements DataSource {
    * @param config the configuration properties from which to get the connection information.
    * @throws SQLException if any error occurs.
    */
-  public JDBCDataSource(final TypedProperties config) throws SQLException {
+  public JPPFDataSource(final TypedProperties config) throws SQLException {
     try {
       this.driverClass = config.get(DATASOURCE_DRIVER_CLASS);
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -102,7 +102,7 @@ public class JDBCDataSource implements DataSource {
    * @param driverClass JDBC driver class name.
    * @throws SQLException if any error occurs.
    */
-  public JDBCDataSource(final String user, final String pwd, final String url, final String driverClass) throws SQLException {
+  public JPPFDataSource(final String user, final String pwd, final String url, final String driverClass) throws SQLException {
     try {
       this.driverClass = driverClass;
       Class.forName(driverClass);

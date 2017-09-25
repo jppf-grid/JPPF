@@ -18,7 +18,6 @@
 
 package test.org.jppf.test.setup;
 
-import org.jppf.client.JPPFClient;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -30,11 +29,6 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * @author Laurent Cohen
  */
 public class Setup1D2N1C extends BaseTest {
-  /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
-
   /** */
   @Rule
   public TestWatcher setup1D2N1CWatcher = new TestWatcher() {

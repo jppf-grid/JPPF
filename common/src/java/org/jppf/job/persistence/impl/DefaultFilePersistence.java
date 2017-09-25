@@ -19,10 +19,10 @@ package org.jppf.job.persistence.impl;
 
 import java.io.*;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import org.jppf.job.persistence.*;
+import org.jppf.persistence.AbstractFilePersistence;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 6.0
  */
-public class DefaultFilePersistence implements JobPersistence {
+public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceInfo, JobPersistenceException> implements JobPersistence {
   /**
    * Logger for this class.
    */
@@ -69,24 +69,12 @@ public class DefaultFilePersistence implements JobPersistence {
    * Prefix format for a task result file name.
    */
   private static final String RESULT_PREFIX = "result-";
-  /**
-   * Default extension for the persisted objects files.
-   */
-  private static final String DEFAULT_EXTENSION = ".data";
-  /**
-   * Default extension for temporary files.
-   */
-  private static final String TEMP_EXTENSION = ".tmp";
-  /**
-   * The root directory for this persistence.
-   */
-  private final Path rootPath;
 
   /**
    * Initialize this persistence with the root path {@link #DEFAULT_ROOT} under the current user directory.
    * @throws JobPersistenceException if the default root does not exist and could not be created.
    */
-  public DefaultFilePersistence() throws JobPersistenceException {
+  public DefaultFilePersistence() {
     this(DEFAULT_ROOT);
   }
 
@@ -95,9 +83,8 @@ public class DefaultFilePersistence implements JobPersistence {
    * @param paths the root directory for this persistence.
    * @throws JobPersistenceException if the specified root does not exist and could not be created.
    */
-  public DefaultFilePersistence(final String... paths) throws JobPersistenceException {
-    this.rootPath = Paths.get((paths == null) || (paths.length == 0) || (paths[0] == null) ? DEFAULT_ROOT : paths[0]);
-    if (debugEnabled) log.debug("initializing {} with rootPath={}", getClass().getSimpleName(), rootPath);
+  public DefaultFilePersistence(final String... paths) {
+    super(paths.length > 0 ? paths : new String[] { DEFAULT_ROOT });
   }
 
   /**
@@ -110,7 +97,7 @@ public class DefaultFilePersistence implements JobPersistence {
   public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     try {
       if (debugEnabled) log.debug("storing {}", infos);
-      Path jobDir = getJobDir(infos.iterator().next().getJobUuid());
+      Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
       checkDirectory(jobDir);
       for (PersistenceInfo info: infos) {
         Path path = getPathFor(jobDir, info, false);
@@ -131,7 +118,7 @@ public class DefaultFilePersistence implements JobPersistence {
     if ((infos == null) || infos.isEmpty()) return null;
     try {
       if (debugEnabled) log.debug("loading {}", infos);
-      Path jobDir = getJobDir(infos.iterator().next().getJobUuid());
+      Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
       List<InputStream> result = new ArrayList<>(infos.size());
       if (Files.exists(jobDir)) {
         for (PersistenceInfo info: infos) {
@@ -150,14 +137,10 @@ public class DefaultFilePersistence implements JobPersistence {
     try {
       List<String> result = new ArrayList<>();
       if (Files.exists(rootPath)) {
-        DirectoryStream<Path> ds = Files.newDirectoryStream(rootPath, new DirectoryStream.Filter<Path>() {
-          @Override
-          public boolean accept(final Path entry) throws IOException {
-            return Files.isDirectory(entry);
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
+          for (Path path : ds) {
+            if (path != null) result.add(path.getFileName().toString());
           }
-        });
-        for (Path path : ds) {
-          if (path != null) result.add(path.getFileName().toString());
         }
       }
       if (debugEnabled) log.debug("uuids of persisted jobs: {}", result);
@@ -185,8 +168,8 @@ public class DefaultFilePersistence implements JobPersistence {
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
     try {
       if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
-      Path jobDir = getJobDir(jobUuid);
-      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new DeleteFileVisitor());
+      Path jobDir = getSubDir(jobUuid);
+      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new FileUtils.DeleteFileVisitor());
     } catch (Exception e) {
       throw new JobPersistenceException(e);
     }
@@ -195,7 +178,7 @@ public class DefaultFilePersistence implements JobPersistence {
   @Override
   public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
     try {
-      Path path = getPathFor(getJobDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
+      Path path = getPathFor(getSubDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
       return (path != null) && Files.exists(path);
     } catch (IOException e) {
       throw new JobPersistenceException(e);
@@ -213,7 +196,7 @@ public class DefaultFilePersistence implements JobPersistence {
   private int[] getPositions(final String jobUuid, final PersistenceObjectType type) throws JobPersistenceException {
     int[] positions = null;
     try {
-      Path jobDir = getJobDir(jobUuid);
+      Path jobDir = getSubDir(jobUuid);
       if (!Files.exists(jobDir)) positions = new int[0];
       else {
         List<Path> list = getPathsFor(jobDir, type);
@@ -235,15 +218,6 @@ public class DefaultFilePersistence implements JobPersistence {
       throw new JobPersistenceException(e);
     }
     return positions;
-  }
-
-  /**
-   * Get the directory of the job with the specified uuid.
-   * @param jobUuid the uuid of the job for which to get a path.
-   * @return a {@link Path} instance.
-   */
-  private Path getJobDir(final String jobUuid) {
-    return Paths.get(pathname(rootPath), jobUuid);
   }
 
   /**
@@ -288,16 +262,17 @@ public class DefaultFilePersistence implements JobPersistence {
    */
   private List<Path> getPathsFor(final Path jobDir, final PersistenceObjectType type) throws IOException {
     List<Path> result = new ArrayList<>();
-    DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, new DirectoryStream.Filter<Path>() {
+    try (DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, new DirectoryStream.Filter<Path>() {
       @Override
       public boolean accept(final Path entry) throws IOException {
         String fileName = pathname(entry.getFileName());
         String prefix = getPrefixForType(type);
         return fileName.startsWith(prefix) && fileName.endsWith(DEFAULT_EXTENSION);
       }
-    });
-    for (Path path : ds) {
-      if (path != null) result.add(path);
+    })) {
+      for (Path path : ds) {
+        if (path != null) result.add(path);
+      }
     }
     return result;
   }
@@ -317,45 +292,9 @@ public class DefaultFilePersistence implements JobPersistence {
     return null;
   }
 
-  /**
-   * Get the full path name for the file or directory denoted by the specified path.
-   * @param path the path for which to get the full name.
-   * @return the full path name.
-   */
-  private String pathname(final Path path) {
-    return path.toFile().getPath();
-  }
-
-  /**
-   * Check the specified directory and create it if it doesn't exist.
-   * @param dir the directory to check.
-   * @throws JobPersistenceException if any error occurs.
-   */
-  private synchronized void checkDirectory(final Path dir) throws JobPersistenceException {
-    if (!Files.exists(dir)) {
-      try {
-        Files.createDirectories(dir);
-      } catch (IOException e) {
-        throw new JobPersistenceException(e);
-      }
-    }
-  }
-
-  /**
-   * A file walker that deletes a complete file and folder hierarchy.
-   */
-  private class DeleteFileVisitor extends SimpleFileVisitor<Path> {
-    @Override
-    public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-      Files.delete(file);
-      return FileVisitResult.CONTINUE;
-    }
-
-    @Override
-    public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
-      if (e != null) throw e;
-      Files.delete(dir);
-      return FileVisitResult.CONTINUE;
-    }
+  /** @exclude */
+  @Override
+  protected JobPersistenceException convertException(final Exception e) {
+    return (e instanceof JobPersistenceException) ? (JobPersistenceException) e : new JobPersistenceException(e);
   }
 }

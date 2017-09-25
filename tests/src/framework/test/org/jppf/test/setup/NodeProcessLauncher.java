@@ -18,25 +18,13 @@
 
 package test.org.jppf.test.setup;
 
-import java.util.List;
-
+import java.util.*;
 
 /**
  * Used to launch a single node.
  * @author Laurent Cohen
  */
-public class NodeProcessLauncher extends GenericProcessLauncher
-{
-  /**
-   * Initialize the node launcher with the specified node id.
-   * @param n the id of the node, used to determine which configuration files to use.
-   */
-  public NodeProcessLauncher(final int n)
-  {
-    super(n, "  node", "classes/tests/config/node.template.properties", "classes/tests/config/log4j-node.template.properties");
-    setupCommon();
-  }
-
+public class NodeProcessLauncher extends GenericProcessLauncher {
   /**
    * Initialize the node launcher.
    * @param n the id of the driver, used to determine which configuration files to use.
@@ -44,20 +32,10 @@ public class NodeProcessLauncher extends GenericProcessLauncher
    * @param log4jConfig the path to the log4j template file.
    * @param classpath the classpath elements for the node.
    * @param jvmOptions additional JVM options for the node.
+   * @param bindings variable bindings used in 'expr:' script expressions.
    */
-  public NodeProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions)
-  {
-    super(n, "  node", driverConfig, log4jConfig, classpath, jvmOptions);
+  public NodeProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions, final Map<String, Object> bindings) {
+    super(n, "  node", driverConfig, log4jConfig, classpath, jvmOptions, bindings);
     setMainClass("org.jppf.node.NodeRunner");
-  }
-
-  /**
-   * Perform setup common to all configurations.
-   */
-  private void setupCommon()
-  {
-    setMainClass("org.jppf.node.NodeRunner");
-    addClasspathElement("classes/tests/config");
-    addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-node" + n + ".properties");
   }
 }
