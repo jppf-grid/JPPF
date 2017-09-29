@@ -1,10 +1,10 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "6.0-alpha-2";
+  $ver1 = "6.0-alpha-3";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 6.0 alpha 2 preview</h1>
+  <h1 align="center">Downloads - JPPF 6.0 alpha 3 preview</h1>
 
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">

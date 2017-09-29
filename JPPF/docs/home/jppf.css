@@ -105,6 +105,8 @@ hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: 
 .blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
 .simpleList { list-style: none; text-indent: -20 }
 
+sub { font-size: 0.8em; }
+
 .news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #6D78B6 }
 .links { color: #000060; font-size: 10pt; font-family: Arial, Verdana, sans-serif }
 .linksub { font-size: 12pt; color: #8080FF; font-weight: bold }
@@ -388,7 +390,7 @@ div#bodyContent div h2 {
 }
 
 .wiki_note {
-  background-color: #FFF990;
+  background-color: #FFFD94;
   border: solid 1px #8D98D6;
   padding: 3px 2px;
   margin: 0px;

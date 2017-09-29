@@ -28,7 +28,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @since 5.2
  */
-abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
+public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   /**
    * Location of the localization resource bundles.
    */

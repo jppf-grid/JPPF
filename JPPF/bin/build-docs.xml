@@ -155,7 +155,7 @@
         <include name="*.jpg"/>
       </fileset>
     </copy>
-    <favicon javadoc.dir="${javadoc}"/>
+    <favicon dir="${javadoc}"/>
     <!-- create API doc zip -->
     <property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
     <delete file="${javadoc.file}" quiet="true"/>
@@ -183,17 +183,19 @@
   </macrodef>
 
   <!--
-    Add a link to JPPF favicon in all javadoc HTML pages.
+    Add a link to a favicon in all javadoc HTML pages.
     Attributes:
-      "javadoc.dir" the root javadoc folder
+      "dir" the root javadoc folder
+      "icon" the url of the favicon, defaults to "http://www.jppf.org/images/jppf-icon.ico"
   -->
   <macrodef name="favicon">
-    <attribute name="javadoc.dir"/>
+    <attribute name="dir"/>
+    <attribute name="icon" default="http://www.jppf.org/images/jppf-icon.ico"/>
     <sequential>
-      <replace dir="@{javadoc.dir}">
+      <replace dir="@{dir}">
         <include name="**/*.html"/>
         <replacetoken><![CDATA[</head>]]></replacetoken>
-        <replacevalue><![CDATA[<link rel="shortcut icon" href="http://www.jppf.org/images/jppf-icon.ico" type="image/x-icon">
+        <replacevalue><![CDATA[<link rel="shortcut icon" href="@{icon}" type="image/x-icon">
       </head>]]></replacevalue>
       </replace>
     </sequential>

@@ -66,7 +66,7 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
         break;
 
       case JOB_RETURNED:
-        if (node != null) monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
+        if ((node != null) && (job != null)) monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
         break;
     }
   }

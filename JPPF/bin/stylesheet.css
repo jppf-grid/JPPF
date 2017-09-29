@@ -4,28 +4,22 @@ Overall document style
 */
 body {
     background-color: #D8DAED;
-    /*color:#353833;*/
     color:black;
     font-family:Arial, Helvetica, sans-serif;
-    /*font-size:86%;*/
     font-size: 10pt;
     margin:0;
 }
 a:link
     text-decoration:none;
-    /*color:#2c4bD7;*/
 }
 a:visited {
     text-decoration:none;
-    /*color:#bb7a2a;*/
 }
 a:hover, a:focus {
     text-decoration:none;
-    /*color:#bb7a2a;*/
 }
 a:active {
     text-decoration:none;
-    /*color:#4c6b87;*/
 }
 a[name] {
     color:#353833;
@@ -36,6 +30,9 @@ a[name]:hover {
 }
 pre {
     font-size:1em;
+}
+.jppf_pre {
+    padding: 5px 15px 5px 0px; display: inline-block; margin: 0px; background-color: #E0E0F0
 }
 
 h1, h2, h3, h4, h5 { color: #6D78B6; }
@@ -67,7 +64,10 @@ table tr td dt code {
     vertical-align:top;
 }
 sup {
-    font-size:.6em;
+    font-size:.8em;
+}
+sub {
+    font-size:.8em;
 }
 /*
 Document title and Copyright styles
@@ -88,7 +88,6 @@ Document title and Copyright styles
     margin-left:.5em;
 }
 .bar a, .bar a:link, .bar a:visited, .bar a:active {
-    /*color:#FFFFFF;*/
     text-decoration:none;
 }
 .bar a:hover, .bar a:focus {
@@ -108,21 +107,14 @@ Document title and Copyright styles
 Navigation bar styles
 */
 .bar {
-    /*
-    background-image:url(resources/background.gif);
-    background-repeat:repeat-x;
-    */
     background: transparent;
-    /*color:#FFFFFF;*/
     color:#6D78B6;
     padding:.1em .1em .1em .1em;
-    height:auto;/*height:1.8em;*/
+    height:auto;
     font-size:1em;
     margin:0;
 }
 .topNav {
-    /*background-image:url(resources/background.gif);
-    background-repeat:repeat-x;*/
     background: transparent;
     color:#FFFFFF;
     float:left;
@@ -135,10 +127,6 @@ Navigation bar styles
 }
 .bottomNav {
     margin-top:10px;
-    /*
-    background-image:url(resources/background.gif);
-    background-repeat:repeat-x;
-    */
     color:#FFFFFF;
     float:left;
     padding:0;
@@ -195,8 +183,6 @@ ul.subNavList li, ul.subNavList li a {
     color:#bb7a2a;
 }
 .navBarCell1Rev {
-    /*background-image:url(resources/tab.gif);
-    background-color:#a88834;*/
     background-color: #00008B;
     color:#FFFFFF;
     font-weight: bold;
@@ -240,8 +226,6 @@ Page header and footer styles
 Heading styles
 */
 div.details ul.blockList ul.blockList ul.blockList li.blockList h4, div.details ul.blockList ul.blockList ul.blockListLast li.blockList h4 {
-    /*background-color:#dee3e9;*/
-    /*border-bottom:1px solid #9eadc0;*/
     margin:0 0 6px -8px;
     padding:2px 5px;
 }
@@ -338,9 +322,6 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
     margin-bottom:0px;
 }
 ul.blockList ul.blockList li.blockList, ul.blockList ul.blockListLast li.blockList {
-    /*padding:0px 20px 5px 10px;
-    border:1px solid #9eadc0;
-    background-color:#f9f9f9;*/
     background-color: transparent;
 }
 ul.blockList ul.blockList ul.blockList li.blockList, ul.blockList ul.blockList ul.blockListLast li.blockList {
@@ -429,10 +410,8 @@ ul.blockList ul.blockList li.blockList table {
     background-color: #EEEEFF;
 }
 .altColor {
-    /*background-color:#eeeeef;*/
 }
 .rowColor {
-    /*background-color:#ffffff;*/
 }
 .overviewSummary td, .packageSummary td, .contentContainer ul.blockList li.blockList td, .summary td, .classUseContainer td, .constantValuesContainer td {
     text-align:left;
@@ -440,7 +419,6 @@ ul.blockList ul.blockList li.blockList table {
     padding:2px 4px 1px 4px;
 }
 th.colFirst, th.colLast, th.colOne, .constantValuesContainer th {
-    /*background:#dee3e9;*/
     border-top:1px solid #9eadc0;
     border-bottom:1px solid #9eadc0;
     text-align:left;
@@ -477,11 +455,9 @@ table.overviewSummary  {
 }
 table.overviewSummary td.colFirst, table.overviewSummary th.colFirst,
 table.overviewSummary td.colOne, table.overviewSummary th.colOne {
-  /*width:25%;*/
   vertical-align:middle;
 }
 table.packageSummary td.colFirst, table.overviewSummary th.colFirst {
-    /*width:25%;*/
     vertical-align:middle;
 }
 

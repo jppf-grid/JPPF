@@ -247,7 +247,7 @@
   <h2 style="${style}">&nbsp;<img src="images/icons/emblem-what.png" class="titleWithIcon"/>Curious or adventurous?</h2>
 </div>
       <div style="height: 5px"></div>
-      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha 2</a>.<br>
+      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha 3</a>.<br>
       <div style="height: 5px"></div>
       <p align="left"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>

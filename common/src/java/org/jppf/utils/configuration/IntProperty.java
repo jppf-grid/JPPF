@@ -22,7 +22,6 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code int} properties.
  * @author Laurent Cohen
  * @since 5.2
- * @exclude
  */
 public class IntProperty extends NumberProperty<Integer> {
   /**

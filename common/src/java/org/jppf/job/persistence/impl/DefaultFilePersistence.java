@@ -72,7 +72,6 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
 
   /**
    * Initialize this persistence with the root path {@link #DEFAULT_ROOT} under the current user directory.
-   * @throws JobPersistenceException if the default root does not exist and could not be created.
    */
   public DefaultFilePersistence() {
     this(DEFAULT_ROOT);
@@ -81,7 +80,6 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   /**
    * Initialize this persistence with the specified path as root directory.
    * @param paths the root directory for this persistence.
-   * @throws JobPersistenceException if the specified root does not exist and could not be created.
    */
   public DefaultFilePersistence(final String... paths) {
     super(paths.length > 0 ? paths : new String[] { DEFAULT_ROOT });

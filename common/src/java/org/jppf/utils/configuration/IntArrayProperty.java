@@ -24,7 +24,6 @@ import org.jppf.utils.StringUtils;
  * Implementation of {@link JPPFProperty} for properties whose value is an array of space-separated {@code int}s.
  * @author Laurent Cohen
  * @since 6.0
- * @exclude
  */
 public class IntArrayProperty extends AbstractJPPFProperty<int[]> {
   /**

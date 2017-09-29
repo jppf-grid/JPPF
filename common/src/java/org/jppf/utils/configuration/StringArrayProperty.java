@@ -24,7 +24,6 @@ import org.jppf.utils.StringUtils;
  * Implementation of {@link JPPFProperty} for properties whose value is an array of {@code String}s.
  * @author Laurent Cohen
  * @since 5.2
- * @exclude
  */
 public class StringArrayProperty extends AbstractJPPFProperty<String[]> {
   /**

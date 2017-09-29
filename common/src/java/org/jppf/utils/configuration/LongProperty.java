@@ -22,7 +22,6 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code long} properties.
  * @author Laurent Cohen
  * @since 5.2
- * @exclude
  */
 public class LongProperty extends NumberProperty<Long> {
   /**

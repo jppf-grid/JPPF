@@ -22,7 +22,6 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code float} properties.
  * @author Laurent Cohen
  * @since 5.2
- * @exclude
  */
 public class FloatProperty extends NumberProperty<Float> {
   /**

@@ -22,7 +22,6 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code boolean} properties.
  * @author Laurent Cohen
  * @since 5.2
- * @exclude
  */
 public class BooleanProperty extends AbstractJPPFProperty<Boolean> {
   /**

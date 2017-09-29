@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.load.balancer.persistence.TestClientDatabaseLoadBalancerPersistence;
+import test.org.jppf.load.balancer.persistence.TestClientFileLoadBalancerPersistence;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  */
 @RunWith(RepeatingSuite.class)
 @RepeatingSuite.RepeatingSuiteClasses(repeat=10, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestClientDatabaseLoadBalancerPersistence.class })
+  classes={ TestClientFileLoadBalancerPersistence.class })
 public class JPPFSuite {
 }

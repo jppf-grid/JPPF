@@ -25,7 +25,7 @@ package org.jppf.utils.configuration;
  * @author Laurent Cohen
  * @since 5.2
  */
-abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> {
+public abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> {
   /**
    * The minimum accepted value for this property.
    */
@@ -58,7 +58,7 @@ abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> 
   @SuppressWarnings("unchecked")
   public NumberProperty(final String name, final T defaultValue, final T minValue, final T maxValue, final String... aliases) {
     super(name, defaultValue, aliases);
-    if ((minValue == null) || (maxValue == null)) throw new IllegalArgumentException(String.format("min and max values cannot be nuul (name=%s; min=%s; max=%s", name, minValue, minValue));
+    if ((minValue == null) || (maxValue == null)) throw new IllegalArgumentException(String.format("min and max values cannot be null (name=%s; min=%s; max=%s", name, minValue, minValue));
     if (minValue.doubleValue() > maxValue.doubleValue()) throw new IllegalArgumentException(String.format("min value must be <= max value (name=%s; min=%s; max=%s)", name, minValue, minValue));
     this.minValue = (Comparable<T>) minValue;
     this.maxValue = (Comparable<T>) maxValue;
