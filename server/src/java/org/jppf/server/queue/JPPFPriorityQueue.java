@@ -22,6 +22,7 @@ import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
@@ -101,7 +102,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           int n = clientBundle.getJob().getTaskCount();
           clientBundle.getJob().setDriverQueueTaskCount(n);
           queued = true;
-          serverJob = new ServerJob(lock, jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
+          serverJob = new ServerJob(new ReentrantLock(), jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
           jobManager.jobQueued(serverJob);
           serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
           serverJob.setQueueEntryTime(System.currentTimeMillis());
