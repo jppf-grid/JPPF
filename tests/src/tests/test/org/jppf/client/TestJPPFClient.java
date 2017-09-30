@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
+import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
 import org.jppf.job.JobEventType;
@@ -282,10 +283,12 @@ public class TestJPPFClient extends Setup1D1N {
       job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "2", true, false, nbTasks, LifeCycleTask.class, 10L);
       job.addJobListener(listener = new MyJobListener());
       job.getClientSLA().setMaxChannels(10);
+      JobManagerClient jmc = (JobManagerClient) client.getJobManager();
+      while (jmc.getTaskQueueChecker().getNbIdleChannels() < 2) Thread.sleep(10L);
       props = new TypedProperties().setInt("initialSize", 5).setInt("proportionalityFactor", 1);
       client.setLoadBalancerSettings("proportional", props);
       client.submitJob(job);
-      assertTrue(listener.dispatchCount.get() >= 3);
+      assertTrue("expected at least <3> but got <" + listener.dispatchCount.get() + ">", listener.dispatchCount.get() >= 3);
       assertTrue(listener.tasksPerDispatch.size() >= 3);
       for (int i=1; i<=listener.tasksPerDispatch.size(); i++) assertNotNull(listener.tasksPerDispatch.get(i));
       assertEquals(5, listener.tasksPerDispatch.get(1).intValue());
