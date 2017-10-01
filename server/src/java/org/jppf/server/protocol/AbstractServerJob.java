@@ -421,10 +421,10 @@ public abstract class AbstractServerJob {
       SubmissionStatus oldValue = this.submissionStatus;
       this.submissionStatus = submissionStatus;
       fireStatusChanged(oldValue, this.submissionStatus);
-      if (submissionStatus == SubmissionStatus.ENDED) done();
     } finally {
       lock.unlock();
     }
+    if (submissionStatus == SubmissionStatus.ENDED) done();
   }
 
   /**

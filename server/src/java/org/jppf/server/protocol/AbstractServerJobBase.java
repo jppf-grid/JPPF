@@ -293,18 +293,20 @@ public class AbstractServerJobBase extends AbstractServerJob {
         @Override
         public void run() {
           if (debugEnabled) log.debug("bundle ended: {}", bundle);
+          SubmissionStatus newStatus = null;
           lock.lock();
           try {
             bundle.removeCompletionListener(BundleCompletionListener.this);
             clientBundles.remove(bundle);
             tasks.removeAll(bundle.getTaskList());
             if (completionBundles != null) completionBundles.remove(bundle);
-            if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
+            if (clientBundles.isEmpty() && tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
           } catch(Exception e) {
             if (debugEnabled) log.debug(e.getMessage(), e);
           } finally {
             lock.unlock();
           }
+          if (newStatus != null) setSubmissionStatus(newStatus);
         }
       };
       JPPFDriver.getInstance().getNodeNioServer().getTransitionManager().submit(r);
