@@ -114,8 +114,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    * Get the lock used for synchronized access to the queue.
    * @return a <code>Lock</code> instance.
    */
-  public Lock getLock()
-  {
+  public Lock getLock() {
     return lock;
   }
 
