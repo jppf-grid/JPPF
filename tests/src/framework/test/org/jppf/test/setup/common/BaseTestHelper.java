@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -257,7 +258,8 @@ public class BaseTestHelper {
         }
         if (toNodes) {
           try {
-            jmx.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+            JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+            if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, new String[] { String[].class.getName() });
           } catch (Exception e) {
             System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
               BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
