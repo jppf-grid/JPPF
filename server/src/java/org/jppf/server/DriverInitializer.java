@@ -174,8 +174,6 @@ public class DriverInitializer {
       } catch(@SuppressWarnings("unused") UnknownHostException e) {
         connectionInfo.host = "localhost";
       }
-      if (config.get(MANAGEMENT_ENABLED)) connectionInfo.managementPort = config.get(MANAGEMENT_PORT);
-      if (config.get(MANAGEMENT_SSL_ENABLED)) connectionInfo.sslManagementPort = config.get(MANAGEMENT_SSL_PORT);
       if (config.get(RECOVERY_ENABLED)) connectionInfo.recoveryPort = config.get(RECOVERY_SERVER_PORT);
     }
     return connectionInfo;
@@ -243,14 +241,16 @@ public class DriverInitializer {
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
-            info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
-            String s = props.getString(String.format("jppf.peer.%s.server.port", name), "11111");
-            int[] ports = StringUtils.parseIntValues(s);
-            if (ssl) info.sslServerPorts = ports;
+            info.host = props.get(PARAM_PEER_SERVER_HOST, name);
+            int[] ports = { props.get(PARAM_PEER_SERVER_PORT, name) };
+            boolean peerSSL = ssl;
+            if (props.containsKey(PARAM_PEER_SSL_ENABLED.resolveName(new String[] {name}))) peerSSL = props.get(PARAM_PEER_SSL_ENABLED, name);
+            if (peerSSL) info.sslServerPorts = ports;
             else info.serverPorts = ports;
-            int size = props.getInt(String.format("jppf.peer.%s.pool.size", name), 1);
+            int size = props.get(PARAM_PEER_POOL_SIZE, name);
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
-            peerConnectionPoolHandler.newPool(name, size, info, ssl, false);
+            if (debugEnabled) log.debug(String.format("read peer configuration: name=%s, size=%d, secure=%b, info=%s", name, size, peerSSL, info));
+            peerConnectionPoolHandler.newPool(name, size, info, peerSSL, false);
           }
         }
       }
@@ -302,7 +302,6 @@ public class DriverInitializer {
    */
   private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
-    JPPFConnectionInformation info = getConnectionInformation();
     JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
     String tmp = ssl ? "secure " : "";
     try {
@@ -311,8 +310,6 @@ public class DriverInitializer {
         if (debugEnabled) log.debug("initializing {}management", tmp);
         server = JMXServerFactory.createServer(driver.getUuid(), ssl, ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT);
         server.start(getClass().getClassLoader());
-        if (!ssl) info.managementPort = server.getManagementPort();
-        else info.sslManagementPort = server.getManagementPort();
         String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
         System.out.println(msg);
         if (debugEnabled) log.debug(msg);

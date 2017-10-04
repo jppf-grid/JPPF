@@ -19,6 +19,7 @@
 package org.jppf.utils.configuration;
 
 import java.util.*;
+import java.util.regex.*;
 
 import org.jppf.utils.*;
 
@@ -33,6 +34,15 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * Location of the localization resource bundles.
    */
   private  static final String I18N_BASE = "org.jppf.utils.configuration.i18n.JPPFProperties";
+  /**
+   * Constant for an empty String array.
+   */
+  private  static final String[] NO_PARAM = new String[0];
+  /**
+   * The regex pattern for identifying parameters in a property name. This pattern uses explicit reluctant quantifiers, as opposed
+   * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value.
+   */
+  private static final Pattern PARAM_PATTERN = Pattern.compile("(?:\\<){1}?(.*?)\\>+?");
   /**
    * The name of this property.
    */
@@ -53,6 +63,10 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * The tags that apply to this property.
    */
   private Set<String> tags;
+  /**
+   * Names of the parmaters used in the property's name, if any.
+   */
+  private final String[] paramNames;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -64,6 +78,7 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
     this.name = name;
     this.defaultValue = defaultValue;
     this.aliases = aliases;
+    this.paramNames = parseParams(name);
   }
 
   @Override
@@ -135,5 +150,52 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
       } else tags.add("");
     }
     return tags;
+  }
+
+  @Override
+  public String[] getParameters() {
+    return paramNames;
+  }
+
+
+  @Override
+  public String getParameterDoc(final String param) {
+    return LocalizationUtils.getLocalized(I18N_BASE, name + "." + param);
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public String resolveName(final String...params) {
+    return resolveName(name, params);
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public String resolveName(final String alias, final String...params) {
+    if ((paramNames.length <= 0) || (params == null) || (params.length <= 0)) return name;
+    int n = paramNames.length;
+    if (n > params.length) n = params.length;
+    String s = alias;
+    for (int i=0; i<n; i++) s = s.replace("<" + paramNames[i] + ">", params[i]);
+    return s;
+  }
+
+  /**
+   * Resolve the parameters, if any, included in the property's name.
+   * @param name the name of the property to parse.
+   * @return an array of parameter names, possibly empty.
+   */
+  private static String[] parseParams(final String name) {
+    List<String> params = new ArrayList<>();
+    Matcher matcher = PARAM_PATTERN.matcher(name);
+    while (matcher.find()) {
+      String param = matcher.group(1);
+      params.add(param);
+    }
+    return params.isEmpty() ? NO_PARAM : params.toArray(new String[params.size()]);
   }
 }

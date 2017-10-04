@@ -47,14 +47,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   public int[] sslServerPorts = null;
   /**
-   * Port number used for JMX management and monitoring.
-   */
-  public int managementPort = -1;
-  /**
-   * Port number used for JMX management and monitoring over a SSL/TLS connection.
-   */
-  public int sslManagementPort = -1;
-  /**
    * Port number for recovery from hardware failures.
    */
   public int recoveryPort = -1;
@@ -160,8 +152,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (!equalStrings(host, other.host)) return false;
     if (!equalIntArrays(serverPorts, other.serverPorts)) return false;
     if (!equalIntArrays(sslServerPorts, other.sslServerPorts)) return false;
-    if (managementPort != other.managementPort) return false;
-    if (sslManagementPort != other.sslManagementPort) return false;
     if (recoveryPort != other.recoveryPort) return false;
     if (compareUuid) {
       if (uuid == null) return other.uuid == null;
@@ -175,8 +165,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     JPPFConnectionInformation ci = new JPPFConnectionInformation();
     ci.uuid = uuid;
     ci.host = host;
-    ci.managementPort = managementPort;
-    ci.sslManagementPort = sslManagementPort;
     ci.recoveryPort = recoveryPort;
     if (serverPorts != null) {
       ci.serverPorts = new int[serverPorts.length];
@@ -199,7 +187,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", host=").append(host);
-    sb.append(", managementPort=").append(managementPort);
     sb.append(", recoveryPort=").append(recoveryPort);
     sb.append(", serverPorts=").append(StringUtils.buildString(serverPorts));
     sb.append(", sslServerPorts=").append(StringUtils.buildString(sslServerPorts));

@@ -26,6 +26,7 @@ import javax.swing.JTabbedPane;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -63,12 +64,11 @@ public class PluggableViewHandler {
   private boolean addViewFromConfig(final String name) {
     List<String> errors = new ArrayList<>();
     TypedProperties config = JPPFConfiguration.getProperties();
-    String prefix = String.format("jppf.admin.console.view.%s", name);
-    boolean active = config.getBoolean(prefix + ".enabled", true);
+    boolean active = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ENABLED, name);
     if (!active) return false;
-    String className = config.getString(prefix + ".class", null);
+    String className = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_CLASS, name);
     if ((className == null) || "".equals(className)) errors.add(String.format("no class name defined for pluggable view '%s'", name));
-    String containerName = config.getString(prefix + ".addto", null);
+    String containerName = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ADD_TO, name);
     if ((containerName == null) || "".equals(containerName)) errors.add(String.format("no 'addto' property defined for pluggable view '%s'", name));
     TabbedPaneOption container = null;
     PluggableViewDescriptor containerDesc = viewMap.get(containerName);
@@ -95,19 +95,19 @@ public class PluggableViewHandler {
           view.setJobMonitor(StatsHandler.getInstance().getJobMonitor());
           option = new PluggableViewOption(view);
           option.setName(name);
-          String title = config.getString(prefix + ".title", name);
+          String title = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_TITLE, name);
           if ((title == null) || "".equals(title.trim())) title = name;
           option.setLabel(title);
-          String iconPath = config.getString(prefix + ".icon", null);
+          String iconPath = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ICON, name);
           if (iconPath != null) option.setIconPath(iconPath);
           option.setDetachable(true);
           option.createUI();
-          int pos = config.getInt(prefix + ".position", -1);
+          int pos = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_POSITION, name);
           try {
             if (pos < 0) pos = container.getChildren().size();
             container.add(option, pos);
             JTabbedPane pane = (JTabbedPane) container.getUIComponent();
-            if (config.getBoolean(prefix + ".autoselect", false)) pane.setSelectedIndex(pos);
+            if (config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_AUTOSELECT, name)) pane.setSelectedIndex(pos);
             if (log.isDebugEnabled()) log.debug("successfully added pluggable view '{}'", name);
             return true;
           } catch (Exception e) {

@@ -70,7 +70,7 @@ public class SubstitutionsHandler {
   /**
    * Stores the properties whose values are fully resolved.
    */
-  private final TypedProperties resolvedProps = new TypedProperties();
+  private final Properties resolvedProps = new TypedProperties();
   /**
    * Stores the properties whose values are fully resolved.
    */
@@ -93,10 +93,11 @@ public class SubstitutionsHandler {
   /**
    * Resolve the substitutions in the input {@link TypedProperties} object.
    * This method actually changes the property values in the input, i.e. it mutates the input {@link TypedProperties} object.
+   * @param <T> the ytpe of proeprties of object.
    * @param props the properties where substitutions must be resolved.
    * @return TypedProperties object in which substitutions have been resolved whenever possible.
    */
-  public TypedProperties resolve(final TypedProperties props) {
+  public <T extends Properties> T resolve(final T props) {
     int i = 0;
     if (traceEnabled) log.trace("starting substitution handling");
     Set<String> set = props.stringPropertyNames();

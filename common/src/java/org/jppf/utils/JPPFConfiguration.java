@@ -84,6 +84,19 @@ public final class JPPFConfiguration {
   }
 
   /**
+   * Get the value of a predefined parametrized property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().get(property, parameters)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the value of the property according to its type.
+   * @since 6.0
+   */
+  public static <T> T get(final JPPFProperty<T> property, final String...parameters) {
+    return getProperties().get(property, parameters);
+  }
+
+  /**
    * Set the value of a predefined property.
    * This is the same as calling {@code JPPFConfiguration.getProperties().set(property, value)}.
    * @param <T> the type of the property.
@@ -96,6 +109,20 @@ public final class JPPFConfiguration {
   }
 
   /**
+   * Set the value of a predefined parametrized property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().set(property, value, parameters)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to set.
+   * @param value the value to set.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the {@link TypedProperties} instance in which the value is set.
+   * @since 6.0
+   */
+  public static <T> TypedProperties set(final JPPFProperty<T> property, final T value, final String...parameters) {
+    return getProperties().set(property, value, parameters);
+  }
+
+  /**
    * Remove the predefined property.
    * This is the same as calling {@code JPPFConfiguration.getProperties().remove(property)}.
    * @param <T> the type of the property.
@@ -104,6 +131,19 @@ public final class JPPFConfiguration {
    */
   public static <T> T remove(final JPPFProperty<T> property) {
     return getProperties().remove(property);
+  }
+
+  /**
+   * Remove the predefined parametrized property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().remove(property)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the value of the property according to its type.
+   * @since 6.0
+   */
+  public static <T> T remove(final JPPFProperty<T> property, final String...parameters) {
+    return getProperties().remove(property, parameters);
   }
 
   /**

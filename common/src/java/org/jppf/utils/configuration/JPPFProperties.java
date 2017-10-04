@@ -96,6 +96,18 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> DISCOVERY_PRIORITY = new IntProperty("jppf.discovery.priority", 0);
   /** Names of the manually configured servers in the client */
   public static final JPPFProperty<String[]> DRIVERS = new StringArrayProperty("jppf.drivers", " ", new String[] {"default-driver"});
+  /** Manually defined driver host for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<String> PARAM_SERVER_HOST = new StringProperty("<driver_name>.jppf.server.host", "localhost");
+  /** Manually defined driver port for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_SERVER_PORT = new IntProperty("<driver_name>.jppf.server.port", 11111, 0, 65535);
+  /** Manually defined SSL enabled flag for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<Boolean> PARAM_SERVER_SSL_ENABLED = new BooleanProperty("<driver_name>.jppf.ssl.enabled", false);
+  /** Manually defined priority for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_PRIORITY = new IntProperty("<driver_name>.jppf.priority", 0);
+  /** Manually defined connection ppol size for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_POOL_SIZE = new IntProperty("<driver_name>.jppf.pool.size", 1, 1, Integer.MAX_VALUE);
+  /** Manually defined JMX connection ppol size for a client-to-driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_JMX_POOL_SIZE = new IntProperty("<driver_name>.jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
   /** UI refresh mode for the job data panel: 'immediate_notifications' | 'deferred_notifications' | 'polling' */
   public static final JPPFProperty<String> GUI_PUBLISH_MODE = new StringProperty("jppf.gui.publish.mode", "immediate_notifications");
   /** Interval between updates of the job data view */
@@ -205,6 +217,14 @@ public class JPPFProperties {
   public static final JPPFProperty<Long> PEER_DISCOVERY_REMOVAL_CLEANUP_INTERVAL = new LongProperty("jppf.peer.discovery.removal.cleanup.interval", 30_000L);
   /** Space-separated list of peer server names */
   public static final JPPFProperty<String> PEERS = new StringProperty("jppf.peers", null);
+  /** Server host for a manually configured peer driver connection (parametrized) */
+  public static final JPPFProperty<String> PARAM_PEER_SERVER_HOST = new StringProperty("jppf.peer.<peer_name>.server.host", "localhost");
+  /** Server port for a manually configured peer driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_PEER_SERVER_PORT = new IntProperty("jppf.peer.<peer_name>.server.port", 11111, 0, 65535);
+  /** SSL enabled flag for a manually configured peer driver connection (parametrized) */
+  public static final JPPFProperty<Boolean> PARAM_PEER_SSL_ENABLED = new BooleanProperty("jppf.peer.<peer_name>.ssl.enabled", false);
+  /** COnnection pool size for a manually configured peer driver connection (parametrized) */
+  public static final JPPFProperty<Integer> PARAM_PEER_POOL_SIZE = new IntProperty("jppf.peer.<peer_name>.pool.size", 1, 1, Integer.MAX_VALUE);
   /** Path to the security policy file */
   public static final JPPFProperty<String> POLICY_FILE = new StringProperty("jppf.policy.file", null);
   /** Connection pool size for discovered server conenctions */
@@ -403,6 +423,20 @@ public class JPPFProperties {
   public static final JPPFProperty<Double> JOB_PERSISTENCE_MEMORY_THRESHOLD = new DoubleProperty("jppf.job.persistence.memory.threshold", 70d);
   /** Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence */
   public static final JPPFProperty<String> LOAD_BALANCING_PERSISTENCE_DDL_LOCATION = new StringProperty("jppf.load.balancing.persistence.ddl.location", "org/jppf/load/balancer/persistence/load_balancer_persistence.sql");
+  /** Enable / disable a pluggable view */
+  public static final JPPFProperty<Boolean> ADMIN_CONSOLE_VIEW_ENABLED = new BooleanProperty("jppf.admin.console.view.<view_name>.enabled", true);
+  /** Name of a pluggable view class, extending org.jppf.ui.plugin.PluggableView */
+  public static final JPPFProperty<String> ADMIN_CONSOLE_VIEW_CLASS = new StringProperty("jppf.admin.console.view.<view_name>.class", null);
+  /** The title for the view, seen as the tab label */
+  public static final JPPFProperty<String> ADMIN_CONSOLE_VIEW_TITLE = new StringProperty("jppf.admin.console.view.<view_name>.title", null);
+  /** Path to the icon for a pluggable view, seen as the tab icon */
+  public static final JPPFProperty<String> ADMIN_CONSOLE_VIEW_ICON = new StringProperty("jppf.admin.console.view.<view_name>.icon", null);
+  /** The built-in view a pluggable view is attached to. It must be one of the tabbed panes of the admin console. Possible values: Main | Topology | Charts */
+  public static final JPPFProperty<String> ADMIN_CONSOLE_VIEW_ADD_TO = new StringProperty("jppf.admin.console.view.<view_name>.addto", "Main").setPossibleValues("Main", "Topology", "Charts");
+  /** The position at which a pluggable view is inserted withing the enclosing tabbed pane. A negative value means insert at the end */
+  public static final JPPFProperty<Integer> ADMIN_CONSOLE_VIEW_POSITION = new IntProperty("jppf.admin.console.view.<view_name>.position", -1);
+  /** Whether to automatically select the pluggable view */
+  public static final JPPFProperty<Boolean> ADMIN_CONSOLE_VIEW_AUTOSELECT = new BooleanProperty("jppf.admin.console.view.<view_name>.autoselect", false);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 

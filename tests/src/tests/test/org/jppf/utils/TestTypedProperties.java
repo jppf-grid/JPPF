@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -411,6 +412,47 @@ public class TestTypedProperties extends BaseTest {
       checkProperty(props, "prop.21", "groovy");
       checkProperty(props, "prop.22", "groovy");
     }
+  }
+
+  /**
+   * Test properties with parmaterized names
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testParmetrizedProperties() throws Exception {
+    JPPFProperty<String> hostProp = new StringProperty("<driver_name>.jppf.server.host", "localhost");
+    String[] params = hostProp.getParameters();
+    assertNotNull(params);
+    assertEquals(1, params.length);
+    assertEquals("driver_name", params[0]);
+    JPPFProperty<Integer> portProp = new IntProperty("<driver_name>.jppf.server.port", 11111);
+    params = portProp.getParameters();
+    assertNotNull(params);
+    assertEquals(1, params.length);
+    assertEquals("driver_name", params[0]);
+    TypedProperties props = new TypedProperties().set(JPPFProperties.DRIVERS, new String[] { "driver1", "driver2" });
+    int i = 1;
+    for (String driver: props.get(JPPFProperties.DRIVERS)) {
+      props.set(hostProp, "host" + i, driver);
+      props.set(portProp, 11110 + i, driver);
+      i++;
+    }
+    print(true, true, "testing parmetrized properties: %s", props);
+    i = 1;
+    for (String driver: props.get(JPPFProperties.DRIVERS)) {
+      assertEquals("host" + i, props.get(hostProp, driver));
+      assertEquals(11110 + i, (int) props.get(portProp, driver));
+      i++;
+    }
+    assertEquals("host1", props.getString("driver1.jppf.server.host"));
+    assertEquals(11111, props.getInt("driver1.jppf.server.port"));
+    assertEquals("host2", props.getString("driver2.jppf.server.host"));
+    assertEquals(11112, props.getInt("driver2.jppf.server.port"));
+
+    assertEquals("host1", props.remove(hostProp, "driver1"));
+    assertEquals(11111, (int) props.remove(portProp, "driver1"));
+    assertEquals("host2", props.remove(hostProp, "driver2"));
+    assertEquals(11112, (int) props.remove(portProp, "driver2"));
   }
 
   /**

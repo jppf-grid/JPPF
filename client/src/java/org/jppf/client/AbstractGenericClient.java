@@ -158,7 +158,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -214,22 +213,16 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
-            boolean ssl = config.getBoolean(name + '.' + JPPFProperties.SSL_ENABLED.getName(), false);
-            JPPFProperty<String> serverProp = JPPFProperties.SERVER_HOST;
-            String host =  config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
+            boolean ssl = config.get(JPPFProperties.PARAM_SERVER_SSL_ENABLED, name);
+            String host =  config.get(JPPFProperties.PARAM_SERVER_HOST, name);
             info.host = host;
-            JPPFProperty<Integer> portProp = JPPFProperties.SERVER_PORT;
-            int port = config.getInt(name + '.' + portProp.getName(), portProp.getDefaultValue());
+            int port = config.get(JPPFProperties.PARAM_SERVER_PORT, name);
             if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            portProp = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
-            int jmxport = config.getInt(name + '.' + portProp.getName(), -1);
-            if (!ssl) info.managementPort = jmxport;
-            else info.sslManagementPort = jmxport;
-            int priority = config.getInt(name + ".jppf.priority", 0);
             if (receiverThread != null) receiverThread.addConnectionInformation(info);
-            int poolSize = config.get(new IntProperty(name + '.' + JPPFProperties.POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
-            int jmxPoolSize = config.get(new IntProperty(name + '.' + JPPFProperties.JMX_POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
+            int priority = config.get(JPPFProperties.PARAM_PRIORITY, name);
+            int poolSize = config.get(JPPFProperties.PARAM_POOL_SIZE, name);
+            int jmxPoolSize = config.get(JPPFProperties.PARAM_JMX_POOL_SIZE, name);
             infoList.add(new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize));
           }
         }

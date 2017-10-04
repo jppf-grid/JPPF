@@ -45,4 +45,85 @@ public class PropertiesHelper {
       }
     }
   }
+
+  /**
+   * Get the integer value of the specified string.
+   * @param val the string val to convert to an int.
+   * @param defValue a default value to return if value is {@code null}.
+   * @return the value of the property as an int, or the default value if it is not found.
+   */
+  public static int toInt(final String val, final int defValue) {
+    int intVal = defValue;
+    if (val != null) {
+      String s = val.trim();
+      try {
+        intVal = Integer.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        try {
+          intVal = Double.valueOf(s).intValue();
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+      }
+    }
+    return intVal;
+  }
+
+  /**
+   * Get the long value of the specified string.
+   * @param val the string value to convert to a long.
+   * @param defValue the default val to return if value is {@code null}.
+   * @return the value of the property a a long, or the default value if it is not found.
+   */
+  public static long toLong(final String val, final long defValue) {
+    long longVal = defValue;
+    if (val != null) {
+      String s = val.trim();
+      try {
+        longVal = Long.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        try {
+          longVal = Double.valueOf(s).longValue();
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+      }
+    }
+    return longVal;
+  }
+
+  /**
+   * Get the float value of the specified string.
+   * @param val the string value to convert to a float.
+   * @param defValue the default value to return if val is {@code null}.
+   * @return the value of the property a a float, or the default value if it is not found.
+   */
+  public static float toFloat(final String val, final float defValue) {
+    float floatVal = defValue;
+    if (val != null) {
+      String s = val.trim();
+      try {
+        floatVal = Float.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        try {
+          floatVal = Double.valueOf(s).floatValue();
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+      }
+    }
+    return floatVal;
+  }
+
+  /**
+   * Get the double value of the specified string.
+   * @param val the string value to convert to a double.
+   * @param defValue the default value to return if val is {@code null}.
+   * @return the value of the property a an double, or the default value if it is not found.
+   */
+  public static double toDouble(final String val, final double defValue) {
+    double doubleVal = defValue;
+    if (val != null) {
+      String s = val.trim();
+      try {
+        doubleVal = Double.valueOf(s);
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      }
+    }
+    return doubleVal;
+  }
 }

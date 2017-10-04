@@ -28,7 +28,7 @@ import org.jppf.utils.configuration.*;
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of string values to other types.
  * @author Laurent Cohen
  */
-public class TypedProperties extends Properties {
+public class TypedProperties extends AbstractTypedProperties {
   /**
    * Explicit serialVersionUID.
    */
@@ -45,12 +45,8 @@ public class TypedProperties extends Properties {
    * This will copy into the present object all map entries such that both key and value are strings.
    * @param map the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
    */
-  public TypedProperties(final Map<Object, Object> map) {
-    if (map != null) {
-      for (Map.Entry<Object, Object> entry: map.entrySet()) {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) setProperty((String) entry.getKey(), (String) entry.getValue());
-      }
-    }
+  public TypedProperties(final Map<?, ?> map) {
+    super(map);
   }
 
   /**
@@ -99,19 +95,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as an int, or the default value if it is not found.
    */
   public int getInt(final String key, final int defValue) {
-    int intVal = defValue;
-    String val = getProperty(key, null);
-    if (val != null) {
-      val = val.trim();
-      try {
-        intVal = Integer.valueOf(val);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
-        try {
-          intVal = Double.valueOf(val).intValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
-      }
-    }
-    return intVal;
+    return PropertiesHelper.toInt(getProperty(key, null), defValue);
   }
 
   /**
@@ -140,19 +124,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a long, or the default value if it is not found.
    */
   public long getLong(final String key, final long defValue) {
-    long longVal = defValue;
-    String val = getProperty(key, null);
-    if (val != null) {
-      val = val.trim();
-      try {
-        longVal = Long.valueOf(val);
-      } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
-        try {
-          longVal = Double.valueOf(val).longValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore2) { }
-      }
-    }
-    return longVal;
+    return PropertiesHelper.toLong(getProperty(key, null), defValue);
   }
 
   /**
@@ -181,14 +153,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a float, or the default value if it is not found.
    */
   public float getFloat(final String key, final float defValue) {
-    float floatVal = defValue;
-    String val = getProperty(key, null);
-    if (val != null) {
-      try {
-        floatVal = Float.parseFloat(val.trim());
-      } catch(@SuppressWarnings("unused") NumberFormatException e) { }
-    }
-    return floatVal;
+    return PropertiesHelper.toFloat(getProperty(key, null), defValue);
   }
 
   /**
@@ -218,14 +183,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a double, or the default value if it is not found.
    */
   public double getDouble(final String key, final double defValue) {
-    double doubleVal = defValue;
-    String val = getProperty(key, null);
-    if (val != null) {
-      try {
-        doubleVal = Double.parseDouble(val.trim());
-      } catch(@SuppressWarnings("unused") NumberFormatException e) { }
-    }
-    return doubleVal;
+    return PropertiesHelper.toDouble(getProperty(key, null), defValue);
   }
 
   /**
@@ -435,34 +393,6 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Convert this set of properties into a string.
-   * @return a representation of this object as a string.
-   */
-  public String asString() {
-    String result = "";
-    try (Writer writer = new StringWriter()) {
-      store(writer, null);
-      result = writer.toString();
-    } catch(Exception e) {
-      return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage());
-    }
-    return result;
-  }
-
-  /**
-   * Populat this propertis object from a string source.
-   * @param source the source to read the properties from.
-   * @return this properties object.
-   */
-  public TypedProperties fromString(final String source) {
-    clear();
-    try (Reader reader = new StringReader(source)) {
-      loadAndResolve(reader);
-    } catch (@SuppressWarnings("unused") Exception e) { }
-    return this;
-  }
-
-  /**
    * Extract the properties that pass the specified filter.
    * @param filter the filter to use, if {@code null} then all properties are retruned.
    * @return a new {@code TypedProperties} object containing only the properties matching the filter.
@@ -490,16 +420,29 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Load the properties from the specified reader.
-   * The properties are first loaded, then includes are resolved, variable substitutions are resolved, and finally scripted values are computed.
-   * @param reader the reader to read the properties from.
-   * @return this {@code TypedProperties} object.
-   * @throws IOException if any error occurs.
+   * Set the value of a predefined property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to set.
+   * @param value the value to set.
+   * @return the value of the property according to its type.
+   * @since 5.2
    */
-  public synchronized TypedProperties loadAndResolve(final Reader reader) throws IOException {
-    new PropertiesLoader().load(this, reader);
-    new SubstitutionsHandler().resolve(this);
-    new ScriptHandler().process(this);
+  public <T> TypedProperties set(final JPPFProperty<T> property, final T value) {
+    setProperty(property.getName(), property.toString(value));
+    return this;
+  }
+
+  /**
+   * Set the value of a predefined parametrized property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to set.
+   * @param value the value to set.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the value of the property according to its type.
+   * @since 6.0
+   */
+  public <T> TypedProperties set(final JPPFProperty<T> property, final T value, final String...parameters) {
+    setProperty(property.resolveName(parameters), property.toString(value));
     return this;
   }
 
@@ -522,16 +465,24 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Set the value of a predefined property.
+   * Get the value of a predefined parametrized property.
    * @param <T> the type of the property.
-   * @param property the property whose value to set.
-   * @param value the value to set.
+   * @param property the property whose value to retrieve.
+   * @param parameters the values to replace the property's parameters with.
    * @return the value of the property according to its type.
-   * @since 5.2
+   * @since 6.0
    */
-  public <T> TypedProperties set(final JPPFProperty<T> property, final T value) {
-    setProperty(property.getName(), property.toString(value));
-    return this;
+  public <T> T get(final JPPFProperty<T> property, final String...parameters) {
+    String name = property.resolveName(parameters);
+    if (this.containsKey(name)) return property.valueOf(getProperty(name));
+    String[] aliases = property.getAliases();
+    if ((aliases != null) && (aliases.length > 0)) {
+      for (String alias: aliases) {
+        name = property.resolveName(alias, parameters);
+        if (this.containsKey(name)) return property.valueOf(getProperty(name));
+      }
+    }
+    return property.getDefaultValue();
   }
 
   /**
@@ -543,7 +494,24 @@ public class TypedProperties extends Properties {
    */
   @SuppressWarnings("unchecked")
   public <T> T remove(final JPPFProperty<T> property) {
-    return (T) remove(property.getName());
+    Object o = remove(property.getName());
+    if (!(o instanceof String)) return null; 
+    return property.valueOf((String) o);
+  }
+
+  /**
+   * Remove the specified predefined parametrized property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the old value of the property, or {@code null} if it wasn't defined.
+   * @since 6.0
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T remove(final JPPFProperty<T> property, final String...parameters) {
+    Object o = remove(property.resolveName(parameters));
+    if (!(o instanceof String)) return null; 
+    return property.valueOf((String) o);
   }
 
   @Override

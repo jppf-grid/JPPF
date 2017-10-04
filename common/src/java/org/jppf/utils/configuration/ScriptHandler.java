@@ -93,7 +93,7 @@ public class ScriptHandler {
   /**
    * The properties to evaluate.
    */
-  private TypedProperties config = null;
+  private Properties config = null;
   /**
    * The default script language.
    */
@@ -110,22 +110,22 @@ public class ScriptHandler {
    * and replace the values with the results of the evaluations.
    * @param props the properties object to evaluate.
    */
-  public void process(final TypedProperties props) {
+  public void process(final Properties props) {
     this.config = props;
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("thisProperties", config);
 
     boolean hasDefaultScriptLanguage = config.containsKey(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName());
-    String value = config.get(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE);
+    String value = config.getProperty(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getDefaultValue());
     value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value, bindings).trim();
     if ("".equals(value)) value = "javascript";
-    if (hasDefaultScriptLanguage) props.set(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE, value);
+    if (hasDefaultScriptLanguage) props.setProperty(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value);
     defaultLanguage = value;
 
     for (String name: config.stringPropertyNames()) {
       if (JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName().equals(name)) continue;
-      value = config.getString(name);
-      config.setString(name, evaluate(name, value, bindings));
+      value = config.getProperty(name);
+      config.setProperty(name, evaluate(name, value, bindings));
     }
     bindings.clear();
   }

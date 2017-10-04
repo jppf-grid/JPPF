@@ -77,4 +77,39 @@ public interface JPPFProperty<T> extends Serializable {
    * @return a set of tags as strings.
    */
   Set<String> getTags();
+
+  /**
+   * Get the parmaeters specified in the name of property, if any.
+   * Parameters are specified as in this example: {@code my.<param1>.property.<param2>.name = some value}.
+   * @return an array of the parameter names, empty if there is no parameter.
+   * @since 6.0
+   */
+  String[] getParameters();
+
+  /**
+   * Get the documeentation for the specified parmaeter, if it exists.
+   * @param param the name of the parameter for which to find a description.
+   * @return a string describing the parameter.
+   * @since 6.0
+   */
+  String getParameterDoc(String param);
+
+  /**
+   * Resolve the name of the property by substituting the parameters names with actual values.
+   * @param params the values of the parameters.
+   * @return the new resolve name.
+   * @since 6.0
+   * @exclude
+   */
+  public String resolveName(String...params);
+
+  /**
+   * Resolve the specified alias for the property's name by substituting the parameters names with actual values.
+   * @param alias the alias to resolve.
+   * @param params the values of the parameters.
+   * @return the new resolve name.
+   * @since 6.0
+   * @exclude
+   */
+  public String resolveName(String alias, String...params);
 }

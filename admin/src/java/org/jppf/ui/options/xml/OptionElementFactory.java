@@ -28,6 +28,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.ui.picklist.PickList;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * Factory class used to build UI elements from XML descriptors.
@@ -422,7 +423,7 @@ public class OptionElementFactory {
       boolean enabled = true;
       String pluggableViewName = desc.getProperty("pluggableView");
       if ((pluggableViewName != null) && !"".equals(pluggableViewName.trim())) {
-        enabled = JPPFConfiguration.getProperties().getBoolean(String.format("jppf.admin.console.view.%s.enabled", pluggableViewName), true);
+        enabled = JPPFConfiguration.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ENABLED, pluggableViewName);
       }
       if (enabled) {
         OptionElement elt = "url".equalsIgnoreCase(source) ? builder.buildPageFromURL(location, builder.getBaseName()) : builder.buildPage(location, null);
