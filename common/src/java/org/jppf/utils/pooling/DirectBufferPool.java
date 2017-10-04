@@ -21,7 +21,7 @@ package org.jppf.utils.pooling;
 import java.nio.ByteBuffer;
 
 /**
- * Static factory for a bool of direct byte buffers.
+ * Static factory for pool of direct byte buffers.
  * @author Laurent Cohen
  * @exclude
  */

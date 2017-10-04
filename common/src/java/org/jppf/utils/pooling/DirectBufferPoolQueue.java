@@ -27,17 +27,14 @@ import org.jppf.io.IO;
  * @author Laurent Cohen
  * @exclude
  */
-public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer>
-{
+public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer> {
   @Override
-  protected ByteBuffer create()
-  {
+  protected ByteBuffer create() {
     return ByteBuffer.allocateDirect(IO.TEMP_BUFFER_SIZE);
   }
 
   @Override
-  public void put(final ByteBuffer buffer)
-  {
+  public void put(final ByteBuffer buffer) {
     buffer.clear();
     queue.offer(buffer);
   }
