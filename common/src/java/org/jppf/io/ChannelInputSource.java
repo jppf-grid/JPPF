@@ -90,10 +90,7 @@ public class ChannelInputSource implements InputSource {
       }
       return count;
     } finally {
-      if (tmpBuffer != null) {
-        DirectBufferPool.releaseBuffer(tmpBuffer);
-        tmpBuffer = null;
-      }
+      if (tmpBuffer != null) DirectBufferPool.releaseBuffer(tmpBuffer);
     }
   }
 
