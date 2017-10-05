@@ -80,9 +80,8 @@ public class JobRenderer extends AbstractTreeCellRenderer {
           TopologyNode nodeData = dispatch.getNode();
           if (nodeData != null) {
             JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
+            path = nodeData.isPeer() ? DRIVER_ICON : GuiUtils.computeNodeIconKey(nodeData);
             renderer.setText((StatsHandler.getInstance().getShowIPHandler().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
-            path = GuiUtils.computeNodeIconKey(nodeData);
-            //else path = AbstractTreeCellRenderer.NODE_ICON;
           }
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
