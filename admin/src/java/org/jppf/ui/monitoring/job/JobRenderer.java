@@ -78,11 +78,12 @@ public class JobRenderer extends AbstractTreeCellRenderer {
         } else if (data instanceof JobDispatch) {
           JobDispatch dispatch = (JobDispatch) data;
           TopologyNode nodeData = dispatch.getNode();
-          JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
-          renderer.setText((StatsHandler.getInstance().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
-          TopologyManager mgr = StatsHandler.getInstance().getTopologyManager();
-          if (nodeData != null) path = GuiUtils.computeNodeIconKey(nodeData);
-          //else path = AbstractTreeCellRenderer.NODE_ICON;
+          if (nodeData != null) {
+            JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
+            renderer.setText((StatsHandler.getInstance().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
+            TopologyManager mgr = StatsHandler.getInstance().getTopologyManager();
+            path = nodeData.isPeer() ? DRIVER_ICON : GuiUtils.computeNodeIconKey(nodeData);
+          }
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);
