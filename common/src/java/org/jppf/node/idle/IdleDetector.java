@@ -42,11 +42,11 @@ public class IdleDetector implements Runnable {
   /**
    * A factory that instantiates a platform-specific idle detector.
    */
-  private IdleTimeDetectorFactory factory = null;
+  private IdleTimeDetectorFactory factory;
   /**
    * The timer task that polls the native APIs for idle time.
    */
-  private IdleDetectionTask task = null;
+  private IdleDetectionTask task;
   /**
    * The time of inactivity after which the system is considered idle, in milliseconds.
    */
@@ -58,7 +58,7 @@ public class IdleDetector implements Runnable {
   /**
    * Specifies the action to perform upon idle state changes.
    */
-  private IdleStateListener listener = null;
+  private IdleStateListener listener;
 
   /**
    * Default constructor.
@@ -73,12 +73,14 @@ public class IdleDetector implements Runnable {
    * @throws Exception if any error occurs during initialization.
    */
   private void init() throws Exception {
+    log.debug("initializing IdleTimeDetectorFactory");
     TypedProperties config = JPPFConfiguration.getProperties();
     String factoryName = "org.jppf.node.idle.IdleTimeDetectorFactoryImpl";
     idleTimeout = config.get(JPPFProperties.IDLE_TIMEOUT);
     pollInterval = config.get(JPPFProperties.IDLE_POLL_INTEFRVAL);
     Class<?> c = Class.forName(factoryName);
     factory = (IdleTimeDetectorFactory) c.newInstance();
+    log.debug("IdleTimeDetectorFactory initialized");
   }
 
   @Override

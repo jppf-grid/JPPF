@@ -61,7 +61,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   /**
    * Determines whether the system is in "idle state".
    */
-  private final AtomicBoolean idle = new AtomicBoolean(false);
+  private final AtomicBoolean idle = new AtomicBoolean(true);
   /**
    * Whether idle mode can be used on the process.
    */
@@ -114,7 +114,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
       while (!end) {
         startSocketListener();
         if (idleMode) {
-          while (!idle.get()) goToSleep();
+          while (idle.get()) goToSleep();
         }
         startProcess();
         int n = process.waitFor();
@@ -255,18 +255,17 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   @Override
   public void idleStateChanged(final IdleStateEvent event) {
     IdleState state = event.getState();
-    if (IdleState.BUSY.equals(state)) {
+    if (debugEnabled) log.debug("idle state changed to {}", state);
+    if ((state == IdleState.IDLE) && !idle.get()) {
       if (idleMode && (process != null)) {
-        idle.set(false);
+        idle.set(true);
         stoppedOnBusyState.set(true);
-        boolean b = JPPFConfiguration.get(JPPFProperties.IDLE_INTERRUPT_IF_RUNNING);
-        int action = b ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
+        int action = idleModeImmediateShutdown ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
         if (debugEnabled) log.debug("sending command {}", ProcessCommands.getCommandName(action));
-        //process.destroy();
         sendActionCommand(action);
       }
-    } else {
-      idle.set(true);
+    } else if ((state == IdleState.BUSY) && idle.get()) {
+      idle.set(false);
       wakeUp();
     }
   }

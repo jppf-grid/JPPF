@@ -36,21 +36,21 @@ class IdleDetectionTask extends TimerTask {
    */
   private static Logger log = LoggerFactory.getLogger(IdleDetectionTask.class);
   /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
    * The time of inactivity after which the system is considered idle, in milliseconds.
    */
-  private long idleTimeout = 300000L;
+  private final long idleTimeout;
   /**
    * Captures the idle state of the system, as specified by the idle timeout.
    */
-  private IdleState state = BUSY;
+  private IdleState state = IDLE;
   /**
    * The object used to obtain the system idle time.
    */
-  private IdleTimeDetector detector = null;
-  /**
-   * A factory for creating {@link IdleTimeDetector} instances.
-   */
-  private IdleTimeDetectorFactory factory = null;
+  private final IdleTimeDetector detector;
   /**
    * The list of listeners to this object's events.
    */
@@ -64,39 +64,32 @@ class IdleDetectionTask extends TimerTask {
    */
   public IdleDetectionTask(final IdleTimeDetectorFactory factory, final long idleTimeout, final IdleStateListener...initialListeners) {
     this.idleTimeout = idleTimeout;
-    this.factory = factory;
     if (initialListeners != null) {
       for (IdleStateListener listener: initialListeners) addIdleStateListener(listener);
     }
-    init();
+    detector = factory.newIdleTimeDetector();
   }
 
   @Override
   public void run() {
     try {
       if (detector == null) {
+        log.error("idle detector is null, cancelling idle mode");
         cancel();
         return;
       }
       long idleTime = detector.getIdleTimeMillis();
-      if ((idleTime >= idleTimeout) && BUSY.equals(state)) changeStateTo(IDLE);
-      else if ((idleTime < idleTimeout) && IDLE.equals(state)) changeStateTo(BUSY);
+      if ((idleTime < idleTimeout) && (state == BUSY)) {
+        if (debugEnabled) log.debug("changing to IDLE for idleTime = {}ms", idleTime);
+        changeStateTo(IDLE);
+      } else if ((idleTime >= idleTimeout) && (state == IDLE)) {
+        if (debugEnabled) log.debug("changing to BUSY for idleTime = {}ms", idleTime);
+        changeStateTo(BUSY);
+      }
     } catch(JPPFError e) {
       System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disabled");
-      detector = null;
-      cancel();
-    }
-  }
-
-  /**
-   * Initialize this task.
-   */
-  private void init() {
-    try {
-      detector = factory.newIdleTimeDetector();
-    } catch (Exception e) {
-      cancel();
       log.error(e.getMessage(), e);
+      cancel();
     }
   }
 
@@ -114,6 +107,7 @@ class IdleDetectionTask extends TimerTask {
    * @param state an {@link IdleState} enum value.
    */
   private void changeStateTo(final IdleState state) {
+    log.debug("changing state to {}", state);
     this.state = state;
     fireIdleStateEvent();
   }
