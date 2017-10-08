@@ -408,7 +408,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private void reset(final boolean stopJmx) {
     if (debugEnabled) log.debug("resetting with stopJmx=" + stopJmx);
-    System.out.println("resetting with stopJmx=" + stopJmx);
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
     setNodeAdmin(null);
