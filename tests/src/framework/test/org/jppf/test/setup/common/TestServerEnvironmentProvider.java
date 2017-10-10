@@ -20,7 +20,7 @@ package test.org.jppf.test.setup.common;
 
 import java.util.*;
 
-import javax.management.remote.generic.*;
+import org.jppf.jmx.*;
 
 /**
  * A test {@link ClientEnvironmentProvider}.
