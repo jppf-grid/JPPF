@@ -72,7 +72,6 @@ import java.net.MalformedURLException;
 import java.util.*;
 
 import javax.management.remote.*;
-import javax.management.remote.generic.ClientEnvironmentProvider;
 import javax.management.remote.jmxmp.JMXMPConnector;
 
 /**
@@ -83,18 +82,13 @@ public class ClientProvider implements JMXConnectorProvider {
    * Handles the envrionment providers that allow adding to, or overriding, the environment properties
    * passed to each new JMX connector instance.  
    */
-  private static final EnvironmentProviderHandler<ClientEnvironmentProvider> ENV_HANDLER = new EnvironmentProviderHandler<>(ClientEnvironmentProvider.class);
+  private static final EnvManager ENV_MGR = new EnvManager("org.jppf.jmx.ClientEnvironmentProvider");
 
   @Override
   public JMXConnector newJMXConnector(final JMXServiceURL serviceURL, final Map<String, ?> environment) throws IOException {
     if (!serviceURL.getProtocol().equals("jmxmp")) throw new MalformedURLException("Protocol not jmxmp: " + serviceURL.getProtocol());
     Map<String, Object> env = new HashMap<>(environment);
-    for (ClientEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
-      if (provider != null) {
-        Map<String, ?> map = provider.getEnvironment();
-        if ((map != null) && !map.isEmpty()) env.putAll(map);
-      }
-    }
+    ENV_MGR.augmentEnvironment(env);
     return new JMXMPConnector(serviceURL, env);
   }
 }

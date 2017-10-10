@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.sun.jmx.remote.protocol.jmxmp;
+package org.jppf.jmx;
 
 import java.util.*;
 
@@ -25,7 +25,7 @@ import java.util.*;
  * @param <T> the type of the providers to load.
  * @author Laurent Cohen
  */
-class EnvironmentProviderHandler<T> {
+public class EnvironmentProviderHandler<T> {
   /**
    * The client providers.
    */
@@ -35,7 +35,7 @@ class EnvironmentProviderHandler<T> {
    * Initialize this handler witht he specified provider class.
    * @param clazz the class of the providers to laod.
    */
-  EnvironmentProviderHandler(final Class<T> clazz) {
+  public EnvironmentProviderHandler(final Class<T> clazz) {
     providers = Collections.unmodifiableList(loadProviders(clazz));
   }
 
@@ -65,7 +65,7 @@ class EnvironmentProviderHandler<T> {
    * Get the client providers.
    * @return a list of privder instances.
    */
-  List<T> getProviders() {
+  public List<T> getProviders() {
     return providers;
   }
 }

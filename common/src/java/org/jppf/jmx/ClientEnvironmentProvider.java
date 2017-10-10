@@ -16,19 +16,19 @@
  * limitations under the License.
  */
 
-package javax.management.remote.generic;
+package org.jppf.jmx;
 
 import java.util.Map;
 
 /**
  * Implementations of this interface provide environment properties to add to or override those passed to
- * {@link javax.management.remote.JMXConnectorServerFactory#newJMXConnectorServer(javax.management.remote.JMXServiceURL, Map, javax.management.MBeanServer)
- * JMXConnectorServerFactory.newJMXConnectorServer()} when the a remote connector server is started.
+ * {@link javax.management.remote.JMXConnectorFactory#newJMXConnector(javax.management.remote.JMXServiceURL, Map)
+ * JMXConnectorFactory.newJMXConnector()} when the client side of a JMX connection is attempted.
  * @author Laurent Cohen
  */
-public interface ServerEnvironmentProvider {
+public interface ClientEnvironmentProvider {
   /**
-   * Get a set of environment properties add to or override those passed to each new remote connector server.
+   * Get a set of environment properties add to or override those passed to each new client-side connection.
    * @return an environment map.
    */
   Map<String, ?> getEnvironment();
