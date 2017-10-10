@@ -106,10 +106,8 @@ public class MatrixRunner {
       pool.setSize(nbChannels);
       pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
       // initialize the 2 matrices to multiply
-      Matrix a = new Matrix(size);
-      a.assignRandomValues();
-      Matrix b = new Matrix(size);
-      b.assignRandomValues();
+      Matrix a = new Matrix(size).assignRandomValues();
+      Matrix b = new Matrix(size).assignRandomValues();
       if (size <= 500) performSequentialMultiplication(a, b);
       long totalIterationTime = 0L;
       long min = Long.MAX_VALUE;
@@ -125,8 +123,6 @@ public class MatrixRunner {
       }
       StreamUtils.printf(log, "Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
-      jppfClient.awaitWorkingConnectionPool().awaitWorkingJMXConnection().getDiagnosticsProxy().healthSnapshot();
-      
     } finally {
       StreamUtils.printf(log, "closing the client");
       if (jppfClient != null) jppfClient.close();
