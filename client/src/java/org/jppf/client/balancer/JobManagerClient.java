@@ -137,7 +137,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         taskQueueChecker.wakeUp();
       }
     });
-    new Thread(taskQueueChecker, "TaskQueueChecker").start();
+    Thread thread = new Thread(taskQueueChecker, "TaskQueueChecker");
+    thread.setDaemon(true);
+    thread.start();
     this.queue.addQueueListener(client);
     client.addConnectionPoolListener(new ConnectionPoolListenerAdapter() {
       @Override
