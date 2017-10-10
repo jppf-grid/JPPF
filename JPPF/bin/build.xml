@@ -205,6 +205,7 @@
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 
+  <import file="build-libs.xml"/>
   <import file="build-compile-jar.xml"/>
   <import file="build-modules.xml"/>
   <import file="build-samples.xml"/>

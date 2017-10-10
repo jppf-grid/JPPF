@@ -19,9 +19,10 @@
 <project name="JPPF-admin-web" basedir="..">
 
   <!-- ========================================================================= -->
-  <!--             Package the j2ee connector for deployment                     -->
+  <!-- Package the web administration console                                    -->
   <!-- ========================================================================= -->
 
+  <!-- Build the zip package -->
   <target name="admin.web" depends="build, admin.web.init" description="build the web admin console">
     <ant antfile="${admin-web}/build.xml" target="build" inheritall="false"/>
     <property name="admin-web.prefix" value="${app.ver}-admin-web"/>
@@ -37,6 +38,7 @@
     </zip>
   </target>
 
+  <!-- Update the dependencies -->
   <target name="admin.web.init">
     <copy todir="${admin-web}/bin" file="${basedir}/CheckStyle_JPPF_config.xml" overwrite="true"/>
     <delete><fileset dir="${admin-web}/lib" includes="jppf-*.jar"/></delete>
@@ -47,9 +49,9 @@
         <include name="jppf-admin-${version.number}.jar"/>
       </fileset>
       <fileset dir="${lib}/jmxremote" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
-      <fileset dir="${lib}/log4j" includes="*.jar"/>
-      <fileset dir="${lib}/LZ4" includes="*.jar"/>
-      <fileset dir="${lib}/slf4j" includes="slf4j-api-*.jar, slf4j-log4j12-*.jar"/>
+      <fileset dir="${lib}/log4j" includes="${log4j.inc}"/>
+      <fileset dir="${lib}/LZ4" includes="${LZ4.inc}"/>
+      <fileset dir="${lib}/slf4j" includes="${slf4j.inc}"/>
     </copy>
     <copy todir="${admin-web}/bin" overwrite="true">
       <fileset dir="${bin}">

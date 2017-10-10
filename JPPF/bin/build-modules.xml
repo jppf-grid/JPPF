@@ -42,10 +42,10 @@
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
-        <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="slf4j-api-*.jar,slf4j-${slf4j.bindings}-*.jar"/>
-        <zipfileset dir="${lib}/LZ4" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="${ApacheCommons.inc}"/>
+        <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="${log4j.inc}"/>
+        <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="${slf4j.inc}"/>
+        <zipfileset dir="${lib}/LZ4" prefix="${@{module}.prefix}/lib" includes="${LZ4.inc}"/>
         <module-elements/>
       </zip>
     </sequential>
@@ -87,6 +87,7 @@
         <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node-${version.number}.jar,jppf-server-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar,jppf-server-src-${version.number}.jar"/>
+        <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
       </module-elements>
     </package-module>
   </target>
@@ -98,7 +99,7 @@
       <module-elements>
         <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${node.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
       </module-elements>
     </package-module>
   </target>
@@ -110,12 +111,12 @@
       <module-elements>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib" includes="jppf-client-${version.number}.jar,jppf-admin-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar,jppf-admin-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/Jung" prefix="${gui.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${lib}/RSyntaxTextArea" prefix="${gui.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="${JFreeCharts.inc}"/>
+        <zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="${JGoodies.inc}"/>
+        <zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="${Groovy.inc}"/>
+        <zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="${MigLayout.inc}"/>
+        <zipfileset dir="${lib}/Jung" prefix="${gui.prefix}/lib" includes="*${Jung.inc}"/>
+        <zipfileset dir="${lib}/RSyntaxTextArea" prefix="${gui.prefix}/lib" includes="*${RSyntaxTextArea.inc}"/>
       </module-elements>
     </package-module>
   </target>
