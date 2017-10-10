@@ -18,20 +18,16 @@
 
 package org.jppf.nio;
 
-
-
 /**
  * Nio message that reads or writes a single object from/to the network.
  * @author Laurent Cohen
  */
-public class BaseNioMessage extends AbstractNioMessage
-{
+public class BaseNioMessage extends AbstractNioMessage {
   /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
-  public BaseNioMessage(final ChannelWrapper<?> channel)
-  {
+  public BaseNioMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
@@ -40,8 +36,7 @@ public class BaseNioMessage extends AbstractNioMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void afterFirstRead() throws Exception
-  {
+  protected void afterFirstRead() throws Exception {
     nbObjects = 1;
   }
 
@@ -50,8 +45,7 @@ public class BaseNioMessage extends AbstractNioMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void beforeFirstWrite() throws Exception
-  {
+  protected void beforeFirstWrite() throws Exception {
     nbObjects = 1;
   }
 }
