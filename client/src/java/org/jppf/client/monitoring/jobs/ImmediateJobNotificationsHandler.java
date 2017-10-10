@@ -55,7 +55,7 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
         break;
 
       case JOB_UPDATED:
-        if (monitor.isJobUpdated(job.getJobInformation(), jobInfo)) {
+        if ((job != null) && monitor.isJobUpdated(job.getJobInformation(), jobInfo)) {
           job.setJobInformation(jobInfo);
           monitor.jobUpdated(driver, job);
         }

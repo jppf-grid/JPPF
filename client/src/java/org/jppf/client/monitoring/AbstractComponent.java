@@ -111,8 +111,10 @@ public abstract class AbstractComponent<E extends AbstractComponent> implements 
    */
   @SuppressWarnings("unchecked")
   public synchronized void remove(final E child) {
-    children.remove(child.getUuid());
-    child.setParent(null);
+    if (child != null) {
+      children.remove(child.getUuid());
+      child.setParent(null);
+    }
   }
 
   /**

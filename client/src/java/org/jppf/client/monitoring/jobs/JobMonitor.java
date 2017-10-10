@@ -252,11 +252,13 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    */
   void jobRemoved(final JobDriver driver, final Job job) {
     if (debugEnabled) log.debug("job '{}' removed from driver {}", job.getDisplayName(), driver.getDisplayName());
-    driver.remove(job);
-    synchronized(lock) {
-      jobDriverMap.removeValue(job.getUuid(), driver);
+    if (job != null) {
+      driver.remove(job);
+      synchronized(lock) {
+        jobDriverMap.removeValue(job.getUuid(), driver);
+      }
+      dispatchEvent(JOB_REMOVED, new JobMonitoringEvent(this, driver, job, null));
     }
-    dispatchEvent(JOB_REMOVED, new JobMonitoringEvent(this, driver, job, null));
   }
 
   /**
@@ -277,8 +279,10 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    */
   void dispatchAdded(final JobDriver driver, final Job job, final JobDispatch dispatch) {
     if (debugEnabled) log.debug("adding dispatch {} to job '{}'", dispatch.getDisplayName(), job.getDisplayName());
-    job.add(dispatch);
-    dispatchEvent(DISPATCH_ADDED, new JobMonitoringEvent(this, driver, job, dispatch));
+    if (job != null) {
+      job.add(dispatch);
+      dispatchEvent(DISPATCH_ADDED, new JobMonitoringEvent(this, driver, job, dispatch));
+    }
   }
 
   /**
