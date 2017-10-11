@@ -54,6 +54,15 @@ public class TestJobListener extends BaseTest {
   }
 
   /**
+   * Stops the driver and node.
+   * @throws Exception if a process could not be stopped.
+   */
+  @AfterClass
+  public static void cleanup() throws Exception {
+    BaseSetup.cleanup();
+  }
+
+  /**
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
    * @throws Exception if any error occurs
    */
@@ -114,8 +123,8 @@ public class TestJobListener extends BaseTest {
       client.submitJob(job);
       print(false, false, "waiting for task start notification");
       taskListener.await();
+      BaseTestHelper.printToAll(client, true, true, true, false, false, "resetting client");
       client.reset();
-      //client = BaseSetup.createClient(null, false);
       print(false, false, "getting job results");
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);

@@ -72,14 +72,18 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
+    Exception e = null;
     if (nodeJmx != null) {
       try {
         nodeJmx.close();
+      } catch(Exception e2) {
+        e = e2;
       } finally {
         nodeJmx = null;
       }
     }
     BaseSetup.cleanup();
+    if (e != null) throw e;
   }
 
   /**
