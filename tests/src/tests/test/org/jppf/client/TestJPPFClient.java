@@ -290,7 +290,7 @@ public class TestJPPFClient extends Setup1D1N {
       props = new TypedProperties().setInt("initialSize", 5).setInt("proportionalityFactor", 1);
       client.setLoadBalancerSettings("proportional", props);
       client.submitJob(job);
-      assertTrue(listener.dispatchCount.get() >= 3);
+      assertTrue("expected at least <3> but got <" + listener.dispatchCount.get() + ">", listener.dispatchCount.get() >= 3);
       assertTrue(listener.tasksPerDispatch.size() >= 3);
       for (int i=1; i<=listener.tasksPerDispatch.size(); i++) assertNotNull(listener.tasksPerDispatch.get(i));
       assertEquals(5, listener.tasksPerDispatch.get(1).intValue());
