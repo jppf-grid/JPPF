@@ -482,4 +482,23 @@ public final class SystemUtils {
     }
     return false;
   }
+
+  /**
+   * Print the system properties to a string.
+   * @return the system properties printed one per line.
+   */
+  public static String printSystemProperties() {
+    Enumeration<?> names = System.getProperties().propertyNames();
+    Map<String, String> props = new TreeMap<>();
+    while (names.hasMoreElements()) {
+      String name = (String) names.nextElement();
+      props.put(name, System.getProperty(name));
+    }
+    StringBuilder sb = new StringBuilder("{\n");
+    for (Map.Entry<String, String> entry: props.entrySet()) {
+      sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+    }
+    sb.append('}');
+    return sb.toString();
+  }
 }

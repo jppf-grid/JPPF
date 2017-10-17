@@ -45,6 +45,11 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
+  /**
+   * 
+   */
+  private static final long WAIT_TIME_EMPTY_UUIDS = 5000L;
+
   /** */
   @Rule
   public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
@@ -86,7 +91,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     checkJobResults(nbTasks, results, false);
     JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
 
@@ -116,7 +121,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
     assertEquals(JobStatus.COMPLETE, job2.getStatus());
     assertTrue(mgr.deleteJob(job.getUuid()));
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
   }
 
   /**
@@ -137,7 +142,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     checkJobResults(nbTasks, results, true);
     JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
 
@@ -254,7 +259,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
       assertEquals(JobStatus.COMPLETE, job2.getStatus());
       assertTrue(mgr.deleteJob(job.getUuid()));
-      assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), 2000L));
+      assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     } finally {
       if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
       if (pool != null) {

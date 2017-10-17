@@ -30,6 +30,7 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.common.TestUtils;
 
@@ -39,6 +40,10 @@ import test.org.jppf.test.setup.common.TestUtils;
  * @author Laurent Cohen
  */
 public class BaseSetup {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(BaseSetup.class);
   /**
    * The default configuratin used when none is specified.
    */
@@ -259,10 +264,14 @@ public class BaseSetup {
    */
   public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
     for (JMXDriverConnectionWrapper jmx: jmxConnections) {
-      if (jmx != null) {
-        DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
-        String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
-        FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+      if ((jmx != null) && jmx.isConnected()) {
+        try {
+          DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+          String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+          FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+        } catch (Exception e) {
+          log.error("failed to generate driver thread dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
+        }
       }
     }
   }

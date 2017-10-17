@@ -378,7 +378,9 @@ public class JPPFDriver {
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
-      (instance = new JPPFDriver()).run();
+      instance = new JPPFDriver();
+      if (debugEnabled) log.debug("Driver system properties: {}", SystemUtils.printSystemProperties());
+      instance.run();
     } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
