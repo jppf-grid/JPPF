@@ -261,4 +261,10 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   public void setResetting(final boolean resetting) {
     this.resetting = resetting;
   }
+
+  /**
+   * Init the channel id for load-balancer persistence.
+   */
+  public void initChannelID() {
+  }
 }

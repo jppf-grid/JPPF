@@ -75,7 +75,15 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
   @Override
   public void setSystemInformation(final JPPFSystemInformation systemInfo) {
-    if (systemInfo != null && uuid == null) {
+    super.setSystemInformation(systemInfo);
+  }
+
+
+  @Override
+  public void initChannelID() {
+    if (channelID != null) return;
+    if (systemInfo == null) return;
+    if (uuid == null) {
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
       if (uuid != null && uuid.isEmpty()) uuid = null;
     }
@@ -97,7 +105,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
-    super.setSystemInformation(systemInfo);
   }
 
   @Override
@@ -212,6 +219,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       try {
         long start = System.nanoTime();
         int count = 0;
+
         boolean completed = false;
         JPPFJob newJob = createNewJob(clientBundle, tasks);
         if (debugEnabled) log.debug(String.format("%s executing %d tasks of job %s", ChannelWrapperRemote.this, tasks.size(), newJob));
