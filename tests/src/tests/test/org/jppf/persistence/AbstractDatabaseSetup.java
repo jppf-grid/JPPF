@@ -115,6 +115,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   @AfterClass
   public static void dbTeardown() throws Exception {
     BaseSetup.generateClientThreadDump();
+    BaseSetup.generateDriverThreadDump(BaseSetup.getClient());
     JPPFDatasourceFactory.getInstance().clear();
     if (h2Server != null) {
       // generate sql dump file of the database
