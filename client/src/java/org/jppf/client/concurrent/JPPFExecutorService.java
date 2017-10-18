@@ -98,6 +98,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param batchTimeout the maximum time to wait before the next batch of tasks is to be sent for execution.
    */
   public JPPFExecutorService(final JPPFClient client, final int batchSize, final long batchTimeout) {
+    if (debugEnabled) log.debug(String.format("new %s with batchSize=%d, batchTimeout=%d, client=%s", getClass().getSimpleName(), batchSize, batchTimeout, client));
     this.client = client;
     batchHandler = new BatchHandler(this, batchSize, batchTimeout);
     new Thread(batchHandler, "BatchHandler").start();
@@ -419,6 +420,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @return this executor service, for method chaining.
    */
   public JPPFExecutorService setBatchSize(final int batchSize) {
+    if (debugEnabled) log.debug("setting batchSize = {}", batchSize);
     batchHandler.setBatchSize(batchSize);
     return this;
   }
@@ -437,6 +439,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @return this executor service, for method chaining.
    */
   public JPPFExecutorService setBatchTimeout(final long batchTimeout) {
+    if (debugEnabled) log.debug("setting batchTimeout = {}", batchTimeout);
     batchHandler.setBatchTimeout(batchTimeout);
     return this;
   }

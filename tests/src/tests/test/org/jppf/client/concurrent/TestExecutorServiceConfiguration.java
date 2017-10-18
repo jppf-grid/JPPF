@@ -81,7 +81,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  //@Test(timeout = 5000)
   public void testSubmitCallableWithTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
@@ -99,7 +99,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 15000)
+  //@Test(timeout = 15000)
   public void testSubmitCallableWithJobTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
@@ -116,7 +116,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  //@Test(timeout = 10000)
   public void testSubmitWithDataProvider() throws Exception {
     client.setLocalExecutionEnabled(false);
     DataProvider dp = new MemoryMapDataProvider();
@@ -136,7 +136,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  //@Test(timeout = 5000)
   public void testResetConfiguration() throws Exception {
     client.setLocalExecutionEnabled(false);
     ExecutorServiceConfiguration config = executor.getConfiguration();
@@ -163,7 +163,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  //@Test(timeout = 5000)
   public void testSubmitWithClientExecutionPolicy() throws Exception {
     try {
       client.setLocalExecutionEnabled(true);

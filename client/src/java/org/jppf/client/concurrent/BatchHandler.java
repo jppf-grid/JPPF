@@ -92,7 +92,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
    */
   private final Condition submittingJob = lock.newCondition();
-  /**
+  /**Size
    * The configuration for this batch handler.
    */
   private ExecutorServiceConfiguration config = new ExecutorServiceConfigurationImpl();
@@ -122,32 +122,54 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * Get the minimum number of tasks that must be submitted before they are sent to the server.
    * @return the batch size as an int.
    */
-  synchronized int getBatchSize() {
-    return batchSize;
+  int getBatchSize() {
+    lock.lock();
+    try {
+      return batchSize;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Set the minimum number of tasks that must be submitted before they are sent to the server.
    * @param batchSize the batch size as an int.
    */
-  synchronized void setBatchSize(final int batchSize) {
-    this.batchSize = batchSize;
+  void setBatchSize(final int batchSize) {
+    lock.lock();
+    try {
+      this.batchSize = batchSize;
+      jobReady.signal();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Get the maximum time to wait before the next batch of tasks is to be sent for execution.
    * @return the timeout as a long.
    */
-  synchronized long getBatchTimeout() {
-    return batchTimeout;
+  long getBatchTimeout() {
+    lock.lock();
+    try {
+      return batchTimeout;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
    * @param batchTimeout the timeout as a long.
    */
-  synchronized void setBatchTimeout(final long batchTimeout) {
-    this.batchTimeout = batchTimeout;
+  void setBatchTimeout(final long batchTimeout) {
+    lock.lock();
+    try {
+      this.batchTimeout = batchTimeout;
+      jobReady.signal();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
