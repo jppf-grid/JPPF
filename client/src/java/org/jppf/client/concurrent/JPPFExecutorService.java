@@ -88,8 +88,19 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param client the {@link JPPFClient} to use for job submission.
    */
   public JPPFExecutorService(final JPPFClient client) {
+    this(client, 0, 0L);
+  }
+
+  /**
+   * Initialize this executor service with the specified JPPF client, batch size and batch tiemout.
+   * @param client the {@link JPPFClient} to use for job submission.
+   * @param batchSize the minimum number of tasks that must be submitted before they are sent to the server.
+   * @param batchTimeout the maximum time to wait before the next batch of tasks is to be sent for execution.
+   */
+  public JPPFExecutorService(final JPPFClient client, final int batchSize, final long batchTimeout) {
+    if (debugEnabled) log.debug(String.format("new %s with batchSize=%d, batchTimeout=%d, client=%s", getClass().getSimpleName(), batchSize, batchTimeout, client));
     this.client = client;
-    batchHandler = new BatchHandler(this);
+    batchHandler = new BatchHandler(this, batchSize, batchTimeout);
     new Thread(batchHandler, "BatchHandler").start();
   }
 
@@ -410,6 +421,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param batchSize the batch size as an int.
    */
   public void setBatchSize(final int batchSize) {
+    if (debugEnabled) log.debug("setting batchSize = {}", batchSize);
     batchHandler.setBatchSize(batchSize);
   }
 
@@ -426,6 +438,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param batchTimeout the timeout as a long.
    */
   public void setBatchTimeout(final long batchTimeout) {
+    if (debugEnabled) log.debug("setting batchTimeout = {}", batchTimeout);
     batchHandler.setBatchTimeout(batchTimeout);
   }
 
