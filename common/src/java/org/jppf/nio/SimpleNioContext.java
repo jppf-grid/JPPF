@@ -24,7 +24,6 @@ package org.jppf.nio;
  * @author Laurent Cohen
  */
 public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioContext<S> {
-
   /**
    * Read data from a channel.
    * @param wrapper the channel to read the data from.

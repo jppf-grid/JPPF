@@ -16,27 +16,25 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.collections;
+package org.jppf.jmxremote.nio;
 
-import java.util.Map;
+import org.jppf.nio.*;
 
 /**
- *
- * @param <K> the type of the keys.
- * @param <V> the type of the values.
+ * 
  * @author Laurent Cohen
  */
-public class SoftLRUCache<K, V> extends SoftReferenceValuesMap<K, V> {
+abstract class JMXNioState extends NioState<JMXTransition> {
   /**
-   *
-   * @param capacity the capacity of this cache.
+   * The server which handles the channels states and transitions.
    */
-  public SoftLRUCache(final int capacity) {
-    super(capacity);
-  }
+  final JMXNioServer server;
 
-  @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
-    return new LRUMap<>(capacity);
+  /**
+   * 
+   * @param server the server which handles the channels states and transitions.
+   */
+  JMXNioState(final JMXNioServer server) {
+    this.server = server;
   }
 }

@@ -23,11 +23,25 @@ import java.util.Set;
 
 import javax.management.*;
 
+import org.jppf.jmxremote.nio.ChannelsPair;
+
 /**
  * 
  * @author Laurent Cohen
  */
 public class JPPFMBeanServerConnection implements MBeanServerConnection {
+  /**
+   * The NIO channels that perform the communication with the server.
+   */
+  private final ChannelsPair channels;
+
+  /**
+   * 
+   * @param channels the NIO channels that perform the communication with the server.
+   */
+  public JPPFMBeanServerConnection(final ChannelsPair channels) {
+    this.channels = channels;
+  }
 
   @Override
   public ObjectInstance createMBean(String className, ObjectName name)
@@ -150,5 +164,12 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
   @Override
   public boolean isInstanceOf(ObjectName name, String className) throws InstanceNotFoundException, IOException {
     return false;
+  }
+
+  /**
+   * @return the NIO channels that perform the communication with the server.
+   */
+  ChannelsPair getChannels() {
+    return channels;
   }
 }

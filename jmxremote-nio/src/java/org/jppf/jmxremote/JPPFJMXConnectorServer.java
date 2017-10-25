@@ -24,11 +24,15 @@ import java.util.*;
 import javax.management.MBeanServer;
 import javax.management.remote.*;
 
+import org.jppf.jmxremote.nio.JMXNioServer;
+import org.jppf.nio.NioHelper;
+import org.jppf.utils.ExceptionUtils;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public class JPPFJMXConnectorServer extends JMXConnectorServer {
+public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXConnectionStatusListener {
   /**
    * The environment for this connector.
    */
@@ -37,6 +41,10 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer {
    * The address of this connector.
    */
   private final JMXServiceURL address;
+  /**
+   * Whether this connector server is started.
+   */
+  private boolean started = false;
 
   /**
    * 
@@ -52,15 +60,35 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer {
 
   @Override
   public void start() throws IOException {
+    try {
+      JMXNioServer server = JMXNioServer.getInstance();
+      int port = address.getPort();
+      Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
+      boolean secure = (tls == null) ? false : tls;
+      NioHelper.getAcceptorServer().addServer(port, secure, environment);
+      server.addConnectionStatusListener(this);
+      started = true;
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public void stop() throws IOException {
+    if (!started) return;
+    started = false;
+    try {
+      JMXNioServer.getInstance().removeAllConnections(address.getPort());
+    } finally {
+      JMXNioServer.getInstance().removeConnectionStatusListener(this);
+    }
   }
 
   @Override
   public boolean isActive() {
-    return false;
+    return started;
   }
 
   @Override
@@ -71,9 +99,26 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer {
   @Override
   public Map<String, ?> getAttributes() {
     Map<String, Object> map = new HashMap<>();
-    for (Map.Entry<String, ?> entry: environment.entrySet()) {
-      if (entry.getValue() instanceof Serializable) map.put(entry.getKey(), entry.getValue());
+    synchronized(environment) {
+      for (Map.Entry<String, ?> entry: environment.entrySet()) {
+        if (entry.getValue() instanceof Serializable) map.put(entry.getKey(), entry.getValue());
+      }
     }
     return Collections.unmodifiableMap(map);
+  }
+
+  @Override
+  public void connectionOpened(JMXConnectionStatusEvent event) {
+    connectionOpened(event.getConnectionID(), "connection opened", null);
+  }
+
+  @Override
+  public void connectionClosed(JMXConnectionStatusEvent event) {
+    connectionOpened(event.getConnectionID(), "connection closed", null);
+  }
+
+  @Override
+  public void connectionFailed(JMXConnectionStatusEvent event) {
+    connectionOpened(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
   }
 }

@@ -31,8 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeConnectionEventHandler
-{
+public class NodeConnectionEventHandler {
   /**
    * Logger for this class.
    */
@@ -50,8 +49,7 @@ public class NodeConnectionEventHandler
    * Add a listener to the list of listeners.
    * @param listener a {@link NodeConnectionListener} instance.
    */
-  public void addNodeConnectionListener(final NodeConnectionListener listener)
-  {
+  public void addNodeConnectionListener(final NodeConnectionListener listener) {
     if (listener == null) return;
     listeners.add(listener);
   }
@@ -60,8 +58,7 @@ public class NodeConnectionEventHandler
    * Remove a listener from the list of listeners.
    * @param listener a {@link NodeConnectionListener} instance.
    */
-  public void removeNodeConnectionListener(final NodeConnectionListener listener)
-  {
+  public void removeNodeConnectionListener(final NodeConnectionListener listener) {
     if (listener == null) return;
     listeners.remove(listener);
   }
@@ -70,10 +67,9 @@ public class NodeConnectionEventHandler
    * Notify all listeners that a node is connected tot he server.
    * @param info encapsulates the information about the node.
    */
-  public void fireNodeConnected(final JPPFManagementInfo info)
-  {
+  public void fireNodeConnected(final JPPFManagementInfo info) {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
+    for (NodeConnectionListener listener : listeners) listener.nodeConnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
   }
 
@@ -81,22 +77,19 @@ public class NodeConnectionEventHandler
    * Notify all listeners that a node is disconnected from the server.
    * @param info encapsulates the information about the node.
    */
-  public void fireNodeDisconnected(final JPPFManagementInfo info)
-  {
+  public void fireNodeDisconnected(final JPPFManagementInfo info) {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
+    for (NodeConnectionListener listener : listeners) listener.nodeDisconnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeDisconnected(info);
   }
 
   /**
    * Load all listener instances found in the class path via a service definition.
    */
-  public void loadListeners()
-  {
+  public void loadListeners() {
     Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
     List<NodeConnectionListener> list = new ArrayList<>();
-    while (it.hasNext())
-    {
+    while (it.hasNext()) {
       NodeConnectionListener listener = it.next();
       if (listener == null) continue;
       list.add(listener);

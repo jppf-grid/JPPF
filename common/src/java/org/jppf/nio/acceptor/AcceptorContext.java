@@ -18,6 +18,8 @@
 
 package org.jppf.nio.acceptor;
 
+import java.nio.channels.ServerSocketChannel;
+
 import org.jppf.nio.*;
 import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.JPPFIdentifiers;
@@ -44,23 +46,21 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    * The statsistics to update, if any.
    */
   private final JPPFStatistics stats;
-
   /**
-   * 
-   * @param server the acceptor server.
+   * The server socket channel that accepted the connection.
    */
-  public AcceptorContext(final AcceptorNioServer server) {
-    this(server, null);
-  }
+  private final ServerSocketChannel serverSocketChannel;
 
   /**
    * 
    * @param server the acceptor server.
+   * @param serverSocketChannel the server socket channel that accepted the connection.
    * @param stats the statsistics to update, if any.
    */
-  public AcceptorContext(final AcceptorNioServer server, final JPPFStatistics stats) {
+  public AcceptorContext(final AcceptorNioServer server, final ServerSocketChannel serverSocketChannel, final JPPFStatistics stats) {
     this.server = server;
     this.stats = stats;
+    this.serverSocketChannel = serverSocketChannel;
   }
 
   /**
@@ -99,5 +99,12 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    */
   public int getId() {
     return id;
+  }
+
+  /**
+   * @return the server socket channel that accepted the connection.
+   */
+  public ServerSocketChannel getServerSocketChannel() {
+    return serverSocketChannel;
   }
 }

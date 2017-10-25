@@ -48,10 +48,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * The pool of threads used for submitting channel state transitions.
-   */
-  protected final ExecutorService executor;
-  /**
    * The server for which this transition manager is intended.
    */
   private final NioServer<S, T> server;
@@ -67,7 +63,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Global thread pool used by all NIO servers.
    * @since 5.0
    */
-  private static ExecutorService globalExecutor;
+  private final ExecutorService executor = NioHelper.getGlobalexecutor();
   /**
    * The server lock.
    * @since 5.0
@@ -83,7 +79,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     this.server = server;
     this.factory = server.getFactory();
     this.lock = server.getLock();
-    executor = initExecutor();
     isNodeServer = server.getIdentifier() == JPPFIdentifiers.NODE_JOB_DATA_CHANNEL;
   }
 
@@ -277,28 +272,5 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
       log.error(String.format("error for transition=%s, channel=%s, exception=%s", transition, channel, e));
       throw e;
     }
-  }
-
-  /**
-   * Initialize the executor for this transition manager.
-   * @return an {@link ExecutorService} object.
-   * @since 5.0
-   */
-  private static synchronized ExecutorService initExecutor() {
-    if (globalExecutor == null) {
-      int n = NioConstants.THREAD_POOL_SIZE;
-      globalExecutor = Executors.newFixedThreadPool(n, new JPPFThreadFactory("JPPF NIO"));
-      if (debugEnabled) log.debug("globalExecutor={}, maxSize={}", globalExecutor, ((ThreadPoolExecutor) globalExecutor).getMaximumPoolSize());
-    }
-    return globalExecutor;
-  }
-
-  /**
-   * Shutdown the global executor for all transition managers.
-   * @param now if {@code true} then call {@code shutownNow()} on the executor, otherwise, call {@code shutown()}.
-   */
-  public static void shutdown(final boolean now) {
-    if (now) globalExecutor.shutdownNow();
-    else globalExecutor.shutdown();
   }
 }

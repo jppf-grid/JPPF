@@ -33,6 +33,10 @@ public final class JPPFIdentifiers {
    */
   public static final int UNKNOWN = 0;
   /**
+   * Identifier for a JMX remote channel.
+   */
+  public static final int JMX_REMOTE_CHANNEL = 0xFFF8;
+  /**
    * Identifier for an acceptor channel.
    */
   public static final int ACCEPTOR_CHANNEL = 0xFFF9;
@@ -62,6 +66,7 @@ public final class JPPFIdentifiers {
     idMap.put(CLIENT_CLASSLOADER_CHANNEL, "CLIENT_CLASSLOADER_CHANNEL");
     idMap.put(NODE_JOB_DATA_CHANNEL, "NODE_JOB_DATA_CHANNEL");
     idMap.put(NODE_CLASSLOADER_CHANNEL, "NODE_CLASSLOADER_CHANNEL");
+    idMap.put(JMX_REMOTE_CHANNEL, "JMX_REMOTE_CHANNEL");
   }
   /**
    * Mapping of ids to server names.
@@ -73,6 +78,7 @@ public final class JPPFIdentifiers {
     serverMap.put(CLIENT_CLASSLOADER_CHANNEL, NioConstants.CLIENT_CLASS_SERVER);
     serverMap.put(NODE_JOB_DATA_CHANNEL, NioConstants.NODE_SERVER);
     serverMap.put(NODE_CLASSLOADER_CHANNEL, NioConstants.NODE_CLASS_SERVER);
+    serverMap.put(JMX_REMOTE_CHANNEL, NioConstants.JMX_REMOTE);
   }
 
   /**

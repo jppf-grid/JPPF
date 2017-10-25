@@ -16,27 +16,35 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.collections;
+package org.jppf.jmxremote.nio;
 
-import java.util.Map;
+import org.jppf.nio.ChannelWrapper;
+import org.jppf.utils.Pair;
 
 /**
- *
- * @param <K> the type of the keys.
- * @param <V> the type of the values.
+ * 
  * @author Laurent Cohen
  */
-public class SoftLRUCache<K, V> extends SoftReferenceValuesMap<K, V> {
+public class ChannelsPair extends Pair<ChannelWrapper<?>, ChannelWrapper<?>> {
   /**
-   *
-   * @param capacity the capacity of this cache.
+   * @param first the reading channel.
+   * @param second the writing channel.
    */
-  public SoftLRUCache(final int capacity) {
-    super(capacity);
+  public ChannelsPair(ChannelWrapper<?> first, ChannelWrapper<?> second) {
+    super(first, second);
   }
 
-  @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
-    return new LRUMap<>(capacity);
+  /**
+   * @return the reading channel.
+   */
+  public ChannelWrapper<?> readingChannel() {
+    return first();
+  }
+
+  /**
+   * @return the reading channel.
+   */
+  public ChannelWrapper<?> writingChannel() {
+    return second();
   }
 }

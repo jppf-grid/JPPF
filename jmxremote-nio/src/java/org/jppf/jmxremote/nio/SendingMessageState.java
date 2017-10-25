@@ -1,0 +1,54 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2017 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.jmxremote.nio;
+
+import static org.jppf.jmxremote.nio.JMXTransition.*;
+
+import org.jppf.jmxremote.message.JMXMessage;
+import org.jppf.nio.ChannelWrapper;
+
+/**
+ *
+ * @author Laurent Cohen
+ */
+public class SendingMessageState extends JMXNioState {
+  /**
+   *
+   * @param server the server which handles the channels states and transitions.
+   */
+  public SendingMessageState(final JMXNioServer server) {
+    super(server);
+  }
+
+  @Override
+  public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    JMXContext context = (JMXContext) channel.getContext();
+    if (context.getCurrentJmxMessage() == null) {
+      JMXMessage msg = context.pollJmxMessage();
+      if (msg == null) return TO_IDLE;
+      context.setCurrentJmxMessage(msg);
+      context.serializeMessage(channel);
+    }
+    if (context.writeMessage(channel)) {
+      context.setCurrentJmxMessage(null);
+      context.setMessage(null);
+    }
+    return TO_SENDING_MESSAGE;
+  }
+}

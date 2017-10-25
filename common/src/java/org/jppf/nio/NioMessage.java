@@ -23,8 +23,7 @@ package org.jppf.nio;
  * A channel is a wrapper over a socket connection or in-memory pipe.
  * @author Laurent Cohen
  */
-public interface NioMessage
-{
+public interface NioMessage {
   /**
    * Read data from a channel.
    * @return true if the data has been completely read from the channel, false otherwise.

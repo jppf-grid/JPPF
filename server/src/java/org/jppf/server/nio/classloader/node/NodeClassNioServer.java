@@ -89,7 +89,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   }
 
   @Override
-  public NioContext<NodeClassState> createNioContext() {
+  public NioContext<NodeClassState> createNioContext(final Object...params) {
     return new NodeClassContext();
   }
 

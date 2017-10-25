@@ -99,16 +99,6 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   }
 
   /**
-   * Give the non qualified name of the class of this instance.
-   * @return a class name as a string.
-   */
-  protected String getShortClassName() {
-    String fqn = getClass().getName();
-    int idx = fqn.lastIndexOf('.');
-    return fqn.substring(idx + 1);
-  }
-
-  /**
    * Get the container for the current message data.
    * @return an <code>NioMessage</code> instance.
    */

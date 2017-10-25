@@ -16,27 +16,28 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.collections;
+package org.jppf.jmxremote.nio;
 
-import java.util.Map;
+import org.jppf.nio.ChannelWrapper;
 
 /**
  *
- * @param <K> the type of the keys.
- * @param <V> the type of the values.
  * @author Laurent Cohen
  */
-public class SoftLRUCache<K, V> extends SoftReferenceValuesMap<K, V> {
+public class ReceivingMessageState extends JMXNioState {
   /**
    *
-   * @param capacity the capacity of this cache.
+   * @param server the server which handles the channels states and transitions.
    */
-  public SoftLRUCache(final int capacity) {
-    super(capacity);
+  public ReceivingMessageState(final JMXNioServer server) {
+    super(server);
   }
 
   @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
-    return new LRUMap<>(capacity);
+  public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    JMXContext context = (JMXContext) channel.getContext();
+    if (context.readMessage(channel)) {
+    }
+    return JMXTransition.TO_RECEIVING_MESSAGE;
   }
 }

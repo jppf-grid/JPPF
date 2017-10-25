@@ -61,24 +61,24 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Flag indicating that this socket server is closed.
    */
-  private AtomicBoolean stopped = new AtomicBoolean(false);
+  private final AtomicBoolean stopped = new AtomicBoolean(false);
   /**
    * The ports this server is listening to.
    */
-  protected int[] ports = null;
+  protected int[] ports;
   /**
    * The SSL ports this server is listening to.
    */
-  protected int[] sslPorts = null;
+  protected int[] sslPorts;
   /**
    * Timeout for the select() operations. A value of 0 means no timeout, i.e.
    * the <code>Selector.select()</code> will be invoked without parameters.
    */
-  protected long selectTimeout = 0L;
+  protected long selectTimeout;
   /**
    * The factory for this server.
    */
-  protected NioServerFactory<S, T> factory = null;
+  protected NioServerFactory<S, T> factory;
   /**
    * Lock used to synchronize selector operations.
    */
@@ -86,7 +86,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Performs all operations that relate to channel states.
    */
-  protected StateTransitionManager<S, T> transitionManager = null;
+  protected StateTransitionManager<S, T> transitionManager;
   /**
    * Shutdown requested for this server
    */
@@ -94,7 +94,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * The SSL context associated with this server.
    */
-  protected SSLContext sslContext = null;
+  protected SSLContext sslContext;
   /**
    * The channel identifier for channels handled by this server.
    */
@@ -102,7 +102,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * List of opened server socket channels.
    */
-  private List<ServerSocketChannel> servers = new Vector<>();
+  private final Map<Integer, ServerSocketChannel> servers = new HashMap<>();
 
   /**
    * Initialize this server with a specified port number and name.
@@ -149,24 +149,55 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   }
 
   /**
-   * Initialize the underlying server sockets for the spcified array of ports.
+   * Initialize the underlying server sockets for the specified array of ports.
    * @param portsToInit the array of ports to initiialize.
    * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  private void init(final int[] portsToInit, final Boolean ssl) throws Exception {
-    for (int i=0; i<portsToInit.length; i++) {
-      if (portsToInit[i] < 0) continue;
+  private void init(final int[] portsToInit, final boolean ssl) throws Exception {
+    for (int i=0; i<portsToInit.length; i++) addServer(portsToInit[i], ssl, null);
+  }
+
+  /**
+   * Initialize the underlying server sockets for the spcified array of ports.
+   * @param portToInit the array of ports to initiialize.
+   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
+   * @param env optional map of parameters to associate with the server socket channel.
+   * @throws Exception if any error occurs while initializing the server sockets.
+   */
+  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env) throws Exception {
+    int port = portToInit;
+    if (port >= 0) {
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
+      InetSocketAddress addr = new InetSocketAddress(port);
       server.socket().bind(addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
-      if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
+      if (port == 0) port = server.socket().getLocalPort();
       server.configureBlocking(false);
-      server.register(selector, SelectionKey.OP_ACCEPT, ssl);
-      servers.add(server);
+      Map<String, Object> map = new HashMap<>();
+      map.put("jppf.ssl", ssl);
+      if (env != null) map.putAll(env);
+      synchronized(servers) {
+        server.register(selector, SelectionKey.OP_ACCEPT, map);
+        servers.put(portToInit, server);
+      }
+    }
+  }
+
+  /**
+   * Remove the server identified by the local port it is listneing to.
+   * @param port the port the sever is listening to.
+   * @throws IOException if any error occurs closing the specified server socket channel.
+   */
+  public void removeServer(final int port) throws IOException {
+    ServerSocketChannel server = null;
+    synchronized(servers) {
+      server = servers.remove(port);
+    }
+    if (server != null) {
+      server.close();
     }
   }
 
@@ -192,7 +223,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 
   /**
    * Start the underlying server socket by making it accept incoming connections.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run() {
@@ -276,7 +306,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   private void doAccept(final SelectionKey key) {
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
-    boolean ssl = (Boolean) key.attachment();
+    @SuppressWarnings("unchecked")
+    Map<String, ?> map = (Map<String, ?>) key.attachment();
+    boolean ssl = (Boolean) map.get("jppf.ssl");
     SocketChannel channel;
     try {
       channel = serverSocketChannel.accept();
@@ -285,7 +317,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
-    Runnable task = new AcceptChannelTask(this, channel, ssl);
+    Runnable task = new AcceptChannelTask(this, serverSocketChannel, channel, ssl);
     transitionManager.submit(task);
   }
 
@@ -293,15 +325,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Register an incoming connection with this server's selector.
    * The channel is registered with an empty set of initial interest operations,
    * which means a call to the corresponding {@link SelectionKey}'s <code>interestOps()</code> method will return 0.
+   * @param serverSocketChannel the server socket channel accepting the connection.
    * @param channel the socket channel representing the connection.
    * @param sslHandler an sslEngine eventually passed on from a different server.
    * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
    * @param peer specifiies whether the channel is for a peer driver.
+   * @param params optional parameters.
    * @return a wrapper for the newly registered channel.
    */
-  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer) {
+  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object...params) {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
-    NioContext<?> context = createNioContext();
+    NioContext<?> context = createNioContext(params);
     context.setPeer(peer);
     SelectionKeyWrapper wrapper = null;
     lock.lock();
@@ -335,9 +369,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 
   /**
    * Define a context for a newly created channel.
+   * @param params optional parameters.
    * @return an <code>NioContext</code> instance.
    */
-  public abstract NioContext<S> createNioContext();
+  public abstract NioContext<S> createNioContext(final Object...params);
 
   /**
    * Close the underlying server socket and stop this socket server.
@@ -363,15 +398,18 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
-      for (ServerSocketChannel server: servers) {
+    } finally {
+      lock.unlock();
+    }
+    synchronized(servers) {
+      for (Map.Entry<Integer, ServerSocketChannel> entry: servers.entrySet()) {
         try {
-          server.close();
+          entry.getValue().close();
         } catch (Exception e) {
           log.error(e.getMessage(), e);
         }
       }
-    } finally {
-      lock.unlock();
+      servers.clear();
     }
   }
 

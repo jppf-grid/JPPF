@@ -68,4 +68,9 @@ public interface Chromosome extends Comparable<Chromosome>, Serializable {
    * @return an array of 2 descendants.
    */
   Chromosome crossover(Chromosome mate, int position);
+
+  /**
+   * @return whether this chromosome is valid.
+   */
+  public boolean isValid();
 }

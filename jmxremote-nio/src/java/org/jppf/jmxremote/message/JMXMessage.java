@@ -16,27 +16,18 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.collections;
+package org.jppf.jmxremote.message;
 
-import java.util.Map;
+import java.io.Serializable;
 
 /**
- *
- * @param <K> the type of the keys.
- * @param <V> the type of the values.
+ * 
  * @author Laurent Cohen
  */
-public class SoftLRUCache<K, V> extends SoftReferenceValuesMap<K, V> {
+public interface JMXMessage extends Serializable {
   /**
-   *
-   * @param capacity the capacity of this cache.
+   * Get the id of this message.
+   * @return the message ID.
    */
-  public SoftLRUCache(final int capacity) {
-    super(capacity);
-  }
-
-  @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
-    return new LRUMap<>(capacity);
-  }
+  String getMessageID();
 }

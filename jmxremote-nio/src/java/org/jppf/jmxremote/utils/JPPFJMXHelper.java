@@ -18,6 +18,12 @@
 
 package org.jppf.jmxremote.utils;
 
+import java.util.Map;
+
+import javax.management.remote.JMXServiceURL;
+
+import org.jppf.nio.acceptor.AcceptorNioServer;
+
 /**
  * 
  * @author Laurent Cohen
@@ -27,4 +33,19 @@ public class JPPFJMXHelper {
    * Name of the JMX remote protocol.
    */
   public static final String PROTOCOL = "jppf";
+
+  /**
+   * Create the acceptor server based on the specified parameters.
+   * @param address encapsulates the connection information.
+   * @param env the JMX server environment, including eventual SSL parameters. 
+   * @return a new {@link AcceptorNioServer} instance.
+   */
+  public static AcceptorNioServer createAcceptor(final JMXServiceURL address, Map<String, ?> env) throws Exception {
+    int port = address.getPort();
+    Boolean tls = (Boolean) env.get("jppf.jmx.remote.tls.enabled");
+    boolean secure = (tls == null) ? false : tls;
+    int[] ports = { port };
+    if (secure) return new AcceptorNioServer(null, ports);
+    return new AcceptorNioServer(ports, null);
+  }
 }

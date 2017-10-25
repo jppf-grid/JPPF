@@ -77,9 +77,7 @@ public abstract class AbstractChromosome implements Chromosome {
     return 0;
   }
 
-  /**
-   * @return whether this chromosome is valid.
-   */
+  @Override
   public boolean isValid() {
     return true;
   }

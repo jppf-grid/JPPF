@@ -310,7 +310,7 @@ public class JPPFProperties {
   /** Enabled/diable secure connections */
   public static final JPPFProperty<Boolean> SSL_ENABLED = new BooleanProperty("jppf.ssl.enabled", false);
   /** Space-separated enabled cipher suites */
-  public static final JPPFProperty<String> SSL_CIPHER_SUITES = new StringProperty("jppf.ssl.cipher.suites", null);
+  public static final JPPFProperty<String[]> SSL_CIPHER_SUITES = new StringArrayProperty("jppf.ssl.cipher.suites", " ", null);
   /** SSL client authentication level: 'none' | 'want' | 'need' */
   public static final JPPFProperty<String> SSL_CLIENT_AUTH = new StringProperty("jppf.ssl.client.auth", "none");
   /** Whether to use a separate trust store for client certificates (server only) */
@@ -330,7 +330,7 @@ public class JPPFProperties {
   /** SSL configuration as an arbitrary source */
   public static final JPPFProperty<String> SSL_CONFIGURATION_SOURCE = new StringProperty("jppf.ssl.configuration.source", null);
   /** {@link javax.net.ssl.SSLContext SSLContext} protocol */
-  public static final JPPFProperty<String> SSL_CONTEXT_PROTOCOL = new StringProperty("jppf.ssl.context.protocol", "SSL");
+  public static final JPPFProperty<String> SSL_CONTEXT_PROTOCOL = new StringProperty("jppf.ssl.context.protocol", "TLSv1");
   /** Path to the key store in the file system or classpath */
   public static final JPPFProperty<String> SSL_KEYSTORE_FILE = new StringProperty("jppf.ssl.keystore.file", null);
   /** Plain text key store password */
@@ -342,7 +342,7 @@ public class JPPFProperties {
   /** Key store location as an arbitrary source */
   public static final JPPFProperty<String> SSL_KEYSTORE_SOURCE = new StringProperty("jppf.ssl.keytstore.source", null);
   /** A list of space-separated enabled protocols */
-  public static final JPPFProperty<String> SSL_PROTOCOLS = new StringProperty("jppf.ssl.protocols", null);
+  public static final JPPFProperty<String[]> SSL_PROTOCOLS = new StringArrayProperty("jppf.ssl.protocols", " ", null);
   /** Path to the trust store in the file system or classpath */
   public static final JPPFProperty<String> SSL_TRUSTSTORE_FILE = new StringProperty("jppf.ssl.truststore.file", null);
   /** Plain text trust store password */
@@ -359,8 +359,12 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> TEMP_BUFFER_POOL_SIZE = new IntProperty("jppf.temp.buffer.pool.size", 10, 1, 2*1024);
   /** Size of temporary buffers used in I/O transfers */
   public static final JPPFProperty<Integer> TEMP_BUFFER_SIZE = new IntProperty("jppf.temp.buffer.size", 32*1024, 1024, 64*1024);
-  /** Number of threads performing network I/O (server only) */
-  public static final JPPFProperty<Integer> TRANSITION_THREAD_POOL_SIZE = new IntProperty("jppf.transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32*1024);
+  /** Core number of threads performing network I/O  */
+  public static final JPPFProperty<Integer> TRANSITION_THREAD_POOL_SIZE = new IntProperty("jppf.transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 2, 32*1024);
+  /** Queue size for the pool of threads performing network I/O  */
+  public static final JPPFProperty<Integer> TRANSITION_THREAD_QUEUE_SIZE = new IntProperty("jppf.transition.thread.queue.size", 50, 1, 32*1024);
+  /** TTL in milliseconds for threads beyond the core number performing network I/O */
+  public static final JPPFProperty<Long> TRANSITION_THREAD_TTL = new LongProperty("jppf.transition.thread.ttl", 5000L, 1L, Long.MAX_VALUE);
   /** Whether to display the animated splash screen at console startup, defaults to false */
   public static final JPPFProperty<Boolean> UI_SPLASH = new BooleanProperty("jppf.ui.splash", true);
   /** Interval between images in milliseconds */

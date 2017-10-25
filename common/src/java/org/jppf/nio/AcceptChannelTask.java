@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
@@ -51,17 +51,23 @@ class AcceptChannelTask implements Runnable {
    * Determines whether ssl is enabled for the channel
    */
   private final boolean ssl;
+  /**
+   * The server socketc channel that accepted the connection.
+   */
+  private final ServerSocketChannel serverSocketChannel; 
 
   /**
    * Initialize this task with the specified selection key.
+   * @param serverSocketChannel the server socketc channel that accepted the connection.
    * @param server the related nio server.
    * @param channel the newly accepted socket channel.
    * @param ssl determines whether ssl is enabled for the channel.
    */
-  public AcceptChannelTask(final NioServer<?, ?> server, final SocketChannel channel, final boolean ssl) {
+  public AcceptChannelTask(final NioServer<?, ?> server, final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final boolean ssl) {
     this.server = server;
     this.channel = channel;
     this.ssl = ssl;
+    this.serverSocketChannel = serverSocketChannel;
   }
 
   @Override
@@ -79,7 +85,7 @@ class AcceptChannelTask implements Runnable {
       StreamUtils.close(channel, log);
       return;
     }
-    server.accept(channel, null, ssl, false);
+    server.accept(serverSocketChannel, channel, null, ssl, false);
   }
 
   /**

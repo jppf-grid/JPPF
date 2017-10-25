@@ -60,9 +60,13 @@ public class NioConstants {
    */
   public static final String CLIENT_SERVER = "ClientJobServer";
   /**
-   * Name of the acceptor server server.
+   * Name of the acceptor server.
    */
   public static final String ACCEPTOR = "Acceptor";
+  /**
+   * Name of the JMX remote server.
+   */
+  public static final String JMX_REMOTE = "JMXRemote";
   /**
    * Default timeout for <code>Selector.select(long)</code> operations.
    */

@@ -185,17 +185,18 @@ public class JPPFDriver {
     int[] sslPorts = extractValidPorts(info.sslServerPorts);
     boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
-    AcceptorHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL)));
-    AcceptorHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL)));
-    AcceptorHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL)));
-    AcceptorHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
     jobManager.loadTaskReturnListeners();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
     initializer.initJmxServer();
     HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
     initializer.getNodeConnectionEventHandler().loadListeners();
 
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
+    startServer(recoveryServer, acceptorServer);
 
     if (config.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
@@ -329,7 +330,7 @@ public class JPPFDriver {
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
     if (clientNioServer != null) clientNioServer.shutdown();
-    StateTransitionManager.shutdown(true);
+    NioHelper.shutdown(true);
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
     initializer.stopJmxServer();

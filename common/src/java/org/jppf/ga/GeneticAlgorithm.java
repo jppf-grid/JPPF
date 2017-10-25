@@ -37,7 +37,7 @@ public class GeneticAlgorithm implements AutoCloseable {
   /**
    *
    */
-  static ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("GA"));
+  static ExecutorService executor = Executors.newFixedThreadPool(8, new JPPFThreadFactory("GA"));
   /**
    * The genetic algorithm's population.
    */
@@ -100,12 +100,12 @@ public class GeneticAlgorithm implements AutoCloseable {
   public Chromosome run(final int maxGenerations) {
     Chromosome best = null;
     try {
-      double bestFitness = Double.NEGATIVE_INFINITY;
       generationCount = 0;
       computeFitness(population);
       testValid();
       long start = System.nanoTime();
       while (generationCount < maxGenerations) {
+        double bestFitness = Double.NEGATIVE_INFINITY;
         Arrays.sort(population);
         Chromosome[] pop = selector.select(population, nbSelect);
         population = performCrossover(pop);
@@ -113,13 +113,6 @@ public class GeneticAlgorithm implements AutoCloseable {
         population = performMutation(population, nbSelect);
         if (population[0] == null) throw new NullPointerException();
         computeFitness(population);
-        if (generationCount % outputFrequency == 0) {
-          long elapsed = (System.nanoTime() - start) / 1_000_000L;
-          displayStats(generationCount, population, elapsed);
-          start = System.nanoTime();
-        }
-        generationCount++;
-
         for (Chromosome c: population) {
           if (c.getFitness() > bestFitness) {
             best = c;
@@ -128,6 +121,12 @@ public class GeneticAlgorithm implements AutoCloseable {
         }
         if (shouldStop(best)) break;
         postEpoch(best);
+        generationCount++;
+        if (generationCount % outputFrequency == 0) {
+          long elapsed = (System.nanoTime() - start) / 1_000_000L;
+          displayStats(generationCount, population, elapsed);
+          start = System.nanoTime();
+        }
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -163,6 +162,7 @@ public class GeneticAlgorithm implements AutoCloseable {
    * @param pop the chromosomes for which to compute the fitness.
    */
   protected void computeFitness(final Chromosome[] pop) {
+    /*
     CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
     for (final Chromosome c: pop) {
       Runnable r = new Runnable() {
@@ -178,7 +178,9 @@ public class GeneticAlgorithm implements AutoCloseable {
     } catch(Exception e) {
       e.printStackTrace();
     }
-  }
+    */
+    for (final Chromosome c: pop) c.computeFitness();
+}
 
   /**
    * Perform the crossover operation for the specified population.

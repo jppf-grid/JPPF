@@ -307,7 +307,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   @Override
-  public AbstractNodeContext createNioContext() {
+  public AbstractNodeContext createNioContext(final Object...params) {
     final RemoteNodeContext context = new RemoteNodeContext(getTransitionManager());
     context.setOnClose(new Runnable() {
       @Override

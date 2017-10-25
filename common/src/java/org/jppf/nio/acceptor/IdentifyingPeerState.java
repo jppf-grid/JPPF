@@ -61,15 +61,15 @@ class IdentifyingPeerState extends AcceptorServerState {
       if (!(channel instanceof SelectionKeyWrapper)) return null;
       int id = context.getId();
       if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
-      NioServer<?, ?> newServer = AcceptorHelper.getServer(id);
-      if (newServer == null) throw new JPPFException("unknown JPPF identifier: " + id);
+      NioServer<?, ?> server = NioHelper.getServer(id);
+      if (server == null) throw new JPPFException("unknown JPPF identifier: " + id);
       if (debugEnabled) log.debug("cancelling key for {}", channel);
       SelectionKey key = (SelectionKey) channel.getChannel();
       SocketChannel socketChannel = (SocketChannel) key.channel();
       key.cancel();
-      if (debugEnabled) log.debug("registering channel with new server {}", newServer);
-      ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLHandler(), context.isSsl(), false);
-      if (debugEnabled) log.debug("channel registered: {}", newChannel);
+      if (debugEnabled) log.debug("transfering channel to new server {}", server);
+      server.accept(context.getServerSocketChannel(), socketChannel, context.getSSLHandler(), context.isSsl(), false);
+      if (debugEnabled) log.debug("channel accepted: {}", socketChannel);
       context.setSSLHandler(null);
       return null;
     }

@@ -72,7 +72,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   }
 
   @Override
-  public NioContext<ClientClassState> createNioContext() {
+  public NioContext<ClientClassState> createNioContext(final Object...params) {
     return new ClientClassContext();
   }
 

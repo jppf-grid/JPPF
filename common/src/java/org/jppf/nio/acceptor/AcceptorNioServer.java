@@ -18,6 +18,8 @@
 
 package org.jppf.nio.acceptor;
 
+import java.nio.channels.*;
+
 import javax.net.ssl.SSLEngine;
 
 import org.jppf.nio.*;
@@ -80,6 +82,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   }
 
   @Override
+  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
+    return super.accept(serverSocketChannel, channel, sslHandler, ssl, peer, serverSocketChannel);
+  }
+
+  @Override
   public void postAccept(final ChannelWrapper<?> channel) {
     try {
       transitionManager.transitionChannel(channel, AcceptorTransition.TO_IDENTIFYING_PEER);
@@ -91,8 +98,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   }
 
   @Override
-  public NioContext<AcceptorState> createNioContext() {
-    AcceptorContext context = new AcceptorContext(this, stats);
+  public NioContext<AcceptorState> createNioContext(final Object...params) {
+    AcceptorContext context = new AcceptorContext(this, (ServerSocketChannel) params[0], stats);
     return context;
   }
 

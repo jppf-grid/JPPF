@@ -16,27 +16,30 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.collections;
+package org.jppf.jmxremote;
 
-import java.util.Map;
+import java.util.EventListener;
 
 /**
- *
- * @param <K> the type of the keys.
- * @param <V> the type of the values.
+ * 
  * @author Laurent Cohen
  */
-public class SoftLRUCache<K, V> extends SoftReferenceValuesMap<K, V> {
+public interface JMXConnectionStatusListener extends EventListener {
   /**
-   *
-   * @param capacity the capacity of this cache.
+   * Called when a connection is opened.
+   * @param event encasulates the connection ID and Throwable information.
    */
-  public SoftLRUCache(final int capacity) {
-    super(capacity);
-  }
+  void connectionOpened(JMXConnectionStatusEvent event);
 
-  @Override
-  Map<K, SoftReferenceValuesMap.SoftValue<K, V>> createMap(final int capacity) {
-    return new LRUMap<>(capacity);
-  }
+  /**
+   * Called when a connection is closed.
+   * @param event encasulates the connection ID and Throwable information.
+   */
+  void connectionClosed(JMXConnectionStatusEvent event);
+
+  /**
+   * Called when a connection fails.
+   * @param event encasulates the connection ID and Throwable information.
+   */
+  void connectionFailed(JMXConnectionStatusEvent event);
 }
