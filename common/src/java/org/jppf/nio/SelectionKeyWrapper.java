@@ -120,4 +120,9 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey> {
   public boolean isLocal() {
     return false;
   }
+
+  @Override
+  public SocketChannel getSocketChannel() {
+    return (SocketChannel) channel.channel();
+  }
 }

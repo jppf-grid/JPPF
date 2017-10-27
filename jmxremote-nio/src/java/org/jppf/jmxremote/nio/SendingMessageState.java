@@ -22,12 +22,21 @@ import static org.jppf.jmxremote.nio.JMXTransition.*;
 
 import org.jppf.jmxremote.message.JMXMessage;
 import org.jppf.nio.ChannelWrapper;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class SendingMessageState extends JMXNioState {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendingMessageState.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    *
    * @param server the server which handles the channels states and transitions.
@@ -41,14 +50,16 @@ public class SendingMessageState extends JMXNioState {
     JMXContext context = (JMXContext) channel.getContext();
     if (context.getCurrentJmxMessage() == null) {
       JMXMessage msg = context.pollJmxMessage();
-      if (msg == null) return TO_IDLE;
+      if (msg == null) return transitionChannel(channel, TO_IDLE);
+      if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
       context.setCurrentJmxMessage(msg);
       context.serializeMessage(channel);
     }
     if (context.writeMessage(channel)) {
+      if (debugEnabled) log.debug("fully sent message {} from context {}", context.getCurrentJmxMessage(), context);
       context.setCurrentJmxMessage(null);
       context.setMessage(null);
     }
-    return TO_SENDING_MESSAGE;
+    return transitionChannel(channel, TO_SENDING_MESSAGE);
   }
 }

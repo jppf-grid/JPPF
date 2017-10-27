@@ -16,21 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.classloader;
-
-import org.jppf.nio.*;
-
 /**
- * Channel wrapper and I/O implementation for the class loader of an in-VM node.
- * @author Laurent Cohen
- * @exclude
+ * Unit tests for {@code org.jppf.jmxremote} code.
  */
-public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFResourceWrapper, AbstractNioContext<?>> {
-  /**
-   * Initialize this I/O handler with the specified context.
-   * @param context the context used as communication channel.
-   */
-  public LocalClassLoaderChannel(final AbstractNioContext<?> context) {
-    super(context);
-  }
-}
+package test.org.jppf.jmxremote;

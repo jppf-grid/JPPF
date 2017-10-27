@@ -272,7 +272,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param selectedKeys the set of keys that were selected by the latest <code>select()</code> invocation.
    * @throws Exception if an error is raised while processing the keys.
    */
-  public void go(final Set<SelectionKey> selectedKeys) throws Exception {
+  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
     Iterator<SelectionKey> it = selectedKeys.iterator();
     while (it.hasNext()) {
       SelectionKey key = it.next();
@@ -304,7 +304,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * It accept and put it in a state to define what type of peer is.
    * @param key the selection key that represents the channel's registration with the selector.
    */
-  private void doAccept(final SelectionKey key) {
+  protected void doAccept(final SelectionKey key) {
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
     @SuppressWarnings("unchecked")
     Map<String, ?> map = (Map<String, ?>) key.attachment();

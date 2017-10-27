@@ -28,8 +28,7 @@ import org.slf4j.*;
  * Instances of this class represent a data frame read asynchronously from an input source.
  * @author Laurent Cohen
  */
-public class PlainNioObject extends AbstractNioObject
-{
+public class PlainNioObject extends AbstractNioObject {
   /**
    * Logger for this class.
    */
@@ -56,8 +55,7 @@ public class PlainNioObject extends AbstractNioObject
    * @param channel where to read or write the data.
    * @param size the size of the internal buffer.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final int size)
-  {
+  public PlainNioObject(final ChannelWrapper<?> channel, final int size) {
     this(channel, new MultipleBuffersLocation(size));
   }
 
@@ -66,8 +64,7 @@ public class PlainNioObject extends AbstractNioObject
    * @param channel where to read or write the data.
    * @param location the location of the data to read from or write to.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final DataLocation location)
-  {
+  public PlainNioObject(final ChannelWrapper<?> channel, final DataLocation location) {
     super(location, location.getSize());
     this.channel = channel;
   }
@@ -78,26 +75,21 @@ public class PlainNioObject extends AbstractNioObject
    * @throws Exception if any error occurs.
    */
   @Override
-  public boolean read() throws Exception
-  {
+  public boolean read() throws Exception {
     if (count >= size) return true;
-    if (source == null)
-    {
-      SocketChannel socketChannel = (SocketChannel) ((SelectionKeyWrapper) channel).getChannel().channel();
+    if (source == null) {
+      SocketChannel socketChannel = channel.getSocketChannel();
       source = new ChannelInputSource(socketChannel);
     }
     int n;
-    do
-    {
+    do {
       n = location.transferFrom(source, false);
-      if (n > 0)
-      {
+      if (n > 0) {
         count += n;
         channelCount = count;
       }
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
-    }
-    while ((n > 0) && (count < size));
+    } while ((n > 0) && (count < size));
     return count >= size;
   }
 
@@ -107,32 +99,26 @@ public class PlainNioObject extends AbstractNioObject
    * @throws Exception if any error occurs.
    */
   @Override
-  public boolean write() throws Exception
-  {
+  public boolean write() throws Exception {
     if (count >= size) return true;
-    if (dest == null)
-    {
-      SocketChannel socketChannel = (SocketChannel) ((SelectionKeyWrapper) channel).getChannel().channel();
+    if (dest == null) {
+      SocketChannel socketChannel = channel.getSocketChannel();
       dest = new ChannelOutputDestination(socketChannel);
     }
     int n;
-    do
-    {
+    do {
       n = location.transferTo(dest, false);
-      if (n > 0)
-      {
+      if (n > 0) {
         count += n;
         channelCount = count;
       }
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
-    }
-    while ((n > 0) && (count < size));
+    } while ((n > 0) && (count < size));
     return count >= size;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("channel id=").append(channel.getId());

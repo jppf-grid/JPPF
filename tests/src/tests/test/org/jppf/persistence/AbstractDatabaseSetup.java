@@ -88,7 +88,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @throws Exception if a process could not be started.
    */
   protected static TestConfiguration dbSetup(final String prefix, final boolean useDB) throws Exception {
-    BaseSetup.setLoggerLevel("org.jppf.persistence", Level.DEBUG);
+    BaseSetup.setLoggerLevel(Level.DEBUG, "org.jppf.persistence");
     if (useDB) {
       print(false, false, "starting H2 server");
       h2Server = Server.createTcpServer().start();

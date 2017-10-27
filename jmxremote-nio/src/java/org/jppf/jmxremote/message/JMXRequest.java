@@ -18,8 +18,10 @@
 
 package org.jppf.jmxremote.message;
 
+import java.util.Arrays;
+
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JMXRequest extends AbstractJMXMessage {
@@ -31,6 +33,10 @@ public class JMXRequest extends AbstractJMXMessage {
    * The request's parameters.
    */
   private final Object[] params;
+  /**
+   * The response to this reqquest.
+   */
+  private transient JMXResponse response;
 
   /**
    * Initialize this request with the specified ID, request type and parameters.
@@ -38,7 +44,7 @@ public class JMXRequest extends AbstractJMXMessage {
    * @param requestType the type of request.
    * @param params the request's parameters.
    */
-  public JMXRequest(final String messageID, final JMXMessageType requestType, final Object... params) {
+  public JMXRequest(final long messageID, final JMXMessageType requestType, final Object... params) {
     super(messageID, requestType);
     this.params = params;
   }
@@ -48,5 +54,29 @@ public class JMXRequest extends AbstractJMXMessage {
    */
   public Object[] getParams() {
     return params;
+  }
+
+  /**
+   * @return the response to this reqquest.
+   */
+  public JMXResponse getResponse() {
+    return response;
+  }
+
+  /**
+   * Set the response to this reqquest.
+   * @param response a {@code JMXResponse} object.
+   */
+  public void setResponse(final JMXResponse response) {
+    this.response = response;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("messageID=").append(messageID)
+      .append(", messageType=").append(messageType)
+      .append(", params=").append(Arrays.asList(params))
+      .append(']').toString();
   }
 }

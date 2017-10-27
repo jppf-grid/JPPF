@@ -18,13 +18,14 @@
 
 package org.jppf.nio;
 
+import java.nio.channels.SocketChannel;
+
 /**
  * Interface for a set of abstractions wrapping different communication channels into a common semantic.
  * @param <S>
  * @author Laurent Cohen
  */
-public interface ChannelWrapper<S>
-{
+public interface ChannelWrapper<S> {
   /**
    * Get the channel to wrap.
    * @return the wrapped channel.
@@ -114,4 +115,10 @@ public interface ChannelWrapper<S>
    * @return  the id as a long value.
    */
   long getId();
+
+  /**
+   * Get the associated socket chanel, if any.
+   * @return a {@link SocketChannel} instance, or null if this wrapper has no associated socket chanel.
+   */
+  SocketChannel getSocketChannel();
 }

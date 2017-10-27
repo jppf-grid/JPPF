@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.jmxremote.message;
+package test.org.jppf.jmxremote;
 
 import java.io.Serializable;
 
@@ -24,15 +24,39 @@ import java.io.Serializable;
  * 
  * @author Laurent Cohen
  */
-public interface JMXMessage extends Serializable {
+public interface ConnectorTestMBean extends Serializable {
   /**
-   * Get the id of this message.
-   * @return the message ID.
+   * Name of the node's admin MBean.
    */
-  long getMessageID();
+  String MBEAN_NAME = "org.jppf:name=TestConnector,type=test";
 
   /**
-   * @return the type of request/response/notification to send.
+   * Test method.
+   * @param stringParam .
+   * @param intParam .
+   * @return .
    */
-  JMXMessageType getMessageType();
+  String test1(String stringParam, int intParam);
+
+  /**
+   * @return a string.
+   */
+  String getStringParam();
+
+  /**
+   * Set the string parameter.
+   * @param stringParam the parameter's value.
+   */
+  void setStringParam(String stringParam);
+
+  /**
+   * @return an int.
+   */
+  int getIntParam();
+
+  /**
+   * Set the int parameter.
+   * @param intParam the parameter's value.
+   */
+  void setIntParam(int intParam);
 }

@@ -21,6 +21,8 @@ package org.jppf.jmxremote.nio;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.management.MBeanServer;
+
 import org.jppf.io.*;
 import org.jppf.jmxremote.message.JMXMessage;
 import org.jppf.nio.*;
@@ -63,6 +65,14 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * Server port on which the connection was established. 
    */
   private int serverPort = -1;
+  /**
+   * The object that handles messages correlations.
+   */
+  private JMXMessageHandler messageHandler;
+  /**
+   * The associated MBeanServer.
+   */
+  private MBeanServer mbeanServer;
 
   /**
    * Initializewitht he specified server.
@@ -180,10 +190,6 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   public void offerJmxMessage(final JMXMessage msg) throws Exception {
     pendingJmxMessages.offer(msg);
-    ChannelWrapper<?> channel = getChannel();
-    synchronized(channel) {
-      if (getState() == JMXState.IDLE) server.getTransitionManager().transitionChannel(channel, JMXTransition.TO_SENDING_MESSAGE);
-    }
   }
 
   /**
@@ -209,5 +215,38 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   public JMXContext setServerPort(int serverPort) {
     this.serverPort = serverPort;
     return this;
+  }
+
+  /**
+   * 
+   * @return the object that handles messages correlations.
+   */
+  public JMXMessageHandler getMessageHandler() {
+    return messageHandler;
+  }
+
+  /**
+   * Set the object that handles messages correlations.
+   * @param messageHandler a {@link JMXMessageHandler} instance.
+   * @return this context, for method chaining.
+   */
+  public JMXContext setMessageHandler(JMXMessageHandler messageHandler) {
+    this.messageHandler = messageHandler;
+    return this;
+  }
+
+  /**
+   * @return the associated MBeanServer, if any.
+   */
+  public MBeanServer getMbeanServer() {
+    return mbeanServer;
+  }
+
+  /**
+   * Set the associated MBeanServer.
+   * @param mbeanServer a {@link MBeanServer} instance.
+   */
+  public void setMbeanServer(MBeanServer mbeanServer) {
+    this.mbeanServer = mbeanServer;
   }
 }

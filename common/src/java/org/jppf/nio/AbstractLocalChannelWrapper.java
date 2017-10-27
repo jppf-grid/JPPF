@@ -18,6 +18,8 @@
 
 package org.jppf.nio;
 
+import java.nio.channels.SocketChannel;
+
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -27,8 +29,7 @@ import org.slf4j.*;
  * @param <T> The type of context used by the channel on the server side of the communication.
  * @author Laurent Cohen
  */
-public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> extends AbstractChannelWrapper<T>
-{
+public abstract class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> extends AbstractChannelWrapper<T> {
   /**
    * Logger for this class.
    */
@@ -70,32 +71,26 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Initialize this I/O handler with the specified context.
    * @param context the context used as communication channel.
    */
-  public AbstractLocalChannelWrapper(final T context)
-  {
+  public AbstractLocalChannelWrapper(final T context) {
     super(context);
     if (traceEnabled) log.trace("created " + this);
   }
 
   @Override
-  public NioContext<?> getContext()
-  {
+  public NioContext<?> getContext() {
     return getChannel();
   }
 
   @Override
-  public int getInterestOps()
-  {
-    synchronized(opsLock)
-    {
+  public int getInterestOps() {
+    synchronized (opsLock) {
       return keyOps;
     }
   }
 
   @Override
-  public void setInterestOps(final int keyOps)
-  {
-    synchronized(opsLock)
-    {
+  public void setInterestOps(final int keyOps) {
+    synchronized (opsLock) {
       this.keyOps = keyOps;
       if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
       if (selector != null) selector.wakeUp();
@@ -103,10 +98,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
   }
 
   @Override
-  public int getReadyOps()
-  {
-    synchronized(opsLock)
-    {
+  public int getReadyOps() {
+    synchronized (opsLock) {
       return readyOps;
     }
   }
@@ -115,10 +108,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Set the operations for which this channel is ready.
    * @param readyOps the bitwise operations as an int value.
    */
-  public void setReadyOps(final int readyOps)
-  {
-    synchronized(opsLock)
-    {
+  public void setReadyOps(final int readyOps) {
+    synchronized (opsLock) {
       this.readyOps = readyOps;
       if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
       if (selector != null) selector.wakeUp();
@@ -129,10 +120,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Fetermine whether this channel can be selected by its selector.
    * @return <code>true</code> if the channel can be selected, <code>false</code> otherwise.
    */
-  public boolean isSelectable()
-  {
-    synchronized(opsLock)
-    {
+  public boolean isSelectable() {
+    synchronized (opsLock) {
       return (readyOps & keyOps) != 0;
     }
   }
@@ -141,10 +130,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Get the resource passed to the node.
    * @return an instance of the resource type used by this channel.
    */
-  public S getNodeResource()
-  {
-    synchronized(nodeLock)
-    {
+  public S getNodeResource() {
+    synchronized (nodeLock) {
       return nodeResource;
     }
   }
@@ -153,10 +140,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Set the resource passed to the node.
    * @param resource an instance of the resource type used by this channel.
    */
-  public void setNodeResource(final S resource)
-  {
-    synchronized(nodeLock)
-    {
+  public void setNodeResource(final S resource) {
+    synchronized (nodeLock) {
       this.nodeResource = resource;
       nodeLock.wakeUp();
     }
@@ -166,10 +151,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Get the resource passed to the server.
    * @return an instance of the resource type used by this channel.
    */
-  public S getServerResource()
-  {
-    synchronized(serverLock)
-    {
+  public S getServerResource() {
+    synchronized (serverLock) {
       return serverResource;
     }
   }
@@ -178,22 +161,18 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Set the resource passed to the server.
    * @param serverResource an instance of the resource type used by this channel.
    */
-  public void setServerResource(final S serverResource)
-  {
-    synchronized(serverLock)
-    {
+  public void setServerResource(final S serverResource) {
+    synchronized (serverLock) {
       this.serverResource = serverResource;
       serverLock.wakeUp();
     }
   }
 
-
   /**
    * Get the object used to synchronize threads when reading/writing the node resource.
    * @return a {@link ThreadSynchronization} instance.
    */
-  public ThreadSynchronization getNodeLock()
-  {
+  public ThreadSynchronization getNodeLock() {
     return nodeLock;
   }
 
@@ -201,8 +180,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * Get the object used to synchronize threads when reading/writing the server resource.
    * @return a {@link ThreadSynchronization} instance.
    */
-  public ThreadSynchronization getServerLock()
-  {
+  public ThreadSynchronization getServerLock() {
     return serverLock;
   }
 
@@ -210,14 +188,12 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
    * @return <code>true</code>.
    */
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return true;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
@@ -229,5 +205,10 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> ext
     sb.append(", context=").append(getContext());
     sb.append(']');
     return sb.toString();
+  }
+
+  @Override
+  public SocketChannel getSocketChannel() {
+    return null;
   }
 }

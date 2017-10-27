@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.MBeanServer;
 import javax.net.ssl.*;
 
 import org.jppf.jmxremote.*;
@@ -60,7 +61,7 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    */
   private final Map<String, ChannelsPair> channelsByConnectionID = new ConcurrentHashMap<>();
   /**
-   * Mapping of connectionIDs tot he server port on which the connection was established.
+   * Mapping of connectionIDs to the server port on which the connection was established.
    */
   private final CollectionMap<Integer, String> connectionsByServerPort = new ArrayListHashMap<>();
   /**
@@ -68,7 +69,7 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    */
   private final Object mapsLock = new Object();
   /**
-   * 
+   *
    */
   private final List<JMXConnectionStatusListener> connectionStatusListeners = new CopyOnWriteArrayList<>();
 
@@ -77,8 +78,6 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    */
   private JMXNioServer() throws Exception {
     super(JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
-    NioHelper.putServer(JPPFIdentifiers.JMX_REMOTE_CHANNEL, this);
-    start();
   }
 
   @Override
@@ -87,15 +86,41 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   }
 
   @Override
+  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
+    Iterator<SelectionKey> it = selectedKeys.iterator();
+    while (it.hasNext()) {
+      SelectionKey key = it.next();
+      it.remove();
+      ChannelsPair pair = null;
+      try {
+        if (!key.isValid()) continue;
+        if (key.isAcceptable()) doAccept(key);
+        else {
+          pair = (ChannelsPair) key.attachment();
+          if (key.isReadable()) transitionManager.submitTransition(pair.readingChannel());
+          if (key.isWritable()) transitionManager.submitTransition(pair.writingChannel());
+        }
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
+        
+        if (pair != null) {
+          JMXContext context = (JMXContext) pair.readingChannel().getContext();
+          context.handleException(context.getChannel(), e);
+        }
+        if (!(key.channel() instanceof ServerSocketChannel)) try {
+          key.channel().close();
+        } catch (Exception e2) {
+          log.error(e2.getMessage(), e2);
+        }
+      }
+    }
+  }
+
+  @Override
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object... params) {
-    // client-side connection
-    if (serverSocketChannel == null) {
-      ChannelWrapper<?>  channelWrapper = super.accept(null, channel, sslHandler, ssl, peer, params);
-      ((JMXContext) channelWrapper.getContext()).setClient(true);
-      return channelWrapper;
-    }
     // server-side connection
+    if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
     NioServer<?, ?> acceptor = NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
     @SuppressWarnings("unchecked")
     Map<String, ?> env = (Map<String, ?>) serverSocketChannel.keyFor(acceptor.getSelector()).attachment();
@@ -104,43 +129,74 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     InetAddress addr = serverSocket.getInetAddress();
     String ip = addr.getHostAddress();
     if (addr instanceof Inet6Address) ip =  "[" + ip + "]";
-    //String connectionID = "jppf://192.168.1.1:12001 2135";
+    //e.g. "jppf://192.168.1.1:12001 2135"
     String connectionID = String.format("%s://%s:%d %d", JPPFJMXHelper.PROTOCOL, ip, port, connectionIdSequence.incrementAndGet());
-    ChannelWrapper<?> readingChannel = createChannel(env, channel, ssl, true);
-    ((JMXContext) readingChannel.getContext()).setConnectionID(connectionID).setClient(false).setServerPort(port);
-    ChannelWrapper<?> writingChannel = createChannel(env, channel, ssl, false);
-    ((JMXContext) writingChannel.getContext()).setConnectionID(connectionID).setClient(false).setServerPort(port);
-    synchronized(mapsLock) {
-      channelsByConnectionID.put(connectionID, new ChannelsPair(readingChannel, writingChannel));
-      connectionsByServerPort.putValue(port, connectionID);
+    try {
+      ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false);
+      synchronized(mapsLock) {
+        channelsByConnectionID.put(connectionID, pair);
+        connectionsByServerPort.putValue(port, connectionID);
+      }
+      postAccept(pair.readingChannel());
+      postAccept(pair.writingChannel());
+      ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
+      return pair.writingChannel();
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
-    ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
-    return writingChannel;
+    return null;
+  }
+
+  /**
+   * 
+   * @param env environment parameters to use for TLS properties.
+   * @param connectionID the server-sde connection ID.
+   * @param port the server port that accepted the connection.
+   * @param channel the associated socket channel.
+   * @param ssl, whether the connection is secure.
+   * @param client whether the created channels are client-side (true) or server-side false.
+   * @return a {@link ChannelsPair} instance.
+   */
+  public ChannelsPair createChannelsPair(final Map<String, ?> env, final String connectionID, final int port, final SocketChannel channel, final boolean ssl, final boolean client) throws Exception {
+    ChannelWrapper<?> readingChannel = createChannel(env, channel, ssl, true);
+    ChannelWrapper<?> writingChannel = createChannel(env, channel, ssl, false);
+    ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel);
+    JMXMessageHandler handler = new JMXMessageHandler(pair);
+    MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
+    ((JMXContext) readingChannel.getContext()).setConnectionID(connectionID).setClient(client).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer);
+    ((JMXContext) writingChannel.getContext()).setConnectionID(connectionID).setClient(client).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer);
+    transitionManager.transitionChannel(readingChannel, JMXTransition.TO_RECEIVING_MESSAGE);
+    transitionManager.transitionChannel(writingChannel, JMXTransition.TO_IDLE);
+    lock.lock();
+    try {
+      channel.register(selector.wakeup(), SelectionKey.OP_READ | SelectionKey.OP_WRITE, pair);
+    } finally {
+      lock.unlock();
+    }
+    return pair;
   }
 
   /**
    * Create a new channel wrapper.
-   * @param env environement parmateers to use for SL properties.
-   * @param channelWrapper the channel to configure.
+   * @param env environment parameters to use for TLS properties.
    * @param channel the associated socket channel.
+   * @param ssl, whether the connection is secure.
    * @param reading {@code true} to create a reading channel, {@code false} to create a writing channel.
    * @return a new {@link ChannelWrapper} instance.
    */
-  public ChannelWrapper<?> createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading) {
-    NioContext<?> context = createNioContext(reading);
+  private ChannelWrapper<?> createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading) {
+    JMXContext context = (JMXContext) createNioContext(reading);
+    context.setReading(reading);
     context.setPeer(false);
-    SelectionKeyWrapper wrapper = null;
+    JMXChannelWrapper wrapper = new JMXChannelWrapper(context, channel);
     lock.lock();
     try {
-      SelectionKey selKey = channel.register(selector.wakeup(), 0, context);
-      wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       context.setSsl(ssl);
       if (ssl) {
         if (debugEnabled) log.debug("creating SSLEngine for {}", wrapper);
         configureSSL(env, wrapper, channel);
       }
-      postAccept(wrapper);
     } catch (Exception e) {
       wrapper = null;
       log.error(e.getMessage(), e);
@@ -152,7 +208,7 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
 
   /**
    * Configure SSL for th specified channel accepted by the specified server.
-   * @param env environement parmateers to use for SL properties.
+   * @param env environment parameters to use for TLS properties.
    * @param channelWrapper the channel to configure.
    * @param channel the associated socket channel.
    * @return a SSLHandler instance.
@@ -174,7 +230,9 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   public void postAccept(final ChannelWrapper<?> channel) {
     try {
       JMXContext context = (JMXContext) channel.getContext();
-      transitionManager.transitionChannel(channel, context.isReading() ? JMXTransition.TO_RECEIVING_MESSAGE : JMXTransition.TO_SENDING_MESSAGE);
+      JMXTransition tr = context.isReading() ? JMXTransition.TO_RECEIVING_MESSAGE : JMXTransition.TO_SENDING_MESSAGE;
+      if (debugEnabled) log.debug(String.format("transitioning %s channel to %s, context = %s", (context.isReading() ? "reading" : "writing"), tr, context));
+      transitionManager.transitionChannel(channel, tr);
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
@@ -259,10 +317,11 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * @param port .
    */
   public void removeAllConnections(final int port) {
-    Collection<String> connectionIDs = null;
+    List<String> connectionIDs = null;
     synchronized(mapsLock) {
-      connectionIDs = connectionsByServerPort.getValues(port);
-      if (connectionIDs != null) {
+      Collection<String> coll = connectionsByServerPort.getValues(port);
+      if (coll != null) {
+        connectionIDs = new ArrayList<>(coll);
         for (String connectionID: connectionIDs) {
           try {
             closeConnection(connectionID);
@@ -315,7 +374,7 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * Add a listener to the connection status events.
    * @param listener the luistener to add.
    */
-  public void addConnectionStatusListener(JMXConnectionStatusListener listener) {
+  public void addConnectionStatusListener(final JMXConnectionStatusListener listener) {
     if (listener != null) connectionStatusListeners.add(listener);
   }
 
@@ -323,7 +382,7 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * Remove a listener from the connection status events.
    * @param listener the luistener to remove.
    */
-  public void removeConnectionStatusListener(JMXConnectionStatusListener listener) {
+  public void removeConnectionStatusListener(final JMXConnectionStatusListener listener) {
     if (listener != null) connectionStatusListeners.remove(listener);
   }
 
@@ -337,24 +396,24 @@ public class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   }
 
   /**
-   * Enumeration of the possible types of connection status event 
+   * Enumeration of the possible types of connection status event
    */
   private enum ConnectionEventType {
     OPENED {
       @Override
-      void fireNotification(List<JMXConnectionStatusListener> listeners, JMXConnectionStatusEvent event) {
+      void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
         for (JMXConnectionStatusListener listener: listeners) listener.connectionOpened(event);
       }
     },
     CLOSED {
       @Override
-      void fireNotification(List<JMXConnectionStatusListener> listeners, JMXConnectionStatusEvent event) {
+      void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
         for (JMXConnectionStatusListener listener: listeners) listener.connectionClosed(event);
       }
     },
     FAILED {
       @Override
-      void fireNotification(List<JMXConnectionStatusListener> listeners, JMXConnectionStatusEvent event) {
+      void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
         for (JMXConnectionStatusListener listener: listeners) listener.connectionFailed(event);
       }
     };

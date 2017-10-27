@@ -101,7 +101,7 @@ public class NioHelper {
       core, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory("JPPF"));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
-    if (debugEnabled) log.debug("globalExecutor={}, maxSize={}", executor, executor.getMaximumPoolSize());
+    if (debugEnabled) log.debug(String.format(Locale.US, "globalExecutor=%s; core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", executor, core, queueSize, ttl, executor.getMaximumPoolSize()));
     return executor;
   }
 

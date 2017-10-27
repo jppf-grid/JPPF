@@ -19,37 +19,35 @@
 package org.jppf.jmxremote.message;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public abstract class AbstractJMXMessage implements JMXMessage {
   /**
    * The message identifier.
    */
-  private final String messageID;
+  protected final long messageID;
   /**
    * The type of request to send.
    */
-  private final JMXMessageType messageType;
+  protected final JMXMessageType messageType;
 
   /**
    * Intiialize this message with the specified ID.
    * @param messageID the message ID.
    * @param messageType the type of request.
    */
-  public AbstractJMXMessage(final String messageID, final JMXMessageType messageType) {
+  public AbstractJMXMessage(final long messageID, final JMXMessageType messageType) {
     this.messageID = messageID;
     this.messageType = messageType;
   }
 
   @Override
-  public String getMessageID() {
+  public long getMessageID() {
     return messageID;
   }
 
-  /**
-   * @return the type of request to send.
-   */
+  @Override
   public JMXMessageType getMessageType() {
     return messageType;
   }

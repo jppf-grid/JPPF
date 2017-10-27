@@ -119,6 +119,23 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   }
 
   /**
+   * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
+   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
+   * @param channel the key on which to set the interest operations.
+   * @param interestOps the operations to set on the key.
+   */
+  public void setInterestOps(final SocketChannel channel, final int interestOps) {
+    lock.lock();
+    try {
+      server.getSelector().wakeup();
+      SelectionKey key = channel.keyFor(server.getSelector());
+      key.interestOps(interestOps);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
    * Transition the specified channel to the specified state.
    * @param channel the key holding the channel and associated context.
    * @param transition holds the new state of the channel and associated key ops.

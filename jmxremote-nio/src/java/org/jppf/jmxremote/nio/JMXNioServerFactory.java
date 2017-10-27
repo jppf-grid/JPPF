@@ -59,9 +59,9 @@ final class JMXNioServerFactory extends NioServerFactory<JMXState, JMXTransition
   @Override
   public Map<JMXTransition, NioTransition<JMXState>> createTransitionMap() {
     Map<JMXTransition, NioTransition<JMXState>> map = new EnumMap<>(JMXTransition.class);
-    map.put(TO_SENDING_MESSAGE, transition(SENDING_MESSAGE, W));
-    map.put(TO_RECEIVING_MESSAGE, transition(RECEIVING_MESSAGE, R));
-    map.put(TO_IDLE, transition(IDLE, 0));
+    map.put(TO_SENDING_MESSAGE, transition(SENDING_MESSAGE, RW));
+    map.put(TO_RECEIVING_MESSAGE, transition(RECEIVING_MESSAGE, RW));
+    map.put(TO_IDLE, transition(IDLE, R));
     return map;
   }
 }

@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
 	<classpathentry kind="lib" path="lib/h2.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote-nio"/>
 	<classpathentry kind="output" path="classes/tests"/>
 </classpath>

@@ -93,7 +93,7 @@ public class SSLHandler {
    * @throws Exception if any error occurs.
    */
   public SSLHandler(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception {
-    this.channel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
+    this.channel = channel.getSocketChannel();
     this.sslEngine = sslEngine;
     SSLSession session = sslEngine.getSession();
     this.applicationSendBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);

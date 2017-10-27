@@ -18,158 +18,289 @@
 
 package org.jppf.jmxremote;
 
+import static org.jppf.jmxremote.message.JMXMessageType.*;
+
 import java.io.IOException;
 import java.util.Set;
 
 import javax.management.*;
 
-import org.jppf.jmxremote.nio.ChannelsPair;
+import org.jppf.jmxremote.nio.JMXMessageHandler;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JPPFMBeanServerConnection implements MBeanServerConnection {
   /**
-   * The NIO channels that perform the communication with the server.
+   * The message handler.
    */
-  private final ChannelsPair channels;
+  private final JMXMessageHandler messageHandler;
 
   /**
-   * 
-   * @param channels the NIO channels that perform the communication with the server.
+   *
+   * @param messageHandler performs the communication with the server.
    */
-  public JPPFMBeanServerConnection(final ChannelsPair channels) {
-    this.channels = channels;
+  public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler) {
+    this.messageHandler = messageHandler;
   }
 
   @Override
-  public ObjectInstance createMBean(String className, ObjectName name)
+  public ObjectInstance createMBean(final String className, final ObjectName name)
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
-    return null;
+    try {
+      return (ObjectInstance) messageHandler.sendRequest(CREATE_MBEAN, className, name);
+    } catch (MBeanRegistrationException e) {
+      throw e;
+    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName)
+  public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName)
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
-    return null;
+    try {
+      return (ObjectInstance) messageHandler.sendRequest(CREATE_MBEAN_LOADER, className, name, loaderName);
+    } catch (MBeanRegistrationException e) {
+      throw e;
+    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature)
+  public ObjectInstance createMBean(final String className, final ObjectName name, final Object[] params, final String[] signature)
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
-    return null;
+    try {
+      return (ObjectInstance) messageHandler.sendRequest(CREATE_MBEAN_PARAMS, className, name, params, signature);
+    } catch (MBeanRegistrationException e) {
+      throw e;
+    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature)
+  public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName, final Object[] params, final String[] signature)
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
-    return null;
+    try {
+      return (ObjectInstance) messageHandler.sendRequest(CREATE_MBEAN_LOADER_PARAMS, className, name, loaderName);
+    } catch (MBeanRegistrationException e) {
+      throw e;
+    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public void unregisterMBean(ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException, IOException {
+  public void unregisterMBean(final ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException, IOException {
+    try {
+      messageHandler.sendRequest(UNREGISTER_MBEAN, name);
+    } catch (InstanceNotFoundException | MBeanRegistrationException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public ObjectInstance getObjectInstance(ObjectName name) throws InstanceNotFoundException, IOException {
-    return null;
+  public ObjectInstance getObjectInstance(final ObjectName name) throws InstanceNotFoundException, IOException {
+    try {
+      return (ObjectInstance) messageHandler.sendRequest(GET_OBJECT_INSTANCE, name);
+    } catch (InstanceNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<ObjectInstance> queryMBeans(final ObjectName name, final QueryExp query) throws IOException {
+    try {
+      return (Set<ObjectInstance>) messageHandler.sendRequest(QUERY_MBEANS, name, query);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<ObjectName> queryNames(final ObjectName name, final QueryExp query) throws IOException {
+    try {
+      return (Set<ObjectName>) messageHandler.sendRequest(QUERY_NAMES, name, query);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query) throws IOException {
-    return null;
-  }
-
-  @Override
-  public Set<ObjectName> queryNames(ObjectName name, QueryExp query) throws IOException {
-    return null;
-  }
-
-  @Override
-  public boolean isRegistered(ObjectName name) throws IOException {
-    return false;
+  public boolean isRegistered(final ObjectName name) throws IOException {
+    try {
+      return (Boolean) messageHandler.sendRequest(IS_REGISTERED, name);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public Integer getMBeanCount() throws IOException {
-    return null;
+    try {
+      return (Integer) messageHandler.sendRequest(GET_MBEAN_COUNT);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public Object getAttribute(ObjectName name, String attribute) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException {
-    return null;
+  public Object getAttribute(final ObjectName name, final String attribute) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException {
+    try {
+      return messageHandler.sendRequest(GET_ATTRIBUTE, name, attribute);
+    } catch (MBeanException | AttributeNotFoundException | InstanceNotFoundException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public AttributeList getAttributes(ObjectName name, String[] attributes) throws InstanceNotFoundException, ReflectionException, IOException {
-    return null;
+  public AttributeList getAttributes(final ObjectName name, final String[] attributes) throws InstanceNotFoundException, ReflectionException, IOException {
+    try {
+      return (AttributeList) messageHandler.sendRequest(GET_ATTRIBUTES, name, attributes);
+    } catch (InstanceNotFoundException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public void setAttribute(ObjectName name, Attribute attribute)
+  public void setAttribute(final ObjectName name, final Attribute attribute)
     throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException, IOException {
+    try {
+      messageHandler.sendRequest(SET_ATTRIBUTE, name, attribute);
+    } catch (InstanceNotFoundException | AttributeNotFoundException | InvalidAttributeValueException | MBeanException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public AttributeList setAttributes(ObjectName name, AttributeList attributes) throws InstanceNotFoundException, ReflectionException, IOException {
-    return null;
+  public AttributeList setAttributes(final ObjectName name, final AttributeList attributes) throws InstanceNotFoundException, ReflectionException, IOException {
+    try {
+      return (AttributeList) messageHandler.sendRequest(SET_ATTRIBUTES, name, attributes);
+    } catch (InstanceNotFoundException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public Object invoke(ObjectName name, String operationName, Object[] params, String[] signature) throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
-    return null;
+  public Object invoke(final ObjectName name, final String operationName, final Object[] params, final String[] signature)
+    throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+    try {
+      return messageHandler.sendRequest(INVOKE, name, operationName, params, signature);
+    } catch (InstanceNotFoundException | MBeanException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public String getDefaultDomain() throws IOException {
-    return null;
+    try {
+      return (String) messageHandler.sendRequest(GET_DEFAULT_DOMAIN);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public String[] getDomains() throws IOException {
-    return null;
+    try {
+      return (String[]) messageHandler.sendRequest(GET_DOMAINS);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
-  public void addNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException, IOException {
+  public void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
+    throws InstanceNotFoundException, IOException {
   }
 
   @Override
-  public void addNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException, IOException {
+  public void addNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback) throws InstanceNotFoundException, IOException {
   }
 
   @Override
-  public void removeNotificationListener(ObjectName name, ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+  public void removeNotificationListener(final ObjectName name, final ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
   }
 
   @Override
-  public void removeNotificationListener(ObjectName name, NotificationListener listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+  public void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
   }
 
   @Override
-  public void removeNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-  }
-
-  @Override
-  public void removeNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback)
+  public void removeNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, ListenerNotFoundException, IOException {
   }
 
   @Override
-  public MBeanInfo getMBeanInfo(ObjectName name) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
-    return null;
+  public void removeNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
+    throws InstanceNotFoundException, ListenerNotFoundException, IOException {
   }
 
   @Override
-  public boolean isInstanceOf(ObjectName name, String className) throws InstanceNotFoundException, IOException {
-    return false;
+  public MBeanInfo getMBeanInfo(final ObjectName name) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
+    try {
+      return (MBeanInfo) messageHandler.sendRequest(GET_MBEAN_INFO, name);
+    } catch (InstanceNotFoundException | IntrospectionException | ReflectionException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public boolean isInstanceOf(final ObjectName name, final String className) throws InstanceNotFoundException, IOException {
+    try {
+      return (Boolean) messageHandler.sendRequest(IS_INSTANCE_OF, name, className);
+    } catch (InstanceNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   /**
-   * @return the NIO channels that perform the communication with the server.
+   * @return the message handler.
    */
-  ChannelsPair getChannels() {
-    return channels;
+  public JMXMessageHandler getMessageHandler() {
+    return messageHandler;
   }
 }

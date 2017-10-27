@@ -27,6 +27,7 @@ import javax.management.remote.*;
 import org.jppf.jmxremote.nio.JMXNioServer;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
 
 /**
  * 
@@ -34,9 +35,21 @@ import org.jppf.utils.ExceptionUtils;
  */
 public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXConnectionStatusListener {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFJMXConnectorServer.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The environment key for the MBean server.
+   */
+  public static final String MBEAN_SERVER_KEY = "jppf.jmxremote.internal.mbeanserver";
+  /**
    * The environment for this connector.
    */
-  private final Map<String, ?> environment;
+  private final Map<String, Object> environment = new HashMap<>();
   /**
    * The address of this connector.
    */
@@ -54,12 +67,15 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
    */
   public JPPFJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, MBeanServer mbeanServer) {
     super(mbeanServer);
-    this.environment = (environment == null) ? new HashMap<String, Object>() : environment;
+    if (environment != null) this.environment.putAll(environment);
+    this.environment.put(MBEAN_SERVER_KEY, mbeanServer); 
     this.address = serviceURL;
+    
   }
 
   @Override
   public void start() throws IOException {
+    if (debugEnabled) log.debug("starting server @{}, env={}", address, environment);
     try {
       JMXNioServer server = JMXNioServer.getInstance();
       int port = address.getPort();
@@ -109,16 +125,19 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
 
   @Override
   public void connectionOpened(JMXConnectionStatusEvent event) {
+    if (debugEnabled) log.debug("server @{} connection opened event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection opened", null);
   }
 
   @Override
   public void connectionClosed(JMXConnectionStatusEvent event) {
+    if (debugEnabled) log.debug("server @{} connection closed event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection closed", null);
   }
 
   @Override
   public void connectionFailed(JMXConnectionStatusEvent event) {
+    if (debugEnabled) log.debug("server @{} connection failed event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
   }
 }

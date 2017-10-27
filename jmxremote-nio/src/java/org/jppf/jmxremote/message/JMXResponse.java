@@ -18,6 +18,8 @@
 
 package org.jppf.jmxremote.message;
 
+import java.util.Arrays;
+
 /**
  * 
  * @author Laurent Cohen
@@ -40,12 +42,10 @@ public class JMXResponse extends AbstractJMXMessage {
    * Initialize this request with the specified ID, request type and parameters.
    * @param messageID the message id.
    * @param requestType the type of request.
-   * @param params the request's parameters.
+   * @param result the request's result.
    */
-  public JMXResponse(final String messageID, final JMXMessageType requestType, final Object result) {
-    super(messageID, requestType);
-    this.result = result;
-    this.exception = null;
+  public JMXResponse(final long messageID, final JMXMessageType requestType, final Object result) {
+    this(messageID, requestType, result, null);
   }
 
   /**
@@ -54,9 +54,20 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param requestType the type of request.
    * @param Exception an exception eventually raised when performing the request.
    */
-  public JMXResponse(final String messageID, final JMXMessageType requestType, final Exception exception) {
+  public JMXResponse(final long messageID, final JMXMessageType requestType, final Exception exception) {
+    this(messageID, requestType, null, exception);
+  }
+
+  /**
+   * Initialize this request with the specified ID, request type and parameters.
+   * @param messageID the message id.
+   * @param requestType the type of request.
+   * @param result the request's result.
+   * @param Exception an exception eventually raised when performing the request.
+   */
+  public JMXResponse(final long messageID, final JMXMessageType requestType, final Object result, final Exception exception) {
     super(messageID, requestType);
-    this.result = null;
+    this.result = result;
     this.exception = exception;
   }
 
@@ -72,5 +83,15 @@ public class JMXResponse extends AbstractJMXMessage {
    */
   public Exception getException() {
     return exception;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("messageID=").append(messageID)
+      .append(", messageType=").append(messageType)
+      .append(", result=").append(Arrays.asList(result))
+      .append(", exception=").append(exception)
+      .append(']').toString();
   }
 }

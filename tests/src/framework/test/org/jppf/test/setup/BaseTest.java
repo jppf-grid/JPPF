@@ -20,7 +20,7 @@ package test.org.jppf.test.setup;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.location.FileLocation;
@@ -128,8 +128,8 @@ public class BaseTest {
    * @param params the parameter values.
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
-    String message = String.format(format, params);
-    System.out.printf("[  client] [%s] %s%n", getFormattedTimestamp(), message);
+    String message = String.format(Locale.US, format, params);
+    System.out.printf(Locale.US, "[  client] [%s] %s%n", getFormattedTimestamp(), message);
     if (!systemOutOnly) {
       String s = "";
       if (decorate) {

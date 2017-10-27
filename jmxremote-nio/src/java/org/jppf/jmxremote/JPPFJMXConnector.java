@@ -30,8 +30,8 @@ import javax.security.auth.Subject;
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
+import org.jppf.jmxremote.message.JMXMessageType;
 import org.jppf.jmxremote.nio.*;
-import org.jppf.nio.ChannelWrapper;
 import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
@@ -159,14 +159,15 @@ public class JPPFJMXConnector implements JMXConnector {
     if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier", address);
     socketClient.writeInt(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
     if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
-
     SocketChannel channel = socketClient.getChannel();
     JMXNioServer server = JMXNioServer.getInstance();
-    ChannelWrapper<?> readingChannel = server.createChannel(environment, channel, secure, true);
-    ((JMXContext) readingChannel.getContext()).setClient(false).setServerPort(port);
-    ChannelWrapper<?> writingChannel = server.createChannel(environment, channel, secure, false);
-    ((JMXContext) writingChannel.getContext()).setClient(true).setServerPort(port);
-    ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel);
-    mbsc = new JPPFMBeanServerConnection(pair);
+    ChannelsPair pair = server.createChannelsPair(environment, "", port, channel, secure, true);
+    JMXContext readingContext = (JMXContext) pair.readingChannel().getContext();
+    JMXContext writingContext = (JMXContext) pair.writingChannel().getContext();
+    mbsc = new JPPFMBeanServerConnection(readingContext.getMessageHandler());
+    String connectionID = (String) mbsc.getMessageHandler().sendRequest(JMXMessageType.CONNECT);
+    readingContext.setConnectionID(connectionID);
+    writingContext.setConnectionID(connectionID);
+    this.connectionID = connectionID;
   }
 }

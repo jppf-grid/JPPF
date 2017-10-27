@@ -30,7 +30,7 @@ import org.slf4j.*;
 /**
  * This task performs the processing of a newly accepted channel.
  */
-class AcceptChannelTask implements Runnable {
+public class AcceptChannelTask implements Runnable {
   /**
    * Logger for this class.
    */

@@ -436,11 +436,13 @@ public class BaseSetup {
 
   /**
    * Set the specified Log4j logger to the specified level.
-   * @param name the name of the log4j logger.
    * @param level the level to set.
+   * @param names the names of the log4j loggers to configure.
    */
-  public static void setLoggerLevel(final String name, final Level level) {
-    org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
-    if (logger != null) logger.setLevel(level);
+  public static void setLoggerLevel(final Level level, final String...names) {
+    for (String name: names) {
+      org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
+      if (logger != null) logger.setLevel(level);
+    }
   }
 }

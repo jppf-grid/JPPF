@@ -37,4 +37,17 @@ abstract class JMXNioState extends NioState<JMXTransition> {
   JMXNioState(final JMXNioServer server) {
     this.server = server;
   }
+
+  /**
+   * 
+   * @param channel the channel to transiition.
+   * @param transition the transition to set.
+   * @return the transition.
+   * @throws Exception if any error occurs.
+   */
+  JMXTransition transitionChannel(final ChannelWrapper<?> channel, final JMXTransition transition) throws Exception {
+    StateTransitionManager<JMXState, JMXTransition> mgr = server.getTransitionManager();
+    mgr.setInterestOps(channel.getSocketChannel(), server.getFactory().getTransition(transition).getInterestOps());
+    return transition;
+  }
 }
