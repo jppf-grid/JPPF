@@ -20,55 +20,43 @@ package org.jppf.jmxremote.message;
 
 import java.util.Arrays;
 
+import javax.management.Notification;
+
 /**
- * A specialized message that represents a request.
+ * A specialized message that represents a JMX notification to dispatch client-side.
  * @author Laurent Cohen
  */
-public class JMXRequest extends AbstractJMXMessage {
+public class JMXNotification extends AbstractJMXMessage {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The request's parameters.
+   * The notification to dispatch.
    */
-  private final Object[] params;
+  private final Notification notification;
   /**
-   * The response to this reqquest.
+   * The ids of the listeners to dispatch to.
    */
-  private transient JMXResponse response;
+  private final Integer[] listenerIDs;
 
   /**
    * Initialize this request with the specified ID, request type and parameters.
    * @param messageID the message id.
-   * @param requestType the type of request.
-   * @param params the request's parameters.
+   * @param notification the notification to dispatch.
+   * @param listenerIDs ids of the listeners to dispatch the notification to.
    */
-  public JMXRequest(final long messageID, final JMXMessageType requestType, final Object... params) {
-    super(messageID, requestType);
-    this.params = params;
+  public JMXNotification(final long messageID, final Notification notification, final Integer[] listenerIDs) {
+    super(messageID, JMXMessageType.NOTIFICATION);
+    this.notification = notification;
+    this.listenerIDs = listenerIDs;
   }
 
   /**
-   * @return the request's parameters.
+   * @return the actual notification.
    */
-  public Object[] getParams() {
-    return params;
-  }
-
-  /**
-   * @return the response to this reqquest.
-   */
-  public JMXResponse getResponse() {
-    return response;
-  }
-
-  /**
-   * Set the response to this reqquest.
-   * @param response a {@code JMXResponse} object.
-   */
-  public void setResponse(final JMXResponse response) {
-    this.response = response;
+  public Notification getNotification() {
+    return notification;
   }
 
   @Override
@@ -76,7 +64,15 @@ public class JMXRequest extends AbstractJMXMessage {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(messageID)
       .append(", messageType=").append(messageType)
-      .append(", params=").append(Arrays.asList(params))
+      .append(", listenerIDs=").append(Arrays.asList(listenerIDs))
+      .append(", notification=").append(Arrays.asList(notification))
       .append(']').toString();
+  }
+
+  /**
+   * @return the ids of the listeners to dispatch to.
+   */
+  public Integer[] getListenerIDs() {
+    return listenerIDs;
   }
 }

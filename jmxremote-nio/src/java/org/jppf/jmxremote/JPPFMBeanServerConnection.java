@@ -21,11 +21,12 @@ package org.jppf.jmxremote;
 import static org.jppf.jmxremote.message.JMXMessageType.*;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
 
 import javax.management.*;
 
-import org.jppf.jmxremote.nio.JMXMessageHandler;
+import org.jppf.jmxremote.message.*;
+import org.jppf.jmxremote.notification.ClientListenerInfo;
 
 /**
  *
@@ -36,6 +37,14 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
    * The message handler.
    */
   private final JMXMessageHandler messageHandler;
+  /**
+   * The connection ID.
+   */
+  private String connectionID;
+  /**
+   * Mapping of notification listener ids to actual listeners.
+   */
+  private final Map<Integer, ClientListenerInfo> listenerMap = new HashMap<>();
 
   /**
    *
@@ -251,6 +260,16 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
   @Override
   public void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, IOException {
+    try {
+      int listenerID = (Integer) messageHandler.sendRequest(ADD_NOTIFICATION_LISTENER, name, filter);
+      synchronized(listenerMap) {
+        listenerMap.put(listenerID, new ClientListenerInfo(listenerID, name, listener, filter, handback));
+      }
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
@@ -258,20 +277,40 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
   }
 
   @Override
-  public void removeNotificationListener(final ObjectName name, final ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-  }
-
-  @Override
   public void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-  }
-
-  @Override
-  public void removeNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback)
-    throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    try {
+      List<ClientListenerInfo> toRemove = new ArrayList<>();
+      synchronized(listenerMap) {
+        for (Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
+          ClientListenerInfo info = entry.getValue();
+          if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
+        }
+      }
+      if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
+      int[] ids = new int[toRemove.size()];
+      for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
+      messageHandler.sendRequest(REMOVE_NOTIFICATION_LISTENER, name, ids);
+      synchronized(listenerMap) {
+        for (int id: ids) listenerMap.remove(id);
+      }
+    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public void removeNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
+    throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+  }
+
+  @Override
+  public void removeNotificationListener(final ObjectName name, final ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+  }
+
+  @Override
+  public void removeNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, ListenerNotFoundException, IOException {
   }
 
@@ -302,5 +341,43 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
    */
   public JMXMessageHandler getMessageHandler() {
     return messageHandler;
+  }
+
+  /**
+   * @return the connection ID.
+   */
+  public String getConnectionID() {
+    return connectionID;
+  }
+
+  /**
+   * Set the connection ID.
+   * @param connectionID the connection id to set.
+   */
+  public void setConnectionID(final String connectionID) {
+    this.connectionID = connectionID;
+  }
+
+  /**
+   * Get the listener information for the specified listener id.
+   * @param listenerID the id of the listener for which to get information.
+   * @return a {@link ClientListenerInfo} object, or {@code null} if no listener is registered witht he specified id.
+   */
+  public ClientListenerInfo getListenerInfo(final int listenerID) {
+    synchronized(listenerMap) {
+      return listenerMap.get(listenerID);
+    }
+  }
+
+  /**
+   * Handle a new received notification.
+   * @param jmxNotification the notification message to process.
+   * @throws Exception if any error occurs.
+   */
+  public void handleNotification(final JMXNotification jmxNotification) throws Exception {
+    for (Integer listenerID: jmxNotification.getListenerIDs()) {
+      ClientListenerInfo info = getListenerInfo(listenerID);
+      if (info != null) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+    }
   }
 }

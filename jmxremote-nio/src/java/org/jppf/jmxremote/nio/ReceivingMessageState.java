@@ -18,7 +18,9 @@
 
 package org.jppf.jmxremote.nio;
 
-import static org.jppf.jmxremote.nio.JMXTransition.*;
+import static org.jppf.jmxremote.nio.JMXState.*;
+
+import java.nio.channels.SelectionKey;
 
 import javax.management.*;
 
@@ -27,7 +29,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**
- *
+ * Reads the next message, if any, or the current uncomplete message.
  * @author Laurent Cohen
  */
 public class ReceivingMessageState extends JMXNioState {
@@ -56,89 +58,70 @@ public class ReceivingMessageState extends JMXNioState {
       if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
       if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
       else if (msg instanceof JMXResponse) handleResponse(context, (JMXResponse) msg);
+      else if (msg instanceof JMXNotification) handleNotification(context, (JMXNotification) msg);
     }
-    return TO_RECEIVING_MESSAGE;
+    return transitionChannel(channel, RECEIVING_MESSAGE, SelectionKey.OP_READ, true);
   }
 
   /**
    * Handle a received reqUest.
-   * @param the JMX nio context.
-   * @param requests the request to process.
+   * @param context the JMX nio context.
+   * @param request the request to process.
    * @throws Exception if any error occurs.
    */
   private void handleRequest(final JMXContext context, final JMXRequest request) throws Exception {
     if (debugEnabled) log.debug("handling request = {} on context = {}", request, context);
     Exception exception = null;
     Object result = null;
-    Object[] params = request.getParams();
+    Object[] p = request.getParams();
     MBeanServer mbs = context.getMbeanServer();
     try {
       switch(request.getMessageType()) {
-        case CONNECT:
-          result = context.getConnectionID();
+        case CONNECT: result = context.getConnectionID();
           break;
-        case INVOKE:
-          result = mbs.invoke((ObjectName) params[0], (String) params[1], (Object[]) params[2], (String[]) params[3]);
+        case INVOKE: result = mbs.invoke((ObjectName) p[0], (String) p[1], (Object[]) p[2], (String[]) p[3]);
           break;
-        case GET_ATTRIBUTE:
-          result = mbs.getAttribute((ObjectName) params[0], (String) params[1]);
+        case GET_ATTRIBUTE: result = mbs.getAttribute((ObjectName) p[0], (String) p[1]);
           break;
-        case GET_ATTRIBUTES:
-          result = mbs.getAttributes((ObjectName) params[0], (String[]) params[1]);
+        case GET_ATTRIBUTES: result = mbs.getAttributes((ObjectName) p[0], (String[]) p[1]);
           break;
-        case SET_ATTRIBUTE:
-          mbs.setAttribute((ObjectName) params[0], (Attribute) params[1]);
+        case SET_ATTRIBUTE: mbs.setAttribute((ObjectName) p[0], (Attribute) p[1]);
           break;
-        case SET_ATTRIBUTES:
-          result = mbs.setAttributes((ObjectName) params[0], (AttributeList) params[1]);
+        case SET_ATTRIBUTES: result = mbs.setAttributes((ObjectName) p[0], (AttributeList) p[1]);
           break;
-        case CREATE_MBEAN:
-          result = mbs.createMBean((String) params[0], (ObjectName) params[1]);
+        case CREATE_MBEAN: result = mbs.createMBean((String) p[0], (ObjectName) p[1]);
           break;
-        case CREATE_MBEAN_PARAMS:
-          result = mbs.createMBean((String) params[0], (ObjectName) params[1], (Object[]) params[2], (String[]) params[3]);
+        case CREATE_MBEAN_PARAMS: result = mbs.createMBean((String) p[0], (ObjectName) p[1], (Object[]) p[2], (String[]) p[3]);
           break;
-        case CREATE_MBEAN_LOADER:
-          result = mbs.createMBean((String) params[0], (ObjectName) params[1], (ObjectName) params[2]);
+        case CREATE_MBEAN_LOADER: result = mbs.createMBean((String) p[0], (ObjectName) p[1], (ObjectName) p[2]);
           break;
-        case CREATE_MBEAN_LOADER_PARAMS:
-          result = mbs.createMBean((String) params[0], (ObjectName) params[1], (ObjectName) params[2], (Object[]) params[3], (String[]) params[4]);
+        case CREATE_MBEAN_LOADER_PARAMS: result = mbs.createMBean((String) p[0], (ObjectName) p[1], (ObjectName) p[2], (Object[]) p[3], (String[]) p[4]);
           break;
-        case GET_DEFAULT_DOMAIN:
-          result = mbs.getDefaultDomain();
+        case GET_DEFAULT_DOMAIN: result = mbs.getDefaultDomain();
           break;
-        case GET_DOMAINS:
-          result = mbs.getDomains();
+        case GET_DOMAINS: result = mbs.getDomains();
           break;
-        case GET_MBEAN_COUNT:
-          result = mbs.getMBeanCount();
+        case GET_MBEAN_COUNT: result = mbs.getMBeanCount();
           break;
-        case GET_MBEAN_INFO:
-          result = mbs.getMBeanInfo((ObjectName) params[0]);
+        case GET_MBEAN_INFO: result = mbs.getMBeanInfo((ObjectName) p[0]);
           break;
-        case GET_OBJECT_INSTANCE:
-          result = mbs.getObjectInstance((ObjectName) params[0]);
+        case GET_OBJECT_INSTANCE: result = mbs.getObjectInstance((ObjectName) p[0]);
           break;
-        case IS_INSTANCE_OF:
-          result = mbs.isInstanceOf((ObjectName) params[0], (String) params[1]);
+        case IS_INSTANCE_OF: result = mbs.isInstanceOf((ObjectName) p[0], (String) p[1]);
           break;
-        case IS_REGISTERED:
-          result = mbs.isRegistered((ObjectName) params[0]);
+        case IS_REGISTERED: result = mbs.isRegistered((ObjectName) p[0]);
           break;
-        case QUERY_MBEANS:
-          result = mbs.queryMBeans((ObjectName) params[0], (QueryExp) params[1]);
+        case QUERY_MBEANS: result = mbs.queryMBeans((ObjectName) p[0], (QueryExp) p[1]);
           break;
-        case QUERY_NAMES:
-          result = mbs.queryNames((ObjectName) params[0], (QueryExp) params[1]);
+        case QUERY_NAMES: result = mbs.queryNames((ObjectName) p[0], (QueryExp) p[1]);
           break;
-        case UNREGISTER_MBEAN:
-          mbs.unregisterMBean((ObjectName) params[0]);
+        case UNREGISTER_MBEAN: mbs.unregisterMBean((ObjectName) p[0]);
           break;
-        case ADD_NOTIFICATION_LISTENERS:
+        case ADD_NOTIFICATION_LISTENER: result = jmxServer.getServerNotificationHandler().addNotificationListener(mbs, context.getConnectionID(), (ObjectName) p[0], (NotificationFilter) p[1]);
           break;
         case ADD_NOTIFICATION_LISTENER_OBJECTNAME:
           break;
-        case REMOVE_NOTIFICATION_LISTENER:
+        case REMOVE_NOTIFICATION_LISTENER: jmxServer.getServerNotificationHandler().removeNotificationListeners(mbs, (ObjectName) p[0], (int[]) p[1]);
           break;
         case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK:
           break;
@@ -150,26 +133,28 @@ public class ReceivingMessageState extends JMXNioState {
     } catch (Exception e) {
       exception = e;
     }
-    ChannelWrapper<?> writingChannel = context.getMessageHandler().getChannels().writingChannel();
-    JMXContext writingContext = (JMXContext) writingChannel.getContext();
     JMXResponse response = new JMXResponse(request.getMessageID(), request.getMessageType(), result, exception);
-    if (debugEnabled) log.debug("sending response = {} on context = {}", response, context);
-    writingContext.offerJmxMessage(response);
-    synchronized(writingChannel) {
-      if (writingContext.getState() == JMXState.IDLE) {
-        server.getTransitionManager().transitionChannel(writingChannel, JMXTransition.TO_SENDING_MESSAGE);
-        transitionChannel(writingChannel, JMXTransition.TO_SENDING_MESSAGE);
-      }
-    }
+    context.getMessageHandler().sendMessage(response);
   }
 
   /**
    * Handle a received reqUest.
-   * @param the JMX nio context.
-   * @param requests the request to process.
+   * @param context the JMX nio context.
+   * @param response the response to handle.
    * @throws Exception if any error occurs.
    */
   private void handleResponse(final JMXContext context, final JMXResponse response) throws Exception {
     context.getMessageHandler().responseReceived(response);
+  }
+
+  /**
+   * Handle a received notification.
+   * @param context the JMX nio context.
+   * @param jmxNotification the notification message to process.
+   * @throws Exception if any error occurs.
+   */
+  private void handleNotification(final JMXContext context, final JMXNotification jmxNotification) throws Exception {
+    if (debugEnabled) log.debug("received notification {} from context = {}", jmxNotification, context);
+    context.getMbeanServerConnection().handleNotification(jmxNotification);
   }
 }

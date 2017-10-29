@@ -40,7 +40,11 @@ public class NioHelper {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   *
+   * Prefix for the NIO thread names.
+   */
+  public static final String NIO_THREAD_NAME_PREFIX = "JPPF";
+  /**
+   * Mapping of NIO servers to their identifier.
    */
   private static final Map<Integer, NioServer<?, ?>> identifiedServers = new HashMap<>();
   /**
@@ -98,7 +102,7 @@ public class NioHelper {
     long ttl = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_TTL);
     //ThreadPoolExecutor executor = new ThreadPoolExecutor(core, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JPPF_NIO"));
     ThreadPoolExecutor executor = new ThreadPoolExecutor(
-      core, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory("JPPF"));
+      core, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory(NIO_THREAD_NAME_PREFIX));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
     if (debugEnabled) log.debug(String.format(Locale.US, "globalExecutor=%s; core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", executor, core, queueSize, ttl, executor.getMaximumPoolSize()));

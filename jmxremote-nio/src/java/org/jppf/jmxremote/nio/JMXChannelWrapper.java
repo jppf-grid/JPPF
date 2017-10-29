@@ -38,7 +38,7 @@ public class JMXChannelWrapper extends AbstractChannelWrapper<Void> {
 
   /**
    * 
-   * @param channel the channel.
+   * @param context the associated NIO context.
    * @param socketChannel the associated socket channel.
    */
   public JMXChannelWrapper(final JMXContext context, final SocketChannel socketChannel) {

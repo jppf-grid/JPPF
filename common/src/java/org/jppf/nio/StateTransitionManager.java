@@ -20,9 +20,8 @@ package org.jppf.nio;
 
 import static java.nio.channels.SelectionKey.OP_WRITE;
 
-import java.io.IOException;
 import java.nio.channels.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.utils.*;
@@ -122,14 +121,18 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
    * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
    * @param channel the key on which to set the interest operations.
-   * @param interestOps the operations to set on the key.
+   * @param update the operations to update on the key.
+   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
    */
-  public void setInterestOps(final SocketChannel channel, final int interestOps) {
+  public void updateInterestOps(final SocketChannel channel, final int update, final boolean add) {
     lock.lock();
     try {
       server.getSelector().wakeup();
       SelectionKey key = channel.keyFor(server.getSelector());
-      key.interestOps(interestOps);
+      int ops = key.interestOps();
+      int newOps = add ? ops | update : ops & ~update;
+      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, channel));
+      key.interestOps(newOps);
     } finally {
       lock.unlock();
     }
@@ -205,41 +208,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   }
 
   /**
-   * Register a channel not opened through this server, with initial interest operation set to 0.
-   * @param channel the channel to register.
-   * @param context the context attached to the channel.
-   * @return a {@link ChannelWrapper} instance.
-   */
-  public ChannelWrapper<?> registerChannel(final SocketChannel channel, final NioContext<?> context) {
-    return registerChannel(channel, 0, context);
-  }
-
-  /**
-   * Register a channel not opened through this server.
-   * @param channel the channel to register.
-   * @param interestOps the operations the channel is initially interested in.
-   * @param context the context attached to the channel.
-   * @return a {@link ChannelWrapper} instance.
-   */
-  private ChannelWrapper<?> registerChannel(final SocketChannel channel, final int interestOps, final NioContext<?> context) {
-    ChannelWrapper<?> wrapper = null;
-    try {
-      lock.lock();
-      try {
-        if (channel.isBlocking()) channel.configureBlocking(false);
-        SelectionKey key = channel.register(server.getSelector().wakeup(), interestOps, context);
-        wrapper = new SelectionKeyWrapper(key);
-        context.setChannel(wrapper);
-      } finally {
-        lock.unlock();
-      }
-    } catch (IOException e) {
-      log.error(e.getMessage(), e);
-    }
-    return wrapper;
-  }
-
-  /**
    * @param channel the channel to check.
    * @return true or false.
    */
@@ -248,20 +216,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     SSLHandler sslHandler = channel.getContext().getSSLHandler();
     if (sslHandler == null) return false;
     int interestOps = channel.getInterestOps();
-    boolean b = (interestOps != channel.getReadyOps()) && (interestOps != 0) && !server.isIdle(channel) &&
-        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
-    return b;
-  }
-
-  /**
-   * @param channel the channel to check.
-   * @param transition the transition about to be performed on the channel.
-   * @return true or false.
-   */
-  public boolean checkSubmitTransition2(final ChannelWrapper<?> channel, final T transition) {
-    SSLHandler sslHandler = channel.getContext().getSSLHandler();
-    if (channel.isLocal() || (sslHandler == null)) return false;
-    int interestOps = factory.getTransition(transition).getInterestOps();
     boolean b = (interestOps != channel.getReadyOps()) && (interestOps != 0) && !server.isIdle(channel) &&
         ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
     return b;

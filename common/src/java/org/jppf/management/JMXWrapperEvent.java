@@ -29,7 +29,7 @@ public class JMXWrapperEvent extends EventObject {
    * Initialize this event witht he specified source.
    * @param jmxWrapper the jmx connection wrapper source of this event.
    */
-  public JMXWrapperEvent(final JMXConnectionWrapper jmxWrapper) {
+  public JMXWrapperEvent(final AbstractJMXConnectionWrapper jmxWrapper) {
     super(jmxWrapper);
   }
 
@@ -37,7 +37,7 @@ public class JMXWrapperEvent extends EventObject {
    * Get the jmx connection wrapper source of this event.
    * @return a {@link JMXConnectionWrapper} instance.
    */
-  public JMXConnectionWrapper getJMXConnectionWrapper() {
-    return (JMXConnectionWrapper) getSource();
+  public AbstractJMXConnectionWrapper getJMXConnectionWrapper() {
+    return (AbstractJMXConnectionWrapper) getSource();
   }
 }

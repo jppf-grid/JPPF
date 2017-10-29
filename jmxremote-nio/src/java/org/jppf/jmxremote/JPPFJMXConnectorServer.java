@@ -30,7 +30,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXConnectionStatusListener {
@@ -60,17 +60,17 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   private boolean started = false;
 
   /**
-   * 
+   *
    * @param serviceURL the address of this connector.
    * @param environment the environment for this connector.
    * @param mbeanServer .
    */
-  public JPPFJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, MBeanServer mbeanServer) {
+  public JPPFJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, final MBeanServer mbeanServer) {
     super(mbeanServer);
     if (environment != null) this.environment.putAll(environment);
-    this.environment.put(MBEAN_SERVER_KEY, mbeanServer); 
+    this.environment.put(MBEAN_SERVER_KEY, mbeanServer);
     this.address = serviceURL;
-    
+
   }
 
   @Override
@@ -116,27 +116,26 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public Map<String, ?> getAttributes() {
     Map<String, Object> map = new HashMap<>();
     synchronized(environment) {
-      for (Map.Entry<String, ?> entry: environment.entrySet()) {
+      for (Map.Entry<String, ?> entry: environment.entrySet())
         if (entry.getValue() instanceof Serializable) map.put(entry.getKey(), entry.getValue());
-      }
     }
     return Collections.unmodifiableMap(map);
   }
 
   @Override
-  public void connectionOpened(JMXConnectionStatusEvent event) {
+  public void connectionOpened(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection opened event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection opened", null);
   }
 
   @Override
-  public void connectionClosed(JMXConnectionStatusEvent event) {
+  public void connectionClosed(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection closed event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection closed", null);
   }
 
   @Override
-  public void connectionFailed(JMXConnectionStatusEvent event) {
+  public void connectionFailed(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection failed event = {}", address, event);
     connectionOpened(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
   }

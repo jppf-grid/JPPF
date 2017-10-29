@@ -21,7 +21,7 @@ package org.jppf.jmxremote.message;
 import java.util.Arrays;
 
 /**
- * 
+ * A specialized message that represents a repsponse to a previous request.
  * @author Laurent Cohen
  */
 public class JMXResponse extends AbstractJMXMessage {
@@ -52,7 +52,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * Initialize this request with the specified ID, request type and parameters.
    * @param messageID the message id.
    * @param requestType the type of request.
-   * @param Exception an exception eventually raised when performing the request.
+   * @param exception an exception eventually raised when performing the request.
    */
   public JMXResponse(final long messageID, final JMXMessageType requestType, final Exception exception) {
     this(messageID, requestType, null, exception);
@@ -63,7 +63,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param messageID the message id.
    * @param requestType the type of request.
    * @param result the request's result.
-   * @param Exception an exception eventually raised when performing the request.
+   * @param exception an exception eventually raised when performing the request.
    */
   public JMXResponse(final long messageID, final JMXMessageType requestType, final Object result, final Exception exception) {
     super(messageID, requestType);

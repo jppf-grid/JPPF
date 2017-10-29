@@ -18,13 +18,17 @@
 
 package test.org.jppf.jmxremote;
 
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.management.*;
+
 import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class ConnectorTest implements ConnectorTestMBean {
+public class ConnectorTest extends NotificationBroadcasterSupport implements ConnectorTestMBean {
   /**
    * Logger for this class.
    */
@@ -32,9 +36,13 @@ public class ConnectorTest implements ConnectorTestMBean {
   /**
    * 
    */
+  private static final AtomicLong sequence = new AtomicLong(0L);
+  /**
+   *
+   */
   private String stringParam;
   /**
-   * 
+   *
    */
   private int intParam;
 
@@ -63,5 +71,14 @@ public class ConnectorTest implements ConnectorTestMBean {
   public void setIntParam(final int intParam) {
     log.info("setting intParam = {}", intParam);
     this.intParam = intParam;
+  }
+
+  @Override
+  public void triggerNotifications(final String...messages) {
+    for (String msg: messages) {
+      Notification notif = new Notification("tesNotification", ConnectorTestMBean.MBEAN_NAME, sequence.incrementAndGet(), msg);
+      notif.setUserData(msg);
+      sendNotification(notif);
+    }
   }
 }

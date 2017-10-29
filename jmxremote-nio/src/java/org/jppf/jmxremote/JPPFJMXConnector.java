@@ -36,7 +36,7 @@ import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JPPFJMXConnector implements JMXConnector {
@@ -70,7 +70,7 @@ public class JPPFJMXConnector implements JMXConnector {
   private String connectionID;
 
   /**
-   * 
+   *
    * @param serviceURL the address of this connector.
    * @param environment the environment for this connector.
    */
@@ -85,7 +85,7 @@ public class JPPFJMXConnector implements JMXConnector {
   }
 
   @Override
-  public void connect(Map<String, ?> env) throws IOException {
+  public void connect(final Map<String, ?> env) throws IOException {
     if (env != null) environment.putAll(env);
     Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
     secure = (tls != null) && tls;
@@ -104,7 +104,7 @@ public class JPPFJMXConnector implements JMXConnector {
   }
 
   @Override
-  public MBeanServerConnection getMBeanServerConnection(Subject delegationSubject) throws IOException {
+  public MBeanServerConnection getMBeanServerConnection(final Subject delegationSubject) throws IOException {
     return mbsc;
   }
 
@@ -113,15 +113,15 @@ public class JPPFJMXConnector implements JMXConnector {
   }
 
   @Override
-  public void addConnectionNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) {
+  public void addConnectionNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
   }
 
   @Override
-  public void removeConnectionNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
+  public void removeConnectionNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
   }
 
   @Override
-  public void removeConnectionNotificationListener(NotificationListener l, NotificationFilter f, Object handback) throws ListenerNotFoundException {
+  public void removeConnectionNotificationListener(final NotificationListener l, final NotificationFilter f, final Object handback) throws ListenerNotFoundException {
   }
 
   @Override
@@ -165,9 +165,13 @@ public class JPPFJMXConnector implements JMXConnector {
     JMXContext readingContext = (JMXContext) pair.readingChannel().getContext();
     JMXContext writingContext = (JMXContext) pair.writingChannel().getContext();
     mbsc = new JPPFMBeanServerConnection(readingContext.getMessageHandler());
+    readingContext.setMbeanServerConnection(mbsc);
+    writingContext.setMbeanServerConnection(mbsc);
+    if (debugEnabled) log.debug("sending connection request");
     String connectionID = (String) mbsc.getMessageHandler().sendRequest(JMXMessageType.CONNECT);
     readingContext.setConnectionID(connectionID);
     writingContext.setConnectionID(connectionID);
     this.connectionID = connectionID;
+    mbsc.setConnectionID(connectionID);
   }
 }

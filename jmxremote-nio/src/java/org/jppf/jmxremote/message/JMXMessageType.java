@@ -32,7 +32,7 @@ public enum JMXMessageType {
   /**
    * Identifier for the method {@link MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)}.
    */
-  ADD_NOTIFICATION_LISTENERS,
+  ADD_NOTIFICATION_LISTENER,
   /**
    * Identifier for the method {@link MBeanServerConnection#addNotificationListener(ObjectName, ObjectName, NotificationFilter, Object)}.
    */
@@ -128,5 +128,9 @@ public enum JMXMessageType {
   /**
    * Identifier for the method {@link MBeanServerConnection#unregisterMBean(ObjectName)}.
    */
-  UNREGISTER_MBEAN
+  UNREGISTER_MBEAN,
+  /**
+   * Identifier for a notification.
+   */
+  NOTIFICATION
 }

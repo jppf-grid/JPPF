@@ -21,33 +21,36 @@ package org.jppf.jmxremote.nio;
 import org.jppf.nio.*;
 
 /**
- * 
+ * Abstract superclass for the states of a JMX NIO channel.
  * @author Laurent Cohen
  */
 abstract class JMXNioState extends NioState<JMXTransition> {
   /**
    * The server which handles the channels states and transitions.
    */
-  final JMXNioServer server;
+  final JMXNioServer jmxServer;
 
   /**
-   * 
-   * @param server the server which handles the channels states and transitions.
+   * Initialize with the specified NIO server.
+   * @param jmxServer the server which handles the channels states and transitions.
    */
-  JMXNioState(final JMXNioServer server) {
-    this.server = server;
+  JMXNioState(final JMXNioServer jmxServer) {
+    this.jmxServer = jmxServer;
   }
 
   /**
-   * 
-   * @param channel the channel to transiition.
-   * @param transition the transition to set.
-   * @return the transition.
+   * Set the spceied state to the channel and prepare it for selection.
+   * @param channel the channel to transition.
+   * @param state the transition to set.
+   * @param updateOps the value to AND-wise update the interest ops with.
+   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
+   * @return {@code null}.
    * @throws Exception if any error occurs.
    */
-  JMXTransition transitionChannel(final ChannelWrapper<?> channel, final JMXTransition transition) throws Exception {
-    StateTransitionManager<JMXState, JMXTransition> mgr = server.getTransitionManager();
-    mgr.setInterestOps(channel.getSocketChannel(), server.getFactory().getTransition(transition).getInterestOps());
-    return transition;
+  JMXTransition transitionChannel(final ChannelWrapper<?> channel, final JMXState state, final int updateOps, final boolean add) throws Exception {
+    JMXContext context = (JMXContext) channel.getContext();
+    context.setState(state);
+    jmxServer.getTransitionManager().updateInterestOps(channel.getSocketChannel(), updateOps, add);
+    return null;
   }
 }

@@ -21,10 +21,11 @@ package org.jppf.jmxremote.nio;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.management.MBeanServer;
+import javax.management.*;
 
 import org.jppf.io.*;
-import org.jppf.jmxremote.message.JMXMessage;
+import org.jppf.jmxremote.JPPFMBeanServerConnection;
+import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
 import org.slf4j.*;
 
@@ -46,10 +47,6 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private boolean reading;
   /**
-   * Whether the associated channel represents a client-side connection.
-   */
-  private boolean client;
-  /**
    * The last read or written non-serialized JMX message.
    */
   private JMXMessage currentJmxMessage;
@@ -62,7 +59,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private final JMXNioServer server;
   /**
-   * Server port on which the connection was established. 
+   * Server port on which the connection was established.
    */
   private int serverPort = -1;
   /**
@@ -70,9 +67,13 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private JMXMessageHandler messageHandler;
   /**
-   * The associated MBeanServer.
+   * The associated MBeanServer (server-side).
    */
   private MBeanServer mbeanServer;
+  /**
+   * The associated MBeanServerConnection (clientr-side).
+   */
+  private JPPFMBeanServerConnection mbeanServerConnection;
 
   /**
    * Initializewitht he specified server.
@@ -109,32 +110,15 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   }
 
   /**
-   * @return whether the associated channel represents a client-side connection.
-   */
-  public boolean isClient() {
-    return client;
-  }
-
-  /**
-   * Specify whether the associated channel represents a client-side connection.
-   * @param client {@code true} for a client-side connection, {@code false} for a server-side connection.
-   * @return this context, for method chaining.
-   */
-  public JMXContext setClient(final boolean client) {
-    this.client = client;
-    return this;
-  }
-
-  /**
-   * @return the conenction id.
+   * @return the connection id.
    */
   public String getConnectionID() {
     return getConnectionUuid();
   }
 
   /**
-   * Specify whether the associated channel respresents a client-side connection.
-   * @param client {@code true} for a client-side connection, {@code false} for a server-side connection.
+   * Set the connection id.
+   * @param connectionID the connection id to set.
    * @return this context, for method chaining.
    */
   public JMXContext setConnectionID(final String connectionID) {
@@ -158,8 +142,8 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   }
 
   /**
-   * Deserialize the last read message.
-   * @return a deserialzed message.
+   * Serialize the current message message.
+   * @param channel the channel to which the serialized message is written.
    * @throws Exception if any error occurs.
    */
   public void serializeMessage(final ChannelWrapper<?> channel) throws Exception {
@@ -212,13 +196,13 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @param serverPort the port number.
    * @return this context, for method chaining.
    */
-  public JMXContext setServerPort(int serverPort) {
+  public JMXContext setServerPort(final int serverPort) {
     this.serverPort = serverPort;
     return this;
   }
 
   /**
-   * 
+   *
    * @return the object that handles messages correlations.
    */
   public JMXMessageHandler getMessageHandler() {
@@ -230,23 +214,42 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @param messageHandler a {@link JMXMessageHandler} instance.
    * @return this context, for method chaining.
    */
-  public JMXContext setMessageHandler(JMXMessageHandler messageHandler) {
+  public JMXContext setMessageHandler(final JMXMessageHandler messageHandler) {
     this.messageHandler = messageHandler;
     return this;
   }
 
   /**
-   * @return the associated MBeanServer, if any.
+   * @return the associated MBeanServer (server-side), if any.
    */
   public MBeanServer getMbeanServer() {
     return mbeanServer;
   }
 
   /**
-   * Set the associated MBeanServer.
+   * Set the associated MBeanServer (server-side).
    * @param mbeanServer a {@link MBeanServer} instance.
+   * @return this context, for method chaining.
    */
-  public void setMbeanServer(MBeanServer mbeanServer) {
+  public JMXContext setMbeanServer(final MBeanServer mbeanServer) {
     this.mbeanServer = mbeanServer;
+    return this;
+  }
+
+  /**
+   * @return the associated MBeanServerConnection (client-side).
+   */
+  public JPPFMBeanServerConnection getMbeanServerConnection() {
+    return mbeanServerConnection;
+  }
+
+  /**
+   * Set the associated MBeanServerConnection (client-side).
+   * @param mbeanServerConnection the {@link MBeanServerConnection} to set.
+   * @return this context, for method chaining.
+   */
+  public JMXContext setMbeanServerConnection(final JPPFMBeanServerConnection mbeanServerConnection) {
+    this.mbeanServerConnection = mbeanServerConnection;
+    return this;
   }
 }

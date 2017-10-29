@@ -22,7 +22,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.utils.Pair;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class ChannelsPair extends Pair<ChannelWrapper<?>, ChannelWrapper<?>> {
@@ -30,7 +30,7 @@ public class ChannelsPair extends Pair<ChannelWrapper<?>, ChannelWrapper<?>> {
    * @param first the reading channel.
    * @param second the writing channel.
    */
-  public ChannelsPair(ChannelWrapper<?> first, ChannelWrapper<?> second) {
+  public ChannelsPair(final ChannelWrapper<?> first, final ChannelWrapper<?> second) {
     super(first, second);
   }
 

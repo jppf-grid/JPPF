@@ -18,14 +18,16 @@
 
 package org.jppf.jmxremote.nio;
 
-import static org.jppf.jmxremote.nio.JMXTransition.*;
+import static org.jppf.jmxremote.nio.JMXState.*;
+
+import java.nio.channels.SelectionKey;
 
 import org.jppf.jmxremote.message.JMXMessage;
 import org.jppf.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**
- *
+ * Writes all messages in the channel's context queue, if any, or keep writing the current message.
  * @author Laurent Cohen
  */
 public class SendingMessageState extends JMXNioState {
@@ -50,7 +52,7 @@ public class SendingMessageState extends JMXNioState {
     JMXContext context = (JMXContext) channel.getContext();
     if (context.getCurrentJmxMessage() == null) {
       JMXMessage msg = context.pollJmxMessage();
-      if (msg == null) return transitionChannel(channel, TO_IDLE);
+      if (msg == null) return transitionChannel(channel, IDLE, SelectionKey.OP_WRITE, false);
       if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
       context.setCurrentJmxMessage(msg);
       context.serializeMessage(channel);
@@ -60,6 +62,6 @@ public class SendingMessageState extends JMXNioState {
       context.setCurrentJmxMessage(null);
       context.setMessage(null);
     }
-    return transitionChannel(channel, TO_SENDING_MESSAGE);
+    return transitionChannel(channel, SENDING_MESSAGE, SelectionKey.OP_WRITE, true);
   }
 }

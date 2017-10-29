@@ -20,11 +20,13 @@ package test.org.jppf.jmxremote;
 
 import java.io.Serializable;
 
+import javax.management.NotificationEmitter;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public interface ConnectorTestMBean extends Serializable {
+public interface ConnectorTestMBean extends Serializable, NotificationEmitter {
   /**
    * Name of the node's admin MBean.
    */
@@ -59,4 +61,10 @@ public interface ConnectorTestMBean extends Serializable {
    * @param intParam the parameter's value.
    */
   void setIntParam(int intParam);
+
+  /**
+   * Send a notification for each of the specified messages, where user data is set to the message.
+   * @param messages the messages to send.
+   */
+  void triggerNotifications(final String...messages);
 }

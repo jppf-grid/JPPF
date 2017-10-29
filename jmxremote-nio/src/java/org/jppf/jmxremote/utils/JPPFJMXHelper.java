@@ -25,7 +25,7 @@ import javax.management.remote.JMXServiceURL;
 import org.jppf.nio.acceptor.AcceptorNioServer;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class JPPFJMXHelper {
@@ -37,10 +37,11 @@ public class JPPFJMXHelper {
   /**
    * Create the acceptor server based on the specified parameters.
    * @param address encapsulates the connection information.
-   * @param env the JMX server environment, including eventual SSL parameters. 
+   * @param env the JMX server environment, including eventual SSL parameters.
    * @return a new {@link AcceptorNioServer} instance.
+   * @throws Exception if any error occurs.
    */
-  public static AcceptorNioServer createAcceptor(final JMXServiceURL address, Map<String, ?> env) throws Exception {
+  public static AcceptorNioServer createAcceptor(final JMXServiceURL address, final Map<String, ?> env) throws Exception {
     int port = address.getPort();
     Boolean tls = (Boolean) env.get("jppf.jmx.remote.tls.enabled");
     boolean secure = (tls == null) ? false : tls;

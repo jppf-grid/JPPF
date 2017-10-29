@@ -16,18 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.jmxremote.nio;
+package org.jppf.jmxremote.message;
 
+import java.nio.channels.SelectionKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.jmxremote.message.*;
+import org.jppf.jmxremote.nio.*;
 import org.jppf.nio.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Handles requests/responses and notifications with a message-based semantics.
  * @author Laurent Cohen
  */
 public class JMXMessageHandler {
@@ -48,16 +49,17 @@ public class JMXMessageHandler {
    */
   private final ChannelsPair channels;
   /**
-   * 
+   * Mapping of pending requests to their messageID.
    */
   private final Map<Long, JMXRequest> requestMap = new ConcurrentHashMap<>();
   /**
-   * 
+   * Reference to the state transition manager.
    */
   private static StateTransitionManager<JMXState, JMXTransition> transitionManager = JMXNioServer.getInstance().getTransitionManager();
 
   /**
-   * 
+   * Initialize with the specified pair of reading and writing channels.
+   * @param channels the associated pair of reading/writing channels.
    */
   public JMXMessageHandler(final ChannelsPair channels) {
     this.channels = channels;
@@ -71,7 +73,7 @@ public class JMXMessageHandler {
   }
 
   /**
-   * Send a request and return a response when it arrives
+   * Send a request and return a response when it arrives.
    * @param type the type of requets ot send.
    * @param params the request's parameters.
    * @return the result of the requet.
@@ -81,17 +83,7 @@ public class JMXMessageHandler {
     JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
     if (debugEnabled) log.debug("sendingRequest {}", request);
     requestMap.put(request.getMessageID(), request);
-    ChannelWrapper<?> writingChannel = channels.writingChannel();
-    JMXContext context = (JMXContext) writingChannel.getContext();
-    context.offerJmxMessage(request);
-    synchronized(writingChannel) {
-      JMXState state = context.getState();
-      if (debugEnabled) log.debug("writing channel state: {}, context = {}", state, context);
-      if (state == JMXState.IDLE) {
-        transitionManager.transitionChannel(writingChannel, JMXTransition.TO_SENDING_MESSAGE);
-        transitionManager.setInterestOps(writingChannel.getSocketChannel(), JMXNioServer.getInstance().getFactory().getTransition(JMXTransition.TO_SENDING_MESSAGE).getInterestOps());
-      }
-    }
+    sendMessage(request);
     synchronized(request) {
       request.wait();
     }
@@ -115,6 +107,25 @@ public class JMXMessageHandler {
       }
     } else {
       log.warn("no matching request for {}", response);
+    }
+  }
+
+  /**
+   * Sends the specified message.
+   * @param message the message to send.
+   * @throws Exception if any error occurs.
+   */
+  public void sendMessage(final JMXMessage message) throws Exception {
+    ChannelWrapper<?> writingChannel = channels.writingChannel();
+    JMXContext context = (JMXContext) writingChannel.getContext();
+    context.offerJmxMessage(message);
+    synchronized(writingChannel) {
+      JMXState state = context.getState();
+      if (debugEnabled) log.debug("writing channel state: {}, context = {}", state, context);
+      if (state == JMXState.IDLE) {
+        context.setState(JMXState.SENDING_MESSAGE);
+        transitionManager.updateInterestOps(writingChannel.getSocketChannel(), SelectionKey.OP_WRITE, true);
+      }
     }
   }
 }
