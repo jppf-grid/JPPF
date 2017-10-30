@@ -274,6 +274,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
 
   @Override
   public void addNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback) throws InstanceNotFoundException, IOException {
+    try {
+      messageHandler.sendRequest(ADD_NOTIFICATION_LISTENER_OBJECTNAME, name, listener, filter, handback);
+    } catch (InstanceNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
@@ -303,15 +310,50 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
   @Override
   public void removeNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    try {
+      ClientListenerInfo toRemove = null;
+      synchronized(listenerMap) {
+        for (Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
+          ClientListenerInfo info = entry.getValue();
+          if (info.getMbeanName().equals(name) && (info.getListener() == listener)) {
+            toRemove = info;
+            break;
+          }
+        }
+      }
+      if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
+      messageHandler.sendRequest(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
+      synchronized(listenerMap) {
+        listenerMap.remove(toRemove.getListenerID());
+      }
+    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public void removeNotificationListener(final ObjectName name, final ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    try {
+      messageHandler.sendRequest(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME, name, listener);
+    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override
   public void removeNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    try {
+      messageHandler.sendRequest(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK, name, listener, filter, handback);
+    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
   }
 
   @Override

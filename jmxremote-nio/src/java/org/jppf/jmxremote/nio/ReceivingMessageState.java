@@ -119,15 +119,15 @@ public class ReceivingMessageState extends JMXNioState {
           break;
         case ADD_NOTIFICATION_LISTENER: result = jmxServer.getServerNotificationHandler().addNotificationListener(mbs, context.getConnectionID(), (ObjectName) p[0], (NotificationFilter) p[1]);
           break;
-        case ADD_NOTIFICATION_LISTENER_OBJECTNAME:
+        case ADD_NOTIFICATION_LISTENER_OBJECTNAME: mbs.addNotificationListener((ObjectName) p[0], (ObjectName) p[1], (NotificationFilter) p[2], p[3]);
           break;
         case REMOVE_NOTIFICATION_LISTENER: jmxServer.getServerNotificationHandler().removeNotificationListeners(mbs, (ObjectName) p[0], (int[]) p[1]);
           break;
-        case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK:
+        case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK: jmxServer.getServerNotificationHandler().removeNotificationListeners(mbs, (ObjectName) p[0], new int[] { (Integer) p[1] });
           break;
-        case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME:
+        case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME: mbs.removeNotificationListener((ObjectName) p[0], (ObjectName) p[1]);
           break;
-        case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK:
+        case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK: mbs.removeNotificationListener((ObjectName) p[0], (ObjectName) p[1], (NotificationFilter) p[2], p[3]);
           break;
       }
     } catch (Exception e) {

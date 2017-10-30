@@ -34,10 +34,6 @@ public class ClientListenerInfo {
    */
   private final ObjectName mbeanName;
   /**
-   * The object name of the listener to register with. May be null, in which case {@link #listener} must not be null.
-   */
-  private final ObjectName listenerName;
-  /**
    * The notification listener. May be null, in which case {@link #listenerName} must not be null.
    */
   private final NotificationListener listener;
@@ -64,24 +60,6 @@ public class ClientListenerInfo {
     this.listener = listener;
     this.filter = filter;
     this.handback = handback;
-    this.listenerName = null;
-  }
-
-  /**
-   * Initialize with the specified parameters.
-   * @param listenerID the server-side listener ID.
-   * @param mbeanName the object name of the mbean to register the listener with.
-   * @param listenerName the object name of the listener to register.
-   * @param filter the notification filter.
-   * @param handback the associated handback.
-   */
-  public ClientListenerInfo(final int listenerID, final ObjectName mbeanName, final ObjectName listenerName, final NotificationFilter filter, final Object handback) {
-    this.listenerID = listenerID;
-    this.mbeanName = mbeanName;
-    this.listener = null;
-    this.filter = filter;
-    this.handback = handback;
-    this.listenerName = listenerName;
   }
 
   /**
@@ -110,13 +88,6 @@ public class ClientListenerInfo {
    */
   public ObjectName getMbeanName() {
     return mbeanName;
-  }
-
-  /**
-   * @return the object name of the listener to register with. May be null, in which case {@link #getListener()} must not return null.
-   */
-  public ObjectName getListenerName() {
-    return listenerName;
   }
 
   /**

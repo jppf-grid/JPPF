@@ -70,7 +70,6 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
     if (environment != null) this.environment.putAll(environment);
     this.environment.put(MBEAN_SERVER_KEY, mbeanServer);
     this.address = serviceURL;
-
   }
 
   @Override
