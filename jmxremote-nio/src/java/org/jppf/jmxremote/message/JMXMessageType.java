@@ -21,7 +21,7 @@ package org.jppf.jmxremote.message;
 import javax.management.*;
 
 /**
- * 
+ * ENumeration of the possible types of JMX messages.
  * @author Laurent Cohen
  */
 public enum JMXMessageType {

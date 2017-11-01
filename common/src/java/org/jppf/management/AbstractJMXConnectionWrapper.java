@@ -27,6 +27,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.*;
 import javax.management.remote.generic.GenericConnector;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -71,14 +72,18 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   protected Map<String, Object> env = new HashMap<>();
   /** Determines whether the JMX connection should be secure or not. */
   protected boolean sslEnabled;
-  /**  */
+  /** Used to synchronize during the connection process. */
   final Object connectionLock = new Object();
   /** The list of listeners to this connection wrapper. */
   final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>();
   /** The time at which connection attempts started. */
   long connectionStart;
-  /** */
+  /** Whether to try to reconnect upon error. */
   boolean reconnectOnError = true;
+  /**
+   * The JMX remote protocol.
+   */
+  private final String protocol;
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -87,6 +92,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     local = true;
     idString = displayName = "local";
     host = "local";
+    this.protocol = JMXHelper.LOCAL_PROTOCOL;
   }
 
   /**
@@ -96,25 +102,58 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * @param sslEnabled specifies whether the jmx connection should be secure or not.
    */
   public AbstractJMXConnectionWrapper(final String host, final int port, final boolean sslEnabled) {
+    this(JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL), host, port, sslEnabled);
+  }
+
+  /**
+   * Initialize the connection to the remote MBean server.
+   * @param protocol the JMX remote protocol to use.
+   * @param host the host the server is running on.
+   * @param port the port used by the server.
+   * @param sslEnabled specifies whether the jmx connection should be secure or not.
+   */
+  public AbstractJMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
+    this.protocol = protocol;
     try {
       this.host = (NetworkUtils.isIPv6Address(host)) ? "[" + host + "]" : host;
       this.port = port;
       this.sslEnabled = sslEnabled;
       idString = this.host + ':' + this.port;
       this.displayName = this.idString;
-      url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
-      if (sslEnabled) SSLHelper.configureJMXProperties(env);
-      env.put(GenericConnector.OBJECT_WRAPPING, JMXMPServer.newObjectWrapping());
-      env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
-      env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
-      env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
-      env.put("jmx.remote.x.server.max.threads", 1);
-      env.put("jmx.remote.x.client.connection.check.period", 0);
-      env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
+      //url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
+      url = new JMXServiceURL(protocol, host, port);
+      if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
+      if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
+      else initJPPF();
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     local = false;
+  }
+
+  /**
+   * Initialize the environment for the JMXMP protocol.
+   * @throws Exception if any error occcurs.
+   */
+  private void initJMXMP() throws Exception {
+    env.put(GenericConnector.OBJECT_WRAPPING, JMXMPServer.newObjectWrapping());
+    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
+    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
+    env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
+    env.put("jmx.remote.x.server.max.threads", 1);
+    env.put("jmx.remote.x.client.connection.check.period", 0);
+    env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
+  }
+
+  /**
+   * Initialize the environment for the JPPF JMX remote protocol.
+   * @throws Exception if any error occcurs.
+   */
+  private void initJPPF() throws Exception {
+    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "org.jppf.jmxremote.protocol");
+    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
+    env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
+    env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
   }
 
   /**
@@ -220,7 +259,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   }
 
   /**
-   * Add a listener to this connection wrapper
+   * Add a listener to this connection wrapper.
    * @param listener the listener to add.
    */
   public void addJMXWrapperListener(final JMXWrapperListener listener) {
@@ -228,7 +267,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   }
 
   /**
-   * Remove a listener from this connection wrapper
+   * Remove a listener from this connection wrapper.
    * @param listener the listener to add.
    */
   public void removeJMXWrapperListener(final JMXWrapperListener listener) {
@@ -272,5 +311,13 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   public synchronized void setReconnectOnError(final boolean reconnectOnError) {
     this.reconnectOnError = reconnectOnError;
+  }
+
+  /**
+   * Get the JMX remote protocol used.
+   * @return the JMX remote protocol string.
+   */
+  public String getProtocol() {
+    return protocol;
   }
 }

@@ -21,7 +21,7 @@ package org.jppf.jmxremote.nio;
 import org.jppf.nio.ChannelWrapper;
 
 /**
- *
+ * Idle state for a channel.
  * @author Laurent Cohen
  */
 public class IdleState extends JMXNioState {

@@ -439,7 +439,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public JMXServer getJmxServer() throws Exception {
     synchronized(this) {
       if ((jmxServer == null) || jmxServer.isStopped()) {
-        boolean ssl = JPPFConfiguration.getProperties().get(JPPFProperties.SSL_ENABLED);
+        if (debugEnabled) log.debug("starting JMX server");
+        boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
         jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, ssl ? JPPFProperties.MANAGEMENT_SSL_PORT_NODE : JPPFProperties.MANAGEMENT_PORT_NODE);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());

@@ -36,7 +36,7 @@ import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
- *
+ * Implementation of the {@link JMXConnector} interface for the JPPF JMX remote connector.
  * @author Laurent Cohen
  */
 public class JPPFJMXConnector implements JMXConnector {

@@ -23,7 +23,7 @@ import java.util.List;
 import org.jppf.jmxremote.*;
 
 /**
- * Enumeration of the possible types of connection status events.
+ * Enumeration of the possible types of connection status events on the server side.
  * @author Laurent Cohen
  */
 enum ConnectionEventType {

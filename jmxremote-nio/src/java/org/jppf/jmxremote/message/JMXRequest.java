@@ -21,7 +21,7 @@ package org.jppf.jmxremote.message;
 import java.util.Arrays;
 
 /**
- * A specialized message that represents a request.
+ * A specialized message that represents a request to the server.
  * @author Laurent Cohen
  */
 public class JMXRequest extends AbstractJMXMessage {

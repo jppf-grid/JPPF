@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MBeanServer;
 import javax.net.ssl.*;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.jmxremote.notification.ServerNotificationHandler;
-import org.jppf.jmxremote.utils.JPPFJMXHelper;
 import org.jppf.nio.*;
 import org.jppf.ssl.*;
 import org.jppf.utils.*;
@@ -84,6 +84,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    */
   private JMXNioServer() throws Exception {
     super(JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
+    this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
+    //this.selectTimeout = 1L;
   }
 
   @Override
@@ -144,7 +146,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     String ip = addr.getHostAddress();
     if (addr instanceof Inet6Address) ip =  "[" + ip + "]";
     //e.g. "jppf://192.168.1.1:12001 2135"
-    String connectionID = String.format("%s://%s:%d %d", JPPFJMXHelper.PROTOCOL, ip, port, connectionIdSequence.incrementAndGet());
+    String connectionID = String.format("%s://%s:%d %d", JMXHelper.JPPF_JMX_PROTOCOL, ip, port, connectionIdSequence.incrementAndGet());
     try {
       ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false);
       synchronized(mapsLock) {
@@ -176,10 +178,9 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel);
     JMXMessageHandler handler = new JMXMessageHandler(pair);
     MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
-    ((JMXContext) readingChannel.getContext()).setConnectionID(connectionID).setServerPort(port)
-      .setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.RECEIVING_MESSAGE);
-    ((JMXContext) writingChannel.getContext()).setConnectionID(connectionID).setServerPort(port)
-      .setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.IDLE);
+    //if (mbeanServer == null) log.warn("mbean server is null, call stack:\n{}", ExceptionUtils.getCallStack());
+    ((JMXContext) readingChannel.getContext()).setConnectionID(connectionID).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.RECEIVING_MESSAGE);
+    ((JMXContext) writingChannel.getContext()).setConnectionID(connectionID).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.IDLE);
     lock.lock();
     try {
       channel.register(selector.wakeup(), SelectionKey.OP_READ, pair);
@@ -220,7 +221,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   }
 
   /**
-   * Configure SSL for th specified channel accepted by the specified server.
+   * Configure SSL for the specified channel accepted by the specified server.
    * @param env environment parameters to use for TLS properties.
    * @param channelWrapper the channel to configure.
    * @param channel the associated socket channel.

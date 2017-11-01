@@ -21,7 +21,7 @@ package org.jppf.jmxremote;
 import java.util.EventListener;
 
 /**
- * 
+ * Listener interface for receiving connection JMX connection events on the server side.
  * @author Laurent Cohen
  */
 public interface JMXConnectionStatusListener extends EventListener {

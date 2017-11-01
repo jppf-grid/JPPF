@@ -19,7 +19,7 @@
 package org.jppf.jmxremote.message;
 
 /**
- *
+ * Abstract superclass for all JMX messages.
  * @author Laurent Cohen
  */
 public abstract class AbstractJMXMessage implements JMXMessage {

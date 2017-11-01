@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import javax.net.ssl.*;
 
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.jmx.JMXHelper;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -165,10 +166,21 @@ public final class SSLHelper2 {
 
   /**
    * Configure the SSL environment parameters for a JMX connector server or client.
+   * @param protocol the JMX remote protocol to use.
    * @param env the environment in which to add the SSL/TLS properties.
    * @throws Exception if any error occurs.
    */
-  public void configureJMXProperties(final Map<String, Object> env) throws Exception {
+  public void configureJMXProperties(final String protocol, final Map<String, Object> env) throws Exception {
+    if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) configureJMXMPProperties(env);
+    else configureJPPFJMXProperties(env);
+  }
+
+  /**
+   * Configure the SSL environment parameters for a JMX connector server or client.
+   * @param env the environment in which to add the SSL/TLS properties.
+   * @throws Exception if any error occurs.
+   */
+  private void configureJMXMPProperties(final Map<String, Object> env) throws Exception {
     Map<String, Object> newProps = new LinkedHashMap<>();
     SSLContext sslContext = getSSLContext();
     SSLSocketFactory factory = sslContext.getSocketFactory();
@@ -179,6 +191,43 @@ public final class SSLHelper2 {
     newProps.put("jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
     newProps.put("jmx.remote.tls.need.client.authentication", "" + params.getNeedClientAuth());
     newProps.put("jmx.remote.tls.want.client.authentication", "" + params.getWantClientAuth());
+    env.putAll(newProps);
+    if (debugEnabled) log.debug("JMX SSL connection properties: {}", newProps);
+  }
+
+  /**
+   * Configure the SSL environment parameters for a JMX connector server or client.
+   * @param env the environment in which to add the SSL/TLS properties.
+   * @throws Exception if any error occurs.
+   */
+  private void configureJPPFJMXProperties(final Map<String, Object> env) throws Exception {
+    Map<String, Object> newProps = new LinkedHashMap<>();
+    SSLContext sslContext = getSSLContext();
+    newProps.put("jppf.jmx.remote.tls.enabled", true);
+    newProps.put("jppf.jmx.remote.tls.socket.factory", sslContext.getSocketFactory());
+    SSLParameters params = getSSLParameters();
+    newProps.put("jppf.jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(" ", null, null, params.getProtocols()));
+    newProps.put("jppf.jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
+    if (params.getNeedClientAuth()) newProps.put("jppf.jmx.remote.tls.client.authentication", "need");
+    else if (params.getWantClientAuth()) newProps.put("jppf.jmx.remote.tls.client.authentication", "want");
+
+    String s = sslConfig.getString("jppf.ssl.truststore.password");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.truststore.password", s);
+    s = sslConfig.getString("jppf.ssl.truststore.password.source");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.truststore.password.source", s);
+    s = sslConfig.getString("jppf.ssl.truststore.file");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.truststore.file", s);
+    s = sslConfig.getString("jppf.ssl.truststore.source");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.truststore.source", s);
+    s = sslConfig.getString("jppf.ssl.keystore.password");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.keystore.password", s);
+    s = sslConfig.getString("jppf.ssl.keystore.password.source");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.keystore.password.source", s);
+    s = sslConfig.getString("jppf.ssl.keystore.file");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.keystore.file", s);
+    s = sslConfig.getString("jppf.ssl.keystore.source");
+    if (s != null) newProps.put("jppf.jmx.remote.tls.keystore.source", s);
+
     env.putAll(newProps);
     if (debugEnabled) log.debug("JMX SSL connection properties: {}", newProps);
   }

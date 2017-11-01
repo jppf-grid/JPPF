@@ -21,7 +21,7 @@ package org.jppf.jmxremote;
 import java.util.EventObject;
 
 /**
- * 
+ * Notification of a connection event on the server side.
  * @author Laurent Cohen
  */
 public class JMXConnectionStatusEvent extends EventObject {
@@ -31,7 +31,7 @@ public class JMXConnectionStatusEvent extends EventObject {
   private final Throwable throwable;
 
   /**
-   * 
+   * Initialize this event with the specified connection id and no {@link Throwable}. 
    * @param connectionID the id of the connection source of this event.
    */
   public JMXConnectionStatusEvent(final String connectionID) {
@@ -39,7 +39,7 @@ public class JMXConnectionStatusEvent extends EventObject {
   }
 
   /**
-   * 
+   * Initialize this event with the specified connection id and {@link Throwable}. 
    * @param connectionID the id of the connection source of this event.
    * @param throwable a {@link Throwable} that caused the connection failure, may be {@code null}.
    */
@@ -67,6 +67,6 @@ public class JMXConnectionStatusEvent extends EventObject {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("connectionID=").append(getConnectionID())
       .append("throwable=").append(throwable)
-      .append('[').toString();
+      .append(']').toString();
   }
 }

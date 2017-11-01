@@ -21,8 +21,6 @@ package org.jppf.management;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
-import javax.management.remote.generic.ObjectWrapping;
-
 import org.jppf.jmx.JMXHelper;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -34,11 +32,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JMXMPServer extends AbstractJMXServer {
+public class JPPFJMXServer extends AbstractJMXServer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXMPServer.class);
+  private static Logger log = LoggerFactory.getLogger(JPPFJMXServer.class);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -55,11 +53,12 @@ public class JMXMPServer extends AbstractJMXServer {
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @exclude
    */
-  public JMXMPServer(final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
+  public JPPFJMXServer(final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
     this.uuid = id;
     this.ssl = ssl;
-    if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_SSL_PORT;
+    if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
     else this.portProperty = portProperty;
+    if (debugEnabled) log.debug(String.format("initializing with ssl=%b, portProperty=%s", ssl, this.portProperty));
   }
 
   /**
@@ -79,24 +78,11 @@ public class JMXMPServer extends AbstractJMXServer {
       Map<String, Object> env = new HashMap<>();
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
-      env.put("jmx.remote.x.server.max.threads", 1);
-      env.put("jmx.remote.x.client.connection.check.period", 0);
-      // remove the "JMX server connection timeout Thread-*" threads. See bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
-      env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
-      if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JMXMP_PROTOCOL, env);
-      env.put("jmx.remote.object.wrapping", newObjectWrapping());
-      startConnectorServer("jmxmp", env);
+      if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
+      startConnectorServer("jppf", env);
     } finally {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);
     }
-  }
-
-  /**
-   * @return a new instance of an implementation of {@code ObjectWrapping}.
-   */
-  public static ObjectWrapping newObjectWrapping() {
-    //return new CustomWrapping();
-    return new CustomWrapping2();
   }
 }

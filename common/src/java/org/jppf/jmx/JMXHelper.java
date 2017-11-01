@@ -16,23 +16,23 @@
  * limitations under the License.
  */
 
-package org.jppf.jmxremote.message;
-
-import java.io.Serializable;
+package org.jppf.jmx;
 
 /**
- * JMX message interface. All communication between clients and server is performed via objects implementing this interface.
+ * 
  * @author Laurent Cohen
  */
-public interface JMXMessage extends Serializable {
+public class JMXHelper {
   /**
-   * Get the id of this message.
-   * @return the message ID.
+   * The JMXMP protocol string.
    */
-  long getMessageID();
-
+  public static final String JMXMP_PROTOCOL = "jmxmp";
   /**
-   * @return the type of request/response/notification to send.
+   * The JPPF JMX remote protocol string.
    */
-  JMXMessageType getMessageType();
+  public static final String JPPF_JMX_PROTOCOL = "jppf";
+  /**
+   * The protocol string for local connections.
+   */
+  public static final String LOCAL_PROTOCOL = "jppf";
 }

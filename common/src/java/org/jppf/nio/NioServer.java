@@ -112,6 +112,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected NioServer(final int identifier, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.serverName(identifier));
+    if (debugEnabled) log.debug(String.format("starting %s with identifier=%s and useSSL=%b", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL));
     this.identifier = identifier;
     selector = Selector.open();
     factory = createFactory();
@@ -167,11 +168,27 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env) throws Exception {
     int port = portToInit;
-    if (port >= 0) {
+    if (debugEnabled) log.debug("adding server for port={}, ssl={}", port, ssl);
+    if (port > 0) {
+      synchronized(servers) {
+        ServerSocketChannel server = servers.get(port);
+        if (server != null) {
+          if (debugEnabled) log.debug("port {} already used, not creating nio server", port);
+          SelectionKey key = server.keyFor(selector);
+          @SuppressWarnings("unchecked")
+          Map<String, Object> map = (Map<String, Object>) key.attachment();
+          if (env != null) map.putAll(env);
+          if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
+          return;
+        }
+      }
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+      //InetSocketAddress addr = new InetSocketAddress(NetworkUtils.getNonLocalHostAddress(), port);
       InetSocketAddress addr = new InetSocketAddress(port);
+      if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
       server.socket().bind(addr);
+      if (debugEnabled) log.debug("server socket channel bound to address {}", addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
       if (port == 0) port = server.socket().getLocalPort();
@@ -180,10 +197,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       map.put("jppf.ssl", ssl);
       if (env != null) map.putAll(env);
       synchronized(servers) {
-        server.register(selector, SelectionKey.OP_ACCEPT, map);
+        lock.lock();
+        try {
+          selector.wakeup();
+          server.register(selector, SelectionKey.OP_ACCEPT, map);
+        } finally {
+          lock.unlock();
+        }
         servers.put(portToInit, server);
       }
     }
+    if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
   }
 
   /**

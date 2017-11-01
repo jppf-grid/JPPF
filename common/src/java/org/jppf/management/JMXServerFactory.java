@@ -18,8 +18,9 @@
 
 package org.jppf.management;
 
-import org.jppf.utils.LoggingUtils;
-import org.jppf.utils.configuration.JPPFProperty;
+import org.jppf.jmx.JMXHelper;
+import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -27,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JMXServerFactory
-{
+public class JMXServerFactory {
   /**
    * Logger for this class.
    */
@@ -46,9 +46,14 @@ public class JMXServerFactory
    * @return an instance of {@link JMXServer}.
    * @throws Exception if the server could not be created.
    */
-  public static JMXServer createServer(final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception
-  {
-    JMXServer server = new JMXMPServer(uuid, ssl, portProperty);
+  public static JMXServer createServer(final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception {
+    String protocol = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
+    JMXServer server = null;
+    if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) {
+      server = new JPPFJMXServer(uuid, ssl, portProperty);
+    } else {
+      server = new JMXMPServer(uuid, ssl, portProperty);
+    }
     if (debugEnabled) log.debug("created JMX server: " + server);
     return server;
   }

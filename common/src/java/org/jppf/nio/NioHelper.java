@@ -83,9 +83,11 @@ public class NioHelper {
     synchronized(identifiedServers) {
       NioServer<?, ?> acceptor = identifiedServers.get(JPPFIdentifiers.ACCEPTOR_CHANNEL);
       if (acceptor == null) {
+        if (debugEnabled) log.debug("starting acceptor");
         acceptor = new AcceptorNioServer(null, null);
         putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptor);
         acceptor.start();
+        if (debugEnabled) log.debug("acceptor started");
       }
       return acceptor;
     }
@@ -100,12 +102,13 @@ public class NioHelper {
     int core = NioConstants.THREAD_POOL_SIZE;
     int queueSize = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_QUEUE_SIZE);
     long ttl = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_TTL);
+    if (debugEnabled) log.debug(String.format(Locale.US, "creating global executor with core=%,d; queueSize=%,d; ttl=%,d", core, queueSize, ttl));
     //ThreadPoolExecutor executor = new ThreadPoolExecutor(core, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JPPF_NIO"));
     ThreadPoolExecutor executor = new ThreadPoolExecutor(
       core, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory(NIO_THREAD_NAME_PREFIX));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
-    if (debugEnabled) log.debug(String.format(Locale.US, "globalExecutor=%s; core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", executor, core, queueSize, ttl, executor.getMaximumPoolSize()));
+    if (debugEnabled) log.debug(String.format(Locale.US, "globalExecutor: core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", core, queueSize, ttl, executor.getMaximumPoolSize()));
     return executor;
   }
 

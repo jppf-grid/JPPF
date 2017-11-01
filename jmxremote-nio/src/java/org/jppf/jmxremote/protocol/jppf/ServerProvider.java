@@ -27,7 +27,6 @@ import javax.management.remote.*;
 
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.JPPFJMXConnectorServer;
-import org.jppf.jmxremote.utils.JPPFJMXHelper;
 
 /**
  * 
@@ -41,7 +40,7 @@ public class ServerProvider implements JMXConnectorServerProvider {
 
   @Override
   public JMXConnectorServer newJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, final MBeanServer mbeanServer) throws IOException {
-    if (!JPPFJMXHelper.PROTOCOL.equals(serviceURL.getProtocol())) throw new MalformedURLException("Protocol not " + JPPFJMXHelper.PROTOCOL + ": " + serviceURL.getProtocol());
+    if (!JMXHelper.JPPF_JMX_PROTOCOL.equals(serviceURL.getProtocol())) throw new MalformedURLException("Protocol not " + JMXHelper.JPPF_JMX_PROTOCOL + ": " + serviceURL.getProtocol());
     Map<String, Object> env = new HashMap<>(environment);
     for (ServerEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {

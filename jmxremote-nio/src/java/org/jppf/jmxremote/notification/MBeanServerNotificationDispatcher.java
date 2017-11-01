@@ -54,6 +54,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @param mbeanServer the MBean server whose notifications to dispatch.
    */
   public MBeanServerNotificationDispatcher(final MBeanServer mbeanServer) {
+    if (mbeanServer == null) throw new IllegalArgumentException("MBeanServer cannot be null");
     this.mbeanServer = mbeanServer;
   }
 

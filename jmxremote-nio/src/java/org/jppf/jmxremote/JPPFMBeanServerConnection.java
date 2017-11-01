@@ -29,7 +29,7 @@ import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.notification.ClientListenerInfo;
 
 /**
- *
+ * Implementation of the {@link MBeanServerConnection} interface for JPPF JMX remote connectors.
  * @author Laurent Cohen
  */
 public class JPPFMBeanServerConnection implements MBeanServerConnection {
@@ -47,7 +47,7 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
   private final Map<Integer, ClientListenerInfo> listenerMap = new HashMap<>();
 
   /**
-   *
+   * Initialize with the specified message handler.
    * @param messageHandler performs the communication with the server.
    */
   public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler) {
@@ -315,7 +315,7 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection {
       synchronized(listenerMap) {
         for (Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
           ClientListenerInfo info = entry.getValue();
-          if (info.getMbeanName().equals(name) && (info.getListener() == listener)) {
+          if (info.getMbeanName().equals(name) && (info.getListener() == listener) && (info.getFilter() == filter) && (info.getHandback() == handback)) {
             toRemove = info;
             break;
           }

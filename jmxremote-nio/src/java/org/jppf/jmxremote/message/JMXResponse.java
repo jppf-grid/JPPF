@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 /**
  * A specialized message that represents a repsponse to a previous request.
+ * The correlation between request and response is realized via the {@link JMXMessage#getMessageID() messageID}.
  * @author Laurent Cohen
  */
 public class JMXResponse extends AbstractJMXMessage {

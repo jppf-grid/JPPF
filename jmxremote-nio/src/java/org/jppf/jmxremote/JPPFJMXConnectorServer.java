@@ -30,7 +30,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- *
+ * Concrete subclass of the {@link JMXConnectorServer} class for the JPPF JMX remote connector server.
  * @author Laurent Cohen
  */
 public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXConnectionStatusListener {
@@ -77,12 +77,14 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
     if (debugEnabled) log.debug("starting server @{}, env={}", address, environment);
     try {
       JMXNioServer server = JMXNioServer.getInstance();
+      if (debugEnabled) log.debug("Got JMXNioServer instance {}", server);
       int port = address.getPort();
       Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       boolean secure = (tls == null) ? false : tls;
       NioHelper.getAcceptorServer().addServer(port, secure, environment);
       server.addConnectionStatusListener(this);
       started = true;
+      if (debugEnabled) log.debug("successfully started server @{}", address);
     } catch (IOException e) {
       throw e;
     } catch (Exception e) {

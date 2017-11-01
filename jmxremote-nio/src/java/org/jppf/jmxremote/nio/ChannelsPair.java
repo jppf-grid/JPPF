@@ -22,7 +22,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.utils.Pair;
 
 /**
- *
+ * Convenience class to group a pair of channels respectively reading from and writing to the smae socket channel. 
  * @author Laurent Cohen
  */
 public class ChannelsPair extends Pair<ChannelWrapper<?>, ChannelWrapper<?>> {

@@ -90,12 +90,13 @@ public final class SSLHelper {
 
   /**
    * Configure the SSL environment parameters for a JMX connector server or client.
+   * @param protocol the JMX remote protocol to use.
    * @param env the environment in which to add the SSL/TLS properties.
    * @throws Exception if any error occurs.
    */
-  public static void configureJMXProperties(final Map<String, Object> env) throws Exception {
+  public static void configureJMXProperties(final String protocol, final Map<String, Object> env) throws Exception {
     checkSSLProperties();
-    helper.configureJMXProperties(env);
+    helper.configureJMXProperties(protocol, env);
   }
 
   /**
@@ -172,12 +173,20 @@ public final class SSLHelper {
     if (s != null) props.setString("jppf.ssl.client.auth", s);
     s = (String) env.get("jppf.jmx.remote.tls.truststore.password");
     if (s != null) props.setString("jppf.ssl.truststore.password", s);
-    s = (String) env.get("jppf.jmx.remote.tls.truststore.location");
+    s = (String) env.get("jppf.jmx.remote.tls.truststore.password.source");
+    if (s != null) props.setString("jppf.ssl.truststore.password.source", s);
+    s = (String) env.get("jppf.jmx.remote.tls.truststore.file");
     if (s != null) props.setString("jppf.ssl.truststore.file", s);
+    s = (String) env.get("jppf.jmx.remote.tls.truststore.source");
+    if (s != null) props.setString("jppf.ssl.truststore.source", s);
     s = (String) env.get("jppf.jmx.remote.tls.keystore.password");
     if (s != null) props.setString("jppf.ssl.keystore.password", s);
-    s = (String) env.get("jppf.jmx.remote.tls.keystore.location");
+    s = (String) env.get("jppf.jmx.remote.tls.keystore.password.source");
+    if (s != null) props.setString("jppf.ssl.keystore.password.source", s);
+    s = (String) env.get("jppf.jmx.remote.tls.keystore.file");
     if (s != null) props.setString("jppf.ssl.keystore.file", s);
+    s = (String) env.get("jppf.jmx.remote.tls.keystore.source");
+    if (s != null) props.setString("jppf.ssl.keystore.source", s);
     return new SSLHelper2(props);
   }
 }

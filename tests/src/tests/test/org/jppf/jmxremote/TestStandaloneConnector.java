@@ -62,6 +62,7 @@ public class TestStandaloneConnector extends BaseTest {
     BaseSetup.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
     BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
     url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
+    //url = new JMXServiceURL("service:jmx:jppf://192.168.1.24:12001");
     connectorTestName = new ObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
   }
@@ -84,12 +85,9 @@ public class TestStandaloneConnector extends BaseTest {
   @Test
   public void testConnection() throws Exception {
     print(false, false, "***** starting connector server *****");
-    JMXConnectorServer server = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbeanServer);
-    assertTrue(server instanceof JPPFJMXConnectorServer);
-    server.start();
+    JMXConnectorServer server = createConnectorServer();
     print(false, true, "***** starting connector client *****");
-    JMXConnector client = JMXConnectorFactory.connect(url);
-    assertTrue(client instanceof JPPFJMXConnector);
+    JMXConnector client = createConnectorClient();
     String connectionID = client.getConnectionId();
     assertNotNull(connectionID);
     assertTrue(connectionID.startsWith("jppf://"));
@@ -184,6 +182,29 @@ public class TestStandaloneConnector extends BaseTest {
     mbeanServer.registerMBean(new ConnectorTest(), connectorTestName);
   }
 
+  /**
+   * Create a connector server.
+   * @return a new started {@link JMXConnectorServer}.
+   * @throws Exception if any error occurs.
+   */
+  static JMXConnectorServer createConnectorServer() throws Exception {
+    JMXConnectorServer server = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbeanServer);
+    assertTrue(server instanceof JPPFJMXConnectorServer);
+    server.start();
+    return server;
+  }
+
+  /**
+   * Create a connector client.
+   * @return a new connected {@link JMXConnector}.
+   * @throws Exception if any error occurs.
+   */
+  static JMXConnector createConnectorClient() throws Exception {
+    JMXConnector client = JMXConnectorFactory.connect(url);
+    assertTrue(client instanceof JPPFJMXConnector);
+    return client;
+  }
+
   /** */
   static class MyListener implements NotificationListener {
     /** */
@@ -195,23 +216,6 @@ public class TestStandaloneConnector extends BaseTest {
       synchronized(infos) {
         infos.putValue(handback, msg);
       }
-    }
-  }
-
-  /** */
-  static class NotifInfo {
-    /** */
-    String msg;
-    /** */
-    Object handback;
-
-    /**
-     * @param msg .
-     * @param handback .
-     */
-    NotifInfo(final String msg, final Object handback) {
-      this.msg = msg;
-      this.handback = handback;
     }
   }
 

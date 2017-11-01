@@ -23,7 +23,7 @@ import java.util.Arrays;
 import javax.management.Notification;
 
 /**
- * A specialized message that represents a JMX notification to dispatch client-side.
+ * A specialized message that represents a JMX notification to dispatch on the client side.
  * @author Laurent Cohen
  */
 public class JMXNotification extends AbstractJMXMessage {

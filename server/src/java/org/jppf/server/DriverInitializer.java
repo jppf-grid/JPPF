@@ -29,6 +29,7 @@ import javax.management.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.discovery.*;
+import org.jppf.jmx.JMXHelper;
 import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
@@ -308,7 +309,11 @@ public class DriverInitializer {
       // default is false for ssl, true for plain connection
       if (config.get(prop)) {
         if (debugEnabled) log.debug("initializing {}management", tmp);
-        server = JMXServerFactory.createServer(driver.getUuid(), ssl, ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT);
+        String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
+        JPPFProperty<Integer> jmxProp = null;
+        if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = ssl ? SERVER_SSL_PORT : SERVER_PORT;
+        else jmxProp = ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT;
+        server = JMXServerFactory.createServer(driver.getUuid(), ssl, jmxProp);
         server.start(getClass().getClassLoader());
         String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
         System.out.println(msg);
