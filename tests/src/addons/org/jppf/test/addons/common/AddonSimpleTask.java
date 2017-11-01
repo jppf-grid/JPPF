@@ -35,7 +35,7 @@ public class AddonSimpleTask extends AbstractTask<String> {
    */
   public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
   /**
-   * The duration of this task;
+   * The duration of this task.
    */
   private long duration = 0L;
 

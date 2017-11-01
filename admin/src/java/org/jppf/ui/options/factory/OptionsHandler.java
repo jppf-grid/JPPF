@@ -35,7 +35,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- * This class handles the persistence of the dynamic UI com
+ * This class handles the persistence of the dynamic UI com.
  * @author Laurent Cohen
  */
 public final class OptionsHandler {

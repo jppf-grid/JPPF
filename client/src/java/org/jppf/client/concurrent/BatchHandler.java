@@ -81,7 +81,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private long elapsed;
   /**
-   * Used to synchronize access to <code>currentJobRef</code> and <code>nextJobRef</code>
+   * Used to synchronize access to <code>currentJobRef</code> and <code>nextJobRef</code>.
    */
   private final ReentrantLock lock = new ReentrantLock(true);
   /**

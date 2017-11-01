@@ -23,11 +23,11 @@ import java.util.*;
 /** */
 public class TestConfiguration {
   /**
-   * Path to the driver JPPF config
+   * Path to the driver JPPF config.
    */
   public String driverJppf = "";
   /**
-   * Path to the driver log4j config
+   * Path to the driver log4j config.
    */
   public String driverLog4j = "";
   /**
@@ -39,11 +39,11 @@ public class TestConfiguration {
    */
   public List<String> driverJvmOptions = new ArrayList<>();
   /**
-   * Path to the node JPPF config
+   * Path to the node JPPF config.
    */
   public String nodeJppf = "";
   /**
-   * Path to the node log4j config
+   * Path to the node log4j config.
    */
   public String nodeLog4j = "";
   /**

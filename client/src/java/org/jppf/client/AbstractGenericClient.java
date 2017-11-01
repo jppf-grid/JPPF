@@ -55,7 +55,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Constant for JPPF automatic connection discovery
+   * Constant for JPPF automatic connection discovery.
    */
   static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
   /**

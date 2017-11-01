@@ -267,7 +267,7 @@ public class AbstractNonStandardSetup extends BaseTest {
   }
 
   /**
-   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {

@@ -99,7 +99,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
   }
 
   /**
-   * Increment the indentation level
+   * Increment the indentation level.
    */
   protected void incIndentation()
   {
@@ -110,7 +110,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
   }
   
   /**
-   * Increment the indentation level
+   * Increment the indentation level.
    */
   protected void decIndentation()
   {

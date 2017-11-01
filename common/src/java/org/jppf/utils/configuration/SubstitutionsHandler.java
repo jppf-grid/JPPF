@@ -25,7 +25,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Handles property substitutions in a properties file, that is resolve all
+ * Handles property substitutions in a properties file, that is resolve all.
  * references of the following form in properties values:
  * <pre> property.name = ${&lt;other.property.name&gt;}
  * some.property.name = ${env.&lt;environment_variable_name&gt;}

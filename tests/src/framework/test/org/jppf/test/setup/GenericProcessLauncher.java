@@ -108,7 +108,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    */
   protected String name = "";
   /**
-   * The driver or node number
+   * The driver or node number.
    */
   protected int n = 0;
   /**

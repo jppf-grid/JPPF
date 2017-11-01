@@ -69,7 +69,7 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    */
   private TopologyDriver currentDriver;
   /**
-   * The user's node filter
+   * The user's node filter.
    */
   private TopologyFilter nodeFilter;
   /**

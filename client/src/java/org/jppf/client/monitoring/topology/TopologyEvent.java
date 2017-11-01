@@ -72,7 +72,7 @@ public class TopologyEvent extends EventObject {
   };
 
   /**
-   * The types of updates for an event
+   * The types of updates for an event.
    * @exclude
    */
   public enum UpdateType {

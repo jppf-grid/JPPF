@@ -146,7 +146,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
    */
   private class JmxInitializer extends ThreadSynchronization implements Runnable {
     /**
-     * The driver to connect to
+     * The driver to connect to.
      */
     final TopologyDriver driver;
 

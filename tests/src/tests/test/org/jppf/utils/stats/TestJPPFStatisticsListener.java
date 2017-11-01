@@ -106,7 +106,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
    */
   public static class MyStatsListener extends JPPFFilteredStatisticsListener {
     /**
-     * Numbers of creation, deletion and update events
+     * Numbers of creation, deletion and update events.
      */
     public int createCount=0, removeCount=0, updateCount=0, getFilterCount=0;
     /**

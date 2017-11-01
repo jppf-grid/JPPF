@@ -25,11 +25,11 @@ import org.jppf.utils.CryptoUtils;
  */
 public enum ConfigType {
   /**
-   * The JPPF client configuration
+   * The JPPF client configuration.
    */
   CLIENT("jppf_client_config", "admin.config", "jppf.properties"),
   /**
-   * The SSL/TLS configuration
+   * The SSL/TLS configuration.
    */
   SSL("jppf_ssl_config", "admin.ssl", "ssl.properties");
 

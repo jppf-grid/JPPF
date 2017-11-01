@@ -28,15 +28,15 @@ import org.jppf.utils.LocalizationUtils;
  */
 public class LocalizedListItem {
   /**
-   * The non-localized name of this item
+   * The non-localized name of this item.
    */
   public final String name;
   /**
-   * The localized name of this item
+   * The localized name of this item.
    */
   public final String label;
   /**
-   * The localized tooltip of this item
+   * The localized tooltip of this item.
    */
   public final String tooltip;
   /**

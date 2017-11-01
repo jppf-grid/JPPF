@@ -52,7 +52,7 @@ public class DetachableComponentDescriptor {
   private String viewId;
 
   /**
-   * Initialize this descriptor
+   * Initialize this descriptor.
    * @param component the component to describe.
    * @param listenerComponent the UI component which has the mouse listener.
    * @param tabComponent the component displayed in the tab.

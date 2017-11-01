@@ -36,7 +36,7 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  */
 public class TestResourceLookup extends AbstractNonStandardSetup {
   /**
-   * Launches a driver and 1 node and start the client,
+   * Launches a driver and 1 node and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -83,7 +83,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
     }
 
     /**
-     * Looup the specified resource
+     * Looup the specified resource.
      * @param resName the name of the resource to lookup.
      * @return the url of the resource as a string, or {@code null} if the reosurce was not found.
      */

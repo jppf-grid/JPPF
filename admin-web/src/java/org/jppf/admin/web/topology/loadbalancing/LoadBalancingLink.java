@@ -34,7 +34,7 @@ import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
- * Implementation of the load-balanc
+ * Implementation of the load-balancing.
  * @author Laurent Cohen
  */
 public class LoadBalancingLink extends AbstractModalLink<LoadBalancingForm> {

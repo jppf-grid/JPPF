@@ -183,7 +183,7 @@ public class TestNodeSelector extends BaseTest {
     }
   }
 
-  /** Selects only the nodes whose IP address ends with an even number */
+  /** Selects only the nodes whose IP address ends with an even number. */
   public static class EvenNodeSelector implements NodeSelector {
     @Override
     public boolean accepts(final JPPFManagementInfo nodeInfo) {

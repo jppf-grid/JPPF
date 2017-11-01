@@ -56,7 +56,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    */
   private boolean requeued = false;
   /**
-   * Job cancel indicator
+   * Job cancel indicator.
    */
   private boolean cancelled = false;
 
@@ -86,7 +86,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   }
 
   /**
-   * Get the client job this job is for
+   * Get the client job this job is for.
    * @return a {@link ClientJob} instance.
    */
   public ClientJob getClientJob() {
@@ -175,7 +175,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   }
 
   /**
-   * Called when this task bundle should be resubmitted
+   * Called when this task bundle should be resubmitted.
    */
   public synchronized void resubmit() {
     if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.

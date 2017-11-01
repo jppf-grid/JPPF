@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test.org.jppf.management.forwarding;
 
 /**
  * Unit tests for <code>org.jppf.management</code> classes.
  * @exclude
  */
+package test.org.jppf.management.forwarding;

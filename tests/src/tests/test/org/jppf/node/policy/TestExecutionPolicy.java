@@ -35,17 +35,17 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestExecutionPolicy extends BaseTest {
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy truePolicy1 = new Equal("int.1", 1);
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy truePolicy2 = new Equal("int.2", 2);
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy truePolicy3 = new Equal("int.3", 3);
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy falsePolicy1 = new Equal("int.1", 2);
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy falsePolicy2 = new Equal("int.2", 4);
-  /** used for testing logical policies */
+  /** used for testing logical policies. */
   private final ExecutionPolicy falsePolicy3 = new Equal("int.3", 6);
   /** */
   private static JPPFSystemInformation systemInfo;

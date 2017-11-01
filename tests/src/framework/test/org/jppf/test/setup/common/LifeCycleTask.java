@@ -40,7 +40,7 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   protected static final int ONE_MILLION = 1000 * 1000;
   /**
-   * The duration of this task;
+   * The duration of this task.
    */
   protected long duration = 0L;
   /**

@@ -81,7 +81,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
   }
 
   /**
-   * Create, initialize and layout the GUI components displayed in this 
+   * Create, initialize and layout the GUI components displayed in this panel. 
    */
   @Override
   public void createUI() {

@@ -47,7 +47,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The job manager
+   * The job manager.
    */
   private final JobManagerClient jobManager;
   /**
@@ -288,7 +288,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   }
 
   /**
-   * Cancel the job with the specified UUID
+   * Cancel the job with the specified UUID.
    * @param jobId the uuid of the job to cancel.
    * @return whether cancellation was successful.
    */

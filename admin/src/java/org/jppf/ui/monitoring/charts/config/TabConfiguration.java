@@ -63,7 +63,7 @@ public class TabConfiguration
   }
 
   /**
-   * Get a string representation of this TabConfiguration
+   * Get a string representation of this TabConfiguration.
    * @return a string with the tab name.
    * @see java.lang.Object#toString()
    */

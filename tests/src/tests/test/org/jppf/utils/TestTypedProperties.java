@@ -415,7 +415,7 @@ public class TestTypedProperties extends BaseTest {
   }
 
   /**
-   * Test properties with parmaterized names
+   * Test properties with parmaterized names.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)

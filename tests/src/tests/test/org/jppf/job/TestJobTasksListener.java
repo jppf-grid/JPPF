@@ -287,7 +287,7 @@ public class TestJobTasksListener extends Setup1D1N {
 
   /** */
   private static class CountDownJobListener extends JobListenerAdapter {
-    /** count of tasks sent to the driver */
+    /** count of tasks sent to the driver. */
     private final AtomicInteger sentCount = new AtomicInteger(0);
     /** */
     final CountDownLatch cdl = new CountDownLatch(1);

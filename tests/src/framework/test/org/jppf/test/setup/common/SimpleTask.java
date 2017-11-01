@@ -31,7 +31,7 @@ public class SimpleTask extends AbstractTask<String> {
    */
   private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
   /**
-   * The duration of this task;
+   * The duration of this task.
    */
   private long duration = 0L;
 

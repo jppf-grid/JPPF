@@ -61,7 +61,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    */
   final boolean sslEnabled;
   /**
-   * Sequence number for created connections
+   * Sequence number for created connections.
    */
   final AtomicInteger sequence = new AtomicInteger(0);
   /**

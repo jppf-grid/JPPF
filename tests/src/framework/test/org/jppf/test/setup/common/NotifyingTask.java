@@ -50,7 +50,7 @@ public class NotifyingTask extends AbstractTask<String> {
    */
   public static final String SUCCESS = "success";
   /**
-   * The duration of this task
+   * The duration of this task.
    */
   private final long duration;
   /**

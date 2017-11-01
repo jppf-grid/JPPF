@@ -47,7 +47,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
   }
 
   /**
-   * Render the header
+   * Render the header.
    */
   private void renderHeader() {
     header.append("\nTotal tests: ").append(result.getTestsCount());
@@ -62,7 +62,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
   }
 
   /**
-   * Render the header
+   * Render the header.
    */
   private void renderBody() {
     if (!result.getExceptions().isEmpty()) {
