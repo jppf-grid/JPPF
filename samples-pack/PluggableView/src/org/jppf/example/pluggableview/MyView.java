@@ -289,15 +289,19 @@ public class MyView extends PluggableView {
     @Override
     public void jobDispatchAdded(final JobMonitoringEvent event) {
       JobDispatch dispatch = event.getJobDispatch();
-      String message = String.format("job '%s' dispatched to node %s", event.getJob().getDisplayName(), dispatch.getDisplayName());
+      TopologyNode node = dispatch.getNode();
+      String message = String.format("job '%s' dispatched to %s %s by driver %s",
+        event.getJob().getDisplayName(), node.isPeer() ? "peer node" : "node", dispatch.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }
 
     @Override
     public void jobDispatchRemoved(final JobMonitoringEvent event) {
       JobDispatch dispatch = event.getJobDispatch();
+      TopologyNode node = dispatch.getNode();
       // we can't use dispatch.getJob(), since the job dispatch is already removed from its parent job
-      String message = String.format("job '%s' returned from node %s", event.getJob().getDisplayName(), dispatch.getDisplayName());
+      String message = String.format("job '%s' returned from %s %s to driver %s", event.getJob().getDisplayName(),
+        node.isPeer() ? "peer node" : "node", dispatch.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }
   }
