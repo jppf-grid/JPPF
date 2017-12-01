@@ -30,37 +30,6 @@
   </target>
 
   <!--
-    Generate web site pages based on templates.
-    Attributes:
-    - source: the folder where the source documents to convert are located
-    - dest: the destination folder where the generated php and html files are written
-    - templates: the folder where the templates are located
-  -->
-  <macrodef name="doc.gen">
-    <attribute name="source"/>
-    <attribute name="dest"/>
-    <attribute name="templates"/>
-    <attribute name="fi" default="html,php"/>
-    <attribute name="fe" default=""/>
-    <attribute name="di" default=""/>
-    <attribute name="de" default=""/>
-    <sequential>
-      <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
-        <jvmarg value="-Xmx128m"/>
-        <arg value="-s"/>
-        <arg value="@{source}"/>
-        <arg value="-d"/>
-        <arg value="@{dest}"/>
-        <arg value="-t"/>
-        <arg value="@{templates}"/>
-        <arg value="-r"/>
-        <arg value="-fi"/>
-        <arg value="html,php"/>
-      </java>
-    </sequential>
-  </macrodef>
-
-  <!--
     Generate the screenshots thumbnails.
   -->
   <target name="doc.screenshots" >
@@ -103,7 +72,54 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                        Generate the Javadoc                               -->
+  <!-- Javadoc command properties                                                -->
+  <!-- ========================================================================= -->
+
+  <property name="javadoc.header"><![CDATA[
+    <table><tr><td valign="center">
+        <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
+      </td></tr></table>
+  ]]></property>
+
+  <property name="javadoc.bottom"><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2017 JPPF Team.</i></font>]]></property>
+
+  <property name="javadoc.sourcepath.before">
+    ${node}/src/java;${common}/src/java;${client}/src/java;${server}/src/java;${admin}/src/java;${jmxremote}/src;
+    ${jca-client}/src/java;${jca-client}/src/j2eeclient;${node-android}/events/src/main/java
+  </property>
+
+  <property name="javadoc.classpath.before">
+    ${common}/classes;
+    ${node}/classes;
+    ${admin}/classes;
+    ${client}/classes;
+    ${server}/classes;
+    ${demo}/classes;
+    ${jca-client}/classes/j2eeclient;
+    ${jca-client}/classes/jca;
+    ${samples-pack}/DataEncryption/classes;
+    ${env.ANDROID_HOME}/platforms/android-19/android.jar;
+    ${lib}/ApacheCommons/*;
+    ${lib}/BouncyCastle/*;
+    ${lib}/Checkstyle/*;
+    ${lib}/Groovy/*;
+    ${lib}/HikariCP/*;
+    ${lib}/J2EE/*;
+    ${lib}/java2html_50/*;
+    ${lib}/JFreeChart/*;
+    ${lib}/JGoodies/*;
+    ${lib}/JNA/*;
+    ${lib}/Jung/*;
+    ${lib}/JUnit/*;
+    ${lib}/log4j/*;
+    ${lib}/LZ4/*;
+    ${lib}/MigLayout/*;
+    ${lib}/RSyntaxTextArea/*;
+    ${lib}/slf4j/*
+  </property>
+  
+  <!-- ========================================================================= -->
+  <!--  Generate the Javadoc                                                     -->
   <!-- ========================================================================= -->
 
   <target name="javadoc" depends="compile.doclet" description="Generate all javadoc">
@@ -112,7 +128,24 @@
     <exec executable="java">
       <arg value="-version"/>
     </exec>
-    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath"
+    <antcall target="javadoc.external"/>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${bin}">
+        <include name="*.gif"/>
+        <include name="*.jpg"/>
+      </fileset>
+    </copy>
+    <favicon dir="${javadoc}"/>
+    <!-- create API doc zip -->
+    <property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
+    <delete file="${javadoc.file}" quiet="true"/>
+    <zip destfile="${javadoc.file}">
+      <zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-api"/>
+    </zip>
+  </target>
+
+  <target name="javadoc.anttask">
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.7"
       stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
       <arg value="-linksource"/>
@@ -132,42 +165,113 @@
       <link href="http://x-stream.github.io/javadoc"/>
       <link offline="true" href="http://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
-      <header>
-        <![CDATA[
-          <table><tr>
-            <td valign="center">
-              <a href="http://www.jppf.org" target="_top">
-                <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
-              </a>
-            </td>
-          </tr></table>
-        ]]>
-      </header>
-      <bottom>
-        <![CDATA[
-          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2017 JPPF Team.</i></font>
-        ]]>
-      </bottom>
+      <header>${javadoc.header}</header>
+      <bottom>${javadoc.bottom}</bottom>
     </javadoc>
-    <copy todir="${javadoc}/resources" overwrite="true">
-      <fileset dir="${bin}">
-        <include name="*.gif"/>
-        <include name="*.jpg"/>
-      </fileset>
-    </copy>
-    <favicon dir="${javadoc}"/>
-    <!-- create API doc zip -->
-    <property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
-    <delete file="${javadoc.file}" quiet="true"/>
-    <zip destfile="${javadoc.file}">
-      <zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-api"/>
-    </zip>
+  </target>
+  
+  <target name="javadoc.external">
+    <replaceProp dest="javadoc.sourcepath" search="\\s" replace=""/>
+    <replaceProp dest="javadoc.classpath" search="\\s" replace=""/>
+    <echo message="javadoc path = ${env.JAVA_HOME}/bin/javadoc"/>
+    <!-- JAVA_HOME should point to a JDK 1.7 -->
+    <exec executable="${env.JAVA_HOME}/bin/javadoc">
+      <arg value="-protected"/>
+      <arg value="-sourcepath"/>
+      <arg value="${javadoc.sourcepath}"/>
+      <arg value="-subpackages"/>
+      <arg value="org.jppf"/>
+      <arg value="-classpath"/>
+      <arg value="${javadoc.classpath}"/>
+      <arg value="-source"/>
+      <arg value="1.7"/>
+      <arg value="-stylesheetfile"/>
+      <arg value="${bin}/stylesheet.css"/>
+      <arg value="-use"/>
+      <arg value="-doclet"/>
+      <arg value="org.jppf.javadoc.ExcludeDoclet"/>
+      <arg value="-docletpath"/>
+      <arg value="${basedir}/classes"/>
+      <arg value="-link"/>
+      <arg value="https://docs.oracle.com/javase/7/docs/api/"/>
+      <arg value="-link"/>
+      <arg value="https://docs.oracle.com/javaee/6/api/"/>
+      <arg value="-link"/>
+      <arg value="http://junit.sourceforge.net/javadoc"/>
+      <arg value="-link"/>
+      <arg value="http://x-stream.github.io/javadoc"/>
+      <arg value="-linkoffline"/>
+      <arg value="http://d.android.com/reference"/>
+      <arg value="file:${env.ANDROID_HOME}/docs/reference"/>
+      <arg value="-doctitle"/>
+      <arg value="'JPPF v${version.number}'"/>
+      <arg value="-header"/>
+      <arg value="${javadoc.header}"/>
+      <arg value="-bottom"/>
+      <arg value="${javadoc.bottom}"/>
+      <arg value="-J-Xmx512m"/>
+      <arg value="-linksource"/>
+      <arg value="-quiet"/>
+      <arg value="-windowtitle"/>
+      <arg value="JPPF"/>
+      <arg value="-d"/>
+      <arg value="${javadoc}"/>
+    </exec>
+  </target>
+
+  <path id="doclet.classpath">
+    <pathelement location="${java.home}/lib/tools.jar"/>
+  </path>
+  
+  <target name="compile.doclet">
+    <delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
+    <javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
+      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="doclet.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${basedir}/src/java"/>
+    </javac>
   </target>
 
   <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
     <code.doc.tgz dir="javadoc" vname="6.0"/>
     <code.doc.tgz dir="csdoc" vname="6.0"/>
   </target>
+
+  <!-- ========================================================================= -->
+  <!--  Macrodefs                                                                -->
+  <!-- ========================================================================= -->
+
+  <!--
+    Generate web site pages based on templates.
+    Attributes:
+    - source:    the folder where the source documents to convert are located
+    - dest:      the destination folder where the generated php and html files are written
+    - templates: the folder where the templates are located
+  -->
+  <macrodef name="doc.gen">
+    <attribute name="source"/>
+    <attribute name="dest"/>
+    <attribute name="templates"/>
+    <attribute name="fi" default="html,php"/>
+    <attribute name="fe" default=""/>
+    <attribute name="di" default=""/>
+    <attribute name="de" default=""/>
+    <sequential>
+      <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+        <jvmarg value="-Xmx128m"/>
+        <arg value="-s"/>
+        <arg value="@{source}"/>
+        <arg value="-d"/>
+        <arg value="@{dest}"/>
+        <arg value="-t"/>
+        <arg value="@{templates}"/>
+        <arg value="-r"/>
+        <arg value="-fi"/>
+        <arg value="html,php"/>
+      </java>
+    </sequential>
+  </macrodef>
 
   <macrodef name="code.doc.tgz">
     <attribute name="dir"/>
@@ -185,8 +289,8 @@
   <!--
     Add a link to a favicon in all javadoc HTML pages.
     Attributes:
-      "dir" the root javadoc folder
-      "icon" the url of the favicon, defaults to "http://www.jppf.org/images/jppf-icon.ico"
+      dir:  the root javadoc folder
+      icon: the url of the favicon, defaults to "http://www.jppf.org/images/jppf-icon.ico"
   -->
   <macrodef name="favicon">
     <attribute name="dir"/>
@@ -201,18 +305,25 @@
     </sequential>
   </macrodef>
 
-  <path id="doclet.classpath">
-    <pathelement location="${java.home}/lib/tools.jar"/>
-  </path>
-
-  <target name="compile.doclet">
-    <delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
-    <javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
-      debug="on" deprecation="off" optimize="on" includes="**/*.java">
-      <classpath refid="doclet.classpath"/>
-      <compilerarg line="-Xlint:unchecked"/>
-      <src path="${basedir}/src/java"/>
-    </javac>
-  </target>
+  <!--
+    Make replacements in the value of a property.
+    Attributes:
+      dest:        the name of the new property in whose value the replacement is done
+      src:         the property whose value will be rreeplaced, defaults to @{dest}.before
+      search:      the string to search for
+      replacement: the replacement string
+  -->
+  <macrodef name="replaceProp">
+    <attribute name="dest"/>
+    <attribute name="src" default="@{dest}.before"/>
+    <attribute name="search"/>
+    <attribute name="replace"/>
+    <sequential>
+      <script language="javascript">
+        var before = project.getProperty("@{src}");
+        project.setProperty("@{dest}", before.replaceAll("@{search}", "@{replace}"));
+      </script>
+    </sequential>
+  </macrodef>
 
 </project> 

@@ -21,14 +21,14 @@ package org.jppf.nio;
 import static java.nio.channels.SelectionKey.OP_WRITE;
 
 import java.nio.channels.*;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Instances of this class manage the state transitions of channels opened via a <code>NioServer</code>.
+ * Instances of this class manage the state transitions of channels opened via a {@link NioServer}.
  * @param <S> type safe enum of the possible states for a channel.
  * @param <T> type safe enum of the possible state transitions for a channel.
  * @author Laurent Cohen
@@ -53,19 +53,17 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   /**
    * The state and transition factory associated with the server.
    */
-  private final NioServerFactory<S, T> factory;
+  private NioServerFactory<S, T> factory;
   /**
    * Determines whether the channels handled by the server are node job channels.
    */
   private final boolean isNodeServer;
   /**
    * Global thread pool used by all NIO servers.
-   * @since 5.0
    */
   private final ExecutorService executor = NioHelper.getGlobalexecutor();
   /**
    * The server lock.
-   * @since 5.0
    */
   private final Lock lock;
 
@@ -110,7 +108,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   private void setInterestOps(final ChannelWrapper<?> channel, final int interestOps) {
     lock.lock();
     try {
-      server.getSelector().wakeup();
+      server.wakeUpSelectorIfNeeded();
       channel.setInterestOps(interestOps);
     } finally {
       lock.unlock();
@@ -120,22 +118,35 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   /**
    * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
    * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param channel the key on which to set the interest operations.
+   * @param key the key on which to set the interest operations.
    * @param update the operations to update on the key.
    * @param add whether to add the update ({@code true}) or remove it ({@code false}).
    */
-  public void updateInterestOps(final SocketChannel channel, final int update, final boolean add) {
+  public void updateInterestOps(final SelectionKey key, final int update, final boolean add) {
     lock.lock();
     try {
-      server.getSelector().wakeup();
-      SelectionKey key = channel.keyFor(server.getSelector());
+      server.wakeUpSelectorIfNeeded();
       int ops = key.interestOps();
       int newOps = add ? ops | update : ops & ~update;
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, channel));
-      key.interestOps(newOps);
+      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
+      if (newOps != ops) key.interestOps(newOps);
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Set the interest ops of a specified selection key.
+   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
+   * @param key the key on which to set the interest operations.
+   * @param update the operations to update on the key.
+   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
+   */
+  public void updateInterestOpsNoWakeup(final SelectionKey key, final int update, final boolean add) {
+    int ops = key.interestOps();
+    int newOps = add ? ops | update : ops & ~update;
+    if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
+    if (newOps != ops) key.interestOps(newOps);
   }
 
   /**
@@ -161,25 +172,21 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     if (traceEnabled) log.trace("transition {} for channel {}", transition, channel);
     lock.lock();
     try {
-      server.getSelector().wakeup();
+      server.wakeUpSelectorIfNeeded();
       synchronized(channel) {
         channel.setInterestOps(0);
         NioContext<S> context = (NioContext<S>) channel.getContext();
         S s1 = context.getState();
         NioTransition<S> t = factory.getTransition(transition);
         S s2 = t.getState();
-        if (s1 != null) {
-          if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
-          else if (traceEnabled) log.trace(getTransitionMessage(s1, s2, t, channel, submit));
-        }
-        if (context.setState(s2)) {
-          if (!submit) {
-            channel.setInterestOps(t.getInterestOps());
-            if (traceEnabled) log.trace("set interestOps={} for channel id={}", t.getInterestOps(), channel.getId());
-          } else {
-            submitTransition(channel);
-            if (traceEnabled) log.trace("submitted transition={} for channel id={}", t, channel.getId());
-          }
+        if (s1 != null) if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
+        else if (traceEnabled) log.trace(getTransitionMessage(s1, s2, t, channel, submit));
+        if (context.setState(s2)) if (!submit) {
+          channel.setInterestOps(t.getInterestOps());
+          if (traceEnabled) log.trace("set interestOps={} for channel id={}", t.getInterestOps(), channel.getId());
+        } else {
+          submitTransition(channel);
+          if (traceEnabled) log.trace("submitted transition={} for channel id={}", t, channel.getId());
         }
       }
     } catch (Exception e) {
@@ -217,7 +224,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     if (sslHandler == null) return false;
     int interestOps = channel.getInterestOps();
     boolean b = (interestOps != channel.getReadyOps()) && (interestOps != 0) && !server.isIdle(channel) &&
-        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
+      ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
     return b;
   }
 
@@ -237,11 +244,19 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
       SSLHandler sslHandler = channel.getContext().getSSLHandler();
       if (sslHandler == null) return false;
       boolean b = (interestOps != readyOps) && (interestOps != 0) && !server.isIdle(channel) &&
-          ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
+        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
       return b;
     } catch (RuntimeException e) {
       log.error(String.format("error for transition=%s, channel=%s, exception=%s", transition, channel, e));
       throw e;
     }
+  }
+
+  /**
+   * Set the state and transition factory associated with the server.
+   * @param factory an instance of {@link NioServerFactory}.
+   */
+  public void setFactory(final NioServerFactory<S, T> factory) {
+    this.factory = factory;
   }
 }

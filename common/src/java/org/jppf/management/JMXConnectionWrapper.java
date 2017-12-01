@@ -73,7 +73,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
         if ((jct = connectionThread.get()) == null) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
-          Thread t = new Thread(jct, CONNECTION_NAME_PREFIX + getId());
+          Thread t = new DebuggableThread(jct, CONNECTION_NAME_PREFIX + getId());
           t.setDaemon(true);
           connectionStart = System.nanoTime();
           t.start();
@@ -139,18 +139,20 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("invoking mbean '%s' method '%s(%s)' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature))));
       return null;
     }
+    /*
     synchronized(this) {
-      Object result = null;
-      try {
-        ObjectName mbeanName = new ObjectName(name);
-        result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-      } catch(IOException e) {
-        String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
-        if (debugEnabled) log.debug(msg);
-        reset();
-      }
-      return result;
     }
+    */
+    Object result = null;
+    try {
+      ObjectName mbeanName = new ObjectName(name);
+      result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+    } catch(IOException e) {
+      String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
+      if (debugEnabled) log.debug(msg);
+      reset();
+    }
+    return result;
   }
 
   /**
@@ -178,18 +180,20 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("getting mbean '%s' attribute '%s' while not connected", name, attribute));
       return null;
     }
+    /*
     synchronized(this) {
-      Object result = null;
-      try {
-        ObjectName mbeanName = new ObjectName(name);
-        result = getMbeanConnection().getAttribute(mbeanName, attribute);
-      } catch(IOException e) {
-        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-        reset();
-        throw e;
-      }
-      return result;
     }
+    */
+    Object result = null;
+    try {
+      ObjectName mbeanName = new ObjectName(name);
+      result = getMbeanConnection().getAttribute(mbeanName, attribute);
+    } catch(IOException e) {
+      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+      reset();
+      throw e;
+    }
+    return result;
   }
 
   /**
@@ -204,15 +208,17 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("setting mbean '%s' attribute '%s' while not connected", name, attribute));
       return;
     }
+    /*
     synchronized(this) {
-      try {
-        ObjectName mbeanName = new ObjectName(name);
-        getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
-      } catch(IOException e) {
-        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-        reset();
-        throw e;
-      }
+    }
+    */
+    try {
+      ObjectName mbeanName = new ObjectName(name);
+      getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
+    } catch(IOException e) {
+      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+      reset();
+      throw e;
     }
   }
 

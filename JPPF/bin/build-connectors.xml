@@ -43,6 +43,7 @@
       <fileset dir="${build}">
         <include name="jppf-client*.jar"/>
         <include name="jppf-common*.jar"/>
+        <include name="jppf-jmxremote-nio*.jar"/>
       </fileset>
     </copy>
     <copy todir="${jca-client}">

@@ -18,15 +18,19 @@
 
 package org.jppf.jmxremote.nio;
 
-import static org.jppf.jmxremote.nio.JMXState.*;
+import static org.jppf.jmxremote.nio.JMXState.RECEIVING_MESSAGE;
+import static org.jppf.jmxremote.message.JMXMessageType.*;
 
-import java.nio.channels.SelectionKey;
+import java.io.IOException;
+import java.nio.channels.*;
 
 import javax.management.*;
 
+import org.jppf.jmxremote.JMXEnvHelper;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.ChannelWrapper;
-import org.slf4j.*;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.Logger;
 
 /**
  * Reads the next message, if any, or the current uncomplete message.
@@ -36,7 +40,7 @@ public class ReceivingMessageState extends JMXNioState {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ReceivingMessageState.class);
+  private static Logger log = LoggingUtils.getLogger(ReceivingMessageState.class, JMXEnvHelper.isAsyncLoggingEnabled());
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -51,33 +55,47 @@ public class ReceivingMessageState extends JMXNioState {
 
   @Override
   public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    JMXContext context = (JMXContext) channel.getContext();
-    if (context.readMessage(channel)) {
-      JMXMessage msg = context.deserializeMessage();
-      context.setMessage(null);
-      if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
-      if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
-      else if (msg instanceof JMXResponse) handleResponse(context, (JMXResponse) msg);
-      else if (msg instanceof JMXNotification) handleNotification(context, (JMXNotification) msg);
+    JMXContext context = ((JMXChannelWrapper) channel).context;
+    ChannelsPair pair = context.getChannels();
+    //if (pair.isClosed() || pair.isClosing()) return null;
+    while (true) {
+      boolean b = false;
+      try {
+        b = context.readMessage(channel);
+      } catch (IOException e) {
+        if (pair.isClosed() || pair.isClosing()) return null;
+        else throw e;
+      }
+      if (b) {
+        JMXMessage msg = context.deserializeMessage();
+        context.setMessage(null);
+        if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
+        if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
+        else if (msg instanceof JMXResponse) handleResponse(context, (JMXResponse) msg);
+        else if (msg instanceof JMXNotification) handleNotification(context, (JMXNotification) msg);
+      } else if (context.byteCount <= 0L) break;
     }
-    return transitionChannel(channel, RECEIVING_MESSAGE, SelectionKey.OP_READ, true);
+    return context.transitionChannel(RECEIVING_MESSAGE, SelectionKey.OP_READ, true);
   }
 
   /**
-   * Handle a received reqUest.
+   * Handle a reqUest received from a client.
    * @param context the JMX nio context.
    * @param request the request to process.
    * @throws Exception if any error occurs.
    */
   private void handleRequest(final JMXContext context, final JMXRequest request) throws Exception {
-    if (debugEnabled) log.debug("handling request = {} on context = {}", request, context);
+    if (debugEnabled) log.debug("handling request = {} from {}", request, context);
     Exception exception = null;
     Object result = null;
     Object[] p = request.getParams();
-    MBeanServer mbs = context.getMbeanServer();
+    MBeanServer mbs = context.getChannels().getMbeanServer();
     try {
       switch(request.getMessageType()) {
         case CONNECT: result = context.getConnectionID();
+          break;
+        case CLOSE: context.getChannels().disableReadWrite();
+          jmxServer.closeConnection(context.getConnectionID(), null);
           break;
         case INVOKE: result = mbs.invoke((ObjectName) p[0], (String) p[1], (Object[]) p[2], (String[]) p[3]);
           break;
@@ -133,8 +151,7 @@ public class ReceivingMessageState extends JMXNioState {
     } catch (Exception e) {
       exception = e;
     }
-    JMXResponse response = new JMXResponse(request.getMessageID(), request.getMessageType(), result, exception);
-    context.getMessageHandler().sendMessage(response);
+    respond(context, request, result, exception);
   }
 
   /**
@@ -155,6 +172,23 @@ public class ReceivingMessageState extends JMXNioState {
    */
   private void handleNotification(final JMXContext context, final JMXNotification jmxNotification) throws Exception {
     if (debugEnabled) log.debug("received notification {} from context = {}", jmxNotification, context);
-    context.getMbeanServerConnection().handleNotification(jmxNotification);
+    context.getChannels().getMbeanServerConnection().handleNotification(jmxNotification);
+  }
+
+  /**
+   * Send the response to the specified request.
+   * @param context the JMX context that received the request.
+   * @param request the request to respond to.
+   * @param result the result of the requets, if any.
+   * @param exception an exception that may have occurred if the request failed.
+   * @throws Exception if any error occurs.
+   */
+  private void respond(final JMXContext context, final JMXRequest request, final Object result, final Exception exception) throws Exception {
+    if (request.getMessageType() == JMXMessageType.CLOSE) {
+      if (exception != null) throw exception;
+    } else {
+      JMXResponse response = new JMXResponse(request.getMessageID(), request.getMessageType(), result, exception);
+      context.getMessageHandler().sendMessage(response);
+    }
   }
 }

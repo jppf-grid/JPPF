@@ -19,25 +19,30 @@
 package org.jppf.jmxremote.nio;
 
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.nio.*;
 
 /**
- * 
+ * One of the 2 pseudo channels associated with a JMX connection.
  * @author Laurent Cohen
  */
 public class JMXChannelWrapper extends AbstractChannelWrapper<Void> {
   /**
    * The associated context.
    */
-  private final JMXContext context;
+  final JMXContext context;
   /**
    * The associated socket channel.
    */
-  private final SocketChannel socketChannel;
+  final SocketChannel socketChannel;
+  /**
+   * Whether this channel was closed.
+   */
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
-   * 
+   * Initialize with the specified context and {@link SocketChannel}.
    * @param context the associated NIO context.
    * @param socketChannel the associated socket channel.
    */
@@ -58,12 +63,24 @@ public class JMXChannelWrapper extends AbstractChannelWrapper<Void> {
   }
 
   @Override
-  public NioContext<?> getContext() {
+  public JMXContext getContext() {
     return context;
   }
 
   @Override
   public SocketChannel getSocketChannel() {
     return socketChannel;
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (closed.compareAndSet(false, true)) {
+      if ((socketChannel != null) && socketChannel.isOpen()) socketChannel.close();
+    }
+  }
+
+  @Override
+  public boolean isOpen() {
+    return !closed.get() && socketChannel.isOpen();
   }
 }

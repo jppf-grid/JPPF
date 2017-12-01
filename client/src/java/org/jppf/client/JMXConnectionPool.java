@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**

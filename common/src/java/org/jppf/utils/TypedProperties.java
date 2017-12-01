@@ -500,6 +500,23 @@ public class TypedProperties extends AbstractTypedProperties {
   }
 
   /**
+   * Determine whether this set of properties contains the specified property.
+   * The lookkup is performed on the property's name first, then on its aliases if the name is not found.
+   * @param property the property to look for.
+   * @return {@code true} if the property or one of its aliases is found, {@code false} otherwise.
+   * @since 5.2
+   */
+  public boolean containsProperty(final JPPFProperty<?> property) {
+    if (getProperty(property.getName()) != null) return true;
+    if (property.getAliases() != null) {
+      for (String name: property.getAliases()) {
+        if (getProperty(name) != null) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Remove the specified predefined parametrized property.
    * @param <T> the type of the property.
    * @param property the property whose value to retrieve.

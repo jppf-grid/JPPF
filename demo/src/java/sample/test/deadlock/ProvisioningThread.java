@@ -24,7 +24,7 @@ import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

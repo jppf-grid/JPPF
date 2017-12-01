@@ -41,7 +41,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   /**
    * The list of buffers that contain the data.
    */
-  private List<JPPFBuffer> list = null;
+  private final List<JPPFBuffer> list;
   /**
    * The current count of bytes read from/written to the underlying file.
    */
@@ -284,6 +284,26 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    */
   public List<JPPFBuffer> getBufferList() {
     return list;
+  }
+
+  /**
+   * Get the buffer at the specified index..
+   * @param n the index of the buffer to get.
+   * @return a list of {@link JPPFBuffer} instances.
+   */
+  public JPPFBuffer getBuffer(final int n) {
+    return list.get(n);
+  }
+
+  /**
+   * Reset the state of this location.
+   * @return this location, for method call chaining.
+   */
+  public MultipleBuffersLocation reset() {
+    count = 0;
+    currentBuffer = null;
+    currentBufferIndex = 0;
+    return this;
   }
 
   @Override

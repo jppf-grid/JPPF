@@ -29,6 +29,7 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;

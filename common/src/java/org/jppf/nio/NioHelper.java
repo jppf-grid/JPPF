@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -100,15 +101,26 @@ public class NioHelper {
    */
   private static ExecutorService initExecutor() {
     int core = NioConstants.THREAD_POOL_SIZE;
-    int queueSize = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_QUEUE_SIZE);
-    long ttl = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_TTL);
-    if (debugEnabled) log.debug(String.format(Locale.US, "creating global executor with core=%,d; queueSize=%,d; ttl=%,d", core, queueSize, ttl));
-    //ThreadPoolExecutor executor = new ThreadPoolExecutor(core, Integer.MAX_VALUE, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JPPF_NIO"));
-    ThreadPoolExecutor executor = new ThreadPoolExecutor(
-      core, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory(NIO_THREAD_NAME_PREFIX));
-    executor.allowCoreThreadTimeOut(false);
-    executor.prestartAllCoreThreads();
-    if (debugEnabled) log.debug(String.format(Locale.US, "globalExecutor: core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", core, queueSize, ttl, executor.getMaximumPoolSize()));
+    String poolType = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_POOL_TYPE);
+    ThreadPoolExecutor tpe = null;
+    ExecutorService executor = null;
+    if ("dynamic".equals(poolType)) {
+      int queueSize = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_QUEUE_SIZE);
+      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      executor = tpe = ConcurrentUtils.newBoundedQueueExecutor(core, queueSize, ttl, NIO_THREAD_NAME_PREFIX);
+      if (debugEnabled) log.debug(String.format(Locale.US, "dynamic globalExecutor: core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", core, queueSize, ttl, tpe.getMaximumPoolSize()));
+    } else if ("sync".equals(poolType)) {
+      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      executor = tpe = ConcurrentUtils.newDirectHandoffExecutor(core, ttl, NIO_THREAD_NAME_PREFIX);
+      if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, tpe.getMaximumPoolSize()));
+    } else if ("jppf".equals(poolType)) {
+      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      executor = ConcurrentUtils.newJPPFThreadPool(core, Integer.MAX_VALUE, ttl, NIO_THREAD_NAME_PREFIX);
+      if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, Integer.MAX_VALUE));
+    } else {
+      executor = tpe = ConcurrentUtils.newFixedExecutor(core, NIO_THREAD_NAME_PREFIX);
+      if (debugEnabled) log.debug(String.format(Locale.US, "fixed globalExecutor: core=%,d; maxSize=%,d", core, tpe.getMaximumPoolSize()));
+    }
     return executor;
   }
 

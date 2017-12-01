@@ -62,8 +62,8 @@ public class JMXNotification extends AbstractJMXMessage {
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("messageID=").append(messageID)
-      .append(", messageType=").append(messageType)
+      .append("messageID=").append(getMessageID())
+      .append(", messageType=").append(getMessageType())
       .append(", listenerIDs=").append(Arrays.asList(listenerIDs))
       .append(", notification=").append(Arrays.asList(notification))
       .append(']').toString();

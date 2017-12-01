@@ -41,7 +41,7 @@ public class OverflowDetectorCallback implements NotifyingStreamCallback {
   public void bytesNotification(final long length) throws IOException {
     sum += length;
     if (sum >= MAX_VALUE) {
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sb = new StringBuilder(100);
       sb.append("stream output exceeds maximum size of Integer.MAX_VALUE, current size=");
       sb.append(sum - length).append(" bytes, about to add ").append(length).append(" bytes");
       throw new SerializationOverflowException(sb.toString());

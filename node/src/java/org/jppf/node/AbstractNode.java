@@ -23,7 +23,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.serialization.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  * Abstract implementation of the {@link Node} interface.

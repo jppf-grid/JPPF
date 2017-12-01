@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**

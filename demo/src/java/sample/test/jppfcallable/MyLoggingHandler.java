@@ -26,6 +26,7 @@ import javax.management.*;
 
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.streams.StreamUtils;
 
 /**

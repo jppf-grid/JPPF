@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.monitoring.data.*;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 
 /**
  *

@@ -22,7 +22,7 @@ import static java.nio.channels.SelectionKey.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  * Wraps a communication channel, no matter what the channel is.

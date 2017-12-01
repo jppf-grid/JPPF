@@ -18,14 +18,16 @@
 
 package org.jppf.jmxremote.message;
 
-import java.nio.channels.SelectionKey;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.*;
+import java.util.concurrent.atomic.*;
 
+import org.jppf.JPPFTimeoutException;
+import org.jppf.jmxremote.JMXEnvHelper;
 import org.jppf.jmxremote.nio.*;
-import org.jppf.nio.*;
-import org.slf4j.*;
+import org.jppf.nio.StateTransitionManager;
+import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
+import org.slf4j.Logger;
 
 /**
  * Handles requests/responses and notifications with a message-based semantics.
@@ -35,15 +37,19 @@ public class JMXMessageHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXMessageHandler.class);
+  private static Logger log = LoggingUtils.getLogger(JMXMessageHandler.class, JMXEnvHelper.isAsyncLoggingEnabled());
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Message ID for receiving a connection ID from the server.
+   */
+  public final static long CONNECTION_MESSAGE_ID = -1;
+  /**
    * Sequence number representing message IDs.
    */
-  private final AtomicLong messageSequence = new AtomicLong(0L);
+  private static final AtomicLong messageSequence = new AtomicLong(0L);
   /**
    * The NIO channels that perform the communication with the server.
    */
@@ -51,18 +57,35 @@ public class JMXMessageHandler {
   /**
    * Mapping of pending requests to their messageID.
    */
-  private final Map<Long, JMXRequest> requestMap = new ConcurrentHashMap<>();
+  private final HashMap<Long, JMXRequest> requestMap = new HashMap<>();
   /**
-   * Reference to the state transition manager.
+   * Request timeout in millis.
    */
-  private static StateTransitionManager<JMXState, JMXTransition> transitionManager = JMXNioServer.getInstance().getTransitionManager();
+  private final long requestTimeout;
+  /**
+   * Whether this handler was closed.
+   */
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * The transition manager.
+   */
+  private final StateTransitionManager<JMXState, JMXTransition> mgr;
+  /**
+   * 
+   */
+  private final JMXRequest connectionRequest;
 
   /**
    * Initialize with the specified pair of reading and writing channels.
    * @param channels the associated pair of reading/writing channels.
+   * @param env environment parameters to use for connector properties.
    */
-  public JMXMessageHandler(final ChannelsPair channels) {
+  public JMXMessageHandler(final ChannelsPair channels, final Map<String, ?> env) {
     this.channels = channels;
+    this.mgr = channels.readingChannel().getContext().getServer().getTransitionManager();
+    this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
+    connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
+    if (connectionRequest != null) putRequest(connectionRequest);
   }
 
   /**
@@ -74,23 +97,52 @@ public class JMXMessageHandler {
 
   /**
    * Send a request and return a response when it arrives.
-   * @param type the type of requets ot send.
+   * @param type the type of request to send.
    * @param params the request's parameters.
-   * @return the result of the requet.
+   * @return the result of the request.
    * @throws Exception if any error occurs.
    */
-  public Object sendRequest(final JMXMessageType type, final Object...params) throws Exception {
-    JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
-    if (debugEnabled) log.debug("sendingRequest {}", request);
-    requestMap.put(request.getMessageID(), request);
-    sendMessage(request);
+  public Object sendRequestWithResponse(final byte type, final Object...params) throws Exception {
+    return receiveResponse(new JMXRequest(messageSequence.incrementAndGet(), type, params), true);
+  }
+
+  /**
+   * Get the connection ID upon startup of a client connection.
+   * @return the connection ID.
+   * @throws Exception if any error occurs.
+   */
+  public String receiveConnectionID() throws Exception {
+    synchronized(connectionRequest) {
+      if (connectionRequest.getResponse() != null) {
+        Object o = connectionRequest.getResponse().getResult();
+        if (o != null) return (String) o;
+      }
+      return (String) receiveResponse(connectionRequest, false);
+    }
+  }
+
+  /**
+   * Wait for a response message form the server.
+   * @param request the request to wat a response for.
+   * @param doSendMessage whether to actually send the message.
+   * @return the result of the request.
+   * @throws Exception if any error occurs.
+   */
+  private Object receiveResponse(final JMXRequest request, final boolean doSendMessage) throws Exception {
+    if (closed.get()) return null;
+    if (debugEnabled) log.debug("sending request {}, channels={}", request, channels);
+    putRequest(request);
     synchronized(request) {
-      request.wait();
+      if (doSendMessage) sendMessage(request);
+      waitForMessage(request);
     }
     JMXResponse response = request.getResponse();
-    if (debugEnabled) log.debug("got response {}", response);
-    if (response.getException() != null) throw response.getException();
-    return response.getResult();
+    if (response != null) {
+      if (debugEnabled) log.debug("got response {}", response);
+      if (response.getException() != null) throw response.getException();
+      return response.getResult();
+    }
+    return null;
   }
 
   /**
@@ -98,15 +150,54 @@ public class JMXMessageHandler {
    * @param response the repsonse to process.
    */
   public void responseReceived(final JMXResponse response) {
-    if (debugEnabled) log.debug("received response {}", response);
-    JMXRequest request = requestMap.remove(response.getMessageID());
+    final JMXRequest request = removeRequest(response.getMessageID());
     if (request != null) {
+      if (debugEnabled) log.debug("received response {}, channels={}", response, channels);
       synchronized(request) {
         request.setResponse(response);
-        request.notify();
+        request.notifyAll();
       }
     } else {
-      log.warn("no matching request for {}", response);
+      log.warn("no matching request for {}, channels={}", response, channels);
+    }
+  }
+
+  /**
+   * Sends the specified message.
+   * @param type the type of request to send.
+   * @param params the request's parameters.
+   * @throws Exception if any error occurs.
+   */
+  public void sendRequestNoResponse(final byte type, final Object...params) throws Exception {
+    if (closed.get()) return;
+    try {
+      JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
+      if (debugEnabled) log.debug("sending request {}, channels={}", request, channels);
+      putRequest(request);
+      synchronized(request) {
+        sendMessage(request);
+        waitForMessage(request);
+      }
+    } catch(JPPFTimeoutException e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    }
+  }
+
+  /**
+   * Called when a request that doesn't require a response is sent.
+   * @param message the request.
+   */
+  public void messageSent(final JMXMessage message) {
+    if (debugEnabled) log.debug("sent request {}, channels={}", message, channels);
+    JMXRequest request = removeRequest(message.getMessageID());
+    if (request == null) {
+      log.warn("no matching request for {}", message);
+    } else if (request != message) {
+      log.warn("message and request do not match, request = {}, message = {}", request, message);
+    }
+    synchronized(message) {
+      message.notifyAll();
     }
   }
 
@@ -116,16 +207,64 @@ public class JMXMessageHandler {
    * @throws Exception if any error occurs.
    */
   public void sendMessage(final JMXMessage message) throws Exception {
-    ChannelWrapper<?> writingChannel = channels.writingChannel();
-    JMXContext context = (JMXContext) writingChannel.getContext();
-    context.offerJmxMessage(message);
-    synchronized(writingChannel) {
-      JMXState state = context.getState();
-      if (debugEnabled) log.debug("writing channel state: {}, context = {}", state, context);
-      if (state == JMXState.IDLE) {
-        context.setState(JMXState.SENDING_MESSAGE);
-        transitionManager.updateInterestOps(writingChannel.getSocketChannel(), SelectionKey.OP_WRITE, true);
+    if (closed.get()) return;
+    if (debugEnabled) log.debug("sending message {}", message);
+    channels.writingChannel().getContext().offerJmxMessage(message);
+    mgr.submit(channels.getWritingTask());
+  }
+
+  /**
+   * Close this message handler.
+   */
+  public void close() {
+    if (closed.compareAndSet(false, true)) {
+      synchronized(requestMap) {
+        for (Map.Entry<Long, JMXRequest> entry: requestMap.entrySet()) {
+          JMXRequest request = entry.getValue();
+          synchronized(request) {
+            request.notifyAll();
+          }
+        }
+        requestMap.clear();
       }
+    }
+  }
+
+  /**
+   * Wait for a call to {@code notify()} on the specified message, for at most the request timeout.
+   * The calling method is assumed to own the request's monitor.
+   * @param request the message to wait on.
+   * @throws JPPFTimeoutException if the timeout was reached before a {@code notify()} was performed.
+   * @throws Exception if any other error occurs.
+   */
+  private void waitForMessage(final JMXRequest request) throws JPPFTimeoutException, Exception {
+    long start = System.nanoTime();
+    request.wait(requestTimeout);
+    if ((System.nanoTime() - start) / 1_000_000L >= requestTimeout) {
+      String text = "exceeded timeout of " + requestTimeout + " ms waiting for " + request + " on " + channels;
+      log.warn(text + ", requests map = {}");
+      throw new JPPFTimeoutException(text);
+    }
+  }
+
+  /**
+   * Put the specified request in the requests map.
+   * @param request the request to add to the map.
+   */
+  private void putRequest(final JMXRequest request) {
+    synchronized(requestMap) {
+      requestMap.put(request.getMessageID(), request);
+    }
+  }
+
+  /**
+   * Put the specified request in the requests map.
+   * @param requestID the id of the request.
+   * @return the request that was removed, or {@link null}.
+   */
+  private JMXRequest removeRequest(final Long requestID) {
+    synchronized(requestMap) {
+      return requestMap.remove(requestID);
     }
   }
 }

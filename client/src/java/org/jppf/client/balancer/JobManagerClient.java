@@ -31,6 +31,7 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

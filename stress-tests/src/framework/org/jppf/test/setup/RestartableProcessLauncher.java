@@ -77,7 +77,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
     super(n, processType);
     this.config = config;
     variables.put("$n", n);
-    variables.put("$scenario_dir", config.getConfigDir().getPath());
+    variables.put("$scenario_dir", config.getConfigDir().getAbsolutePath().replace("\\", "/"));
     variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
     variables.put("$nbDrivers", config.getNbDrivers());
     variables.put("$nbNodes", config.getNbNodes());
@@ -126,7 +126,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
     File templateFile = new File(config.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
     File overrideFile = new File(config.getConfigDir(), override);
-    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getPath(), variables);
+    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
     if (overrideFile.exists()) ConfigurationHelper.overrideConfig(config, overrideFile);
     String path = ConfigurationHelper.createTempConfigFile(config);
     tempFileCache.add(path);

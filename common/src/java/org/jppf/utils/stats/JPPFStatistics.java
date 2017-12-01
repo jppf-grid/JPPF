@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 
 /**
  * Instances of this class hold statistics snapshots.

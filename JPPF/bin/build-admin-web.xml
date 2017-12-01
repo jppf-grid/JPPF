@@ -45,6 +45,7 @@
     <copy todir="${admin-web}/lib" overwrite="true">
       <fileset dir="${build}">
         <include name="jppf-common-${version.number}.jar"/>
+        <include name="jppf-jmxremote-nio-${version.number}.jar"/>
         <include name="jppf-client-${version.number}.jar"/>
         <include name="jppf-admin-${version.number}.jar"/>
       </fileset>

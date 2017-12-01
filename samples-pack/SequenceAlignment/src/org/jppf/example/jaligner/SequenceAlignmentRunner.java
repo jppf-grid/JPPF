@@ -29,6 +29,7 @@ import org.jppf.client.*;
 import org.jppf.node.protocol.*;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 import jaligner.Sequence;

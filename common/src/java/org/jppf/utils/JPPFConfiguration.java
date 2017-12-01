@@ -147,6 +147,17 @@ public final class JPPFConfiguration {
   }
 
   /**
+   * Determine whether the JPPF configuration contains the specified property.
+   * The lookkup is performed on the property's name first, then on its aliases if the name is not found.
+   * @param property the property to look for.
+   * @return {@code true} if the property or one of its aliases is found, {@code false} otherwise.
+   * @since 6.0
+   */
+  public static boolean containsProperty(final JPPFProperty<?> property) {
+    return getProperties().containsProperty(property);
+  }
+
+  /**
    * Reset and reload the JPPF configuration.
    * This allows reloading the configuration from a different source or file
    * (after changing the values of the related system properties for instance).

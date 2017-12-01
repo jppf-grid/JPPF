@@ -33,6 +33,7 @@ import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;

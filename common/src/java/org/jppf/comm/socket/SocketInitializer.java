@@ -28,8 +28,9 @@ public interface SocketInitializer
    * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
    * <code>TimerTask</code> until a specified amount of time has passed.
    * @param socketWrapper the socket wrapper to initialize.
+   * @return whether the initialization was successful.
    */
-  void initializeSocket(SocketWrapper socketWrapper);
+  boolean initializeSocket(SocketWrapper socketWrapper);
 
   /**
    * Close this initializer.

@@ -26,7 +26,8 @@ import org.apache.commons.io.FileUtils;
 import org.jppf.node.NodeRunner;
 import org.jppf.process.*;
 import org.jppf.utils.*;
-import org.jppf.utils.ConcurrentUtils.Condition;
+import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ConcurrentUtils.Condition;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

@@ -25,6 +25,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.NodeSelector;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

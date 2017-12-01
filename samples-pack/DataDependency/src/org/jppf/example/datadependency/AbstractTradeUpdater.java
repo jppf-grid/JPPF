@@ -29,6 +29,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

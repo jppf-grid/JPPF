@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.concurrent;
 
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.*;
+import org.jppf.utils.*;
 
 /**
  * Custom thread factory used mostly to specify the names of created threads.
@@ -208,36 +208,6 @@ public class JPPFThreadFactory implements ThreadFactory {
     @Override
     public void uncaughtException(final Thread t, final Throwable e) {
       System.out.println("exception caught from thread " + t + " :\n" + ExceptionUtils.getStackTrace(e));
-    }
-  }
-
-  /**
-   * A thread that prints out the call stack when {@link #interrupt()} is called.
-   */
-  public static class DebuggableThread extends Thread {
-    /**
-      * Logger for this class.
-      */
-    private static Logger log = LoggerFactory.getLogger(JPPFThreadFactory.DebuggableThread.class);
-    /**
-     * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-     */
-    private static boolean debugEnabled = log.isDebugEnabled();
-
-    /**
-     * Construct this thread.
-     * @param group the thread group owning this thread.
-     * @param target the associate {@code Runnable}.
-     * @param name the name of this thread.
-     */
-    public DebuggableThread(final ThreadGroup group, final Runnable target, final String name) {
-      super(group, target, name);
-    }
-
-    @Override
-    public void interrupt() {
-      if (debugEnabled) log.debug("interrupt() called on {}, call stack:\n{}", this, ExceptionUtils.getCallStack());
-      super.interrupt();
     }
   }
 }

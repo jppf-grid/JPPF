@@ -31,6 +31,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
 

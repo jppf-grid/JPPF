@@ -64,8 +64,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       String msg = String.format("[client: %s] Attempting connection to the task server at %s:%d", name, host, port);
       System.out.println(msg);
       log.info(msg);
-      socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful()) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server", name));
+      if (!socketInitializer.initializeSocket(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server", name));
       if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException(String.format("[%s] Could not reconnect to the JPPF task server due to interceptor failure", name));
       try {
         if (debugEnabled) log.debug("sending JPPF identifier");

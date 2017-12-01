@@ -24,6 +24,7 @@ import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.ComboBoxOption;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

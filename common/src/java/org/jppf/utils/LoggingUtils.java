@@ -18,11 +18,12 @@
 
 package org.jppf.utils;
 
+import org.jppf.utils.concurrent.AsyncLogger;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.slf4j.Logger;
+import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public final class LoggingUtils {
@@ -35,6 +36,17 @@ public final class LoggingUtils {
    * Instanciation not permitted.
    */
   private LoggingUtils() {
+  }
+
+  /**
+   * Create an optionally asynchronous logger.
+   * @param clazz the class whose name is given as the logger name.
+   * @param async whether to create an asynchronous logger.
+   * @return a {@link Logger} instance.
+   */
+  public static Logger getLogger(final Class<?> clazz, final boolean async) {
+    Logger log = LoggerFactory.getLogger(clazz);
+    return async ? new AsyncLogger(log) : log;
   }
 
   /**

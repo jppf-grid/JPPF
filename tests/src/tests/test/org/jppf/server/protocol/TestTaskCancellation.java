@@ -28,6 +28,7 @@ import org.jppf.client.taskwrapper.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 

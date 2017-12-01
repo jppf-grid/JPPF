@@ -51,6 +51,7 @@
   <target name="maven.generate" depends="maven.init">
     <maven.artifacts.module module="${node}" file="node"/>
     <maven.artifacts.module module="${common}" file="common"/>
+    <maven.artifacts.module module="${jmxremote-nio}" file="jmxremote-nio"/>
     <maven.artifacts.module module="${client}" file="client"/>
     <maven.artifacts.module module="${server}" file="server"/>
     <maven.artifacts.module module="${admin}" file="admin"/>

@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;

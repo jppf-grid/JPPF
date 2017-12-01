@@ -122,6 +122,15 @@ public class JPPFBuffer {
   }
 
   /**
+   * Reset this buffer's position to 0.
+   * @return this buffer, for method call chaining.
+   */
+  public JPPFBuffer reset() {
+    pos = 0;
+    return this;
+  }
+
+  /**
    * Transform this buffer into a string using UTF-8 encoding.
    * @return the content of this buffer as a string.
    */

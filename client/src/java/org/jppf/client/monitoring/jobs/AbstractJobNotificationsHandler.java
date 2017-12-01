@@ -26,7 +26,7 @@ import javax.management.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobNotification;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**

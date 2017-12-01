@@ -91,6 +91,6 @@ public class NioConstants {
    * @return the pool size as an int.
    */
   private static int computeNIOPoolSize() {
-    return Math.max(2, JPPFConfiguration.get(TRANSITION_THREAD_POOL_SIZE));
+    return Math.max(2, JPPFConfiguration.get(NIO_THREAD_POOL_SIZE));
   }
 }

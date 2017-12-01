@@ -38,7 +38,7 @@ import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.common.*;
 
 /**
- *
+ * Base class for load-balancer persistence testing, independantly of the configured persistence.
  * @author Laurent Cohen
  */
 public abstract class AbstractDriverLoadBalancerPersistenceTest extends AbstractDatabaseSetup {
@@ -57,8 +57,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
   @After
   public void tearDownInstance() throws Exception {
     try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
-      jmx.connectAndWait(5_000L);
-      boolean b = jmx.isConnected();
+      boolean b = jmx.connectAndWait(5_000L);
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
       if (b) jmx.getLoadBalancerPersistenceManagement().deleteAll();
     }
@@ -128,9 +127,10 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
           assertTrue(nodeAlgos.isEmpty());
         }
       }
+      Thread.sleep(500L);
       List<String> nodes = mgt.listAllChannels();
       assertNotNull(nodes);
-      assertTrue(nodes.isEmpty());
+      assertTrue("nodes should be empty but is " + nodes, nodes.isEmpty());
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }

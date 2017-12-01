@@ -22,6 +22,7 @@ import java.lang.management.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

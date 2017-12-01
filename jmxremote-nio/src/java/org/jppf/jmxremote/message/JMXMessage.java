@@ -34,5 +34,5 @@ public interface JMXMessage extends Serializable {
   /**
    * @return the type of request/response/notification to send.
    */
-  JMXMessageType getMessageType();
+  byte getMessageType();
 }

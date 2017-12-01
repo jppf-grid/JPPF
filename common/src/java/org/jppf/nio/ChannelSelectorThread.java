@@ -19,6 +19,7 @@
 package org.jppf.nio;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

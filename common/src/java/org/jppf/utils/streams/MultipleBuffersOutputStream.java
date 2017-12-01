@@ -89,7 +89,7 @@ public class MultipleBuffersOutputStream extends OutputStream {
     currentBuffer.buffer[currentBuffer.length] = (byte) b;
     currentBuffer.length++;
     totalSize++;
-    if (traceEnabled) log.trace("wrote one byte '" + b + "' to " + this);
+    if (traceEnabled) log.trace("wrote one byte '{}' to {}", b, this);
   }
 
   /**

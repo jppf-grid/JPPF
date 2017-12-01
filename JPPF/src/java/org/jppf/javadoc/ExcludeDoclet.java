@@ -77,7 +77,13 @@ public class ExcludeDoclet {
    * @throws java.io.IOException if an I/O exception occurs while generating the javadoc.
    */
   public static boolean start(final RootDoc root) throws java.io.IOException {
-    return Standard.start((RootDoc) process(root, RootDoc.class));
+    try {
+      System.out.println("root doc = " + root.name());
+      return Standard.start((RootDoc) process(root, RootDoc.class));
+    } catch (IllegalArgumentException e) {
+      System.out.println("IllegalArgumentException for root doc = " + root);
+      throw e;
+    }
   }
 
   /**

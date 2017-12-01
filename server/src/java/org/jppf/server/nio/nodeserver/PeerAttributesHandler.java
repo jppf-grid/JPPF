@@ -26,6 +26,7 @@ import javax.management.*;
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

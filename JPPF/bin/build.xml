@@ -34,6 +34,7 @@
   <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
   <property name="jmxremote"             value="${basedir}/../jmxremote"/>
+  <property name="jmxremote-nio"         value="${basedir}/../jmxremote-nio"/>
   <property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
@@ -265,6 +266,7 @@
       <zipfileset dir="${jmxremote}" prefix="${zip.prefix}/jmxremote" excludes="**/*.zip,**/*.jar"/>
       <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
       <zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
+      <zipfileset dir="${jmxremote-nio}" prefix="${zip.prefix}/jmxremote-nio"/>
       <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
       <zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
       <zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>

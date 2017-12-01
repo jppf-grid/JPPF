@@ -32,6 +32,7 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;

@@ -32,6 +32,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.test.addons.common.AddonSimpleTask;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;

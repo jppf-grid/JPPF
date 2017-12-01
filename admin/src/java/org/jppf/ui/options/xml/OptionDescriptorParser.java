@@ -223,7 +223,7 @@ public class OptionDescriptorParser {
         try {
           is = new URL(desc.source).openStream();
         } catch(Exception e) {
-          if (debugEnabled) log.debug(e.getMessage());
+          if (debugEnabled) log.debug(String.format("node %s, error creating URL from '%s', will try as file:%n%s", node.getNodeName(), desc.source, ExceptionUtils.getStackTrace(e)));
         }
         try {
           if (is == null) is = FileUtils.getFileInputStream(desc.source);

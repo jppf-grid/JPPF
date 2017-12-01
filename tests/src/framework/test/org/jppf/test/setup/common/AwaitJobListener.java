@@ -22,7 +22,7 @@ import static org.jppf.client.event.JobEvent.Type.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  *

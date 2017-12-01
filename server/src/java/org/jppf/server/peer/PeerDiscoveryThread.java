@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

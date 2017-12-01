@@ -25,6 +25,7 @@ import java.util.regex.*;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;

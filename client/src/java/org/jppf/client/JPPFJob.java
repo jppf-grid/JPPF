@@ -30,6 +30,7 @@ import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.slf4j.*;
 
 /**

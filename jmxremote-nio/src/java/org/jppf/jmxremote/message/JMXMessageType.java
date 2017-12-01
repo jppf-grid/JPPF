@@ -24,113 +24,117 @@ import javax.management.*;
  * ENumeration of the possible types of JMX messages.
  * @author Laurent Cohen
  */
-public enum JMXMessageType {
+public class JMXMessageType {
   /**
    * Identifier for the initial handshake of a copnnection.
    */
-  CONNECT,
+  public static final byte CONNECT = 1;
+  /**
+   * Identifier a connection close request. A close request does not expect a response.
+   */
+  public static final byte CLOSE = 2;
   /**
    * Identifier for the method {@link MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)}.
    */
-  ADD_NOTIFICATION_LISTENER,
+  public static final byte ADD_NOTIFICATION_LISTENER = 3;
   /**
    * Identifier for the method {@link MBeanServerConnection#addNotificationListener(ObjectName, ObjectName, NotificationFilter, Object)}.
    */
-  ADD_NOTIFICATION_LISTENER_OBJECTNAME,
+  public static final byte ADD_NOTIFICATION_LISTENER_OBJECTNAME = 4;
   /**
    * Identifier for the method {@link MBeanServerConnection#createMBean(String, ObjectName)}.
    */
-  CREATE_MBEAN,
+  public static final byte CREATE_MBEAN = 5;
   /**
    * Identifier for the method {@link MBeanServerConnection#createMBean(String, ObjectName, Object[], String[])}.
    */
-  CREATE_MBEAN_PARAMS,
+  public static final byte CREATE_MBEAN_PARAMS = 6;
   /**
    * Identifier for the method {@link MBeanServerConnection#createMBean(String, ObjectName, ObjectName)}.
    */
-  CREATE_MBEAN_LOADER,
+  public static final byte CREATE_MBEAN_LOADER = 7;
   /**
    * Identifier for the method {@link MBeanServerConnection#createMBean(String, ObjectName, ObjectName, Object[], String[])}.
    */
-  CREATE_MBEAN_LOADER_PARAMS,
+  public static final byte CREATE_MBEAN_LOADER_PARAMS = 8;
   /**
    * Identifier for the method {@link MBeanServerConnection#getAttribute(ObjectName, String)}.
    */
-  GET_ATTRIBUTE,
+  public static final byte GET_ATTRIBUTE = 9;
   /**
    * Identifier for the method {@link MBeanServerConnection#getAttributes(ObjectName, String[])}.
    */
-  GET_ATTRIBUTES,
+  public static final byte GET_ATTRIBUTES = 10;
   /**
    * Identifier for the method {@link MBeanServerConnection#getDefaultDomain()}.
    */
-  GET_DEFAULT_DOMAIN,
+  public static final byte GET_DEFAULT_DOMAIN = 11;
   /**
    * Identifier for the method {@link MBeanServerConnection#getDomains()}.
    */
-  GET_DOMAINS,
+  public static final byte GET_DOMAINS = 12;
   /**
    * Identifier for the method {@link MBeanServerConnection#getMBeanCount()}.
    */
-  GET_MBEAN_COUNT,
+  public static final byte GET_MBEAN_COUNT = 13;
   /**
    * Identifier for the method {@link MBeanServerConnection#getMBeanInfo(ObjectName)}.
    */
-  GET_MBEAN_INFO,
+  public static final byte GET_MBEAN_INFO = 14;
   /**
    * Identifier for the method {@link MBeanServerConnection#getObjectInstance(ObjectName)}.
    */
-  GET_OBJECT_INSTANCE,
+  public static final byte GET_OBJECT_INSTANCE = 15;
   /**
    * Identifier for the method {@link MBeanServerConnection#invoke(ObjectName, String, Object[], String[])}.
    */
-  INVOKE,
+  public static final byte INVOKE = 16;
   /**
    * Identifier for the method {@link MBeanServerConnection#isInstanceOf(ObjectName, String)}.
    */
-  IS_INSTANCE_OF,
+  public static final byte IS_INSTANCE_OF = 17;
   /**
    * Identifier for the method {@link MBeanServerConnection#isRegistered(ObjectName)}.
    */
-  IS_REGISTERED,
+  public static final byte IS_REGISTERED = 18;
   /**
    * Identifier for the method {@link MBeanServerConnection#queryMBeans(ObjectName, QueryExp)}.
    */
-  QUERY_MBEANS,
+  public static final byte QUERY_MBEANS = 19;
   /**
    * Identifier for the method {@link MBeanServerConnection#queryNames(ObjectName, QueryExp)}.
    */
-  QUERY_NAMES,
+  public static final byte QUERY_NAMES = 20;
   /**
    * Identifier for the method {@link MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener)}.
    */
-  REMOVE_NOTIFICATION_LISTENER,
+  public static final byte REMOVE_NOTIFICATION_LISTENER = 21;
   /**
    *  Identifier for the method {@link MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)}.
    */
-  REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK,
+  public static final byte REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK = 22;
   /**
    * Identifier for the method {@link MBeanServerConnection#removeNotificationListener(ObjectName, ObjectName)}.
    */
-  REMOVE_NOTIFICATION_LISTENER_OBJECTNAME,
+  public static final byte REMOVE_NOTIFICATION_LISTENER_OBJECTNAME = 23;
   /**
    * Identifier for the method {@link MBeanServerConnection#removeNotificationListener(ObjectName, ObjectName, NotificationFilter, Object)}.
    */
-  REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK,
+  public static final byte REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK = 24;
   /**
    * Identifier for the method {@link MBeanServerConnection#setAttribute(ObjectName, Attribute)}.
    */
-  SET_ATTRIBUTE,
+  public static final byte SET_ATTRIBUTE = 25;
   /**
    * Identifier for the method {@link MBeanServerConnection#setAttributes(ObjectName, AttributeList)}.
    */
-  SET_ATTRIBUTES,
+  public static final byte SET_ATTRIBUTES = 26;
   /**
    * Identifier for the method {@link MBeanServerConnection#unregisterMBean(ObjectName)}.
    */
-  UNREGISTER_MBEAN,
+  public static final byte UNREGISTER_MBEAN = 27;
   /**
    * Identifier for a notification.
    */
-  NOTIFICATION
+  public static final byte NOTIFICATION = 28;
 }

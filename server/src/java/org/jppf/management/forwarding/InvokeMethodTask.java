@@ -18,6 +18,9 @@
 
 package org.jppf.management.forwarding;
 
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
@@ -46,24 +49,24 @@ class InvokeMethodTask extends AbstractForwardingTask {
 
   /**
    * Initialize this task.
+   * @param latch .
    * @param context represents the node to which a request is sent.
+   * @param resultMap the results map.
    * @param mbeanName the name of the node MBean to which the request is sent.
    * @param methodName the name of the method to invoke, or the attribute to get or set.
    * @param params the method parameter values.
    * @param signature the types of the method parameters.
    */
-  protected InvokeMethodTask(final AbstractNodeContext context, final String mbeanName, final String methodName, final Object[] params, final String[] signature) {
-    super(context, mbeanName, methodName);
+  protected InvokeMethodTask(final CountDownLatch latch, final AbstractNodeContext context, final Map<String, Object> resultMap, final String mbeanName, final String methodName, final Object[] params, final String[] signature) {
+    super(latch, context, resultMap, mbeanName, methodName);
     this.params = params;
     this.signature = signature;
   }
 
   @Override
-  protected Pair<String, Object> execute() throws Exception {
-    String uuid = context.getUuid();
+  Object execute() throws Exception {
     JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-    if (debugEnabled) log.debug(String.format("invoking %s() on mbean=%s for node=%s with jmx=%s", memberName, mbeanName, uuid, wrapper));
-    Object o = wrapper.invoke(mbeanName, memberName, params, signature);
-    return new Pair<>(uuid, o);
+    if (debugEnabled) log.debug(String.format("invoking %s() on mbean=%s for node=%s with jmx=%s", memberName, mbeanName, context.getUuid(), wrapper));
+    return wrapper.invoke(mbeanName, memberName, params, signature);
   }
 }

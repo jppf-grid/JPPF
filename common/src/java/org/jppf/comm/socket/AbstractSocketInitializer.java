@@ -20,14 +20,13 @@ package org.jppf.comm.socket;
 
 import java.util.Random;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  * Common abstract superclass for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
  */
-public abstract class AbstractSocketInitializer extends ThreadSynchronization implements SocketInitializer
-{
+public abstract class AbstractSocketInitializer extends ThreadSynchronization implements SocketInitializer {
   /**
    * Determines whether any connection attempt succeeded.
    */
@@ -50,8 +49,7 @@ public abstract class AbstractSocketInitializer extends ThreadSynchronization im
    * @return true if this socket initializer has been intentionally closed, false otherwise.
    */
   @Override
-  public boolean isClosed()
-  {
+  public boolean isClosed() {
     return closed;
   }
 
@@ -60,8 +58,7 @@ public abstract class AbstractSocketInitializer extends ThreadSynchronization im
    * @return true if any attempt was successful, false otherwise.
    */
   @Override
-  public boolean isSuccessful()
-  {
+  public boolean isSuccessful() {
     return successful;
   }
 }

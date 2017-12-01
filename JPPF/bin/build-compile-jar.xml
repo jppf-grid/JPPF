@@ -24,6 +24,7 @@ limitations under the License.
 
   <target name="compile" depends="init, i18n" unless="compile.done">
     <compile.module path="${common}"/>
+    <compile.module path="${jmxremote-nio}"/>
     <compile.module path="${node}"/>
     <compile.module path="${client}"/>
     <compile.module path="${admin}"/>
@@ -81,6 +82,7 @@ limitations under the License.
         <fileset dir="${build}">
           <include name="jppf-node-${version.number}.jar"/>
           <include name="jppf-common-${version.number}.jar"/>
+          <include name="jppf-jmxremote-nio-${version.number}.jar"/>
           <include name="jppf-client-${version.number}.jar"/>
           <include name="jppf-admin-${version.number}.jar"/>
           <include name="jppf-server-${version.number}.jar"/>
@@ -92,6 +94,7 @@ limitations under the License.
   <target name="jar" depends="compile" unless="jar.done">
     <jar.module module="node"/>
     <jar.module module="common"/>
+    <jar.module module="jmxremote-nio"/>
     <jar.module module="client"/>
     <jar.module module="admin"/>
     <jar.module module="server"/>
@@ -134,6 +137,7 @@ limitations under the License.
 
   <target name="jar.src" depends="compile" unless="jar.src.done">
     <jar.src.module module="common"/>
+    <jar.src.module module="jmxremote-nio"/>
     <jar.src.module module="node"/>
     <jar.src.module module="admin"/>
     <jar.src.module module="client"/>

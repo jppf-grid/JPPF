@@ -107,8 +107,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
       log.info(msg);
       System.out.println(msg);
     }
-    socketInitializer.initializeSocket(socketClient);
-    if (!socketInitializer.isSuccessful()) throw new ConnectException("could not connect to peer " + cname);
+    if (!socketInitializer.initializeSocket(socketClient)) throw new ConnectException("could not connect to peer " + cname);
     if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException("peer connection denied by interceptor");
     if (debugEnabled) log.debug("Connected to peer {}, sending channel identifier", cname);
     socketClient.writeInt(channelIdentifier);

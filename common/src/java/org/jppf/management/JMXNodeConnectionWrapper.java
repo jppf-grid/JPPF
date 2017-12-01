@@ -75,7 +75,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   @Override
   public JPPFNodeState state() throws Exception {
-    return (JPPFNodeState) invoke(JPPFNodeAdminMBean.MBEAN_NAME,	"state", (Object[]) null, (String[]) null);
+    return (JPPFNodeState) invoke(JPPFNodeAdminMBean.MBEAN_NAME,	"state");
   }
 
   /**
@@ -96,7 +96,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception {
-    return (JPPFSystemInformation) invoke(JPPFNodeAdminMBean.MBEAN_NAME,	"systemInformation", (Object[]) null, (String[]) null);
+    return (JPPFSystemInformation) invoke(JPPFNodeAdminMBean.MBEAN_NAME,	"systemInformation");
   }
 
   /**
@@ -106,7 +106,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void shutdown() throws Exception {
     if (debugEnabled) log.debug("node " + this + " shutdown requested");
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "shutdown", (Object[]) null, (String[]) null);
+    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "shutdown");
   }
 
   /**
@@ -126,7 +126,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void restart() throws Exception {
     if (debugEnabled) log.debug("node " + this + " restart requested");
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "restart", (Object[]) null, (String[]) null);
+    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "restart");
   }
 
   /**
@@ -145,7 +145,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   @Override
   public void resetTaskCounter() throws Exception {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "resetTaskCounter", (Object[]) null, (String[]) null);
+    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "resetTaskCounter");
   }
 
   /**

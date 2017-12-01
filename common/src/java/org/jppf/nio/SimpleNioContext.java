@@ -25,6 +25,11 @@ package org.jppf.nio;
  */
 public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioContext<S> {
   /**
+   * 
+   */
+  public long byteCount;
+
+  /**
    * Read data from a channel.
    * @param wrapper the channel to read the data from.
    * @return true if all the data has been read, false otherwise.
@@ -32,8 +37,14 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (message == null) message = new BaseNioMessage(channel);
-    return message.read();
+    if (message == null) {
+      message = new BaseNioMessage(channel);
+      byteCount = 0L;
+    }
+    byteCount = ((BaseNioMessage) message).channelCount;
+    boolean b = message.read();
+    byteCount = ((BaseNioMessage) message).channelCount - byteCount;
+    return b;
   }
 
   /**
@@ -44,7 +55,9 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    */
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    //if (message == null) message = new BaseNioMessage(sslHandler != null);
-    return message.write();
+    byteCount = ((BaseNioMessage) message).channelCount;
+    boolean b = message.write();
+    byteCount = ((BaseNioMessage) message).channelCount - byteCount;
+    return b;
   }
 }

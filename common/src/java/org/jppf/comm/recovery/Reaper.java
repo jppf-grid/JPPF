@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

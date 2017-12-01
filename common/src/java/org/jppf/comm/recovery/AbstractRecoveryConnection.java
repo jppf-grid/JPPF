@@ -23,6 +23,7 @@ import java.net.SocketTimeoutException;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

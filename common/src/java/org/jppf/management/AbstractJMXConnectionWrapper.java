@@ -30,6 +30,7 @@ import javax.management.remote.generic.GenericConnector;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -142,7 +143,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
     env.put("jmx.remote.x.server.max.threads", 1);
     env.put("jmx.remote.x.client.connection.check.period", 0);
-    env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
+    env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT));
   }
 
   /**
@@ -153,7 +154,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "org.jppf.jmxremote.protocol");
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
     env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
-    env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
+    env.put(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT.getName(), JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT));
   }
 
   /**
@@ -187,7 +188,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     synchronized(connectionLock) {
       if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
       jmxc.connect();
-      connectionThread.get().close();
+      //connectionThread.get().close();
+      connectionThread.get().setStopped(true);
       connectionThread.set(null);
     }
     synchronized(this) {
@@ -285,7 +287,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
         for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
       }
     };
-    new Thread(r, getDisplayName() + " connection notifier").start();
+    //new Thread(r, getDisplayName() + " connection notifier").start();
+    r.run();
   }
 
   /**

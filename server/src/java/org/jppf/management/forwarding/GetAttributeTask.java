@@ -18,9 +18,11 @@
 
 package org.jppf.management.forwarding;
 
-import org.jppf.management.JMXNodeConnectionWrapper;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,20 +40,20 @@ class GetAttributeTask extends AbstractForwardingTask {
 
   /**
    * Initialize this task.
+   * @param latch .
    * @param context represents the node to which a request is sent.
+   * @param resultMap the results map.
    * @param mbeanName the name of the node MBean to which the request is sent.
    * @param attribute the name of the attribute to get.
    */
-  protected GetAttributeTask(final AbstractNodeContext context, final String mbeanName, final String attribute) {
-    super(context, mbeanName, attribute);
+  protected GetAttributeTask(final CountDownLatch latch, final AbstractNodeContext context, final Map<String, Object> resultMap, final String mbeanName, final String attribute) {
+    super(latch, context, resultMap, mbeanName, attribute);
   }
 
   @Override
-  protected Pair<String, Object> execute() throws Exception {
-    String uuid = context.getUuid();
-    JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-    Object o = wrapper.getAttribute(mbeanName, memberName);
-    if (debugEnabled) log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, uuid));
-    return new Pair<>(uuid, o);
+  protected Object execute() throws Exception {
+    Object o = context.getJmxConnection().getAttribute(mbeanName, memberName);
+    if (debugEnabled) log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, context.getUuid()));
+    return o;
   }
 }

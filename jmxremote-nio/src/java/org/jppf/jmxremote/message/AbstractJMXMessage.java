@@ -18,6 +18,8 @@
 
 package org.jppf.jmxremote.message;
 
+import java.io.*;
+
 /**
  * Abstract superclass for all JMX messages.
  * @author Laurent Cohen
@@ -26,18 +28,18 @@ public abstract class AbstractJMXMessage implements JMXMessage {
   /**
    * The message identifier.
    */
-  protected final long messageID;
+  private long messageID;
   /**
    * The type of request to send.
    */
-  protected final JMXMessageType messageType;
+  private byte messageType;
 
   /**
    * Intiialize this message with the specified ID.
    * @param messageID the message ID.
    * @param messageType the type of request.
    */
-  public AbstractJMXMessage(final long messageID, final JMXMessageType messageType) {
+  public AbstractJMXMessage(final long messageID, final byte messageType) {
     this.messageID = messageID;
     this.messageType = messageType;
   }
@@ -48,7 +50,34 @@ public abstract class AbstractJMXMessage implements JMXMessage {
   }
 
   @Override
-  public JMXMessageType getMessageType() {
+  public byte getMessageType() {
     return messageType;
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write this object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.writeByte(messageType);
+    if (messageType != JMXMessageType.CONNECT) {
+      boolean isInt = (messageID <= Integer.MAX_VALUE) && (messageID >= Integer.MIN_VALUE);
+      out.writeBoolean(isInt);
+      if (isInt) out.writeInt((int) messageID);
+      else out.writeLong(messageID);
+    }
+  }
+
+  /**
+   * Reconstitute this object from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    messageType = in.readByte();
+    if (messageType == JMXMessageType.CONNECT) messageID = JMXMessageHandler.CONNECTION_MESSAGE_ID;
+    else messageID = in.readBoolean() ? in.readInt() : in.readLong();
   }
 }

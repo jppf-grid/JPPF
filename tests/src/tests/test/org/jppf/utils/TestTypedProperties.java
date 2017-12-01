@@ -450,9 +450,9 @@ public class TestTypedProperties extends BaseTest {
     assertEquals(11112, props.getInt("driver2.jppf.server.port"));
 
     assertEquals("host1", props.remove(hostProp, "driver1"));
-    assertEquals(11111, (int) props.remove(portProp, "driver1"));
+    assertEquals(Integer.valueOf(11111), props.remove(portProp, "driver1"));
     assertEquals("host2", props.remove(hostProp, "driver2"));
-    assertEquals(11112, (int) props.remove(portProp, "driver2"));
+    assertEquals(Integer.valueOf(11112), props.remove(portProp, "driver2"));
   }
 
   /**

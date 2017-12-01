@@ -33,6 +33,7 @@ import org.jppf.example.common.AbstractFractalConfiguration;
 import org.jppf.node.protocol.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

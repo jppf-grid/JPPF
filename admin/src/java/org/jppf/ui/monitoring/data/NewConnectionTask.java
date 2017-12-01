@@ -25,6 +25,7 @@ import javax.swing.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

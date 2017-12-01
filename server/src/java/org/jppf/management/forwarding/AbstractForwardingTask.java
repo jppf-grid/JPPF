@@ -18,15 +18,15 @@
 
 package org.jppf.management.forwarding;
 
-import java.util.concurrent.Callable;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.utils.Pair;
 
 /**
  * Common super class for all forwrding tasks.
  */
-abstract class AbstractForwardingTask implements Callable<Pair<String, Object>> {
+abstract class AbstractForwardingTask implements Runnable {
   /**
    * Represents the node to which a request is sent.
    */
@@ -39,32 +39,51 @@ abstract class AbstractForwardingTask implements Callable<Pair<String, Object>> 
    * The name of the method to invoke, or the attribute to get or set.
    */
   final String memberName;
+  /**
+   * The results map.
+   */
+  final Map<String, Object> resultMap;
+  /**
+   * 
+   */
+  final CountDownLatch latch;
 
   /**
    * Initialize this task.
+   * @param latch .
    * @param context represents the node to which a request is sent.
+   * @param resultMap the results map.
    * @param mbeanName the name of the node MBean to which the request is sent.
    * @param memberName the name of the method to invoke, or the attribute to get or set.
    */
-  AbstractForwardingTask(final AbstractNodeContext context, final String mbeanName, final String memberName) {
+  AbstractForwardingTask(final CountDownLatch latch, final AbstractNodeContext context, final Map<String, Object> resultMap, final String mbeanName, final String memberName) {
+    this.latch = latch;
     this.context = context;
+    this.resultMap = resultMap;
     this.mbeanName = mbeanName;
     this.memberName = memberName;
   }
 
+
   @Override
-  public Pair<String, Object> call() {
+  public void run() {
+    String uuid = context.getUuid();
+    Object result = null;
     try {
-      return execute();
+      result = execute();
     } catch (Exception e) {
-     return new Pair<String, Object>(context.getUuid(), e);
+      result = e;
     }
+    synchronized(resultMap) {
+      resultMap.put(uuid, result);
+    }
+    latch.countDown();
   }
 
   /**
-   * Executes the request.
-   * @return a pair made of the node uuid and either the request result or an exception that was raised.
+   * Perform a JMX operation.
+   * @return the result of the JMX invocation.
    * @throws Exception if any error occurs.
    */
-  protected abstract Pair<String, Object> execute() throws Exception;
+  abstract Object execute() throws Exception;
 }

@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
@@ -63,8 +64,8 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
           connectionWrapper.performConnection();
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
-        } catch(Exception ignored) {
-          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
+        } catch(Exception e) {
+          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), e);
           goToSleep(10L);
         }
       }

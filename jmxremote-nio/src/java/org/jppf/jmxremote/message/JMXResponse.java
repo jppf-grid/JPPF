@@ -18,6 +18,7 @@
 
 package org.jppf.jmxremote.message;
 
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -33,11 +34,11 @@ public class JMXResponse extends AbstractJMXMessage {
   /**
    * The result of the request.
    */
-  private final Object result;
+  private Object result;
   /**
    * An exception eventually raised when performing the request.
    */
-  private final Exception exception;
+  private Exception exception;
 
   /**
    * Initialize this request with the specified ID, request type and parameters.
@@ -45,7 +46,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param requestType the type of request.
    * @param result the request's result.
    */
-  public JMXResponse(final long messageID, final JMXMessageType requestType, final Object result) {
+  public JMXResponse(final long messageID, final byte requestType, final Object result) {
     this(messageID, requestType, result, null);
   }
 
@@ -55,7 +56,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param requestType the type of request.
    * @param exception an exception eventually raised when performing the request.
    */
-  public JMXResponse(final long messageID, final JMXMessageType requestType, final Exception exception) {
+  public JMXResponse(final long messageID, final byte requestType, final Exception exception) {
     this(messageID, requestType, null, exception);
   }
 
@@ -66,7 +67,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param result the request's result.
    * @param exception an exception eventually raised when performing the request.
    */
-  public JMXResponse(final long messageID, final JMXMessageType requestType, final Object result, final Exception exception) {
+  public JMXResponse(final long messageID, final byte requestType, final Object result, final Exception exception) {
     super(messageID, requestType);
     this.result = result;
     this.exception = exception;
@@ -89,10 +90,34 @@ public class JMXResponse extends AbstractJMXMessage {
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("messageID=").append(messageID)
-      .append(", messageType=").append(messageType)
+      .append("messageID=").append(getMessageID())
+      .append(", messageType=").append(getMessageType())
       .append(", result=").append(Arrays.asList(result))
       .append(", exception=").append(exception)
       .append(']').toString();
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write this object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    boolean hasException = exception != null;
+    out.writeBoolean(hasException);
+    out.writeObject(hasException ? exception : result);
+  }
+
+  /**
+   * Reconstitute this object from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    boolean hasException = in.readBoolean();
+    Object o = in.readObject();
+    if (hasException) exception = (Exception) o;
+    else result = o;
   }
 }

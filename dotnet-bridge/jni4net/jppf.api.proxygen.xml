@@ -124,6 +124,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.location.LocationEventListener"/>
 
   <JavaClass TypeName="org.jppf.management.TaskInformation"/>
+  <JavaClass TypeName="org.jppf.management.AbstractJMXConnectionWrapper"/>
   <JavaClass TypeName="org.jppf.management.JMXConnectionWrapper"/>
   <JavaClass TypeName="org.jppf.management.JMXNodeConnectionWrapper"/>
   <JavaClass TypeName="org.jppf.management.JMXDriverConnectionWrapper"/>

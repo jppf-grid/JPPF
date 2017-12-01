@@ -18,18 +18,19 @@
 
 package org.jppf.jmxremote.nio;
 
+import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.MBeanServer;
+import javax.management.*;
 import javax.net.ssl.*;
 
 import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.*;
-import org.jppf.jmxremote.message.JMXMessageHandler;
+import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.notification.ServerNotificationHandler;
 import org.jppf.nio.*;
 import org.jppf.ssl.*;
@@ -41,7 +42,7 @@ import org.slf4j.*;
  * The NIO server that handles client-side and server-side JMX connections.
  * @author Laurent Cohen
  */
-public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
+public final class JMXNioServer extends NioServer<JMXState, JMXTransition> implements JMXNioServerMBean {
   /**
    * Logger for this class.
    */
@@ -55,9 +56,9 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    */
   private static final JMXNioServer INSTANCE = createInstance();
   /**
-   * Sequence number used to generate connection IDs. 
+   * Sequence number used to generate connection IDs.
    */
-  private final AtomicLong connectionIdSequence = new AtomicLong(0L);
+  private static final AtomicLong connectionIdSequence = new AtomicLong(0L);
   /**
    * Mapping of connections to their connection ID.
    */
@@ -78,6 +79,10 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * Handles server-side notification listeners.
    */
   private final ServerNotificationHandler serverNotificationHandler = new ServerNotificationHandler();
+  /**
+   * The peak number of connections.
+   */
+  private int peakConnections;
 
   /**
    * @throws Exception if any error occurs.
@@ -85,7 +90,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   private JMXNioServer() throws Exception {
     super(JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    //this.selectTimeout = 1L;
+    this.selectTimeout = 1L;
   }
 
   @Override
@@ -99,29 +104,34 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     while (it.hasNext()) {
       SelectionKey key = it.next();
       it.remove();
+      if (!key.isValid()) continue;
       ChannelsPair pair = null;
       try {
-        if (!key.isValid()) continue;
-        if (key.isAcceptable()) doAccept(key);
-        else {
-          SocketChannel socketChannel = (SocketChannel) key.channel();
-          pair = (ChannelsPair) key.attachment();
-          if (key.isReadable()) {
-            transitionManager.updateInterestOps(socketChannel, SelectionKey.OP_READ, false);
-            transitionManager.submitTransition(pair.readingChannel());
-          }
-          if (key.isWritable()) {
-            transitionManager.updateInterestOps(socketChannel, SelectionKey.OP_WRITE, false);
-            transitionManager.submitTransition(pair.writingChannel());
+        pair = (ChannelsPair) key.attachment();
+        if (pair.isClosed()) continue;
+        int ops = 0;
+        boolean readable = key.isReadable(), writable = key.isWritable();
+        if (readable) {
+          if (pair.isClosing()) continue;
+          ops = SelectionKey.OP_READ;
+        }
+        if (writable) ops |= SelectionKey.OP_WRITE;
+        if (ops == 0) continue;
+        transitionManager.updateInterestOpsNoWakeup(key, ops, false);
+        if (readable) transitionManager.submit(pair.getReadingTask());
+        if (writable) transitionManager.submit(pair.getWritingTask());
+      } catch (CancelledKeyException e) {
+        if (pair != null) {
+          if (!pair.isClosing() && !pair.isClosed()) {
+            log.error(e.getMessage(), e);
+            closeConnection(pair.getConnectionID(), e);
           }
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);
         if (pair != null) {
-          JMXContext context = (JMXContext) pair.readingChannel().getContext();
-          context.handleException(context.getChannel(), e);
-        }
-        if (!(key.channel() instanceof ServerSocketChannel)) {
+          closeConnection(pair.getConnectionID(), e);
+        } else if (!(key.channel() instanceof ServerSocketChannel)) {
           try {
             key.channel().close();
           } catch (Exception e2) {
@@ -145,15 +155,18 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     InetAddress addr = serverSocket.getInetAddress();
     String ip = addr.getHostAddress();
     if (addr instanceof Inet6Address) ip =  "[" + ip + "]";
-    //e.g. "jppf://192.168.1.1:12001 2135"
+    //e.g. "jppf://192.168.1.12:12001 2135"
     String connectionID = String.format("%s://%s:%d %d", JMXHelper.JPPF_JMX_PROTOCOL, ip, port, connectionIdSequence.incrementAndGet());
     try {
-      ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false);
+      ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false).setServerSide(true);
       synchronized(mapsLock) {
         channelsByConnectionID.put(connectionID, pair);
+        int n = channelsByConnectionID.size();
+        if (n > peakConnections) peakConnections = n;
         connectionsByServerPort.putValue(port, connectionID);
       }
       ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
+      pair.writingChannel().getContext().getMessageHandler().sendMessage(new JMXResponse(JMXMessageHandler.CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT, connectionID));
       return pair.writingChannel();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -163,27 +176,28 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
 
   /**
    * Create a pair of channels that can be used concurrently for the specified socket channel.
-   * @param env environment parameters to use for TLS properties.
+   * @param env environment parameters to use for connector properties.
    * @param connectionID the server-sde connection ID.
    * @param port the server port that accepted the connection.
    * @param channel the associated socket channel.
    * @param ssl whether the connection is secure.
-   * @param client whether the created channels are client-side (true) or server-side false.
+   * @param client whether the created channels are client-side (true) or server-side (false).
    * @return a {@link ChannelsPair} instance.
    * @throws Exception if any error occurs.
    */
   public ChannelsPair createChannelsPair(final Map<String, ?> env, final String connectionID, final int port, final SocketChannel channel, final boolean ssl, final boolean client) throws Exception {
-    ChannelWrapper<?> readingChannel = createChannel(env, channel, ssl, true);
-    ChannelWrapper<?> writingChannel = createChannel(env, channel, ssl, false);
-    ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel);
-    JMXMessageHandler handler = new JMXMessageHandler(pair);
+    JMXChannelWrapper readingChannel = createChannel(env, channel, ssl, true);
+    JMXChannelWrapper writingChannel = createChannel(env, channel, ssl, false);
+    ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this);
+    JMXMessageHandler handler = new JMXMessageHandler(pair, env);
     MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
-    //if (mbeanServer == null) log.warn("mbean server is null, call stack:\n{}", ExceptionUtils.getCallStack());
-    ((JMXContext) readingChannel.getContext()).setConnectionID(connectionID).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.RECEIVING_MESSAGE);
-    ((JMXContext) writingChannel.getContext()).setConnectionID(connectionID).setServerPort(port).setMessageHandler(handler).setMbeanServer(mbeanServer).setState(JMXState.IDLE);
+    pair.setConnectionID(connectionID).setMbeanServer(mbeanServer).setServerPort(port);
+    readingChannel.context.setMessageHandler(handler).setState(JMXState.RECEIVING_MESSAGE);
+    writingChannel.context.setMessageHandler(handler).setState(JMXState.IDLE);
     lock.lock();
     try {
-      channel.register(selector.wakeup(), SelectionKey.OP_READ, pair);
+      wakeUpSelectorIfNeeded();
+      channel.register(selector, SelectionKey.OP_READ, pair);
     } finally {
       lock.unlock();
     }
@@ -198,12 +212,9 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * @param reading {@code true} to create a reading channel, {@code false} to create a writing channel.
    * @return a new {@link ChannelWrapper} instance.
    */
-  private ChannelWrapper<?> createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading) {
-    JMXContext context = (JMXContext) createNioContext(reading);
-    context.setReading(reading);
-    context.setPeer(false);
+  private JMXChannelWrapper createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading) {
+    JMXContext context = createNioContext(reading);
     JMXChannelWrapper wrapper = new JMXChannelWrapper(context, channel);
-    lock.lock();
     try {
       context.setChannel(wrapper);
       context.setSsl(ssl);
@@ -214,8 +225,6 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     } catch (Exception e) {
       wrapper = null;
       log.error(e.getMessage(), e);
-    } finally {
-      lock.unlock();
     }
     return wrapper;
   }
@@ -228,14 +237,14 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * @return a SSLHandler instance.
    * @throws Exception if any error occurs.
    */
-  SSLHandler configureSSL(final Map<String, ?> env, final ChannelWrapper<?> channelWrapper, final SocketChannel channel) throws Exception {
+  SSLHandler configureSSL(final Map<String, ?> env, final JMXChannelWrapper channelWrapper, final SocketChannel channel) throws Exception {
     SSLHelper2 helper = SSLHelper.getJPPFJMXremoteSSLHelper(env);
     SSLContext sslContext = helper.getSSLContext(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
     SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
     SSLParameters params = helper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
-    JMXContext jmxContext = (JMXContext) channelWrapper.getContext();
+    JMXContext jmxContext = channelWrapper.context;
     SSLHandler sslHandler = new SSLHandler(channelWrapper, engine);
     jmxContext.setSSLHandler(sslHandler);
     return sslHandler;
@@ -246,10 +255,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
   }
 
   @Override
-  public NioContext<JMXState> createNioContext(final Object...params) {
-    JMXContext context = new JMXContext(this);
-    if ((params != null) && (params.length > 0)) context.setReading((Boolean) params[0]);
-    return context;
+  public JMXContext createNioContext(final Object...params) {
+    return new JMXContext(this, (Boolean) params[0]);
   }
 
   @Override
@@ -259,37 +266,55 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
 
   /**
    * Close a connection.
-   * @param channel a <code>SocketChannel</code> that encapsulates the connection.
+   * @param connectionID the id of the connection to close.
+   * @param exception optional exception that caused the connection close.
    * @throws Exception if any error occurs.
    */
-  public void closeConnection(final ChannelWrapper<?> channel) throws Exception {
-    JMXContext context = (JMXContext) channel.getContext();
-    if (debugEnabled) log.debug("closing JMX {} channel {}", context.isReading() ? "reader" : "writer", channel);
-    closeConnection(context.getConnectionID());
+  public void closeConnection(final String connectionID, final Exception exception) throws Exception {
+    closeConnection(connectionID, exception, false);
   }
 
   /**
    * Close a connection.
    * @param connectionID the id of the connection to close.
+   * @param exception optional exception that caused the connection close.
+   * @param clientRequestedClose .
    * @throws Exception if any error occurs.
    */
-  public void closeConnection(final String connectionID) throws Exception {
+  public void closeConnection(final String connectionID, final Exception exception, final boolean clientRequestedClose) throws Exception {
     if (debugEnabled) log.debug("closing JMX channels for connectionID = {}", connectionID);
+    Exception ex = exception;
+    ChannelsPair pair = channelsByConnectionID.get(connectionID);
     try {
-      ChannelsPair pair = channelsByConnectionID.get(connectionID);
       if (pair != null) {
-        ChannelWrapper<?> channel = pair.readingChannel();
-        JMXContext context = (JMXContext) channel.getContext();
-        synchronized(mapsLock) {
-          channelsByConnectionID.remove(connectionID);
-          connectionsByServerPort.removeValue(context.getServerPort(), connectionID);
+        if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
+        pair.requestClose();
+        JMXChannelWrapper channel = pair.readingChannel();
+        JMXContext context = channel.context;
+        context.getMessageHandler().close();
+        if (pair.isServerSide()) {
+          synchronized(mapsLock) {
+            channelsByConnectionID.remove(connectionID);
+            connectionsByServerPort.removeValue(pair.getServerPort(), connectionID);
+          }
         }
-        channel.close();
+        try {
+          pair.close();
+        } catch (Exception e) {
+          if (ex != null) ex = e;
+        }
       }
-      fireNotification(ConnectionEventType.CLOSED, new JMXConnectionStatusEvent(connectionID));
     } catch (Exception e) {
-      fireNotification(ConnectionEventType.FAILED, new JMXConnectionStatusEvent(connectionID, e));
-      throw e;
+      if (ex == null) ex = e;
+    }
+    if ((pair != null) && pair.isServerSide()) {
+      ConnectionEventType type = (ex != null) ? ConnectionEventType.FAILED : ConnectionEventType.CLOSED;
+      try {
+        if (ex != null) fireNotification(type, new JMXConnectionStatusEvent(connectionID, ex));
+        else fireNotification(type, new JMXConnectionStatusEvent(connectionID));
+      } catch (Exception e) {
+        log.error(String.format("error firing %s notification for connectionID=%s, exception=%s:%n%s", type, connectionID, ex, ExceptionUtils.getStackTrace(e))); 
+      }
     }
   }
 
@@ -302,7 +327,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
       for (Map.Entry<String, ChannelsPair> entry: connectionMap.entrySet()) {
         String connectionID = entry.getKey();
         try {
-          closeConnection(connectionID);
+          closeConnection(connectionID, null);
         } catch (Exception e) {
           log.error("error closing connectionID {} : {}", connectionID, ExceptionUtils.getStackTrace(e));
         }
@@ -325,7 +350,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
         connectionIDs = new ArrayList<>(coll);
         for (String connectionID: connectionIDs) {
           try {
-            closeConnection(connectionID);
+            closeConnection(connectionID, null);
           } catch (Exception e) {
             log.error("error closing connectionID " + connectionID, e);
           }
@@ -341,6 +366,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     try {
       JMXNioServer server = new JMXNioServer();
       NioHelper.putServer(JPPFIdentifiers.JMX_REMOTE_CHANNEL, server);
+      ManagementFactory.getPlatformMBeanServer().registerMBean(server, new ObjectName(JMXNioServerMBean.MBEAN_NAME));
       server.start();
       return server;
     } catch (Exception e) {
@@ -390,8 +416,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
     Map<String, JMXMessageHandler> result = new HashMap<>(connectionIDs.size());
     synchronized(mapsLock) {
       for (String connectionID: connectionIDs) {
-        ChannelsPair channels = this.channelsByConnectionID.get(connectionID);
-        if (channels != null) result.put(connectionID, ((JMXContext) channels.readingChannel().getContext()).getMessageHandler());
+        ChannelsPair channels = channelsByConnectionID.get(connectionID);
+        if (channels != null) result.put(connectionID, channels.readingChannel().context.getMessageHandler());
       }
     }
     return result;
@@ -401,7 +427,21 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> {
    * Get the object that handles server-side notification listeners.
    * @return a {@link ServerNotificationHandler} instance.
    */
-  public ServerNotificationHandler getServerNotificationHandler() {
+  ServerNotificationHandler getServerNotificationHandler() {
     return serverNotificationHandler;
+  }
+
+  @Override
+  public String stats() {
+    StringBuilder sb = new StringBuilder();
+    synchronized(mapsLock) {
+      sb.append("nbConnections = ").append(channelsByConnectionID.size()).append('\n');
+      sb.append("peakConnections = ").append(peakConnections).append('\n');
+      sb.append("connectionsByServerPort:");
+      for (Map.Entry<Integer, Collection<String>> entry: connectionsByServerPort.entrySet()) {
+        sb.append("\n  ").append(entry.getKey()).append(" --> ").append(entry.getValue().size());
+      }
+    }
+    return sb.toString();
   }
 }

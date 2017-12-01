@@ -35,35 +35,35 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   /**
    * The current state of the channel this context is associated with.
    */
-  protected S state = null;
+  protected S state;
   /**
    * Uuid of the remote client or node.
    */
-  protected String uuid = null;
+  protected String uuid;
   /**
    * Container for the current message data.
    */
-  protected NioMessage message = null;
+  protected NioMessage message;
   /**
    * The associated channel.
    */
-  protected ChannelWrapper<?> channel = null;
+  protected ChannelWrapper<?> channel;
   /**
    * Unique ID for the corresponding connection on the remote peer.
    */
-  protected String connectionUuid = null;
+  protected String connectionUuid;
   /**
    * The SSL engine associated with the channel.
    */
-  protected SSLHandler sslHandler = null;
+  protected SSLHandler sslHandler;
   /**
    * Determines whether the associated channel is connected to a peer server.
    */
-  protected boolean peer = false;
+  protected boolean peer;
   /**
    * Determines whether the connection was opened on an SSL port.
    */
-  protected boolean ssl = false;
+  protected boolean ssl;
   /**
    * Whether this context is enabled.
    */

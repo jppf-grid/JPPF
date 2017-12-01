@@ -19,10 +19,10 @@
 package org.jppf.utils.pooling;
 
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * A thread-safe, dynamic object pool backed by a {@link ConcurrentLinkedQueue}.
+ * A thread-safe, dynamic object pool backed by a {@link LinkedBlockingQueue}.
  * This pool is designed for maximum throughput, thus its size will grow dynamically,
  * up to maximum concurrent usage.
  * <p>Subclasses that wish to avoid a size too large for the pool may for instance
@@ -37,7 +37,7 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T> {
   /**
    * The pool of objects.
    */
-  protected final Queue<T> queue = new ConcurrentLinkedQueue<>();
+  protected final Queue<T> queue = new LinkedBlockingQueue<>();
 
   @Override
   public T get() {

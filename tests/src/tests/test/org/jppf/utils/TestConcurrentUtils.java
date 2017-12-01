@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 
 import org.jppf.JPPFTimeoutException;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;

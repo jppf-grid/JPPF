@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 
 import org.jppf.job.persistence.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 

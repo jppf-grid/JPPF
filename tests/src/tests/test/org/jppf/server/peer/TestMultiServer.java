@@ -26,6 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.node.policy.Equal;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 

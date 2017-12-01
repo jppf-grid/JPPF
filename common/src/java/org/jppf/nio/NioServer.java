@@ -23,13 +23,14 @@ import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 import javax.net.ssl.*;
 
 import org.jppf.io.IO;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.SynchronizedBoolean;
 import org.slf4j.*;
 
 
@@ -61,7 +62,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Flag indicating that this socket server is closed.
    */
-  private final AtomicBoolean stopped = new AtomicBoolean(false);
+  protected final AtomicBoolean stopped = new AtomicBoolean(false);
   /**
    * The ports this server is listening to.
    */
@@ -103,6 +104,19 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * List of opened server socket channels.
    */
   private final Map<Integer, ServerSocketChannel> servers = new HashMap<>();
+  /**
+   * Whether the selector is currently selecting.
+   */
+  protected final SynchronizedBoolean selecting = new SynchronizedBoolean(false);
+  /**
+   * 
+   */
+  protected final Runnable wakeUpAction = new Runnable() {
+    @Override
+    public void run() {
+      getSelector().wakeup();
+    }
+  };
 
   /**
    * Initialize this server with a specified port number and name.
@@ -112,11 +126,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected NioServer(final int identifier, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.serverName(identifier));
+    setDaemon(true);
     if (debugEnabled) log.debug(String.format("starting %s with identifier=%s and useSSL=%b", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL));
     this.identifier = identifier;
     selector = Selector.open();
-    factory = createFactory();
     transitionManager = new StateTransitionManager<>(this);
+    factory = createFactory();
+    transitionManager.setFactory(factory);
     if (useSSL) createSSLContext();
   }
 
@@ -184,7 +200,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       }
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      //InetSocketAddress addr = new InetSocketAddress(NetworkUtils.getNonLocalHostAddress(), port);
       InetSocketAddress addr = new InetSocketAddress(port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
       server.socket().bind(addr);
@@ -199,7 +214,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       synchronized(servers) {
         lock.lock();
         try {
-          selector.wakeup();
+          wakeUpSelectorIfNeeded();
           server.register(selector, SelectionKey.OP_ACCEPT, map);
         } finally {
           lock.unlock();
@@ -220,9 +235,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     synchronized(servers) {
       server = servers.remove(port);
     }
-    if (server != null) {
-      server.close();
-    }
+    if (server != null) server.close();
   }
 
   /**
@@ -252,17 +265,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public void run() {
     try {
       boolean hasTimeout = selectTimeout > 0L;
+      int n = 0;
       while (!isStopped() && !externalStopCondition()) {
         try {
           lock.lock();
         } finally {
           lock.unlock();
         }
-        int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
+        selecting.set(true);
+        try {
+          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
+        } finally {
+          selecting.set(false);
+        }
         if (n > 0) go(selector.selectedKeys());
       }
     } catch (Throwable t) {
-      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), t);
+      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
     } finally {
       end();
     }
@@ -285,7 +304,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     requestShutdown.set(true);
     try {
       lock.lock();
-      selector.wakeup();
+      wakeUpSelectorIfNeeded();
     } finally {
       lock.unlock();
     }
@@ -357,7 +376,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param params optional parameters.
    * @return a wrapper for the newly registered channel.
    */
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object...params) {
+  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
+    final boolean peer, final Object...params) {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
     NioContext<?> context = createNioContext(params);
     context.setPeer(peer);
@@ -365,7 +385,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     lock.lock();
     try {
       if (sslHandler != null) context.setSSLHandler(sslHandler);
-      SelectionKey selKey = channel.register(selector.wakeup(), 0, context);
+      wakeUpSelectorIfNeeded();
+      SelectionKey selKey = channel.register(selector, 0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       context.setSsl(ssl);
@@ -404,7 +425,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public void end() {
     if (!isStopped()) {
       if (debugEnabled) log.debug("closing server {}", this);
-      setStopped(true);
+      stopped.set(true);
       removeAllConnections();
     }
   }
@@ -417,7 +438,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     lock.lock();
     try {
       try {
-        selector.wakeup();
+        wakeUpSelectorIfNeeded();
         selector.close();
       } catch (Exception e) {
         log.error(e.getMessage(), e);
@@ -445,7 +466,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     List<ChannelWrapper<?>> channels = new ArrayList<>();
     lock.lock();
     try {
-      selector.wakeup();
+      wakeUpSelectorIfNeeded();
       Set<SelectionKey> keySet = selector.keys();
       for (SelectionKey key: keySet) {
         NioContext<?> ctx = (NioContext<?>) key.attachment();
@@ -480,16 +501,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the lock used to synchronize selector operations.
    * @return a <code>ReentrantLock</code> instance.
    */
-  public ReentrantLock getLock() {
+  public Lock getLock() {
     return lock;
-  }
-
-  /**
-   * Set this server in the specified stopped state.
-   * @param stopped true if this server is stopped, false otherwise.
-   */
-  protected void setStopped(final boolean stopped) {
-    this.stopped.set(stopped);
   }
 
   /**
@@ -563,5 +576,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public int getIdentifier() {
     return identifier;
+  }
+
+  /**
+   * @return whether the selector had to be awaken.
+   */
+  public boolean wakeUpSelectorIfNeeded() {
+    return selecting.compareAndRun(true, wakeUpAction);
   }
 }

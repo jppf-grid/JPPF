@@ -18,7 +18,9 @@
 
 package org.jppf.management.forwarding;
 
-import org.jppf.management.JMXNodeConnectionWrapper;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -42,22 +44,22 @@ class SetAttributeTask extends AbstractForwardingTask {
 
   /**
    * Initialize this task.
+   * @param latch .
    * @param context represents the node to which a request is sent.
+   * @param resultMap the results map.
    * @param mbeanName the name of the node MBean to which the request is sent.
    * @param attribute the name of the attribute to set.
    * @param value the value to set on the attribute.
    */
-  SetAttributeTask(final AbstractNodeContext context, final String mbeanName, final String attribute, final Object value) {
-    super(context, mbeanName, attribute);
+  SetAttributeTask(final CountDownLatch latch, final AbstractNodeContext context, final Map<String, Object> resultMap, final String mbeanName, final String attribute, final Object value) {
+    super(latch, context, resultMap, mbeanName, attribute);
     this.value = value;
   }
 
   @Override
   protected Pair<String, Object> execute() throws Exception {
-    String uuid = context.getUuid();
-    JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-    wrapper.setAttribute(mbeanName, memberName, value);
-    if (debugEnabled) log.debug("set attribute '{}' on node {}", memberName, uuid);
+    context.getJmxConnection().setAttribute(mbeanName, memberName, value);
+    if (debugEnabled) log.debug("set attribute '{}' on node {}", memberName, context.getUuid());
     return null;
   }
 }

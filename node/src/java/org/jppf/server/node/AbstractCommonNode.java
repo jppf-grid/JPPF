@@ -26,6 +26,7 @@ import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

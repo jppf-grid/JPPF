@@ -289,8 +289,9 @@ public final class IOHelper {
   public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to memory " + o);
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-    NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
-    ser.serialize(o, nos);
+    //NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
+    //ser.serialize(o, nos);
+    ser.serialize(o, mbos);
     return new MultipleBuffersLocation(mbos.toBufferList(), mbos.size());
   }
 

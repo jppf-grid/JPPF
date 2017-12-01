@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.jppf.io.*;
 import org.jppf.serialization.SerializationUtils;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -39,19 +38,19 @@ public abstract class AbstractNioMessage implements NioMessage {
   /**
    * The current count of bytes sent or received.
    */
-  protected int count = 0;
+  protected int count;
   /**
    * The total length of data to send or receive, used for tracing and debugging purposes only.
    */
-  protected int length = 0;
+  protected int length;
   /**
    * The data location objects abstracting the data to send or receive.
    */
-  protected List<DataLocation> locations = new ArrayList<>();
+  protected final List<DataLocation> locations = new ArrayList<>();
   /**
    * The current position in the list of data locations.
    */
-  protected int position = 0;
+  protected int position;
   /**
    * The number of objects to read or write.
    */
@@ -63,11 +62,11 @@ public abstract class AbstractNioMessage implements NioMessage {
   /**
    * Object storing the length of the object currently being read or written.
    */
-  protected NioObject currentLengthObject = null;
+  protected NioObject currentLengthObject;
   /**
    * Object storing the object currently being read or written.
    */
-  protected NioObject currentObject = null;
+  protected NioObject currentObject;
   /**
    * <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
@@ -87,11 +86,15 @@ public abstract class AbstractNioMessage implements NioMessage {
   /**
    * Temporary holder used as a local performance optimization for write operations.
    */
-  private DataLocation currentDataLocation = null;
+  private DataLocation currentDataLocation;
   /**
    * Actual bytes sent to or received from the underlying channel.
    */
-  protected long channelCount = 0L;
+  protected long channelCount;
+  /**
+   * Reusable buffer for reading/writing serialized object lengths.
+   */
+  protected final MultipleBuffersLocation lengthBuf = new MultipleBuffersLocation(4);
 
   /**
    * Initialize this nio message with the specified sll flag.
@@ -154,7 +157,10 @@ public abstract class AbstractNioMessage implements NioMessage {
    * @throws Exception if an IO error occurs.
    */
   protected boolean readNextObject() throws Exception {
-    if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4);
+    if (currentLengthObject == null) {
+      lengthBuf.reset();
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
+    }
     if (currentLength < 0) {
       try {
         if (!currentLengthObject.read()) return false;
@@ -163,11 +169,8 @@ public abstract class AbstractNioMessage implements NioMessage {
         throw e;
       }
       channelCount += currentLengthObject.getChannelCount();
-      InputStream is = currentLengthObject.getData().getInputStream();
-      try {
+      try (InputStream is = currentLengthObject.getData().getInputStream()) {
         currentLength = SerializationUtils.readInt(is);
-      } finally {
-        StreamUtils.close(is);
       }
       count += 4;
     }
@@ -202,9 +205,8 @@ public abstract class AbstractNioMessage implements NioMessage {
   protected boolean writeNextObject() throws Exception {
     if (currentLengthObject == null) {
       currentDataLocation = locations.get(position);
-      byte[] bytes = SerializationUtils.writeInt(currentDataLocation.getSize());
-      DataLocation dl = new MultipleBuffersLocation(bytes);
-      currentLengthObject = ssl ? new SSLNioObject(dl, sslHandler) : new PlainNioObject(channel, dl);
+      SerializationUtils.writeInt(currentDataLocation.getSize(), lengthBuf.reset().getBuffer(0).buffer, 0);
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
     }
     if (currentLength < 0) {
       try {

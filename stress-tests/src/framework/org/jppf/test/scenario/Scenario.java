@@ -99,12 +99,13 @@ public class Scenario {
     try {
       Map<String, Object> variables = new HashMap<>();
       variables.put("$n", 1);
-      variables.put("$scenario_dir", configDir.getPath());
+      variables.put("$scenario_dir", configDir.getAbsolutePath().replace("\\", "/"));
       variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
       String jppf = doConfigOverride("client.template.properties", "client.properties", variables);
       System.setProperty("jppf.config", jppf);
       String log4j = doConfigOverride("log4j-client.template.properties", "log4j-client.properties", variables);
       URL url = new File(log4j).toURI().toURL();
+      System.out.println("Log4j url = " + url);
       // use reflection to avoid compile-time dependency on log4j lib.
       Class<?> configuratorClass = Class.forName("org.apache.log4j.PropertyConfigurator");
       Method method = configuratorClass.getMethod("configure", URL.class);
@@ -182,7 +183,7 @@ public class Scenario {
   protected String doConfigOverride(final String template, final String override, final Map<String, Object> variables) {
     File templateFile = new File(configuration.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
-    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getPath(), variables);
+    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
     File overrideFile = new File(configuration.getConfigDir(), override);
     if (overrideFile.exists()) ConfigurationHelper.overrideConfig(config, overrideFile);
     String path = ConfigurationHelper.createTempConfigFile(config);

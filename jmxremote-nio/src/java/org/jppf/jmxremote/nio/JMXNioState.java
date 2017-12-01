@@ -29,6 +29,10 @@ abstract class JMXNioState extends NioState<JMXTransition> {
    * The server which handles the channels states and transitions.
    */
   final JMXNioServer jmxServer;
+  /**
+   * The transition manager.
+   */
+  final StateTransitionManager<JMXState, JMXTransition> transitionManager;
 
   /**
    * Initialize with the specified NIO server.
@@ -36,21 +40,6 @@ abstract class JMXNioState extends NioState<JMXTransition> {
    */
   JMXNioState(final JMXNioServer jmxServer) {
     this.jmxServer = jmxServer;
-  }
-
-  /**
-   * Set the spceied state to the channel and prepare it for selection.
-   * @param channel the channel to transition.
-   * @param state the transition to set.
-   * @param updateOps the value to AND-wise update the interest ops with.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   * @return {@code null}.
-   * @throws Exception if any error occurs.
-   */
-  JMXTransition transitionChannel(final ChannelWrapper<?> channel, final JMXState state, final int updateOps, final boolean add) throws Exception {
-    JMXContext context = (JMXContext) channel.getContext();
-    context.setState(state);
-    jmxServer.getTransitionManager().updateInterestOps(channel.getSocketChannel(), updateOps, add);
-    return null;
+    this.transitionManager = jmxServer.getTransitionManager();
   }
 }

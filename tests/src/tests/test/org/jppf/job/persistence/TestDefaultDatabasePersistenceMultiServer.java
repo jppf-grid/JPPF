@@ -32,6 +32,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 

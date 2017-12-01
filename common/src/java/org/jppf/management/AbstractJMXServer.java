@@ -168,6 +168,6 @@ public abstract class AbstractJMXServer implements JMXServer {
       }
     }
     stopped = false;
-    if (debugEnabled) log.debug("JMXConnectorServer started at URL {} after {} tries", url, nbTries);
+    if (debugEnabled) log.debug(String.format("%s started at URL %s after %d tries", getClass().getSimpleName(), url, nbTries));
   }
 }

@@ -25,6 +25,7 @@ import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

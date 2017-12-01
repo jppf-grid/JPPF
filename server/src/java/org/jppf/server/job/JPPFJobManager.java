@@ -30,6 +30,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 

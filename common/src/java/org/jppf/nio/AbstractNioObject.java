@@ -33,7 +33,7 @@ public abstract class AbstractNioObject implements NioObject {
   /**
    * What has currently been read from or written to the message.
    */
-  protected int count = 0;
+  protected int count;
   /**
    * Location of the data to read or write.
    */
@@ -41,7 +41,7 @@ public abstract class AbstractNioObject implements NioObject {
   /**
    * Actual bytes sent to or received from the underlying channel.
    */
-  protected long channelCount = 0L;
+  protected long channelCount;
 
   /**
    * Initialize this NioObject with the specified data location and size.

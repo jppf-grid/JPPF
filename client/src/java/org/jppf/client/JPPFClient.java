@@ -27,6 +27,7 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**

@@ -66,7 +66,7 @@ public class JMXConnectionStatusEvent extends EventObject {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("connectionID=").append(getConnectionID())
-      .append("throwable=").append(throwable)
+      .append(", throwable=").append(throwable)
       .append(']').toString();
   }
 }

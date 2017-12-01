@@ -102,10 +102,10 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   }
 
   /**
-   * Check that there are results for all the expected nodes, and only these ndoes.
+   * Check that there are results for all the expected nodes, and only these nodes.
    * @param result the result to chek.
    * @param expectedClass the expected class of each result value.
-   * @param expectedNodes the list of expectd nodes.
+   * @param expectedNodes the list of expected nodes.
    * @throws Exception if any error occurs or the check fails.
    */
   protected static void checkNodes(final Map<String, Object> result, final Class<?> expectedClass, final String... expectedNodes) throws Exception {
@@ -117,6 +117,26 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
       Object value = result.get(uuid);
       assertNotNull(value);
       assertEquals(expectedClass, value.getClass());
+    }
+  }
+
+  /**
+   * Check that there are null results for all the expected nodes, and only these nodes.
+   * @param result the result to chek.
+   * @param expectedNodes the list of expected nodes.
+   * @throws Exception if any error occurs or the check fails.
+   */
+  protected static void checkNullResults(final Map<String, Object> result, final String... expectedNodes) throws Exception {
+    assertNotNull(result);
+    assertFalse(result.isEmpty());
+    assertEquals(expectedNodes.length, result.size());
+    for (String node: expectedNodes) {
+      assertTrue(result.keySet().contains(node));
+    }
+    for (String uuid : expectedNodes) {
+      assertTrue(result.containsKey(uuid));
+      Object value = result.get(uuid);
+      assertNull(value);
     }
   }
 

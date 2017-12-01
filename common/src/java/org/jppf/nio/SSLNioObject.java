@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 
 import org.jppf.io.*;
+import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -31,8 +32,7 @@ import org.slf4j.*;
  * encapsulated within an instance of {@link SSLHandler}.
  * @author Laurent Cohen
  */
-public class SSLNioObject extends AbstractNioObject
-{
+public class SSLNioObject extends AbstractNioObject {
   /**
    * Logger for this class.
    */
@@ -44,11 +44,11 @@ public class SSLNioObject extends AbstractNioObject
   /**
    * The source from which the data is read.
    */
-  private InputStream is = null;
+  private InputStream is;
   /**
    * The destination to which the data is written.
    */
-  private OutputStream os = null;
+  private OutputStream os;
   /**
    * 
    */
@@ -56,7 +56,7 @@ public class SSLNioObject extends AbstractNioObject
   /**
    * 
    */
-  private int statefulCount = 0;
+  private int statefulCount;
 
   /**
    * Construct this SSLMessage.
@@ -64,9 +64,18 @@ public class SSLNioObject extends AbstractNioObject
    * @param sslHandler the <code>SSLHandler</code> to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final int size, final SSLHandler sslHandler) throws Exception
-  {
+  public SSLNioObject(final int size, final SSLHandler sslHandler) throws Exception {
     this(new MultipleBuffersLocation(size), sslHandler);
+  }
+
+  /**
+   * Construct this SSLMessage.
+   * @param buf the internal buffer.
+   * @param sslHandler the <code>SSLHandler</code> to use with this nio object.
+   * @throws Exception if any error occurs.
+   */
+  public SSLNioObject(final JPPFBuffer buf, final SSLHandler sslHandler) throws Exception {
+    this(new MultipleBuffersLocation(buf), sslHandler);
   }
 
   /**
@@ -75,24 +84,20 @@ public class SSLNioObject extends AbstractNioObject
    * @param sslHandler the <code>SSLHandler</code> to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final DataLocation location, final SSLHandler sslHandler) throws Exception
-  {
+  public SSLNioObject(final DataLocation location, final SSLHandler sslHandler) throws Exception {
     super(location, location.getSize());
     this.sslHandler = sslHandler;
   }
 
   @Override
-  public boolean read() throws Exception
-  {
+  public boolean read() throws Exception {
     if (count >= size) return true;
     ByteBuffer buf = sslHandler.getApplicationReceiveBuffer();
     if (os == null) os = location.getOutputStream();
 
     int n = 0;
-    while (count < size)
-    {
-      if (buf.position() <= 0)
-      {
+    while (count < size) {
+      if (buf.position() <= 0) {
         n = sslHandler.read();
         if (n == 0) return false;
         if (n < 0) throw new EOFException();
@@ -100,7 +105,7 @@ public class SSLNioObject extends AbstractNioObject
       }
       buf.flip();
       if (traceEnabled) log.trace("n1=" + n + ", count=" + count + ", size=" + size + ", buf=" + buf);
-  
+
       n = Math.min(buf.remaining(), size - count);
       os.write(buf.array(), 0, n);
       count += n;
@@ -111,8 +116,7 @@ public class SSLNioObject extends AbstractNioObject
     }
 
     boolean b = count >= size;
-    if (b)
-    {
+    if (b) {
       StreamUtils.close(os, log);
       os = null;
     }
@@ -120,22 +124,18 @@ public class SSLNioObject extends AbstractNioObject
   }
 
   @Override
-  public boolean write() throws Exception
-  {
+  public boolean write() throws Exception {
     if (count >= size) return true;
     ByteBuffer buf = sslHandler.getApplicationSendBuffer();
-    if (is == null)
-    {
+    if (is == null) {
       is = location.getInputStream();
       statefulCount = 0;
     }
     //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-    if (buf.hasRemaining() && (statefulCount < size))
-    {
-      int min = Math.min(size-statefulCount, buf.remaining());
+    if (buf.hasRemaining() && (statefulCount < size)) {
+      int min = Math.min(size - statefulCount, buf.remaining());
       int read = is.read(buf.array(), buf.position(), min);
-      if (read > 0)
-      {
+      if (read > 0) {
         statefulCount += read;
         buf.position(buf.position() + read);
       }
@@ -143,18 +143,15 @@ public class SSLNioObject extends AbstractNioObject
     //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
 
     int n;
-    do
-    {
+    do {
       n = sslHandler.write();
       if (n > 0) count += n;
       sslHandler.flush();
       //if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-    }
-    while (n > 0);
+    } while (n > 0);
 
     boolean b = count >= size;
-    if (b)
-    {
+    if (b) {
       sslHandler.flush();
       buf.clear();
       StreamUtils.close(is, log);

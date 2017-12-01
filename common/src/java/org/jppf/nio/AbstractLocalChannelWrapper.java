@@ -20,7 +20,7 @@ package org.jppf.nio;
 
 import java.nio.channels.SocketChannel;
 
-import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

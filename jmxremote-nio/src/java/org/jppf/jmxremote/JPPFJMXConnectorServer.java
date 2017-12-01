@@ -96,10 +96,11 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public void stop() throws IOException {
     if (!started) return;
     started = false;
+    JMXNioServer server = JMXNioServer.getInstance();
     try {
-      JMXNioServer.getInstance().removeAllConnections(address.getPort());
+      server.removeAllConnections(address.getPort());
     } finally {
-      JMXNioServer.getInstance().removeConnectionStatusListener(this);
+      server.removeConnectionStatusListener(this);
     }
   }
 
@@ -132,12 +133,12 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   @Override
   public void connectionClosed(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection closed event = {}", address, event);
-    connectionOpened(event.getConnectionID(), "connection closed", null);
+    connectionClosed(event.getConnectionID(), "connection closed", null);
   }
 
   @Override
   public void connectionFailed(final JMXConnectionStatusEvent event) {
     if (debugEnabled) log.debug("server @{} connection failed event = {}", address, event);
-    connectionOpened(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
+    connectionFailed(event.getConnectionID(), "connection failed", ExceptionUtils.getStackTrace(event.getThrowable()));
   }
 }

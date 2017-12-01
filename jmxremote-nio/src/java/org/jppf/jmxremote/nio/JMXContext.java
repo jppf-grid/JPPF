@@ -18,19 +18,18 @@
 
 package org.jppf.jmxremote.nio;
 
+import java.nio.channels.SelectionKey;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.management.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.io.*;
-import org.jppf.jmxremote.JPPFMBeanServerConnection;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
 import org.slf4j.*;
 
 /**
- *
+ * Context associated with a {@link JMXChannelWrapper}.
  * @author Laurent Cohen
  */
 public class JMXContext extends SimpleNioContext<JMXState> {
@@ -39,91 +38,55 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private static Logger log = LoggerFactory.getLogger(JMXContext.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  //private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
-   */
-  private boolean reading;
-  /**
    * The last read or written non-serialized JMX message.
    */
   private JMXMessage currentJmxMessage;
   /**
    * The queue of pending messages to send.
    */
-  private final Queue<JMXMessage> pendingJmxMessages = new LinkedBlockingQueue<>();
+  private final Queue<JMXMessage> pendingJmxMessages;
   /**
    * The JMX nio server to use.
    */
   private final JMXNioServer server;
   /**
-   * Server port on which the connection was established.
-   */
-  private int serverPort = -1;
-  /**
    * The object that handles messages correlations.
    */
   private JMXMessageHandler messageHandler;
   /**
-   * The associated MBeanServer (server-side).
+   *
    */
-  private MBeanServer mbeanServer;
+  private AtomicReference<JMXState> stateRef = new AtomicReference<>();
   /**
-   * The associated MBeanServerConnection (clientr-side).
+   * 
    */
-  private JPPFMBeanServerConnection mbeanServerConnection;
+  private SelectionKey selectionKey;
 
   /**
    * Initializewitht he specified server.
    * @param server the JMX nio server to use.
+   * @param reading whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
    */
-  public JMXContext(final JMXNioServer server) {
+  public JMXContext(final JMXNioServer server, final boolean reading) {
     this.server = server;
+    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<JMXMessage>();
+    this.peer = false;
   }
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
     try {
-      server.closeConnection(channel);
+      server.closeConnection(getConnectionID(), exception);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
   /**
-   * @return whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
-   */
-  public boolean isReading() {
-    return reading;
-  }
-
-  /**
-   * Specify whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
-   * @param reading {@code true} for read operations, {@code false} otherwise.
-   * @return this context, for method chaining.
-   */
-  public JMXContext setReading(final boolean reading) {
-    this.reading = reading;
-    return this;
-  }
-
-  /**
    * @return the connection id.
    */
   public String getConnectionID() {
-    return getConnectionUuid();
-  }
-
-  /**
-   * Set the connection id.
-   * @param connectionID the connection id to set.
-   * @return this context, for method chaining.
-   */
-  public JMXContext setConnectionID(final String connectionID) {
-    setConnectionUuid(connectionID);
-    return this;
+    return getMessageHandler().getChannels().getConnectionID();
   }
 
   /**
@@ -148,6 +111,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   public void serializeMessage(final ChannelWrapper<?> channel) throws Exception {
     BaseNioMessage msg = (BaseNioMessage) (message = new BaseNioMessage(channel));
+    byteCount = 0;
     DataLocation dl = IOHelper.serializeData(currentJmxMessage);
     msg.addLocation(dl);
   }
@@ -185,28 +149,24 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   }
 
   /**
-   * @return the server port on which the connection was established.
+   * @return whether there is at least one pending message.
    */
-  public int getServerPort() {
-    return serverPort;
+  public boolean hasQueuedMessage() {
+    return !pendingJmxMessages.isEmpty();
   }
 
   /**
-   * Set the server port on which the connection was established.
-   * @param serverPort the port number.
-   * @return this context, for method chaining.
-   */
-  public JMXContext setServerPort(final int serverPort) {
-    this.serverPort = serverPort;
-    return this;
-  }
-
-  /**
-   *
    * @return the object that handles messages correlations.
    */
   public JMXMessageHandler getMessageHandler() {
     return messageHandler;
+  }
+
+  /**
+   * @return the ChannelsPair this context's channel is a part of.
+   */
+  public ChannelsPair getChannels() {
+    return messageHandler.getChannels();
   }
 
   /**
@@ -219,37 +179,65 @@ public class JMXContext extends SimpleNioContext<JMXState> {
     return this;
   }
 
-  /**
-   * @return the associated MBeanServer (server-side), if any.
-   */
-  public MBeanServer getMbeanServer() {
-    return mbeanServer;
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append(", state=").append(getState());
+    sb.append(", connectionID=").append(messageHandler == null ? "null" : getConnectionID());
+    sb.append(", serverSide=").append(messageHandler == null ? "null" : getChannels().isServerSide());
+    sb.append(", ssl=").append(ssl);
+    if (pendingJmxMessages != null) sb.append(", pendingMessages=").append(pendingJmxMessages.size());
+    return sb.append(']').toString();
+  }
+
+  @Override
+  public JMXState getState() {
+    return stateRef.get();
+  }
+
+  @Override
+  public boolean setState(final JMXState state) {
+    stateRef.set(state);
+    return true;
   }
 
   /**
-   * Set the associated MBeanServer (server-side).
-   * @param mbeanServer a {@link MBeanServer} instance.
-   * @return this context, for method chaining.
+   * Compare the state to the expected one, and set it to the update value only if they are the same.
+   * @param expected the state to compare to.
+   * @param update the state value to update with.
+   * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public JMXContext setMbeanServer(final MBeanServer mbeanServer) {
-    this.mbeanServer = mbeanServer;
-    return this;
+  public boolean compareAndSetState(final JMXState expected, final JMXState update) {
+    return stateRef.compareAndSet(expected, update);
   }
 
   /**
-   * @return the associated MBeanServerConnection (client-side).
+   * Set the spcecified state to the channel and prepare it for selection.
+   * @param state the transition to set.
+   * @param updateOps the value to AND-wise update the interest ops with.
+   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
+   * @return {@code null}.
+   * @throws Exception if any error occurs.
    */
-  public JPPFMBeanServerConnection getMbeanServerConnection() {
-    return mbeanServerConnection;
+  JMXTransition transitionChannel(final JMXState state, final int updateOps, final boolean add) throws Exception {
+    setState(state);
+    server.getTransitionManager().updateInterestOps(getSelectionKey(), updateOps, add);
+    return null;
   }
 
   /**
-   * Set the associated MBeanServerConnection (client-side).
-   * @param mbeanServerConnection the {@link MBeanServerConnection} to set.
-   * @return this context, for method chaining.
+   * @return the JMX nio server to use.
    */
-  public JMXContext setMbeanServerConnection(final JPPFMBeanServerConnection mbeanServerConnection) {
-    this.mbeanServerConnection = mbeanServerConnection;
-    return this;
+  public JMXNioServer getServer() {
+    return server;
+  }
+
+  /**
+   * @return the channel's selection key.
+   */
+  public SelectionKey getSelectionKey() {
+    if (selectionKey == null) selectionKey = getChannel().getSocketChannel().keyFor(server.getSelector());
+    return selectionKey;
   }
 }

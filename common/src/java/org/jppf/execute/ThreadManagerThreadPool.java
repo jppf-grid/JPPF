@@ -20,7 +20,7 @@ package org.jppf.execute;
 
 import java.util.concurrent.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**

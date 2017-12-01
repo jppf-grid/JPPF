@@ -45,10 +45,11 @@ final class JMXNioServerFactory extends NioServerFactory<JMXState, JMXTransition
    */
   @Override
   public Map<JMXState, NioState<JMXTransition>> createStateMap() {
+    JMXNioServer server = (JMXNioServer) this.server;
     Map<JMXState, NioState<JMXTransition>> map = new EnumMap<>(JMXState.class);
-    map.put(SENDING_MESSAGE, new SendingMessageState((JMXNioServer) server));
-    map.put(RECEIVING_MESSAGE, new ReceivingMessageState((JMXNioServer) server));
-    map.put(IDLE, new IdleState((JMXNioServer) server));
+    map.put(SENDING_MESSAGE, new SendingMessageState(server));
+    map.put(RECEIVING_MESSAGE, new ReceivingMessageState(server));
+    map.put(IDLE, new IdleState(server));
     return map;
   }
 

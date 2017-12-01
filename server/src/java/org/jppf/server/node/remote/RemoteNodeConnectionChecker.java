@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.node.AbstractNodeConnectionChecker;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

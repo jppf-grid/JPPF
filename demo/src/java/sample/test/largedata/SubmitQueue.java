@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  * 

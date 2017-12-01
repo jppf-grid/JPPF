@@ -20,11 +20,13 @@ package org.jppf.jmxremote.nio;
 
 import static org.jppf.jmxremote.nio.JMXState.*;
 
-import java.nio.channels.SelectionKey;
+import java.nio.channels.*;
 
-import org.jppf.jmxremote.message.JMXMessage;
+import org.jppf.jmxremote.JMXEnvHelper;
+import org.jppf.jmxremote.message.*;
 import org.jppf.nio.ChannelWrapper;
-import org.slf4j.*;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.Logger;
 
 /**
  * Writes all messages in the channel's context queue, if any, or keep writing the current message.
@@ -34,11 +36,12 @@ public class SendingMessageState extends JMXNioState {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingMessageState.class);
+  private static Logger log = LoggingUtils.getLogger(SendingMessageState.class, JMXEnvHelper.isAsyncLoggingEnabled());
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+
   /**
    *
    * @param server the server which handles the channels states and transitions.
@@ -49,19 +52,29 @@ public class SendingMessageState extends JMXNioState {
 
   @Override
   public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    JMXContext context = (JMXContext) channel.getContext();
-    if (context.getCurrentJmxMessage() == null) {
-      JMXMessage msg = context.pollJmxMessage();
-      if (msg == null) return transitionChannel(channel, IDLE, SelectionKey.OP_WRITE, false);
-      if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
-      context.setCurrentJmxMessage(msg);
-      context.serializeMessage(channel);
+    JMXContext context = ((JMXChannelWrapper) channel).context;
+    while (true) {
+      if (context.getChannels().isClosed()) return null;
+      if (context.getCurrentJmxMessage() == null) {
+        JMXMessage msg = context.pollJmxMessage();
+        if (msg == null) return context.transitionChannel(SENDING_MESSAGE, SelectionKey.OP_WRITE, false);
+        if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
+        context.setCurrentJmxMessage(msg);
+        context.serializeMessage(channel);
+      }
+      if (context.writeMessage(channel)) {
+        JMXMessage msg = context.getCurrentJmxMessage();
+        if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
+        context.setCurrentJmxMessage(null);
+        context.setMessage(null);
+        if (msg.getMessageType() == JMXMessageType.CLOSE) {
+          if (debugEnabled) log.debug("handling CLOSE for context {}", context);
+          context.getMessageHandler().messageSent(msg);
+          return null;
+        }
+      } else if (context.byteCount <= 0L) {
+        return context.transitionChannel(SENDING_MESSAGE, SelectionKey.OP_WRITE, true);
+      }
     }
-    if (context.writeMessage(channel)) {
-      if (debugEnabled) log.debug("fully sent message {} from context {}", context.getCurrentJmxMessage(), context);
-      context.setCurrentJmxMessage(null);
-      context.setMessage(null);
-    }
-    return transitionChannel(channel, SENDING_MESSAGE, SelectionKey.OP_WRITE, true);
   }
 }

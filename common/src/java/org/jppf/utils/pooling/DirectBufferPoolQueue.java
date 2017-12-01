@@ -36,6 +36,7 @@ public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer> {
   @Override
   public void put(final ByteBuffer buffer) {
     buffer.clear();
+    //super.put(buffer);
     queue.offer(buffer);
   }
 }

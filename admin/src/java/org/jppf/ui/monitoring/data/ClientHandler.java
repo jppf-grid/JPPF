@@ -34,6 +34,7 @@ import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
@@ -220,8 +221,8 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * @return an <code>OptionElement</code> instance.
    */
   public synchronized OptionElement getServerListOption() {
-    //return serverListOption;
-    return OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("ServerChooser");
+    OptionElement page =  OptionsHandler.getPage("JPPFAdminTool");
+    return (page == null) ? null : page.findFirstWithName("ServerChooser");
   }
 
   /**

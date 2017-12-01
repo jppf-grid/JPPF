@@ -36,6 +36,7 @@ import org.jppf.example.fractals.mandelbrot.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.monte.media.*;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;

@@ -239,7 +239,8 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       assertEquals(0, state.getNbTasksExecuted());
     }
     result = nodeForwarder.setTaskCounter(selector, 12);
-    checkEmpty(result);
+    System.out.println("testSetTaskCounter() result = " + result);
+    checkNullResults(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
     for (Map.Entry<String, Object> entry : result.entrySet()) {
@@ -247,7 +248,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       assertEquals(12, state.getNbTasksExecuted());
     }
     result = nodeForwarder.setTaskCounter(selector, 0);
-    checkEmpty(result);
+    checkNullResults(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
     for (Map.Entry<String, Object> entry : result.entrySet()) {
@@ -433,14 +434,14 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    */
   private void testSetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
     Map<String, Object> result = nodeForwarder.setDelegationModel(selector, DelegationModel.URL_FIRST);
-    checkEmpty(result);
+    checkNullResults(result, expectedNodes);
     result = nodeForwarder.getDelegationModel(selector);
     checkNodes(result, DelegationModel.class, expectedNodes);
     for (Map.Entry<String, Object> entry : result.entrySet()) {
       assertEquals(DelegationModel.URL_FIRST, entry.getValue());
     }
     result = nodeForwarder.setDelegationModel(selector, DelegationModel.PARENT_FIRST);
-    checkEmpty(result);
+    checkNullResults(result, expectedNodes);
     result = nodeForwarder.getDelegationModel(selector);
     checkNodes(result, DelegationModel.class, expectedNodes);
     for (Map.Entry<String, Object> entry : result.entrySet()) {

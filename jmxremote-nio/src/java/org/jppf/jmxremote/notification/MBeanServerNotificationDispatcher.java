@@ -28,7 +28,8 @@ import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
- *
+ * Instances of this class handle the registration and unregistration of remote notification listeners
+ * and dispatch local notifications to the registered remote notification listeners.
  * @author Laurent Cohen
  */
 public class MBeanServerNotificationDispatcher implements NotificationListener {
@@ -50,7 +51,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
   private final CollectionMap<ObjectName, ServerListenerInfo> listenerMap = new ArrayListHashMap<>();
 
   /**
-   *
+   * Initiamize with the specified MBean server.
    * @param mbeanServer the MBean server whose notifications to dispatch.
    */
   public MBeanServerNotificationDispatcher(final MBeanServer mbeanServer) {
@@ -107,8 +108,9 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
     }
     if (infos != null) {
       CollectionMap<String, Integer> listenersPerConnection = new ArrayListHashMap<>();
-      for (ServerListenerInfo info: infos)
+      for (ServerListenerInfo info: infos) {
         if (info.getFilter().isNotificationEnabled(notification)) listenersPerConnection.putValue(info.getConnectionID(), info.getListenerID());
+      }
       Map<String, JMXMessageHandler> handlersMap = JMXNioServer.getInstance().getMessageHandlers(listenersPerConnection.keySet());
       for (Map.Entry<String, JMXMessageHandler> entry: handlersMap.entrySet()) {
         Collection<Integer> listenerIDs = listenersPerConnection.getValues(entry.getKey());

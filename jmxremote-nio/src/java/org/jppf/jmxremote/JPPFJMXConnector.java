@@ -30,7 +30,7 @@ import javax.security.auth.Subject;
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
-import org.jppf.jmxremote.message.JMXMessageType;
+import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
@@ -88,7 +88,7 @@ public class JPPFJMXConnector implements JMXConnector {
   public void connect(final Map<String, ?> env) throws IOException {
     if (env != null) environment.putAll(env);
     Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
-    secure = (tls != null) && tls;
+    secure = (tls == null) ? false : tls;
     try {
       init();
     } catch (IOException e) {
@@ -110,6 +110,7 @@ public class JPPFJMXConnector implements JMXConnector {
 
   @Override
   public void close() throws IOException {
+    mbsc.close();
   }
 
   @Override
@@ -148,30 +149,29 @@ public class JPPFJMXConnector implements JMXConnector {
    * @throws Exception if an error is raised during initialization.
    */
   private synchronized void init() throws Exception {
+    JMXNioServer server = JMXNioServer.getInstance();
     String host = address.getHost();
     int port = address.getPort();
     SocketChannelClient socketClient =  new SocketChannelClient(host, port, false);
     if (debugEnabled) log.debug("Attempting connection to remote peer at {}", address);
-    SocketInitializer socketInitializer = new SocketInitializerImpl();
-    socketInitializer.initializeSocket(socketClient);
-    if (!socketInitializer.isSuccessful()) throw new ConnectException("could not connect to remote JMX server " + address);
+    SocketInitializerImpl socketInitializer = new SocketInitializerImpl();
+    if (!socketInitializer.initializeSocket(socketClient)) {
+      Exception e = socketInitializer.getLastException();
+      if (e == null) throw new ConnectException("could not connect to remote JMX server " + address);
+      else throw e;
+    }
     if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException("peer connection denied by interceptor");
     if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier", address);
     socketClient.writeInt(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
     if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
     SocketChannel channel = socketClient.getChannel();
-    JMXNioServer server = JMXNioServer.getInstance();
     ChannelsPair pair = server.createChannelsPair(environment, "", port, channel, secure, true);
-    JMXContext readingContext = (JMXContext) pair.readingChannel().getContext();
-    JMXContext writingContext = (JMXContext) pair.writingChannel().getContext();
-    mbsc = new JPPFMBeanServerConnection(readingContext.getMessageHandler());
-    readingContext.setMbeanServerConnection(mbsc);
-    writingContext.setMbeanServerConnection(mbsc);
+    JMXMessageHandler messageHandler = pair.readingChannel().getContext().getMessageHandler();
+    mbsc = new JPPFMBeanServerConnection(messageHandler);
+    pair.setMbeanServerConnection(mbsc);
     if (debugEnabled) log.debug("sending connection request");
-    String connectionID = (String) mbsc.getMessageHandler().sendRequest(JMXMessageType.CONNECT);
-    readingContext.setConnectionID(connectionID);
-    writingContext.setConnectionID(connectionID);
+    String connectionID = mbsc.connect();
+    pair.setConnectionID(connectionID);
     this.connectionID = connectionID;
-    mbsc.setConnectionID(connectionID);
   }
 }

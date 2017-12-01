@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 
 /**
  * Instances of this class act as a NIO selector for local (in-VM) channels.

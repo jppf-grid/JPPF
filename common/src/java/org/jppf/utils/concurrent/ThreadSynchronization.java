@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.concurrent;
 
 /**
  * This class implements a goToSleep and a wakeUp method as wrappers to {@link java.lang.Object#wait() Object.wait()} and

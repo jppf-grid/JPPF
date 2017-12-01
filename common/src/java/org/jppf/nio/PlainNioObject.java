@@ -18,10 +18,8 @@
 
 package org.jppf.nio;
 
-import java.nio.channels.SocketChannel;
-
 import org.jppf.io.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,11 +38,11 @@ public class PlainNioObject extends AbstractNioObject {
   /**
    * Where to read the data from (a socket channel)
    */
-  private InputSource source = null;
+  private InputSource source;
   /**
    * Where to write the data to (a socket channel)
    */
-  private OutputDestination dest = null;
+  private OutputDestination dest;
   /**
    * The channel from which to read or write the data.
    */
@@ -57,6 +55,15 @@ public class PlainNioObject extends AbstractNioObject {
    */
   public PlainNioObject(final ChannelWrapper<?> channel, final int size) {
     this(channel, new MultipleBuffersLocation(size));
+  }
+
+  /**
+   * Initialize this NioObject with the specified channel and size.
+   * @param channel where to read or write the data.
+   * @param buf the internal buffer.
+   */
+  public PlainNioObject(final ChannelWrapper<?> channel, final JPPFBuffer buf) {
+    this(channel, new MultipleBuffersLocation(buf));
   }
 
   /**
@@ -77,10 +84,7 @@ public class PlainNioObject extends AbstractNioObject {
   @Override
   public boolean read() throws Exception {
     if (count >= size) return true;
-    if (source == null) {
-      SocketChannel socketChannel = channel.getSocketChannel();
-      source = new ChannelInputSource(socketChannel);
-    }
+    if (source == null) source = new ChannelInputSource(channel.getSocketChannel());
     int n;
     do {
       n = location.transferFrom(source, false);
@@ -101,10 +105,7 @@ public class PlainNioObject extends AbstractNioObject {
   @Override
   public boolean write() throws Exception {
     if (count >= size) return true;
-    if (dest == null) {
-      SocketChannel socketChannel = channel.getSocketChannel();
-      dest = new ChannelOutputDestination(socketChannel);
-    }
+    if (dest == null) dest = new ChannelOutputDestination(channel.getSocketChannel());
     int n;
     do {
       n = location.transferTo(dest, false);

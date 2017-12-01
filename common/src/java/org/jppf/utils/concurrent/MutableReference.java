@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.concurrent;
 
 /**
  * Holds a mutable object reference witho no locking or synchronization mechanism.

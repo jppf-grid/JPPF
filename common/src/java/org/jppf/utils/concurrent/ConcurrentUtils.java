@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.concurrent;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -165,6 +165,29 @@ public final class ConcurrentUtils {
   }
 
   /**
+   * Wait on the specified monitor for at most the specified tiemout or until the specified condition is fulfilled, waiting by increment of the specified wait time.
+   * @param monitor the monitor to wait on.
+   * @param condition the condition to check.
+   * @param timeout the wait timeout.
+   * @param waitTime the max wait time in the wait loop.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @throws Exception if any error occurs.
+   */
+  public static void waitForMonitor(final Object monitor, final Condition condition, final long timeout, final long waitTime, final boolean throwExceptionOnTImeout) throws Exception {
+    if (monitor == null) throw new IllegalArgumentException("monitor cannot be null");
+    if (waitTime < 0L) throw new IllegalArgumentException("waitTime must be > 0");
+    if (condition == null) return;
+    if (timeout < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    long millis = (timeout > 0L) ? timeout : Long.MAX_VALUE;
+    long elapsed = 0L;
+    final long start = System.nanoTime();
+    synchronized(monitor) {
+      while (!condition.evaluate() && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < millis)) monitor.wait(Math.min(waitTime, Math.max(1, timeout - elapsed)));
+    }
+    if (throwExceptionOnTImeout && (elapsed >= millis)) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", millis));
+  }
+
+  /**
    * This interface represents a condition to evaluate to either {@code true} or {@code false}.
    */
   public static interface Condition {
@@ -173,5 +196,76 @@ public final class ConcurrentUtils {
      * @return {@code true} if the condition is fulfilled, {@code false} otherwise.
      */
     boolean evaluate();
+  }
+
+  /**
+   * Create a pool that directly hands off new tasks, creating new threads as required.
+   * @param coreThreads the number of core threads.
+   * @param ttl the threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ThreadPoolExecutor newDirectHandoffExecutor(final int coreThreads, final long ttl, final String threadNamePrefix) {
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
+    executor.allowCoreThreadTimeOut(false);
+    executor.prestartAllCoreThreads();
+    return executor;
+  }
+
+  /**
+   * Create a pool that directly hands off new tasks, creating new threads as required.
+   * @param coreThreads the number of core threads.
+   * @param maxThreads the maximum number of threads.
+   * @param ttl the threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ThreadPoolExecutor newDirectHandoffExecutor(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, maxThreads, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
+    executor.allowCoreThreadTimeOut(false);
+    executor.prestartAllCoreThreads();
+    return executor;
+  }
+
+  /**
+   * Create a pool that directly hands off new tasks, creating new threads as required.
+   * @param coreThreads the number of core threads.
+   * @param queueSize the size of the bounded queue.
+   * @param ttl the threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ThreadPoolExecutor newBoundedQueueExecutor(final int coreThreads, final int queueSize, final long ttl, final String threadNamePrefix) {
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(
+      coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory(threadNamePrefix));
+    executor.allowCoreThreadTimeOut(false);
+    executor.prestartAllCoreThreads();
+    return executor;
+  }
+
+  /**
+   * Create a fixed-size pool.
+   * @param coreThreads the number of core threads.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ThreadPoolExecutor newFixedExecutor(final int coreThreads, final String threadNamePrefix) {
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
+    executor.allowCoreThreadTimeOut(false);
+    executor.prestartAllCoreThreads();
+    return executor;
+  }
+
+  /**
+   * Create a {@link JPPFThreadPool}.
+   * @param coreThreads the number of core threads.
+   * @param maxThreads the maximum number of threads.
+   * @param ttl the non-core threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link JPPFThreadPool} instance.
+   */
+  public static ExecutorService newJPPFThreadPool(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
+    JPPFThreadPool executor = new JPPFThreadPool(coreThreads, maxThreads, ttl, new JPPFThreadFactory(threadNamePrefix));
+    return executor;
   }
 }

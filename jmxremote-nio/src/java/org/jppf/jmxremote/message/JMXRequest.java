@@ -18,6 +18,7 @@
 
 package org.jppf.jmxremote.message;
 
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -30,9 +31,13 @@ public class JMXRequest extends AbstractJMXMessage {
    */
   private static final long serialVersionUID = 1L;
   /**
+   * 
+   */
+  private static final Object[] NO_PARAMS = {};
+  /**
    * The request's parameters.
    */
-  private final Object[] params;
+  private Object[] params;
   /**
    * The response to this reqquest.
    */
@@ -44,9 +49,9 @@ public class JMXRequest extends AbstractJMXMessage {
    * @param requestType the type of request.
    * @param params the request's parameters.
    */
-  public JMXRequest(final long messageID, final JMXMessageType requestType, final Object... params) {
+  public JMXRequest(final long messageID, final byte requestType, final Object... params) {
     super(messageID, requestType);
-    this.params = params;
+    this.params = (params == null) || (params.length == 0) ? NO_PARAMS : params;
   }
 
   /**
@@ -74,9 +79,37 @@ public class JMXRequest extends AbstractJMXMessage {
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("messageID=").append(messageID)
-      .append(", messageType=").append(messageType)
-      .append(", params=").append(Arrays.asList(params))
+      .append("messageID=").append(getMessageID())
+      .append(", messageType=").append(getMessageType())
+      .append(", params=").append(Arrays.deepToString(params))
       .append(']').toString();
+  }
+
+  /**
+   * Save the state of this object to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write this object. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    int n = params.length;
+    out.writeByte(n);
+    if (n > 0) {
+      for (Object o: params) out.writeObject(o);
+    }
+  }
+
+  /**
+   * Reconstitute this object from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the object. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    int n = in.readByte();
+    if (n <= 0) params = NO_PARAMS;
+    else {
+      params  = new Object[n];
+      for (int i=0; i<n; i++) params[i] = in.readObject();
+    }
   }
 }

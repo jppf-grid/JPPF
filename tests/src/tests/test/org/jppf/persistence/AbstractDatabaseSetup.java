@@ -120,7 +120,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
     if (h2Server != null) {
       // generate sql dump file of the database
       print(false, false, "generating SQL dump");
-      Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "h2dump.log");
+      dumpDatabase("h2dump.log");
       print(false, false, "stopping H2 server");
       h2Server.stop();
       print(false, false, "H2 server stopped, deleting database");
@@ -177,5 +177,14 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
     assertEquals(job.getName(), job2.getName());
     assertEquals(job.getTaskCount(), job2.getTaskCount());
     if (checkResults) assertEquals(job.getResults().size(), job2.getResults().size());
+  }
+
+  /**
+   * Generate a database dump.
+   * @param filepath the path to the dump file.
+   * @throws Exception if any error occurs.
+   */
+  protected static void dumpDatabase(final String filepath) throws Exception {
+    if (h2Server != null) Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", filepath);
   }
 }

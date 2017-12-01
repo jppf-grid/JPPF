@@ -34,6 +34,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;

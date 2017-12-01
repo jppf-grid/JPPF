@@ -44,6 +44,10 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
    * The configuration to use.
    */
   private final TypedProperties config;
+  /**
+   * The last captured exception.
+   */
+  private Exception lastException;
 
   /**
    * Instantiate this SocketInitializer with a specified socket wrapper.
@@ -66,9 +70,9 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
    * @param socketWrapper the socket wrapper to initialize.
    */
   @Override
-  public void initializeSocket(final SocketWrapper socketWrapper) {
+  public boolean initializeSocket(final SocketWrapper socketWrapper) {
     successful = false;
-    if (closed) return;
+    if (closed) return false;
     name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);
@@ -92,10 +96,12 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
         if (traceEnabled) log.trace("{} socket connection successfully opened", name);
       } catch(Exception e) {
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
+        lastException = e;
       }
       if (!successful && !closed) goToSleep(period);
       elapsed = (System.nanoTime() - start) / 1_000_000L;
     }
+    return successful;
   }
 
   @Override
@@ -105,5 +111,13 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
       closed = true;
       wakeUp();
     }
+  }
+
+  /**
+   * Get the last captured exception.
+   * @return the last captured exception, if any, otherwise {@code null}.
+   */
+  public Exception getLastException() {
+    return lastException;
   }
 }

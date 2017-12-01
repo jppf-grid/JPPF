@@ -20,7 +20,7 @@ package sample.test.deadlock;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 

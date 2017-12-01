@@ -152,7 +152,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
-        selector.wakeup();
+        wakeUpSelectorIfNeeded();
         taskQueueChecker.wakeUp();
       }
     });
@@ -364,7 +364,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public void closeNode(final AbstractNodeContext context) {
     lock.lock();
     try {
-      selector.wakeup();
+      wakeUpSelectorIfNeeded();
       if (debugEnabled) log.debug("closing node {}", context);
       if (context != null) context.close();
     } catch (Exception e) {
@@ -446,7 +446,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public void removeAllConnections() {
     lock.lock();
     try {
-      selector.wakeup();
+      wakeUpSelectorIfNeeded();
       if (taskQueueChecker != null) {
         taskQueueChecker.setStopped(true);
         taskQueueChecker.wakeUp();

@@ -27,8 +27,7 @@ import java.io.*;
  * @see org.jppf.utils.streams.NotifyingOutputStream
  * @author Laurent Cohen
  */
-public class NotifyingOutputStream extends OutputStream
-{
+public class NotifyingOutputStream extends OutputStream {
   /**
    * The output stream to which operations are delegated.
    */
@@ -43,8 +42,7 @@ public class NotifyingOutputStream extends OutputStream
    * @param delegate the input stream to which operations are delegated.
    * @param callback the callback to notify of stream operations.
    */
-  public NotifyingOutputStream(final OutputStream delegate, final NotifyingStreamCallback callback)
-  {
+  public NotifyingOutputStream(final OutputStream delegate, final NotifyingStreamCallback callback) {
     if (delegate == null) throw new IllegalArgumentException("output stream cannot be null");
     if (callback == null) throw new IllegalArgumentException("the callback cannot be null");
     this.delegate = delegate;
@@ -52,35 +50,30 @@ public class NotifyingOutputStream extends OutputStream
   }
 
   @Override
-  public void write(final int n) throws IOException
-  {
+  public void write(final int n) throws IOException {
     delegate.write(n);
     callback.bytesNotification(1);
   }
 
   @Override
-  public void write(final byte[] b) throws IOException
-  {
+  public void write(final byte[] b) throws IOException {
     write(b, 0, b.length);
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len) throws IOException
-  {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     delegate.write(b, off, len);
     callback.bytesNotification(len);
   }
 
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     delegate.close();
     super.close();
   }
 
   @Override
-  public void flush() throws IOException
-  {
+  public void flush() throws IOException {
     delegate.flush();
   }
 }

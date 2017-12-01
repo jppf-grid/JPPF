@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JPanel;
 
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.concurrent.JPPFThreadFactory;
 
 /**
  * 
