@@ -174,7 +174,7 @@ public class ExcludeDoclet {
      * @param proxy a dynamic proxy to the element.
      * @return the actual javadoc element to process.
      */
-    private Object unwrap(final Object proxy) {
+    private static Object unwrap(final Object proxy) {
       if (proxy instanceof Proxy) return ((ExcludeHandler) Proxy.getInvocationHandler(proxy)).target;
       return proxy;
     }
