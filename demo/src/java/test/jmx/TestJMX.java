@@ -62,7 +62,7 @@ public class TestJMX {
       System.out.println("waiting till jmx is connected ...");
       while (!driverJmx.isConnected()) Thread.sleep(10L);
       perform3();
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -75,10 +75,10 @@ public class TestJMX {
    */
   @SuppressWarnings("unused")
   private static void perform1() throws Exception {
-    DiagnosticsMBean diag = driverJmx.getDiagnosticsProxy();
-    ThreadDump td = diag.threadDump();
-    StringWriter sw = new StringWriter();
-    HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, "driver " + driverJmx.getDisplayName());
+    final DiagnosticsMBean diag = driverJmx.getDiagnosticsProxy();
+    final ThreadDump td = diag.threadDump();
+    final StringWriter sw = new StringWriter();
+    final HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, "driver " + driverJmx.getDisplayName());
     writer.printThreadDump(td);
     writer.close();
     output("driver thread dump:");
@@ -93,11 +93,11 @@ public class TestJMX {
   @SuppressWarnings("unused")
   private static void perform2() throws Exception {
     Thread.sleep(500L);
-    NodeNotificationListener listener = new NodeNotificationListener();
-    String listenerID = driverJmx.registerForwardingNotificationListener(new AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
-    JPPFJob job = new JPPFJob();
+    final NodeNotificationListener listener = new NodeNotificationListener();
+    final String listenerID = driverJmx.registerForwardingNotificationListener(new AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+    final JPPFJob job = new JPPFJob();
     for (int i = 0; i < 5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i + 1));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     Thread.sleep(500L);
     driverJmx.unregisterForwardingNotificationListener(listenerID);
     Thread.sleep(500L);
@@ -108,17 +108,17 @@ public class TestJMX {
    * @throws Exception if any error occurs.
    */
   private static void perform3() throws Exception {
-    int nbJobs = 10;
-    int nbTasks = 100;
+    final int nbJobs = 10;
+    final int nbTasks = 100;
     for (int i = 0; i < nbJobs; i++) {
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName("job" + (i + 1));
       for (int j = 0; j < nbTasks; j++) {
-        Task<String> task = new LongTask(100L);
+        final Task<String> task = new LongTask(100L);
         task.setTimeoutSchedule(new JPPFSchedule(50L));
         job.add(task).setId(String.valueOf(j + 1));
       }
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       output(job.getName() + " : received " + results.size() + " results");
     }
   }
@@ -149,10 +149,10 @@ public class TestJMX {
     public void handleNotification(final Notification notification, final Object handback) {
       try {
         System.out.println("received notification " + notification);
-        JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
+        final JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
         System.out.println("nodeUuid=" + notif.getNodeUuid() + ", mBeanName='" + notif.getMBeanName() + "', inner notification=" + notif.getNotification());
         notifs.add(notification);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (exception == null) exception = e;
       }
     }

@@ -46,7 +46,7 @@ public final class ConsoleOutputRedirector {
     try {
       System.setOut(new RedirectPrintStream(outStream, consoleOut));
       System.setErr(new RedirectPrintStream(errStream, consoleErr));
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       t.printStackTrace(consoleErr);
     }
   }
@@ -71,11 +71,11 @@ public final class ConsoleOutputRedirector {
    * the second is the error output.
    */
   public static String[] endRedirect() {
-    String[] output = new String[2];
+    final String[] output = new String[2];
     try {
-      ByteArrayOutputStream out = outStream.get();
+      final ByteArrayOutputStream out = outStream.get();
       output[0] = (out == null) ? null : new String(out.toByteArray());
-      ByteArrayOutputStream err = errStream.get();
+      final ByteArrayOutputStream err = errStream.get();
       output[1] = (err == null) ? null : new String(err.toByteArray());
     } finally {
       outStream.remove();
@@ -90,12 +90,12 @@ public final class ConsoleOutputRedirector {
   private static class ThreadLocalOutputStream extends ThreadLocal<ByteArrayOutputStream> {
     @Override
     public void remove() {
-      OutputStream out = get();
+      final OutputStream out = get();
       if (out != null) {
         try {
           set(null);
           out.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace(consoleErr);
         }
       }
@@ -131,22 +131,22 @@ public final class ConsoleOutputRedirector {
 
     @Override
     public void write(final int b) {
-      OutputStream out = tlos.get();
+      final OutputStream out = tlos.get();
       try {
         if (out != null) out.write(b);
         else defaultStream.write(b);
-      } catch(IOException e) {
+      } catch(final IOException e) {
         e.printStackTrace(defaultStream);
       }
     }
 
     @Override
     public void write(final byte[] buf, final int off, final int len) {
-      OutputStream out = tlos.get();
+      final OutputStream out = tlos.get();
       try {
         if (out != null) out.write(buf, off, len);
         else defaultStream.write(buf, off, len);
-      } catch(IOException e) {
+      } catch(final IOException e) {
         e.printStackTrace(defaultStream);
       }
     }

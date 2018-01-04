@@ -35,9 +35,9 @@ public class StatsTest {
    * @param args not used.
    */
   public static void main(final String[] args) {
-    int nbJobs = 1000, tasksPerJob = 1000, nbSlaves = 0;
-    long duration = 1L;
-    Random rand = new Random(System.nanoTime());
+    final int nbJobs = 1000, tasksPerJob = 1000, nbSlaves = 0;
+    final long duration = 1L;
+    final Random rand = new Random(System.nanoTime());
     JMXDriverConnectionWrapper jmx = null;
     JPPFClient client  = null;
     boolean reproduced = false;
@@ -45,17 +45,17 @@ public class StatsTest {
     try {
       while (!reproduced) {
         count++;
-        int stopAfter = 50 + rand.nextInt(50);
+        final int stopAfter = 50 + rand.nextInt(50);
         System.out.printf("Iteration %d, stop after %d jobs%n", count, stopAfter);
         client  = new JPPFClient();
         if (jmx == null) {
-          JMXDriverConnectionWrapper tmp = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+          final JMXDriverConnectionWrapper tmp = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
           jmx = new JMXDriverConnectionWrapper(tmp.getHost(), tmp.getPort());
           jmx.connectAndWait(5000L);
         }
         if (nbSlaves >= 0) doProvisioning(client, nbSlaves);
         for (int i=1; i<= nbJobs; i++) {
-          JPPFJob job = new JPPFJob();
+          final JPPFJob job = new JPPFJob();
           job.setName("test " + i);
           job.setBlocking(false);
           for (int j=0; j<tasksPerJob; j++) job.add(new MyTask(duration));
@@ -65,8 +65,8 @@ public class StatsTest {
             client.close();
             client = null;
             Thread.sleep(500L);
-            JPPFStatistics stats = jmx.statistics();
-            JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
+            final JPPFStatistics stats = jmx.statistics();
+            final JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
             System.out.printf("stats after job %d: %s%n", i, snapshot);
             if (snapshot.getLatest() != 0d) reproduced = true;
             break;
@@ -77,7 +77,7 @@ public class StatsTest {
       }
       if (client != null) client.close();
       if (jmx != null) jmx.close();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -90,7 +90,7 @@ public class StatsTest {
    */
   private static void doProvisioning(final JPPFClient client, final int nbSlaves) throws Exception {
     System.out.printf("provisioning %d slaves%n", nbSlaves);
-    JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     jmx.getNodeForwarder().provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
   }
@@ -111,9 +111,9 @@ public class StatsTest {
     public void run() {
       try {
         Thread.sleep(duration);
-      } catch (RuntimeException e) {
+      } catch (final RuntimeException e) {
         throw e;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException(e);
       }
     }

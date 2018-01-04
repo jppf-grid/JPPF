@@ -82,10 +82,10 @@ public class AwaitTaskNotificationListener implements NotificationListener {
 
   @Override
   public synchronized void handleNotification(final Notification notification, final Object handback) {
-    JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
-    TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
+    final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+    final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     if (!actualNotif.isUserNotification()) return;
-    String data = (String) actualNotif.getUserData();
+    final String data = (String) actualNotif.getUserData();
     if (data.startsWith(expectedMessage)) {
       count++;
       System.out.printf("received notification %s, count=%d%n", data, count);

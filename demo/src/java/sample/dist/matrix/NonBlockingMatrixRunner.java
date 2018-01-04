@@ -31,8 +31,7 @@ import org.slf4j.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class NonBlockingMatrixRunner extends JobListenerAdapter
-{
+public class NonBlockingMatrixRunner extends JobListenerAdapter {
   /**
    * Logger for this class.
    */
@@ -60,22 +59,18 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
-      TypedProperties props = JPPFConfiguration.getProperties();
-      int size = props.getInt("matrix.size",300);
-      int iterations = props.getInt("matrix.iterations",10);
-      System.out.println("Running Matrix demo with matrix size = "+size+ '*' + size + " for " + iterations + " iterations");
-      NonBlockingMatrixRunner runner = new NonBlockingMatrixRunner();
+      final TypedProperties props = JPPFConfiguration.getProperties();
+      final int size = props.getInt("matrix.size", 300);
+      final int iterations = props.getInt("matrix.iterations", 10);
+      System.out.println("Running Matrix demo with matrix size = " + size + '*' + size + " for " + iterations + " iterations");
+      final NonBlockingMatrixRunner runner = new NonBlockingMatrixRunner();
       runner.perform(size, iterations);
       jppfClient.close();
       System.exit(0);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -87,52 +82,46 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
    * @param iterations the number of times the multiplication will be performed.
    * @throws JPPFException if an error is raised during the execution.
    */
-  public synchronized void perform(final int size, final int iterations) throws JPPFException
-  {
-    try
-    {
+  public synchronized void perform(final int size, final int iterations) throws JPPFException {
+    try {
       // initialize the 2 matrices to multiply
-      Matrix a = new Matrix(size);
+      final Matrix a = new Matrix(size);
       a.assignRandomValues();
-      Matrix b = new Matrix(size);
+      final Matrix b = new Matrix(size);
       b.assignRandomValues();
 
       // perform "iteration" times
-      for (int iter=0; iter<iterations; iter++)
-      {
+      for (int iter = 0; iter < iterations; iter++) {
         count = 0;
         resultMap.clear();
         nbTasks = size;
-        long start = System.nanoTime();
+        final long start = System.nanoTime();
         // create a task for each row in matrix a
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName("non-blocking matrix sample");
-        for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
+        for (int i = 0; i < size; i++) job.add(new MatrixTask(a.getRow(i)));
         // create a data provider to share matrix b among all tasks
         job.setDataProvider(new MemoryMapDataProvider());
         job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
         // submit the tasks for execution
         jppfClient.submitJob(job);
         waitForResults();
-        List<Task<?>> results = new ArrayList<>();
-        for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
+        final List<Task<?>> results = new ArrayList<>();
+        for (final Map.Entry<Integer, Task<?>> entry: resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
-        Matrix c = new Matrix(size);
+        final Matrix c = new Matrix(size);
         // Get the matrix values from the tasks results
-        for (int i=0; i<results.size(); i++)
-        {
-          MatrixTask matrixTask = (MatrixTask) results.get(i);
-          double[] row = (double[]) matrixTask.getResult();
-          for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
+        for (int i = 0; i < results.size(); i++) {
+          final MatrixTask matrixTask = (MatrixTask) results.get(i);
+          final double[] row = (double[]) matrixTask.getResult();
+          for (int j = 0; j < row.length; j++) c.setValueAt(i, j, row[j]);
         }
-        long elapsed = (System.nanoTime() - start) / 1_000_000L;
-        System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+        final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+        System.out.println("Iteration #" + (iter + 1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
-      JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
-      if (stats != null) System.out.println("End statistics :\n"+stats.toString());
-    }
-    catch(Exception e)
-    {
+      final JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
+      if (stats != null) System.out.println("End statistics :\n" + stats.toString());
+    } catch (final Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }
@@ -142,11 +131,10 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
    * @param event notification that a set of tasks results have been received.
    */
   @Override
-  public synchronized void jobReturned(final JobEvent event)
-  {
-    List<Task<?>> tasks = event.getJobTasks();
+  public synchronized void jobReturned(final JobEvent event) {
+    final List<Task<?>> tasks = event.getJobTasks();
     System.out.println("Received results for " + tasks.size() + " tasks ");
-    for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
+    for (final Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     count += tasks.size();
     notify();
   }
@@ -154,16 +142,11 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
   /**
    * Wait until all results of a request have been collected.
    */
-  private synchronized void waitForResults()
-  {
-    while (count < nbTasks)
-    {
-      try
-      {
+  private synchronized void waitForResults() {
+    while (count < nbTasks) {
+      try {
         wait();
-      }
-      catch(InterruptedException e)
-      {
+      } catch (final InterruptedException e) {
         e.printStackTrace();
       }
     }

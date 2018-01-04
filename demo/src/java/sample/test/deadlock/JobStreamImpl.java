@@ -52,16 +52,16 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
 
   @Override
   protected JPPFJob createNextJob() {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("streaming job " + getJobCount());
     if (options.callback != null) options.callback.jobCreated(job);
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
-        String message = "this is task " + i;
-        MyTask task = new MyTask(message, options.taskOptions);
+        final String message = "this is task " + i;
+        final MyTask task = new MyTask(message, options.taskOptions);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     return job;

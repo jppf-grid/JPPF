@@ -41,12 +41,12 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
    * @throws Throwable .
    */
   public static void main(final String[] args) throws Throwable {
-    long start = System.nanoTime();
-    try (JPPFClient client = new JPPFClient(new ConnectionPerformance())) {
+    final long start = System.nanoTime();
+    try (final JPPFClient client = new JPPFClient(new ConnectionPerformance())) {
       client.awaitActiveConnectionPool();
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.printf("done in %,d ms%n", elapsed);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     StreamUtils.waitKeyPressed();
@@ -55,16 +55,16 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
 
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
-    long time = System.nanoTime();
-    JPPFClientConnection connection = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+    final long time = System.nanoTime();
+    final JPPFClientConnection connection = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+    final JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
     ConnectionInfo info = map.get(connection.getConnectionUuid());
     if (info == null) {
       info = new ConnectionInfo();
       info.connection = connection;
       map.put(connection.getConnectionUuid(), info);
     }
-    long elapsed = (time - info.lastStatusTime) / 1_000_000L;
+    final long elapsed = (time - info.lastStatusTime) / 1_000_000L;
     info.lastStatusTime = time;
     if (status == JPPFClientConnectionStatus.ACTIVE) System.out.printf("connection %s connected in %,d ms%n", connection, elapsed);
     else if (status != JPPFClientConnectionStatus.NEW) System.out.printf("connection %s time since previous status: %,d ms%n", connection, elapsed);

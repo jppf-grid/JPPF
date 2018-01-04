@@ -33,8 +33,7 @@ import org.jppf.utils.ExceptionUtils;
  * This task simply prints a message.
  * @author Laurent Cohen
  */
-public class JBossTask extends CommandLineTask<Object>
-{
+public class JBossTask extends CommandLineTask<Object> {
   /**
    * The location of the JBoss root installation.
    */
@@ -49,8 +48,7 @@ public class JBossTask extends CommandLineTask<Object>
    * @param jbossHome the location of the JBoss root installation.
    * @param serverConfig the JBoss server configuration to use.
    */
-  public JBossTask(final String jbossHome, final String serverConfig)
-  {
+  public JBossTask(final String jbossHome, final String serverConfig) {
     this.jbossHome = jbossHome;
     this.serverConfig = serverConfig;
   }
@@ -60,58 +58,46 @@ public class JBossTask extends CommandLineTask<Object>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     jbossHome = jbossHome.replace("\\", "/");
-    while (jbossHome.endsWith("/")) jbossHome = jbossHome.substring(0, jbossHome.length()-1);
-    String[] args = {
-        "-server", "-Xms128M", "-Xmx1024M", "-XX:MaxPermSize=256M",
-        "-Dprogram.name=run.bat", "-Dsun.rmi.dgc.client.gcInterval=3600000",
-        "-Dsun.rmi.dgc.server.gcInterval=3600000", "-Dorg.jboss.resolver.warning=true",
-        "-Djava.endorsed.dirs=" + jbossHome + "/lib/endorsed",
-        "-classpath", jbossHome + "/bin/run.jar",
-        "org.jboss.Main", "-c", serverConfig
-    };
+    while (jbossHome.endsWith("/")) jbossHome = jbossHome.substring(0, jbossHome.length() - 1);
+    final String[] args = { "-server", "-Xms128M", "-Xmx1024M", "-XX:MaxPermSize=256M", "-Dprogram.name=run.bat", "-Dsun.rmi.dgc.client.gcInterval=3600000", "-Dsun.rmi.dgc.server.gcInterval=3600000",
+      "-Dorg.jboss.resolver.warning=true", "-Djava.endorsed.dirs=" + jbossHome + "/lib/endorsed", "-classpath", jbossHome + "/bin/run.jar", "org.jboss.Main", "-c", serverConfig };
     // build invocation of java executable
-    StringBuilder javaCmd = new StringBuilder(System.getProperty("java.home").replace("\\", "/"));
-    if (javaCmd.charAt(javaCmd.length()-1) != '/') javaCmd.append('/');
+    final StringBuilder javaCmd = new StringBuilder(System.getProperty("java.home").replace("\\", "/"));
+    if (javaCmd.charAt(javaCmd.length() - 1) != '/') javaCmd.append('/');
     javaCmd.append("bin/java");
-    List<String> command = new ArrayList<>();
+    final List<String> command = new ArrayList<>();
     command.add(javaCmd.toString());
     command.addAll(Arrays.asList(args));
     setCommandList(command);
 
-    Map<String, String> rawEnv = new HashMap<>();
+    final Map<String, String> rawEnv = new HashMap<>();
     rawEnv.put("JBOSS_CLASSPATH", jbossHome + "/bin/run.jar");
     rawEnv.put("JBOSS_ENDORSED_DIRS", jbossHome + "/lib/endorsed");
-    rawEnv.put("JBOSS_HOME", jbossHome );
+    rawEnv.put("JBOSS_HOME", jbossHome);
     rawEnv.put("RUN_CLASSPATH", jbossHome + "/bin/run.jar");
     rawEnv.put("RUN_CONF", jbossHome + "/bin/run.conf.bat");
     rawEnv.put("RUNJAR", jbossHome + "/bin/run.jar");
-    Map<String, String> env = new HashMap<>();
-    String sep = System.getProperty("file.separator");
-    for (Map.Entry<String, String> entry: rawEnv.entrySet()) env.put(entry.getKey(), entry.getValue().replace("/", sep));
+    final Map<String, String> env = new HashMap<>();
+    final String sep = System.getProperty("file.separator");
+    for (final Map.Entry<String, String> entry: rawEnv.entrySet()) env.put(entry.getKey(), entry.getValue().replace("/", sep));
     rawEnv.clear();
     setEnv(env);
 
     setStartDir(jbossHome + "/bin/");
     setCaptureOutput(true);
-    try
-    {
-      int n = launchProcess();
-      String s = "process ended with exit code " + n;
+    try {
+      final int n = launchProcess();
+      final String s = "process ended with exit code " + n;
       System.out.println(s);
       setResult(s);
-    }
-    catch (@SuppressWarnings("unused") InterruptedException e)
-    {
+    } catch (@SuppressWarnings("unused") final InterruptedException e) {
       // this excception is normally raised when the task
       // is cancelled from a separate thread so it's considered "normal"
       System.out.println("this task has been cancelled");
       //setResult("this task has been cancelled");
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
       e.printStackTrace();
     }
@@ -122,9 +108,8 @@ public class JBossTask extends CommandLineTask<Object>
    * @param event a chunk of standard output wrapped as a {@link ProcessWrapperEvent}.
    */
   @Override
-  public void outputStreamAltered(final ProcessWrapperEvent event)
-  {
-    String s = event.getContent();
+  public void outputStreamAltered(final ProcessWrapperEvent event) {
+    final String s = event.getContent();
     if (s == null) return;
     System.out.print(s);
   }
@@ -134,9 +119,8 @@ public class JBossTask extends CommandLineTask<Object>
    * @param event a chunk of error output wrapped as a {@link ProcessWrapperEvent}.
    */
   @Override
-  public void errorStreamAltered(final ProcessWrapperEvent event)
-  {
-    String s = event.getContent();
+  public void errorStreamAltered(final ProcessWrapperEvent event) {
+    final String s = event.getContent();
     if (s == null) return;
     System.err.print(s);
   }
@@ -148,34 +132,29 @@ public class JBossTask extends CommandLineTask<Object>
    * the JBoss process.
    */
   @Override
-  public void onCancel()
-  {
-    try
-    {
-      AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
-      URL[] urls = cl.getURLs();
+  public void onCancel() {
+    try {
+      final AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
+      final URL[] urls = cl.getURLs();
       boolean found = false;
       // is shutdown.jar already in the classpath ?
-      for (URL url: urls)
-      {
-        if (url.toString().indexOf("shutdown.jar") >= 0)
-        {
+      for (URL url: urls) {
+        if (url.toString().indexOf("shutdown.jar") >= 0) {
           found = true;
           break;
         }
       }
       // if not let's add it dynamically
-      if (!found)
-      {
+      if (!found) {
         File file = new File(jbossHome + "/bin/shutdown.jar");
         cl.addURL(file.toURI().toURL());
         file = new File(jbossHome + "/client/jbossall-client.jar");
         cl.addURL(file.toURI().toURL());
-        JarFile jar = new JarFile(file);
-        Manifest manifest = jar.getManifest();
-        String classPath = manifest.getMainAttributes().getValue("Class-Path");
-        String[] libs = classPath.split("\\s");
-        File dir = file.getParentFile();
+        final JarFile jar = new JarFile(file);
+        final Manifest manifest = jar.getManifest();
+        final String classPath = manifest.getMainAttributes().getValue("Class-Path");
+        final String[] libs = classPath.split("\\s");
+        final File dir = file.getParentFile();
         for (String s: libs) cl.addURL(new File(dir, s).toURI().toURL());
         jar.close();
       }
@@ -183,15 +162,13 @@ public class JBossTask extends CommandLineTask<Object>
       // org.jboss.Shutdown.main("-S") to shtudown the server
       System.setProperty("java.naming.factory.initial", "org.jnp.interfaces.NamingContextFactory");
       System.setProperty("jboss.boot.loader.name", "shutdown.bat");
-      Class<?> clazz = cl.loadClass("org.jboss.Shutdown");
-      Method method = clazz.getDeclaredMethod("main", String[].class);
+      final Class<?> clazz = cl.loadClass("org.jboss.Shutdown");
+      final Method method = clazz.getDeclaredMethod("main", String[].class);
       System.out.println("shutting down by invoking " + method);
-      method.invoke((Object) null, (Object) new String[] {"-S"});
-    }
-    catch(Exception e)
-    {
+      method.invoke((Object) null, (Object) new String[] { "-S" });
+    } catch (final Exception e) {
       System.out.println("Could not shutdown properly, destroying the process: " + ExceptionUtils.getStackTrace(e));
-      Process p = getProcess();
+      final Process p = getProcess();
       if (p != null) p.destroy();
     }
   }

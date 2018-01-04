@@ -65,12 +65,12 @@ class MyCallback extends JobStreamingCallback.Adapter {
    * @param filename the name of the dexed jar file.
    */
   void addToClassPath(final JPPFJob job, final String filename) {
-    ClassPath cp = job.getSLA().getClassPath();
-    File file = new File(filename);
+    final ClassPath cp = job.getSLA().getClassPath();
+    final File file = new File(filename);
     try {
-      Location<?> loc = new FileLocation(file).copyTo(new MemoryLocation(file.length()));
+      final Location<?> loc = new FileLocation(file).copyTo(new MemoryLocation(file.length()));
       cp.add(filename, loc);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IllegalStateException(e.getMessage(), e);
     }
   }

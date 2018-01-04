@@ -23,8 +23,7 @@ import org.jppf.node.protocol.AbstractTask;
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
-public class DestinationTask extends AbstractTask<String>
-{
+public class DestinationTask extends AbstractTask<String> {
   /**
    * The input string.
    */
@@ -34,8 +33,7 @@ public class DestinationTask extends AbstractTask<String>
    * Initialize this task.
    * @param input the input string.
    */
-  public DestinationTask(final String input)
-  {
+  public DestinationTask(final String input) {
     this.input = input;
   }
 
@@ -44,10 +42,9 @@ public class DestinationTask extends AbstractTask<String>
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     System.out.println("Starting destination task '" + getId() + "' : input = " + input);
-    String s = "task '" + getId() + "' completed";
+    final String s = "task '" + getId() + "' completed";
     System.out.println(s);
     setResult(s);
   }
@@ -56,9 +53,8 @@ public class DestinationTask extends AbstractTask<String>
    * Called when this task is cancelled.
    */
   @Override
-  public void onCancel()
-  {
-    String s = "task '" + getId() + "' has been cancelled";
+  public void onCancel() {
+    final String s = "task '" + getId() + "' has been cancelled";
     setResult(s);
     System.out.println(s);
   }

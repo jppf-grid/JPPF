@@ -66,7 +66,7 @@ public class TestDriverRestart {
       while ((getJmxWrapper() == null) || (diagnostics == null)) Thread.sleep(10L);
       System.out.println("second try after restart");
       performGC();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -80,7 +80,7 @@ public class TestDriverRestart {
   public static JMXDriverConnectionWrapper getJmxWrapper() {
     try {
       return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       return null;
     }
@@ -107,9 +107,9 @@ public class TestDriverRestart {
     @Override
     public void run() {
       try {
-        JPPFDriverAdminMBean jmx = getJmxWrapper();
+        final JPPFDriverAdminMBean jmx = getJmxWrapper();
         jmx.restartShutdown(10L, 10L);
-      } catch (Exception e) {
+      } catch (final Exception e) {
       }
     }
   }

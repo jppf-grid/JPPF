@@ -19,30 +19,25 @@ package sample.test;
 
 import org.jppf.node.protocol.AbstractTask;
 
-
 /**
  * JPPF task used to test how exceptions are handled within the nodes.
  * @author Laurent Cohen
  */
-public class OutOfMemoryTestTask extends AbstractTask<String>
-{
+public class OutOfMemoryTestTask extends AbstractTask<String> {
   /**
    * Default constructor .
    */
-  public OutOfMemoryTestTask()
-  {
+  public OutOfMemoryTestTask() {
   }
 
   /**
    * This method throws a <code>OutOfMemoryError</code>.
    */
   @Override
-  public void run()
-  {
-    int n = 50 * 1024 * 1024;
-    byte[][] data = new byte[n][];
-    for (int i=0; i<n; i++)
-    {
+  public void run() {
+    final int n = 50 * 1024 * 1024;
+    final byte[][] data = new byte[n][];
+    for (int i = 0; i < n; i++) {
       data[i] = new byte[10];
     }
     System.out.println("allocated all arrays");

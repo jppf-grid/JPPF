@@ -54,13 +54,13 @@ public class JPPFCallableRunner {
    * @throws Exception if an error is raised during the execution.
    */
   public static void main(final String...args) throws Exception {
-    int nbRuns = 1;
+    final int nbRuns = 1;
     //loggingHandler = new MyLoggingHandler();
     for (int i=1; i<=nbRuns; i++) {
       print("*---------- run "  + StringUtils.padLeft(String.valueOf(i), '0', 3) + " ----------*");
       try {
         perform();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
       } finally {
         //restartDriver(1L, i < nbRuns ? 2000L : -1L);
@@ -75,11 +75,11 @@ public class JPPFCallableRunner {
    * @throws Exception if an error is raised during the execution.
    */
   private static void perform() throws Exception {
-    int nbTasks = 400;
-    int nbJobs = 1;
-    int maxChannels = 1;
-    int size = 1024;
-    long time = 10L;
+    final int nbTasks = 400;
+    final int nbJobs = 1;
+    final int maxChannels = 1;
+    final int size = 1024;
+    final long time = 10L;
     configure();
     jppfClient = new JPPFClient();
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
@@ -89,10 +89,10 @@ public class JPPFCallableRunner {
       loggingHandler.register(jmxLogger);
     }
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
-    List<JPPFJob> jobList = new ArrayList<>();
+    final List<JPPFJob> jobList = new ArrayList<>();
     for (int n=1; n<=nbJobs; n++) {
-      String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);
-      JPPFJob job = new JPPFJob(name);
+      final String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);
+      final JPPFJob job = new JPPFJob(name);
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
@@ -137,13 +137,13 @@ public class JPPFCallableRunner {
    */
   @SuppressWarnings("unused")
   private static void restartDriver(final long shutdownDelay, final long restartDelay) throws Exception {
-    JMXDriverConnectionWrapper jmx = getDriverJmx();
+    final JMXDriverConnectionWrapper jmx = getDriverJmx();
     try {
       jmx.restartShutdown(shutdownDelay, restartDelay);
     } finally {
       try {
         jmx.close();
-      } catch (Exception ignore) {
+      } catch (final Exception ignore) {
       }
     }
   }
@@ -178,8 +178,8 @@ public class JPPFCallableRunner {
     @Override
     public void jobReturned(final JobEvent event) {
       System.out.println("job '" + event.getJob().getName() + "' returned");
-      JPPFJob job = event.getJob();
-      int size = job.getResults().size();
+      final JPPFJob job = event.getJob();
+      final int size = job.getResults().size();
       if (size - lastCount > 100) {
         System.out.println("received " + size + " tasks for job '" + job.getName() + "'");
         lastCount = size;

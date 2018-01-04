@@ -24,16 +24,14 @@ import org.jppf.node.protocol.AbstractTask;
  * A simple hello world JPPF task.
  * @author Laurent Cohen
  */
-public class HelloWorld extends AbstractTask<String>
-{
+public class HelloWorld extends AbstractTask<String> {
   /**
    * Execute the task.
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    String hello = "Hello, World";
+  public void run() {
+    final String hello = "Hello, World";
     System.out.println(hello);
     setResult(hello);
   }

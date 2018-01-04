@@ -48,7 +48,7 @@ public class MyTask extends AbstractTask<String> {
   public void run() {
     try {
       System.out.println("starting task");
-      AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
+      final AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
       if (!initialized) loadJars(cl);
       Class<?> c = cl.loadClass("com.hazelcast.core.Hazelcast");
       System.out.println("found class " + c);
@@ -57,7 +57,7 @@ public class MyTask extends AbstractTask<String> {
       c = cl.loadClass("org.mozilla.javascript.Evaluator");
       System.out.println("found class " + c);
       setResult("ok");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       setThrowable(e);
     }
@@ -75,7 +75,7 @@ public class MyTask extends AbstractTask<String> {
     /* URL url = cl.getResource(JAR_PATH);
      * System.out.println("got URL: " + url);
      * if (url != null) cl.addURL(url); */
-    URL[] urls = cl.getMultipleResources(JAR_PATHS);
+    final URL[] urls = cl.getMultipleResources(JAR_PATHS);
     System.out.println("got URLs: " + CollectionUtils.list(urls));
     for (URL url : urls)
       if (url != null) cl.addURL(url);

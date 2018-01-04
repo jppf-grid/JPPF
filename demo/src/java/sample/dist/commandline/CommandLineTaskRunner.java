@@ -27,8 +27,7 @@ import org.slf4j.*;
  * Runner class used for testing the framework.
  * @author Laurent Cohen
  */
-public class CommandLineTaskRunner
-{
+public class CommandLineTaskRunner {
   /**
    * Logger for this class.
    */
@@ -42,19 +41,13 @@ public class CommandLineTaskRunner
    * Entry point for this class, performs a matrix multiplication a number of times.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
       performCommand();
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       jppfClient.close();
     }
     System.exit(0);
@@ -64,19 +57,15 @@ public class CommandLineTaskRunner
    * .
    * @throws Exception .
    */
-  private static void performCommand() throws Exception
-  {
-    JPPFJob job = new JPPFJob();
-		job.add(new ListDirectoryTask("/usr/local"));
-		job.add(new ListDirectoryTask("C:\\Windows"));
-    /*
-    job.addTask(new TestTask("1"));
-    for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
-    */
+  private static void performCommand() throws Exception {
+    final JPPFJob job = new JPPFJob();
+    job.add(new ListDirectoryTask("/usr/local"));
+    job.add(new ListDirectoryTask("C:\\Windows"));
+    /* job.addTask(new TestTask("1"));
+     * for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000)); */
 
-    List<Task<?>> results = jppfClient.submitJob(job);
-    for (Task<?> task: results)
-    {
+    final List<Task<?>> results = jppfClient.submitJob(job);
+    for (final Task<?> task: results) {
       if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       System.out.println("result: " + task.getResult());
     }

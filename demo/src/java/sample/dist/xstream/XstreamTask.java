@@ -26,8 +26,7 @@ import org.jppf.node.protocol.AbstractTask;
  * Sample task using XStream to serialize/deserialize objects.
  * @author Laurent Cohen
  */
-public class XstreamTask extends AbstractTask<String>
-{
+public class XstreamTask extends AbstractTask<String> {
   /**
    * Person object to serialize with xstream. Note that it must be declared as transient.
    */
@@ -41,17 +40,13 @@ public class XstreamTask extends AbstractTask<String>
    * Initialize this task with the specified person.
    * @param person a <code>Person</code> instance.
    */
-  public XstreamTask(final Person person)
-  {
-    try
-    {
+  public XstreamTask(final Person person) {
+    try {
       this.person = person;
-      Object xstream = instantiateXStream();
-      Method m = xstream.getClass().getDeclaredMethod("toXML", Object.class);
+      final Object xstream = instantiateXStream();
+      final Method m = xstream.getClass().getDeclaredMethod("toXML", Object.class);
       this.personXml = (String) m.invoke(xstream, person);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -61,19 +56,15 @@ public class XstreamTask extends AbstractTask<String>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
-      Object xstream = instantiateXStream();
-      Method m = xstream.getClass().getDeclaredMethod("fromXML", String.class);
+  public void run() {
+    try {
+      final Object xstream = instantiateXStream();
+      final Method m = xstream.getClass().getDeclaredMethod("fromXML", String.class);
       this.person = (Person) m.invoke(xstream, personXml);
-      String s = this.person.toString();
+      final String s = this.person.toString();
       System.out.println("deserialized this person: " + s);
       setResult(s);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -84,13 +75,12 @@ public class XstreamTask extends AbstractTask<String>
    * @return an XStream object.
    * @throws Exception if an instantiation error occurs or the required classes are not in the classpath.
    */
-  private Object instantiateXStream() throws Exception
-  {
-    Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-    Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-    Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
-    Class<?> domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
-    Object driver = domDriverClass.newInstance();
+  private static Object instantiateXStream() throws Exception {
+    final Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+    final Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+    final Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+    final Class<?> domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
+    final Object driver = domDriverClass.newInstance();
     return c.newInstance(driver);
   }
 }

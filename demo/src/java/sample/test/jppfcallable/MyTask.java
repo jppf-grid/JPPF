@@ -22,12 +22,10 @@ import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-
 /**
  * 
  */
-public class MyTask extends AbstractTask<String>
-{
+public class MyTask extends AbstractTask<String> {
   /**
    * Logger for this class.
    */
@@ -50,25 +48,20 @@ public class MyTask extends AbstractTask<String>
    * @param time the duration of the callable.
    * @param size the size of the data to create.
    */
-  public MyTask(final long time, final int size)
-  {
+  public MyTask(final long time, final int size) {
     this.time = time;
     this.size = size;
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
-      MyCallable mc = new MyCallable(getId(), time, size);
-      String s = compute(mc);
+  public void run() {
+    try {
+      final MyCallable mc = new MyCallable(getId(), time, size);
+      final String s = compute(mc);
       //System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
       setResult(s);
       if (debugEnabled) log.debug(s);
-    }
-    catch (Throwable t)
-    {
+    } catch (final Throwable t) {
       //t.printStackTrace();
       setThrowable(t);
       log.error(getId() + " : " + ExceptionUtils.getMessage(t), t);

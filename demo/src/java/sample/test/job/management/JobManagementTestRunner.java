@@ -48,10 +48,10 @@ public class JobManagementTestRunner {
    * @throws Exception if any error occurs.
    */
   public void runTest1(final String jobName) throws Exception {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    int nbTasks = props.getInt("job.management.nbTasks", 2);
-    long duration = props.getLong("job.management.duration", 1000L);
-    JPPFJob job = new JPPFJob(jobName);
+    final TypedProperties props = JPPFConfiguration.getProperties();
+    final int nbTasks = props.getInt("job.management.nbTasks", 2);
+    final long duration = props.getLong("job.management.duration", 1000L);
+    final JPPFJob job = new JPPFJob(jobName);
     job.setName(jobName);
     job.setBlocking(false);
     for (int i = 0; i < nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
@@ -59,9 +59,9 @@ public class JobManagementTestRunner {
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(job.getUuid());
-    List<Task<?>> results = job.awaitResults();
-    for (Task<?> task : results) {
-      Throwable e = task.getThrowable();
+    final List<Task<?>> results = job.awaitResults();
+    for (final Task<?> task : results) {
+      final Throwable e = task.getThrowable();
       if (e != null) System.out.println("" + task.getId() + " has an exception: " + ExceptionUtils.getStackTrace(e));
       else System.out.println("Result for " + task.getId() + ": " + task.getResult());
     }
@@ -75,11 +75,12 @@ public class JobManagementTestRunner {
   public void runTest2() throws Exception {
     JMXNodeConnectionWrapper[] nodes = null;
     try {
-      Collection<JPPFManagementInfo> coll = driver.nodesInformation();
+      final Collection<JPPFManagementInfo> coll = driver.nodesInformation();
       nodes = new JMXNodeConnectionWrapper[2];
       int count = 0;
-      for (JPPFManagementInfo info : coll) {
-        JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
+      for (final JPPFManagementInfo info : coll) {
+        @SuppressWarnings("resource")
+        final JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
         node.connectAndWait(0L);
         nodes[count++] = node;
       }
@@ -87,7 +88,7 @@ public class JobManagementTestRunner {
       Thread.sleep(500L);
       client.submitJob(createJob("broadcast1"));
       Thread.sleep(500L);
-      NodeSelector selector = new ExecutionPolicySelector(new AtLeast("jppf.processing.threads", 4));
+      final NodeSelector selector = new ExecutionPolicySelector(new AtLeast("jppf.processing.threads", 4));
       int n = driver.nbNodes(selector);
       System.out.println("found " + n + " nodes, expected = 2");
       nodes[1].updateThreadPoolSize(2);
@@ -108,7 +109,7 @@ public class JobManagementTestRunner {
    * @throws Exception if any error occurs.
    */
   protected JPPFJob createJob(final String id) throws Exception {
-    JPPFJob job = new JPPFJob(id);
+    final JPPFJob job = new JPPFJob(id);
     job.setName(id);
     job.add(new MyBroadcastTask());
     job.getSLA().setBroadcastJob(true);
@@ -124,24 +125,22 @@ public class JobManagementTestRunner {
       System.out.println("Initializing client ...");
       client = new JPPFClient("client");
       System.out.println("Awaiting server connection ...");
-      while (!client.hasAvailableConnection())
-        Thread.sleep(100L);
+      while (!client.hasAvailableConnection()) Thread.sleep(100L);
       System.out.println("Awaiting JMX connection ...");
       driver = client.getConnectionPool().getJmxConnection();
-      while (!driver.isConnected())
-        driver.connectAndWait(100L);
-      JobManagementTestRunner runner = new JobManagementTestRunner();
+      while (!driver.isConnected()) driver.connectAndWait(100L);
+      final JobManagementTestRunner runner = new JobManagementTestRunner();
       System.out.println("Running test 1 ...");
       runner.runTest1("job1");
       System.out.println("Running test 2 ...");
       runner.runTest1("job2");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (driver != null) {
         try {
           driver.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }

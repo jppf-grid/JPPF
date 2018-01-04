@@ -26,8 +26,7 @@ import org.jppf.utils.streams.StreamUtils;
  * 
  * @author Laurent Cohen
  */
-public class DataReader
-{
+public class DataReader {
   /**
    * 
    */
@@ -53,8 +52,7 @@ public class DataReader
    * Initiialize with the specified file.
    * @param filename the path to the file to process.
    */
-  public DataReader(final String filename)
-  {
+  public DataReader(final String filename) {
     this.filename = filename;
   }
 
@@ -63,34 +61,28 @@ public class DataReader
    * @return the next article.
    * @throws Exception if any error occurs.
    */
-  public String nextArticle() throws Exception
-  {
+  public String nextArticle() throws Exception {
     if (closed) return null;
     if (reader == null) reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf8"));
     String s = "";
     boolean found = false;
-    while (!found)
-    {
+    while (!found) {
       s = reader.readLine();
-      if (s == null)
-      {
+      if (s == null) {
         close();
         return null;
       }
       if (s.indexOf(ARTICLE_START) >= 0) found = true;
     }
     if (!found) return null;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     found = false;
-    while (!found)
-    {
+    while (!found) {
       s = reader.readLine();
-      if (s == null)
-      {
+      if (s == null) {
         close();
         return null;
-      }
-      else if (s.indexOf(ARTICLE_END) >= 0) found = true;
+      } else if (s.indexOf(ARTICLE_END) >= 0) found = true;
       else sb.append(s).append('\n');
     }
     return sb.toString();
@@ -99,10 +91,8 @@ public class DataReader
   /**
    * 
    */
-  public void close()
-  {
-    if (!closed)
-    {
+  public void close() {
+    if (!closed) {
       closed = true;
       if (reader != null) StreamUtils.closeSilent(reader);
     }
@@ -112,8 +102,7 @@ public class DataReader
    * Determine whether this reader is closed.
    * @return <code>true</code> if this reader is closed, <code>false</code> otherwise.
    */
-  public boolean isClosed()
-  {
+  public boolean isClosed() {
     return closed;
   }
 }

@@ -53,10 +53,10 @@ public class ConnectionPoolRunner {
    */
   public static void main(final String[] args) {
     JPPFClient client = null;
-    int nbTasks = 80;
-    long duration = 3000L;
+    final int nbTasks = 80;
+    final long duration = 3000L;
     //int[] nbJobs = { 1, 5, 1 };
-    int[] nbJobs = { 1 };
+    final int[] nbJobs = { 1 };
     try {
       configure(2);
       client = new JPPFClient();
@@ -68,9 +68,9 @@ public class ConnectionPoolRunner {
       */
       start = System.nanoTime();
       for (int n=0; n<nbJobs.length; n++) {
-        int size = nbJobs[n];
+        final int size = nbJobs[n];
         //int nbConnections = nbJobs[n];
-        int nbConnections = 2;
+        final int nbConnections = 2;
         print("----------------------------------------------------------------------");
         print("running %d jobs/%d connections", size, nbConnections);
         /*
@@ -78,16 +78,16 @@ public class ConnectionPoolRunner {
         waitForNbConnections(pool, nbConnections, 5000L);
         */
         waitForNbPools(client, nbConnections, 5000L);
-        List<JPPFJob> jobs = new ArrayList<>(size);
+        final List<JPPFJob> jobs = new ArrayList<>(size);
         for (int i=1; i<=size; i++) jobs.add(createJob(String.format("job_%d_%d", (n + 1), i), nbTasks, duration));
-        for (JPPFJob job: jobs) {
+        for (final JPPFJob job: jobs) {
           client.submitJob(job);
           print("[" + getElapsed() + "] submittted job '" + job.getName() + "'");
         }
         for (JPPFJob job: jobs) printJobResults(job);
       }
       Thread.sleep(2500L);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -103,7 +103,7 @@ public class ConnectionPoolRunner {
    * @throws Exception if any error occurs.
    */
   private static JPPFJob createJob(final String name, final int nbTasks, final long taskDuration) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(name);
     job.setBlocking(false);
     job.getClientSLA().setMaxChannels(2);
@@ -116,10 +116,10 @@ public class ConnectionPoolRunner {
    * @param job the job whose results to print.
    */
   private static void printJobResults(final JPPFJob job) {
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     print("[" + getElapsed() + "] ***** results for job %s :", job.getName());
     for (Task<?> task: results) {
-      String id = task.getId();
+      final String id = task.getId();
       if (task.getThrowable() != null) print("task %s raised an error: %s", id, ExceptionUtils.getStackTrace(task.getThrowable()));
       else print("task %s result: %s", id, task.getResult());
     }
@@ -130,12 +130,12 @@ public class ConnectionPoolRunner {
    * @param nbPools the number of pools to configure
    */
   private static void configure(final int nbPools) {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     config.set(JPPFProperties.DISCOVERY_ENABLED, false);
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=1; i<=nbPools; i++) {
       if (i > 1) sb.append(' ');
-      String name = DRIVER_NAME + i;
+      final String name = DRIVER_NAME + i;
       sb.append(name);
       config.setString(name + ".jppf.server.host", "localhost")
         .setInt(name + ".jppf.server.port", 11110 + i)
@@ -151,7 +151,7 @@ public class ConnectionPoolRunner {
    * @param args the arguments to the format string.
    */
   private static void print(final String format, final Object...args) {
-    String s = String.format(format, args);
+    final String s = String.format(format, args);
     System.out.println(s);
     log.info(s);
   }
@@ -167,7 +167,7 @@ public class ConnectionPoolRunner {
   @SuppressWarnings("unused")
   private static void waitForNbConnections(final JPPFConnectionPool pool, final int n, final long timeout) {
     long elapsed = 0L;
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     while (elapsed < timeout * 1_000_000L) {
       if (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) == n) return;
       elapsed = System.nanoTime() - start;
@@ -184,9 +184,9 @@ public class ConnectionPoolRunner {
    */
   private static void waitForNbPools(final JPPFClient client, final int n, final long timeout) {
     long elapsed = 0L;
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     while (elapsed < timeout * 1_000_000L) {
-      List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE);
+      final List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE);
       if ((pools != null) && (pools.size() >= n)) return;
       elapsed = System.nanoTime() - start;
       if (elapsed >= timeout * 1_000_000L) throw new IllegalStateException("timed out while waiting for " + n + " active pools");

@@ -48,10 +48,10 @@ public class DeadlockRunner {
   public static void main(final String[] args) {
     try {
       //StreamUtils.waitKeyPressed("Please press [Enter]");
-      DeadlockRunner runner = new DeadlockRunner();
+      final DeadlockRunner runner = new DeadlockRunner();
       runner.jobStreaming();
       //runner.testNodes();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -80,12 +80,12 @@ public class DeadlockRunner {
           new Thread(pt, "ProvisioningThread").start();
           new Thread(mnmt, "MasterNodeMonitoringThread").start();
         }
-        TimeMarker marker = new TimeMarker().start();
+        final TimeMarker marker = new TimeMarker().start();
         int count = 0;
-        for (JPPFJob job: jobProvider) {
+        for (final JPPFJob job: jobProvider) {
           if ((job != null) && !client.isClosed()) client.submitJob(job);
           if (count == ro.triggerNodeDeadlockAfter) {
-            JPPFJob deadlockingJob = new JPPFJob();
+            final JPPFJob deadlockingJob = new JPPFJob();
             deadlockingJob.setName("deadlock trigger job");
             deadlockingJob.setBlocking(false);
             deadlockingJob.add(new DeadlockingTask());
@@ -102,7 +102,7 @@ public class DeadlockRunner {
           mnmt.setStopped(true);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -111,16 +111,16 @@ public class DeadlockRunner {
    *
    */
   public void testNodes() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int[] nbSlaves = StringUtils.parseIntValues(config.getString("deadlock.nbSlaves", "0"));
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int[] nbSlaves = StringUtils.parseIntValues(config.getString("deadlock.nbSlaves", "0"));
     try (JPPFClient jppfClient = new JPPFClient()) {
       ensureSufficientConnections(jppfClient, 1);
       updateSlaveNodes(jppfClient, 0);
-      TimeMarker marker = new TimeMarker().start();
+      final TimeMarker marker = new TimeMarker().start();
       for (int n: nbSlaves) updateSlaveNodes(jppfClient, n);
       printf("total time: %s", marker.stop().getLastElapsedAsString());
       updateSlaveNodes(jppfClient, 0);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -131,7 +131,7 @@ public class DeadlockRunner {
    */
   public static void processResults(final JPPFJob job) {
     printf("*** results for job '%s' ***", job.getName());
-    List<Task<?>> results = job.getAllResults();
+    final List<Task<?>> results = job.getAllResults();
     for (Task<?> task: results) {
       if (task.getThrowable() != null) printf("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
       //else System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
@@ -146,7 +146,7 @@ public class DeadlockRunner {
    */
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
     printf("***** ensuring %d connections ...", nbConnections);
-    JPPFConnectionPool pool = client.awaitConnectionPool();
+    final JPPFConnectionPool pool = client.awaitConnectionPool();
     printf("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
     printf("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
@@ -162,12 +162,12 @@ public class DeadlockRunner {
    */
   private static void updateSlaveNodes(final JPPFClient client, final int nbSlaves) throws Exception {
     printf("ensuring %d slaves ...", nbSlaves);
-    JMXDriverConnectionWrapper jmx = getJmxConnection(client);
+    final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     if (jmx.nbNodes() == nbSlaves + 1) return;
-    JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-    NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     // request that <nbSlaves> slave nodes be provisioned
-    TimeMarker marker = new TimeMarker().start();
+    final TimeMarker marker = new TimeMarker().start();
     forwarder.provisionSlaveNodes(masterSelector, nbSlaves, null);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
     printf("slaves confirmation wait time: %s", marker.stop().getLastElapsedAsString());
@@ -181,8 +181,8 @@ public class DeadlockRunner {
   @SuppressWarnings("unused")
   private static void requestNodeShutdown(final JPPFClient client) throws Exception {
     printf("requesting node shutdown ...");
-    JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    NodeSelector selector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
+    final NodeSelector selector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     jmx.getNodeForwarder().shutdown(selector, false);
   }
 
@@ -204,7 +204,7 @@ public class DeadlockRunner {
    */
   @SuppressWarnings("unused")
   private static void submitDeadlockingJob(final JPPFClient client) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("Deadlocking job");
     job.setBlocking(false);
     job.add(new DeadlockingTask());
@@ -217,7 +217,7 @@ public class DeadlockRunner {
    * @param params the parameters of the message.
    */
   static void printf(final String format, final Object...params) {
-    String msg = String.format(format, params);
+    final String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
   }

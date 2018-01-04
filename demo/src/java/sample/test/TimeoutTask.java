@@ -39,7 +39,7 @@ public class TimeoutTask extends JPPFTestTask {
   public void test() {
     try {
       Thread.sleep(5000L);
-    } catch (@SuppressWarnings("unused") InterruptedException e) {
+    } catch (@SuppressWarnings("unused") final InterruptedException e) {
     }
   }
 

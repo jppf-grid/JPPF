@@ -27,8 +27,7 @@ import org.jppf.location.FileLocation;
  * This task lists the files in a specified directory of the node's host.
  * @author Laurent Cohen
  */
-public class TestTask extends CommandLineTaskEx
-{
+public class TestTask extends CommandLineTaskEx {
   /**
    * Directory in which to list the files.
    */
@@ -39,8 +38,7 @@ public class TestTask extends CommandLineTaskEx
    * Initialize the script's parameters.
    * @param number directory in which to list the files.
    */
-  public TestTask(final String number)
-  {
+  public TestTask(final String number) {
     this.number = number;
   }
 
@@ -49,54 +47,48 @@ public class TestTask extends CommandLineTaskEx
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       //setCommandList("cat", "etc/file |", "grep -s A", ">", "output-"+ number +".txt");
-      /*
-			setCommandList("cat", "etc/file", "|", "grep", "-s", "A", ">", "output-"+ number +".txt");
-			StringBuilder sb = new StringBuilder();
-			for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
-			System.out.println("command to run: " + sb.toString());
-			setCaptureOutput(true);
-			launchProcess();
-			FileLocation fileLoc = new FileLocation("output-" + number + ".txt");
-			FileLocation tmp = new FileLocation("/tmp/somefolder/output-" + number + ".txt");
-			fileLoc.copyTo(tmp);
-       */
-      String outputPath = "/home/lcohen/Downloads/folder1/output.txt";
+      /* setCommandList("cat", "etc/file", "|", "grep", "-s", "A", ">", "output-"+ number +".txt");
+       * StringBuilder sb = new StringBuilder();
+       * for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
+       * System.out.println("command to run: " + sb.toString());
+       * setCaptureOutput(true);
+       * launchProcess();
+       * FileLocation fileLoc = new FileLocation("output-" + number + ".txt");
+       * FileLocation tmp = new FileLocation("/tmp/somefolder/output-" + number + ".txt");
+       * fileLoc.copyTo(tmp); */
+      final String outputPath = "/home/lcohen/Downloads/folder1/output.txt";
       setCommandList("/bin/sh", "-c", "ps -A|grep java > " + outputPath);
       //setCommandList("/bin/sh", "-c", "cat etc/file|grep -s A > " + "output-"+ number + ".txt");
       //setCommandList("/bin/sh", "-c", "cat /etc/file|grep -s A > " + outputPath);
-      StringBuilder sb = new StringBuilder();
-      for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
+      final StringBuilder sb = new StringBuilder();
+      for (final String cmd: this.getCommandList()) sb.append(cmd).append(' ');
       System.out.println("command to run: " + sb);
       setCaptureOutput(true);
       launchProcess();
-      FileLocation fileLoc = new FileLocation(outputPath);
-      FileLocation tmp = new FileLocation("/home/lcohen/Downloads/folder2/output.txt");
+      final FileLocation fileLoc = new FileLocation(outputPath);
+      final FileLocation tmp = new FileLocation("/home/lcohen/Downloads/folder2/output.txt");
       fileLoc.copyTo(tmp);
 
-      InputStream is = fileLoc.getInputStream();
-      InputStreamReader isr = new InputStreamReader(is);
-      BufferedReader br = new BufferedReader(isr);
+      final InputStream is = fileLoc.getInputStream();
+      final InputStreamReader isr = new InputStreamReader(is);
+      final BufferedReader br = new BufferedReader(isr);
 
       // Read in the File
       String line = "";
-      List<String> file = new ArrayList<>();
-      List<String> bFile = new ArrayList<>();
+      final List<String> file = new ArrayList<>();
+      final List<String> bFile = new ArrayList<>();
       while ((line = br.readLine()) != null) file.add(line);
       // "Process" the File
-      for (int i = file.size()-1; i >= 0; i--) bFile.add(file.get(i));
+      for (int i = file.size() - 1; i >= 0; i--) bFile.add(file.get(i));
       // "Write" out the File
-      for (String l : file) System.out.println(l);
+      for (String l: file) System.out.println(l);
 
       setResult(getStandardOutput());
-    }
-    catch(Exception e)
-    {
-      setResult("an exception was raised: " +e);
+    } catch (final Exception e) {
+      setResult("an exception was raised: " + e);
       setThrowable(e);
     }
     System.out.println("std output:\n" + getStandardOutput());

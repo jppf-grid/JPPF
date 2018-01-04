@@ -57,7 +57,7 @@ public class AnnotatedTask extends AbstractTask<String> {
         getClass().getClassLoader().getResources("META-INF/services/xxx");
       }
       setResult("task #" + id + " execution successful");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
       setResult("task #" + id + ' ' + e.getMessage());
     }

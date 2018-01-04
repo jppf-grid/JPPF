@@ -28,72 +28,58 @@ import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.slf4j.*;
 
-
-
 /**
  * Test of the executor service.
  */
-public class Main
-{
+public class Main {
   /**
    * Logger for this class.
    */
-  private static Logger logger = LoggerFactory.getLogger(Main.class);
+  private static Logger log = LoggerFactory.getLogger(Main.class);
 
   /**
    * Entry point.
-   * @param args  not used.
+   * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    logger.info("Starting test");
-    JPPFClient client = new JPPFClient();
-    JPPFExecutorService executor = new JPPFExecutorService(client);
-    try
-    {
-      DataProvider dp = new MemoryMapDataProvider();
+  public static void main(final String[] args) {
+    log.info("Starting test");
+    final JPPFClient client = new JPPFClient();
+    final JPPFExecutorService executor = new JPPFExecutorService(client);
+    try {
+      final DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("testKey", "testValue");
       executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
       executor.setBatchSize(5);
       executor.setBatchTimeout(100L);
-      List<Future<Integer>> futures = new ArrayList<>(20);
-      int nbTasks = 20;
-      logger.info("Adding tasks");
-      for (int i = 0; i < nbTasks; i++)
-      {
+      final List<Future<Integer>> futures = new ArrayList<>(20);
+      final int nbTasks = 20;
+      log.info("Adding tasks");
+      for (int i = 0; i < nbTasks; i++) {
         futures.add(executor.submit(new SimpleCountTask(i)));
         //Thread.sleep(1);
       }
-      logger.info("Waiting for pending tasks to complete");
-      /*
-      executor.shutdown();
-      while (!executor.isTerminated())
-      {
-        Thread.sleep(1000);
-      }
-      */
-      logger.info("Pending tasks completed");
-      for (int i = 0; i < nbTasks; i++)
-      {
-        logger.info("Checking task {}", i);
-        if (futures.get(i).get() != i)
-        {
+      log.info("Waiting for pending tasks to complete");
+      /* executor.shutdown();
+       * while (!executor.isTerminated())
+       * {
+       * Thread.sleep(1000);
+       * } */
+      log.info("Pending tasks completed");
+      for (int i = 0; i < nbTasks; i++) {
+        log.info("Checking task {}", i);
+        if (futures.get(i).get() != i) {
           throw new Exception("Invalid future response");
         }
       }
-      logger.info("All completed tasks checked");
+      log.info("All completed tasks checked");
 
-      MyTask myTask = new MyTask();
+      final MyTask myTask = new MyTask();
       myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
-      Future<String> future = executor.submit((Callable<String>) myTask);
+      final Future<String> future = executor.submit((Callable<String>) myTask);
       System.out.println("result: " + future.get());
-    }
-    catch (Exception e)
-    {
-      logger.error("Error", e);
-    }
-    finally
-    {
+    } catch (final Exception e) {
+      log.error("Error", e);
+    } finally {
       executor.shutdownNow();
       client.close();
     }
@@ -102,8 +88,7 @@ public class Main
   /**
    * Simple task.
    */
-  private static class SimpleCountTask implements Callable<Integer>, Serializable
-  {
+  private static class SimpleCountTask implements Callable<Integer>, Serializable {
     /**
      * Logger for this class.
      */
@@ -121,8 +106,7 @@ public class Main
      * Initialize this task with its number.
      * @param number the task number.
      */
-    public SimpleCountTask(final int number)
-    {
+    public SimpleCountTask(final int number) {
       this.number = number;
     }
 
@@ -131,12 +115,10 @@ public class Main
      */
     // @Override
     @Override
-    public Integer call() throws Exception
-    {
+    public Integer call() throws Exception {
       logger.info("From logger {}", number);
       logger.info("From stdout " + number);
       return number;
     }
-
   }
 }

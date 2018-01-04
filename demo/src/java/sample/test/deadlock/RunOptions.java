@@ -85,8 +85,8 @@ public class RunOptions {
    * Create the object holding the task-specific options.
    * @return a {@link TaskOptions} instance. 
    */
-  private TaskOptions createTaskOptions() {
-    TaskOptions to = new TaskOptions();
+  private static TaskOptions createTaskOptions() {
+    final TaskOptions to = new TaskOptions();
     to.dataSize = config.getInt("deadlock.dataSize", -1);
     to.taskDuration = config.getLong("deadlock.taskDuration", 10L);
     to.useCPU = config.getBoolean("deadlock.useCPU", false);

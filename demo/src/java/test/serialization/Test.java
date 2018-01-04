@@ -38,15 +38,15 @@ public class Test {
    */
   public static void main(final String[] args) {
     try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oos = new ObjectOutputStream(baos);
-      Hello hello = new Hello();
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      final ObjectOutputStream oos = new ObjectOutputStream(baos);
+      final Hello hello = new Hello();
       try {
         oos.writeObject(hello);
       } finally {
         oos.close();
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -56,15 +56,15 @@ public class Test {
    * @throws Exception if any error occurs.
    */
   public static void test() throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("my job id");
-    Task<String> task = new LongTask(1000);
+    final Task<String> task = new LongTask(1000);
     task.setId("someID");
     task.setResult("result");
     task.setThrowable(new JPPFException("exception"));
     job.add(task);
-    Test test = new Test();
-    byte[] data = test.serialize(job);
+    final Test test = new Test();
+    final byte[] data = test.serialize(job);
     test.deserialize(data);
     print("the end");
   }
@@ -74,16 +74,15 @@ public class Test {
    * @throws Exception if any error occurs.
    */
   public static void test2() throws Exception {
-    TaskBundle bundle = new JPPFTaskBundle();
+    final TaskBundle bundle = new JPPFTaskBundle();
     bundle.setName("server handshake");
     bundle.setUuid("job uuid");
     bundle.setUuid("0");
     bundle.getUuidPath().add("driver_uuid");
     bundle.setTaskCount(0);
     bundle.setHandshake(true);
-    ;
-    Test test = new Test();
-    byte[] data = test.serialize(bundle);
+    final Test test = new Test();
+    final byte[] data = test.serialize(bundle);
     test.deserialize(data);
     print("the end 2");
   }
@@ -93,9 +92,9 @@ public class Test {
    * @throws Exception if any error occurs.
    */
   public static void test3() throws Exception {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(baos);
-    Hello hello = new Hello();
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ObjectOutputStream oos = new ObjectOutputStream(baos);
+    final Hello hello = new Hello();
     try {
       oos.writeObject(hello);
     } finally {
@@ -118,10 +117,10 @@ public class Test {
    * @throws Exception if any error occurs.
    */
   public byte[] serialize(final Object o) throws Exception {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    JPPFObjectOutputStream joos = new JPPFObjectOutputStream(baos);
-    joos.writeObject(o);
-    return baos.toByteArray();
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); JPPFObjectOutputStream joos = new JPPFObjectOutputStream(baos)) {
+      joos.writeObject(o);
+      return baos.toByteArray();
+    }
   }
 
   /**
@@ -131,9 +130,9 @@ public class Test {
    * @throws Exception if any error occurs.
    */
   public Object deserialize(final byte[] data) throws Exception {
-    ByteArrayInputStream bais = new ByteArrayInputStream(data);
-    JPPFObjectInputStream jois = new JPPFObjectInputStream(bais);
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(data); JPPFObjectInputStream jois = new JPPFObjectInputStream(bais)) {
     return jois.readObject();
+    }
   }
 
   /**
@@ -143,7 +142,7 @@ public class Test {
     /**
      * Explicit serialVersionUID.
      */
-    //private static final long serialVersionUID = 12345678L;
+    private static final long serialVersionUID = 12345678L;
     /**
      * 
      */

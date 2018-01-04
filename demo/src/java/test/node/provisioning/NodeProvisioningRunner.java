@@ -47,7 +47,7 @@ public class NodeProvisioningRunner {
   public static void main(final String[] args) {
     try (JPPFClient client = new JPPFClient()) {
       perform2(client);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -59,18 +59,18 @@ public class NodeProvisioningRunner {
    */
   @SuppressWarnings("unused")
   private static void perform1(final JPPFClient client) throws Exception {
-    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-    JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
     
-    int nbSlaves = 3;
+    final int nbSlaves = 3;
     System.out.printf("provisioning %d slaves%n", nbSlaves);
-    Object o = forwarder.provisionSlaveNodes(masterSelector, nbSlaves, false);
+    final Object o = forwarder.provisionSlaveNodes(masterSelector, nbSlaves, false);
     Thread.sleep(3000L);
     printNbSlaves(forwarder);
 
     System.out.println("submitting job ...");
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setBlocking(false);
     job.setName("Hello World");
     for (int i=1; i<=4; i++) job.add(new LongTask(30_000L)).setId("task " + i);
@@ -90,7 +90,7 @@ public class NodeProvisioningRunner {
     printNbSlaves(forwarder);
     System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
 
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     System.out.println("got " + results.size() + " results for job");
 
     System.out.println("shutting down all slaves ...");
@@ -105,9 +105,9 @@ public class NodeProvisioningRunner {
    * @throws Exception if any error occurs.
    */
   private static void perform2(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitJMXConnection(true);
-    JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-    int nbSlaves = 10;
+    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitJMXConnection(true);
+    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final int nbSlaves = 10;
     long totalElapsed = 0L;
     for (int i=1; i<=10; i++) {
       System.out.println("*******************");
@@ -136,8 +136,8 @@ public class NodeProvisioningRunner {
    * @throws Exception .
    */
   private static void printNbSlaves(final JPPFNodeForwardingMBean forwarder) throws Exception {
-    Map<String, Object> resultsMap = forwarder.getNbSlaves(masterSelector);
-    for (Map.Entry<String, Object> entry: resultsMap.entrySet()) {
+    final Map<String, Object> resultsMap = forwarder.getNbSlaves(masterSelector);
+    for (final Map.Entry<String, Object> entry: resultsMap.entrySet()) {
       if (entry.getValue() instanceof Throwable) System.out.printf("node %s raised %s%n", entry.getKey(), ExceptionUtils.getStackTrace((Throwable) entry.getValue()));
       else System.out.printf("master node %s has %d slaves%n", entry.getKey(), entry.getValue());
     }
@@ -149,7 +149,7 @@ public class NodeProvisioningRunner {
   public static class ExampleTask extends AbstractTask<String> {
     @Override
     public void run() {
-      String message = "hello from " + getId();
+      final String message = "hello from " + getId();
       // this should be printed in the stdout.log of the slave node
       System.out.println(message);
       setResult(message);

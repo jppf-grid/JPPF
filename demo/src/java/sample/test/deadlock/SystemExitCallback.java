@@ -48,7 +48,7 @@ class SystemExitCallback extends JobStreamingCallback.Adapter {
 
   @Override
   public void jobCompleted(final JPPFJob job, final JobStreamImpl jobStream) {
-    int n = count.incrementAndGet();
+    final int n = count.incrementAndGet();
     if (n >= killCount) System.exit(0);
   }
 }

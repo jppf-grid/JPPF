@@ -34,17 +34,17 @@ public class NonSerializableTaskRunner {
    * @param args not used.
    */
   public static void main(final String[] args) {
-    try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = new JPPFJob();
+    try (final JPPFClient client = new JPPFClient()) {
+      final JPPFJob job = new JPPFJob();
       job.setName("job name");
       job.add(new NonSerializableTask(false));
       job.add(new NonSerializableTask(false));
-      List<Task<?>> results = client.submitJob(job);
-      for (Task<?> task : results) {
+      final List<Task<?>> results = client.submitJob(job);
+      for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("task %d got exception: %s%n", task.getPosition(), ExceptionUtils.getStackTrace(task.getThrowable()));
         else System.out.printf("task %d got result: %s%n", task.getPosition(), task.getResult());
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

@@ -58,7 +58,7 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    String message = notification.getMessage();
+    final String message = notification.getMessage();
     queue.offer(message);
     wakeUp();
   }
@@ -77,7 +77,7 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
         if (isStopped()) break;
         goToSleep(1L, 0);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       StreamUtils.closeSilent(writer);
@@ -100,7 +100,7 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
   public void unregister(final JmxLogger jmxLogger) {
     try {
       jmxLogger.removeNotificationListener(this);
-    } catch (@SuppressWarnings("unused") ListenerNotFoundException ignore) {
+    } catch (@SuppressWarnings("unused") final ListenerNotFoundException ignore) {
     }
   }
 }

@@ -25,24 +25,19 @@ import org.jppf.utils.PropertiesCollection;
  * 
  * @author Laurent Cohen
  */
-public class MyCustomPolicy extends CustomPolicy
-{
+public class MyCustomPolicy extends CustomPolicy {
   /**
    * Determines whether this policy accepts the specified node.
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection<String> info)
-  {
-    String s = getProperty(info, "processing.thread");
+  public boolean accepts(final PropertiesCollection<String> info) {
+    final String s = getProperty(info, "processing.thread");
     int n = 1;
-    try
-    {
+    try {
       n = Integer.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch (final NumberFormatException e) {
       e.printStackTrace();
     }
     return n > 1;

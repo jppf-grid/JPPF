@@ -29,8 +29,7 @@ import org.jppf.utils.compilation.SourceCompiler;
  * 
  * @author Laurent Cohen
  */
-public class TestCompilation
-{
+public class TestCompilation {
   /**
    * A string containing a list of whitespace characters.
    */
@@ -48,15 +47,11 @@ public class TestCompilation
    * Entry point ofr this program.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       testToFile();
       testToMemory();
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -65,29 +60,25 @@ public class TestCompilation
    * Test compilation to file system from a string java source.
    * @throws Exception if any error occurs.
    */
-  public static void testToFile() throws Exception
-  {
+  public static void testToFile() throws Exception {
     output("****************************************");
-    File classesDir = new File("tmpclasses/");
+    final File classesDir = new File("tmpclasses/");
     if (!classesDir.exists()) {
       // create the classes dir
       if (!classesDir.mkdirs()) throw new IOException("could not create the classes directory '" + classesDir + "'");
     }
-    String className = "test.compilation.MyTask";
-    Map<String, CharSequence> sources = new HashMap<>();
+    final String className = "test.compilation.MyTask";
+    final Map<String, CharSequence> sources = new HashMap<>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;
-    try
-    {
+    try {
       compiler = new SourceCompiler();
       compiler.compileToFile(sources, classesDir);
-      Class<?> clazz = compiler.getClassloader().loadClass(className);
-      Callable<?> task = (Callable<?>) clazz.newInstance();
+      final Class<?> clazz = compiler.getClassloader().loadClass(className);
+      final Callable<?> task = (Callable<?>) clazz.newInstance();
       output("result: " + task.call());
-    }
-    finally
-    {
+    } finally {
       compiler.close();
     }
   }
@@ -96,29 +87,25 @@ public class TestCompilation
    * Test compilation to memory from a string java source.
    * @throws Exception if any error occurs.
    */
-  public static void testToMemory() throws Exception
-  {
+  public static void testToMemory() throws Exception {
     output("****************************************");
-    String className = "test.compilation.MyTask";
+    final String className = "test.compilation.MyTask";
     // build the map of sources to compile
-    Map<String, CharSequence> sources = new HashMap<>();
+    final Map<String, CharSequence> sources = new HashMap<>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;
-    try
-    {
+    try {
       compiler = new SourceCompiler();
       // receive the map of generated classes bytecode
-      Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
+      final Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
       output("bytecode map = " + bytecodeMap);
       // load the class
-      Class<?> clazz = compiler.getClassloader().loadClass(className);
+      final Class<?> clazz = compiler.getClassloader().loadClass(className);
       // create an instance and execute it
-      Callable<?> task = (Callable<?>) clazz.newInstance();
+      final Callable<?> task = (Callable<?>) clazz.newInstance();
       output("result: " + task.call());
-    }
-    finally
-    {
+    } finally {
       compiler.close();
     }
   }
@@ -127,9 +114,8 @@ public class TestCompilation
    * Generate the source code of a class.
    * @return the source code to compile as a string.
    */
-  public static CharSequence buildSourceCode2()
-  {
-    StringBuilder sb = new StringBuilder();
+  public static CharSequence buildSourceCode2() {
+    final StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
     append(sb, "import java.io.Serializable;                           ");
@@ -152,9 +138,8 @@ public class TestCompilation
    * Generate the source code of a more complex class.
    * @return the source code to compile as a string.
    */
-  public static CharSequence buildSourceCode()
-  {
-    StringBuilder sb = new StringBuilder();
+  public static CharSequence buildSourceCode() {
+    final StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
     append(sb, "import java.io.Serializable;                           ");
@@ -215,8 +200,7 @@ public class TestCompilation
    * @param sb a string builder to append to.
    * @param s the string to append.
    */
-  static void append(final StringBuilder sb, final String s)
-  {
+  static void append(final StringBuilder sb, final String s) {
     sb.append(trimRight(s)).append('\n');
   }
 
@@ -225,34 +209,32 @@ public class TestCompilation
    * @param seq the char sequence to trim.
    * @return a new char sequence without spaces on the right.
    */
-  static CharSequence trimRight(final CharSequence seq)
-  {
+  static CharSequence trimRight(final CharSequence seq) {
     int pos = seq.length() - 1;
-    while ((pos >=0) && (WHITE_SPACE.indexOf(seq.charAt(pos)) >= 0)) pos--;
-    return new StringBuilder().append(seq, 0, pos+1);
+    while ((pos >= 0) && (WHITE_SPACE.indexOf(seq.charAt(pos)) >= 0))
+      pos--;
+    return new StringBuilder().append(seq, 0, pos + 1);
   }
 
   /**
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  static void output(final String message)
-  {
+  static void output(final String message) {
     System.out.println(message);
   }
 
   /**
-   * Attempt to determine the qualified name of a class from its source. 
+   * Attempt to determine the qualified name of a class from its source.
    * @param source the source code to parse.
-   * @return the fully qualified name of the top-level class found in the source. 
+   * @return the fully qualified name of the top-level class found in the source.
    */
-  public static String classNameFromSource(final CharSequence source)
-  {
+  public static String classNameFromSource(final CharSequence source) {
     Matcher matcher = PACKAGE_PATTERN.matcher(source);
-    String pkg = matcher.find() ? matcher.group(1).trim() + '.' : "";
+    final String pkg = matcher.find() ? matcher.group(1).trim() + '.' : "";
     matcher = CLASS_PATTERN.matcher(source);
     if (!matcher.find()) return null;
-    String name = matcher.group(1).trim();
+    final String name = matcher.group(1).trim();
     return pkg + name;
   }
 }

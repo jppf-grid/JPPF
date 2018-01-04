@@ -26,8 +26,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class ManyConnections
-{
+public class ManyConnections {
   /**
    * Logger for this class.
    */
@@ -41,26 +40,20 @@ public class ManyConnections
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
-      TypedProperties props = JPPFConfiguration.getProperties();
+  public static void main(final String... args) {
+    try {
+      final TypedProperties props = JPPFConfiguration.getProperties();
       props.set(JPPFProperties.DISCOVERY_ENABLED, true).set(JPPFProperties.POOL_SIZE, 50);
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       jppfClient = new JPPFClient();
       //Thread.sleep(1000);
       int count = 0;
       while ((count = jppfClient.getAllConnectionsCount()) < 50) Thread.sleep(10L);
-      long elapsed = System.nanoTime() - start;
-      print("found " + count + " connections in " + (elapsed/1000000) + " ms");
-    }
-    catch(Exception e)
-    {
+      final long elapsed = System.nanoTime() - start;
+      print("found " + count + " connections in " + (elapsed / 1000000) + " ms");
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -69,8 +62,7 @@ public class ManyConnections
    * Print a message to the log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }

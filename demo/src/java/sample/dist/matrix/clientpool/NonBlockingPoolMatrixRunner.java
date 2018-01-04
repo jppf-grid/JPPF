@@ -32,8 +32,7 @@ import sample.dist.matrix.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class NonBlockingPoolMatrixRunner
-{
+public class NonBlockingPoolMatrixRunner {
   /**
    * Logger for this class.
    */
@@ -49,22 +48,18 @@ public class NonBlockingPoolMatrixRunner
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
-      TypedProperties props = JPPFConfiguration.getProperties();
-      int size = props.getInt("matrix.size", 300);
-      int iterations = props.getInt("matrix.iterations", 10);
-      int nbSubmissions = props.getInt("nb.submissions", 5);
-      System.out.println("Running Matrix demo with matrix size = "+size+ '*' + size + " for " + iterations + " iterations");
-      NonBlockingPoolMatrixRunner runner = new NonBlockingPoolMatrixRunner();
+      final TypedProperties props = JPPFConfiguration.getProperties();
+      final int size = props.getInt("matrix.size", 300);
+      final int iterations = props.getInt("matrix.iterations", 10);
+      final int nbSubmissions = props.getInt("nb.submissions", 5);
+      System.out.println("Running Matrix demo with matrix size = " + size + '*' + size + " for " + iterations + " iterations");
+      final NonBlockingPoolMatrixRunner runner = new NonBlockingPoolMatrixRunner();
       runner.perform(size, iterations, nbSubmissions);
       System.exit(0);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -77,30 +72,26 @@ public class NonBlockingPoolMatrixRunner
    * @param nbSubmissions the number of concurrent task submissions for each iteration.
    * @throws JPPFException if an error is raised during the execution.
    */
-  public void perform(final int size, final int iterations, final int nbSubmissions) throws JPPFException
-  {
-    try
-    {
+  public void perform(final int size, final int iterations, final int nbSubmissions) throws JPPFException {
+    try {
       // initialize the 2 matrices to multiply
-      Matrix a = new Matrix(size);
+      final Matrix a = new Matrix(size);
       a.assignRandomValues();
-      Matrix b = new Matrix(size);
+      final Matrix b = new Matrix(size);
       b.assignRandomValues();
 
       // perform "iteration" times
       long totalTime = 0L;
-      for (int iter=0; iter<iterations; iter++)
-      {
-        long start = System.nanoTime();
+      for (int iter = 0; iter < iterations; iter++) {
+        final long start = System.nanoTime();
         // create a data provider to share matrix b among all tasks
-        DataProvider dataProvider = new MemoryMapDataProvider();
+        final DataProvider dataProvider = new MemoryMapDataProvider();
         dataProvider.setParameter(MatrixTask.DATA_KEY, b);
-        List<JPPFJob> submissions = new ArrayList<>();
-        for (int n=0; n<nbSubmissions; n++)
-        {
-          JPPFJob job = new JPPFJob();
+        final List<JPPFJob> submissions = new ArrayList<>();
+        for (int n = 0; n < nbSubmissions; n++) {
+          final JPPFJob job = new JPPFJob();
           job.setDataProvider(dataProvider);
-          for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
+          for (int i = 0; i < size; i++) job.add(new MatrixTask(a.getRow(i)));
           job.setBlocking(false);
           // create a task for each row in matrix a
           submissions.add(job);
@@ -108,29 +99,25 @@ public class NonBlockingPoolMatrixRunner
         // submit the tasks for execution
         for (JPPFJob job: submissions) jppfClient.submitJob(job);
 
-        for (JPPFJob job: submissions)
-        {
-          List<Task<?>> results = job.awaitResults();
+        for (JPPFJob job: submissions) {
+          final List<Task<?>> results = job.awaitResults();
           // initialize the resulting matrix
-          Matrix c = new Matrix(size);
+          final Matrix c = new Matrix(size);
           // Get the matrix values from the tasks results
-          for (int i=0; i<results.size(); i++)
-          {
-            MatrixTask matrixTask = (MatrixTask) results.get(i);
-            double[] row = (double[]) matrixTask.getResult();
-            for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
+          for (int i = 0; i < results.size(); i++) {
+            final MatrixTask matrixTask = (MatrixTask) results.get(i);
+            final double[] row = (double[]) matrixTask.getResult();
+            for (int j = 0; j < row.length; j++) c.setValueAt(i, j, row[j]);
           }
         }
-        long elapsed = (System.nanoTime() - start) / 1_000_000L;
+        final long elapsed = (System.nanoTime() - start) / 1_000_000L;
         totalTime += elapsed;
-        System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+        System.out.println("Iteration #" + (iter + 1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
-      System.out.println("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
-      JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
-      if (stats != null) System.out.println("End statistics :\n"+stats.toString());
-    }
-    catch(Exception e)
-    {
+      System.out.println("Average iteration time: " + StringUtils.toStringDuration(totalTime / iterations));
+      final JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
+      if (stats != null) System.out.println("End statistics :\n" + stats.toString());
+    } catch (final Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }

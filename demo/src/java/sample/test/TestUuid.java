@@ -46,10 +46,10 @@ public class TestUuid {
    */
   public static void main(final String... args) {
     try {
-      int nbIter = 1000 * 1000;
+      final int nbIter = 1000 * 1000;
       long elapsed_1 = 0L;
       long elapsed_2 = 0L;
-      TestUuid tu = new TestUuid();
+      final TestUuid tu = new TestUuid();
       long start = System.nanoTime();
       for (int i = 0; i < nbIter; i++) tu.generate1();
       elapsed_1 = (System.nanoTime() - start) / 1_000_000L;
@@ -58,7 +58,7 @@ public class TestUuid {
       for (int i = 0; i < nbIter; i++) tu.generate2();
       elapsed_2 = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Test 2 : " + elapsed_2 + " ms");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     System.exit(0);
@@ -77,10 +77,9 @@ public class TestUuid {
    * @return a uuid represented as a string.
    */
   public String generate2() {
-    int len = ALPHABET.length;
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 16; i++)
-      sb.append(ALPHABET[rand.nextInt(len)]);
+    final int len = ALPHABET.length;
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 16; i++) sb.append(ALPHABET[rand.nextInt(len)]);
     return sb.toString();
   }
 }

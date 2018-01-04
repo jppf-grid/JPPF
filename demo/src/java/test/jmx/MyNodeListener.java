@@ -73,8 +73,8 @@ public class MyNodeListener extends NodeLifeCycleListenerAdapter {
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
     // establish a connection to the driver's JMX server
-    String host = "driverHost";
-    int port = 11198; // use the proper port number here
+    final String host = "driverHost";
+    final int port = 11198; // use the proper port number here
     driverJmx = new JMXDriverConnectionWrapper(host, port, false);
     driverJmx.connect();
   }
@@ -84,7 +84,7 @@ public class MyNodeListener extends NodeLifeCycleListenerAdapter {
     if ((driverJmx != null) && driverJmx.isConnected()) {
       try {
         driverJmx.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -97,7 +97,7 @@ public class MyNodeListener extends NodeLifeCycleListenerAdapter {
     if ((currentUuid != null) && driverJmx.isConnected()) {
       try {
         driverJmx.cancelJob(currentUuid);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

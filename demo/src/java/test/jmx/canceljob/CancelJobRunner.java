@@ -48,22 +48,22 @@ public class CancelJobRunner {
     try {
       configure();
       client = new JPPFClient();
-      long duration = 100_000L;
-      int n = 30;
-      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+      final long duration = 100_000L;
+      final int n = 30;
+      final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
       print("waiting for " + n + " client connections ...");
       client.awaitConnectionPools(Operator.EQUAL, n, 100_000L, JPPFClientConnectionStatus.workingStatuses());
-      JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-      DriverJobManagementMBean jobManager = jmx.getJobManager();
+      final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+      final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+      final DriverJobManagementMBean jobManager = jmx.getJobManager();
       forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, n - 1);
       int idleNodes;
       print("waiting for " + (n-1) + " slave nodes ...");
       while ((idleNodes = jmx.nbIdleNodes()) < n) Thread.sleep(10L);
-      List<JPPFJob> jobs = new ArrayList<>();
+      final List<JPPFJob> jobs = new ArrayList<>();
       for (int i=0; i<n; i++) {
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName("Cancel-" + i);
         job.setBlocking(false);
         job.add(new LifeCycleTask(duration)).setId(job.getName() + ":task-0");
@@ -92,7 +92,7 @@ public class CancelJobRunner {
         while ((idleNodes = jmx.nbIdleNodes()) < n) Thread.sleep(10L);
       } else print("got all results");
       print("end: nb idle nodes = " + idleNodes);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();

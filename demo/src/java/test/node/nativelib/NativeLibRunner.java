@@ -48,12 +48,12 @@ public class NativeLibRunner {
       jppfClient = new JPPFClient();
 
       // create a runner instance.
-      NativeLibRunner runner = new NativeLibRunner();
+      final NativeLibRunner runner = new NativeLibRunner();
 
       for (int i = 0; i < 3; i++) {
         System.out.println("submitting job #" + (i + 1) + " ...");
         // Create a job
-        JPPFJob job = runner.createJob();
+        final JPPFJob job = runner.createJob();
         job.setName("" + (i + 1));
 
         // execute a blocking job
@@ -61,7 +61,7 @@ public class NativeLibRunner {
       }
       // execute a non-blocking job
       //runner.executeNonBlockingJob(job);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -75,13 +75,13 @@ public class NativeLibRunner {
    */
   public JPPFJob createJob() throws Exception {
     // create a JPPF job
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
 
     // give this job a readable unique id that we can use to monitor and manage it.
     job.setName("Template Job Id");
 
     // add a task to the job.
-    NativeLibTask task = new NativeLibTask();
+    final NativeLibTask task = new NativeLibTask();
     //task.setTimeout(1000);
     job.add(task);
 
@@ -105,10 +105,10 @@ public class NativeLibRunner {
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of JPPFTask instances,
     // in the same order as the one in which the tasks where initially added the job.
-    List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
 
     // process the results
-    for (Task<?> task : results) {
+    for (final Task<?> task : results) {
       // if the task execution resulted in an exception
       if (task.getThrowable() != null) {
         // process the exception here ...
@@ -142,7 +142,7 @@ public class NativeLibRunner {
     // We use JPPFResultCollector.waitForResults() for this. This method returns immediately
     // with the results if the job has completed, otherwise it waits until the job execution
     // is complete.
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
 
     // process the results
     for (Task<?> task : results) {

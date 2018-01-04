@@ -25,8 +25,7 @@ import java.util.Arrays;
  * Representation of large positive integers.
  * @author Laurent Cohen
  */
-public class LargeInt implements Serializable
-{
+public class LargeInt implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -60,8 +59,7 @@ public class LargeInt implements Serializable
    * .
    * @param data .
    */
-  public LargeInt(final byte[] data)
-  {
+  public LargeInt(final byte[] data) {
     this.data = data;
     dataLength = actualLength(data);
   }
@@ -70,12 +68,10 @@ public class LargeInt implements Serializable
    * Multiply by an int no larger than 127.
    * @param other the number to multiply by.
    */
-  public void multiply(final LargeInt other)
-  {
-    LargeInt result = new LargeInt(ZERO);
-    for (int i=0; i<other.dataLength; i++)
-    {
-      byte[] tempData = multiply(other.data[i], i);
+  public void multiply(final LargeInt other) {
+    final LargeInt result = new LargeInt(ZERO);
+    for (int i = 0; i < other.dataLength; i++) {
+      final byte[] tempData = multiply(other.data[i], i);
       result.add(new LargeInt(tempData));
     }
   }
@@ -87,24 +83,19 @@ public class LargeInt implements Serializable
    * @return the result of the multiplication.
    */
   @SuppressWarnings("unused")
-  private byte[] multiply(final int operand, final int position)
-  {
+  private byte[] multiply(final int operand, final int position) {
     if (operand == 0) return ZERO;
     if (operand == 1) return data;
-    int length = dataLength + position;
-    byte[] temp = new byte[length + 1];
+    final int length = dataLength + position;
+    final byte[] temp = new byte[length + 1];
     int toReport = 0;
     Arrays.fill(temp, 0, position, (byte) 0);
-    for (int i=0; i<dataLength; i++)
-    {
-      int n = operand * data[i];
-      if (n > 127)
-      {
+    for (int i = 0; i < dataLength; i++) {
+      final int n = operand * data[i];
+      if (n > 127) {
         temp[i + position] = (byte) (n % 128);
         toReport = n / 128;
-      }
-      else
-      {
+      } else {
         temp[i + position] = (byte) n;
         toReport = 0;
       }
@@ -116,10 +107,9 @@ public class LargeInt implements Serializable
    * Add a LargeInt to this one.
    * @param other the value to add.
    */
-  public void add(final LargeInt other)
-  {
-    int n1 = dataLength;
-    int n2 = other.dataLength;
+  public void add(final LargeInt other) {
+    final int n1 = dataLength;
+    final int n2 = other.dataLength;
     if (n1 > n2) data = add(data, n1, other.data, n2);
     else data = add(other.data, n2, data, n1);
     dataLength = actualLength(data);
@@ -133,19 +123,15 @@ public class LargeInt implements Serializable
    * @param biggerLength the actual length of the bigger array.
    * @return an array of byte, 2's complement representation of the addition.
    */
-  private byte[] add(final byte[] smaller, final int smallerLength, final byte[] bigger, final int biggerLength)
-  {
-    byte[] temp = new byte[biggerLength + 1];
+  private static byte[] add(final byte[] smaller, final int smallerLength, final byte[] bigger, final int biggerLength) {
+    final byte[] temp = new byte[biggerLength + 1];
     int toReport = 0;
-    for (int i=0; i<biggerLength; i++)
-    {
+    for (int i = 0; i < biggerLength; i++) {
       int n = bigger[i] + (i < smallerLength ? smaller[i] : 0) + toReport;
-      if (n > 127)
-      {
+      if (n > 127) {
         n -= 128;
         toReport = 1;
-      }
-      else toReport = 0;
+      } else toReport = 0;
       temp[i] = (byte) n;
     }
     temp[biggerLength] = (toReport > 0) ? (byte) toReport : 0;
@@ -156,8 +142,7 @@ public class LargeInt implements Serializable
    * Add a LargeInt to this one.
    * @param other the value to add.
    */
-  public void subtract(final LargeInt other)
-  {
+  public void subtract(final LargeInt other) {
     data = add(data, dataLength, other.data, other.dataLength);
     dataLength = actualLength(data);
   }
@@ -166,12 +151,10 @@ public class LargeInt implements Serializable
    * Subtract an integer no larger than 127.
    * @param n the value to subtract.
    */
-  public void subtract(final int n)
-  {
+  public void subtract(final int n) {
     if (n <= data[0]) data[0] = (byte) (data[0] - n);
-    else
-    {
-      int tmp = 128 * data[1] + data[0] - n;
+    else {
+      final int tmp = 128 * data[1] + data[0] - n;
       data[1] = (byte) (tmp / 128);
       data[0] = (byte) (tmp % 128);
       dataLength = actualLength(data);
@@ -187,20 +170,16 @@ public class LargeInt implements Serializable
    * @return an array of byte, 2's complement representation of the addition.
    */
   @SuppressWarnings("unused")
-  private byte[] subtract(final byte[] smaller, final int smallerLength, final byte[] bigger, final int biggerLength)
-  {
-    byte[] temp = new byte[biggerLength];
+  private static byte[] subtract(final byte[] smaller, final int smallerLength, final byte[] bigger, final int biggerLength) {
+    final byte[] temp = new byte[biggerLength];
     int toReport = 0;
-    for (int i=biggerLength-1; i<=0; i--)
-    {
+    for (int i = biggerLength - 1; i <= 0; i--) {
 
       int n = bigger[i] - (i < smallerLength ? smaller[i] : 0) - toReport;
-      if (n < 0)
-      {
+      if (n < 0) {
         n += 128;
         toReport = 1;
-      }
-      else toReport = 0;
+      } else toReport = 0;
       temp[i] = (byte) n;
     }
     temp[biggerLength] = (toReport > 0) ? (byte) toReport : 0;
@@ -212,10 +191,10 @@ public class LargeInt implements Serializable
    * @param bytes the array from which to get the length.
    * @return the length as an int value.
    */
-  private int actualLength(final byte[] bytes)
-  {
+  private static int actualLength(final byte[] bytes) {
     int n = bytes.length;
-    while ((bytes[n - 1] == 0) && (n > 0)) n--;
+    while ((bytes[n - 1] == 0) && (n > 0))
+      n--;
     return n;
   }
 }

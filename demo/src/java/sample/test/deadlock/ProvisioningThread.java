@@ -59,15 +59,15 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
   public void run() {
     log.info("starting ProvisioningThread, waitTime={}", waitTime);
     JPPFNodeForwardingMBean forwarder = null;
-    ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
-    NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
+    final ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
+    final NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
     while (!isStopped()) {
       if (forwarder == null) {
         try {
-          JMXDriverConnectionWrapper jmx = DeadlockRunner.getJmxConnection(client);
+          final JMXDriverConnectionWrapper jmx = DeadlockRunner.getJmxConnection(client);
           log.info("getting forwarder");
           forwarder = jmx.getNodeForwarder();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
           return;
         }
@@ -77,11 +77,11 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       goToSleep(1000L);
       if (isStopped()) break;
       try {
-        Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 40);
+        final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 40);
         for (Map.Entry<String, Object> entry: map.entrySet()) {
           if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
         System.exit(1);
         return;
@@ -90,11 +90,11 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       goToSleep(waitTime);
       if (isStopped()) break;
       try {
-        Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 0);
+        final Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 0);
         for (Map.Entry<String, Object> entry: map.entrySet()) {
           if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
         System.exit(1);
         return;
@@ -102,7 +102,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
     }
     try {
       forwarder.provisionSlaveNodes(masterSelector, 0);
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       //e.printStackTrace();
       return;
     }

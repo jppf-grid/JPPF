@@ -71,7 +71,7 @@ public class MyTask extends AbstractTask<String> {
         }
       }
       setResult("execution success for " + message);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

@@ -45,9 +45,8 @@ public class SerializationOverflowRunner {
   public static void main(final String... args) {
     try {
       jppfClient = new JPPFClient();
-      for (int i = 1; i <= 1; i++)
-        perform(i);
-    } catch (Exception e) {
+      for (int i = 1; i <= 1; i++) perform(i);
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -77,17 +76,16 @@ public class SerializationOverflowRunner {
    * @throws Exception if an error is raised during the execution.
    */
   private static void submitJob(final String name, final int nbTasks, final long time, final boolean blocking) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(name);
-    for (int j = 1; j <= nbTasks; j++)
-      job.add(new SerializationOverflowTask(time, j));
+    for (int j = 1; j <= nbTasks; j++) job.add(new SerializationOverflowTask(time, j));
     job.setBlocking(blocking);
     if (blocking) {
       output("* submitting job '" + job.getName() + "'");
-      List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submitJob(job);
       output("+ got results for job " + job.getName());
-      for (Task<?> task : results) {
-        Throwable e = task.getThrowable();
+      for (final Task<?> task : results) {
+        final Throwable e = task.getThrowable();
         if (e != null) {
           output("task got exception: " + ExceptionUtils.getStackTrace(e));
           output("result is: " + task.getResult());

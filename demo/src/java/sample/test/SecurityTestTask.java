@@ -48,9 +48,9 @@ public class SecurityTestTask extends JPPFTestTask {
    */
   public void testConnectForbiddenHost() throws SecurityException {
     try {
-      Socket s = new Socket("www.apache.org", 8000);
+      final Socket s = new Socket("www.apache.org", 8000);
       s.close();
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused") final IOException e) {
     }
   }
 
@@ -60,10 +60,10 @@ public class SecurityTestTask extends JPPFTestTask {
    */
   public void testConnectForbiddenPort() throws SecurityException {
     try {
-      String host = JPPFConfiguration.get(JPPFProperties.SERVER_HOST);
-      Socket s = new Socket(host, 1001);
+      final String host = JPPFConfiguration.get(JPPFProperties.SERVER_HOST);
+      final Socket s = new Socket(host, 1001);
       s.close();
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused") final IOException e) {
     }
   }
 
@@ -73,10 +73,10 @@ public class SecurityTestTask extends JPPFTestTask {
    */
   public void testWriteFile() throws SecurityException {
     try {
-      FileWriter writer = new FileWriter("foo.bar");
+      final FileWriter writer = new FileWriter("foo.bar");
       writer.write("Hello");
       writer.close();
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused") final IOException e) {
     }
   }
 
@@ -86,17 +86,17 @@ public class SecurityTestTask extends JPPFTestTask {
    */
   public void testReadFile() throws SecurityException {
     try {
-      File file = new File("/");
-      File[] dirList = file.listFiles();
+      final File file = new File("/");
+      final File[] dirList = file.listFiles();
       for (File f : dirList) {
         if (!f.isDirectory()) {
-          FileInputStream fis = new FileInputStream(f);
+          final FileInputStream fis = new FileInputStream(f);
           fis.read();
           fis.close();
           break;
         }
       }
-    } catch (@SuppressWarnings("unused") IOException e) {
+    } catch (@SuppressWarnings("unused") final IOException e) {
     }
   }
 }

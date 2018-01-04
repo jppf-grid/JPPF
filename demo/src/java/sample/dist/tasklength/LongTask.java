@@ -61,7 +61,7 @@ public class LongTask extends AbstractTask<String> {
 
   @Override
   public void run() {
-    long taskStart = System.nanoTime();
+    final long taskStart = System.nanoTime();
     long elapsed = 0L;
     try {
       if (useCPU) {
@@ -74,17 +74,17 @@ public class LongTask extends AbstractTask<String> {
         if (taskLength > 0) Thread.sleep(taskLength);
         elapsed = (System.nanoTime() - taskStart) / 1_000_000L;
       }
-      String result = "task '" + getId() + "' has run for " + elapsed + " ms";
+      final String result = "task '" + getId() + "' has run for " + elapsed + " ms";
       setResult(result);
       System.out.println(result);
-    } catch(InterruptedException e) {
+    } catch(final InterruptedException e) {
       setResult(e.getClass().getName() + " : " + e.getMessage());
     }
   }
 
   @Override
   public void onCancel() {
-    String s = "task " + getId() + " has been cancelled";
+    final String s = "task " + getId() + " has been cancelled";
     setResult(s);
     System.out.println(s);
   }

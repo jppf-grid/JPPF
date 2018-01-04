@@ -23,8 +23,7 @@ import java.io.Serializable;
  * A simple hello world JPPF task implemented as a POJO with a constructor.
  * @author Laurent Cohen
  */
-public class HelloWorldPojoConstructor implements Serializable
-{
+public class HelloWorldPojoConstructor implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -39,8 +38,7 @@ public class HelloWorldPojoConstructor implements Serializable
    * @param message a message to print.
    * @param number an example primitive argument.
    */
-  public HelloWorldPojoConstructor(final String message, final int number)
-  {
+  public HelloWorldPojoConstructor(final String message, final int number) {
     this.hello = "Hello, World (pojo constructor, " + message + ", " + number + ')';
     System.out.println(this.hello);
   }
@@ -51,8 +49,7 @@ public class HelloWorldPojoConstructor implements Serializable
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return hello;
   }
 }

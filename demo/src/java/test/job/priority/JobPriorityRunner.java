@@ -57,7 +57,7 @@ public class JobPriorityRunner {
       JPPFConfiguration.set(JPPFProperties.DISCOVERY_ENABLED, true).set(JPPFProperties.POOL_SIZE, 2);
       jppfClient = new JPPFClient();
       perform();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -70,12 +70,12 @@ public class JobPriorityRunner {
    */
   private static void perform() throws Exception {
     try {
-      DriverJobManagementMBean jobMgt = getJobManagement();
-      long start = System.nanoTime();
-      JPPFJob job1 = createJob("job 1", 1, 10, 1000);
-      JPPFJob job2 = createJob("job 2", 0, 10, 1000);
-      JobRunner runner1 = new JobRunner(job1);
-      JobRunner runner2 = new JobRunner(job2);
+      final DriverJobManagementMBean jobMgt = getJobManagement();
+      final long start = System.nanoTime();
+      final JPPFJob job1 = createJob("job 1", 1, 10, 1000);
+      final JPPFJob job2 = createJob("job 2", 0, 10, 1000);
+      final JobRunner runner1 = new JobRunner(job1);
+      final JobRunner runner2 = new JobRunner(job2);
       runner1.start();
       runner2.start();
       Thread.sleep(2000L);
@@ -83,9 +83,9 @@ public class JobPriorityRunner {
       runner1.join();
       runner2.join();
       // submit the tasks for execution
-      long elapsed = DateTimeUtils.elapsedFrom(start);
+      final long elapsed = DateTimeUtils.elapsedFrom(start);
       print("elapsed time: " + StringUtils.toStringDuration(elapsed));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }
@@ -100,11 +100,11 @@ public class JobPriorityRunner {
    * @throws Exception if an error is raised during the job creation.
    */
   private static JPPFJob createJob(final String name, final int priority, final int nbTasks, final int length) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(name);
     job.getSLA().setPriority(priority);
     for (int i = 0; i < nbTasks; i++) {
-      LongTask task = new LongTask(length, false);
+      final LongTask task = new LongTask(length, false);
       task.setId("" + (i + 1));
       job.add(task);
     }
@@ -156,13 +156,13 @@ public class JobPriorityRunner {
    */
   @SuppressWarnings("unused")
   private static void restartDriver() throws Exception {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         try {
-          String s = getJmxConnection().restartShutdown(100L, 2000L);
+          final String s = getJmxConnection().restartShutdown(100L, 2000L);
           System.out.println("response for restart: " + s);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }
@@ -195,17 +195,17 @@ public class JobPriorityRunner {
     public void run() {
       try {
         jppfClient.submitJob(job);
-        List<Task<?>> results = job.awaitResults();
+        final List<Task<?>> results = job.awaitResults();
         print("job '" + job.getName() + "' complete");
-        for (Task<?> task : results) {
-          StringBuilder sb = new StringBuilder();
+        for (final Task<?> task : results) {
+          final StringBuilder sb = new StringBuilder();
           sb.append("results for task [").append(job.getName()).append("] ").append(task.getId()).append(" : ");
-          Throwable e = task.getThrowable();
+          final Throwable e = task.getThrowable();
           if (e != null) sb.append(ExceptionUtils.getStackTrace(e));
           else sb.append(task.getResult());
           print(sb.toString());
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

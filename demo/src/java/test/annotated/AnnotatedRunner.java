@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class AnnotatedRunner
-{
+public class AnnotatedRunner {
   /**
    * Logger for this class.
    */
@@ -47,19 +46,13 @@ public class AnnotatedRunner
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
       perform2();
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -69,27 +62,24 @@ public class AnnotatedRunner
    * @throws Exception if an error is raised during the execution.
    */
   @SuppressWarnings("unused")
-  private static void perform() throws Exception
-  {
-    int nbJobs = 50;
-    long time = 0L;
+  private static void perform() throws Exception {
+    final int nbJobs = 50;
+    final long time = 0L;
 
     output("Running demo with time = " + time + " for " + nbJobs + " jobs");
     long totalTime = System.nanoTime();
-    List<JPPFJob> jobs = new ArrayList<>();
-    for (int i=0; i<nbJobs; i++)
-    {
-      JPPFJob job = new JPPFJob();
-      job.setName("demo job " + (i+1));
-      job.add(new AnnotatedTask(time, (i+1)));
+    final List<JPPFJob> jobs = new ArrayList<>();
+    for (int i = 0; i < nbJobs; i++) {
+      final JPPFJob job = new JPPFJob();
+      job.setName("demo job " + (i + 1));
+      job.add(new AnnotatedTask(time, (i + 1)));
       job.setBlocking(false);
       jobs.add(job);
       jppfClient.submitJob(job);
     }
-    for (JPPFJob job: jobs)
-    {
-      List<Task<?>> results = job.awaitResults();
-      Task<?> t = results.get(0);
+    for (final JPPFJob job: jobs) {
+      final List<Task<?>> results = job.awaitResults();
+      final Task<?> t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
@@ -100,32 +90,29 @@ public class AnnotatedRunner
    * Perform the test.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform2() throws Exception
-  {
-    int nbJobs = 1;
-    long time = 0L;
+  private static void perform2() throws Exception {
+    final int nbJobs = 1;
+    final long time = 0L;
 
     output("Running demo with time = " + time + " for " + nbJobs + " jobs");
-    File file = new File("../jppftest/bin");
-    URL url = file.toURI().toURL();
-    URLClassLoader cl = new URLClassLoader(new URL[] { url }, AnnotatedRunner.class.getClassLoader());
+    final File file = new File("../jppftest/bin");
+    final URL url = file.toURI().toURL();
+    final URLClassLoader cl = new URLClassLoader(new URL[] { url }, AnnotatedRunner.class.getClassLoader());
     Thread.currentThread().setContextClassLoader(cl);
     long totalTime = System.nanoTime();
-    List<JPPFJob> jobs = new ArrayList<>();
-    for (int i=0; i<nbJobs; i++)
-    {
-      JPPFJob job = new JPPFJob();
-      job.setName("demo job " + (i+1));
-      Task<?> task = (Task<?>) cl.loadClass("test.TestClass").newInstance();
+    final List<JPPFJob> jobs = new ArrayList<>();
+    for (int i = 0; i < nbJobs; i++) {
+      final JPPFJob job = new JPPFJob();
+      job.setName("demo job " + (i + 1));
+      final Task<?> task = (Task<?>) cl.loadClass("test.TestClass").newInstance();
       job.add(task);
       job.setBlocking(false);
       jobs.add(job);
       jppfClient.submitJob(job);
     }
-    for (JPPFJob job: jobs)
-    {
-      List<Task<?>> results = job.awaitResults();
-      Task<?> t = results.get(0);
+    for (final JPPFJob job: jobs) {
+      final List<Task<?>> results = job.awaitResults();
+      final Task<?> t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
@@ -136,8 +123,7 @@ public class AnnotatedRunner
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

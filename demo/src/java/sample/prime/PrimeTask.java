@@ -61,17 +61,15 @@ public class PrimeTask extends AbstractTask<Integer> {
     elapsed1 = (System.nanoTime() - elapsed1) / 1_000_000L;
     System.out.println("elapsed1 = " + elapsed1);
     */
-    int n1 = exponent / 8;
-    int n2 = exponent % 8;
-    int n3 = n2 == 0 ? n1 : n1 + 1;
-    byte[] data = new byte[n3];
-    byte b = (byte) -1;
-    for (int i = n3 - 1; i >= n3 - n1; i--)
-      data[i] = b;
+    final int n1 = exponent / 8;
+    final int n2 = exponent % 8;
+    final int n3 = n2 == 0 ? n1 : n1 + 1;
+    final byte[] data = new byte[n3];
+    final byte b = (byte) -1;
+    for (int i = n3 - 1; i >= n3 - n1; i--) data[i] = b;
     if (n1 < n3) {
       int n = 0;
-      for (int i = 0; i < n2; i++)
-        n = n * 2 + 1;
+      for (int i = 0; i < n2; i++) n = n * 2 + 1;
       data[0] = (byte) n;
     }
     mersenne = new BigInteger(1, data);
@@ -87,7 +85,7 @@ public class PrimeTask extends AbstractTask<Integer> {
   public void run() {
     try {
       if (test()) setResult(Integer.valueOf(exponent));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

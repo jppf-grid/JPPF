@@ -47,17 +47,17 @@ public class LongTaskRunner {
   public static void main(final String...args) {
     try {
       jppfClient = new JPPFClient();
-      TypedProperties props = JPPFConfiguration.getProperties();
-      int length = props.getInt("longtask.length");
-      int nbTask = props.getInt("longtask.number");
-      int iterations = props.getInt("longtask.iterations");
+      final TypedProperties props = JPPFConfiguration.getProperties();
+      final int length = props.getInt("longtask.length");
+      final int nbTask = props.getInt("longtask.number");
+      final int iterations = props.getInt("longtask.iterations");
       print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
       perform(nbTask, length, iterations);
       //performAsync(nbTask, length, iterations);
       //perform3(nbTask, length, iterations);
       //perform4();
       //perform5();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -75,20 +75,20 @@ public class LongTaskRunner {
     // perform "iteration" times
     long totalTime = 0L;
     for (int iter=1; iter<=iterations; iter++) {
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
       // submit the tasks for execution
-      List<Task<?>> results = jppfClient.submitJob(job);
-      for (Task<?> task: results) {
-        Throwable e = task.getThrowable();
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      for (final Task<?> task: results) {
+        final Throwable e = task.getThrowable();
         if (e != null) {
           if (e instanceof Exception) throw (Exception) e;
           else throw new JPPFException(e);
         }
       }
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
       totalTime += elapsed;
     }

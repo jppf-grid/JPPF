@@ -25,8 +25,7 @@ import org.slf4j.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class DataSizeRunner
-{
+public class DataSizeRunner {
   /**
    * Logger for this class.
    */
@@ -50,21 +49,15 @@ public class DataSizeRunner
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
       perform();
       //perform2();
       //perform3();
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -73,45 +66,41 @@ public class DataSizeRunner
    * Perform the test.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform() throws Exception
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
-    int iterations = config.getInt("datasize.iterations", 1);
+  private static void perform() throws Exception {
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
+    final int iterations = config.getInt("datasize.iterations", 1);
     int datasize = config.getInt("datasize.size", 1);
-    int nbTasks = config.getInt("datasize.nbTasks", 10);
-    String unit = config.getString("datasize.unit", "b").toLowerCase();
+    final int nbTasks = config.getInt("datasize.nbTasks", 10);
+    final String unit = config.getString("datasize.unit", "b").toLowerCase();
     if ("k".equals(unit)) datasize *= KILO;
     else if ("m".equals(unit)) datasize *= MEGA;
 
     output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks for " + iterations + " iterations");
     long totalTime = 0;
-    for (int i=1; i<=iterations; i++)
-    {
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+    for (int i = 1; i <= iterations; i++) {
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("Datasize job " + i);
-      for (int j=0; j<nbTasks; j++) job.add(new DataTask(datasize, inNodeOnly));
+      for (int j = 0; j < nbTasks; j++) job.add(new DataTask(datasize, inNodeOnly));
       jppfClient.submitJob(job);
-      /*
-			for (JPPFTask t: results)
-			{
-				if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
-				else System.out.println("task result: " + t.getResult());
-			}
-       */
-      long elapsed = System.nanoTime() - start;
+      /* for (JPPFTask t: results)
+       * {
+       * if (t.getException() != null) System.out.println("task error: " + t.getException().getMessage());
+       * else System.out.println("task result: " + t.getResult());
+       * } */
+      final long elapsed = System.nanoTime() - start;
       totalTime += elapsed;
-      output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
+      output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed / 1000000L));
     }
-    output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
+    output("Computation time: " + StringUtils.toStringDuration(totalTime / 1000000L));
   }
+
   /**
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

@@ -28,18 +28,15 @@ import org.jppf.node.protocol.Task;
  * Runner for the hello world application.
  * @author Laurent Cohen
  */
-public class HelloWorldRunner
-{
+public class HelloWorldRunner {
   /**
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
-      JPPFClient client = new JPPFClient();
-      JPPFJob job = new JPPFJob();
+  public static void main(final String... args) {
+    try {
+      final JPPFClient client = new JPPFClient();
+      final JPPFJob job = new JPPFJob();
       job.add(new HelloWorld());
       job.add(new HelloWorldAnnotated(), "hello message", 1);
       job.add(HelloWorldAnnotatedStatic.class, "hello message", 2);
@@ -49,22 +46,17 @@ public class HelloWorldRunner
       job.add("HelloWorldPojoConstructor", HelloWorldPojoConstructor.class, "hello message", 6);
       job.add(new HelloWorldRunnable());
       job.add(new HelloWorldCallable());
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       System.out.println("********** Results: **********");
-      for (Task<?> task: results)
-      {
-        if (task.getThrowable() != null)
-        {
-          StringWriter sw = new StringWriter();
+      for (final Task<?> task: results) {
+        if (task.getThrowable() != null) {
+          final StringWriter sw = new StringWriter();
           task.getThrowable().printStackTrace(new PrintWriter(sw));
           System.out.println(sw.toString());
-        }
-        else System.out.println("" + task.getResult());
+        } else System.out.println("" + task.getResult());
       }
       client.close();
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     System.exit(0);

@@ -19,13 +19,11 @@ package sample.datasize;
 
 import org.jppf.node.protocol.AbstractTask;
 
-
 /**
  * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
-public class DataTask extends AbstractTask<String>
-{
+public class DataTask extends AbstractTask<String> {
   /**
    * The data this task owns.
    */
@@ -45,8 +43,7 @@ public class DataTask extends AbstractTask<String>
    * The array is created at construction time and passed on to the node.
    * @param datasize the size in byte of the byte array this task owns.
    */
-  public DataTask(final int datasize)
-  {
+  public DataTask(final int datasize) {
     this.datasize = datasize;
     data = new byte[datasize];
   }
@@ -58,8 +55,7 @@ public class DataTask extends AbstractTask<String>
    * @param datasize the size in byte of the byte array this task owns.
    * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
    */
-  public DataTask(final int datasize, final boolean inNodeOnly)
-  {
+  public DataTask(final int datasize, final boolean inNodeOnly) {
     this.datasize = datasize;
     this.inNodeOnly = inNodeOnly;
     if (!inNodeOnly) data = new byte[datasize];
@@ -70,15 +66,11 @@ public class DataTask extends AbstractTask<String>
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (inNodeOnly) data = new byte[datasize];
       setResult("execution successful");
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

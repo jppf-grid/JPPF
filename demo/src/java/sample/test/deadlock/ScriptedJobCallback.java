@@ -34,7 +34,7 @@ public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
   /** */
   public ScriptedJobCallback() {
     runner = ScriptRunnerFactory.getScriptRunner("javascript");
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     jobCreatedScript = config.getString("deadlock.script.created");
     jobCompletedScript = config.getString("deadlock.script.completed");
   }
@@ -56,11 +56,11 @@ public class ScriptedJobCallback extends JobStreamingCallback.Adapter {
    * @param script .
    */
   private void runScript(final JPPFJob job, final String scriptID, final String script) {
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("job", job);
     try {
       runner.evaluate(scriptID, script, variables);
-    } catch (JPPFScriptingException e) {
+    } catch (final JPPFScriptingException e) {
       e.printStackTrace();
     }
   }

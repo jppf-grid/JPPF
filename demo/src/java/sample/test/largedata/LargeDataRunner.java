@@ -100,7 +100,7 @@ public class LargeDataRunner {
     SubmitQueue queue = null;
     try {
       nf.setGroupingUsed(true);
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       dataFile = config.getString("largedata.file");
       nbArticles = config.getInt("largedata.articles.per.task");
       nbTasks = config.getInt("largedata.tasks.per.job");
@@ -109,18 +109,18 @@ public class LargeDataRunner {
       config.set(JPPFProperties.POOL_SIZE, nbChannels);
       jppfClient = new JPPFClient();
       queue = new SubmitQueue(jppfClient);
-      Thread t = new Thread(queue, "SubmitQueue");
+      final Thread t = new Thread(queue, "SubmitQueue");
       t.setDaemon(true);
       t.start();
       System.out.println("Processing '" + dataFile + "' with " + nf.format(nbArticles) + " articles per task, " + nf.format(nbTasks) + " tasks per job, nb channels = " + nbChannels);
       reader = new DataReader(dataFile);
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       JPPFJob job;
       while ((job = nextJob()) != null) {
         queue.submit(job);
         //List<JPPFTask> results = queue.fetchResults();
       }
-      Object lock = new Object();
+      final Object lock = new Object();
       //while (queue.getResultCount() < jobCount)
       while (totalTasksProcessed.get() < totalTasksSent) {
         synchronized (lock) {
@@ -128,11 +128,10 @@ public class LargeDataRunner {
         }
       }
       executor.shutdown();
-      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS))
-        ;
-      long elapsed = (System.nanoTime() - start) / 1000000L;
+      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS));
+      final long elapsed = (System.nanoTime() - start) / 1000000L;
       System.out.println("processed " + jobCount + " jobs for " + nf.format(totalArticles) + " articles in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");
-      BufferedWriter writer = new BufferedWriter(new FileWriter("CountResults.txt"));
+      final BufferedWriter writer = new BufferedWriter(new FileWriter("CountResults.txt"));
       System.out.println("writing results ...");
       for (Map.Entry<String, Long> entry : mergedResults.entrySet()) {
         writer.write(StringUtils.padRight(entry.getKey(), ' ', 26, false));
@@ -143,7 +142,7 @@ public class LargeDataRunner {
       writer.flush();
       writer.close();
       System.out.println("done");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (queue != null) queue.setStopped(true);
@@ -160,13 +159,13 @@ public class LargeDataRunner {
   private static JPPFJob nextJob() throws Exception {
     int taskCount = 0;
     int totalJobArticles = 0;
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("job-" + (jobCount + 1));
     job.getClientSLA().setMaxChannels(nbChannels);
     while (!reader.isClosed() && (taskCount < nbTasks)) {
       int articleCount = 0;
       String article = null;
-      List<String> list = new ArrayList<>(nbArticles);
+      final List<String> list = new ArrayList<>(nbArticles);
       while (!reader.isClosed() && (articleCount < nbArticles)) {
         article = reader.nextArticle();
         if (article == null) break;
@@ -246,10 +245,10 @@ public class LargeDataRunner {
     public void run() {
       for (Task<?> task : tasks) {
         @SuppressWarnings("unchecked")
-        Map<String, Long> map = (Map<String, Long>) task.getResult();
+        final Map<String, Long> map = (Map<String, Long>) task.getResult();
         if (map == null) continue;
         task.setResult(null);
-        for (Map.Entry<String, Long> entry : map.entrySet()) {
+        for (final Map.Entry<String, Long> entry : map.entrySet()) {
           Long n = mergedResults.get(entry.getKey());
           if (n == null) n = entry.getValue();
           else n += entry.getValue();

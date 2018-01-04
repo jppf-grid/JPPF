@@ -56,7 +56,7 @@ public class SocketPerformance {
       if ((args == null) || (args.length < 1)) perform();
       else if ("server".equalsIgnoreCase(args[0])) performServer();
       else if ("client".equalsIgnoreCase(args[0])) performClient();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -66,7 +66,7 @@ public class SocketPerformance {
    * @throws Exception if any error occurs.
    */
   private static void perform() throws Exception {
-    Server server = new Server();
+    final Server server = new Server();
     server.start();
     Thread.sleep(500L);
     new Client().start();
@@ -79,7 +79,7 @@ public class SocketPerformance {
    */
   private static void performServer() throws Exception {
     System.out.println("starting server");
-    Server server = new Server();
+    final Server server = new Server();
     server.start();
     server.join();
     System.out.println("server ended");
@@ -91,7 +91,7 @@ public class SocketPerformance {
    */
   private static void performClient() throws Exception {
     System.out.println("starting client");
-    Client client = new Client();
+    final Client client = new Client();
     client.start();
     client.join();
     System.out.println("client ended");
@@ -115,18 +115,17 @@ public class SocketPerformance {
      */
     @Override
     public void run() {
-      try {
-        ServerSocket server = new ServerSocket(15555);
+      try (ServerSocket server = new ServerSocket(15555)) {
         while (true) {
-          Socket s = server.accept();
-          Connection c = new Connection(s);
+          final Socket s = server.accept();
+          final Connection c = new Connection(s);
           c.start();
           if (clientStarted) {
             c.join();
             break;
           }
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -158,13 +157,13 @@ public class SocketPerformance {
     @Override
     public void run() {
       try {
-        TypedProperties props = JPPFConfiguration.getProperties();
+        final TypedProperties props = JPPFConfiguration.getProperties();
         int datasize = props.getInt("datasize.size", 1);
-        int nbTasks = props.getInt("datasize.nbTasks", 10);
-        String unit = props.getString("datasize.unit", "b").toLowerCase();
+        final int nbTasks = props.getInt("datasize.nbTasks", 10);
+        final String unit = props.getString("datasize.unit", "b").toLowerCase();
         if ("k".equals(unit)) datasize *= KILO;
         else if ("m".equals(unit)) datasize *= MEGA;
-        byte[] data = new byte[datasize];
+        final byte[] data = new byte[datasize];
         for (int i = 0; i < nbTasks; i++) {
           //log.info("Server: writing datasize");
           socketWrapper.writeInt(datasize);
@@ -175,7 +174,7 @@ public class SocketPerformance {
           //log.info("Server: data written in " + elapsed + " ms");
         }
         socketWrapper.writeInt(0);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -200,24 +199,23 @@ public class SocketPerformance {
      */
     @Override
     public void run() {
-      try {
-        SocketClient sc = new SocketClient("lolo-quad", 15555);
+      try (SocketClient sc = new SocketClient("lolo-quad", 15555)) {
         byte[] data = null;
         while (true) {
           //log.info("Client: reading next datasize");
-          int datasize = sc.readInt();
+          final int datasize = sc.readInt();
           if (datasize == 0) {
             log.info("Client: terminating");
             break;
           }
           //log.info("Client: read datasize = " + datasize + ", reading next data");
           if ((data == null) || (data.length < datasize)) data = new byte[datasize];
-          long start = System.nanoTime();
+          final long start = System.nanoTime();
           sc.read(data, 0, datasize);
-          long elapsed = DateTimeUtils.elapsedFrom(start);
+          final long elapsed = DateTimeUtils.elapsedFrom(start);
           log.info("Client: read data size = " + datasize + " in " + elapsed + " ms");
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

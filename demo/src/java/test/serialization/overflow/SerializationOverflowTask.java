@@ -21,13 +21,11 @@ import java.util.*;
 
 import org.jppf.node.protocol.AbstractTask;
 
-
 /**
  * .
  * @author Laurent Cohen
  */
-public class SerializationOverflowTask extends AbstractTask<String>
-{
+public class SerializationOverflowTask extends AbstractTask<String> {
   /**
    * The time this task will sleep.
    */
@@ -47,8 +45,7 @@ public class SerializationOverflowTask extends AbstractTask<String>
    * @param time .
    * @param id .
    */
-  public SerializationOverflowTask(final long time, final int id)
-  {
+  public SerializationOverflowTask(final long time, final int id) {
     this.time = time;
     this.id = id;
   }
@@ -58,19 +55,15 @@ public class SerializationOverflowTask extends AbstractTask<String>
    * The node should have at least 6 GB of heap.
    */
   @Override
-  public void run()
-  {
+  public void run() {
     String s = null;
-    try
-    {
+    try {
       if (time > 0L) Thread.sleep(time);
-      int size = 256 * 1024 * 1024; // 256 MB
+      final int size = 256 * 1024 * 1024; // 256 MB
       data = new ArrayList<>();
-      for (int i=0; i<10; i++) data.add(new byte[size]);
+      for (int i = 0; i < 10; i++) data.add(new byte[size]);
       s = "task #" + id + " execution successful";
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
       s = "task #" + id + " " + e.getMessage();
       e.printStackTrace();
@@ -78,4 +71,3 @@ public class SerializationOverflowTask extends AbstractTask<String>
     setResult(s);
   }
 }
-

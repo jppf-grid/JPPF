@@ -49,9 +49,9 @@ public class ProfilingRunner {
    */
   public static void main(final String... args) {
     try {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      int nbTask = config.getInt("profiling.nbTasks");
-      int iterations = config.getInt("profiling.iterations");
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final int nbTask = config.getInt("profiling.nbTasks");
+      final int iterations = config.getInt("profiling.iterations");
       int nbChannels = config.getInt("profiling.channels");
       if (nbChannels < 1) nbChannels = 1;
       config.set(JPPFProperties.POOL_SIZE, nbChannels);
@@ -61,7 +61,7 @@ public class ProfilingRunner {
       //performSequential(nbTask, false);
       perform(nbTask, iterations);
       //StreamUtils.waitKeyPressed();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -76,12 +76,12 @@ public class ProfilingRunner {
    */
   private static void perform(final int nbTask, final int iterations) throws Exception {
     for (int iter = 1; iter <= iterations; iter++) {
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("profiling-" + iter);
       for (int i = 0; i < nbTask; i++) job.add(new EmptyTask(dataSize));
       jppfClient.submitJob(job);
-      long elapsed = System.nanoTime() - start;
+      final long elapsed = System.nanoTime() - start;
       System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed / 1000000));
     }
   }
@@ -94,11 +94,11 @@ public class ProfilingRunner {
    */
   @SuppressWarnings("unused")
   private static void performSequential(final int nbTask, final boolean silent) throws Exception {
-    long start = System.nanoTime();
-    List<Task<?>> tasks = new ArrayList<>();
+    final long start = System.nanoTime();
+    final List<Task<?>> tasks = new ArrayList<>();
     for (int i = 0; i < nbTask; i++) tasks.add(new EmptyTask(dataSize));
     for (Task<?> task : tasks) task.run();
-    long elapsed = System.nanoTime() - start;
+    final long elapsed = System.nanoTime() - start;
     if (!silent) System.out.println("Sequential iteration performed in " + StringUtils.toStringDuration(elapsed / 1000000));
   }
 }

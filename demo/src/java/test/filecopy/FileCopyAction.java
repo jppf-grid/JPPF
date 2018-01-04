@@ -101,8 +101,8 @@ public class FileCopyAction implements JPPFCallable<CopyResult> {
         }
       }
       if (is == null) throw new FileNotFoundException("file '" + clientLocation + "' not found");
-      byte[] bytes = new byte[maxChunkSize];
-      int n = is.read(bytes);
+      final byte[] bytes = new byte[maxChunkSize];
+      final int n = is.read(bytes);
       if (DEBUG) System.out.printf("read %d bytes for '%s'%n", n, clientLocation);
       if (n < maxChunkSize) {
         eof = true;
@@ -112,12 +112,12 @@ public class FileCopyAction implements JPPFCallable<CopyResult> {
         }
       }
       if (n <= 0) return new CopyResult(null, true);
-      byte[] result = new byte[n];
+      final byte[] result = new byte[n];
       System.arraycopy(bytes, 0, result, 0, n);
       return new CopyResult(result, eof);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       synchronized(streamMap) {
-        InputStream is = streamMap.get(uuid);
+        final InputStream is = streamMap.get(uuid);
         if (is != null) {
           StreamUtils.closeSilent(is);
           streamMap.remove(uuid);

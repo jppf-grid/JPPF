@@ -50,12 +50,12 @@ public class LocalExecutionRunner {
    */
   public static void main(final String... args) {
     try {
-      TypedProperties props = JPPFConfiguration.getProperties();
+      final TypedProperties props = JPPFConfiguration.getProperties();
       props.set(JPPFProperties.LOCAL_EXECUTION_ENABLED, false);
       print("starting client ...");
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       jppfClient = new JPPFClient();
-      long elapsed = System.nanoTime() - start;
+      final long elapsed = System.nanoTime() - start;
       print("client started in " + StringUtils.toStringDuration(elapsed / 1000000));
       /* print("run 1 with local execution off");
        * perform(nbTask, length, 1); */
@@ -66,7 +66,7 @@ public class LocalExecutionRunner {
       /* print("run 3 with local execution off");
        * jppfClient.setLocalExecutionEnabled(false);
        * perform(nbTask, length, 3); */
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -83,24 +83,24 @@ public class LocalExecutionRunner {
   @SuppressWarnings("unused")
   private static void perform(final int nbTasks, final int length, final int iter) throws Exception {
     try {
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i = 0; i < nbTasks; i++) {
-        LongTask task = new LongTask(length, false);
+        final LongTask task = new LongTask(length, false);
         task.setId("" + (iter + 1) + ':' + (i + 1));
         job.add(task);
       }
       // submit the tasks for execution
-      List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submitJob(job);
       for (Task<?> task : results) {
-        Throwable e = task.getThrowable();
+        final Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
-      long elapsed = DateTimeUtils.elapsedFrom(start);
+      final long elapsed = DateTimeUtils.elapsedFrom(start);
       print("run " + iter + " time: " + StringUtils.toStringDuration(elapsed));
 
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new JPPFException(t.getMessage(), t);
     }
   }
@@ -118,28 +118,26 @@ public class LocalExecutionRunner {
       jppfClient.setLocalExecutionEnabled(true);
       Thread.sleep(1000L);
       print("creating the jobs");
-      List<JPPFJob> jobs = new ArrayList<>(nbJobs);
+      final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i = 0; i < nbJobs; i++) {
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName("job " + i);
         job.setBlocking(false);
-        for (int j = 0; j < nbTasks; j++)
-          job.add(new LongTask(length)).setId("task " + i + ':' + j);
+        for (int j = 0; j < nbTasks; j++) job.add(new LongTask(length)).setId("task " + i + ':' + j);
         jobs.add(job);
       }
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       print("submitting the jobs");
-      for (JPPFJob job : jobs)
-        jppfClient.submitJob(job);
+      for (JPPFJob job : jobs) jppfClient.submitJob(job);
       print("getting the results");
       for (JPPFJob job : jobs) {
         job.awaitResults();
         print("got results for " + job.getName());
       }
-      long elapsed = System.nanoTime() - start;
+      final long elapsed = System.nanoTime() - start;
       print("ran " + nbJobs + " in: " + StringUtils.toStringDuration(elapsed / 1000000));
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }
@@ -160,7 +158,7 @@ public class LocalExecutionRunner {
    */
   @SuppressWarnings("unused")
   private static DriverJobManagementMBean getJobManagement() throws Exception {
-    JMXDriverConnectionWrapper wrapper = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper wrapper = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     return wrapper.getJobManager();
   }
 
@@ -169,18 +167,18 @@ public class LocalExecutionRunner {
    * @throws Throwable if an error is raised during the execution.
    */
   private static void perform3() throws Throwable {
-    long start = System.nanoTime();
-    JPPFJob job = new JPPFJob();
+    final long start = System.nanoTime();
+    final JPPFJob job = new JPPFJob();
     job.setName("test jar download");
     job.add(new MyTask());
     //job.setDataProvider(new ClientDataProvider());
     // submit the tasks for execution
-    List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
     for (Task<?> task : results) {
-      Throwable e = task.getThrowable();
+      final Throwable e = task.getThrowable();
       if (e != null) throw e;
     }
-    long elapsed = System.nanoTime() - start;
+    final long elapsed = System.nanoTime() - start;
     print("run time: " + StringUtils.toStringDuration(elapsed / 1000000));
   }
 }

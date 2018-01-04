@@ -32,11 +32,11 @@ public class FileCopyTask extends AbstractTask<String> {
   @Override
   public void run() {
     try {
-      String dest = "node.txt";
-      TimeMarker marker = new TimeMarker().start();
-      Pair<Long, Integer> result = copyFile("client.txt", dest, 1024*1024);
+      final String dest = "node.txt";
+      final TimeMarker marker = new TimeMarker().start();
+      final Pair<Long, Integer> result = copyFile("client.txt", dest, 1024*1024);
       setResult(String.format("successfully written %,d bytes to '%s' in %s, %,d chunks", result.first(), dest, marker.stop().getLastElapsedAsString(), result.second()));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       setThrowable(e);
     }
@@ -59,18 +59,18 @@ public class FileCopyTask extends AbstractTask<String> {
       while (!done) {
         byte[] bytes = null;
         try {
-          CopyResult result = compute(action);
+          final CopyResult result = compute(action);
           count++;
           if (result.isDone()) done = true;
           if (result.getBytes() != null) { 
             bytes = result.getBytes();
             size += bytes.length;
             os.write(bytes);
-            FileCopyAction tmp = new FileCopyAction(action);
+            final FileCopyAction tmp = new FileCopyAction(action);
             tmp.setPos(size);
             action = tmp;
           }
-        } catch (Exception e) {
+        } catch (final Exception e) {
           done = true;
           throw e;
         }

@@ -27,8 +27,7 @@ import org.slf4j.*;
 /**
  * 
  */
-public class Probe
-{
+public class Probe {
   /**
    * Logger for this class.
    */
@@ -42,21 +41,17 @@ public class Probe
    * Main entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      String host = config.getString("ipprobe.host", "localhost");
-      String[] sports = config.getString("ipprobe.ports").trim().split("\\s");
-      Integer[] ports = new Integer[sports.length];
-      for (int i=0; i<sports.length; i++) ports[i] = Integer.valueOf(sports[i]);
-      Timer timer = new Timer();
-      ProbeTask task = new ProbeTask(host, ports);
+  public static void main(final String... args) {
+    try {
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final String host = config.getString("ipprobe.host", "localhost");
+      final String[] sports = config.getString("ipprobe.ports").trim().split("\\s");
+      final Integer[] ports = new Integer[sports.length];
+      for (int i = 0; i < sports.length; i++) ports[i] = Integer.valueOf(sports[i]);
+      final Timer timer = new Timer();
+      final ProbeTask task = new ProbeTask(host, ports);
       timer.schedule(task, 10, config.getLong("ipprobe.interval", 1000L));
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -64,8 +59,7 @@ public class Probe
   /**
    * Timer task that attempts to connect to specified TCP ports.
    */
-  public static class ProbeTask extends TimerTask
-  {
+  public static class ProbeTask extends TimerTask {
     /**
      * The host to connect to.
      */
@@ -80,8 +74,7 @@ public class Probe
      * @param host - the host to connect to.
      * @param ports - the ports to connect to.
      */
-    public ProbeTask(final String host, final Integer... ports)
-    {
+    public ProbeTask(final String host, final Integer... ports) {
       this.host = host;
       this.ports = ports;
     }
@@ -91,17 +84,12 @@ public class Probe
      * @see java.util.TimerTask#run()
      */
     @Override
-    public void run()
-    {
-      for (int n: ports)
-      {
-        try
-        {
-          Socket s = new Socket(host, n);
+    public void run() {
+      for (int n: ports) {
+        try {
+          final Socket s = new Socket(host, n);
           s.close();
-        }
-        catch(Exception e)
-        {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.error(e.getMessage());
         }

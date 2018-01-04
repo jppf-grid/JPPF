@@ -20,13 +20,11 @@ package sample.dist.commandline;
 
 import org.jppf.location.*;
 
-
 /**
  * This task lists the files in a specified directory of the node's host.
  * @author Laurent Cohen
  */
-public class ListDirectoryTask extends CommandLineTaskEx
-{
+public class ListDirectoryTask extends CommandLineTaskEx {
   /**
    * Directory in which to list the files.
    */
@@ -36,8 +34,7 @@ public class ListDirectoryTask extends CommandLineTaskEx
    * Initialize the script's parameters.
    * @param dir directory in which to list the files.
    */
-  public ListDirectoryTask(final String dir)
-  {
+  public ListDirectoryTask(final String dir) {
     this.dir = dir;
   }
 
@@ -46,43 +43,36 @@ public class ListDirectoryTask extends CommandLineTaskEx
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
-      String[] nix_oses = { "linux", "unix", "aix", "solaris" };
+  public void run() {
+    try {
+      final String[] nix_oses = { "linux", "unix", "aix", "solaris" };
       // get the name of the node's operating system
-      String os = System.getProperty("os.name").toLowerCase();
+      final String os = System.getProperty("os.name").toLowerCase();
       // the type of OS determines which command to execute
       boolean found = false;
-      for (String s: nix_oses)
-      {
-        if (os.contains(s))
-        {
+      for (String s: nix_oses) {
+        if (os.contains(s)) {
           found = true;
           break;
         }
       }
       if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
       else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
-      else
-      {
+      else {
         setResult("OS '" + os + "' not recognized");
         return;
       }
       // set whether the script output is captured
       setCaptureOutput(false);
       // execute the script/command
-      int code = launchProcess();
+      final int code = launchProcess();
       System.out.println("code = " + code + ", getExitCode() = " + getExitCode());
       // copy the resulting file in memory and set it as a result
-      FileLocation fl = new FileLocation("dirlist.txt");
-      MemoryLocation ml = new MemoryLocation((int) fl.size());
+      final FileLocation fl = new FileLocation("dirlist.txt");
+      final MemoryLocation ml = new MemoryLocation((int) fl.size());
       fl.copyTo(ml);
       setResult(new String(ml.toByteArray()));
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

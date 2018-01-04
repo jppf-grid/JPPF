@@ -35,16 +35,16 @@ public class EmbeddedConsole {
    */
   public static void main(final String[] args) throws Exception {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    JPanel mainPanel = new JPanel();
+    final JPanel mainPanel = new JPanel();
     // layout the components vetically within a box
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
     // the top component is a label within an image and some text
-    ImageIcon icon = GuiUtils.loadIcon("../admin/jppf_logo.gif");
-    JLabel label = new JLabel("Test JPPF embedded console", icon, SwingConstants.LEFT);
+    final ImageIcon icon = GuiUtils.loadIcon("../admin/jppf_logo.gif");
+    final JLabel label = new JLabel("Test JPPF embedded console", icon, SwingConstants.LEFT);
     mainPanel.add(label);
     mainPanel.add(JPPFAdminConsole.getAdminConsole());
     // add the admin console as the bottom componenty
-    JFrame frame = new JFrame("Embedded console");
+    final JFrame frame = new JFrame("Embedded console");
     frame.setSize(800, 600);
     frame.add(mainPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

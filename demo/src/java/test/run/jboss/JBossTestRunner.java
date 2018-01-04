@@ -43,7 +43,7 @@ public class JBossTestRunner {
       System.out.println("Starting ...");
       client = new JPPFClient();
       perform();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -56,13 +56,13 @@ public class JBossTestRunner {
    * @throws Exception if any error occurs.
    */
   public static void perform() throws Exception {
-    JPPFJob job = new JPPFJob("JBoss Runner");
+    final JPPFJob job = new JPPFJob("JBoss Runner");
     job.add(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
     job.setBlocking(false);
     job.getSLA().setBroadcastJob(true);
     client.submitJob(job);
-    List<Task<?>> results = job.awaitResults();
-    Task<?> task = results.get(0);
+    final List<Task<?>> results = job.awaitResults();
+    final Task<?> task = results.get(0);
     if (task.getThrowable() != null) {
       System.out.println("task ended with exception:\n" + ExceptionUtils.getStackTrace(task.getThrowable()));
     } else {

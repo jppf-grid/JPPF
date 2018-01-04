@@ -22,8 +22,7 @@ import org.jppf.node.protocol.AbstractTask;
 /**
  * @author Laurent Cohen
  */
-public class TemplateJPPFTask extends AbstractTask<String>
-{
+public class TemplateJPPFTask extends AbstractTask<String> {
   /**
    * Some Id.
    */
@@ -35,8 +34,7 @@ public class TemplateJPPFTask extends AbstractTask<String>
    * before the task is executed by the node.
    * @param taskId Some Id.
    */
-  public TemplateJPPFTask(final int taskId)
-  {
+  public TemplateJPPFTask(final int taskId) {
     // perform initializations here ...
     this.taskId = taskId;
   }
@@ -45,23 +43,22 @@ public class TemplateJPPFTask extends AbstractTask<String>
    * This method contains the code that will be executed by a node.
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       // write your task code here.
       System.out.println("Hello, this is the node executing a template JPPF task");
 
-      for (int i = 0; i < 10; i++)
-      {
+      for (int i = 0; i < 10; i++) {
         System.out.println(i);
-        try {Thread.sleep(1000);} catch (Exception e) {System.out.println(e);}
+        try {
+          Thread.sleep(1000);
+        } catch (final Exception e) {
+          System.out.println(e);
+        }
       }
       // eventually set the execution results
       setResult("the execution was performed successfully");
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

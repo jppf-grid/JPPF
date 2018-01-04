@@ -38,7 +38,7 @@ public class CancelJob {
   public static void main(final String[] args) {
     try {
       perform2();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -47,34 +47,34 @@ public class CancelJob {
    * @throws Exception if any error occurs.
    */
   static void perform2() throws Exception {
-    String name = "org.jppf:name=my.test,type=test";
-    ObjectName objName = new ObjectName(name);
-    int port = 4444;
+    final String name = "org.jppf:name=my.test,type=test";
+    final ObjectName objName = new ObjectName(name);
+    final int port = 4444;
     JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
     System.out.println("registering MBean");
-    MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-    My my = new My();
+    final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+    final My my = new My();
     mbeanServer.registerMBean(my, objName);
     System.out.println("starting JMXMP server");
-    JMXMPServer server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+    final JMXMPServer server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
     server.start(CancelJob.class.getClassLoader());
     System.out.println("connecting JMX client");
-    JMXConnectionWrapper client = new JMXConnectionWrapper("localhost", port, false);
-    client.connectAndWait(3000L);
-    if (!client.isConnected()) throw new IllegalStateException("JMX client not connected");
-    System.out.println("registering notification listener");
-    NotificationListener listener = new MyNotifListener();
-    client.addNotificationListener(name, listener);
-    System.out.println("sending notification");
-    Notification notif = new Notification("type", "source", 1L, "message");
-    JPPFSystemInformation info = new JPPFSystemInformation("uuid", true, false);
-    notif.setUserData(info);
-    my.sendNotification(notif);
-    Thread.sleep(1000L);
-    System.out.println("unregistering notification listener");
-    client.removeNotificationListener(name, listener);
-    System.out.println("closing client and server");
-    client.close();
+    try (JMXConnectionWrapper client = new JMXConnectionWrapper("localhost", port, false)) {
+      client.connectAndWait(3000L);
+      if (!client.isConnected()) throw new IllegalStateException("JMX client not connected");
+      System.out.println("registering notification listener");
+      final NotificationListener listener = new MyNotifListener();
+      client.addNotificationListener(name, listener);
+      System.out.println("sending notification");
+      final Notification notif = new Notification("type", "source", 1L, "message");
+      final JPPFSystemInformation info = new JPPFSystemInformation("uuid", true, false);
+      notif.setUserData(info);
+      my.sendNotification(notif);
+      Thread.sleep(1000L);
+      System.out.println("unregistering notification listener");
+      client.removeNotificationListener(name, listener);
+      System.out.println("closing client and server");
+    }
     server.stop();
     System.out.println("done");
   }

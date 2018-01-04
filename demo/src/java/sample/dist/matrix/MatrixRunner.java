@@ -61,17 +61,17 @@ public class MatrixRunner {
   public static void main(final String...args) {
     MatrixRunner runner = null;
     try {
-      String clientUuid = ((args != null) && (args.length > 0)) ? args[0] : null;
-      TypedProperties props = JPPFConfiguration.getProperties();
-      int size = props.getInt("matrix.size", 300);
-      int iterations = props.getInt("matrix.iterations", 10);
+      final String clientUuid = ((args != null) && (args.length > 0)) ? args[0] : null;
+      final TypedProperties props = JPPFConfiguration.getProperties();
+      final int size = props.getInt("matrix.size", 300);
+      final int iterations = props.getInt("matrix.iterations", 10);
       int nbChannels = props.getInt("matrix.nbChannels", 1);
       if (nbChannels < 1) nbChannels = 1;
-      int nbRows = props.getInt("task.nbRows", 1);
+      final int nbRows = props.getInt("task.nbRows", 1);
       StreamUtils.printf(log, "Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations"  + " with " + nbChannels  + " channels");
       runner = new MatrixRunner();
       runner.perform(size, iterations, nbRows, clientUuid, nbChannels);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -88,26 +88,26 @@ public class MatrixRunner {
   public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception {
     try {
       JPPFConfiguration.set(JPPFProperties.POOL_SIZE, nbChannels);
-      String s = JPPFConfiguration.getProperties().getString("matrix.classpath");
+      final String s = JPPFConfiguration.getProperties().getString("matrix.classpath");
       if (s != null) {
         classpath = new ClassPathImpl();
-        String[] paths = s.split("\\|");
-        for (String path: paths) {
-          String p = path.trim();
-          String name = new File(p).getName();
-          Location<?> fileLoc = new FileLocation(p);
-          Location<?> jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
+        final String[] paths = s.split("\\|");
+        for (final String path: paths) {
+          final String p = path.trim();
+          final String name = new File(p).getName();
+          final Location<?> fileLoc = new FileLocation(p);
+          final Location<?> jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
           classpath.add(name, jar);
         }
       }
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
-      JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+      final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
       pool.setSize(nbChannels);
       pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
       // initialize the 2 matrices to multiply
-      Matrix a = new Matrix(size).assignRandomValues();
-      Matrix b = new Matrix(size).assignRandomValues();
+      final Matrix a = new Matrix(size).assignRandomValues();
+      final Matrix b = new Matrix(size).assignRandomValues();
       if (size <= 500) performSequentialMultiplication(a, b);
       long totalIterationTime = 0L;
       long min = Long.MAX_VALUE;
@@ -115,7 +115,7 @@ public class MatrixRunner {
 
       // perform "iteration" times
       for (int iter=0; iter<iterations; iter++) {
-        long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
+        final long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
         totalIterationTime += elapsed;
@@ -140,10 +140,10 @@ public class MatrixRunner {
    * @throws Exception if an error is raised during the execution.
    */
   private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy, final int nbChannels) throws Exception {
-    long start = System.nanoTime();
-    int size = a.getSize();
+    final long start = System.nanoTime();
+    final int size = a.getSize();
     // create a task for each row in matrix a
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("matrix sample " + (iterationsCount++));
     job.getClientSLA().setMaxChannels(nbChannels);
     int remaining = size;
@@ -164,18 +164,18 @@ public class MatrixRunner {
     if (classpath != null) job.getSLA().setClassPath(classpath);
     //job.getJobSLA().setMaxNodes(8);
     // submit the tasks for execution
-    List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
     // initialize the resulting matrix
-    Matrix c = new Matrix(size);
+    final Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results
     int rowIdx = 0, pos = 0;
-    for (Task<?> matrixTask : results) {
+    for (final Task<?> matrixTask : results) {
       if (matrixTask.getThrowable() != null) {
         StreamUtils.printf(log, "got exception: " + ExceptionUtils.getStackTrace(matrixTask.getThrowable()));
         throw new JPPFException(matrixTask.getThrowable());
       }
       if (pos != matrixTask.getPosition()) throw new JPPFException(String.format("pos=%d is different from task.getPosition()=%d", pos, matrixTask.getPosition()));
-      double[][] rows = (double[][]) matrixTask.getResult();
+      final double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
       }
@@ -190,10 +190,10 @@ public class MatrixRunner {
    * @param a the left-hand matrix.
    * @param b the right-hand matrix.
    */
-  private void performSequentialMultiplication(final Matrix a, final Matrix b) {
-    long start = System.nanoTime();
+  private static void performSequentialMultiplication(final Matrix a, final Matrix b) {
+    final long start = System.nanoTime();
     a.multiply(b);
-    long elapsed = System.nanoTime() - start;
+    final long elapsed = System.nanoTime() - start;
     StreamUtils.printf(log, "Sequential computation performed in " + StringUtils.toStringDuration(elapsed / 1_000_000L));
   }
 }

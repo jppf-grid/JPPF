@@ -70,7 +70,7 @@ public class MasterNodeMonitoringThread extends ThreadSynchronization implements
       if (jmx == null) {
         try {
           jmx = DeadlockRunner.getJmxConnection(client);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
           return;
         }
@@ -80,8 +80,8 @@ public class MasterNodeMonitoringThread extends ThreadSynchronization implements
       goToSleep(waitTime);
       if (isStopped()) break;
       try {
-        JPPFStatistics stats = jmx.statistics();
-        int n = (int) stats.getSnapshot(JPPFStatisticsHelper.TASK_DISPATCH).getTotal();
+        final JPPFStatistics stats = jmx.statistics();
+        final int n = (int) stats.getSnapshot(JPPFStatisticsHelper.TASK_DISPATCH).getTotal();
         if ((nbTasks == n) && !isStopped()) {
           System.out.println("EPIC FAIL !!!!!!!");
           provisioner.setStopped(true);
@@ -91,7 +91,7 @@ public class MasterNodeMonitoringThread extends ThreadSynchronization implements
           return;
         }
         nbTasks = n;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
         System.exit(1);
         return;

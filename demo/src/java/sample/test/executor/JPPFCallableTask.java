@@ -30,20 +30,15 @@ import org.jppf.scheduling.JPPFSchedule;
  * @param <V>
  * @author Laurent Cohen
  */
-public abstract class JPPFCallableTask<V> extends AbstractTask<V> implements Callable<V>
-{
+public abstract class JPPFCallableTask<V> extends AbstractTask<V> implements Callable<V> {
   /**
    * {@inheritDoc}
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       setResult(call());
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -52,25 +47,19 @@ public abstract class JPPFCallableTask<V> extends AbstractTask<V> implements Cal
    * 
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     JPPFClient jppfClient = null;
     ExecutorService executor = null;
-    try
-    {
+    try {
       jppfClient = new JPPFClient();
       executor = new JPPFExecutorService(jppfClient);
-      MyTask myTask = new MyTask();
+      final MyTask myTask = new MyTask();
       myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
-      Future<String> future = executor.submit((Callable<String>) myTask);
+      final Future<String> future = executor.submit((Callable<String>) myTask);
       System.out.println("result: " + future.get());
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (executor != null) executor.shutdown();
       if (jppfClient != null) jppfClient.close();
     }

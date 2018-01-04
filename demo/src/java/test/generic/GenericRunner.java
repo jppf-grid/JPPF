@@ -30,26 +30,23 @@ import org.jppf.utils.*;
  * 
  * @author Laurent Cohen
  */
-public class GenericRunner
-{
+public class GenericRunner {
   /**
    * Run the test.
    * @param args not used.
    * @throws Exception if any error occurs.
    */
-  public static void main(final String[] args) throws Exception
-  {
+  public static void main(final String[] args) throws Exception {
     JPPFClient client = null;
-    try
-    {
-      JPPFJob job = new JPPFJob();
+    try {
+      final JPPFJob job = new JPPFJob();
       addConfiguredTasks(job);
       //job.addTask(new CallableTask());
       job.add(new LotsOfOutputTask(50000, 200));
       client = new JPPFClient();
       List<Task<?>> results = null;
       //results = client.submit(job);
-      JobListener jobListener = new JobListenerAdapter() {
+      final JobListener jobListener = new JobListenerAdapter() {
         @Override
         public synchronized void jobReturned(final JobEvent event) {
           System.out.println("received " + event.getJobTasks().size() + " tasks");
@@ -59,26 +56,20 @@ public class GenericRunner
       job.addJobListener(jobListener);
       client.submitJob(job);
       results = job.awaitResults();
-      for (Task<?> task: results)
-      {
+      for (final Task<?> task: results) {
         System.out.println("*****************************************");
         System.out.println("Result: " + task.getResult());
-        if (task.getThrowable() != null)
-        {
-          StringWriter sw = new StringWriter();
-          PrintWriter pw = new PrintWriter(sw);
+        if (task.getThrowable() != null) {
+          final StringWriter sw = new StringWriter();
+          final PrintWriter pw = new PrintWriter(sw);
           task.getThrowable().printStackTrace(pw);
           System.out.println("Exception: " + sw.toString());
           pw.close();
         }
       }
-    }
-    catch(Throwable t)
-    {
+    } catch (final Throwable t) {
       t.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
     }
     System.exit(0);
@@ -89,16 +80,14 @@ public class GenericRunner
    * @param job the job to add the tasks to.
    * @throws Exception if any IO error occurs.
    */
-  private static void addConfiguredTasks(final JPPFJob job) throws Exception
-  {
-    String path = JPPFConfiguration.getProperties().getString("task.list.file", null);
+  private static void addConfiguredTasks(final JPPFJob job) throws Exception {
+    final String path = JPPFConfiguration.getProperties().getString("task.list.file", null);
     if (path == null) return;
-    String text = FileUtils.readTextFile(path);
-    String[] classnames = text.split("\n");
-    for (String s: classnames)
-    {
-      Class<?> clazz = Class.forName(s);
-      Object o = clazz.newInstance();
+    final String text = FileUtils.readTextFile(path);
+    final String[] classnames = text.split("\n");
+    for (final String s: classnames) {
+      final Class<?> clazz = Class.forName(s);
+      final Object o = clazz.newInstance();
       job.add(o);
     }
   }

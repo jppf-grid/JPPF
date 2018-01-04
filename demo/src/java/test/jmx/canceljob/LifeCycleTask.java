@@ -83,16 +83,16 @@ public class LifeCycleTask extends AbstractTask<String> {
     start = System.nanoTime();
     try {
       Thread.sleep(500L);
-      JMXServer server = NodeRunner.getNode().getJmxServer();
-      int id = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_ID);
-      String type = (id < 0) ? "master" : String.format("slave.id = %2d", id);
-      String s = String.format("%s-%s:%d (%-13s)", MSG, server.getManagementHost(), server.getManagementPort(), type);
+      final JMXServer server = NodeRunner.getNode().getJmxServer();
+      final int id = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_ID);
+      final String type = (id < 0) ? "master" : String.format("slave.id = %2d", id);
+      final String s = String.format("%s-%s:%d (%-13s)", MSG, server.getManagementHost(), server.getManagementPort(), type);
       fireNotification(s, true);
       if (duration > 0) Thread.sleep(duration);
       elapsed = (System.nanoTime() - start) / 1_000_000L;
       setResult("execution succesful in " + elapsed + " ms");
       displayElapsed("successful");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

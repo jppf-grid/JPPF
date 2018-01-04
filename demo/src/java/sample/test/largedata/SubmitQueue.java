@@ -31,8 +31,7 @@ import org.jppf.utils.concurrent.ThreadSynchronization;
  * 
  * @author Laurent Cohen
  */
-public class SubmitQueue extends ThreadSynchronization implements Runnable
-{
+public class SubmitQueue extends ThreadSynchronization implements Runnable {
   /**
    * 
    */
@@ -55,29 +54,22 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
    * 
    * @param client the JPPF clmient to submit to.
    */
-  public SubmitQueue(final JPPFClient client)
-  {
+  public SubmitQueue(final JPPFClient client) {
     this.client = client;
-    int capacity = JPPFConfiguration.getProperties().getInt("largedata.job.cache.size", 1);
+    final int capacity = JPPFConfiguration.getProperties().getInt("largedata.job.cache.size", 1);
     queue = new ArrayBlockingQueue<>(capacity);
   }
 
   @Override
-  public void run()
-  {
-    while (!isStopped())
-    {
-      try
-      {
-        JPPFJob job = queue.poll(1L, TimeUnit.MILLISECONDS);
-        if (job != null)
-        {
+  public void run() {
+    while (!isStopped()) {
+      try {
+        final JPPFJob job = queue.poll(1L, TimeUnit.MILLISECONDS);
+        if (job != null) {
           results = client.submitJob(job);
           resultCount.incrementAndGet();
         }
-      }
-      catch(Exception e)
-      {
+      } catch (final Exception e) {
         e.printStackTrace();
         setStopped(true);
       }
@@ -88,14 +80,10 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
    * Submit a job.
    * @param job the job to submit.
    */
-  public void submit(final JPPFJob job)
-  {
-    try
-    {
+  public void submit(final JPPFJob job) {
+    try {
       queue.put(job);
-    }
-    catch (InterruptedException e)
-    {
+    } catch (final InterruptedException e) {
       setStopped(true);
       e.printStackTrace();
     }
@@ -105,8 +93,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
    * Get the count of job resultls received.
    * @return the count as an int.
    */
-  public int getResultCount()
-  {
+  public int getResultCount() {
     return resultCount.get();
   }
 }

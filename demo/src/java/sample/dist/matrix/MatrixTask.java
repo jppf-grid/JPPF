@@ -62,8 +62,8 @@ public class MatrixTask extends BaseDemoTask {
   @Override
   public void doWork() {
     try {
-      Matrix matrix = getDataProvider().getParameter(DATA_KEY);
-      int size = matrix.getSize();
+      final Matrix matrix = getDataProvider().getParameter(DATA_KEY);
+      final int size = matrix.getSize();
       result = new double[size];
 
       for (int col = 0; col < size; col++) {
@@ -71,7 +71,7 @@ public class MatrixTask extends BaseDemoTask {
         for (int row = 0; row < size; row++) sum += matrix.getValueAt(row, col) * rowValues[row];
         result[col] = sum;
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

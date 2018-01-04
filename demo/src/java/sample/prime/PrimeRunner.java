@@ -52,7 +52,7 @@ public class PrimeRunner {
       else jppfClient = new JPPFClient();
       perform();
       System.exit(0);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       output("before exit(1)");
       System.exit(1);
@@ -64,9 +64,9 @@ public class PrimeRunner {
    * @throws JPPFException if an error is raised during the execution.
    */
   private static void perform() throws JPPFException {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    int limit = props.getInt("prime.limit", 10000);
-    int batchSize = props.getInt("prime.batch.size", 100);
+    final TypedProperties props = JPPFConfiguration.getProperties();
+    final int limit = props.getInt("prime.limit", 10000);
+    final int batchSize = props.getInt("prime.batch.size", 100);
     int count = props.getInt("prime.start", 10000);
     output("Running Mersenne prime demo with limit = " + limit + " with a batch size of " + batchSize + " tasks, starting with an exponent of " + count);
     try {
@@ -75,20 +75,20 @@ public class PrimeRunner {
       //int count = 3;
       //count = 33222592; // about 10 million digits
       while (pending > 0) {
-        JPPFJob job = new JPPFJob();
-        int nbTasks = (pending > batchSize) ? batchSize : pending;
+        final JPPFJob job = new JPPFJob();
+        final int nbTasks = (pending > batchSize) ? batchSize : pending;
         for (int i = 0; i < nbTasks; i++) job.add(new PrimeTask(count++));
         pending -= nbTasks;
-        List<Task<?>> results = jppfClient.submitJob(job);
-        for (Task<?> t : results) {
+        final List<Task<?>> results = jppfClient.submitJob(job);
+        for (final Task<?> t : results) {
           if (t.getResult() != null) output("Found Mersenne prime for exponent = " + t.getResult());
         }
       }
       totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
       output("Computation time: " + StringUtils.toStringDuration(totalTime));
-      JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
+      final JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
       output("End statistics :\n" + stats.toString());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }

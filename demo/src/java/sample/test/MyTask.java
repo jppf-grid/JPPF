@@ -24,8 +24,7 @@ import org.jppf.node.protocol.AbstractTask;
  * 
  * @author Laurent Cohen
  */
-public class MyTask extends AbstractTask<String>
-{
+public class MyTask extends AbstractTask<String> {
   /**
    * serialVersionUID.
    */
@@ -36,16 +35,11 @@ public class MyTask extends AbstractTask<String>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     String str = null;
-
-    try
-    {
+    try {
       str = ((SimpleData) getDataProvider().getParameter("DATA")).getStr();
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
 

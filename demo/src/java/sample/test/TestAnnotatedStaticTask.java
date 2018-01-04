@@ -26,8 +26,7 @@ import org.jppf.node.protocol.JPPFRunnable;
  * Class used to test the annotated task wrapper.
  * @author Laurent Cohen
  */
-public final class TestAnnotatedStaticTask implements Serializable
-{
+public final class TestAnnotatedStaticTask implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -36,8 +35,7 @@ public final class TestAnnotatedStaticTask implements Serializable
   /**
    * Instantiation not permitted.
    */
-  private TestAnnotatedStaticTask()
-  {
+  private TestAnnotatedStaticTask() {
   }
 
   /**
@@ -47,9 +45,8 @@ public final class TestAnnotatedStaticTask implements Serializable
    * @return the result as a string.
    */
   @JPPFRunnable
-  public static String someStaticMethod(final int intArg, final String stringArg)
-  {
-    String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
+  public static String someStaticMethod(final int intArg, final String stringArg) {
+    final String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
     System.out.println(s);
     return s;
   }

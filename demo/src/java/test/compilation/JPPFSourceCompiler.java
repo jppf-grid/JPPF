@@ -45,11 +45,11 @@ public class JPPFSourceCompiler {
       String taskClassName = null;
       // an array of the sources - the first element is the one executed as a task
       //CharSequence[] srcArray = { buildTaskSource() };
-      CharSequence[] srcArray = { buildSourceCode(), buildSourceCode2() };
+      final CharSequence[] srcArray = { buildSourceCode(), buildSourceCode2() };
       // build the map of sources to compile
-      Map<String, CharSequence> sources = new HashMap<>();
-      for (CharSequence seq : srcArray) {
-        String name = classNameFromSource(seq);
+      final Map<String, CharSequence> sources = new HashMap<>();
+      for (final CharSequence seq : srcArray) {
+        final String name = classNameFromSource(seq);
         output("adding source for " + name);
         if (taskClassName == null) taskClassName = name;
         sources.put(name, seq);
@@ -58,24 +58,24 @@ public class JPPFSourceCompiler {
       try {
         compiler = new SourceCompiler();
         // receive the map of generated classes bytecode
-        Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
+        final Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
         output("bytecode map = " + bytecodeMap);
-        byte[] bytecode = bytecodeMap.get(taskClassName);
+        final byte[] bytecode = bytecodeMap.get(taskClassName);
         output("got bytecode = " + (bytecode == null ? "null" : "[length=" + bytecode.length + "]"));
         if (bytecode == null) {
-          List<Diagnostic<JavaFileObject>> diags = compiler.getDiagnostics();
+          final List<Diagnostic<JavaFileObject>> diags = compiler.getDiagnostics();
           output("diagnostics: ");
           for (Diagnostic<JavaFileObject> d : diags) output("  " + d);
         } else {
           // load the class
-          Class<?> clazz = compiler.getClassloader().loadClass(taskClassName);
-          Object task = clazz.newInstance();
+          final Class<?> clazz = compiler.getClassloader().loadClass(taskClassName);
+          final Object task = clazz.newInstance();
           executeJob(task);
         }
       } finally {
         compiler.close();
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -86,13 +86,13 @@ public class JPPFSourceCompiler {
    * @throws Exception if any error occurs.
    */
   private static void executeJob(final Object task) throws Exception {
-    JPPFClient client = new JPPFClient();
+    final JPPFClient client = new JPPFClient();
     try {
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName("compiled class job");
       job.add(task);
-      List<Task<?>> results = client.submitJob(job);
-      Task<?> result = results.get(0);
+      final List<Task<?>> results = client.submitJob(job);
+      final Task<?> result = results.get(0);
       if (result.getThrowable() != null) output("got exception: " + ExceptionUtils.getStackTrace(result.getThrowable()));
       else output("got result: " + result.getResult());
     } finally {

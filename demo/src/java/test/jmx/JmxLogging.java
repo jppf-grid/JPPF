@@ -51,16 +51,15 @@ public class JmxLogging {
    * 
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     try {
       client = new JPPFClient();
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       initJmxLogging();
-      for (int i=1; i<=10; i++) job.add(new MyTask()).setId(Integer.toString(i));
-      List<Task<?>> results = client.submitJob(job);
+      for (int i = 1; i <= 10; i++) job.add(new MyTask()).setId(Integer.toString(i));
+      final List<Task<?>> results = client.submitJob(job);
       System.out.println("received results: " + results);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -68,7 +67,7 @@ public class JmxLogging {
         for (JMXNodeConnectionWrapper jmx: jmxNodes) {
           try {
             jmx.close();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             e.printStackTrace();
           }
         }
@@ -82,19 +81,19 @@ public class JmxLogging {
    */
   public static void initJmxLogging() throws Exception {
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
-    JMXDriverConnectionWrapper jmxDriver = client.getConnectionPool().getJmxConnection();
-    Collection<JPPFManagementInfo> coll = jmxDriver.nodesInformation();
+    final JMXDriverConnectionWrapper jmxDriver = client.getConnectionPool().getJmxConnection();
+    final Collection<JPPFManagementInfo> coll = jmxDriver.nodesInformation();
     jmxNodes = new JMXNodeConnectionWrapper[coll.size()];
     int count = 0;
-    for (JPPFManagementInfo info: coll) {
+    for (final JPPFManagementInfo info: coll) {
       // get a JMX connection to the node MBean server
       jmxNodes[count] = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
       jmxNodes[count].connectAndWait(5000L);
       // get a proxy to the logging MBean
-      JmxLogger nodeProxy = jmxNodes[count].getProxy(JmxLogger.DEFAULT_MBEAN_NAME, JmxLogger.class);
+      final JmxLogger nodeProxy = jmxNodes[count].getProxy(JmxLogger.DEFAULT_MBEAN_NAME, JmxLogger.class);
 
       // use a handback object so we know where the log messages come from
-      String source = "node   " + info.getHost() + ":" + info.getPort();
+      final String source = "node   " + info.getHost() + ":" + info.getPort();
       // subbscribe to all notifications from the MBean
       nodeProxy.addNotificationListener(loggingHandler, null, source);
       count++;
@@ -107,8 +106,8 @@ public class JmxLogging {
   public static class MyLoggingHandler implements NotificationListener {
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
-      String message = notification.getMessage();
-      String toDisplay = handback.toString() + ": " + message;
+      final String message = notification.getMessage();
+      final String toDisplay = handback.toString() + ": " + message;
       System.out.print(toDisplay);
     }
   }

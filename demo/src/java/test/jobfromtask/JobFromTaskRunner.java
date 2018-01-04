@@ -25,13 +25,11 @@ import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
-
 /**
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class JobFromTaskRunner
-{
+public class JobFromTaskRunner {
   /**
    * Logger for this class.
    */
@@ -45,37 +43,30 @@ public class JobFromTaskRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      int poolSize = config.get(JPPFProperties.POOL_SIZE);
+  public static void main(final String... args) {
+    try {
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final int poolSize = config.get(JPPFProperties.POOL_SIZE);
       // ensure we have at least 2 connections to the server
       if (poolSize < 2) config.set(JPPFProperties.POOL_SIZE, 2);
       jppfClient = new JPPFClient();
       print("Running Long Task demo with");
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("source job");
       job.add(new SourceTask()).setId("source");
       job.getSLA().setMaxNodes(1);
-      List<Task<?>> results = jppfClient.submitJob(job);
-      for (Task<?> t: results)
-      {
-        Throwable e = t.getThrowable();
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      for (final Task<?> t: results) {
+        final Throwable e = t.getThrowable();
         if (e != null) throw e;
         else print("task '" + t.getId() + "' result: " + t.getResult());
       }
-      long elapsed = DateTimeUtils.elapsedFrom(start);
+      final long elapsed = DateTimeUtils.elapsedFrom(start);
       print("processing  performed in " + StringUtils.toStringDuration(elapsed));
-    }
-    catch(Throwable e)
-    {
+    } catch (final Throwable e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -86,13 +77,12 @@ public class JobFromTaskRunner
    * @return a string showing successful execution.
    * @throws Exception if any error occurs.
    */
-  public static String submitDestinationJob(final String input) throws Exception
-  {
-    JPPFJob job = new JPPFJob();
+  public static String submitDestinationJob(final String input) throws Exception {
+    final JPPFJob job = new JPPFJob();
     job.setName("destination job");
     job.add(new DestinationTask(input)).setId("destination task");
     job.getSLA().setMaxNodes(1);
-    List<Task<?>> result = jppfClient.submitJob(job);
+    final List<Task<?>> result = jppfClient.submitJob(job);
     return (String) result.get(0).getResult();
   }
 
@@ -100,8 +90,7 @@ public class JobFromTaskRunner
    * Print a message tot he log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }

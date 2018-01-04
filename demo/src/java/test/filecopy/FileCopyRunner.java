@@ -36,18 +36,18 @@ public class FileCopyRunner {
    */
   public static void main(final String[] args) {
     try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName("copy file");
       job.add(new FileCopyTask());
-      List<Task<?>> results = client.submitJob(job);
-      Task<?> task = results.get(0);
+      final List<Task<?>> results = client.submitJob(job);
+      final Task<?> task = results.get(0);
       if (task.getThrowable() != null) System.out.println("got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("result: " + task.getResult());
-      TimeMarker marker = new TimeMarker().start();
-      Location<?> in = new FileLocation("client.txt");
+      final TimeMarker marker = new TimeMarker().start();
+      final Location<?> in = new FileLocation("client.txt");
       in.copyTo(new FileLocation("node.txt"));
       System.out.printf("local copy done in %s%n", marker.stop().getLastElapsedAsString());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

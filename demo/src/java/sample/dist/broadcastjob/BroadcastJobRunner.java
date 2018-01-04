@@ -36,20 +36,20 @@ public class BroadcastJobRunner {
     try {
       jppfClient = new JPPFClient();
       //while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
-      int nbTasks = 1;
+      final int nbTasks = 1;
       System.out.println("Running Broadcast Job with " + nbTasks + " tasks");
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob("broadcast test");
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob("broadcast test");
       for (int i=1; i<=nbTasks; i++) job.add(new BroadcastTask()).setId("task " + i);
       job.getSLA().setBroadcastJob(true);
-      List<Task<?>> results = jppfClient.submitJob(job);
-      for (Task<?> task: results) {
-        Throwable e = task.getThrowable();
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      for (final Task<?> task: results) {
+        final Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Total time: " + elapsed + " ms");
-    } catch(Throwable e) {
+    } catch(final Throwable e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();

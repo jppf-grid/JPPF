@@ -38,7 +38,7 @@ public class ClientTest {
   public static void main(final String... args) {
     JPPFClient client = null;
     try {
-      ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
+      final ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
         @Override
         public void connectionAdded(final ConnectionPoolEvent event) {
           System.out.println("newConnection: " + event);
@@ -51,12 +51,12 @@ public class ClientTest {
       };
       client = new JPPFClient(UUID.randomUUID().toString());
       client.addConnectionPoolListener(listener);
-      int sizeInit = client.getAllConnectionsCount();
+      final int sizeInit = client.getAllConnectionsCount();
       System.out.println("sizeInit = " + sizeInit);
       Thread.sleep(5000L);
-      int sizeDone = client.getAllConnectionsCount();
+      final int sizeDone = client.getAllConnectionsCount();
       System.out.println("sizeDone = " + sizeDone);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -68,9 +68,9 @@ public class ClientTest {
    * @throws Exception .
    */
   public static void testHTML() throws Exception {
-    HTMLDocument doc = new HTMLDocument();
-    try (Reader reader = new FileReader("C:/temp/MyFile.html")) {
-      HTMLEditorKit kit = new HTMLEditorKit();
+    final HTMLDocument doc = new HTMLDocument();
+    try (final Reader reader = new FileReader("C:/temp/MyFile.html")) {
+      final HTMLEditorKit kit = new HTMLEditorKit();
       kit.read(reader, doc, 0);
     }
     //doc.

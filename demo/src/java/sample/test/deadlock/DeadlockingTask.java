@@ -29,7 +29,7 @@ public class DeadlockingTask extends AbstractTask<String> {
   public void run() {
     try {
       final Object[] dlo = { new Object(), new Object() };
-      Thread[] threads = new Thread[2];
+      final Thread[] threads = new Thread[2];
       for (int i=1; i<=2; i++) {
         final int[] n = (i == 1) ? new int[] { 0, 1 } : new int[] { 1, 0};
         threads[i-1] = new Thread("deadlocked thread " + i) {
@@ -39,7 +39,7 @@ public class DeadlockingTask extends AbstractTask<String> {
               dlo[n[0]].toString();
               try {
                 Thread.sleep(100L);
-              } catch (Exception e) {
+              } catch (final Exception e) {
                 e.printStackTrace();
               }
               synchronized(dlo[n[1]]) {
@@ -51,7 +51,7 @@ public class DeadlockingTask extends AbstractTask<String> {
       }
       for (int i=0; i<threads.length; i++) threads[i].start();
       for (int i=0; i<threads.length; i++) threads[i].join();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
       e.printStackTrace();
     }

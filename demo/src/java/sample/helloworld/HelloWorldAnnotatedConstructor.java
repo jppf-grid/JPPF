@@ -25,8 +25,7 @@ import org.jppf.node.protocol.JPPFRunnable;
  * A simple hello world JPPF task with a JPPF-annotated constructor.
  * @author Laurent Cohen
  */
-public class HelloWorldAnnotatedConstructor implements Serializable
-{
+public class HelloWorldAnnotatedConstructor implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -42,8 +41,7 @@ public class HelloWorldAnnotatedConstructor implements Serializable
    * @param number an example primitive argument.
    */
   @JPPFRunnable
-  public HelloWorldAnnotatedConstructor(final String message, final int number)
-  {
+  public HelloWorldAnnotatedConstructor(final String message, final int number) {
     this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ')';
     System.out.println(this.hello);
   }
@@ -53,8 +51,7 @@ public class HelloWorldAnnotatedConstructor implements Serializable
    * @return a string.
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return hello;
   }
 }

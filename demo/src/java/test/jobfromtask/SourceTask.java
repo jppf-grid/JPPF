@@ -24,13 +24,11 @@ import org.jppf.utils.*;
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
-public class SourceTask extends AbstractTask<String>
-{
+public class SourceTask extends AbstractTask<String> {
   /**
    * Initialize this task.
    */
-  public SourceTask()
-  {
+  public SourceTask() {
   }
 
   /**
@@ -38,25 +36,19 @@ public class SourceTask extends AbstractTask<String>
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     System.out.println("Starting source task '" + getId() + '\'');
-    try
-    {
-      long start = System.nanoTime();
+    try {
+      final long start = System.nanoTime();
       print("submitting new remote job");
       compute(new MyCallable());
-      long elapsed = System.nanoTime() - start;
-      String s = "processing  performed in "+StringUtils.toStringDuration(elapsed/1000000L);
+      final long elapsed = System.nanoTime() - start;
+      final String s = "processing  performed in " + StringUtils.toStringDuration(elapsed / 1000000L);
       print(s);
       setResult(s);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       print("source task ended");
     }
   }
@@ -65,9 +57,8 @@ public class SourceTask extends AbstractTask<String>
    * Called when this task is cancelled.
    */
   @Override
-  public void onCancel()
-  {
-    String s = "task '" + getId() + "' has been cancelled";
+  public void onCancel() {
+    final String s = "task '" + getId() + "' has been cancelled";
     setResult(s);
     print(s);
   }
@@ -76,8 +67,7 @@ public class SourceTask extends AbstractTask<String>
    * Print a message to the log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     //log.info(msg);
     System.out.println(msg);
   }
@@ -85,11 +75,9 @@ public class SourceTask extends AbstractTask<String>
   /**
    * 
    */
-  public static class MyCallable implements JPPFCallable<String>
-  {
+  public static class MyCallable implements JPPFCallable<String> {
     @Override
-    public String call() throws Exception
-    {
+    public String call() throws Exception {
       return JobFromTaskRunner.submitDestinationJob("from source callable");
     }
   }

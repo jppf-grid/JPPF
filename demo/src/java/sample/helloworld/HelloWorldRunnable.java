@@ -23,8 +23,7 @@ import java.io.Serializable;
  * A simple hello world JPPF task implemented as a <code>Runnable</code>.
  * @author Laurent Cohen
  */
-public class HelloWorldRunnable implements Runnable, Serializable
-{
+public class HelloWorldRunnable implements Runnable, Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -39,8 +38,7 @@ public class HelloWorldRunnable implements Runnable, Serializable
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     this.hello = "Hello, World (runnable)";
     System.out.println(this.hello);
   }
@@ -51,8 +49,7 @@ public class HelloWorldRunnable implements Runnable, Serializable
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return hello;
   }
 }

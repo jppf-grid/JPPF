@@ -33,14 +33,11 @@ public class MyTask extends AbstractTask<String> {
     // Execute some code on the client side via the ClientDataProvider
     //ClientDataProvider dataProvider = (ClientDataProvider) getDataProvider();
     //dataProvider.computeValue("computeResult", new MyCallable(this));
-    try
-    {
+    try {
       compute(new MyCallable(this));
       // we can now cancel the job
       MyNodeListener.getInstance().cancelJob();
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -65,11 +62,10 @@ public class MyTask extends AbstractTask<String> {
 
     // this method will be executed on the client side
     @Override
-    public String call() throws Exception
-    {
+    public String call() throws Exception {
       try {
         // ... your code here ...
-      } catch (Exception e) {
+      } catch (final Exception e) {
         return e.getMessage();
       }
       return "callable was successfully executed on the client side";

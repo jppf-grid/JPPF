@@ -25,20 +25,15 @@ import java.util.Calendar;
  * Test of multithreaded serialization/deserialization of Calendar.
  * @author Laurent Cohen
  */
-public class CalendarSerialization
-{
+public class CalendarSerialization {
   /**
    * 
    * @param args not used
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       new CalendarSerialization().perform();
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -47,26 +42,24 @@ public class CalendarSerialization
    * 
    * @throws Exception if any error occurs.
    */
-  public void perform() throws Exception
-  {
-    int nbThreads = 8;
-    Calendar cal = Calendar.getInstance();
-    SerializationThread[] threads = new SerializationThread[nbThreads];
-    for (int i=0; i<nbThreads; i++) threads[i] = new SerializationThread(cal);
-    for (int i=0; i<nbThreads; i++) threads[i].start();
-    for (int i=0; i<nbThreads; i++) threads[i].join();
-    DeserializationThread[] threads2 = new DeserializationThread[nbThreads];
-    for (int i=0; i<nbThreads; i++) threads2[i] = new DeserializationThread(threads[i].data);
-    for (int i=0; i<nbThreads; i++) threads2[i].start();
-    for (int i=0; i<nbThreads; i++) threads2[i].join();
+  public void perform() throws Exception {
+    final int nbThreads = 8;
+    final Calendar cal = Calendar.getInstance();
+    final SerializationThread[] threads = new SerializationThread[nbThreads];
+    for (int i = 0; i < nbThreads; i++) threads[i] = new SerializationThread(cal);
+    for (int i = 0; i < nbThreads; i++) threads[i].start();
+    for (int i = 0; i < nbThreads; i++) threads[i].join();
+    final DeserializationThread[] threads2 = new DeserializationThread[nbThreads];
+    for (int i = 0; i < nbThreads; i++) threads2[i] = new DeserializationThread(threads[i].data);
+    for (int i = 0; i < nbThreads; i++) threads2[i].start();
+    for (int i = 0; i < nbThreads; i++) threads2[i].join();
   }
 
   /**
    * 
    * @author Laurent Cohen
    */
-  public class SerializationThread extends Thread
-  {
+  public class SerializationThread extends Thread {
     /**
      * 
      */
@@ -80,25 +73,20 @@ public class CalendarSerialization
      * 
      * @param cal .
      */
-    public SerializationThread(final Calendar cal)
-    {
+    public SerializationThread(final Calendar cal) {
       this.cal = cal;
     }
 
     @Override
-    public void run()
-    {
-      try
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
+    public void run() {
+      try {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(cal);
         oos.flush();
         oos.close();
         data = baos.toByteArray();
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -107,8 +95,7 @@ public class CalendarSerialization
   /**
    * 
    */
-  public class DeserializationThread extends Thread
-  {
+  public class DeserializationThread extends Thread {
     /**
      * 
      */
@@ -122,23 +109,18 @@ public class CalendarSerialization
      * 
      * @param data .
      */
-    public DeserializationThread(final byte[] data)
-    {
+    public DeserializationThread(final byte[] data) {
       this.data = data;
     }
 
     @Override
-    public void run()
-    {
-      try
-      {
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(bais);
+    public void run() {
+      try {
+        final ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        final ObjectInputStream ois = new ObjectInputStream(bais);
         cal = (Calendar) ois.readObject();
         ois.close();
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

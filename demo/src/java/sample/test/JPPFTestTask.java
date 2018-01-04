@@ -27,8 +27,7 @@ import org.jppf.node.protocol.AbstractTask;
  * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
-public abstract class JPPFTestTask extends AbstractTask<Object>
-{
+public abstract class JPPFTestTask extends AbstractTask<Object> {
   /**
    * Holder for the execution results.
    */
@@ -37,8 +36,7 @@ public abstract class JPPFTestTask extends AbstractTask<Object>
   /**
    * Initialize this task.
    */
-  public JPPFTestTask()
-  {
+  public JPPFTestTask() {
   }
 
   /**
@@ -46,34 +44,28 @@ public abstract class JPPFTestTask extends AbstractTask<Object>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     runTestMethods();
   }
 
   /**
    * Execute the test methods and generate an execution report for each.
    */
-  protected void runTestMethods()
-  {
-    Class<?> thisClass = getClass();
-    Method[] methods = thisClass.getMethods();
-    for (Method m: methods)
-    {
+  protected void runTestMethods() {
+    final Class<?> thisClass = getClass();
+    final Method[] methods = thisClass.getMethods();
+    for (final Method m: methods) {
       if (!isTestMethod(m)) continue;
-      ExecutionReport report = new ExecutionReport();
+      final ExecutionReport report = new ExecutionReport();
       report.methodName = m.getName();
-      try
-      {
+      try {
         m.invoke(this, (Object[]) null);
         report.description = "No exception was raised";
-      }
-      catch(Throwable e)
-      {
-        Throwable t = e.getCause() == null ? e : e.getCause();
+      } catch (final Throwable e) {
+        final Throwable t = e.getCause() == null ? e : e.getCause();
         report.description = t.getMessage();
-        StringWriter sw = new StringWriter();
-        PrintWriter writer = new PrintWriter(sw);
+        final StringWriter sw = new StringWriter();
+        final PrintWriter writer = new PrintWriter(sw);
         t.printStackTrace(writer);
         report.stackTrace = sw.toString();
         setThrowable(t);
@@ -95,14 +87,13 @@ public abstract class JPPFTestTask extends AbstractTask<Object>
    * @param m the method to check.
    * @return true if the method is a test method, false otherwise.
    */
-  protected boolean isTestMethod(final Method m)
-  {
+  protected boolean isTestMethod(final Method m) {
     if (m == null) return false;
     if (!m.getName().startsWith("test")) return false;
-    int mod = m.getModifiers();
+    final int mod = m.getModifiers();
     if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
     if (!Void.TYPE.equals(m.getReturnType())) return false;
-    Class<?>[] paramTypes = m.getParameterTypes();
+    final Class<?>[] paramTypes = m.getParameterTypes();
     if ((paramTypes != null) && (paramTypes.length > 0)) return false;
     return true;
   }
@@ -111,8 +102,7 @@ public abstract class JPPFTestTask extends AbstractTask<Object>
    * Get the holder for the execution results.
    * @return a list of <code>ExecutionReport</code> instances.
    */
-  public List<ExecutionReport> getReports()
-  {
+  public List<ExecutionReport> getReports() {
     return reports;
   }
 
@@ -122,11 +112,9 @@ public abstract class JPPFTestTask extends AbstractTask<Object>
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
-    for (ExecutionReport r: reports)
-    {
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for (final ExecutionReport r: reports) {
       sb.append("----------------------------------------------------------\n");
       sb.append("method name: ").append(r.methodName).append('\n');
       sb.append("description: ").append(r.description).append('\n');

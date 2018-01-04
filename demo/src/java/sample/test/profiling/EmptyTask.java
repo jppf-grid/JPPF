@@ -24,8 +24,7 @@ import org.jppf.node.protocol.AbstractTask;
  * to analyse the JPPF overhead for task execution.
  * @author Laurent Cohen
  */
-public class EmptyTask extends AbstractTask<String>
-{
+public class EmptyTask extends AbstractTask<String> {
   /**
    * The data size in KB.
    */
@@ -36,12 +35,12 @@ public class EmptyTask extends AbstractTask<String>
    */
   @SuppressWarnings("unused")
   private byte[] data = null;
+
   /**
    * Initialize with the specified data size.
    * @param dataSize the data size in bytes.
    */
-  public EmptyTask(final int dataSize)
-  {
+  public EmptyTask(final int dataSize) {
     this.dataSize = dataSize;
     data = new byte[dataSize];
   }
@@ -51,12 +50,10 @@ public class EmptyTask extends AbstractTask<String>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    String[] res = { "res/res1.txt", "res/res2.txt", "res/res3.txt"};
-    ClassLoader cl = getClass().getClassLoader();
-    for (String s: res)
-    {
+  public void run() {
+    final String[] res = { "res/res1.txt", "res/res2.txt", "res/res3.txt" };
+    final ClassLoader cl = getClass().getClassLoader();
+    for (final String s: res) {
       cl.getResource(s);
       //System.out.println("url for '" + s + "' : " + url);
     }

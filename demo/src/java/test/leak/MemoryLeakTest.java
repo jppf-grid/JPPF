@@ -63,23 +63,23 @@ public class MemoryLeakTest {
     System.out.println("configuration = " + options);
     try (JPPFClient client = new JPPFClient()) {
       //client.addClientQueueListener(new MyQueueListener());
-      JMXDriverConnectionWrapper jmx = getJmxConnection(client);
+      final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
       // register the task notifications listener on all nodes
-      String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, new MyNotificationHandler(client), null, null);
-      long start = System.nanoTime();
+      final String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, new MyNotificationHandler(client), null, null);
+      final long start = System.nanoTime();
       for (int i=1; i<=options.nbJobs; i++) {
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName("test" + i);
         for (int j=1; j<=options.nbTasks; j++) job.add(new MyTask(options.duration, options.dataSize)).setId(job.getName() + "_task" + j);
-        List<Task<?>> results = client.submitJob(job);
-        MyTask task = (MyTask) results.get(0);
-        String res = task.getResult();
+        final List<Task<?>> results = client.submitJob(job);
+        final MyTask task = (MyTask) results.get(0);
+        final String res = task.getResult();
         System.out.printf("job '%s' terminated with status '%s'%n", job.getName(), (res == null ? "cancelled" : "completed"));
       }
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.printf("test finished in %,d ms; cancel count = %,d%n", elapsed, cancelCount.get());
       jmx.unregisterForwardingNotificationListener(listenerId);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -113,13 +113,13 @@ public class MemoryLeakTest {
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
       try {
-        JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
-        TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
+        final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+        final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
         if (MyTask.NOTIF_MESSAGE.equals(actualNotif.getUserData())) {
           client.cancelJob(actualNotif.getTaskInformation().getJobId());
           cancelCount.incrementAndGet();
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -161,7 +161,7 @@ public class MemoryLeakTest {
         // if this task is cancelled, the next 2 lines are not executed
         setResult("execution success for " + getId());
         System.out.printf("%s (data size = %,d)%n", getResult(), dummyData.length);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         setThrowable(e);
       }
     }
@@ -183,7 +183,7 @@ public class MemoryLeakTest {
 
     @Override
     public void jobRemoved(final ClientQueueEvent event) {
-      String name = event.getJob().getName();
+      final String name = event.getJob().getName();
       if ("test1".equals(name)) log.info(String.format("removed job '%s' from the queue, callstack=%n%s", name, ExceptionUtils.getCallStack()));
       else log.info(String.format("removed job '%s' from the queue", name));
     }
@@ -223,7 +223,7 @@ public class MemoryLeakTest {
     /**
      * Set JPPF config properties overrides.
      */
-    public void configure() {
+    public static void configure() {
       config
         // load balancing
         .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")

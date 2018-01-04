@@ -25,12 +25,12 @@ import org.jppf.node.protocol.JPPFRunnable;
  * A simple hello world JPPF task with a JPPF-annotated static method.
  * @author Laurent Cohen
  */
-public class HelloWorldAnnotatedStatic implements Serializable
-{
+public class HelloWorldAnnotatedStatic implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
   /**
    * Execute the task.
    * @param message a message to print.
@@ -38,9 +38,8 @@ public class HelloWorldAnnotatedStatic implements Serializable
    * @return a string hello message.
    */
   @JPPFRunnable
-  public static String helloStaticMethod(final String message, final int number)
-  {
-    String hello = "Hello, World (annotated static, " + message + ", " + number + ')';
+  public static String helloStaticMethod(final String message, final int number) {
+    final String hello = "Hello, World (annotated static, " + message + ", " + number + ')';
     System.out.println(hello);
     return hello;
   }

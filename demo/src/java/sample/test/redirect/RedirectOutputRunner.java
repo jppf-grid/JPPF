@@ -42,24 +42,23 @@ public class RedirectOutputRunner {
     try {
       System.out.println("Starting ...");
       client = new JPPFClient();
-      JPPFJob job = new JPPFJob();
-      String name = "redirect output";
+      final JPPFJob job = new JPPFJob();
+      final String name = "redirect output";
       job.setName(name);
-      int nbTasks = 10;
+      final int nbTasks = 10;
       for (int i=1; i<=nbTasks; i++) job.add(new RedirectOutputTask()).setId(name + " - task " + i);
-      List<Task<?>> results = client.submitJob(job);
-      for (Task <?>task: results) {
-        Throwable e = task.getThrowable();
-        if (e != null)
-          System.out.println("'" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));
+      final List<Task<?>> results = client.submitJob(job);
+      for (final Task <?>task: results) {
+        final Throwable e = task.getThrowable();
+        if (e != null) System.out.println("'" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));
         else {
-          String[] result = (String[]) task.getResult();
+          final String[] result = (String[]) task.getResult();
           System.out.println("result for '" + task.getId() + "' : ");
           System.out.print("*** standard output: " + result[0]);
           System.out.println("*** error output:    " + result[1]);
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();

@@ -56,7 +56,7 @@ public class TestScheduledExecutor {
     try {
       //perform2();
       perform3();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -66,10 +66,10 @@ public class TestScheduledExecutor {
    * @throws Exception if any error occurs.
    */
   public static void perform1() throws Exception {
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory("TestScheduledExecutor"));
+    final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory("TestScheduledExecutor"));
     for (int i = 0; i < n * million; i++) {
       if ((i + 1) % million == 0) System.out.println("done " + (i / million) + "/" + n + " M");
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
           count.decrementAndGet();
@@ -98,15 +98,14 @@ public class TestScheduledExecutor {
       new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
       //String uuid = new JPPFUuid().toString();
     }
-    long elapsed1 = System.nanoTime() - start;
-    long avg1 = elapsed1 / (n * million);
+    final long elapsed1 = System.nanoTime() - start;
+    final long avg1 = elapsed1 / (n * million);
     System.out.println(" JPPF uuid time = " + StringUtils.toStringDuration(elapsed1 / million) + ", avg = " + avg1 + " ns");
     System.out.println(" Test JDK uuid = " + UUID.randomUUID().toString());
     start = System.nanoTime();
-    for (int i = 0; i < n * million; i++)
-      UUID.randomUUID().toString();
-    long elapsed2 = System.nanoTime() - start;
-    long avg2 = elapsed2 / (n * million);
+    for (int i = 0; i < n * million; i++) UUID.randomUUID().toString();
+    final long elapsed2 = System.nanoTime() - start;
+    final long avg2 = elapsed2 / (n * million);
     System.out.println(" JDK uuid time = " + StringUtils.toStringDuration(elapsed2 / million) + ", avg = " + avg2 + " ns");
   }
 
@@ -115,7 +114,7 @@ public class TestScheduledExecutor {
    * @throws Exception if any error occurs.
    */
   public static void perform3() throws Exception {
-    int[] threadValues = { 1, 2, 4, 8, 16, 24, 32 };
+    final int[] threadValues = { 1, 2, 4, 8, 16, 24, 32 };
     //int[] threadValues = { 1 };
     for (int i = 0; i < threadValues.length; i++) {
       nbThreads = threadValues[i];
@@ -128,16 +127,16 @@ public class TestScheduledExecutor {
    * @throws Exception if any error occurs.
    */
   private static void performTest3() throws Exception {
-    NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
+    final NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
     nf.setGroupingUsed(true);
     nf.setMinimumFractionDigits(0);
     nf.setMaximumFractionDigits(0);
-    ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
+    final ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
     try {
       System.out.println(StringUtils.padRight("", '-', 40));
       System.out.println("Running test with nbThreads = " + nbThreads + ", runs per thread = " + nf.format(n * million));
       System.out.println("Test JPPF uuid = " + new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-      Runnable task1 = new Runnable() {
+      final Runnable task1 = new Runnable() {
         @Override
         public void run() {
           for (int i = 0; i < n * million; i++) {
@@ -150,7 +149,7 @@ public class TestScheduledExecutor {
       executeTest(executor, task1, "JPPF");
 
       System.out.println("Test JDK uuid = " + UUID.randomUUID().toString());
-      Runnable task2 = new Runnable() {
+      final Runnable task2 = new Runnable() {
         @Override
         public void run() {
           for (int i = 0; i < n * million; i++) {
@@ -172,12 +171,12 @@ public class TestScheduledExecutor {
    * @throws Exception .
    */
   private static void executeTest(final ExecutorService executor, final Runnable task, final String uuidProvider) throws Exception {
-    Future<?>[] futures = new Future<?>[nbThreads];
-    long start = System.nanoTime();
+    final Future<?>[] futures = new Future<?>[nbThreads];
+    final long start = System.nanoTime();
     for (int i = 0; i < nbThreads; i++) futures[i] = executor.submit(task);
     for (int i = 0; i < nbThreads; i++) futures[i].get();
-    long elapsed = System.nanoTime() - start;
-    long avg = elapsed / (nbThreads * n * million);
+    final long elapsed = System.nanoTime() - start;
+    final long avg = elapsed / (nbThreads * n * million);
     System.out.println(uuidProvider + " uuid time = " + StringUtils.toStringDuration(elapsed / million) + ", avg = " + avg + " ns");
   }
 }

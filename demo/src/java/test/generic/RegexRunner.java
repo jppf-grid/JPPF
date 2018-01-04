@@ -35,7 +35,7 @@ public class RegexRunner {
   public static void main(final String[] args) {
     try {
       performScriptedProperties();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -55,11 +55,11 @@ public class RegexRunner {
     config.setString("prop.4", "hello $script:groovy{ return 2 + 3 }$ dear $script:javascript{'' + (2 + 5)}$ world");
     config.setString("prop.5", "hello $script{ return '${prop.0} ' + (2 + 3) }$ world");
     config.setString("prop.6", "hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe");
-    TypedProperties oldProps = new TypedProperties(config);
+    final TypedProperties oldProps = new TypedProperties(config);
     config = new SubstitutionsHandler().resolve(config);
-    ScriptHandler sh = new ScriptHandler();
+    final ScriptHandler sh = new ScriptHandler();
     sh.process(config);
-    for (String key: oldProps.stringPropertyNames()) {
+    for (final String key: oldProps.stringPropertyNames()) {
       System.out.printf("name=%s, before=%s, after=%s\n", key, oldProps.getString(key), config.getString(key));
     }
   }
@@ -72,18 +72,18 @@ public class RegexRunner {
   private static void performRegex() throws Exception {
     //Pattern p = Pattern.compile("\\$script\\:(.*)\\:(.*)\\{(.*)\\}\\$");
     //Pattern p = Pattern.compile("\\$script(?:\\:(.*))?(?:\\:(.*))?\\{(.*)\\}\\$");
-    Pattern p = Pattern.compile("\\$script(?:\\:([^:]*))?(?:\\:(.*))?\\{(.*)\\}\\$");
+    final Pattern p = Pattern.compile("\\$script(?:\\:([^:]*))?(?:\\:(.*))?\\{(.*)\\}\\$");
     //String s = "$script:javascript:inline{ 2 + 3 }$";
-    String[] strings = {"$script{ 2 + 3 }$", "$script:{ 2 + 3 }$", "$script::{ 2 + 3 }$", "$script::inline{ 2 + 3 }$", "$script:javascript{ 2 + 3 }$", "$script:javascript:{ 2 + 3 }$", "$script:javascript:inline{ 2 + 3 }$"};
-    for (String s: strings) {
+    final String[] strings = {"$script{ 2 + 3 }$", "$script:{ 2 + 3 }$", "$script::{ 2 + 3 }$", "$script::inline{ 2 + 3 }$", "$script:javascript{ 2 + 3 }$", "$script:javascript:{ 2 + 3 }$", "$script:javascript:inline{ 2 + 3 }$"};
+    for (final String s: strings) {
       System.out.println("***** test for '" + s + "' *****");
-      Matcher m = p.matcher(s);
-      boolean found = m.find();
+      final Matcher m = p.matcher(s);
+      final boolean found = m.find();
       System.out.println("  pattern found = " + found);
-      int n = m.groupCount();
+      final int n = m.groupCount();
       System.out.println("  group count = " + n);
       for (int i=1; i<= n; i++) {
-        String g = m.group(i);
+        final String g = m.group(i);
         System.out.println("  group " + i + " = " + g);
       }
     }

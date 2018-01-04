@@ -25,8 +25,7 @@ import org.jppf.node.protocol.AbstractTask;
  * See bug report <a href="http://sourceforge.net/tracker/?func=detail&aid=2713542&group_id=135654&atid=733518">2713542 - OOM when node/driver generates too much console output</a>
  * @author Laurent Cohen
  */
-public class LotsOfOutputTask extends AbstractTask<String>
-{
+public class LotsOfOutputTask extends AbstractTask<String> {
   /**
    * Number of output lines to print.
    */
@@ -41,8 +40,7 @@ public class LotsOfOutputTask extends AbstractTask<String>
    * @param nbLines - the number of output lines to print.
    * @param lineLength - the length in chars of each output line.
    */
-  public LotsOfOutputTask(final int nbLines, final int lineLength)
-  {
+  public LotsOfOutputTask(final int nbLines, final int lineLength) {
     this.nbLines = nbLines;
     this.lineLength = lineLength;
   }
@@ -52,11 +50,10 @@ public class LotsOfOutputTask extends AbstractTask<String>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    StringBuilder sb = new StringBuilder();
-    for (int i=0; i<lineLength; i++) sb.append('X');
-    String s = sb.toString();
-    for (int i=0; i<nbLines; i++) System.out.println(s);
+  public void run() {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < lineLength; i++) sb.append('X');
+    final String s = sb.toString();
+    for (int i = 0; i < nbLines; i++) System.out.println(s);
   }
 }

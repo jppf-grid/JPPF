@@ -27,8 +27,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * This task implementation is used for testing the parsing of an xml document.
  * @author Laurent Cohen
  */
-public class ParserTask extends JPPFTestTask
-{
+public class ParserTask extends JPPFTestTask {
   /**
    * Path to the XML file.
    */
@@ -38,8 +37,7 @@ public class ParserTask extends JPPFTestTask
    * Initialize this task with the specified xml file path.
    * @param filePath the client side path of the xml file to parse.
    */
-  public ParserTask(final String filePath)
-  {
+  public ParserTask(final String filePath) {
     this.filePath = filePath;
   }
 
@@ -48,11 +46,10 @@ public class ParserTask extends JPPFTestTask
    * @throws Exception if parsing fails.
    * @see java.lang.Runnable#run()
    */
-  public void testParsing() throws Exception
-  {
-    System.out.println("Started Parser for "+filePath+" ...");
+  public void testParsing() throws Exception {
+    System.out.println("Started Parser for " + filePath + " ...");
     fileParser(filePath);
-    System.out.println("Finished Parser for "+filePath+" ...");
+    System.out.println("Finished Parser for " + filePath + " ...");
   }
 
   /**
@@ -60,19 +57,16 @@ public class ParserTask extends JPPFTestTask
    * @param filetoParse path of the file to parse in the client file system.
    * @throws Exception if parsing fails.
    */
-  public void fileParser(final String filetoParse) throws Exception
-  {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
+  public void fileParser(final String filetoParse) throws Exception {
+    final InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
     //InputSource src = new InputSource(is);
     new InputSource(is);
     // Creating XMLReader instance
     //XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
     XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-    /*
-		reader.setContentHandler(brsaxParser);
-		reader.setErrorHandler(brsaxParser);
-		// Parsing the XML file
-		reader.parse(src);
-     */
+    /* reader.setContentHandler(brsaxParser);
+     * reader.setErrorHandler(brsaxParser);
+     * // Parsing the XML file
+     * reader.parse(src); */
   }
 }

@@ -33,8 +33,7 @@ import org.jppf.utils.collections.CollectionUtils;
  * external process.
  * @author Laurent Cohen
  */
-public abstract class CommandLineTaskEx extends AbstractTask<Object> implements ProcessWrapperEventListener
-{
+public abstract class CommandLineTaskEx extends AbstractTask<Object> implements ProcessWrapperEventListener {
   /**
    * Explicit serialVersionUID.
    */
@@ -71,16 +70,14 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
   /**
    * Default constructor.
    */
-  public CommandLineTaskEx()
-  {
+  public CommandLineTaskEx() {
   }
 
   /**
    * Create an instance of this class and set the parameters of the external process or script to launch.
    * @param commands the list of command-line arguments.
    */
-  public CommandLineTaskEx(final String...commands)
-  {
+  public CommandLineTaskEx(final String... commands) {
     this(null, null, commands);
   }
 
@@ -90,11 +87,10 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * @param startDir the directory to start the command in.
    * @param commands the list of command-line arguments.
    */
-  public CommandLineTaskEx(final Map<String, String> env, final String startDir, final String...commands)
-  {
-    if (commands != null)
-    {
-      for (String s: commands) commandList.add(s);
+  public CommandLineTaskEx(final Map<String, String> env, final String startDir, final String... commands) {
+    if (commands != null) {
+      for (String s: commands)
+        commandList.add(s);
     }
     this.env = env;
     this.startDir = startDir;
@@ -105,26 +101,21 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * @return the exit code returned of the sub-process.
    * @throws Exception if an error occurs.
    */
-  public int launchProcess() throws Exception
-  {
-    ProcessBuilder builder = new ProcessBuilder();
+  public int launchProcess() throws Exception {
+    final ProcessBuilder builder = new ProcessBuilder();
     builder.command(commandList);
     if (startDir != null) builder.directory(new File(startDir));
-    if (env != null)
-    {
-      Map<String, String> map = builder.environment();
-      for (Map.Entry<String, String> e: env.entrySet()) map.put(e.getKey(), e.getValue());
+    if (env != null) {
+      final Map<String, String> map = builder.environment();
+      for (final Map.Entry<String, String> e: env.entrySet()) map.put(e.getKey(), e.getValue());
     }
-    ProcessWrapper wrapper = new ProcessWrapper();
-    try
-    {
+    final ProcessWrapper wrapper = new ProcessWrapper();
+    try {
       if (captureOutput) wrapper.addListener(this);
-      Process p = builder.start();
+      final Process p = builder.start();
       wrapper.setProcess(p);
       exitCode = p.waitFor();
-    }
-    finally
-    {
+    } finally {
       if (captureOutput) wrapper.removeListener(this);
     }
     return exitCode;
@@ -134,8 +125,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Determines whether the process output is captured.
    * @return true if the output is captured, false otherwise.
    */
-  public boolean isCaptureOutput()
-  {
+  public boolean isCaptureOutput() {
     return captureOutput;
   }
 
@@ -143,8 +133,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Specifies whether the process output is captured.
    * @param captureOutput true if the output is captured, false otherwise.
    */
-  public void setCaptureOutput(final boolean captureOutput)
-  {
+  public void setCaptureOutput(final boolean captureOutput) {
     this.captureOutput = captureOutput;
   }
 
@@ -152,8 +141,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the content of the standard output for the process.
    * @return the output as a string.
    */
-  public String getStandardOutput()
-  {
+  public String getStandardOutput() {
     return standardOutput.toString();
   }
 
@@ -161,8 +149,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the content of the error output for the process.
    * @return the output as a string.
    */
-  public String getErrorOutput()
-  {
+  public String getErrorOutput() {
     return errorOutput.toString();
   }
 
@@ -170,8 +157,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the list of command-line arguments.
    * @return a list of arguments as strings.
    */
-  public List<String> getCommandList()
-  {
+  public List<String> getCommandList() {
     return commandList;
   }
 
@@ -179,8 +165,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Set the list of command-line arguments.
    * @param commandList a list of arguments as strings.
    */
-  public void setCommandList(final List<String> commandList)
-  {
+  public void setCommandList(final List<String> commandList) {
     this.commandList = commandList;
   }
 
@@ -188,8 +173,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Set the list of command-line arguments.
    * @param commands a list of arguments as strings.
    */
-  public void setCommandList(final String...commands)
-  {
+  public void setCommandList(final String... commands) {
     commandList = CollectionUtils.list(commands);
   }
 
@@ -197,8 +181,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the environment variables to set.
    * @return a map of variable names to their corresponding values.
    */
-  public Map<String, String> getEnv()
-  {
+  public Map<String, String> getEnv() {
     return env;
   }
 
@@ -206,8 +189,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the environment variables to set.
    * @param env a map of variable names to their corresponding values.
    */
-  public void setEnv(final Map<String, String> env)
-  {
+  public void setEnv(final Map<String, String> env) {
     this.env = env;
   }
 
@@ -215,8 +197,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the directory to start the command in.
    * @return the start directory as a string.
    */
-  public String getStartDir()
-  {
+  public String getStartDir() {
     return startDir;
   }
 
@@ -224,8 +205,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Set the directory to start the command in.
    * @param startDir the start directory as a string.
    */
-  public void setStartDir(final String startDir)
-  {
+  public void setStartDir(final String startDir) {
     this.startDir = startDir;
   }
 
@@ -235,8 +215,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * @see org.jppf.process.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
-  public void outputStreamAltered(final ProcessWrapperEvent event)
-  {
+  public void outputStreamAltered(final ProcessWrapperEvent event) {
     standardOutput.append(event.getContent());
   }
 
@@ -246,8 +225,7 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
-  public void errorStreamAltered(final ProcessWrapperEvent event)
-  {
+  public void errorStreamAltered(final ProcessWrapperEvent event) {
     errorOutput.append(event.getContent());
   }
 
@@ -255,10 +233,9 @@ public abstract class CommandLineTaskEx extends AbstractTask<Object> implements 
    * Get the exit code returned by the sub-process.
    * @return the value of the exit code returned by the sub-process.
    * A negative value indicates the process was never launched or never returned.
-   * @see java.lang.Process#waitFor() 
+   * @see java.lang.Process#waitFor()
    */
-  public int getExitCode()
-  {
+  public int getExitCode() {
     return exitCode;
   }
 }

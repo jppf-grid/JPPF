@@ -53,12 +53,12 @@ public class AwaitJobNotificationListener implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    JobNotification jobNotif = (JobNotification) notification;
+    final JobNotification jobNotif = (JobNotification) notification;
     try {
       synchronized(this) {
         if (jobNotif.getEventType() == expectedEvent) notifyAll();
       }
-    } catch (Exception ignore) {
+    } catch (final Exception ignore) {
       ignore.printStackTrace();
     }
   }

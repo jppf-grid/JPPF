@@ -41,7 +41,7 @@ public class BroadcastJobRunner {
     try {
       //submitJob();
       submitJobWithExecutor();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -52,7 +52,7 @@ public class BroadcastJobRunner {
    */
   @SuppressWarnings("unused")
   private static void submitJob() throws Exception {
-    boolean remoteEnabled = true;
+    final boolean remoteEnabled = true;
     JPPFConfiguration.set(DISCOVERY_ENABLED, false)
       .set(DRIVERS, new String[] {"driver1"})
       .setString("driver1.jppf.server.host", "localhost")
@@ -62,16 +62,16 @@ public class BroadcastJobRunner {
       .set(LOAD_BALANCING_ALGORITHM, "manual")
       .set(LOAD_BALANCING_PROFILE, "manual")
       .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 10);
-    try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = new JPPFJob();
+    try (final JPPFClient client = new JPPFClient()) {
+      final JPPFJob job = new JPPFJob();
       job.setName("my job");
       job.getSLA().setBroadcastJob(true);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(5000L));
       job.getClientSLA().setMaxChannels(2);
       for (int i=0; i<1; i++) job.add(new LongTask(10L)).setId("my task" + (i + 1));
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       System.out.println("job complete");
-      for (Task<?> task : results) {
+      for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("got exception for task '%' : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));
         else System.out.printf("got result for task '%s': %s%n", task.getId(), task.getResult());
       }
@@ -83,7 +83,7 @@ public class BroadcastJobRunner {
    * @throws Exception if any error occurs.
    */
   private static void submitJobWithExecutor() throws Exception {
-    boolean remoteEnabled = true;
+    final boolean remoteEnabled = true;
     JPPFConfiguration.set(DISCOVERY_ENABLED, false)
       .setString("jppf.drivers", "driver1")
       .setString("driver1.jppf.server.host", "localhost")
@@ -94,28 +94,28 @@ public class BroadcastJobRunner {
       .set(LOAD_BALANCING_PROFILE, "manual")
       .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 10);
     System.out.println("starting client");
-    JPPFClient client = new JPPFClient();
+    final JPPFClient client = new JPPFClient();
     System.out.println("creating executor");
-    int nbTasks = 10;
-    JPPFExecutorService executor = new JPPFExecutorService(client);
+    final int nbTasks = 10;
+    final JPPFExecutorService executor = new JPPFExecutorService(client);
     executor.setBatchSize(nbTasks);
-    JPPFCompletionService<?> completionService = new JPPFCompletionService<>(executor);
-    ExecutorServiceConfiguration cfg = executor.getConfiguration();
-    JobConfiguration jobConfig = cfg.getJobConfiguration();
+    final JPPFCompletionService<?> completionService = new JPPFCompletionService<>(executor);
+    final ExecutorServiceConfiguration cfg = executor.getConfiguration();
+    final JobConfiguration jobConfig = cfg.getJobConfiguration();
     jobConfig.getClientSLA().setMaxChannels(2);
     jobConfig.getSLA().setBroadcastJob(true);
     System.out.println("submitting tasks");
     for (int i=0; i<nbTasks; i++) {
-      Task<?> task = new LongTask(10L);
+      final Task<?> task = new LongTask(10L);
       task.setId("my task " + (i + 1));
       completionService.submit(task, null);
     }
     System.out.println("getting results");
     int count = 0;
     while (count < nbTasks) {
-      JPPFTaskFuture<?> future = (JPPFTaskFuture<?>) completionService.take();
-      Object o = future.get();
-      Task<?> task = future.getTask();
+      final JPPFTaskFuture<?> future = (JPPFTaskFuture<?>) completionService.take();
+      final Object o = future.get();
+      final Task<?> task = future.getTask();
       System.out.printf("got result for task '%s': %s%n", task.getId(), o);
       count++;
     }
@@ -146,14 +146,14 @@ public class BroadcastJobRunner {
 
     @Override
     public void run() {
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       try {
         if (duration > 0) Thread.sleep(duration);
-        long elapsed = (System.nanoTime() - start) / 1_000_000L;
-        String result = "task '" + getId() + "' has run for " + elapsed + " ms";
+        final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+        final String result = "task '" + getId() + "' has run for " + elapsed + " ms";
         setResult(result);
         System.out.println(result);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         setThrowable(e);
       }
     }

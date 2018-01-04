@@ -28,35 +28,28 @@ import org.jppf.node.protocol.*;
  * This task submits a JPPF job.
  * @author Laurent Cohen
  */
-public class Task1 extends AbstractTask<String>
-{
+public class Task1 extends AbstractTask<String> {
 
   /**
    * Run this task.
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     JPPFClient client = null;
-    try
-    {
+    try {
       System.out.println("Hello, this is Task1, about to submit Task2");
       client = new JPPFClient();
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.add(new Task2());
       job.getSLA().setExecutionPolicy(new Equal("id", 2));
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
       setResult("Task1 executed successfully");
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
       setThrowable(e);
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
     }
   }

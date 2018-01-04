@@ -24,8 +24,7 @@ import org.slf4j.*;
 /**
  * 
  */
-public class MyCallable implements JPPFCallable<String>
-{
+public class MyCallable implements JPPFCallable<String> {
   /**
    * Logger for this class.
    */
@@ -54,27 +53,23 @@ public class MyCallable implements JPPFCallable<String>
    * @param time the duration of the callable.
    * @param size the size of the data to create.
    */
-  public MyCallable(final String id, final long time, final int size)
-  {
+  public MyCallable(final String id, final long time, final int size) {
     this.id = id;
     this.time = time;
     this.size = size;
   }
 
   @Override
-  public String call() throws Exception
-  {
+  public String call() throws Exception {
     data = new byte[size > 0 ? size : 0];
-    if (time > 0L)
-    {
-      synchronized(this)
-      {
+    if (time > 0L) {
+      synchronized (this) {
         wait(time);
       }
     }
     //throw new RuntimeException();
     //throw new Error();
-    String s = id + " : OK";
+    final String s = id + " : OK";
     //log.info("callable " + s);
     return s;
   }
