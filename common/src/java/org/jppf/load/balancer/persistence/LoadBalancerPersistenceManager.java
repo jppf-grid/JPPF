@@ -73,15 +73,15 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
    * @return a {@link Bundler} instance.
    */
   public Pair<String, Bundler<?>> loadBundler(final Pair<String, String> channelId) {
-    Bundler<?> bundler = factory.newBundler();
-    String algo = factory.getCurrentInfo().getAlgorithm();
+    final Bundler<?> bundler = factory.newBundler();
+    final String algo = factory.getCurrentInfo().getAlgorithm();
     if (isPersistenceEnabled() && (bundler instanceof PersistentState)) {
-      LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algo, factory.getAlgorithmHash(algo), null);
+      final LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algo, factory.getAlgorithmHash(algo), null);
       try {
-        Object state = persistence.load(info);
+        final Object state = persistence.load(info);
         if (debugEnabled) log.debug("persisted state for {} is " + state, info);
         if (state != null) ((PersistentState) bundler).setState(state);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -97,14 +97,14 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
   public void storeBundler(final Pair<String, String> channelId, final Bundler<?> bundler, final String algorithm) {
     if (isPersistenceEnabled() && (bundler instanceof PersistentState)) {
       try {
-        Object state = ((PersistentState) bundler).getState();
+        final Object state = ((PersistentState) bundler).getState();
         if (state != null) {
-          Lock lock = ((PersistentState) bundler).getStateLock();
+          final Lock lock = ((PersistentState) bundler).getStateLock();
           //if (debugEnabled) log.debug("persisting state for {}, {}", nodeId, algorithm);
-          LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algorithm, factory.getAlgorithmHash(algorithm), state, lock);
+          final LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algorithm, factory.getAlgorithmHash(algorithm), state, lock);
           persistence.store(info);
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -119,9 +119,9 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
   @Override
   public List<String> listAlgorithms(final String channelID) throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) return Collections.emptyList();
-    List<String> hashes = persistence.list(new LoadBalancerPersistenceInfo(channelID, null, null));
-    List<String> names = hashes.isEmpty() ? Collections.<String>emptyList() : new ArrayList<String>(hashes.size());
-    for (String hash: hashes) names.add(factory.getAlgorithmNameFromHash(hash));
+    final List<String> hashes = persistence.list(new LoadBalancerPersistenceInfo(channelID, null, null));
+    final List<String> names = hashes.isEmpty() ? Collections.<String>emptyList() : new ArrayList<String>(hashes.size());
+    for (final String hash: hashes) names.add(factory.getAlgorithmNameFromHash(hash));
     return names;
   }
 

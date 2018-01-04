@@ -54,10 +54,10 @@ public class SamplesPHPReadmeProcessor implements Runnable {
    * @throws Exception if any error occurs.
    */
   private List<File> getHTMLFiles() throws Exception {
-    List<File> result = new ArrayList<>();
-    File[] subdirs = sourceDir.listFiles(new JPPFDirFilter());
-    for (File dir : subdirs) {
-      File readme = new File(dir, "Readme.html");
+    final List<File> result = new ArrayList<>();
+    final File[] subdirs = sourceDir.listFiles(new JPPFDirFilter());
+    for (final File dir : subdirs) {
+      final File readme = new File(dir, "Readme.html");
       if (readme.exists()) result.add(readme);
     }
     return result;
@@ -66,9 +66,9 @@ public class SamplesPHPReadmeProcessor implements Runnable {
   @Override
   public void run() {
     try {
-      List<File> list = getHTMLFiles();
+      final List<File> list = getHTMLFiles();
       for (File file : list) processFile(file);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -80,15 +80,15 @@ public class SamplesPHPReadmeProcessor implements Runnable {
    */
   private void processFile(final File file) throws Exception {
     System.out.println("processing input file " + file);
-    int len = sourceDir.getCanonicalPath().length();
+    final int len = sourceDir.getCanonicalPath().length();
     String s = file.getParentFile().getCanonicalPath().substring(len);
     if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
     String content = FileUtils.readTextFile(file);
     content = content.replace("/Readme.html", "");
     //String[] filenames = { "/index.php", "/Readme.php" };
-    String[] filenames = { "/index.php" };
-    for (String name: filenames) {
-      File outFile = new File(destDir, s + name);
+    final String[] filenames = { "/index.php" };
+    for (final String name: filenames) {
+      final File outFile = new File(destDir, s + name);
       FileUtils.mkdirs(outFile);
       FileUtils.writeTextFile(outFile, content);
       System.out.println("wrote output file " + outFile);
@@ -101,10 +101,10 @@ public class SamplesPHPReadmeProcessor implements Runnable {
    */
   public static void main(final String[] args) {
     try {
-      File srcDir = new File(args[0]);
-      File destDir = new File(args[1]);
+      final File srcDir = new File(args[0]);
+      final File destDir = new File(args[1]);
       new SamplesPHPReadmeProcessor(srcDir, destDir).run();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

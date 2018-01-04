@@ -89,7 +89,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     this.mainClass = mainClass;
     jppfType = mainClass.toLowerCase().contains("driver") ? "driver" : "node";
     this.idleModeSupported = idleModeSupported;
-    int idx = mainClass.lastIndexOf('.');
+    final int idx = mainClass.lastIndexOf('.');
     this.name = (idx < 0) ? mainClass : mainClass.substring(idx);
   }
 
@@ -99,7 +99,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   @Override
   public void run() {
     if (idleModeSupported) {
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       idleMode = config.get(JPPFProperties.IDLE_MODE_ENABLED);
       idleModeImmediateShutdown = config.get(JPPFProperties.IDLE_INTERRUPT_IF_RUNNING);
     }
@@ -117,16 +117,16 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
           while (idle.get()) goToSleep();
         }
         startProcess();
-        int n = process.waitFor();
+        final int n = process.waitFor();
         end = onProcessExit(n);
         if (process != null) process.destroy();
         if (!end) {
           JPPFConfiguration.reset();
-          TypedProperties overrides = new ConfigurationOverridesHandler().load(false);
+          final TypedProperties overrides = new ConfigurationOverridesHandler().load(false);
           if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     System.exit(0);
@@ -149,14 +149,14 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    * @throws Exception if the process failed to start.
    */
   private Process buildProcess() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (debugEnabled) log.debug("jppf.jvm.options=" + s);
-    Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
-    List<String> jvmOptions = parsed.first();
-    List<String> cpElements = parsed.second();
+    final Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
+    final List<String> jvmOptions = parsed.first();
+    final List<String> cpElements = parsed.second();
     cpElements.add(0, System.getProperty("java.class.path"));
-    List<String> command = new ArrayList<>();
+    final List<String> command = new ArrayList<>();
     command.add(computeJavaExecPath(config));
     command.add("-cp");
     command.add(buildClasspath(cpElements));
@@ -169,7 +169,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     command.add(mainClass);
     command.add(Integer.toString(processPort));
     if (debugEnabled) log.debug("process command:\n" + command);
-    ProcessBuilder builder = new ProcessBuilder(command);
+    final ProcessBuilder builder = new ProcessBuilder(command);
     return builder.start();
   }
 
@@ -180,7 +180,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    * @return a <code>ProcessWrapper</code> instance.
    */
   protected ProcessWrapper createProcessWrapper(final Process p) {
-    ProcessWrapper wrapper = new ProcessWrapper(process);
+    final ProcessWrapper wrapper = new ProcessWrapper(process);
     wrapper.addListener(this);
     return wrapper;
   }
@@ -215,10 +215,10 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    * @return the output as a string.
    */
   public String getOutput(final Process process, final String streamType) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     try {
-      InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      final InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
       try {
         String s = "";
         while (s != null) {
@@ -228,7 +228,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
       } finally {
         reader.close();
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return sb.toString();
@@ -254,13 +254,13 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
 
   @Override
   public void idleStateChanged(final IdleStateEvent event) {
-    IdleState state = event.getState();
+    final IdleState state = event.getState();
     if (debugEnabled) log.debug("idle state changed to {}", state);
     if ((state == IdleState.IDLE) && !idle.get()) {
       if (idleMode && (process != null)) {
         idle.set(true);
         stoppedOnBusyState.set(true);
-        int action = idleModeImmediateShutdown ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
+        final int action = idleModeImmediateShutdown ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
         if (debugEnabled) log.debug("sending command {}", ProcessCommands.getCommandName(action));
         sendActionCommand(action);
       }

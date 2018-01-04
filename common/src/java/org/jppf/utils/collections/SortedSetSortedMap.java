@@ -26,8 +26,11 @@ import java.util.*;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
-{
+public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Comparator used to sort the keys.
    */
@@ -36,8 +39,7 @@ public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
   /**
    * Default cosntructor.
    */
-  public SortedSetSortedMap()
-  {
+  public SortedSetSortedMap() {
     super();
   }
 
@@ -45,8 +47,7 @@ public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    * Default cosntructor.
    * @param comparator tomparator used to sort the keys.
    */
-  public SortedSetSortedMap(final Comparator<K> comparator)
-  {
+  public SortedSetSortedMap(final Comparator<K> comparator) {
     super(comparator);
   }
 
@@ -55,15 +56,13 @@ public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    * @param keyComparator comparator used to sort the keys.
    * @param valueComparator comparator used to sort the values.
    */
-  public SortedSetSortedMap(final Comparator<K> keyComparator, final Comparator<V> valueComparator)
-  {
+  public SortedSetSortedMap(final Comparator<K> keyComparator, final Comparator<V> valueComparator) {
     super(keyComparator);
     this.valueComparator = valueComparator;
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return valueComparator == null ? new TreeSet<V>() : new TreeSet<>(valueComparator);
   }
 }

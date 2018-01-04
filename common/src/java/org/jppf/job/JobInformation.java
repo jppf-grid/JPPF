@@ -251,7 +251,7 @@ public class JobInformation implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("jobUuid=").append(jobUuid);
     sb.append(", jobName=").append(jobName);
     sb.append(", taskCount=").append(taskCount);

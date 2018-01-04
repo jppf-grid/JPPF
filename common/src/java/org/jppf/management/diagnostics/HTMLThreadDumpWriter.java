@@ -71,14 +71,14 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
 
   @Override
   public void printDeadlocks(final ThreadDump threadDump) {
-    long[] ids = threadDump.getDeadlockedThreads();
+    final long[] ids = threadDump.getDeadlockedThreads();
     if ((ids == null) || (ids.length <= 0)) return;
     out.println("<hr><h3><font color='red'>Deadlock detected</font></h3>");
-    Map<Long, ThreadInformation> threadsMap = threadDump.getThreads();
-    for (long id : ids) {
-      ThreadInformation ti = threadsMap.get(id);
-      LockInformation li = ti.getLockInformation();
-      ThreadInformation owner = threadsMap.get(ti.getLockOwnerId());
+    final Map<Long, ThreadInformation> threadsMap = threadDump.getThreads();
+    for (final long id : ids) {
+      final ThreadInformation ti = threadsMap.get(id);
+      final LockInformation li = ti.getLockInformation();
+      final ThreadInformation owner = threadsMap.get(ti.getLockOwnerId());
       out.println("- " + simpleName(ti) + " is waiting to lock " + simpleName(li) + " which is held by " + simpleName(owner) + BR);
     }
     out.println("<p><b>Stack trace information for the threads listed above</b>");
@@ -90,7 +90,7 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
 
   @Override
   public void printThread(final ThreadInformation thread) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("<p><b>");
     sb.append("<span class='").append(threadClass(thread.getState())).append("'>");
     sb.append('"').append(thread.getName()).append('"').append(" - ").append(thread.getId());
@@ -104,17 +104,17 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
     sb.append("</span>");
     sb.append("</b>").append(BR);
     incIndent();
-    List<StackFrameInformation> stackTrace = thread.getStackTrace();
+    final List<StackFrameInformation> stackTrace = thread.getStackTrace();
     if ((stackTrace != null) && !stackTrace.isEmpty()) {
       int count = 0;
-      for (StackFrameInformation sfi : stackTrace) {
+      for (final StackFrameInformation sfi : stackTrace) {
         sb.append(getIndent()).append("at ").append(sfi).append(BR);
         if ((count == 0) && (thread.getLockInformation() != null)) {
           sb.append(getIndent()).append("<span class='t_lock'>");
           sb.append("- waiting on ").append(simpleName(thread.getLockInformation()));
           sb.append("</span>").append(BR);
         }
-        LockInformation li = sfi.getLock();
+        final LockInformation li = sfi.getLock();
         if (li != null) {
           sb.append(getIndent()).append("<span class='t_lock'>");
           sb.append("- locked ").append(simpleName(li));
@@ -123,12 +123,10 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
         count++;
       }
     }
-    List<LockInformation> synchronizers = thread.getOwnableSynchronizers();
+    final List<LockInformation> synchronizers = thread.getOwnableSynchronizers();
     if ((synchronizers != null) && !synchronizers.isEmpty()) {
       sb.append("<p>").append(getIndent()).append("Locked ownable synchronizers:").append(BR);
-      for (LockInformation li : synchronizers) {
-        sb.append(getIndent()).append("- ").append(simpleName(li)).append(BR);
-      }
+      for (final LockInformation li : synchronizers) sb.append(getIndent()).append("- ").append(simpleName(li)).append(BR);
     }
     decIndent();
     out.println(sb);
@@ -168,7 +166,7 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
    * @param state the state to use.
    * @return a CSS class name.
    */
-  private String threadClass(final Thread.State state) {
+  private static String threadClass(final Thread.State state) {
     switch (state) {
       case NEW:
         return "t_new";
@@ -198,7 +196,7 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
     String result = null;
     HTMLThreadDumpWriter writer = null;
     try {
-      StringWriter sw = new StringWriter();
+      final StringWriter sw = new StringWriter();
       writer = new HTMLThreadDumpWriter(sw, title, fontSize, includeBody);
       writer.printThreadDump(dump);
       result = sw.toString();

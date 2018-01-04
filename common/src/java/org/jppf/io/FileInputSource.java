@@ -39,6 +39,7 @@ public class FileInputSource extends ChannelInputSource {
    * @param file the file to read from.
    * @throws Exception if an IO error occurs.
    */
+  @SuppressWarnings("resource")
   public FileInputSource(final File file) throws Exception {
     super(new FileInputStream(file).getChannel());
   }

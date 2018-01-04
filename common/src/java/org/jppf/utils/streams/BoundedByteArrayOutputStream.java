@@ -24,8 +24,7 @@ import java.io.*;
  * A byte ArrayOutputStream with a maximum size of data that can be written into it.
  * @author Laurent Cohen
  */
-public class BoundedByteArrayOutputStream extends OutputStream
-{
+public class BoundedByteArrayOutputStream extends OutputStream {
   /**
    * The backing buffer for this stream.
    */
@@ -53,32 +52,28 @@ public class BoundedByteArrayOutputStream extends OutputStream
    * @param offset start position in the backing buffer.
    * @param length maximum length of data that can be written.
    */
-  public BoundedByteArrayOutputStream(final byte[] buf, final int offset, final int length)
-  {
+  public BoundedByteArrayOutputStream(final byte[] buf, final int offset, final int length) {
     this.buf = buf;
     this.offset = offset;
     this.length = length;
   }
 
   @Override
-  public void write(final int b) throws IOException
-  {
+  public void write(final int b) throws IOException {
     if (eof) throw new EOFException("buffer overflow");
     buf[offset + pos++] = (byte) b;
     eof = pos >= length - 1;
   }
 
   @Override
-  public void write(final byte[] b) throws IOException
-  {
+  public void write(final byte[] b) throws IOException {
     write(b, 0, b.length);
   }
 
   @Override
-  public void write(final byte[] b, final int off, final int len) throws IOException
-  {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     if (eof) throw new EOFException("buffer overflow");
-    int min = Math.min(len, length - pos);
+    final int min = Math.min(len, length - pos);
     System.arraycopy(b, off, buf, offset + pos, min);
     pos += min;
     eof = pos >= length - 1;

@@ -66,7 +66,7 @@ public class AbstractMBeanStaticProxy {
     Object result = null;
     try {
       result = connection.invoke(mbeanName, methodName, params, signature);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while invoking a method with the JMX connection", e);
     }
     return result;
@@ -81,7 +81,7 @@ public class AbstractMBeanStaticProxy {
     Object result = null;
     try {
       result = connection.getAttribute(mbeanName, attribute);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while getting an attribute with the JMX connection", e);
     }
     return result;
@@ -95,7 +95,7 @@ public class AbstractMBeanStaticProxy {
   public void setAttribute(final String attribute, final Object value) {
     try {
       connection.setAttribute(mbeanName, attribute, value);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while setting an attribute with the JMX connection", e);
     }
   }
@@ -109,7 +109,7 @@ public class AbstractMBeanStaticProxy {
   public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
     try {
       connection.addNotificationListener(mbeanName, listener, filter, handback);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while adding notification filter", e);
     }
   }
@@ -121,7 +121,7 @@ public class AbstractMBeanStaticProxy {
   public void removeNotificationListener(final NotificationListener listener) {
     try {
       connection.removeNotificationListener(mbeanName, listener, null, null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
     }
   }
@@ -135,7 +135,7 @@ public class AbstractMBeanStaticProxy {
   public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
     try {
       connection.removeNotificationListener(mbeanName, listener, filter, handback);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
     }
   }
@@ -147,7 +147,7 @@ public class AbstractMBeanStaticProxy {
   public MBeanNotificationInfo[] getNotificationInfo() {
     try {
       return connection.getNotificationInfo(mbeanName);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error getting MBeanNotificationInfo[]", e);
     }
     return new MBeanNotificationInfo[0];

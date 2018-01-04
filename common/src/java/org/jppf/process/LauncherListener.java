@@ -75,18 +75,17 @@ public class LauncherListener extends Thread {
    */
   @Override
   public void run() {
-    try {
-      Socket s = new Socket("localhost", port);
-      DataInputStream dis = new DataInputStream(s.getInputStream());
+    try (final Socket s = new Socket("localhost", port)) {
+      final DataInputStream dis = new DataInputStream(s.getInputStream());
       if (debugEnabled) log.debug("launcher listener initialized on port {}", port);
       while (true) {
-        int n = dis.readInt();
+        final int n = dis.readInt();
         if (n == -1) throw new EOFException("eof");
         if (debugEnabled) log.debug("received command code {} from controling process", ProcessCommands.getCommandName(n));
-        LauncherListenerProtocolHandler ah = getActionHandler();
+        final LauncherListenerProtocolHandler ah = getActionHandler();
         if (ah != null) ah.performAction(n);
       }
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       if (debugEnabled) log.debug("exiting with exception: " + ExceptionUtils.getMessage(t));
       System.exit(0);
     }

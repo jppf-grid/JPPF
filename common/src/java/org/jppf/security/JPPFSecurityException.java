@@ -24,15 +24,18 @@ import org.jppf.JPPFException;
  * the framework fail to match.
  * @author Laurent Cohen
  */
-public class JPPFSecurityException extends JPPFException
-{
+public class JPPFSecurityException extends JPPFException {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JPPFSecurityException(final String message, final Throwable cause)
-  {
+  public JPPFSecurityException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -40,8 +43,7 @@ public class JPPFSecurityException extends JPPFException
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JPPFSecurityException(final String message)
-  {
+  public JPPFSecurityException(final String message) {
     super(message);
   }
 
@@ -49,8 +51,7 @@ public class JPPFSecurityException extends JPPFException
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFSecurityException(final Throwable cause)
-  {
+  public JPPFSecurityException(final Throwable cause) {
     super(cause);
   }
 }

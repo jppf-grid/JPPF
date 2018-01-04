@@ -38,9 +38,9 @@ public class CustomWrapping2 implements ObjectWrapping {
   @Override
   public Object unwrap(final Object wrapped, final ClassLoader cl) throws IOException, ClassNotFoundException {
     try {
-      Object o = ((WrappedObject) wrapped).object;
+      final Object o = ((WrappedObject) wrapped).object;
       return o;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -49,7 +49,7 @@ public class CustomWrapping2 implements ObjectWrapping {
   public Object wrap(final Object obj) throws IOException {
     try {
       return new WrappedObject(obj);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -58,6 +58,10 @@ public class CustomWrapping2 implements ObjectWrapping {
    * 
    */
   public static class WrappedObject implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * The object to wrap.
      */
@@ -79,9 +83,9 @@ public class CustomWrapping2 implements ObjectWrapping {
     private void writeObject(final ObjectOutputStream out) throws IOException {
       try {
         SERIALIZER.serialize(object, out, false);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw e;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new IOException(e);
       }
     }
@@ -95,9 +99,9 @@ public class CustomWrapping2 implements ObjectWrapping {
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
       try {
         object = SERIALIZER.deserialize(in, false);
-      } catch (IOException|ClassNotFoundException e) {
+      } catch (final IOException|ClassNotFoundException e) {
         throw e;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new IOException(e);
       }
     }

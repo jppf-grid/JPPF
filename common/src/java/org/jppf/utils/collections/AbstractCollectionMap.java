@@ -30,6 +30,10 @@ import java.util.concurrent.locks.Lock;
  */
 public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The underlying map to which operations are delegated.
    */
   protected Map<K, Collection<V>> map = null;
@@ -42,15 +46,15 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 
   @Override
   public void putValue(final K key, final V value) {
-    Collection<V> coll = createOrGetCollection(key);
+    final Collection<V> coll = createOrGetCollection(key);
     coll.add(value);
   }
 
   @Override
   public boolean removeValue(final K key, final V value) {
-    Collection<V> coll = map.get(key);
+    final Collection<V> coll = map.get(key);
     if (coll != null) {
-      boolean b = coll.remove(value);
+      final boolean b = coll.remove(value);
       if (coll.isEmpty()) map.remove(key);
       return b;
     }
@@ -59,22 +63,22 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 
   @Override
   public void addValues(final K key, final Collection<V> values) {
-    Collection<V> coll = createOrGetCollection(key);
+    final Collection<V> coll = createOrGetCollection(key);
     coll.addAll(values);
   }
 
   @Override
   public void addValues(final K key, @SuppressWarnings("unchecked") final V...values) {
-    Collection<V> coll = createOrGetCollection(key);
-    for (V value: values) coll.add(value);
+    final Collection<V> coll = createOrGetCollection(key);
+    for (final V value: values) coll.add(value);
   }
 
   @Override
   public int removeValues(final K key, @SuppressWarnings("unchecked") final V...values) {
-    Collection<V> coll = map.get(key);
+    final Collection<V> coll = map.get(key);
     if (coll != null) {
       int count = 0;
-      for (V value: values) {
+      for (final V value: values) {
         if (coll.remove(value)) count++;
       }
       if (coll.isEmpty()) map.remove(key);
@@ -96,7 +100,7 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   @Override
   public int size() {
     int result = 0;
-    for (Map.Entry<K, Collection<V>> entry: map.entrySet()) result += entry.getValue().size();
+    for (final Map.Entry<K, Collection<V>> entry: map.entrySet()) result += entry.getValue().size();
     return result;
   }
 
@@ -112,14 +116,14 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 
   @Override
   public boolean containsValue(final K key, final V value) {
-    Collection<V> coll = map.get(key);
+    final Collection<V> coll = map.get(key);
     if (coll == null) return false;
     return coll.contains(value);
   }
 
   @Override
   public boolean containsValue(final V value) {
-    for (Map.Entry<K, Collection<V>> entry: map.entrySet()) {
+    for (final Map.Entry<K, Collection<V>> entry: map.entrySet()) {
       if (entry.getValue().contains(value)) return true;
     }
     return false;
@@ -267,8 +271,8 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 
   @Override
   public List<V> allValues() {
-    List<V> list = new ArrayList<>();
-    for (Map.Entry<K, Collection<V>> entry: map.entrySet()) {
+    final List<V> list = new ArrayList<>();
+    for (final Map.Entry<K, Collection<V>> entry: map.entrySet()) {
       if (!entry.getValue().isEmpty()) list.addAll(entry.getValue());
     }
     return list;

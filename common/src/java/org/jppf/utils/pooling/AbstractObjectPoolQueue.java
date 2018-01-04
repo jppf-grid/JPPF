@@ -37,12 +37,26 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T> {
   /**
    * The pool of objects.
    */
-  protected final Queue<T> queue = new LinkedBlockingQueue<>();
+  protected final Queue<T> queue;
+  
+  /**
+   * 
+   */
+  public AbstractObjectPoolQueue() {
+    this.queue = createQueue();
+  }
 
   @Override
   public T get() {
-    T t = queue.poll();
+    final T t = queue.poll();
     return (t == null) ? create() : t;
+  }
+
+  /**
+   * @return the new queue.
+   */
+  protected Queue<T> createQueue() {
+    return new LinkedBlockingQueue<>();
   }
 
   /**

@@ -73,7 +73,7 @@ abstract class LeftOperandRule extends ExecutionPolicy {
         return leftOperand.evaluate(properties);
 
       case PROPERTY_NAME:
-        String s = properties.getProperty(leftOperand.getExpression());
+        final String s = properties.getProperty(leftOperand.getExpression());
         switch(((PropertyNameExpression) leftOperand).getTargetValueType()) {
           case BOOLEAN:
             return Boolean.valueOf(s);

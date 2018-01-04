@@ -92,15 +92,15 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
   public void store(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
     try {
       if (debugEnabled) log.debug("storing {}", info);
-      Path nodeDir = getSubDir(info.getChannelID());
+      final Path nodeDir = getSubDir(info.getChannelID());
       checkDirectory(nodeDir);
-      Path path = getBundlerPath(nodeDir, info.getAlgorithmID(), false);
-      Path tmpPath = getBundlerPath(nodeDir, info.getAlgorithmID(), true);
-      try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(tmpPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+      final Path path = getBundlerPath(nodeDir, info.getAlgorithmID(), false);
+      final Path tmpPath = getBundlerPath(nodeDir, info.getAlgorithmID(), true);
+      try (final BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(tmpPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
         info.serializeToStream(out);
       }
       Files.move(tmpPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -109,14 +109,14 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
   public Object load(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
     try {
       if (debugEnabled) log.debug("loading {}", info);
-      Path nodeDir = getSubDir(info.getChannelID());
+      final Path nodeDir = getSubDir(info.getChannelID());
       if (!Files.exists(nodeDir)) return null;
-      Path path = getBundlerPath(nodeDir, info.getAlgorithmID(), false);
+      final Path path = getBundlerPath(nodeDir, info.getAlgorithmID(), false);
       if (!Files.exists(path)) return null;
-      try (InputStream is = new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
+      try (final InputStream is = new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
         return JPPFSerializationHelper.deserialize(is);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -128,7 +128,7 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
       if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {
         if (Files.exists(rootPath)) Files.walkFileTree(rootPath, new FileUtils.DeleteFileVisitor());
       } else if (info.getAlgorithmID() == null) {
-        Path channelDir = getSubDir(info.getChannelID());
+        final Path channelDir = getSubDir(info.getChannelID());
         if (Files.exists(channelDir)) Files.walkFileTree(channelDir, new FileUtils.DeleteFileVisitor());
       } else if (info.getChannelID() == null) {
         final String filename = info.getAlgorithmID() + DEFAULT_EXTENSION;
@@ -136,18 +136,18 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
         Files.walkFileTree(rootPath, new FileUtils.DeleteFileVisitor(new PathMatcher() {
           @Override
           public boolean matches(final Path path) {
-            boolean b = filename.equals(path.getFileName().toString());
+            final boolean b = filename.equals(path.getFileName().toString());
             if (b) channelsToDelete.add(path.getParent());
             return b;
           }
         }));
         for (Path channelPath: channelsToDelete) deleteIfEmpty(channelPath);
       } else {
-        Path path = getBundlerPath(getSubDir(info.getChannelID()), info.getAlgorithmID(), false);
+        final Path path = getBundlerPath(getSubDir(info.getChannelID()), info.getAlgorithmID(), false);
         Files.deleteIfExists(path);
         deleteIfEmpty(getSubDir(info.getChannelID()));
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -155,11 +155,11 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
   @Override
   public List<String> list(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
     try {
-      List<String> result = new ArrayList<>();
+      final List<String> result = new ArrayList<>();
       if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {
         if (Files.exists(rootPath)) {
-          try (DirectoryStream<Path> nodeDS = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
-            for (Path path : nodeDS) {
+          try (final DirectoryStream<Path> nodeDS = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
+            for (final Path path : nodeDS) {
               if (path != null) result.add(path.getFileName().toString());
             }
           }
@@ -167,21 +167,21 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
       } else if (info.getAlgorithmID() == null) {
         if (traceEnabled) log.trace("listing algos for request={}", info);
         if (Files.exists(rootPath)) {
-          Path channelDir = getSubDir(info.getChannelID());
+          final Path channelDir = getSubDir(info.getChannelID());
           if (traceEnabled) log.trace("listing algos in {}", channelDir);
           if (Files.exists(channelDir)) {
             if (traceEnabled) log.trace("listing algos in existing {}", channelDir);
-            try (DirectoryStream<Path> channelDS = Files.newDirectoryStream(channelDir, new DirectoryStream.Filter<Path>() {
+            try (final DirectoryStream<Path> channelDS = Files.newDirectoryStream(channelDir, new DirectoryStream.Filter<Path>() {
               @Override
               public boolean accept(final Path entry) throws IOException {
                 if (traceEnabled) log.trace("filter checking {}", entry);
                 return !Files.isDirectory(entry) && pathname(entry).endsWith(DEFAULT_EXTENSION);
               }
             })) {
-              for (Path path : channelDS) {
+              for (final Path path : channelDS) {
                 if (path != null) {
-                  String name = pathname(path.getFileName());
-                  String algo = name.substring(0, name.length() - DEFAULT_EXTENSION.length());
+                  final String name = pathname(path.getFileName());
+                  final String algo = name.substring(0, name.length() - DEFAULT_EXTENSION.length());
                   if (traceEnabled) log.trace("algo is {} for path={}", algo, path);
                   result.add(algo);
                 }
@@ -190,21 +190,21 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
           }
         }
       } else if (info.getChannelID() == null) {
-        try (DirectoryStream<Path> channelDS = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
-          for (Path channel : channelDS) {
+        try (final DirectoryStream<Path> channelDS = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
+          for (final Path channel : channelDS) {
             if (channel != null) {
-              Path algoPath = getBundlerPath(channel, info.getAlgorithmID(), false);
+              final Path algoPath = getBundlerPath(channel, info.getAlgorithmID(), false);
               if (Files.exists(algoPath)) result.add(pathname(channel.getFileName()));
             }
           }
         }
       } else {
-        Path path = getBundlerPath(getSubDir(info.getChannelID()), info.getAlgorithmID(), false);
+        final Path path = getBundlerPath(getSubDir(info.getChannelID()), info.getAlgorithmID(), false);
         if (Files.exists(path)) result.add(info.getAlgorithmID());
       }
       if (debugEnabled) log.debug("identifiers of persisted bundler states: {} for request={}", result, info);
       return result;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }

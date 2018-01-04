@@ -50,7 +50,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
   Boolean valueOf(final String value) {
     try {
       return Boolean.valueOf(value);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return false;
     }
   }

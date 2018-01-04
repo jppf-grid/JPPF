@@ -94,7 +94,7 @@ public final class ProcessWrapper {
    * @param content the text that written to the stream.
    */
   protected synchronized void fireStreamEvent(final boolean output, final String content) {
-    ProcessWrapperEvent event = new ProcessWrapperEvent(content);
+    final ProcessWrapperEvent event = new ProcessWrapperEvent(content);
     for (ProcessWrapperEventListener listener: eventListeners) {
       if (output) listener.outputStreamAltered(event);
       else listener.errorStreamAltered(event);
@@ -130,12 +130,12 @@ public final class ProcessWrapper {
     @Override
     public void run() {
       try {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        boolean end = false;
-        int bufferSize = 8*1024;
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        final boolean end = false;
+        final int bufferSize = 8*1024;
         StringBuilder sb = new StringBuilder(bufferSize);
         while (!end) {
-          int c = reader.read();
+          final int c = reader.read();
           if (c == -1) break;      // end of file (the process has exited)
           if (c == '\r') continue; // skip the line feed
           sb.append((char) c);
@@ -145,8 +145,8 @@ public final class ProcessWrapper {
           }
         }
         Thread.sleep(1);
-      } catch(@SuppressWarnings("unused") IOException ignore) {
-      } catch(Throwable t) {
+      } catch(@SuppressWarnings("unused") final IOException ignore) {
+      } catch(final Throwable t) {
         t.printStackTrace();
       }
     }

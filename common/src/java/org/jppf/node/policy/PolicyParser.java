@@ -49,7 +49,7 @@ public class PolicyParser {
    * @throws Exception if the DOM parser could not be initialized.
    */
   public PolicyParser() throws Exception {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     parser = dbf.newDocumentBuilder();
   }
 
@@ -61,9 +61,9 @@ public class PolicyParser {
    * @throws Exception if an error occurs while parsing the document.
    */
   public PolicyDescriptor parse(final String docPath) throws Exception {
-    InputStream is = FileUtils.getFileInputStream(docPath);
+    final InputStream is = FileUtils.getFileInputStream(docPath);
     if (is == null) return null;
-    Document doc = parser.parse(is);
+    final Document doc = parser.parse(is);
     return generateTree(findFirstElement(doc));
   }
 
@@ -75,8 +75,8 @@ public class PolicyParser {
    * @throws Exception if an error occurs while parsing the document.
    */
   public PolicyDescriptor parse(final Reader reader) throws Exception {
-    InputSource is = new InputSource(reader);
-    Document doc = parser.parse(is);
+    final InputSource is = new InputSource(reader);
+    final Document doc = parser.parse(is);
     return generateTree(findFirstElement(doc));
   }
 
@@ -85,10 +85,10 @@ public class PolicyParser {
    * @param doc the document whose children are looked up.
    * @return a <code>Node</code> instance if one was found, or null otherwise.
    */
-  private Node findFirstElement(final Document doc) {
-    NodeList list = doc.getChildNodes();
+  private static Node findFirstElement(final Document doc) {
+    final NodeList list = doc.getChildNodes();
     for (int i=0; i<list.getLength(); i++) {
-      Node node = list.item(i);
+      final Node node = list.item(i);
       if (node.getNodeType() == Node.ELEMENT_NODE) return node;
     }
     return null;
@@ -101,7 +101,7 @@ public class PolicyParser {
    * or null if the document could not be parsed.
    */
   private PolicyDescriptor generateTree(final Node node) {
-    PolicyDescriptor desc = new PolicyDescriptor();
+    final PolicyDescriptor desc = new PolicyDescriptor();
     desc.type = node.getNodeName();
     if ("Script".equals(desc.type)) desc.script = getTextNodeValue(node);
     desc.valueType = getAttributeValue(node, "valueType", "string");
@@ -110,11 +110,11 @@ public class PolicyParser {
     desc.language = getAttributeValue(node, "language", null);
     desc.operator = getAttributeValue(node, "operator", "EQUAL");
     desc.expected = getAttributeValue(node, "expected", "0");
-    NodeList list = node.getChildNodes();
+    final NodeList list = node.getChildNodes();
     for (int i=0; i<list.getLength(); i++) {
-      Node childNode = list.item(i);
+      final Node childNode = list.item(i);
       if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-        String name = childNode.getNodeName();
+        final String name = childNode.getNodeName();
         /*if ("Script".equals(name)) desc.script = getTextNodeValue(childNode);
         else*/ if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
         else if ("Property".equals(name) || "Value".equals(name) || "Subnet".equals(name)) desc.operands.add(getTextNodeValue(childNode));
@@ -129,11 +129,11 @@ public class PolicyParser {
    * @param node the node to generate whose child is a text node.
    * @return the text as a string.
    */
-  private String getTextNodeValue(final Node node) {
-    NodeList children = node.getChildNodes();
+  private static String getTextNodeValue(final Node node) {
+    final NodeList children = node.getChildNodes();
     for (int j=0; j<children.getLength(); j++) {
-      Node childNode = children.item(j);
-      int type = childNode.getNodeType();
+      final Node childNode = children.item(j);
+      final int type = childNode.getNodeType();
       if ((type == Node.TEXT_NODE) || (type == Node.CDATA_SECTION_NODE)) return childNode.getNodeValue();
     }
     return null;
@@ -146,9 +146,9 @@ public class PolicyParser {
    * @param def the default value to use if the attribute is not defined.
    * @return the attribute value as a string.
    */
-  private String getAttributeValue(final Node node, final String name, final String def) {
-    NamedNodeMap attrMap = node.getAttributes();
-    Node attrNode = attrMap.getNamedItem(name);
+  private static String getAttributeValue(final Node node, final String name, final String def) {
+    final NamedNodeMap attrMap = node.getAttributes();
+    final Node attrNode = attrMap.getNamedItem(name);
     return attrNode == null ? def : attrNode.getNodeValue();
   }
 
@@ -158,23 +158,23 @@ public class PolicyParser {
    */
   public static void main(final String...args) {
     try {
-      String docPath = "ExecutionPolicy.xml";
-      JPPFErrorReporter reporter = new JPPFErrorReporter(docPath);
-      String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
-      SchemaValidator validator = new SchemaValidator(reporter);
+      final String docPath = "ExecutionPolicy.xml";
+      final JPPFErrorReporter reporter = new JPPFErrorReporter(docPath);
+      final String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
+      final SchemaValidator validator = new SchemaValidator(reporter);
       if (!validator.validate(docPath, schemaPath)) {
-        String s = "the document " + docPath;
+        final String s = "the document " + docPath;
         System.out.println(s + " has errors.");
         System.out.println("fatal errors: " + reporter.allFatalErrorsAsStrings());
         System.out.println("errors      : " + reporter.allErrorsAsStrings());
         System.out.println("warnings    : " + reporter.allWarningsAsStrings());
         return;
       }
-      PolicyParser parser = new PolicyParser();
-      PolicyDescriptor desc = parser.parse(docPath);
-      ExecutionPolicy policy = new PolicyBuilder().buildPolicy(desc.children.get(0));
+      final PolicyParser parser = new PolicyParser();
+      final PolicyDescriptor desc = parser.parse(docPath);
+      final ExecutionPolicy policy = new PolicyBuilder().buildPolicy(desc.children.get(0));
       System.out.println("Successfully build policy object:\n" + policy);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -226,7 +226,7 @@ public class PolicyParser {
    * @throws Exception if an error occurs during the validation or parsing.
    */
   public static ExecutionPolicy parsePolicy(final Reader reader) throws Exception {
-    PolicyDescriptor desc = new PolicyParser().parse(reader);
+    final PolicyDescriptor desc = new PolicyParser().parse(reader);
     return desc.children.isEmpty() ? null :  new PolicyBuilder().buildPolicy(desc.children.get(0));
   }
 
@@ -284,11 +284,11 @@ public class PolicyParser {
    * @throws Exception if an error occurs during the validation or parsing.
    */
   public static void validatePolicy(final Reader reader) throws JPPFException, Exception {
-    JPPFErrorReporter reporter = new JPPFErrorReporter("XML validator");
-    String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
-    SchemaValidator validator = new SchemaValidator(reporter);
+    final JPPFErrorReporter reporter = new JPPFErrorReporter("XML validator");
+    final String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";
+    final SchemaValidator validator = new SchemaValidator(reporter);
     if (!validator.validate(reader, FileUtils.getFileReader(schemaPath))) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       //sb.append("The XML document has errors:\n");
       if (!reporter.fatalErrors.isEmpty()) sb.append("fatal errors: ").append(reporter.allFatalErrorsAsStrings()).append('\n');
       if (!reporter.errors.isEmpty())      sb.append("errors      : ").append(reporter.allErrorsAsStrings()).append('\n');

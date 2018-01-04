@@ -49,11 +49,11 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
   public ThreadManagerThreadPool(final int poolSize) {
     super();
     threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, isCpuTimeEnabled());
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory) {
       @Override
       protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
-        RunnableFuture<T> future = super.newTaskFor(runnable, value);
+        final RunnableFuture<T> future = super.newTaskFor(runnable, value);
         if (runnable instanceof NodeTaskWrapper) ((NodeTaskWrapper) runnable).setFuture(future);
         return future;
       }
@@ -76,10 +76,9 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
       log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
       return;
     }
-    int n = getPoolSize();
-    if (n == size) return;
+    if (getPoolSize() == size) return;
 
-    ThreadPoolExecutor tpe = threadPool;
+    final ThreadPoolExecutor tpe = threadPool;
     if (size > tpe.getCorePoolSize()) {
       tpe.setMaximumPoolSize(size);
       tpe.setCorePoolSize(size);
@@ -106,7 +105,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
 
   @Override
   public UsedClassLoader useClassLoader(final ClassLoader classLoader) {
-    ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+    final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
     return new UsedClassLoaderThread(classLoader, oldClassLoader);
   }

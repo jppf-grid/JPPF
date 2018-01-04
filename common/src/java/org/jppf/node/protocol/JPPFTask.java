@@ -25,4 +25,8 @@ package org.jppf.node.protocol;
  * @author Laurent Cohen
  */
 public abstract class JPPFTask extends AbstractTask<Object> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 }

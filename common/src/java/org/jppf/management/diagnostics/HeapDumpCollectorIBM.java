@@ -48,7 +48,7 @@ public class HeapDumpCollectorIBM implements HeapDumpCollector {
     try {
       if (heapdumpMethod == null) throw new JPPFException("Dump class is not avaialable - no heap dump taken");
       heapdumpMethod.invoke(null, (Object[]) null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
     }
@@ -61,9 +61,9 @@ public class HeapDumpCollectorIBM implements HeapDumpCollector {
    */
   private static Method getDumpMethod() {
     try {
-      Class<?> clazz = Class.forName("com.ibm.jvm.Dump");
+      final Class<?> clazz = Class.forName("com.ibm.jvm.Dump");
       return clazz.getDeclaredMethod("HeapDump", (Class<?>[]) null);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }

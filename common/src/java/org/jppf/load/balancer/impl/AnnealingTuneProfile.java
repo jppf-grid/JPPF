@@ -150,7 +150,7 @@ public class AnnealingTuneProfile extends AbstractLoadBalancingProfile {
    * @return an always positive diff to be applied to bundle size
    */
   public int createDiff(final int bestSize, final int collectedSamples, final Random rnd) {
-    double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation() - 1.0f)), 1);
+    final double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation() - 1.0f)), 1);
     if (max < 1.0d) return 1;
     return rnd.nextInt((int) max) + 1;
   }

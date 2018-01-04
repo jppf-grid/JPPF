@@ -26,8 +26,11 @@ import java.util.EventObject;
  * @see java.util.EventObject
  * @author Laurent Cohen
  */
-public class LocationEvent extends EventObject
-{
+public class LocationEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The number of bytes that were transferred to another location.
    */
@@ -38,8 +41,7 @@ public class LocationEvent extends EventObject
    * @param source - the location on which the event is occurring.
    * @param n - the number of bytes that were transferred to another location.
    */
-  public LocationEvent(final Location<?> source, final long n)
-  {
+  public LocationEvent(final Location<?> source, final long n) {
     super(source);
     this.n = n;
   }
@@ -48,17 +50,15 @@ public class LocationEvent extends EventObject
    * Get the number of bytes transferred during this event.
    * @return the number of bytes as an int.
    */
-  public long getTransferredBytes()
-  {
-    return n ;
+  public long getTransferredBytes() {
+    return n;
   }
 
   /**
    * Get the source location, on which the event occurred.
    * @return the source as a <code>Location</code> instance.
    */
-  public Location<?> getLocation()
-  {
+  public Location<?> getLocation() {
     return (Location<?>) getSource();
   }
 }

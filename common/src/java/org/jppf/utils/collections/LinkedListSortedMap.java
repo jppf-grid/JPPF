@@ -26,13 +26,16 @@ import java.util.*;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
-{
+public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public LinkedListSortedMap()
-  {
+  public LinkedListSortedMap() {
     super();
   }
 
@@ -40,14 +43,12 @@ public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    * Initialize this collection sorted map with the specified comparator.
    * @param comparator comparator used to sort the keys.
    */
-  public LinkedListSortedMap(final Comparator<K> comparator)
-  {
+  public LinkedListSortedMap(final Comparator<K> comparator) {
     super(comparator);
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new LinkedList<>();
   }
 
@@ -56,9 +57,8 @@ public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    * @param key the key for which to look up in the corresponding list.
    * @param value the value to look up.
    */
-  public void moveToEndOfList(final K key, final V value)
-  {
-    LinkedList<V> list = (LinkedList<V>) map.get(key);
+  public void moveToEndOfList(final K key, final V value) {
+    final LinkedList<V> list = (LinkedList<V>) map.get(key);
     if ((list == null) || list.isEmpty() || list.getLast().equals(value)) return;
     list.remove(value);
     list.add(value);

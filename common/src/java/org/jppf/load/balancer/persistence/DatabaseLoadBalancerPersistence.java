@@ -134,8 +134,8 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
   @Override
   public Object load(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
     if (debugEnabled) log.debug("loading {}", info);
-    try (Connection connection = dataSource.getConnection()) {
-      String sql = getSQL("load.sql");
+    try (final Connection connection = dataSource.getConnection()) {
+      final String sql = getSQL("load.sql");
       try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setString(1, info.getChannelID());
         ps.setString(2, info.getAlgorithmID());
@@ -145,7 +145,7 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
           }
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
     return null;
@@ -155,21 +155,21 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
   public void store(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
     if (debugEnabled) log.debug("storing {}", info);
     try (Connection connection = dataSource.getConnection()) {
-      boolean autocommit = connection.getAutoCommit();
-      int isolation  = connection.getTransactionIsolation();
+      final boolean autocommit = connection.getAutoCommit();
+      final int isolation  = connection.getTransactionIsolation();
       connection.setAutoCommit(false);
       try {
         connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         storeElement(connection, info, info.getStateAsBytes());
         connection.commit();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         connection.rollback();
         throw new LoadBalancerPersistenceException(e);
       } finally {
         connection.setAutoCommit(autocommit);
         connection.setTransactionIsolation(isolation);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -190,12 +190,12 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
       sql = getSQL("delete.algo.sql");
       args = new String[] { info.getChannelID(), info.getAlgorithmID() };
     }
-    try (Connection connection = dataSource.getConnection()) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    try (final Connection connection = dataSource.getConnection()) {
+      try (final PreparedStatement ps = connection.prepareStatement(sql)) {
         for (int i=0; i<args.length; i++) ps.setString(i + 1, args[i]);
         ps.executeUpdate();
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -216,15 +216,15 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
       sql = getSQL("get.node.with.algo.sql");
       args = new String[] { info.getChannelID(), info.getAlgorithmID() };
     }
-    List<String> result = new ArrayList<>();
-    try (Connection connection = dataSource.getConnection()) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    final List<String> result = new ArrayList<>();
+    try (final Connection connection = dataSource.getConnection()) {
+      try (final PreparedStatement ps = connection.prepareStatement(sql)) {
         for (int i=0; i<args.length; i++) ps.setString(i + 1, args[i]);
-        try (ResultSet rs = ps.executeQuery()) {
+        try (final ResultSet rs = ps.executeQuery()) {
           while (rs.next()) result.add(rs.getString(1));
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
     if (debugEnabled) log.debug("result for {} is {}", info, result);
@@ -234,10 +234,10 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
   /** @exclude */
   @Override
   protected boolean lockForUpdate(final Connection connection, final LoadBalancerPersistenceInfo info) throws Exception {
-    try (PreparedStatement ps = connection.prepareStatement(getSQL("select.for.update.sql"))) {
+    try (final PreparedStatement ps = connection.prepareStatement(getSQL("select.for.update.sql"))) {
       ps.setString(1, info.getChannelID());
       ps.setString(2, info.getAlgorithmID());
-      try (ResultSet rs = ps.executeQuery()) {
+      try (final ResultSet rs = ps.executeQuery()) {
         return rs.next();
       }
     }
@@ -246,8 +246,8 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
   /** @exclude */
   @Override
   protected void insertElement(final Connection connection, final LoadBalancerPersistenceInfo info, final byte[] bytes) throws Exception {
-    try (PreparedStatement ps = connection.prepareStatement(getSQL("insert.sql"))) {
-      try (InputStream is = new ByteArrayInputStream(bytes)) {
+    try (final PreparedStatement ps = connection.prepareStatement(getSQL("insert.sql"))) {
+      try (final InputStream is = new ByteArrayInputStream(bytes)) {
         ps.setString(1, info.getChannelID());
         ps.setString(2, info.getAlgorithmID());
         ps.setBlob(3, is);

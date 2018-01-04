@@ -24,6 +24,10 @@ package org.jppf;
  * @exclude
  */
 public class JPPFReconnectionNotification extends JPPFError {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Initialize this error with a specified message and cause exception.

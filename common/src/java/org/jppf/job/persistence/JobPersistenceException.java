@@ -27,6 +27,11 @@ import org.jppf.JPPFException;
  */
 public class JobPersistenceException extends JPPFException {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this exception with a specified message and cause.
    * @param message the message for this exception.
    * @param cause the cause exception.

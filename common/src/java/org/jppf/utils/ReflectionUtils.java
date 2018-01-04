@@ -49,17 +49,17 @@ public class ReflectionUtils {
    * @return a string with the classname, hashcode, and the value of  each attribute that has a corresponding getter.
    */
   public static String dumpObject(final Object o, final String separator, final boolean displaySimpleClassName, final boolean displayHashCode, final String...names) {
-    Set<String> fieldNames = new LinkedHashSet<>();
+    final Set<String> fieldNames = new LinkedHashSet<>();
     if (names != null) Collections.addAll(fieldNames, names);
     if (o == null) return "null";
-    Class<?> clazz = o.getClass();
-    StringBuilder sb = new StringBuilder();
+    final Class<?> clazz = o.getClass();
+    final StringBuilder sb = new StringBuilder();
     sb.append(displaySimpleClassName ? clazz.getSimpleName() : clazz.getName());
     if (displayHashCode) sb.append('@').append(Integer.toHexString(o.hashCode()));
     sb.append('[');
-    Method[] methods = clazz.getMethods();
+    final Method[] methods = clazz.getMethods();
     // we want the attributes in ascending alphabetical order
-    Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<String, Object>() : new HashMap<String, Object>(names.length);
+    final Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<String, Object>() : new HashMap<String, Object>(names.length);
     for (Method method : methods) {
       if (isGetter(method) && !"getClass".equals(method.getName())) {
         String attrName = null;
@@ -70,7 +70,7 @@ public class ReflectionUtils {
           try {
             value = method.invoke(o, (Object[]) null);
             if (value == null) value = "null";
-          } catch (Exception e) {
+          } catch (final Exception e) {
             value = "*Error: " + ExceptionUtils.getMessage(e) + '*';
           }
           attrMap.put(attrName, value);
@@ -78,9 +78,9 @@ public class ReflectionUtils {
       }
     }
     int count = 0;
-    Set<String> set = fieldNames.isEmpty() ? attrMap.keySet() : fieldNames;
+    final Set<String> set = fieldNames.isEmpty() ? attrMap.keySet() : fieldNames;
     for (String attr: set) {
-      Object value = attrMap.get(attr);
+      final Object value = attrMap.get(attr);
       if (value != null) {
         if (count++ > 0) sb.append(separator);
         sb.append(attr).append('=').append(value);
@@ -97,7 +97,7 @@ public class ReflectionUtils {
    * or {@code null} if the input method is not a setter or getter.
    */
   public static String getMBeanAttributeName(final Method meth) {
-    String name = meth.getName();
+    final String name = meth.getName();
     if (name.startsWith("is")) return name.substring(2);
     else if (name.startsWith("get") || name.startsWith("set")) return name.substring(3);
     return null;
@@ -109,15 +109,15 @@ public class ReflectionUtils {
    * @return {@code true} if the method is a getter, {@code false} otherwise.
    */
   public static boolean isGetter(final Method meth) {
-    Class<?> type = meth.getReturnType();
+    final Class<?> type = meth.getReturnType();
     if (Void.TYPE.equals(type)) return false;
     if (!StringUtils.startsWithOneOf(meth.getName(), false, "get", "is")) return false;
     if (meth.getName().startsWith("is")) {
       if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type)) return false;
     }
-    int mod = meth.getModifiers();
+    final int mod = meth.getModifiers();
     if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
-    Class<?>[] paramTypes = meth.getParameterTypes();
+    final Class<?>[] paramTypes = meth.getParameterTypes();
     return ((paramTypes == null) || (paramTypes.length <= 0));
   }
 
@@ -127,12 +127,12 @@ public class ReflectionUtils {
    * @return {@code true} if the method is a setter, {@code false} otherwise.
    */
   public static boolean isSetter(final Method meth) {
-    Class<?> type = meth.getReturnType();
+    final Class<?> type = meth.getReturnType();
     if (!Void.TYPE.equals(type)) return false;
     if (!meth.getName().startsWith("set")) return false;
-    int mod = meth.getModifiers();
+    final int mod = meth.getModifiers();
     if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
-    Class<?>[] paramTypes = meth.getParameterTypes();
+    final Class<?>[] paramTypes = meth.getParameterTypes();
     return ((paramTypes != null) && (paramTypes.length == 1));
   }
 
@@ -143,7 +143,7 @@ public class ReflectionUtils {
    * @return a <code>Method</code> object, or null if the class has no getter with the specified name.
    */
   public static Method getGetter(final Class<?> clazz, final String name) {
-    Method[] methods = clazz.getMethods();
+    final Method[] methods = clazz.getMethods();
     Method getter = null;
     for (Method method : methods) {
       if (isGetter(method) && name.equals(method.getName())) {
@@ -161,7 +161,7 @@ public class ReflectionUtils {
    * @return a <code>Method</code> object, or null if the class has no setter with the specified name.
    */
   public static Method getSetter(final Class<?> clazz, final String name) {
-    Method[] methods = clazz.getMethods();
+    final Method[] methods = clazz.getMethods();
     Method setter = null;
     for (Method method : methods) {
       if (isSetter(method) && name.equals(method.getName())) {
@@ -180,7 +180,7 @@ public class ReflectionUtils {
    * instance variable name.
    */
   public static Method getGetterForAttribute(final Class<?> clazz, final String attrName) {
-    String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
+    final String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     Method method = getGetter(clazz, "get"+basename);
     if (method == null) method = getGetter(clazz, "is"+basename);
     return method;
@@ -194,7 +194,7 @@ public class ReflectionUtils {
    * instance variable name.
    */
   public static Method getSetterForAttribute(final Class<?> clazz, final String attrName) {
-    String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
+    final String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     return getSetter(clazz, "set"+basename);
   }
 
@@ -205,8 +205,8 @@ public class ReflectionUtils {
    * @return an array of <code>Method</code> instances.
    */
   public static Method[] getAllBeanMethods(final Class<?> clazz, final boolean getters) {
-    List<Method> methodList = new ArrayList<>();
-    Method[] allMethods = clazz.getMethods();
+    final List<Method> methodList = new ArrayList<>();
+    final Method[] allMethods = clazz.getMethods();
     for (Method meth: allMethods) {
       if ((getters && isGetter(meth)) || (!getters && isSetter(meth))) methodList.add(meth);
     }
@@ -231,8 +231,8 @@ public class ReflectionUtils {
    * @return a matching <code>Method</code> instance, or null if no match could be found.
    */
   public static Method getMatchingMethod(final Class<?> clazz, final String name, final Object[] args) {
-    Class<?>[] argTypes = createTypeArray(args);
-    Method[] methods = clazz.getDeclaredMethods();
+    final Class<?>[] argTypes = createTypeArray(args);
+    final Method[] methods = clazz.getDeclaredMethods();
     for (Method m: methods) {
       if (!m.getName().equals(name)) continue;
       if (matchingTypes(argTypes, m.getParameterTypes())) return m;
@@ -248,8 +248,8 @@ public class ReflectionUtils {
    * @return a matching <code>Constructor</code> instance, or null if no match could be found.
    */
   public static Constructor<?> getMatchingConstructor(final Class<?> clazz, final Object[] args) {
-    Class<?>[] argTypes = createTypeArray(args);
-    Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    final Class<?>[] argTypes = createTypeArray(args);
+    final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
     for (Constructor<?> c: constructors) {
       if (matchingTypes(argTypes, c.getParameterTypes())) return c;
     }
@@ -266,7 +266,7 @@ public class ReflectionUtils {
     if (argTypes.length != types.length) return false;
     for (int i=0; i<types.length; i++) {
       if (argTypes[i] != null) {
-        Class<?> c = types[i].isPrimitive() ? mapPrimitveType(types[i]) :  types[i];
+        final Class<?> c = types[i].isPrimitive() ? mapPrimitveType(types[i]) :  types[i];
         if (!c.isAssignableFrom(argTypes[i])) return false;
       }
     }
@@ -298,7 +298,7 @@ public class ReflectionUtils {
    */
   public static Class<?>[] createTypeArray(final Object[] args) {
     if ((args == null) || (args.length == 0)) return new Class[0];
-    Class<?>[] argTypes = new Class[args.length];
+    final Class<?>[] argTypes = new Class[args.length];
     for (int i=0; i<args.length; i++) {
       argTypes[i] = (args[i] != null) ? args[i].getClass() : null;
     }
@@ -310,8 +310,8 @@ public class ReflectionUtils {
    * @return the name of the invoking method as a string.
    */
   public static String getCurrentMethodName() {
-    Exception e = new Exception();
-    StackTraceElement[] elts = e.getStackTrace();
+    final Exception e = new Exception();
+    final StackTraceElement[] elts = e.getStackTrace();
     if (elts.length < 2) return "method name not found";
     return elts[1].getMethodName();
   }
@@ -321,10 +321,10 @@ public class ReflectionUtils {
    * @return the name of the invoking method as a string.
    */
   public static String getCurrentClassAndMethod() {
-    StackTraceElement[] elts = new Exception().getStackTrace();
+    final StackTraceElement[] elts = new Exception().getStackTrace();
     if (elts.length < 2) return "class and method name not found";
-    String s = elts[1].getClassName();
-    int idx = s.lastIndexOf('.');
+    final String s = elts[1].getClassName();
+    final int idx = s.lastIndexOf('.');
     return new StringBuilder(idx >= 0 ? s.substring(idx + 1) : s).append('.').append(elts[1].getMethodName()).toString();
   }
 
@@ -335,7 +335,7 @@ public class ReflectionUtils {
    */
   public static String simpleDump(final Object o) {
     if (o == null) return "null";
-    StringBuilder sb = new StringBuilder(o.getClass().getSimpleName());
+    final StringBuilder sb = new StringBuilder(o.getClass().getSimpleName());
     sb.append('@').append(Integer.toHexString(System.identityHashCode(o)));
     return sb.toString();
   }

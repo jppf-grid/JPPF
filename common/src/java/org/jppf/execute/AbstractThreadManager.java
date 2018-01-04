@@ -41,9 +41,9 @@ public abstract class AbstractThreadManager implements ThreadManager {
 
   @Override
   public ExecutionInfo computeExecutionInfo() {
-    ExecutionInfo info = new ExecutionInfo();
-    long[] ids = getThreadIds();
-    for (long id: ids) info.add(computeExecutionInfo(id));
+    final ExecutionInfo info = new ExecutionInfo();
+    final long[] ids = getThreadIds();
+    for (final long id: ids) info.add(computeExecutionInfo(id));
     return info;
   }
 

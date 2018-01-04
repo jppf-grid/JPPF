@@ -60,9 +60,8 @@ public class JPPFPolicy extends Policy {
   @Override
   public PermissionCollection getPermissions(final CodeSource codesource) {
     if (debugEnabled) log.debug("in getPermissions(CodeSource) : " + toString(codesource));
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf"))
-      return PermissionsFactory.getExtendedPermissions(classLoader);
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf")) return PermissionsFactory.getExtendedPermissions(classLoader);
     return PermissionsFactory.getPermissions(classLoader);
   }
 
@@ -76,9 +75,8 @@ public class JPPFPolicy extends Policy {
   public PermissionCollection getPermissions(final ProtectionDomain domain) {
     // domain.toString() causes a StackOverflowException - because it makes its own security checks that invoke this policy
     if (debugEnabled) log.debug("in getPermissions(ProtectionDomain) : " + toString(domain));
-    ClassLoader cl = domain.getClassLoader();
-    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf"))
-      return PermissionsFactory.getExtendedPermissions(classLoader);
+    final ClassLoader cl = domain.getClassLoader();
+    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf")) return PermissionsFactory.getExtendedPermissions(classLoader);
     return PermissionsFactory.getPermissions(classLoader);
   }
 
@@ -97,7 +95,7 @@ public class JPPFPolicy extends Policy {
    */
   private static String toString(final CodeSource code) {
     if (code == null) return "null";
-    StringBuilder sb = new StringBuilder().append("location = ").append(code.getLocation());
+    final StringBuilder sb = new StringBuilder().append("location = ").append(code.getLocation());
     return sb.toString();
   }
 
@@ -107,7 +105,7 @@ public class JPPFPolicy extends Policy {
    * @return a string representing the specified protection domain.
    */
   private static String toString(final ProtectionDomain domain) {
-    StringBuilder sb = new StringBuilder().append("class loader = ").append(domain.getClassLoader());
+    final StringBuilder sb = new StringBuilder().append("class loader = ").append(domain.getClassLoader());
     sb.append(", code source = [").append(toString(domain.getCodeSource())).append(']');
     return sb.toString();
   }
@@ -123,8 +121,8 @@ public class JPPFPolicy extends Policy {
   public boolean implies(final ProtectionDomain domain, final Permission permission) {
     if (debugEnabled) {
       if (permission instanceof RuntimePermission) {
-        RuntimePermission rp = (RuntimePermission) permission;
-        String action = rp.getActions();
+        final RuntimePermission rp = (RuntimePermission) permission;
+        final String action = rp.getActions();
         if ((action != null) && (action.contains("exitVM"))) {
           log.debug("in implies(exitVM)", new Exception());
         }

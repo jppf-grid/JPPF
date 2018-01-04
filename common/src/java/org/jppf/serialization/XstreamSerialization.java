@@ -26,8 +26,7 @@ import org.jppf.JPPFError;
 /**
  * This implementation uses the Xstream serialization library.
  */
-public class XstreamSerialization implements JPPFSerialization
-{
+public class XstreamSerialization implements JPPFSerialization {
   /**
    * The method to invoke to create an object input stream.
    */
@@ -42,16 +41,14 @@ public class XstreamSerialization implements JPPFSerialization
   private static Object xstream = getXstream();
 
   @Override
-  public void serialize(final Object o, final OutputStream os) throws Exception
-  {
-    ObjectOutputStream oos = (ObjectOutputStream) createOosMethod.invoke(xstream, os);
+  public void serialize(final Object o, final OutputStream os) throws Exception {
+    final ObjectOutputStream oos = (ObjectOutputStream) createOosMethod.invoke(xstream, os);
     oos.writeObject(o);
   }
 
   @Override
-  public Object deserialize(final InputStream is) throws Exception
-  {
-    ObjectInputStream ois = (ObjectInputStream) createOisMethod.invoke(xstream, is);
+  public Object deserialize(final InputStream is) throws Exception {
+    final ObjectInputStream ois = (ObjectInputStream) createOisMethod.invoke(xstream, is);
     return ois.readObject();
   }
 
@@ -59,21 +56,17 @@ public class XstreamSerialization implements JPPFSerialization
    * Create an Xstream object using reflection.
    * @return an Object instance.
    */
-  private static Object getXstream()
-  {
+  private static Object getXstream() {
     Object o = null;
-    try
-    {
-      Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-      Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-      Class<?> driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver");
-      Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+    try {
+      final Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+      final Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+      final Class<?> driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver");
+      final Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
       o = c.newInstance(driverClass.newInstance());
       createOisMethod = xstreamClass.getMethod("createObjectInputStream", InputStream.class);
       createOosMethod = xstreamClass.getMethod("createObjectOutputStream", OutputStream.class);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       throw new JPPFError("A fatal error occurred: " + e.getMessage(), e);
     }
     return o;

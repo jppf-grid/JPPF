@@ -418,7 +418,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * @return a {@link JobSLA} instance.
    */
   public JobSLA copy() {
-    JobSLA sla = new JobSLA();
+    final JobSLA sla = new JobSLA();
     copyTo(sla);
     sla.setApplyMaxResubmitsUponNodeError(applyMaxResubmitsUponNodeError);
     sla.setBroadcastJob(broadcastJob);

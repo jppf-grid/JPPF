@@ -102,7 +102,7 @@ public class Pair<U, V> implements Serializable {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     @SuppressWarnings("unchecked")
-    Pair<U, V> other = (Pair<U, V>) obj;
+    final Pair<U, V> other = (Pair<U, V>) obj;
     if (first == null) {
       if (other.first != null) return false;
     }

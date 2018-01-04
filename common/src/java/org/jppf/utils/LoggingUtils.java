@@ -45,7 +45,7 @@ public final class LoggingUtils {
    * @return a {@link Logger} instance.
    */
   public static Logger getLogger(final Class<?> clazz, final boolean async) {
-    Logger log = LoggerFactory.getLogger(clazz);
+    final Logger log = LoggerFactory.getLogger(clazz);
     return async ? new AsyncLogger(log) : log;
   }
 

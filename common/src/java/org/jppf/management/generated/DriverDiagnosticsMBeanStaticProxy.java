@@ -29,7 +29,6 @@ import org.jppf.management.diagnostics.ThreadDump;
  * Generated static proxy for the {@link org.jppf.management.diagnostics.DiagnosticsMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy implements DiagnosticsMBean {
   /**
    * Initialize this MBean static proxy.

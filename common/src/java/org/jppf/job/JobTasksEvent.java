@@ -28,8 +28,12 @@ import org.jppf.node.protocol.*;
  * @author Laurent Cohen
  * @since 5.1
  */
-@SuppressWarnings("deprecation")
 public class JobTasksEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * The name of the job whose tasks were dispatched.
    */

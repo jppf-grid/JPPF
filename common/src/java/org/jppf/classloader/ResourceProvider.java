@@ -123,12 +123,12 @@ public interface ResourceProvider {
      * @return an {@link AbstractResourceProvider} implementation.
      */
     public static ResourceProvider initResourceProvider() {
-      String name = JPPFConfiguration.get(JPPFProperties.RESOURCE_PROVIDER_CLASS);
+      final String name = JPPFConfiguration.get(JPPFProperties.RESOURCE_PROVIDER_CLASS);
       if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
       try {
-        Class<?> clazz = Class.forName(name);
+        final Class<?> clazz = Class.forName(name);
         return (ResourceProvider) clazz.newInstance();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
       return new ResourceProviderImpl();

@@ -114,7 +114,7 @@ public final class SerializationReflectionHelper {
     try {
       STRING_VALUE_FIELD = String.class.getDeclaredField("value");
       STRING_VALUE_FIELD.setAccessible(true);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -128,13 +128,13 @@ public final class SerializationReflectionHelper {
   public static FieldDescriptor[] getPersistentDeclaredFields(final Class<?> clazz) throws Exception {
     FieldDescriptor[] result = FIELDS_MAP.get(clazz);
     if (result == null) {
-      Field[] allFields = clazz.getDeclaredFields();
+      final Field[] allFields = clazz.getDeclaredFields();
       if (allFields.length <= 0) result = NO_FIELDS;
       else {
         int count = 0;
-        int mods = TRANSIENT_EXCEPTION_CLASSES.contains(clazz) ? Modifier.STATIC : NON_PERSISTENT_MODIFIERS;
-        Field[] fields = new Field[allFields.length];
-        for (Field f : allFields) {
+        final int mods = TRANSIENT_EXCEPTION_CLASSES.contains(clazz) ? Modifier.STATIC : NON_PERSISTENT_MODIFIERS;
+        final Field[] fields = new Field[allFields.length];
+        for (final Field f : allFields) {
           if ((f.getModifiers() & mods) == 0) fields[count++] = f;
         }
         if (count == 0) result = NO_FIELDS;
@@ -153,7 +153,7 @@ public final class SerializationReflectionHelper {
           });
           result = new FieldDescriptor[count];
           for (int i=0; i<count; i++) {
-            Field f = tmp[i];
+            final Field f = tmp[i];
             f.setAccessible(true);
             result[i] = new FieldDescriptor(f);
           }
@@ -173,7 +173,7 @@ public final class SerializationReflectionHelper {
   public static String getSignatureFromType(final Class<?> clazz) throws Exception {
     String sig = SIGNATURE_MAP.get(clazz);
     if (sig != null) return sig;
-    StringBuilder sb = new StringBuilder(32);
+    final StringBuilder sb = new StringBuilder(32);
     Class<?> tmp = clazz;
     while (tmp.isArray()) {
       sb.append('[');
@@ -204,10 +204,10 @@ public final class SerializationReflectionHelper {
     if (signature.charAt(0) != '[') return getNonArrayTypeFromSignature(signature, cl);
     int pos = 0;
     while (signature.charAt(pos) == '[') pos++;
-    Class<?> componentType = getNonArrayTypeFromSignature(signature.substring(pos), cl);
-    int[] dimensions = new int[pos];
+    final Class<?> componentType = getNonArrayTypeFromSignature(signature.substring(pos), cl);
+    final int[] dimensions = new int[pos];
     Arrays.fill(dimensions, 0);
-    Class<?> c = Array.newInstance(componentType, dimensions).getClass();
+    final Class<?> c = Array.newInstance(componentType, dimensions).getClass();
     return c;
   }
 
@@ -229,7 +229,7 @@ public final class SerializationReflectionHelper {
       case 'C': return Character.TYPE;
       case 'Z': return Boolean.TYPE;
       case 'L':
-        String s = signature.substring(1);
+        final String s = signature.substring(1);
         return "void".equals(s) ? Void.TYPE : cl.loadClass(s);
     }
     throw new JPPFException("Could not load type with signature '" + signature + '\'');
@@ -243,18 +243,18 @@ public final class SerializationReflectionHelper {
    * @throws Exception if any error occurs.
    */
   static Method getReadOrWriteObjectMethod(final Class<?> clazz, final boolean isRead) throws Exception {
-    Map<Class<?>, Object> map = isRead ? READ_OBJECT_MAP : WRITE_OBJECT_MAP;
+    final Map<Class<?>, Object> map = isRead ? READ_OBJECT_MAP : WRITE_OBJECT_MAP;
     Object method = map.get(clazz);
     if (method == NO_MEMBER) return null;
     else if (method != null) return (Method) method;
-    String methodName = isRead ? "readObject" : "writeObject";
-    Class<?> paramType = isRead ? ObjectInputStream.class : ObjectOutputStream.class;
+    final String methodName = isRead ? "readObject" : "writeObject";
+    final Class<?> paramType = isRead ? ObjectInputStream.class : ObjectOutputStream.class;
     // iterating over getDeclaredMethods() is much faster than calling getDeclaredMethod(String, Class<?>...)
-    for (Method m: clazz.getDeclaredMethods()) {
+    for (final Method m: clazz.getDeclaredMethods()) {
       if (methodName.equals(m.getName())) {
-        Class<?>[] paramTypes = m.getParameterTypes();
+        final Class<?>[] paramTypes = m.getParameterTypes();
         if ((paramTypes.length == 1) && (paramTypes[0] == paramType)) {
-          int n = m.getModifiers();
+          final int n = m.getModifiers();
           if (!Modifier.isStatic(n) && Modifier.isPrivate(n)) {
             method = m;
             break;
@@ -285,7 +285,7 @@ public final class SerializationReflectionHelper {
       rfClass = Class.forName("sun.reflect.ReflectionFactory");
       rf = initializeRF();
       if (rf != null) rfMethod = initializeRFMethod();
-    } catch (@SuppressWarnings("unused") Throwable t) {
+    } catch (@SuppressWarnings("unused") final Throwable t) {
     }
   }
 
@@ -297,9 +297,9 @@ public final class SerializationReflectionHelper {
    */
   private static Object initializeRF() {
     try {
-      Method m = rfClass.getDeclaredMethod("getReflectionFactory");
+      final Method m = rfClass.getDeclaredMethod("getReflectionFactory");
       return m.invoke(null);
-    } catch (@SuppressWarnings("unused") Throwable t) {
+    } catch (@SuppressWarnings("unused") final Throwable t) {
     }
     return null;
   }
@@ -312,9 +312,9 @@ public final class SerializationReflectionHelper {
    */
   private static Method initializeRFMethod() {
     try {
-      Method m = rfClass.getDeclaredMethod("newConstructorForSerialization", Class.class, Constructor.class);
+      final Method m = rfClass.getDeclaredMethod("newConstructorForSerialization", Class.class, Constructor.class);
       return m;
-    } catch (@SuppressWarnings("unused") Throwable t) {
+    } catch (@SuppressWarnings("unused") final Throwable t) {
     }
     return null;
   }
@@ -348,15 +348,15 @@ public final class SerializationReflectionHelper {
       Constructor<?> constructor = CONSTRUCTOR_MAP.get(clazz);
       if (constructor == null) {
         //==> ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
-        Constructor<?> superConstructor = parent.getDeclaredConstructor();
+        final Constructor<?> superConstructor = parent.getDeclaredConstructor();
         //==> constructor = rf.newConstructorForSerialization(clazz, superConstructor);
         constructor = (Constructor<?>) rfMethod.invoke(rf, clazz, superConstructor);
         CONSTRUCTOR_MAP.put(clazz, constructor);
       }
       return clazz.cast(constructor.newInstance());
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IllegalStateException("Cannot create object", e);
     }
   }
@@ -377,19 +377,19 @@ public final class SerializationReflectionHelper {
   static Object createFromConstructor(final Class<?> clazz) throws Exception {
     ConstructorWithParameters cwp = DEFAULT_CONSTRUCTOR_MAP.get(clazz);
     if (cwp == null) {
-      Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+      final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
       Arrays.sort(constructors, new ConstructorComparator());
-      for (Constructor<?> c : constructors) {
-        Class<?>[] paramTypes = c.getParameterTypes();
-        Object[] params = new Object[paramTypes.length];
+      for (final Constructor<?> c : constructors) {
+        final Class<?>[] paramTypes = c.getParameterTypes();
+        final Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) params[i] = defaultValue(paramTypes[i]);
         if (!c.isAccessible()) c.setAccessible(true);
         try {
-          Object result = c.newInstance(params);
+          final Object result = c.newInstance(params);
           cwp = new ConstructorWithParameters(c, params);
           DEFAULT_CONSTRUCTOR_MAP.put(clazz, cwp);
           return result;
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
           log.info(t.getMessage(), t);
         }
       }
@@ -401,10 +401,15 @@ public final class SerializationReflectionHelper {
    * Compares two constructors based on their number of parameters.
    */
   private static class ConstructorComparator implements Comparator<Constructor<?>>, Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(final Constructor<?> c1, final Constructor<?> c2) {
-      int n1 = c1.getParameterTypes().length;
-      int n2 = c2.getParameterTypes().length;
+      final int n1 = c1.getParameterTypes().length;
+      final int n2 = c2.getParameterTypes().length;
       return n1 < n2 ? -1 : (n1 > n2 ? 1 : 0);
     }
   }
@@ -413,6 +418,11 @@ public final class SerializationReflectionHelper {
    * A class associating a constructor with a set of default values for its parameters.
    */
   private static class ConstructorWithParameters extends Pair<Constructor<?>, Object[]> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this object with the specified constructors and parameters.
      * @param constructor the constructor.
@@ -447,7 +457,7 @@ public final class SerializationReflectionHelper {
    * @throws Exception if any error occurs.
    */
   public static String createString(final char[] chars) throws Exception {
-    String s = new String();
+    final String s = new String();
     STRING_VALUE_FIELD.set(s, chars);
     return s;
   }
@@ -460,7 +470,6 @@ public final class SerializationReflectionHelper {
    */
   public static char[] getStringValue(final String s) throws Exception {
     return (char[]) STRING_VALUE_FIELD.get(s);
-    //return s.toCharArray();
   }
 
   /**
@@ -468,12 +477,10 @@ public final class SerializationReflectionHelper {
    * @return .
    */
   private static Set<Class<?>> initTransientExceptionClasses() {
-    Set<Class<?>> result = new HashSet<>();
+    final Set<Class<?>> result = new HashSet<>();
     try {
       result.add(ConcurrentHashMap.class);
-      //result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$Segment"));
-      //result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$HashEntry"));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return result;

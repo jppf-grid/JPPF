@@ -26,6 +26,11 @@ import java.util.Random;
  */
 public abstract class AbstractChromosome implements Chromosome {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The fitness of this chromosme.
    */
   protected double fitness;

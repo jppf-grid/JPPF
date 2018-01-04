@@ -31,7 +31,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T> {
 
   @Override
   public T get() {
-    T t = data.get();
+    final T t = data.get();
     return t == null ? create() : t;
   }
 
@@ -78,7 +78,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T> {
      * @param content the object to add.
      */
     public void put(final E content) {
-      LinkedNode<E> node = new LinkedNode<>(content);
+      final LinkedNode<E> node = new LinkedNode<>(content);
       synchronized (this) {
         if (tail != null) {
           node.next = tail;
@@ -95,7 +95,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T> {
      */
     public synchronized E get() {
       if (head == null) return null;
-      LinkedNode<E> res = head;
+      final LinkedNode<E> res = head;
       if (res.prev == null) {
         tail = null;
         head = null;

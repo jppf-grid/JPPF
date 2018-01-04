@@ -73,7 +73,7 @@ public class PersistenceInfoKey {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    PersistenceInfoKey other = (PersistenceInfoKey) obj;
+    final PersistenceInfoKey other = (PersistenceInfoKey) obj;
     if (position != other.position) return false;
     if (type != other.type) return false;
     if (uuid == null) {

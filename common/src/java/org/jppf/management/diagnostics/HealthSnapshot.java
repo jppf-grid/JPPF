@@ -162,7 +162,7 @@ public class HealthSnapshot implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[')
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[')
       .append("heapUsedRatio=").append(heapUsedRatio)
       .append(", heapUsed=").append(heapUsed)
       .append(", nonheapUsedRatio=").append( nonheapUsedRatio)
@@ -190,10 +190,10 @@ public class HealthSnapshot implements Serializable {
    * @return a string representation of this snapshot.
    */
   public String toFormattedString(final Locale locale) {
-    Locale l = locale == null ? Locale.US : locale;
-    NumberFormat nf = NumberFormat.getNumberInstance(l);
+    final Locale l = locale == null ? Locale.US : locale;
+    final NumberFormat nf = NumberFormat.getNumberInstance(l);
     final double mb = 1024d * 1024d;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     nf.setGroupingUsed(true);
     nf.setMaximumFractionDigits(1);
@@ -219,7 +219,7 @@ public class HealthSnapshot implements Serializable {
    * @param nf the number format to use.
    * @return a formatted string.
    */
-  private String format(final double value, final NumberFormat nf) {
+  private static String format(final double value, final NumberFormat nf) {
     return StringUtils.padLeft(nf.format(value), ' ', 6);
   }
 
@@ -229,7 +229,7 @@ public class HealthSnapshot implements Serializable {
    * @param nf the number format to use.
    * @return a formatted string.
    */
-  private String format2(final double value, final NumberFormat nf) {
+  private static String format2(final double value, final NumberFormat nf) {
     return (value < 0d) ? "  n/a " : new StringBuilder(format(100d * value, nf)).append(" %").toString();
   }
 
@@ -254,7 +254,7 @@ public class HealthSnapshot implements Serializable {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    HealthSnapshot other = (HealthSnapshot) obj;
+    final HealthSnapshot other = (HealthSnapshot) obj;
     if (processCpuLoad != other.processCpuLoad) return false;
     if (systemCpuLoad != other.systemCpuLoad) return false;
     if (deadlocked != other.deadlocked) return false;

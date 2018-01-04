@@ -78,7 +78,7 @@ class IdleDetectionTask extends TimerTask {
         cancel();
         return;
       }
-      long idleTime = detector.getIdleTimeMillis();
+      final long idleTime = detector.getIdleTimeMillis();
       if ((idleTime < idleTimeout) && (state == BUSY)) {
         if (debugEnabled) log.debug("changing to IDLE for idleTime = {}ms", idleTime);
         changeStateTo(IDLE);
@@ -86,7 +86,7 @@ class IdleDetectionTask extends TimerTask {
         if (debugEnabled) log.debug("changing to BUSY for idleTime = {}ms", idleTime);
         changeStateTo(BUSY);
       }
-    } catch(JPPFError e) {
+    } catch(final JPPFError e) {
       System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disabled");
       log.error(e.getMessage(), e);
       cancel();
@@ -138,7 +138,7 @@ class IdleDetectionTask extends TimerTask {
    * Notify all listeners that an event has occurred.
    */
   private void fireIdleStateEvent() {
-    IdleStateEvent event = new IdleStateEvent(this);
+    final IdleStateEvent event = new IdleStateEvent(this);
     synchronized (listeners) {
       for (IdleStateListener listener : listeners) listener.idleStateChanged(event);
     }

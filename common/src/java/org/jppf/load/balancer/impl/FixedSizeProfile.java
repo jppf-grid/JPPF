@@ -40,7 +40,7 @@ public class FixedSizeProfile extends AbstractLoadBalancingProfile {
    * @param config contains a mapping of the profile parameters to their value.
    */
   public FixedSizeProfile(final TypedProperties config) {
-    int n = config.getInt("size", 1);
+    final int n = config.getInt("size", 1);
     this.size = (n < 1) ? 1 : n; 
   }
 

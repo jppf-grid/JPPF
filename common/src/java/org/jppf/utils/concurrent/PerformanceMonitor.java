@@ -59,7 +59,7 @@ class PerformanceMonitor {
     prevMean = mean;
     prevDeviation = deviation;
     if (nbValues >= capacity) {
-      double oldest = queue.poll();
+      final double oldest = queue.poll();
       total -= oldest;
       variance -= (mean - oldest) * (mean - oldest);
     } else nbValues++;

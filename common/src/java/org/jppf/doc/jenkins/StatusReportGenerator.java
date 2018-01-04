@@ -42,33 +42,33 @@ public class StatusReportGenerator {
    */
   public static void main(final String[] args) {
     try {
-      String jenkinsPath = args[0];
-      String[] projectNames = StringUtils.parseStringArray(args[1], ",");
+      final String jenkinsPath = args[0];
+      final String[] projectNames = StringUtils.parseStringArray(args[1], ",");
       //String projectName = args[1];
-      String outputPath = args[2];
-      String templatePath = args[3];
+      final String outputPath = args[2];
+      final String templatePath = args[3];
 
-      List<Project> projects = new ArrayList<>();
-      for (String projectName: projectNames) {
-        File dir = new File(jenkinsPath + "/jobs/" + projectName + "/builds");
-        FileFilter filter = new FileFilter() {
+      final List<Project> projects = new ArrayList<>();
+      for (final String projectName: projectNames) {
+        final File dir = new File(jenkinsPath + "/jobs/" + projectName + "/builds");
+        final FileFilter filter = new FileFilter() {
           @Override
           public boolean accept(final File file) {
             if (!file.isDirectory()) return false;
             int buildNumber = -1;
             try {
               buildNumber = Integer.valueOf(file.getName());
-            } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
+            } catch(@SuppressWarnings("unused") final NumberFormatException ignore) {
             }
             return buildNumber >= 0;
           }
         };
-        File[] buildDirs = dir.listFiles(filter);
-        Project project = new Project(projectName);
-        for (File buildDir: buildDirs) {
-          int buildNumber = Integer.valueOf(buildDir.getName());
-          File buildFile = new File(buildDir, "build.xml");
-          Build build = parseBuild(buildFile);
+        final File[] buildDirs = dir.listFiles(filter);
+        final Project project = new Project(projectName);
+        for (final File buildDir: buildDirs) {
+          final int buildNumber = Integer.valueOf(buildDir.getName());
+          final File buildFile = new File(buildDir, "build.xml");
+          final Build build = parseBuild(buildFile);
           build.setNumber(buildNumber);
           project.getBuilds().add(build);
         }
@@ -82,9 +82,9 @@ public class StatusReportGenerator {
         projects.add(project);
       }
       if (!projects.isEmpty()) {
-        HTMLPrinter printer = new HTMLPrinter();
-        StringBuilder htmlLeft = new StringBuilder();
-        StringBuilder htmlRight = new StringBuilder();
+        final HTMLPrinter printer = new HTMLPrinter();
+        final StringBuilder htmlLeft = new StringBuilder();
+        final StringBuilder htmlRight = new StringBuilder();
         for (int i=0; i<projects.size(); i+=2) htmlLeft.append(printer.generate(projects.get(i))).append('\n');
         for (int i=1; i<projects.size(); i+=2) htmlRight.append(printer.generate(projects.get(i))).append('\n');
         String template = FileUtils.readTextFile(templatePath);
@@ -92,7 +92,7 @@ public class StatusReportGenerator {
         template = template.replace("@@column_right@@", htmlRight);
         FileUtils.writeTextFile(outputPath, template);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -104,10 +104,10 @@ public class StatusReportGenerator {
    * @throws Exception if any error occurs.
    */
   private static Build parseBuild(final File buildFile) throws Exception {
-    SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-    Handler handler = new Handler();
+    final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+    final Handler handler = new Handler();
     parser.parse(buildFile, handler);
-    Build build = handler.build;
+    final Build build = handler.build;
     //System.out.printf("resulting build = %s%n", build);
     return build;
   }

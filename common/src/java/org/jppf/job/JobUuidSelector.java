@@ -29,6 +29,10 @@ import org.jppf.node.protocol.JPPFDistributedJob;
  */
 public class JobUuidSelector implements JobSelector {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The set of accepted job uuids.
    */
   private final Set<String> uuids;

@@ -25,8 +25,11 @@ import java.lang.management.LockInfo;
  * Information about a lock found in a <code>ThreadInfo</code> object.
  * @author Laurent Cohen
  */
-public class LockInformation implements Serializable
-{
+public class LockInformation implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The fully qualified class name of this lock.
    */
@@ -41,8 +44,7 @@ public class LockInformation implements Serializable
    * @param className the fully qualified class name of this lock.
    * @param identityHashcode the identity hash code of this lock.
    */
-  public LockInformation(final String className, final int identityHashcode)
-  {
+  public LockInformation(final String className, final int identityHashcode) {
     this.className = className;
     this.identityHashcode = identityHashcode;
   }
@@ -51,8 +53,7 @@ public class LockInformation implements Serializable
    * Initialize this lock information from a {@link LockInfo}.
    * @param lockInfo the fully qualified class name of this lock.
    */
-  public LockInformation(final LockInfo lockInfo)
-  {
+  public LockInformation(final LockInfo lockInfo) {
     this(lockInfo.getClassName(), lockInfo.getIdentityHashCode());
   }
 
@@ -60,8 +61,7 @@ public class LockInformation implements Serializable
    * Get the fully qualified class name of this lock.
    * @return the class name as a string.
    */
-  public String getClassName()
-  {
+  public String getClassName() {
     return className;
   }
 
@@ -69,15 +69,12 @@ public class LockInformation implements Serializable
    * Get the identity hash code of this lock.
    * @return the hascode as an int value.
    */
-  public int getIdentityHashcode()
-  {
+  public int getIdentityHashcode() {
     return identityHashcode;
   }
 
   @Override
-  public String toString()
-  {
-    return new StringBuilder().append(getClass().getSimpleName()).append("[className=").append(className)
-      .append(", identityHashcode=").append(identityHashcode).append(']').toString();
+  public String toString() {
+    return new StringBuilder().append(getClass().getSimpleName()).append("[className=").append(className).append(", identityHashcode=").append(identityHashcode).append(']').toString();
   }
 }

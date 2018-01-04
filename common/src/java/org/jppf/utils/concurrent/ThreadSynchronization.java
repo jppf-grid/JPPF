@@ -36,7 +36,7 @@ public class ThreadSynchronization {
   public synchronized void goToSleep() {
     try {
       wait();
-    } catch(@SuppressWarnings("unused") InterruptedException ignored) {
+    } catch(@SuppressWarnings("unused") final InterruptedException ignored) {
     }
   }
 
@@ -47,7 +47,7 @@ public class ThreadSynchronization {
   public synchronized void goToSleep(final long time) {
     try {
       wait(time);
-    } catch(@SuppressWarnings("unused") InterruptedException ignored) {
+    } catch(@SuppressWarnings("unused") final InterruptedException ignored) {
     }
   }
 
@@ -59,7 +59,7 @@ public class ThreadSynchronization {
   public synchronized void goToSleep(final long millis, final int nanos) {
     try {
       wait(millis, nanos);
-    } catch(@SuppressWarnings("unused") InterruptedException ignored) {
+    } catch(@SuppressWarnings("unused") final InterruptedException ignored) {
     }
   }
 

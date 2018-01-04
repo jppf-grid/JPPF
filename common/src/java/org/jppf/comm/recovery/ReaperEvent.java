@@ -24,14 +24,17 @@ import java.util.EventObject;
  * Event emitted when a connection failure is detected.
  * @author Laurent Cohen
  */
-public class ReaperEvent extends EventObject
-{
+public class ReaperEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this event with the specified connection to a remote peer.
    * @param connection the source of this event.
    */
-  public ReaperEvent(final ServerConnection connection)
-  {
+  public ReaperEvent(final ServerConnection connection) {
     super(connection);
   }
 
@@ -39,8 +42,7 @@ public class ReaperEvent extends EventObject
    * Get the connection for which this event is emitted.
    * @return a {@link ServerConnection} instance.
    */
-  public ServerConnection getConnection()
-  {
+  public ServerConnection getConnection() {
     return (ServerConnection) getSource();
   }
 }

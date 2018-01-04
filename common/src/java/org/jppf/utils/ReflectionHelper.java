@@ -52,9 +52,9 @@ public final class ReflectionHelper {
    */
   public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Class<?>[] paramTypes, final Object...values) {
     try {
-      Method m = clazz.getMethod(methodName, paramTypes);
+      final Method m = clazz.getMethod(methodName, paramTypes);
       return m.invoke(instance, values);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -73,10 +73,10 @@ public final class ReflectionHelper {
    */
   public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Object...values) {
     try {
-      int nbArgs = (values == null) ? 0 : values.length;
-      Method m = findMethod(clazz, methodName, nbArgs);
+      final int nbArgs = (values == null) ? 0 : values.length;
+      final Method m = findMethod(clazz, methodName, nbArgs);
       return m.invoke(instance, values);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -105,7 +105,7 @@ public final class ReflectionHelper {
    * @throws Exception if any erorr occurs.
    */
   public static Method findMethod(final Class<?> clazz, final String methodName, final int nbArgs) throws Exception {
-    Method[] methods = clazz.getMethods();
+    final Method[] methods = clazz.getMethods();
     for (Method m: methods) {
       if (m.getName().equals(methodName) && (m.getParameterTypes().length == nbArgs)) return m;
     }
@@ -133,7 +133,7 @@ public final class ReflectionHelper {
    * @throws Exception if any erorr occurs.
    */
   public static Method findMethodAnyArgs(final Class<?> clazz, final String methodName) throws Exception {
-    Method[] methods = clazz.getMethods();
+    final Method[] methods = clazz.getMethods();
     for (Method m: methods) {
       if (m.getName().equals(methodName)) return m;
     }
@@ -147,9 +147,9 @@ public final class ReflectionHelper {
    */
   public static Object newInstance(final String className) {
     try {
-      Class<?> c = getCurrentClassLoader().loadClass(className);
+      final Class<?> c = getCurrentClassLoader().loadClass(className);
       return c.newInstance();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -163,7 +163,7 @@ public final class ReflectionHelper {
   public static Object newInstance(final Class<?> clazz) {
     try {
       return clazz.newInstance();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -178,9 +178,9 @@ public final class ReflectionHelper {
    */
   public static Object invokeConstructor(final Class<?> clazz, final Class<?>[] paramTypes, final Object...values) {
     try {
-      Constructor<?> c = clazz.getConstructor(paramTypes);
+      final Constructor<?> c = clazz.getConstructor(paramTypes);
       return c.newInstance(values);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -195,9 +195,9 @@ public final class ReflectionHelper {
    */
   public static Object getField(final Class<?> clazz, final Object instance, final String fieldName) {
     try {
-      Field f = clazz.getField(fieldName);
+      final Field f = clazz.getField(fieldName);
       return f.get(instance);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -232,11 +232,11 @@ public final class ReflectionHelper {
   public static Class<?>[] getClasses(final String...classNames) {
     try {
       if ((classNames == null) || (classNames.length <= 0)) return new Class[0];
-      Class<?>[] classes = new Class[classNames.length];
-      ClassLoader cl = getCurrentClassLoader();
+      final Class<?>[] classes = new Class[classNames.length];
+      final ClassLoader cl = getCurrentClassLoader();
       for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i], true, cl);
       return classes;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -250,7 +250,7 @@ public final class ReflectionHelper {
   public static Class<?> getClass0(final String className) {
     try {
       return Class.forName(className, true, getCurrentClassLoader());
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -276,10 +276,10 @@ public final class ReflectionHelper {
    * @throws Exception if any erorr occurs.
    */
   public static Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception {
-    Method[] methods = clazz.getMethods();
-    Object[] p = params == null ? new Object[0] : params;
+    final Method[] methods = clazz.getMethods();
+    final Object[] p = params == null ? new Object[0] : params;
     for (Method m: methods) {
-      Class<?>[] formalParams = m.getParameterTypes();
+      final Class<?>[] formalParams = m.getParameterTypes();
       if (m.getName().equals(methodName) && (formalParams.length == p.length)) {
         boolean mismatch = false;
         for (int i=0; i<formalParams.length; i++) {
@@ -303,9 +303,9 @@ public final class ReflectionHelper {
    */
   public static Method findMethod(final Class<?> clazz, final String methodName, final Class<?>...paramTypes) {
     try {
-      Method[] methods = clazz.getMethods();
+      final Method[] methods = clazz.getMethods();
       for (Method m: methods) {
-        Class<?>[] types = m.getParameterTypes();
+        final Class<?>[] types = m.getParameterTypes();
         if (!methodName.equals(m.getName()) || (paramTypes.length != types.length)) continue;
         boolean found = true;
         for (int i=0; i<paramTypes.length; i++) {
@@ -316,7 +316,7 @@ public final class ReflectionHelper {
         }
         if (found) return m;
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return null;
   }
@@ -329,9 +329,9 @@ public final class ReflectionHelper {
    */
   public static Constructor<?> findConstructor(final Class<?> clazz, final Class<?>...paramTypes) {
     try {
-      Constructor<?>[] constructors = clazz.getConstructors();
+      final Constructor<?>[] constructors = clazz.getConstructors();
       for (Constructor<?> c: constructors) {
-        Class<?>[] types = c.getParameterTypes();
+        final Class<?>[] types = c.getParameterTypes();
         if (paramTypes.length != types.length) continue;
         boolean found = true;
         for (int i=0; i<paramTypes.length; i++) {
@@ -342,7 +342,7 @@ public final class ReflectionHelper {
         }
         if (found) return c;
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return null;
   }
@@ -357,7 +357,6 @@ public final class ReflectionHelper {
    * @return an instance of the specified interface.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("unchecked")
   public static <T> T invokeDefaultOrStringArrayConstructor(final Class<T> inf, final JPPFProperty<String[]> prop) {
     return invokeDefaultOrStringArrayConstructor(inf, prop.getName(), JPPFConfiguration.get(prop));
   }
@@ -374,18 +373,18 @@ public final class ReflectionHelper {
    */
   @SuppressWarnings("unchecked")
   public static <T> T invokeDefaultOrStringArrayConstructor(final Class<T> inf, final String prop, final String[] value) {
-    String propName = (prop == null) ? "<unknown_property>" : prop;
+    final String propName = (prop == null) ? "<unknown_property>" : prop;
     if (debugEnabled) log.debug("found {} = {}", propName, value == null ? "null" : Arrays.asList(value));
     if ((value == null) || (value.length <= 0)) return null;
-    String className = value[0];
-    String[] params = new String[value.length - 1];
+    final String className = value[0];
+    final String[] params = new String[value.length - 1];
     if (value.length > 1) {
       for (int i=1; i<value.length; i++) params[i - 1] = value[i];
     }
     Class<?> clazz = null;
     try {
       clazz = Class.forName(className);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       log.error(String.format("The implementation of %s, class %s, was not found. Error is: %s", inf.getName(), className, ExceptionUtils.getStackTrace(e)));
       return null;
     }
@@ -394,29 +393,29 @@ public final class ReflectionHelper {
       return null;
     }
     Object result = null;
-    Constructor<?> stringArrayConstructor = findConstructor(clazz, String[].class);
+    final Constructor<?> stringArrayConstructor = findConstructor(clazz, String[].class);
     if (stringArrayConstructor != null) {
       try {
         result = stringArrayConstructor.newInstance(new Object[] {params});
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(String.format("Error invoking %s(String[]) with params=%s for property '%s': %s", clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
         return null;
       }
     } else {
-      Constructor<?> defaultConstructor = findConstructor(clazz);
+      final Constructor<?> defaultConstructor = findConstructor(clazz);
       if (defaultConstructor != null) {
         try {
           result = defaultConstructor.newInstance();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(String.format("Error invoking default constructor of configured class '%s' for property '%s': %s", clazz.getName(), propName, ExceptionUtils.getStackTrace(e)));
           return null;
         }
         if (params.length > 0) {
-          Method setParamsMethod = findMethod(clazz, "setParameters", String[].class);
+          final Method setParamsMethod = findMethod(clazz, "setParameters", String[].class);
           if (setParamsMethod != null) {
             try {
               setParamsMethod.invoke(result, new Object[] {params});
-            } catch (Exception e) {
+            } catch (final Exception e) {
               log.error(String.format("Error invoking %s.setParameters(%s) for property '%s': %s",
                 clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
               return null;

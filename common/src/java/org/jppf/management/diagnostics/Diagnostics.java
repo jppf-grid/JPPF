@@ -85,13 +85,13 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       try {
         Class.forName("com.sun.management.OperatingSystemMXBean");
         osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
-      } catch (@SuppressWarnings("unused") Exception e) {
+      } catch (@SuppressWarnings("unused") final Exception e) {
         osMXBeanAvailable = false;
         log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
       }
       if (!osMXBeanAvailable) {
         cpuTimeCollector = new CPUTimeCollector();
-        Thread thread = new Thread(cpuTimeCollector, "CPUTimeCollector");
+        final Thread thread = new Thread(cpuTimeCollector, "CPUTimeCollector");
         thread.setDaemon(true);
         thread.start();
       }
@@ -117,9 +117,9 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
 
   @Override
   public String[] threadNames() throws Exception {
-    long[] ids = threadsMXBean.getAllThreadIds();
-    ThreadInfo[] infos = threadsMXBean.getThreadInfo(ids, 0);
-    String[] result = new String[infos.length];
+    final long[] ids = threadsMXBean.getAllThreadIds();
+    final ThreadInfo[] infos = threadsMXBean.getThreadInfo(ids, 0);
+    final String[] result = new String[infos.length];
     for (int i=0; i<infos.length; i++) result[i] = infos[i].getThreadName();
     return result;
   }
@@ -140,14 +140,14 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
 
   @Override
   public Boolean hasDeadlock() throws Exception {
-    long[] ids = threadsMXBean.findDeadlockedThreads();
+    final long[] ids = threadsMXBean.findDeadlockedThreads();
     return (ids != null) && (ids.length > 0);
   }
 
   @Override
   public HealthSnapshot healthSnapshot() throws Exception {
-    HealthSnapshot snapshot = new HealthSnapshot();
-    MemoryInformation memInfo = memoryInformation();
+    final HealthSnapshot snapshot = new HealthSnapshot();
+    final MemoryInformation memInfo = memoryInformation();
     MemoryUsageInformation mem = memInfo.getHeapMemoryUsage();
     snapshot.heapUsedRatio = mem.getUsedRatio();
     snapshot.heapUsed = mem.getUsed();
@@ -158,9 +158,9 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     snapshot.liveThreads = threadsMXBean.getThreadCount();
     snapshot.processCpuLoad = cpuLoad();
     snapshot.systemCpuLoad = osMXBeanDoubleValue("SystemCpuLoad");
-    long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
+    final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
     if (freeRam >= 0L) {
-      long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
+      final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
       snapshot.ramUsed = totalRam - freeRam;
       snapshot.ramUsedRatio = (double) snapshot.ramUsed / (double) totalRam;
     } else {
@@ -196,7 +196,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     if (osMXBeanAvailable) {
       try {
         return (Double) mbeanServer.getAttribute(osMXBeanName, attribute);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
       }
     }
@@ -212,7 +212,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     if (osMXBeanAvailable) {
       try {
         return (long) mbeanServer.getAttribute(osMXBeanName, attribute);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
       }
     }

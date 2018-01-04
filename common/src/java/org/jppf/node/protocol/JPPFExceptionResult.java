@@ -28,8 +28,7 @@ import org.jppf.utils.ExceptionUtils;
  * <p>When such an error occurs, an instance of this class will be sent instead of the initial JPPF task.
  * @author Laurent Cohen
  */
-public class JPPFExceptionResult extends AbstractTask<Object>
-{
+public class JPPFExceptionResult extends AbstractTask<Object> {
   /**
    * Explicit serialVersionUID.
    */
@@ -46,8 +45,7 @@ public class JPPFExceptionResult extends AbstractTask<Object>
   /**
    * Default constructor provided as a convenience for subclassing.
    */
-  public JPPFExceptionResult()
-  {
+  public JPPFExceptionResult() {
   }
 
   /**
@@ -55,16 +53,12 @@ public class JPPFExceptionResult extends AbstractTask<Object>
    * @param throwable the throwable that is to be captured.
    * @param object the object on which the throwable applies.
    */
-  public JPPFExceptionResult(final Throwable throwable, final Object object)
-  {
+  public JPPFExceptionResult(final Throwable throwable, final Object object) {
     setThrowable(throwable);
-    if (object instanceof String)
-    {
+    if (object instanceof String) {
       objectDescriptor = (String) object;
       className = "unknown class";
-    }
-    else
-    {
+    } else {
       objectDescriptor = String.valueOf(object);
       className = (object != null) ? object.getClass().getName() : "unknown class";
     }
@@ -75,8 +69,7 @@ public class JPPFExceptionResult extends AbstractTask<Object>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     //System.out.println(toString());
   }
 
@@ -86,9 +79,8 @@ public class JPPFExceptionResult extends AbstractTask<Object>
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
     if (getThrowable() != null) sb.append(" :\n").append(ExceptionUtils.getStackTrace(getThrowable()));
     return sb.toString();
@@ -98,8 +90,7 @@ public class JPPFExceptionResult extends AbstractTask<Object>
    * Get a string describing the object on which the error occurred.
    * @return "null" if the task was null, the result of its <code>toString()</code> method otherwise.
    */
-  public String getObjectDescriptor()
-  {
+  public String getObjectDescriptor() {
     return objectDescriptor;
   }
 
@@ -107,8 +98,7 @@ public class JPPFExceptionResult extends AbstractTask<Object>
    * Get the fully qualified class name of the intiial task object on which the error occurred.
    * @return "unknown class" if the task object was null, its class name otherwise.
    */
-  public String getTaskClassName()
-  {
+  public String getTaskClassName() {
     return className;
   }
 }

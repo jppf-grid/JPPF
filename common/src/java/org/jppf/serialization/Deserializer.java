@@ -93,12 +93,12 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   Object readObject() throws Exception {
-    byte header = in.readByte();
-    int type = header & 0x0F;
+    final byte header = in.readByte();
+    final int type = header & 0x0F;
     if (type == Serializer.NULL_OBJECT_HEADER) return null;
     else if (type == Serializer.CLASS_OBJECT_HEADER) return readClassObject(header);
-    int handle = readHandle(header);
-    if (traceEnabled) try { log.trace("read object header={}, handle={}", header, handle); } catch(@SuppressWarnings("unused") Exception e) {}
+    final int handle = readHandle(header);
+    if (traceEnabled) try { log.trace("read object header={}, handle={}", header, handle); } catch(@SuppressWarnings("unused") final Exception e) {}
     Object obj = caches.handleToObjectMap.get(handle);
     if (obj != null) return obj;
     if (traceEnabled) log.trace("reading object with handle = {}", handle);
@@ -110,7 +110,7 @@ class Deserializer {
       return obj;
     }
     readObject(handle);
-    Object o = caches.handleToObjectMap.get(handle);
+    final Object o = caches.handleToObjectMap.get(handle);
     if (traceEnabled) log.trace(String.format("read object %s, header=%d, handle=%d", o, header, handle));
     return o;
   }
@@ -123,20 +123,20 @@ class Deserializer {
   @SuppressWarnings("unchecked")
   private void readObject(final int handle) throws Exception {
     if (traceEnabled) log.trace("reading object with handle = {}", handle);
-    String sig = readString();
-    ClassDescriptor cd = caches.getDescriptor(sig, classloader);
+    final String sig = readString();
+    final ClassDescriptor cd = caches.getDescriptor(sig, classloader);
     if (cd.array) readArray(handle, cd);
     else if (cd.enumType) {
-      String name = readString();
-      if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(@SuppressWarnings("unused") Exception e) {}
+      final String name = readString();
+      if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(@SuppressWarnings("unused") final Exception e) {}
       @SuppressWarnings("rawtypes")
-      Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
+      final Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
     } else {
-      Object obj = newInstance(cd);
+      final Object obj = newInstance(cd);
       currentObject = obj;
       currentClassDescriptor = cd;
-      if (traceEnabled) try { log.trace("reading handle={}, object={}", handle, StringUtils.toIdentityString(obj)); } catch(@SuppressWarnings("unused") Exception e) {}
+      if (traceEnabled) try { log.trace("reading handle={}, object={}", handle, StringUtils.toIdentityString(obj)); } catch(@SuppressWarnings("unused") final Exception e) {}
       caches.handleToObjectMap.put(handle, obj);
       readFields(cd, obj);
     }
@@ -149,7 +149,7 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   private Object readClassObject(final byte header) throws Exception {
-    String handle = readString();
+    final String handle = readString();
     return caches.getClassFromHandle(handle, classloader);
   }
 
@@ -161,18 +161,18 @@ class Deserializer {
    */
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception {
     ClassDescriptor tmpDesc = cd;
-    if (traceEnabled) try { log.trace("reading fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") Exception e) {}
-    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
+    if (traceEnabled) try { log.trace("reading fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") final Exception e) {}
+    final Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
     while (tmpDesc != null) {
       stack.addFirst(tmpDesc);
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
+      final SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
       if (handler != null) handler.readDeclaredFields(this, desc, obj);
       else if (desc.hasReadWriteObject) {
-        Method m = desc.readObjectMethod;
-        if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(@SuppressWarnings("unused") Exception e) {}
+        final Method m = desc.readObjectMethod;
+        if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(@SuppressWarnings("unused") final Exception e) {}
         try {
           tmpDesc = currentClassDescriptor;
           currentClassDescriptor = desc;
@@ -194,12 +194,12 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception {
-    if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") Exception e) {}
+    if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") final Exception e) {}
     for (FieldDescriptor fd: cd.fields) {
       //if (traceEnabled) try { log.trace("reading field '{}' of object {}", fd, obj); } catch(@SuppressWarnings("unused") Exception e) {}
-      ClassDescriptor typeDesc = fd.type;
+      final ClassDescriptor typeDesc = fd.type;
       if (fd.field == null) fd.field = cd.clazz.getDeclaredField(fd.name);
-      Field field = fd.field;
+      final Field field = fd.field;
       if (typeDesc.primitive) {
         switch(typeDesc.signature.charAt(0)) {
           case 'B': field.setByte(obj, (byte) in.read()); break;
@@ -212,13 +212,13 @@ class Deserializer {
           case 'Z': field.setBoolean(obj, in.readBoolean()); break;
         }
       } else if (typeDesc.enumType) {
-        String name = (String) readObject();
-        if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(@SuppressWarnings("unused") Exception e) {}
+        final String name = (String) readObject();
+        if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(@SuppressWarnings("unused") final Exception e) {}
         @SuppressWarnings("rawtypes")
-        Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) field.getType(), name);
+        final Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) field.getType(), name);
         field.set(obj, val);
       } else {
-        Object val = readObject();
+        final Object val = readObject();
         field.set(obj, val);
       }
     }
@@ -232,11 +232,11 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   private void readArray(final int handle, final ClassDescriptor cd) throws Exception {
-    int len = readInt();
-    if (traceEnabled) try { log.trace("reading array with signature=" + cd.signature + ", length=" + len); } catch(@SuppressWarnings("unused") Exception e) {}
+    final int len = readInt();
+    if (traceEnabled) try { log.trace("reading array with signature=" + cd.signature + ", length=" + len); } catch(@SuppressWarnings("unused") final Exception e) {}
     ClassDescriptor compCd = cd.componentType;
     if (compCd == null) {
-      Class<?> compClass = cd.clazz.getComponentType();
+      final Class<?> compClass = cd.clazz.getComponentType();
       compCd = caches.classToDescMap.get(compClass);
       if (compCd == null) {
         compCd = new ClassDescriptor(compClass);
@@ -260,17 +260,17 @@ class Deserializer {
       obj = Array.newInstance(compCd.clazz, len);
       caches.handleToObjectMap.put(handle, obj);
       for (int i=0; i<len; i++) {
-        String name = (String) readObject();
-        if (traceEnabled) try { log.trace("read enum name {}", name); } catch(@SuppressWarnings("unused") Exception e) {}
+        final String name = (String) readObject();
+        if (traceEnabled) try { log.trace("read enum name {}", name); } catch(@SuppressWarnings("unused") final Exception e) {}
         @SuppressWarnings("rawtypes")
-        Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) compCd.clazz, name);
+        final Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) compCd.clazz, name);
         Array.set(obj, i, val);
       }
     } else {
       obj = Array.newInstance(compCd.clazz, len);
       caches.handleToObjectMap.put(handle, obj);
       for (int i=0; i<len; i++) {
-        Object ref = readObject();
+        final Object ref = readObject();
         Array.set(obj, i, ref);
       }
     }
@@ -281,7 +281,7 @@ class Deserializer {
    * @return a {@link ClassLoader} instance.
    */
   private ClassLoader initClassLoader() {
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     return cl != null ? cl : getClass().getClassLoader();
   }
 
@@ -291,7 +291,7 @@ class Deserializer {
    * @return a new instance of the class.
    * @throws Exception if any error occurs.
    */
-  private Object newInstance(final ClassDescriptor cd) throws Exception {
+  private static Object newInstance(final ClassDescriptor cd) throws Exception {
     return SerializationReflectionHelper.create(cd.clazz);
   }
 
@@ -302,9 +302,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   byte[] readByteArray(final int len) throws Exception {
-    byte[] array = new byte[len];
+    final byte[] array = new byte[len];
     for (int count=0; count<len;) {
-      int n = in.read(array, count, len-count);
+      final int n = in.read(array, count, len-count);
       if (n < 0) throw new EOFException(String.format("could only read %d bytes out of %d", count, len));
       count += n;
     }
@@ -318,9 +318,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   boolean[] readBooleanArray(final int len) throws Exception {
-    boolean[] array = new boolean[len];
+    final boolean[] array = new boolean[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length, len-count);
+      final int n = Math.min(buf.length, len-count);
       readToBuf(0, n);
       for (int i=0; i<n; i++) array[count++] = buf[i] != 0;
     }
@@ -334,9 +334,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   char[] readCharArray(final int len) throws Exception {
-    char[] array = new char[len];
+    final char[] array = new char[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/2, len-count);
+      final int n = Math.min(buf.length/2, len-count);
       readToBuf(0, 2*n);
       for (int i=0; i<2*n; i+=2) array[count++] = SerializationUtils.readChar(buf, i);
     }
@@ -350,9 +350,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   short[] readShortArray(final int len) throws Exception {
-    short[] array = new short[len];
+    final short[] array = new short[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/2, len-count);
+      final int n = Math.min(buf.length/2, len-count);
       readToBuf(0, 2*n);
       for (int i=0; i<2*n; i+=2) array[count++] = SerializationUtils.readShort(buf, i);
     }
@@ -366,9 +366,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   int[] readIntArray(final int len) throws Exception {
-    int[] array = new int[len];
+    final int[] array = new int[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/4, len-count);
+      final int n = Math.min(buf.length/4, len-count);
       readToBuf(0, 4*n);
       for (int i=0; i<4*n; i+=4) array[count++] = SerializationUtils.readInt(buf, i);
     }
@@ -382,9 +382,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   long[] readLongArray(final int len) throws Exception {
-    long[] array = new long[len];
+    final long[] array = new long[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/8, len-count);
+      final int n = Math.min(buf.length/8, len-count);
       readToBuf(0, 8*n);
       for (int i=0; i<8*n; i+=8) array[count++] = SerializationUtils.readLong(buf, i);
     }
@@ -398,9 +398,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   float[] readFloatArray(final int len) throws Exception {
-    float[] array = new float[len];
+    final float[] array = new float[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/4, len-count);
+      final int n = Math.min(buf.length/4, len-count);
       readToBuf(0, 4*n);
       for (int i=0; i<4*n; i+=4) array[count++] = Float.intBitsToFloat(SerializationUtils.readInt(buf, i));
     }
@@ -414,9 +414,9 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   double[] readDoubleArray(final int len) throws Exception {
-    double[] array = new double[len];
+    final double[] array = new double[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length/8, len-count);
+      final int n = Math.min(buf.length/8, len-count);
       readToBuf(0, 8*n);
       for (int i=0; i<8*n; i+=8) array[count++] = Double.longBitsToDouble(SerializationUtils.readLong(buf, i));
     }
@@ -429,7 +429,7 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   String readString() throws Exception {
-    StringLengthDesc result = SerializationUtils.readStringLength(in, buf);
+    final StringLengthDesc result = SerializationUtils.readStringLength(in, buf);
     if (result.length == 0) return "";
     else if (result.ascii) return readAsciiString(result.length);
     else if (result.length <= 65535/3) return readUTFString(result.length);
@@ -444,9 +444,9 @@ class Deserializer {
    */
   private String readAsciiString(final int len) throws Exception {
     if (traceEnabled) log.trace("reading ASCII string for len={}", len);
-    char[] chars = new char[len];
+    final char[] chars = new char[len];
     for (int count=0; count<len;) {
-      int n = Math.min(buf.length, len - count);
+      final int n = Math.min(buf.length, len - count);
       readToBuf(0, n);
       //for (int i=0; i<n; i++) chars[count++] = (char) (buf[i] & 0x7F);
       for (int i=0; i<n; i++) chars[count++] = (char) buf[i];
@@ -484,7 +484,7 @@ class Deserializer {
    */
   void readToBuf(final int offset, final int len) throws IOException {
     for (int pos=offset, count=0; count<len; ) {
-      int n = in.read(buf, pos, len - count);
+      final int n = in.read(buf, pos, len - count);
       if (n > 0) {
         pos += n;
         count += n;
@@ -500,7 +500,7 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   private int readHandle(final byte header) throws Exception {
-    int n = (header >>> 4) & 0x0F;
+    final int n = (header >>> 4) & 0x0F;
     readToBuf(0, n);
     int handle = 0;
     for (int i=8*(n-1), pos=0; i>=0; i-=8) handle += (buf[pos++] & 0xFF) << i;
@@ -513,7 +513,7 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   int readInt() throws Exception {
-    int value = SerializationUtils.readVarInt(in, buf);
+    final int value = SerializationUtils.readVarInt(in, buf);
     return value;
   }
 
@@ -523,7 +523,7 @@ class Deserializer {
    * @throws Exception if any error occurs.
    */
   long readLong() throws Exception {
-    long value = SerializationUtils.readVarLong(in, buf);
+    final long value = SerializationUtils.readVarLong(in, buf);
     return value;
   }
 

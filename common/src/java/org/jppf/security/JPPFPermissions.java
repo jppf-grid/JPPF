@@ -27,6 +27,10 @@ import java.util.*;
  */
 public class JPPFPermissions extends PermissionCollection {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The list of permissions in this collection.
    */
   private List<Permission> permissions = new Vector<>();
@@ -57,7 +61,7 @@ public class JPPFPermissions extends PermissionCollection {
    */
   @Override
   public synchronized boolean implies(final Permission permission) {
-    List<Permission> perms = Collections.unmodifiableList(permissions);
+    final List<Permission> perms = Collections.unmodifiableList(permissions);
     for (Permission p : perms) {
       if (p.implies(permission)) return true;
     }

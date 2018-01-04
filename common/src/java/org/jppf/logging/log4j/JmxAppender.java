@@ -26,8 +26,7 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
  * An appender that delegates message appending to a JmxLogger.
  * @author Laurent Cohen
  */
-public class JmxAppender extends AppenderSkeleton
-{
+public class JmxAppender extends AppenderSkeleton {
   /**
    * Default layout to use if none is specified.
    */
@@ -48,15 +47,13 @@ public class JmxAppender extends AppenderSkeleton
   /**
    * Initialize this appender.
    */
-  public JmxAppender()
-  {
+  public JmxAppender() {
   }
 
   /**
    * Initialize this appender from its configuration.
    */
-  private void init()
-  {
+  private void init() {
     notifier = new JmxMessageNotifier(mbeanName);
   }
 
@@ -66,16 +63,16 @@ public class JmxAppender extends AppenderSkeleton
    * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
    */
   @Override
-  protected void append(final LoggingEvent event)
-  {
+  protected void append(final LoggingEvent event) {
     if (notifier == null) init();
     Layout layout = getLayout();
     if (layout == null) layout = DEFAULT_LAYOUT;
-    StringBuilder sb = new StringBuilder(layout.format(event));
-    if (layout.ignoresThrowable())
-    {
-      String[] strs = event.getThrowableStrRep();
-      if (strs != null) for (String s: strs) sb.append(s).append(LINE_SEP);
+    final StringBuilder sb = new StringBuilder(layout.format(event));
+    if (layout.ignoresThrowable()) {
+      final String[] strs = event.getThrowableStrRep();
+      if (strs != null) {
+        for (final String s: strs) sb.append(s).append(LINE_SEP);
+      }
     }
     notifier.sendMessage(sb.toString());
   }
@@ -85,8 +82,7 @@ public class JmxAppender extends AppenderSkeleton
    * @see org.apache.log4j.Appender#close()
    */
   @Override
-  public void close()
-  {
+  public void close() {
   }
 
   /**
@@ -95,8 +91,7 @@ public class JmxAppender extends AppenderSkeleton
    * @see org.apache.log4j.Appender#requiresLayout()
    */
   @Override
-  public boolean requiresLayout()
-  {
+  public boolean requiresLayout() {
     return true;
   }
 
@@ -104,8 +99,7 @@ public class JmxAppender extends AppenderSkeleton
    * Get the name of the mbean that sends messages as JMX notifications.
    * @return the mbean name as a string.
    */
-  public String getMbeanName()
-  {
+  public String getMbeanName() {
     return mbeanName;
   }
 
@@ -113,8 +107,7 @@ public class JmxAppender extends AppenderSkeleton
    * Set the name of the mbean that sends messages as JMX notifications.
    * @param mbeanName the mbean name as a string.
    */
-  public void setMbeanName(final String mbeanName)
-  {
+  public void setMbeanName(final String mbeanName) {
     this.mbeanName = mbeanName;
   }
 }

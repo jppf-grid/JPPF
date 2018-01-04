@@ -122,11 +122,11 @@ public class ThumbnailGenerator {
    * @throws Exception if an error is raised while generating the thumbnails.
    */
   private void generateThumbnails() throws Exception {
-    for (Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
-      BufferedImage img = ImageIO.read(entry.getKey());
-      ImageAttributes attrs = entry.getValue();
+    for (final Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
+      final BufferedImage img = ImageIO.read(entry.getKey());
+      final ImageAttributes attrs = entry.getValue();
       attrs.height = img.getHeight();
-      BufferedImage thumbnail = scale(img);
+      final BufferedImage thumbnail = scale(img);
       ImageIO.write(thumbnail, "jpeg", attrs.thumbnailFile);
     }
   }
@@ -136,18 +136,18 @@ public class ThumbnailGenerator {
    * @throws Exception if an IO error is raised.
    */
   private void generateIncludeFile() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     int count = 0;
-    String indent = "\t\t\t\t\t";
+    final String indent = "\t\t\t\t\t";
     sb.append(indent).append("<table align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"4\">\n");
-    for (Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
+    for (final Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
       if (count % rowLength == 0) {
         if (count > 0) sb.append(indent).append("\t</tr>\n");
         sb.append(indent).append("\t<tr>\n");
       }
-      ImageAttributes attrs = entry.getValue();
-      String name1 = entry.getKey().getName();
-      String name2 = attrs.thumbnailFile.getName();
+      final ImageAttributes attrs = entry.getValue();
+      final String name1 = entry.getKey().getName();
+      final String name2 = attrs.thumbnailFile.getName();
       // $template{name="shots-row" image="popup1.gif" thumbnail="popup1.jpg"}$
       sb.append(indent).append("\t\t$template{name=\"shots_cell\" image=\"");
       sb.append(name1);
@@ -165,7 +165,7 @@ public class ThumbnailGenerator {
     sb.append(indent).append("\t</tr>\n");
     sb.append(indent).append("</table>\n");
     FileUtils.writeTextFile(includePath + "/shots.html", sb.toString());
-    File file = fileMap.keySet().iterator().next();
+    final File file = fileMap.keySet().iterator().next();
     FileUtils.writeTextFile(includePath + "/first-shot.html", file.getName());
     FileUtils.writeTextFile(includePath + "/first-shot-title.html", titleFromFilename(file.getName()));
   }
@@ -175,16 +175,16 @@ public class ThumbnailGenerator {
    * @throws Exception if an IO error occurs.
    */
   private void generateFileMap() throws Exception {
-    File dir = new File(path);
+    final File dir = new File(path);
     if (!dir.isDirectory()) throw new IOException("The specified path is not a directory");
-    File[] list = dir.listFiles(new ImageFileFilter("gif", "jpg", "png"));
-    for (File file: list) {
+    final File[] list = dir.listFiles(new ImageFileFilter("gif", "jpg", "png"));
+    for (final File file: list) {
       String s = path;
       if (s.endsWith("/") || s.endsWith("\\")) s = s.substring(0, s.length() - 1);
       s += '/' + TH_PREFIX + file.getName();
-      int idx = s.lastIndexOf('.');
+      final int idx = s.lastIndexOf('.');
       s = s.substring(0, idx+1) + "jpg";
-      ImageAttributes attrs = new ImageAttributes();
+      final ImageAttributes attrs = new ImageAttributes();
       attrs.thumbnailFile = new File(s);
       fileMap.put(file, attrs);
     }
@@ -196,11 +196,11 @@ public class ThumbnailGenerator {
    * @return a scaled version of the input image.
    */
   private BufferedImage scale(final BufferedImage img) {
-    int w = img.getWidth();
-    int h = img.getHeight();
-    double r = Math.max((double) w / width, (double) h / height);
-    BufferedImage thumbnail = new BufferedImage((int) (w/r), (int) (h/r), BufferedImage.TYPE_INT_RGB);
-    Graphics2D g = thumbnail.createGraphics();
+    final int w = img.getWidth();
+    final int h = img.getHeight();
+    final double r = Math.max((double) w / width, (double) h / height);
+    final BufferedImage thumbnail = new BufferedImage((int) (w/r), (int) (h/r), BufferedImage.TYPE_INT_RGB);
+    final Graphics2D g = thumbnail.createGraphics();
     g.drawImage(img.getScaledInstance((int) (w/r), (int) (h/r), Image.SCALE_AREA_AVERAGING), 0, 0, null);
     return thumbnail;
   }
@@ -210,14 +210,14 @@ public class ThumbnailGenerator {
    * @param source the source from which to geenrate a title.
    * @return the generated title as a string.
    */
-  private String titleFromFilename(final String source) {
+  private static String titleFromFilename(final String source) {
     String name = FileUtils.getFileName(source);
-    int idx = name.lastIndexOf('.');
+    final int idx = name.lastIndexOf('.');
     if (idx >= 0) name = name.substring(0, idx);
-    char[] chars = name.toCharArray();
-    StringBuilder sb = new StringBuilder();
+    final char[] chars = name.toCharArray();
+    final StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (char c: chars) {
+    for (final char c: chars) {
       if ((c == '-') || (c == '-')) sb.append(' ');
       else if (Character.isUpperCase(c) && (count > 0)) sb.append(' ').append(c);
       else sb.append(c);
@@ -247,8 +247,8 @@ public class ThumbnailGenerator {
     @Override
     public boolean accept(final File file) {
       if (file.getName().startsWith(TH_PREFIX)) return false;
-      String ext = FileUtils.getFileExtension(file);
-      for (String s: extensions) {
+      final String ext = FileUtils.getFileExtension(file);
+      for (final String s: extensions) {
         if (s.equalsIgnoreCase(ext)) return true;
       }
       return false;
@@ -261,16 +261,16 @@ public class ThumbnailGenerator {
    */
   public static void main(final String...args) {
     try {
-      String path = args[0];
-      int width = Integer.valueOf(args[1]);
-      int height = Integer.valueOf(args[2]);
-      String includePath = args[3];
-      int rowLength = Integer.valueOf(args[4]);
+      final String path = args[0];
+      final int width = Integer.valueOf(args[1]);
+      final int height = Integer.valueOf(args[2]);
+      final String includePath = args[3];
+      final int rowLength = Integer.valueOf(args[4]);
       System.out.println("Using folder = " + path + ", max width = " + width + ", max height = " + height + ", include file path = " + includePath + ", thumbnails per row = " + rowLength);
-      ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height, includePath, rowLength);
+      final ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height, includePath, rowLength);
       tg.generate();
       System.out.println("finished");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

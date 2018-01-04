@@ -42,7 +42,7 @@ public class TimeoutTimerTask implements Runnable {
 
   @Override
   public void run() {
-    Future<?> future = taskWrapper.getFuture();
+    final Future<?> future = taskWrapper.getFuture();
     if (!future.isDone()) {
       taskWrapper.timeout();
       future.cancel(taskWrapper.getTask().isInterruptible());

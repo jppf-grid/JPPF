@@ -86,11 +86,11 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   @Override
   protected Object readObjectOverride() throws IOException, ClassNotFoundException {
     Object o = null;
-    boolean alreadyReading = readingObject;
+    final boolean alreadyReading = readingObject;
     try {
       if (!alreadyReading) readingObject = true;
       o = deserializer.readObject();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
       else if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e.getMessage(), e);
@@ -135,16 +135,13 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   @Override
   public int readInt() throws IOException {
     readToBuf(4);
-    int value = SerializationUtils.readInt(buf, 0);
-    return value;
-    //return SerializationUtils.readVarInt(in, buf);
+    return SerializationUtils.readInt(buf, 0);
   }
 
   @Override
   public long readLong() throws IOException {
     readToBuf(8);
-    long value = SerializationUtils.readLong(buf, 0);
-    return value;
+    return SerializationUtils.readLong(buf, 0);
   }
 
   @Override
@@ -202,7 +199,7 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   public void defaultReadObject() throws IOException, ClassNotFoundException {
     try {
       deserializer.readDeclaredFields(deserializer.currentClassDescriptor, deserializer.currentObject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
       else if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e.getMessage(), e);
@@ -212,11 +209,11 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   @Override
   public GetField readFields() throws IOException, ClassNotFoundException {
     try {
-      JPPFGetField getFields = new JPPFGetField();
+      final JPPFGetField getFields = new JPPFGetField();
       readFields0(getFields.primitiveFields);
       readFields0(getFields.objectFields);
       return getFields;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
       else if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e.getMessage(), e);
@@ -229,11 +226,11 @@ public class JPPFObjectInputStream extends ObjectInputStream {
    * @throws Exception if any error occurs.
    */
   private void readFields0(final Map<String, Object> map) throws Exception {
-    int n = readInt();
+    final int n = readInt();
     for (int i=0; i<n; i++) {
-      Object o = deserializer.readObject();
-      String name = (String) o;
-      Object value = deserializer.readObject();
+      final Object o = deserializer.readObject();
+      final String name = (String) o;
+      final Object value = deserializer.readObject();
       map.put(name, value);
     }
   }
@@ -246,7 +243,7 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   private void readToBuf(final int len) throws IOException {
     int pos = 0;
     while (pos < len) {
-      int n = in.read(buf, pos, len - pos);
+      final int n = in.read(buf, pos, len - pos);
       if (n > 0) pos += n;
       else if (n < 0) throw new EOFException("could only read " + pos + " bytes out of " + len);
     }

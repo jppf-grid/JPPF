@@ -78,13 +78,13 @@ public class NodeThreadsBundler extends AbstractBundler<NodeThreadsProfile> impl
    * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
    */
   private void computeBundleSize() {
-    JPPFSystemInformation nodeConfig = getChannelConfiguration();
+    final JPPFSystemInformation nodeConfig = getChannelConfiguration();
     if (nodeConfig == null) bundleSize = 1;
     else {
       // get the number of processing threads in the node
-      TypedProperties jppf = getChannelConfiguration().getJppf();
-      boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
-      JPPFProperty<Integer> prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+      final TypedProperties jppf = getChannelConfiguration().getJppf();
+      final boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
+      final JPPFProperty<Integer> prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
       int nbThreads = jppf.getInt(prop.getName(), -1);
       if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " nb threads from config = " + nbThreads);
       // if number of threads is not defined, we assume it is the number of available processors

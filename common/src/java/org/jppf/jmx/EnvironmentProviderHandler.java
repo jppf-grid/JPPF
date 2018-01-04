@@ -45,9 +45,9 @@ public class EnvironmentProviderHandler<T> {
    * @return a list of the loaded providers, possibly empty.
    */
   private List<T> loadProviders(final Class<T> clazz) {
-    List<T> list = new ArrayList<>();
-    ServiceLoader<T> sl = ServiceLoader.load(clazz);
-    Iterator<T> it = sl.iterator();
+    final List<T> list = new ArrayList<>();
+    final ServiceLoader<T> sl = ServiceLoader.load(clazz);
+    final Iterator<T> it = sl.iterator();
     boolean end = false;
     while (!end) {
       // hasNext() and next() may throw a ServiceCOnfigurationError

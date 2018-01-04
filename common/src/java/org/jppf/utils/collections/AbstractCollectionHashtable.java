@@ -26,33 +26,33 @@ import java.util.*;
  * @param <V> the type of the objects in the map's collection values.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionHashtable<K, V> extends AbstractCollectionMap<K, V>
-{
+public abstract class AbstractCollectionHashtable<K, V> extends AbstractCollectionMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public AbstractCollectionHashtable()
-  {
+  public AbstractCollectionHashtable() {
     this.map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new Hashtable<>();
   }
 
   @Override
-  public void putValue(final K key, final V value)
-  {
-    Collection<V> coll = createOrGetCollectionSynchronized(key);
+  public void putValue(final K key, final V value) {
+    final Collection<V> coll = createOrGetCollectionSynchronized(key);
     coll.add(value);
   }
 
   @Override
-  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values)
-  {
-    Collection<V> coll = createOrGetCollectionSynchronized(key);
-    for (V value: values) coll.add(value);
+  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values) {
+    final Collection<V> coll = createOrGetCollectionSynchronized(key);
+    for (final V value: values) coll.add(value);
   }
 }

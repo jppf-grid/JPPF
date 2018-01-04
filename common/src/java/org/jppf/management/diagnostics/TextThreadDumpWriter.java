@@ -28,8 +28,7 @@ import org.jppf.utils.streams.StreamUtils;
  * This class prints a thread dump nicely formatted as plain text to a character stream.
  * @author Laurent Cohen
  */
-public class TextThreadDumpWriter extends AbstractThreadDumpWriter
-{
+public class TextThreadDumpWriter extends AbstractThreadDumpWriter {
   /**
    * The new line sequence.
    */
@@ -44,37 +43,33 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
    * @param writer the writer to print to.
    * @param title the tittle given for the output.
    */
-  public TextThreadDumpWriter(final Writer writer, final String title)
-  {
+  public TextThreadDumpWriter(final Writer writer, final String title) {
     super(writer, "  ");
     this.title = title == null ? "Thread dump" : title;
   }
 
   @Override
-  public void printDeadlocks(final ThreadDump threadDump)
-  {
-    String hr = StringUtils.padRight("", '-', 80);
-    long[] ids = threadDump.getDeadlockedThreads();
+  public void printDeadlocks(final ThreadDump threadDump) {
+    final String hr = StringUtils.padRight("", '-', 80);
+    final long[] ids = threadDump.getDeadlockedThreads();
     if ((ids == null) || (ids.length <= 0)) return;
     out.println(hr);
     out.println("Deadlock detected" + BR);
-    Map<Long, ThreadInformation> threadsMap = threadDump.getThreads();
-    for (long id: ids)
-    {
-      ThreadInformation ti = threadsMap.get(id);
-      LockInformation li = ti.getLockInformation();
-      ThreadInformation owner = threadsMap.get(ti.getLockOwnerId());
+    final Map<Long, ThreadInformation> threadsMap = threadDump.getThreads();
+    for (final long id: ids) {
+      final ThreadInformation ti = threadsMap.get(id);
+      final LockInformation li = ti.getLockInformation();
+      final ThreadInformation owner = threadsMap.get(ti.getLockOwnerId());
       out.println("- " + simpleName(ti) + " is waiting to lock " + simpleName(li) + " which is held by " + simpleName(owner));
     }
     out.println("Stack trace information for the threads listed above" + BR);
-    for (long id: ids) printThread(threadsMap.get(id));
+    for (final long id: ids) printThread(threadsMap.get(id));
     out.println(hr + BR);
   }
 
   @Override
-  public void printThread(final ThreadInformation thread)
-  {
-    StringBuilder sb = new StringBuilder();
+  public void printThread(final ThreadInformation thread) {
+    final StringBuilder sb = new StringBuilder();
     sb.append("\"").append(thread.getName()).append('"').append(" - ").append(thread.getId());
     sb.append(" - state: ").append(thread.getState());
     sb.append(" - blocked count: ").append(thread.getBlockedCount());
@@ -85,26 +80,21 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
     if (thread.isInNative()) sb.append(" - in native code");
     sb.append(BR);
     incIndent();
-    List<StackFrameInformation> stackTrace = thread.getStackTrace();
-    if ((stackTrace != null) && !stackTrace.isEmpty())
-    {
+    final List<StackFrameInformation> stackTrace = thread.getStackTrace();
+    if ((stackTrace != null) && !stackTrace.isEmpty()) {
       int count = 0;
-      for (StackFrameInformation sfi: stackTrace)
-      {
+      for (final StackFrameInformation sfi: stackTrace) {
         sb.append(getIndent()).append("at ").append(sfi).append(BR);
-        if ((count == 0) && (thread.getLockInformation() != null))
-          sb.append(getIndent()).append("- waiting on ").append(simpleName(thread.getLockInformation())).append(BR);
-        LockInformation li = sfi.getLock();
+        if ((count == 0) && (thread.getLockInformation() != null)) sb.append(getIndent()).append("- waiting on ").append(simpleName(thread.getLockInformation())).append(BR);
+        final LockInformation li = sfi.getLock();
         if (li != null) sb.append(getIndent()).append("- locked ").append(simpleName(li)).append(BR);
         count++;
       }
     }
-    List<LockInformation> synchronizers = thread.getOwnableSynchronizers();
-    if ((synchronizers != null) && !synchronizers.isEmpty())
-    {
+    final List<LockInformation> synchronizers = thread.getOwnableSynchronizers();
+    if ((synchronizers != null) && !synchronizers.isEmpty()) {
       sb.append(BR).append(getIndent()).append("Locked ownable synchronizers:").append(BR);
-      for (LockInformation li: synchronizers)
-      {
+      for (final LockInformation li: synchronizers) {
         sb.append(getIndent()).append("- ").append(simpleName(li)).append(BR);
       }
     }
@@ -113,9 +103,8 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
   }
 
   @Override
-  public void printThreadDump(final ThreadDump threadDump)
-  {
-    String hr = StringUtils.padRight("", '-', title.length());
+  public void printThreadDump(final ThreadDump threadDump) {
+    final String hr = StringUtils.padRight("", '-', title.length());
     out.println(hr);
     out.println(title);
     out.println(hr + BR);
@@ -123,8 +112,7 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
   }
 
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     out.close();
   }
 
@@ -134,19 +122,15 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
    * @param title title given to the dump.
    * @return the thread dump printed to a string, or null if it could not be printed.
    */
-  public static String printToString(final ThreadDump dump, final String title)
-  {
+  public static String printToString(final ThreadDump dump, final String title) {
     String result = null;
     ThreadDumpWriter writer = null;
-    try
-    {
-      StringWriter sw = new StringWriter();
+    try {
+      final StringWriter sw = new StringWriter();
       writer = new TextThreadDumpWriter(sw, title);
       writer.printThreadDump(dump);
       result = sw.toString();
-    }
-    finally
-    {
+    } finally {
       if (writer != null) StreamUtils.closeSilent(writer);
     }
     return result;

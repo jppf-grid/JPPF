@@ -31,6 +31,10 @@ import org.slf4j.*;
  */
 public class BaseScriptEvaluator implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(BaseScriptEvaluator.class);
@@ -111,7 +115,7 @@ public class BaseScriptEvaluator implements Serializable {
     try {
       runner = ScriptRunnerFactory.getScriptRunner(language);
       if (runner != null) {
-        Object result = runner.evaluate(scriptId, script, variables);
+        final Object result = runner.evaluate(scriptId, script, variables);
         return result;
       }
     } catch (Exception|NoClassDefFoundError e) {
@@ -127,7 +131,7 @@ public class BaseScriptEvaluator implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName())
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName())
       .append('[')
       .append("language=").append(language)
       .append(", script=").append(script)

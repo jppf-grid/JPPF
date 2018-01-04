@@ -134,24 +134,24 @@ abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends 
     synchronized(this) {
       if (netmasks == null) {
         netmasks = new ArrayList<>(subnets.size());
-        for (Expression<String> subnet : subnets) {
+        for (final Expression<String> subnet : subnets) {
           netmasks.add(createNetmask(subnet.evaluate(info)));
         }
       }
     }
     // Get IP strings from properties
     // Returns as "foo.com|1.2.3.4 bar.org|5.6.7.8"
-    String ip = getProperty(info, getIPType().propertyName);
+    final String ip = getProperty(info, getIPType().propertyName);
 
-    for (HostIP hip: NetworkUtils.parseAddresses(ip)) {
+    for (final HostIP hip: NetworkUtils.parseAddresses(ip)) {
       // Check IP against each subnet
-      for (P netmask : netmasks) {
+      for (final P netmask : netmasks) {
         try {
           if (netmask.matches(InetAddress.getByName(hip.ipAddress()))) {
             return true;
           }
-        } catch (UnknownHostException e) {
-          String message = "Unknown host '{}' : {}";
+        } catch (final UnknownHostException e) {
+          final String message = "Unknown host '{}' : {}";
           if (traceEnabled) log.trace(message, hip.ipAddress(), ExceptionUtils.getStackTrace(e));
           else log.warn(message, hip.ipAddress(), ExceptionUtils.getMessage(e));
         }
@@ -162,7 +162,7 @@ abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends 
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder(indent(n)).append(tagStart(getIPType().xmlTag)).append('\n');
+    final StringBuilder sb = new StringBuilder(indent(n)).append(tagStart(getIPType().xmlTag)).append('\n');
     for (Expression<String> subnet: subnets) sb.append(indent(n + 1)).append(xmlElement(SUBNET, subnet.getExpression())).append('\n');
     sb.append(indent(n)).append(tagEnd(getIPType().xmlTag)).append('\n');
     return sb.toString();

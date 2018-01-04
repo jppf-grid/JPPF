@@ -72,7 +72,7 @@ public class Range<T extends Comparable<T>> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append('[');
     sb.append(lower);
     if (!lower.equals(upper)) sb.append(", ").append(upper);
@@ -141,8 +141,8 @@ public class Range<T extends Comparable<T>> {
    */
   public Range<T> merge(final Range<T> other) {
     if (other == null) return new Range<>(getLower(), getUpper());
-    T minLower = lower.compareTo(other.getLower()) <= 0 ? lower : other.getLower();
-    T maxUpper = upper.compareTo(other.getUpper()) >= 0 ? upper : other.getUpper();
+    final T minLower = lower.compareTo(other.getLower()) <= 0 ? lower : other.getLower();
+    final T maxUpper = upper.compareTo(other.getUpper()) >= 0 ? upper : other.getUpper();
     return new Range<>(minLower, maxUpper);
   }
 
@@ -156,8 +156,8 @@ public class Range<T extends Comparable<T>> {
    */
   public Range<T> intersection(final Range<T> other) {
     if ((other == null) || !intersects(other)) return null;
-    T maxLower = lower.compareTo(other.getLower()) >= 0 ? lower : other.getLower();
-    T minUpper = upper.compareTo(other.getUpper()) <= 0 ? upper : other.getUpper();
+    final T maxLower = lower.compareTo(other.getLower()) >= 0 ? lower : other.getLower();
+    final T minUpper = upper.compareTo(other.getUpper()) <= 0 ? upper : other.getUpper();
     return new Range<>(maxLower, minUpper);
   }
 
@@ -170,7 +170,7 @@ public class Range<T extends Comparable<T>> {
   public boolean equals(final Object obj) {
     if (!(obj instanceof Range)) return false;
     @SuppressWarnings("unchecked")
-    Range<T> other = (Range<T>) obj; 
+    final Range<T> other = (Range<T>) obj; 
     return lower.equals(other.lower) && upper.equals(other.upper);
   }
 }

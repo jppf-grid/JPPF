@@ -81,7 +81,7 @@ public class NioConstants {
    * @return <code>true</code> if NIO checks are enabled, <code>false</code> otherwise.
    */
   private static boolean getCheckConnection() {
-    boolean b = JPPFConfiguration.get(NIO_CHECK_CONNECTION);
+    final boolean b = JPPFConfiguration.get(NIO_CHECK_CONNECTION);
     log.info("NIO checks are " + (b ? "enabled" : "disabled"));
     return b;
   }

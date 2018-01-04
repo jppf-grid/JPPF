@@ -48,7 +48,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
    */
   @Override
   public void log(final String message) {
-    Notification notif = new Notification("JmxLogNotification", OBJECT_NAME, sequence.incrementAndGet(), message);
+    final Notification notif = new Notification("JmxLogNotification", OBJECT_NAME, sequence.incrementAndGet(), message);
     sendNotification(notif);
   }
 
@@ -59,7 +59,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
   private static ObjectName makeObjectName() {
     try {
       return new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ')');
     }
     return null;

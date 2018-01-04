@@ -28,6 +28,10 @@ import org.jppf.location.Location;
  */
 public class ClassPathImpl implements ClassPath {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Mapping of classpath elements to their names.
    */
   private final Map<String, ClassPathElement> elementMap = new HashMap<>();
@@ -105,11 +109,12 @@ public class ClassPathImpl implements ClassPath {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     int count = 0;
-    for (ClassPathElement elt: this) {
+    for (final ClassPathElement elt: this) {
       if (count > 0) sb.append(", ");
       sb.append(elt.getName());
+      count++;
     }
     sb.append(']');
     return sb.toString();

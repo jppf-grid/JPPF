@@ -188,7 +188,7 @@ public final class JPPFConfiguration {
     props = new TypedProperties();
     try (Reader reader = new StringReader(newConfig.asString())) {
       props.loadAndResolve(reader);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error reading the configuration", e);
     }
   }
@@ -200,7 +200,7 @@ public final class JPPFConfiguration {
     props = new TypedProperties();
     try (Reader reader = getReader()) {
       if (reader != null) props.loadAndResolve(reader);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error reading the configuration", e);
     }
   }
@@ -213,7 +213,7 @@ public final class JPPFConfiguration {
   private static Reader getReader() throws Exception {
     String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
     if ((altSource != null) && "".equals(altSource.trim())) altSource = null;
-    String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
+    final String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
     return getConfigurationReader(filename, altSource);
   }
 
@@ -246,13 +246,13 @@ public final class JPPFConfiguration {
   public static Reader getConfigurationSourceReader(final String configurationSourceName) throws Exception {
     Reader reader = null;
     if (log.isDebugEnabled()) log.debug("reading JPPF configuration from config source: " + configurationSourceName);
-    Class<?> clazz = Class.forName(configurationSourceName);
+    final Class<?> clazz = Class.forName(configurationSourceName);
     if (ConfigurationSourceReader.class.isAssignableFrom(clazz)) {
-      ConfigurationSourceReader source = (ConfigurationSourceReader) clazz.newInstance();
+      final ConfigurationSourceReader source = (ConfigurationSourceReader) clazz.newInstance();
       reader = source.getPropertyReader();
     } else if (ConfigurationSource.class.isAssignableFrom(clazz)) {
-      ConfigurationSource source = (ConfigurationSource) clazz.newInstance();
-      InputStream is = source.getPropertyStream();
+      final ConfigurationSource source = (ConfigurationSource) clazz.newInstance();
+      final InputStream is = source.getPropertyStream();
       reader = new InputStreamReader(is);
     }
     else throw new IllegalArgumentException("the type '" + configurationSourceName + "' is neither a JPPFConfiguration.ConfigurationSource " + 

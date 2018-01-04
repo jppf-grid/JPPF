@@ -81,8 +81,8 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * @return A list of jvm options.
    */
   protected Pair<List<String>, List<String>> parseJvmOptions(final String source) {
-    List<String> options = new ArrayList<>();
-    Matcher matcher = JVM_OPTIONS_PATTERN.matcher(source);
+    final List<String> options = new ArrayList<>();
+    final Matcher matcher = JVM_OPTIONS_PATTERN.matcher(source);
     while (matcher.find()) {
       String s = matcher.group(1);
       if (s != null) {
@@ -91,11 +91,11 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       }
     }
     log.debug("options={}", options);
-    List<String> jvmOptions = new ArrayList<>();
-    List<String> cpElements = new ArrayList<>();
+    final List<String> jvmOptions = new ArrayList<>();
+    final List<String> cpElements = new ArrayList<>();
     int count = 0;
     while (count < options.size()) {
-      String option = options.get(count++);
+      final String option = options.get(count++);
       if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options.get(count++));
       else jvmOptions.add(option);
     }
@@ -110,8 +110,8 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * any class path element contains one or more spaces.
    */
   protected String buildClasspath(final List<String> cpElements) {
-    StringBuilder sb = new StringBuilder();
-    String sep = System.getProperty("path.separator");
+    final StringBuilder sb = new StringBuilder();
+    final String sep = System.getProperty("path.separator");
     for (int i=0; i<cpElements.size(); i++) {
       if (i > 0) sb.append(sep);
       sb.append(cpElements.get(i));
@@ -161,10 +161,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         processPort = processServer.getLocalPort();
       }
       slaveSocketWrapper = new SlaveSocketWrapper();
-      Thread thread = new Thread(slaveSocketWrapper, getName() + "ServerSocket");
+      final Thread thread = new Thread(slaveSocketWrapper, getName() + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       if (processServer != null) StreamUtils.closeSilent(processServer);
       if (slaveSocketWrapper != null) StreamUtils.closeSilent(slaveSocketWrapper);
     }
@@ -177,13 +177,13 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * @return the created shutdown hook.
    */
   protected Thread createShutdownHook() {
-    Runnable hook = new Runnable() {
+    final Runnable hook = new Runnable() {
       @Override
       public void run() {
         tearDown();
       }
     };
-    Thread hookThread = new Thread(hook);
+    final Thread hookThread = new Thread(hook);
     Runtime.getRuntime().addShutdownHook(hookThread);
     return hookThread;
   }
@@ -219,7 +219,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    */
   protected void fireProcessStarted() {
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has started", getName(), process);
-    ProcessLauncherEvent event = new ProcessLauncherEvent(this);
+    final ProcessLauncherEvent event = new ProcessLauncherEvent(this);
     for (ProcessLauncherListener listener: listeners) listener.processStarted(event);
   }
 
@@ -229,7 +229,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    */
   protected void fireProcessStopped(final boolean clearListeners) {
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has stopped", getName(), process);
-    ProcessLauncherEvent event = new ProcessLauncherEvent(this);
+    final ProcessLauncherEvent event = new ProcessLauncherEvent(this);
     for (ProcessLauncherListener listener: listeners) listener.processStopped(event);
     if (clearListeners) listeners.clear();
   }
@@ -272,9 +272,9 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     public void run() {
       try {
         socketClient = new BootstrapSocketClient(processServer.accept());
-        int n = socketClient.readInt();
+        final int n = socketClient.readInt();
         if (n == -1) throw new EOFException();
-      } catch(Exception ioe) {
+      } catch(final Exception ioe) {
         if (log.isDebugEnabled()) log.debug(getName(), ioe);
         close();
       }
@@ -289,7 +289,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       if (socketClient == null) return;
       try {
         socketClient.writeInt(action);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (log.isDebugEnabled()) log.debug("could not send command to slave process {} : {}", getName(), ExceptionUtils.getStackTrace(e));
       }
     }

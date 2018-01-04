@@ -255,7 +255,7 @@ public class JPPFNodeState implements Serializable {
    * @return a <code>JPPFNodeState</code> instance.
    */
   public JPPFNodeState copy() {
-    JPPFNodeState s = new JPPFNodeState();
+    final JPPFNodeState s = new JPPFNodeState();
     s.setNbTasksExecuted(getNbTasksExecuted());
     s.setConnectionStatus(getConnectionStatus());
     s.setExecutionStatus(getExecutionStatus());
@@ -268,7 +268,7 @@ public class JPPFNodeState implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("threadPoolSize=").append(threadPoolSize);
     sb.append(", threadPriority=").append(threadPriority);
     sb.append(", nbTasksExecuted=").append(nbTasksExecuted);
@@ -299,7 +299,7 @@ public class JPPFNodeState implements Serializable {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    JPPFNodeState other = (JPPFNodeState) obj;
+    final JPPFNodeState other = (JPPFNodeState) obj;
     if (nbTasksExecuted != other.nbTasksExecuted) return false;
     //if (cpuTime != other.cpuTime) return false;
     if (executionStatus != other.executionStatus) return false;

@@ -47,10 +47,10 @@ public class FileReplacerEx {
     try {
       //boolean searchOnly = Boolean.valueOf(args[0]);
       for (int i=0; i<arguments.length; i++) {
-        String root = arguments[i][0];
-        String ext = arguments[i][2];
-        String in = arguments[i][1] + "/in.txt";
-        String out = arguments[i][1] + "/out.txt";
+        final String root = arguments[i][0];
+        final String ext = arguments[i][2];
+        final String in = arguments[i][1] + "/in.txt";
+        final String out = arguments[i][1] + "/out.txt";
         FileUtils.writeTextFile(in, arguments[i][3]);
         FileUtils.writeTextFile(out, arguments[i][4]);
         System.out.println(hr);
@@ -58,7 +58,7 @@ public class FileReplacerEx {
         System.out.println(hr);
         FileReplacer.main(root, in, out, ext, args[0]);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

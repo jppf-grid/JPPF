@@ -22,7 +22,6 @@ import java.net.*;
 
 import org.jppf.utils.Range;
 
-
 /**
  * Represents a pattern used for IPv6 addresses inclusion and exclusion lists.<br/>
  * A pattern represents a single value or a range of values for each component of an IPv6 address.<br/>
@@ -31,7 +30,8 @@ import org.jppf.utils.Range;
  * <li>1080:0:0:0:8:800:200C:417A represents a single IPv6 address</li>
  * <li>1080:0:0:0:8:800:200C represents all IPv6 addresses in the range 1080:0:0:0:8:800:200C:0 - 1080:0:0:0:8:800:200C:FFFF</li>
  * <li>1080:0:0:0:8:800 represents all IPv6 addresses in the range 1080:0:0:0:8:800:0:0 - 1080:0:0:0:8:800:FFFF:FFFF</li>
- * <li>1080:0:0:0:8:800:200C-20FF represents all IP addresses where the first component is equal to 1080, the second to 0, ..., the 7th component in the range 200C - 200FF, and the 8th in the range 0 - FFFF
+ * <li>1080:0:0:0:8:800:200C-20FF represents all IP addresses where the first component is equal to 1080, the second to 0, ..., the 7th component in the range 200C - 200FF, and the 8th in the range 0
+ * - FFFF
  * (equivalent to 1080:0:0:0:8:800:200C-20FF:0-FFFF)</li>
  * </ul>
  * <p>Syntax rules:
@@ -52,33 +52,28 @@ import org.jppf.utils.Range;
  * <p>4. A pattern describing more than 8 components or containing characters other than hexadecimal digits, '-', ':' or spaces will be ignored.
  * @author Laurent Cohen
  */
-public class IPv6AddressPattern extends AbstractIPAddressPattern
-{
+public class IPv6AddressPattern extends AbstractIPAddressPattern {
   /**
    * Initialize this object with the specified string pattern.
    * @param source the source pattern as a string.
    * @throws IllegalArgumentException if the pattern is null or invalid.
    */
-  public IPv6AddressPattern(final String source) throws IllegalArgumentException
-  {
+  public IPv6AddressPattern(final String source) throws IllegalArgumentException {
     super(source, PatternConfiguration.IPV6_CONFIGURATION);
   }
 
   @Override
-  public boolean matches(final InetAddress ip)
-  {
+  public boolean matches(final InetAddress ip) {
     if (!(ip instanceof Inet6Address)) return false;
     return super.matches(ip);
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
-    for (int i=0; i<ranges.size(); i++)
-    {
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < ranges.size(); i++) {
       if (i > 0) sb.append(config.getCompSeparator());
-      Range<Integer> r = ranges.get(i);
+      final Range<Integer> r = ranges.get(i);
       sb.append(Integer.toHexString(r.getLower()));
       if (!r.getLower().equals(r.getUpper())) sb.append('-').append(Integer.toHexString(r.getUpper()));
     }
@@ -89,21 +84,16 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
    * Main method.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     System.out.println("***** IP v6 *****");
-    String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::", "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", };
-    String ip = "1080:0:0:0:8:800:200C:417A";
-    for (int i=0; i<ipv6patterns.length; i++)
-    {
-      try
-      {
-        IPv6AddressPattern p = new IPv6AddressPattern(ipv6patterns[i]);
-        InetAddress addr = InetAddress.getByName(ip);
+    final String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::", "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", };
+    final String ip = "1080:0:0:0:8:800:200C:417A";
+    for (int i = 0; i < ipv6patterns.length; i++) {
+      try {
+        final IPv6AddressPattern p = new IPv6AddressPattern(ipv6patterns[i]);
+        final InetAddress addr = InetAddress.getByName(ip);
         System.out.println("pattern " + i + " for source '" + ipv6patterns[i] + "' = '" + p + "', ip match = " + p.matches(addr));
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         System.out.println("#" + i + " : " + e.getMessage());
       }
     }

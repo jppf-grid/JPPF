@@ -85,7 +85,7 @@ public class AsynchronousPersistence implements JobPersistence {
       n = Integer.valueOf(params[0]);
       forwardParams = new String[params.length - 1];
       System.arraycopy(params, 1, forwardParams, 0, params.length - 1);
-    } catch (@SuppressWarnings("unused") NumberFormatException e) {
+    } catch (@SuppressWarnings("unused") final NumberFormatException e) {
       forwardParams = params;
     }
     if (n < 1) n = 1;
@@ -185,8 +185,8 @@ public class AsynchronousPersistence implements JobPersistence {
    * @param max the maximum thread pool size.
    * @return an {@link ExecutorService}.
    */
-  private ExecutorService createExecutor(final int max) {
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+  private static ExecutorService createExecutor(final int max) {
+    final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncPersistence"));
   }
 
@@ -199,12 +199,12 @@ public class AsynchronousPersistence implements JobPersistence {
    */
   private <T> T submit(final PersistenceTask<T> task) throws JobPersistenceException {
     try {
-      Future<PersistenceTask<T>> f = executor.submit(task, task);
-      PersistenceTask<T> t = f.get();
+      final Future<PersistenceTask<T>> f = executor.submit(task, task);
+      final PersistenceTask<T> t = f.get();
       if (t.exception != null) throw t.exception;
       if (debugEnabled) log.debug("got result = {}", t.result);
       return t.result;
-    } catch (ClassCastException e) {
+    } catch (final ClassCastException e) {
       log.error(e.getMessage(), e);
       throw new JobPersistenceException(e);
     } catch (InterruptedException | ExecutionException e) {
@@ -230,7 +230,7 @@ public class AsynchronousPersistence implements JobPersistence {
     /**
      * Logger for this class.
      */
-    private static Logger log = LoggerFactory.getLogger(AsynchronousPersistence.PersistenceTask.class);
+    private static Logger logger = LoggerFactory.getLogger(AsynchronousPersistence.PersistenceTask.class);
     /**
      * The optional result of this task's execution.
      */
@@ -255,9 +255,9 @@ public class AsynchronousPersistence implements JobPersistence {
     public void run() {
       try {
         result = execute();
-      } catch (JobPersistenceException e) {
+      } catch (final JobPersistenceException e) {
         exception = e;
-        if (!hasResult) log.error(e.getMessage(), e);
+        if (!hasResult) logger.error(e.getMessage(), e);
       }
     }
 

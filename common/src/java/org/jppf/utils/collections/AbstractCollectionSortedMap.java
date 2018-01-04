@@ -28,6 +28,10 @@ import java.util.*;
  */
 public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollectionMap<K, V> implements CollectionSortedMap<K, V> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Comparator used to sort the keys.
    */
   protected final Comparator<K> comparator;

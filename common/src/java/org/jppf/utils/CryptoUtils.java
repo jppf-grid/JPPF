@@ -42,12 +42,12 @@ public class CryptoUtils {
     String hash = null;
     if ((source != null) && (algorithm != null)) {
       try {
-        MessageDigest digest = MessageDigest.getInstance(algorithm);
-        JPPFBuffer buf = new JPPFBuffer(source);
+        final MessageDigest digest = MessageDigest.getInstance(algorithm);
+        final JPPFBuffer buf = new JPPFBuffer(source);
         digest.update(buf.buffer, 0, buf.length);
-        byte[] sig = digest.digest();
+        final byte[] sig = digest.digest();
         hash = StringUtils.toHexString(sig);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(String.format("error compputing %s hash for string %s : %s", algorithm, source, ExceptionUtils.getStackTrace(e)));
       }
     }

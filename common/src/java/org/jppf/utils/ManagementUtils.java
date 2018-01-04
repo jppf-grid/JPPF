@@ -118,28 +118,28 @@ public class ManagementUtils {
     try {
       OBJECT_NAME_CLASS = Class.forName("javax.management.ObjectName");
       OBJECT_NAME_CONSTRUCTOR = OBJECT_NAME_CLASS.getConstructor(String.class);
-      Class<?> serverConnectionClass = Class.forName("javax.management.MBeanServerConnection");
+      final Class<?> serverConnectionClass = Class.forName("javax.management.MBeanServerConnection");
       GET_ATTRIBUTE_METHOD = serverConnectionClass.getDeclaredMethod("getAttribute", OBJECT_NAME_CLASS, String.class);
-      Class<?> attributeClass = Class.forName("javax.management.Attribute");
+      final Class<?> attributeClass = Class.forName("javax.management.Attribute");
       ATTRIBUTE_CONSTRUCTOR = attributeClass.getConstructor(String.class, Object.class);
       SET_ATTRIBUTE_METHOD = serverConnectionClass.getDeclaredMethod("setAttribute", OBJECT_NAME_CLASS, attributeClass);
       INVOKE_METHOD = serverConnectionClass.getDeclaredMethod("invoke", OBJECT_NAME_CLASS, String.class, Object[].class, String[].class);
       IS_MBEAN_REGISTERED_METHOD = serverConnectionClass.getDeclaredMethod("isRegistered", OBJECT_NAME_CLASS);
-      Class<?> notifListenerClass = Class.forName("javax.management.NotificationListener");
-      Class<?> notifFilterClass = Class.forName("javax.management.NotificationFilter");
+      final Class<?> notifListenerClass = Class.forName("javax.management.NotificationListener");
+      final Class<?> notifFilterClass = Class.forName("javax.management.NotificationFilter");
       ADD_NOTIFICATION_LISTENER_METHOD = serverConnectionClass.getDeclaredMethod("addNotificationListener", OBJECT_NAME_CLASS, notifListenerClass, notifFilterClass, Object.class);
       REMOVE_NOTIFICATION_LISTENER_METHOD = serverConnectionClass.getDeclaredMethod("removeNotificationListener", OBJECT_NAME_CLASS, notifListenerClass, notifFilterClass, Object.class);
-      Class<?> jmxClass = Class.forName("javax.management.JMX");
+      final Class<?> jmxClass = Class.forName("javax.management.JMX");
       NEW_PROXY_METHOD = jmxClass.getDeclaredMethod("newMBeanProxy", serverConnectionClass, OBJECT_NAME_CLASS, Class.class, boolean.class);
-      Class<?> mbeanInfoClass = Class.forName("javax.management.MBeanInfo");
+      final Class<?> mbeanInfoClass = Class.forName("javax.management.MBeanInfo");
       Class.forName("javax.management.MBeanNotificationInfo");
       GET_MBEAN_INFO_METHOD = serverConnectionClass.getDeclaredMethod("getMBeanInfo", OBJECT_NAME_CLASS);
       GET_MBEAN_NOTIFICATIONS_INFO_METHOD = mbeanInfoClass.getDeclaredMethod("getNotifications");
 
-      Class<?> factoryClass = Class.forName("java.lang.management.ManagementFactory");
+      final Class<?> factoryClass = Class.forName("java.lang.management.ManagementFactory");
       Method m = factoryClass.getDeclaredMethod("getThreadMXBean");
       THREAD_MXBEAN = m.invoke(null);
-      Class<?> threadMXBeanClass = Class.forName("java.lang.management.ThreadMXBean");
+      final Class<?> threadMXBeanClass = Class.forName("java.lang.management.ThreadMXBean");
       m = threadMXBeanClass.getDeclaredMethod("isThreadCpuTimeSupported");
       CPU_TIME_ENABLED = (Boolean) m.invoke(THREAD_MXBEAN);
       if (CPU_TIME_ENABLED) {
@@ -152,7 +152,7 @@ public class ManagementUtils {
       m = factoryClass.getDeclaredMethod("getPlatformMBeanServer");
       PLATFORM_SERVER = m.invoke(null);
       log.debug("management successfully initialized");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       managementAvailable = false;
       if (!JPPFConfiguration.get(JPPFProperties.NODE_ANDROID)) log.error("management could not be initialized, exception: {}", ExceptionUtils.getStackTrace(e));
       //e.printStackTrace();
@@ -197,7 +197,7 @@ public class ManagementUtils {
    */
   public static void setAttribute(final Object connection, final String mbeanName, final String attributeName, final Object value) throws Exception {
     if (!isManagementAvailable()) return;
-    Object attribute = ATTRIBUTE_CONSTRUCTOR.newInstance(attributeName, value);
+    final Object attribute = ATTRIBUTE_CONSTRUCTOR.newInstance(attributeName, value);
     SET_ATTRIBUTE_METHOD.invoke(connection, getObjectName(mbeanName), attribute);
   }
 
@@ -267,7 +267,7 @@ public class ManagementUtils {
    */
   public static Object getMBeanNotificationsInfo(final Object connection, final String mbeanName) throws Exception {
     if (!isManagementAvailable()) return null;
-    Object mbeanInfo = GET_MBEAN_INFO_METHOD.invoke(connection, getObjectName(mbeanName));
+    final Object mbeanInfo = GET_MBEAN_INFO_METHOD.invoke(connection, getObjectName(mbeanName));
     return GET_MBEAN_NOTIFICATIONS_INFO_METHOD.invoke(mbeanInfo);
   }
 
@@ -309,7 +309,7 @@ public class ManagementUtils {
       try {
         o = OBJECT_NAME_CONSTRUCTOR.newInstance(name);
         objectNames.put(name, o);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug("could not create ObjectName for " + name, e);
       }
     }
@@ -333,7 +333,7 @@ public class ManagementUtils {
     if (!isManagementAvailable()) return -1L;
     try {
       return (Long) GET_THREAD_CPU_TIME_METHOD.invoke(THREAD_MXBEAN, threadID);
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       return -1L;
     }
   }
@@ -347,7 +347,7 @@ public class ManagementUtils {
     if (!isManagementAvailable()) return -1L;
     try {
       return (Long) GET_THREAD_USER_TIME_METHOD.invoke(THREAD_MXBEAN, threadID);
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       return -1L;
     }
   }

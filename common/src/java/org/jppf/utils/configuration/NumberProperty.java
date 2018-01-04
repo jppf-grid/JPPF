@@ -27,6 +27,10 @@ package org.jppf.utils.configuration;
  */
 public abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The minimum accepted value for this property.
    */
   final Comparable<T> minValue;
@@ -97,7 +101,7 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
    */
   @SuppressWarnings("unchecked")
   T validate(final T value) {
-    Comparable<T> cv = (Comparable<T>) value;
+    final Comparable<T> cv = (Comparable<T>) value;
     if ((value != null) && hasMinAndMax() && ((cv.compareTo((T) minValue) < 0) || (cv.compareTo((T) maxValue) > 0))) return getDefaultValue();
     return value;
   }

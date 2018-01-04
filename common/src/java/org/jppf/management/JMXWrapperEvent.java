@@ -26,6 +26,11 @@ import java.util.EventObject;
  */
 public class JMXWrapperEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this event witht he specified source.
    * @param jmxWrapper the jmx connection wrapper source of this event.
    */

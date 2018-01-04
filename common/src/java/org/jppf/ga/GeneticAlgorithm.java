@@ -108,13 +108,13 @@ public class GeneticAlgorithm implements AutoCloseable {
       while (generationCount < maxGenerations) {
         double bestFitness = Double.NEGATIVE_INFINITY;
         Arrays.sort(population);
-        Chromosome[] pop = selector.select(population, nbSelect);
+        final Chromosome[] pop = selector.select(population, nbSelect);
         population = performCrossover(pop);
         if (population[0] == null) throw new NullPointerException();
         population = performMutation(population, nbSelect);
         if (population[0] == null) throw new NullPointerException();
         computeFitness(population);
-        for (Chromosome c: population) {
+        for (final Chromosome c: population) {
           if (c.getFitness() > bestFitness) {
             best = c;
             bestFitness = c.getFitness();
@@ -124,12 +124,12 @@ public class GeneticAlgorithm implements AutoCloseable {
         postEpoch(best);
         generationCount++;
         if (generationCount % outputFrequency == 0) {
-          long elapsed = (System.nanoTime() - start) / 1_000_000L;
+          final long elapsed = (System.nanoTime() - start) / 1_000_000L;
           displayStats(generationCount, population, elapsed);
           start = System.nanoTime();
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return best;
@@ -146,7 +146,7 @@ public class GeneticAlgorithm implements AutoCloseable {
    * Callback invoked at the end of each epoch. Intended to be overriden in subclasses.
    * @param best the chromosome with the best fitness score.
    */
-  protected void postEpoch(@SuppressWarnings("unused") final Chromosome best) {
+  protected void postEpoch(final Chromosome best) {
   }
 
   /**
@@ -154,7 +154,7 @@ public class GeneticAlgorithm implements AutoCloseable {
    * @param best the chromosome with the best fitness score.
    * @return whether to stop the algorithm.
    */
-  protected boolean shouldStop(@SuppressWarnings("unused") final Chromosome best) {
+  protected boolean shouldStop(final Chromosome best) {
     return false;
   }
 
@@ -189,23 +189,23 @@ public class GeneticAlgorithm implements AutoCloseable {
    * @return the new population obtained by corssover.
    */
   public Chromosome[] performCrossover(final Chromosome[] pop) {
-    int populationSize = population.length;
+    final int populationSize = population.length;
     final Chromosome[] newPop = new Chromosome[populationSize];
     for (int i=0; i <nbToKeep; i++) newPop[i] = population[i];
-    CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
+    final CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
     int totalSUbmitted = 0;
     for  (int count=nbToKeep; count<populationSize; count++) {
       final int n1 = random.nextInt(pop.length);
       if (random.nextDouble() < crossoverProbability) {
         final int cnt = count;
         totalSUbmitted++;
-        Runnable r = new Runnable() {
+        final Runnable r = new Runnable() {
           @Override
           public void run() {
             int n2;
             while ((n2 = random.nextInt(pop.length)) == n1);
             //int pos = (pop[n1].getSize() / 2) + (pop[n1].getSize() % 2);
-            int pos = 1 + random.nextInt(pop[n1].getSize() - 1);
+            final int pos = 1 + random.nextInt(pop[n1].getSize() - 1);
             newPop[cnt] = pop[n1].crossover(pop[n2], pos);
           }
         };
@@ -214,7 +214,7 @@ public class GeneticAlgorithm implements AutoCloseable {
     }
     try {
       for (int i=0; i<totalSUbmitted; i++) cs.take();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     return newPop;
@@ -228,7 +228,7 @@ public class GeneticAlgorithm implements AutoCloseable {
    */
   public Chromosome[] performMutation(final Chromosome[] pop, final int nbSelect) {
     final Chromosome[] newPop = new Chromosome[pop.length];
-    CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
+    final CompletionService<Runnable> cs = new ExecutorCompletionService<>(executor);
     for (int i=0; i<nbSelect; i++) {
       final int n = i;
       cs.submit(new Runnable() {
@@ -240,7 +240,7 @@ public class GeneticAlgorithm implements AutoCloseable {
     }
     try {
       for (int i=0; i<nbSelect; i++) cs.take();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     System.arraycopy(pop, nbSelect, newPop, nbSelect, pop.length - nbSelect);
@@ -257,14 +257,14 @@ public class GeneticAlgorithm implements AutoCloseable {
     double min = Double.MAX_VALUE;
     double max = -Double.MAX_VALUE;
     double avg = 0d;
-    for (Chromosome c: pop) {
-      double fitness = c.getFitness();
+    for (final Chromosome c: pop) {
+      final double fitness = c.getFitness();
       avg += fitness;
       if (fitness < min) min = fitness;
       if (fitness > max) max = fitness;
     }
     avg /= pop.length;
-    StringBuilder sb = new StringBuilder("gen=").append(StringUtils.padRight("" + gen, ' ', 5));
+    final StringBuilder sb = new StringBuilder("gen=").append(StringUtils.padRight("" + gen, ' ', 5));
     sb.append(", max=").append(StringUtils.padRight("" + max, ' ', 21));
     sb.append(", min=").append(StringUtils.padRight("" + min, ' ', 21));
     sb.append(", avg=").append(StringUtils.padRight("" + avg, ' ', 21));
@@ -296,9 +296,9 @@ public class GeneticAlgorithm implements AutoCloseable {
    * @return the new population.
    */
   public Chromosome[] addToPoulation(final Chromosome[] toAdd) {
-    int n = population.length;
-    int n2 = toAdd.length;
-    Chromosome[] newPop = new Chromosome[n  + n2];
+    final int n = population.length;
+    final int n2 = toAdd.length;
+    final Chromosome[] newPop = new Chromosome[n  + n2];
     System.arraycopy(population, 0, newPop, 0, n);
     System.arraycopy(toAdd, 0, newPop, n, n2);
     population = newPop;

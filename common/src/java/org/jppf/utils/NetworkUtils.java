@@ -59,7 +59,7 @@ public final class NetworkUtils {
    * @return the ipv4 address as a string.
    */
   public static String getNonLocalHostAddress() {
-    List<InetAddress> allAddresses = getNonLocalIPAddresses();
+    final List<InetAddress> allAddresses = getNonLocalIPAddresses();
     return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
   }
 
@@ -124,19 +124,19 @@ public final class NetworkUtils {
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
   private static List<InetAddress> getIPAddresses(final InetAddressFilter filter) {
-    List<InetAddress> list = new ArrayList<>();
+    final List<InetAddress> list = new ArrayList<>();
     try {
-      Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+      final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
       while (interfaces.hasMoreElements()) {
-        NetworkInterface ni = interfaces.nextElement();
-        Enumeration<InetAddress> addresses = ni.getInetAddresses();
+        final NetworkInterface ni = interfaces.nextElement();
+        final Enumeration<InetAddress> addresses = ni.getInetAddresses();
         if (debugEnabled && addresses.hasMoreElements()) log.debug("found network interface: " + ni);
         while (addresses.hasMoreElements()) {
-          InetAddress addr = addresses.nextElement();
+          final InetAddress addr = addresses.nextElement();
           if ((filter == null) || filter.accepts(addr)) list.add(addr);
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return list;
@@ -147,7 +147,7 @@ public final class NetworkUtils {
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
   public static List<InetAddress> getNonLocalIPAddresses() {
-    List<InetAddress> addresses = new ArrayList<>();
+    final List<InetAddress> addresses = new ArrayList<>();
     addresses.addAll(getNonLocalIPV4Addresses());
     addresses.addAll(getNonLocalIPV6Addresses());
     return addresses;
@@ -159,8 +159,8 @@ public final class NetworkUtils {
    * @return a set of IP addresses as strings.
    */
   private static Set<String> createLoopbackAddresses() {
-    Set<String> addresses = new HashSet<>();
-    String s = "127.0.0.";
+    final Set<String> addresses = new HashSet<>();
+    final String s = "127.0.0.";
     for (int i=0; i<=8; i++) addresses.add(s + i);
     return addresses;
   }
@@ -170,7 +170,7 @@ public final class NetworkUtils {
    * @return the host as a string.
    */
   public static String getManagementHost() {
-    String host = JPPFConfiguration.getProperties().getString(JPPFProperties.MANAGEMENT_HOST.getName(), retrieveManagementHostOrLocalhost());
+    final String host = JPPFConfiguration.getProperties().getString(JPPFProperties.MANAGEMENT_HOST.getName(), retrieveManagementHostOrLocalhost());
     if (debugEnabled) log.debug("computed JMX host: " + host);
     return host;
   }
@@ -180,7 +180,7 @@ public final class NetworkUtils {
    * @return the host as a string.
    */
   public static String retrieveManagementHostOrLocalhost() {
-    String host = NetworkUtils.getNonLocalHostAddress();
+    final String host = NetworkUtils.getNonLocalHostAddress();
     if (debugEnabled) log.debug("JMX host from NetworkUtils: "+host);
     return (host == null) ? "localhost" : host;
   }
@@ -192,9 +192,9 @@ public final class NetworkUtils {
    */
   public static String getHostName(final String ip) {
     try {
-      InetAddress a = InetAddress.getByName(ip);
+      final InetAddress a = InetAddress.getByName(ip);
       return a.getHostName();
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       return ip;
     }
   }
@@ -207,9 +207,9 @@ public final class NetworkUtils {
    */
   public static HostIP getHostIP(final String hostOrIP) {
     try {
-      InetAddress a = InetAddress.getByName(hostOrIP);
+      final InetAddress a = InetAddress.getByName(hostOrIP);
       return new HostIP(a.getHostName(), a.getHostAddress());
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       return new HostIP(hostOrIP, hostOrIP);
     }
   }
@@ -221,12 +221,12 @@ public final class NetworkUtils {
    */
   public static int getSubnetMaskLength(final InetAddress addr) {
     try {
-      NetworkInterface ni = NetworkInterface.getByInetAddress(addr);
-      List<InterfaceAddress> intAddresses = ni.getInterfaceAddresses();
+      final NetworkInterface ni = NetworkInterface.getByInetAddress(addr);
+      final List<InterfaceAddress> intAddresses = ni.getInterfaceAddresses();
       for (InterfaceAddress ia: intAddresses) {
         if (addr.equals(ia.getAddress())) return ia.getNetworkPrefixLength();
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Error getting subnet mask for address "  + addr, e);
     }
     return 0;
@@ -264,17 +264,17 @@ public final class NetworkUtils {
       if (addr instanceof Inet6Address) {
         result = new int[8];
         // special processing for scoped IPv6 addresses
-        int idx = ip.indexOf('%');
+        final int idx = ip.indexOf('%');
         if (idx >= 0) ip = ip.substring(0, idx);
-        String[] comp = RegexUtils.COLUMN_PATTERN.split(ip);
+        final String[] comp = RegexUtils.COLUMN_PATTERN.split(ip);
         for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
       } else {
         result = new int[4];
-        String[] comp = RegexUtils.DOT_PATTERN.split(ip);
+        final String[] comp = RegexUtils.DOT_PATTERN.split(ip);
         for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
       }
       return result;
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }
@@ -286,9 +286,9 @@ public final class NetworkUtils {
    */
   public static boolean isIPv6Address(final String host) {
     try {
-      InetAddress addr = InetAddress.getByName(host);
+      final InetAddress addr = InetAddress.getByName(host);
       if ((addr instanceof Inet6Address) && addr.getHostAddress().equals(host)) return true;
-    } catch (@SuppressWarnings("unused") UnknownHostException ignore) {
+    } catch (@SuppressWarnings("unused") final UnknownHostException ignore) {
     }
     return false;
   }
@@ -300,15 +300,15 @@ public final class NetworkUtils {
    */
   public static HostIP[] parseAddresses(final String addresses) {
     if (addresses == null) return NO_ADDRESS;
-    String[] pairs = RegexUtils.SPACES_PATTERN.split(addresses);
+    final String[] pairs = RegexUtils.SPACES_PATTERN.split(addresses);
     if ((pairs == null) || (pairs.length <= 0)) return NO_ADDRESS;
-    HostIP[] result = new HostIP[pairs.length];
+    final HostIP[] result = new HostIP[pairs.length];
     int count = 0;
     for (String pair: pairs) {
-      String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
+      final String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
       if ("".equals(comps[0])) comps[0] = null;
       if (comps[1] != null) {
-        int idx = comps[1].indexOf('%');
+        final int idx = comps[1].indexOf('%');
         if (idx >= 0) comps[1] = comps[1].substring(0, idx);
       };
       result[count++] = new HostIP(comps[0], comps[1]);

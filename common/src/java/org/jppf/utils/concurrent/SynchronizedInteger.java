@@ -48,32 +48,65 @@ public class SynchronizedInteger {
    * Get the value.
    * @return the current value.
    */
-  public synchronized int get() {
-    return value;
+  public int get() {
+    synchronized(this) {
+      return value;
+    }
   }
 
   /**
    * Set to a new value.
    * @param newValue the value to set.
    */
-  public synchronized void set(final int newValue) {
-    value = newValue;
+  public void set(final int newValue) {
+    synchronized(this) {
+      value = newValue;
+    }
   }
 
   /**
    * Increment the value.
    * @return the new value.
    */
-  public synchronized int incrementAndGet() {
-    return ++value;
+  public int incrementAndGet() {
+    synchronized(this) {
+      return ++value;
+    }
   }
 
   /**
    * Increment the value.
    * @return the new value.
    */
-  public synchronized int decrementAndGet() {
-    return --value;
+  public int incrementGetAndNotify() {
+    synchronized(this) {
+      ++value;
+      notify();
+      return value;
+    }
+  }
+
+  /**
+   * Wait until the value equals the specified target.
+   * @param target the target value to wait for.
+   */
+  public void awaitValue(final int target) {
+    synchronized(this) {
+      try {
+        while (value != target) wait();
+      } catch (@SuppressWarnings("unused") final InterruptedException e) {
+      }
+    }
+  }
+
+  /**
+   * Increment the value.
+   * @return the new value.
+   */
+  public int decrementAndGet() {
+    synchronized(this) {
+      return --value;
+    }
   }
 
   /**
@@ -81,9 +114,11 @@ public class SynchronizedInteger {
    * @param update the value to add.
    * @return the new value.
    */
-  public synchronized int addAndGet(final int update) {
-    value += update;
-    return value;
+  public int addAndGet(final int update) {
+    synchronized(this) {
+      value += update;
+      return value;
+    }
   }
 
   /**
@@ -91,22 +126,27 @@ public class SynchronizedInteger {
    * @param newValue the value to set.
    * @return the value before the set.
    */
-  public synchronized int getAndSet(final int newValue) {
-    int oldValue = value;
-    value = newValue;
+  public int getAndSet(final int newValue) {
+    final int oldValue;
+    synchronized(this) {
+      oldValue = value;
+      value = newValue;
+    }
     return oldValue;
   }
 
   /**
-   * Compare the value witht he expected value, and set it to the update value if they are equal.
+   * Compare the value with the expected value, and set it to the update value if they are equal.
    * @param expected the expected value.
    * @param update the new value to set to if the comparison succeeds.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndSet(final int expected, final int update) {
-    if (value == expected) {
-      value = update;
-      return true;
+  public boolean compareAndSet(final int expected, final int update) {
+    synchronized(this) {
+      if (value == expected) {
+        value = update;
+        return true;
+      }
     }
     return false;
   }
@@ -118,10 +158,12 @@ public class SynchronizedInteger {
    * @param update the new value to set to if the comparison succeeds.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndSet(final Operator operator, final int expected, final int update) {
-    if (operator.evaluate(value, expected)) {
-      value = update;
-      return true;
+  public boolean compareAndSet(final Operator operator, final int expected, final int update) {
+    synchronized(this) {
+      if (operator.evaluate(value, expected)) {
+        value = update;
+        return true;
+      }
     }
     return false;
   }
@@ -132,10 +174,12 @@ public class SynchronizedInteger {
    * @param expectedUpdate the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndSet(final Operator operator, final int expectedUpdate) {
-    if (operator.evaluate(value, expectedUpdate)) {
-      value = expectedUpdate;
-      return true;
+  public boolean compareAndSet(final Operator operator, final int expectedUpdate) {
+    synchronized(this) {
+      if (operator.evaluate(value, expectedUpdate)) {
+        value = expectedUpdate;
+        return true;
+      }
     }
     return false;
   }
@@ -146,10 +190,12 @@ public class SynchronizedInteger {
    * @param expected the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndIncrement(final Operator operator, final int expected) {
-    if (operator.evaluate(value, expected)) {
-      value++;
-      return true;
+  public boolean compareAndIncrement(final Operator operator, final int expected) {
+    synchronized(this) {
+      if (operator.evaluate(value, expected)) {
+        value++;
+        return true;
+      }
     }
     return false;
   }
@@ -160,10 +206,12 @@ public class SynchronizedInteger {
    * @param expected the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndDecrement(final Operator operator, final int expected) {
-    if (operator.evaluate(value, expected)) {
-      value--;
-      return true;
+  public boolean compareAndDecrement(final Operator operator, final int expected) {
+    synchronized(this) {
+      if (operator.evaluate(value, expected)) {
+        value--;
+        return true;
+      }
     }
     return false;
   }

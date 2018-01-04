@@ -27,8 +27,11 @@ import org.jppf.node.protocol.Task;
  * Instances of this class represent events that occur during the life span of an individual JPPF task.
  * @author Laurent Cohen
  */
-public class TaskExecutionEvent extends EventObject
-{
+public class TaskExecutionEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Object encapsulating information about the task.
    */
@@ -56,8 +59,7 @@ public class TaskExecutionEvent extends EventObject
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
    */
-  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error)
-  {
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error) {
     super(task);
     this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, cpuTime, elapsedTime, error, task.getPosition());
     this.userObject = null;
@@ -75,8 +77,7 @@ public class TaskExecutionEvent extends EventObject
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    * @since 4.0
    */
-  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final Object userObject, final boolean sendViaJmx)
-  {
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final Object userObject, final boolean sendViaJmx) {
     super(task);
     this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, -1, -1, false, task.getPosition());
     this.userObject = userObject;
@@ -88,8 +89,7 @@ public class TaskExecutionEvent extends EventObject
    * Get the JPPF task from which the event originates.
    * @return a <code>Task</code> instance.
    */
-  public Task<?> getTask()
-  {
+  public Task<?> getTask() {
     return (Task<?>) getSource();
   }
 
@@ -97,8 +97,7 @@ public class TaskExecutionEvent extends EventObject
    * Get the object encapsulating information about the task.
    * @return a <code>TaskInformation</code> instance.
    */
-  public TaskInformation getTaskInformation()
-  {
+  public TaskInformation getTaskInformation() {
     return taskInformation;
   }
 
@@ -107,8 +106,7 @@ public class TaskExecutionEvent extends EventObject
    * @return the object specified in the constructor or <code>null</code>.
    * @since 4.0
    */
-  public Object getUserObject()
-  {
+  public Object getUserObject() {
     return userObject;
   }
 
@@ -117,8 +115,7 @@ public class TaskExecutionEvent extends EventObject
    * @return <code>true</code> if this notification should be sent via JMX, <code>false</code> otherwise.
    * @since 4.0
    */
-  public boolean isSendViaJmx()
-  {
+  public boolean isSendViaJmx() {
     return sendViaJmx;
   }
 
@@ -128,8 +125,7 @@ public class TaskExecutionEvent extends EventObject
    * @since 4.0
    * @exclude
    */
-  public boolean isTaskCompletion()
-  {
+  public boolean isTaskCompletion() {
     return taskCompletion;
   }
 
@@ -138,8 +134,7 @@ public class TaskExecutionEvent extends EventObject
    * @return <code>true</code> if this is a task completion event, <code>false</code> otherwise.
    * @since 4.1
    */
-  public boolean isUserNotification()
-  {
+  public boolean isUserNotification() {
     return !taskCompletion;
   }
 }

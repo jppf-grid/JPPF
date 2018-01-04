@@ -51,14 +51,12 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {
-        StringBuilder sb = new StringBuilder();
-        new Formatter(sb).format("UncaughtException in thread[%d:%s] - %s", t.getId(), t.getName(), ExceptionUtils.getMessage(e));
-        log.error(sb.toString(), e);
+        log.error(String.format("UncaughtException in thread[%d:%s] - %s", t.getId(), t.getName(), ExceptionUtils.getStackTrace(e)));
       }
     }, false) {
       @Override
       protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
-        RunnableFuture<T> future = super.newTaskFor(runnable, value);
+        final RunnableFuture<T> future = super.newTaskFor(runnable, value);
         if (runnable instanceof NodeTaskWrapper) {
           ((NodeTaskWrapper) runnable).setFuture(future);
         }
@@ -185,7 +183,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
 
     @Override
     public synchronized ForkJoinWorkerThread newThread(final ForkJoinPool pool) {
-      ForkJoinWorkerThread thread = new ForkJoinWorkerThread(pool) {
+      final ForkJoinWorkerThread thread = new ForkJoinWorkerThread(pool) {
         @Override
         protected void onTermination(final Throwable exception) {
           try {
@@ -208,7 +206,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
      */
     protected synchronized void terminate(final Thread thread, final Throwable exception) {
       if (threadIDs != null) {
-        long threadID = thread.getId();
+        final long threadID = thread.getId();
         threadIDs.remove(threadID);
         terminatedInfo.add(computeExecutionInfo(threadID));
       }
@@ -225,9 +223,9 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
      */
     public synchronized long[] getThreadIDs() {
       if (threadIDs == null || threadIDs.isEmpty()) return new long[0];
-      long[] ids = new long[threadIDs.size()];
+      final long[] ids = new long[threadIDs.size()];
       int dstIndex = 0;
-      for (Long id : threadIDs) ids[dstIndex++] = id;
+      for (final Long id : threadIDs) ids[dstIndex++] = id;
       return ids;
     }
 
@@ -269,7 +267,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
       } else if (this.classLoader != classLoader) {
         throw new IllegalStateException("Already used different classLoader");
       }
-      FJUsedClassLoader usedClassLoader = new FJUsedClassLoader(classLoader, this);
+      final FJUsedClassLoader usedClassLoader = new FJUsedClassLoader(classLoader, this);
       usedClassLoaders.add(usedClassLoader);
       return usedClassLoader;
     }

@@ -24,8 +24,7 @@ import org.jppf.utils.FileUtils;
 /**
  * Filter that only accepts files with specified extensions.
  */
-public class JPPFFileFilter extends AbstractFileFilter
-{
+public class JPPFFileFilter extends AbstractFileFilter {
   /**
    * Default excluded directory names.
    */
@@ -34,8 +33,7 @@ public class JPPFFileFilter extends AbstractFileFilter
   /**
    * Initialize a filter accepting all directory names except those excluded by default.
    */
-  public JPPFFileFilter()
-  {
+  public JPPFFileFilter() {
     includes = DEFAULT_INCLUDES;
     excludes = null;
   }
@@ -44,8 +42,7 @@ public class JPPFFileFilter extends AbstractFileFilter
    * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_INCLUDES DEFAULT_EXCLUDES}.
    * @param includes the included directory names; if null all are included. Null values are ignored.
    */
-  public JPPFFileFilter(final String[] includes)
-  {
+  public JPPFFileFilter(final String[] includes) {
     this.includes = includes;
     this.excludes = null;
   }
@@ -55,8 +52,7 @@ public class JPPFFileFilter extends AbstractFileFilter
    * @param includes the included directory names; if null all are included. Null values are ignored.
    * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
    */
-  public JPPFFileFilter(final String[] includes, final String[] excludes)
-  {
+  public JPPFFileFilter(final String[] includes, final String[] excludes) {
     this.includes = includes;
     this.excludes = excludes;
   }
@@ -68,10 +64,9 @@ public class JPPFFileFilter extends AbstractFileFilter
    * @see java.io.FileFilter#accept(java.io.File)
    */
   @Override
-  public boolean accept(final File path)
-  {
+  public boolean accept(final File path) {
     if (path.isDirectory()) return false;
-    String ext = FileUtils.getFileExtension(path);
+    final String ext = FileUtils.getFileExtension(path);
     return included(ext, true) && !excluded(ext, true);
   }
 }

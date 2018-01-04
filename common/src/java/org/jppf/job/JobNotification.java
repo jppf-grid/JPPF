@@ -106,7 +106,7 @@ public class JobNotification extends Notification {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("eventType=").append(eventType);
     sb.append(", jobInfo=").append(jobInfo);
     sb.append(", nodeInfo=").append(nodeInfo);
@@ -126,7 +126,7 @@ public class JobNotification extends Notification {
     ObjectName name = null;
     try {
       name = new ObjectName(DriverJobManagementMBean.MBEAN_NAME);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return name;
   }

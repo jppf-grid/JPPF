@@ -62,16 +62,16 @@ public class Hook<E> {
     if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
     this.infName = infClass.getName();
     this.type = HookType.CONFIG_SINGLE_INSTANCE;
-    ClassLoader cl = findClassLoader(loader);
-    String fqn = JPPFConfiguration.get(property);
+    final ClassLoader cl = findClassLoader(loader);
+    final String fqn = JPPFConfiguration.get(property);
     if ((fqn != null) && !"".equals(fqn.trim())) {
       try {
         @SuppressWarnings("unchecked")
-        Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
+        final Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
         processConcreteInstance(clazz.newInstance(), false);
-      } catch (Exception e) {
-        String format = "failed to instantiate concrete class for {}, {}={}, exception={}";
-        Object[] params = new Object[] { this, property, fqn, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e) };
+      } catch (final Exception e) {
+        final String format = "failed to instantiate concrete class for {}, {}={}, exception={}";
+        final Object[] params = new Object[] { this, property, fqn, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e) };
         if (debugEnabled) log.debug(format, params);
         else log.warn(format, params);
       }
@@ -90,10 +90,9 @@ public class Hook<E> {
     if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
     this.infName = infClass.getName();
     this.type = single ? HookType.SPI_SINGLE_INSTANCE : HookType.SPI_MULTIPLE_INSTANCES;
-    ClassLoader cl = findClassLoader(loader);
-    Iterator<E> it = ServiceFinder.lookupProviders(infClass, cl, single);
-    while (it.hasNext())
-      processConcreteInstance(it.next(), false);
+    final ClassLoader cl = findClassLoader(loader);
+    final Iterator<E> it = ServiceFinder.lookupProviders(infClass, cl, single);
+    while (it.hasNext()) processConcreteInstance(it.next(), false);
     processConcreteInstance(defaultImpl, true);
   }
 
@@ -120,7 +119,7 @@ public class Hook<E> {
    * @return this method always return null.
    */
   public Object[] invoke(final String methodName, final Object... parameters) {
-    List<Object> results = new ArrayList<>();
+    final List<Object> results = new ArrayList<>();
     switch (type) {
       case CONFIG_SINGLE_INSTANCE:
       case SPI_SINGLE_INSTANCE:
@@ -128,7 +127,7 @@ public class Hook<E> {
         break;
       case SPI_MULTIPLE_INSTANCES:
         if (!instances.isEmpty()) {
-          for (HookInstance<?> instance : instances) results.add(instance.invoke(methodName, parameters));
+          for (final HookInstance<?> instance : instances) results.add(instance.invoke(methodName, parameters));
         }
         break;
     }
@@ -160,7 +159,7 @@ public class Hook<E> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("interface=").append(infName);
     sb.append(", type=").append(type);

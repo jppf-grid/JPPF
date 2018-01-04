@@ -28,6 +28,11 @@ import java.util.EventObject;
  */
 public class ProcessLauncherEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Intiialize this event with the specified process launcher as source.
    * @param source the event source.
    */

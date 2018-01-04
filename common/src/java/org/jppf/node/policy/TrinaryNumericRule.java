@@ -116,11 +116,11 @@ abstract class TrinaryNumericRule extends LeftOperandRule {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    Object o = getLeftOperandValue(info);
+    final Object o = getLeftOperandValue(info);
     if (o != null) {
-      double value = (Double) o;
-      double a = this.a.evaluate(info);
-      double b = this.b.evaluate(info);
+      final double value = (Double) o;
+      final double a = this.a.evaluate(info);
+      final double b = this.b.evaluate(info);
       return accepts(value, a, b);
     }
     return false;
@@ -137,8 +137,8 @@ abstract class TrinaryNumericRule extends LeftOperandRule {
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder();
-    String name = new StringBuilder("Between").append(BOUNDS[boundsIndex]).toString();
+    final StringBuilder sb = new StringBuilder();
+    final String name = new StringBuilder("Between").append(BOUNDS[boundsIndex]).toString();
     sb.append(indent(n)).append('<').append(name).append(">\n");
     sb.append(indent(n + 1)).append("<Property>").append(leftOperand.getExpression()).append("</Property>\n");
     sb.append(indent(n + 1)).append("<Value>").append(a.getExpression()).append("</Value>\n");

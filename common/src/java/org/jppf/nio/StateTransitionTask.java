@@ -66,16 +66,16 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
   @Override
   @SuppressWarnings("unchecked")
   public void run() {
-    StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
-    NioContext<S> ctx = (NioContext<S>) channel.getContext();
+    final StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
+    final NioContext<S> ctx = (NioContext<S>) channel.getContext();
     try {
       T transition = null;
       synchronized(channel) {
         try {
-          S s = ctx.getState();
+          final S s = ctx.getState();
           if (s == null) return;
           //boolean traceEnabled = (s != null) && "NodeState".equals(s.getClass().getSimpleName());
-          NioState<T> state = factory.getState(s);
+          final NioState<T> state = factory.getState(s);
           if (traceEnabled) log.trace("performing transition to state {} for {}", s, channel);
           transition = state.performTransition(channel);
           if (transition != null) transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
@@ -89,7 +89,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
       try {
         if (debugEnabled) log.debug("error on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
         else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));
-      } catch (Exception e2) {
+      } catch (final Exception e2) {
         if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
         else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
       }

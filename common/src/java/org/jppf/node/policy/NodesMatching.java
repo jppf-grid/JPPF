@@ -53,6 +53,10 @@ import org.jppf.utils.PropertiesCollection;
  */
 public class NodesMatching extends ExecutionPolicy {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Name of the corresponding XML element.
    */
   public static final String XML_TAG = NodesMatching.class.getSimpleName();
@@ -100,16 +104,16 @@ public class NodesMatching extends ExecutionPolicy {
       jmx.connect();
       nbNodes = jmx.nbNodes((nodePolicy == null) ? NodeSelector.ALL_NODES : new ExecutionPolicySelector(nodePolicy));
       return operator.evaluate(nbNodes, expectedNodes.evaluate(info).longValue());
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JPPFRuntimeException("error evaluating global policy", e);
     }
   }
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(indent(n)).append('<').append(XML_TAG);
     sb.append(" operator=\"").append(operator.name()).append("\" expected=\"").append(expectedNodes.getExpression().replace("\"", "&quot;")).append("\">\n");
     if (nodePolicy != null) sb.append(nodePolicy.toString(n + 1));

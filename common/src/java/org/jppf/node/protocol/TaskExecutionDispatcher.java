@@ -79,7 +79,7 @@ public class TaskExecutionDispatcher {
    * @param error determines whether the task had an exception.
    */
   public void fireTaskEnded(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error) {
-    TaskExecutionEvent event = new TaskExecutionEvent(task, jobId, jobName, cpuTime, elapsedTime, error);
+    final TaskExecutionEvent event = new TaskExecutionEvent(task, jobId, jobName, cpuTime, elapsedTime, error);
     fireEvent(event);
   }
 
@@ -90,7 +90,7 @@ public class TaskExecutionDispatcher {
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    */
   public void fireTaskNotification(final Task<?> task, final Object userObject, final boolean sendViaJmx) {
-    TaskExecutionEvent event = (bundle == null) ? new TaskExecutionEvent(task, null, null, userObject, sendViaJmx)
+    final TaskExecutionEvent event = (bundle == null) ? new TaskExecutionEvent(task, null, null, userObject, sendViaJmx)
       : new TaskExecutionEvent(task, bundle.getUuid(), bundle.getName(), userObject, sendViaJmx);
     fireEvent(event);
   }
@@ -100,7 +100,7 @@ public class TaskExecutionDispatcher {
    * @param event the event to dispatch.
    */
   private void fireEvent(final TaskExecutionEvent event) {
-    for (TaskExecutionListener listener : taskExecutionListeners) {
+    for (final TaskExecutionListener listener : taskExecutionListeners) {
       if (event.isTaskCompletion()) listener.taskExecuted(event);
       else listener.taskNotification(event);
     }
@@ -124,7 +124,7 @@ public class TaskExecutionDispatcher {
    * Register all listeners discovered via SPI.
    */
   private void loadListeners() {
-    Iterator<TaskExecutionListener> it = ServiceFinder.lookupProviders(TaskExecutionListener.class, loader);
+    final Iterator<TaskExecutionListener> it = ServiceFinder.lookupProviders(TaskExecutionListener.class, loader);
     while (it.hasNext()) addTaskExecutionListener(it.next());
   }
 }

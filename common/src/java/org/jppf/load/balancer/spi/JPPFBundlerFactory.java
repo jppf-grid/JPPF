@@ -156,10 +156,10 @@ public class JPPFBundlerFactory {
    */
   @SuppressWarnings("unchecked")
   public Bundler<?> newBundler() {
-    LoadBalancingInformation info = getCurrentInfo();
+    final LoadBalancingInformation info = getCurrentInfo();
     @SuppressWarnings("rawtypes")
-    JPPFBundlerProvider provider = getBundlerProvider(info.getAlgorithm());
-    LoadBalancingProfile profile = provider.createProfile(info.getParameters());
+    final JPPFBundlerProvider provider = getBundlerProvider(info.getAlgorithm());
+    final LoadBalancingProfile profile = provider.createProfile(info.getParameters());
     return provider.createBundler(profile);
   }
 
@@ -172,17 +172,17 @@ public class JPPFBundlerFactory {
     if (algorithm == null) algorithm = defaultConfig.config().get(JPPFProperties.LOAD_BALANCING_ALGORITHM);
     String profileName = config.getString(JPPFProperties.LOAD_BALANCING_PROFILE.getName(), null);
     if (profileName == null) {
-      String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName();
+      final String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName();
       profileName = defaultConfig.config().get(JPPFProperties.LOAD_BALANCING_PROFILE);
-      String prefixDot = prefix + '.';
-      for (Map.Entry<Object, Object> entry: defaultConfig.config().entrySet()) {
+      final String prefixDot = prefix + '.';
+      for (final Map.Entry<Object, Object> entry: defaultConfig.config().entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-          String key = (String) entry.getKey();
+          final String key = (String) entry.getKey();
           if (!config.containsKey(key) && key.startsWith(prefixDot)) config.put(key, entry.getValue());
         }
       }
     }
-    TypedProperties configuration = convertJPPFConfiguration(profileName, config);
+    final TypedProperties configuration = convertJPPFConfiguration(profileName, config);
     if (debugEnabled) log.debug("load balancing configuration using algorithm '" + algorithm +"' with parameters: " + configuration);
     return setAndGetCurrentInfo(new LoadBalancingInformation(algorithm, configuration));
   }
@@ -229,19 +229,19 @@ public class JPPFBundlerFactory {
    * Retrieve all the bundler providers configured through the service provider interface (SPI).
    */
   private void loadProviders() {
-    ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-    ClassLoader currentCL = getClass().getClassLoader();
+    final ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+    final ClassLoader currentCL = getClass().getClassLoader();
     if (debugEnabled) log.debug("oldCL=" + oldCL + ", currentCL=" + currentCL);
     final boolean isDiff = (oldCL != currentCL);
-    ClassLoader[] loaders = (isDiff) ? new ClassLoader[] { currentCL, oldCL } : new ClassLoader[] { oldCL };
-    for (ClassLoader cl: loaders) {
+    final ClassLoader[] loaders = (isDiff) ? new ClassLoader[] { currentCL, oldCL } : new ClassLoader[] { oldCL };
+    for (final ClassLoader cl: loaders) {
       @SuppressWarnings("rawtypes")
-      Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, cl);
+      final Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, cl);
       while (it.hasNext()) {
-        JPPFBundlerProvider<?> provider = it.next();
-        String name = provider.getAlgorithmName();
+        final JPPFBundlerProvider<?> provider = it.next();
+        final String name = provider.getAlgorithmName();
         providerMap.put(name, provider);
-        String hash = CryptoUtils.computeHash(name, hashAlgorithm);
+        final String hash = CryptoUtils.computeHash(name, hashAlgorithm);
         nameToHash.put(name, hash);
         hashToName.put(hash, name);
         if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
@@ -258,12 +258,12 @@ public class JPPFBundlerFactory {
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
   public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration) {
-    TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
-    TypedProperties result = new TypedProperties();
-    for (Map.Entry<Object, Object> entry: profile.entrySet()) {
-      String key = (String) entry.getKey();
-      String s = key.substring(prefix.length());
+    final TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
+    final String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
+    final TypedProperties result = new TypedProperties();
+    for (final Map.Entry<Object, Object> entry: profile.entrySet()) {
+      final String key = (String) entry.getKey();
+      final String s = key.substring(prefix.length());
       result.setProperty(s, (String) entry.getValue());
     }
     return result;
@@ -276,15 +276,15 @@ public class JPPFBundlerFactory {
    * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
-  private TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration) {
-    TypedProperties profile = new TypedProperties();
-    String prefix = "strategy." + profileName + '.';
-    String prefix2 = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
-    for (Map.Entry<Object, Object> entry: configuration.entrySet()) {
+  private static TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration) {
+    final TypedProperties profile = new TypedProperties();
+    final String prefix = "strategy." + profileName + '.';
+    final String prefix2 = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
+    for (final Map.Entry<Object, Object> entry: configuration.entrySet()) {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-        String key = (String) entry.getKey();
+        final String key = (String) entry.getKey();
         if (key.startsWith(prefix)) {
-          String propName = key.substring(prefix.length());
+          final String propName = key.substring(prefix.length());
           profile.setProperty(prefix2 + propName, (String) entry.getValue());
         }
         else if (key.startsWith(prefix2)) profile.setProperty(key, (String) entry.getValue());
@@ -298,7 +298,7 @@ public class JPPFBundlerFactory {
    * @return the settings as a {@link TypedProperties} instance.
    */
   private static TypedProperties createServerDefaults() {
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
+    final String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
     return new TypedProperties().set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "proportional")
         .set(JPPFProperties.LOAD_BALANCING_PROFILE, "jppf")
         .setInt(prefix + "performanceCacheSize", 3000)
@@ -312,7 +312,7 @@ public class JPPFBundlerFactory {
    * @return the settings as a {@link TypedProperties} instance.
    */
   private static TypedProperties createClientDefaults() {
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
+    final String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
     return new TypedProperties().set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
         .set(JPPFProperties.LOAD_BALANCING_PROFILE, "jppf")
         .setInt(prefix + "size", 1_000_000);
@@ -357,8 +357,8 @@ public class JPPFBundlerFactory {
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */
-  private Bundler<?> createFallbackBundler() {
-    FixedSizeProfile profile = new FixedSizeProfile(new TypedProperties().setInt("size", 1));
+  private static Bundler<?> createFallbackBundler() {
+    final FixedSizeProfile profile = new FixedSizeProfile(new TypedProperties().setInt("size", 1));
     return new FixedSizeBundler(profile);
   }
 
@@ -366,10 +366,10 @@ public class JPPFBundlerFactory {
    * Not instantiable from another class.
    * @return {@link LoadBalancerPersistence} implementation based on the configuration.
    */
-  private LoadBalancerPersistence initPersistence() {
+  private static LoadBalancerPersistence initPersistence() {
     try {
       return ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, JPPFProperties.LOAD_BALANCING_PERSISTENCE);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(String.format("error creating LoadBalancerPersistence configured as %s = %s, load-balancer persistence is disabled%n%s",
         JPPFProperties.LOAD_BALANCING_PERSISTENCE.getName(), JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), ExceptionUtils.getStackTrace(e)));
     }

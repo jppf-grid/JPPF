@@ -67,15 +67,15 @@ public class JPPFJMXServer extends AbstractJMXServer {
   @Override
   public void start(final ClassLoader cl) throws Exception {
     if (debugEnabled) log.debug("starting remote connector server");
-    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
       mbeanServer = ManagementFactory.getPlatformMBeanServer();
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
-      Map<String, Object> env = new HashMap<>();
+      final Map<String, Object> env = new HashMap<>();
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);

@@ -75,15 +75,15 @@ public class PropertiesLoader {
    * @throws IOException if any error occurs.
    */
   public void load(final Properties props, final Reader reader) throws IOException {
-    BufferedReader breader = (reader instanceof BufferedReader) ? (BufferedReader) reader : new BufferedReader(reader);
+    final BufferedReader breader = (reader instanceof BufferedReader) ? (BufferedReader) reader : new BufferedReader(reader);
     String list = EMPTY_STRING;
     try {
       list = load(breader);
       try (Reader r = new StringReader(list)) {
         props.load(r);
       }
-    } catch (StackOverflowError e) {
-      String msg = "There is a problem in the configuration: it has cyclic include statements leading to " + ExceptionUtils.getMessage(e);
+    } catch (final StackOverflowError e) {
+      final String msg = "There is a problem in the configuration: it has cyclic include statements leading to " + ExceptionUtils.getMessage(e);
       System.err.println(msg);
       if (debugEnabled) log.debug(msg, e);
       else log.error(msg);
@@ -98,7 +98,7 @@ public class PropertiesLoader {
    * @throws IOException if any error occurs.
    */
   private String load(final BufferedReader reader) throws IOException {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     String line = null;
     while ((line = reader.readLine()) != null) {
       line = line.trim();
@@ -116,7 +116,7 @@ public class PropertiesLoader {
    * @return a String with the content of the source specified by the include.
    */
   private String readInclude(final String include) {
-    String[] tokens = WHITE_SPACE_PATTERN.split(include, 3);
+    final String[] tokens = WHITE_SPACE_PATTERN.split(include, 3);
     if ((tokens == null) || (tokens.length < 3)) {
       log.warn("could not process include '{}' : not enough arguments", include);
       return EMPTY_STRING;
@@ -129,7 +129,7 @@ public class PropertiesLoader {
           reader = new BufferedReader(FileUtils.getFileReader(tokens[2]));
           break;
         case URL_SRC:
-          URL url = new URL(tokens[2]);
+          final URL url = new URL(tokens[2]);
           reader = new BufferedReader(new InputStreamReader(new URLLocation(url).getInputStream()));
           break;
         case CLASS_SRC:
@@ -140,7 +140,7 @@ public class PropertiesLoader {
           return EMPTY_STRING;
       }
       result = load(reader);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.warn("Could not read [{}] '{}' specified in include statement '{}', reason: {}", new Object[] {tokens[1], tokens[2], include, ExceptionUtils.getMessage(e)});
       return EMPTY_STRING;
     } finally {

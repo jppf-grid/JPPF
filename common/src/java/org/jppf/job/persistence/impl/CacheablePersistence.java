@@ -83,7 +83,7 @@ public class CacheablePersistence implements JobPersistence {
       n = Integer.valueOf(params[0]);
       forwardParams = new String[params.length - 1];
       System.arraycopy(params, 1, forwardParams, 0, params.length - 1);
-    } catch (@SuppressWarnings("unused") NumberFormatException e) {
+    } catch (@SuppressWarnings("unused") final NumberFormatException e) {
       forwardParams = params;
     }
     if (n < 1) n = 1024;
@@ -100,9 +100,9 @@ public class CacheablePersistence implements JobPersistence {
       synchronized (cache) {
         for (PersistenceInfo info: infos) cache.put(new PersistenceInfoKey(info), info);
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -110,41 +110,41 @@ public class CacheablePersistence implements JobPersistence {
   @Override
   public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     try {
-      Map<PersistenceInfoKey, PersistenceInfo> map = new LinkedHashMap<>();
-      Map<PersistenceInfoKey, PersistenceInfo> toLoad = new LinkedHashMap<>();
-      for (PersistenceInfo info: infos) {
-        PersistenceInfoKey key = new PersistenceInfoKey(info);
+      final Map<PersistenceInfoKey, PersistenceInfo> map = new LinkedHashMap<>();
+      final Map<PersistenceInfoKey, PersistenceInfo> toLoad = new LinkedHashMap<>();
+      for (final PersistenceInfo info: infos) {
+        final PersistenceInfoKey key = new PersistenceInfoKey(info);
         map.put(key, info);
       }
       synchronized (cache) {
-        for (Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: map.entrySet()) {
-          PersistenceInfoKey key = entry.getKey();
-          PersistenceInfo cachedInfo = cache.get(key);
+        for (final Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: map.entrySet()) {
+          final PersistenceInfoKey key = entry.getKey();
+          final PersistenceInfo cachedInfo = cache.get(key);
           if (cachedInfo != null) map.put(key, cachedInfo);
           else toLoad.put(key, entry.getValue());
         }
         if (!toLoad.isEmpty()) {
-          List<InputStream> streamList = delegate.load(toLoad.values());
-          Iterator<InputStream> it = streamList.iterator();
-          for (Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: toLoad.entrySet()) {
-            InputStream is = it.next();
+          final List<InputStream> streamList = delegate.load(toLoad.values());
+          final Iterator<InputStream> it = streamList.iterator();
+          for (final Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: toLoad.entrySet()) {
+            final InputStream is = it.next();
             if (is != null) {
-              PersistenceInfoKey key = entry.getKey();
-              JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+              final PersistenceInfoKey key = entry.getKey();
+              final JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
               StreamUtils.copyStream(is, baos, true);
-              PersistenceInfo cachedInfo = new PersistenceInfoImpl(key.uuid, null, key.type, key.position, new MultipleBuffersLocation(baos.toByteArray()));
+              final PersistenceInfo cachedInfo = new PersistenceInfoImpl(key.uuid, null, key.type, key.position, new MultipleBuffersLocation(baos.toByteArray()));
               cache.put(key, cachedInfo);
               map.put(key, cachedInfo);
             }
           }
         }
       }
-      List<InputStream> result = new ArrayList<>(map.size());
-      for (Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: map.entrySet()) result.add(entry.getValue().getInputStream());
+      final List<InputStream> result = new ArrayList<>(map.size());
+      for (final Map.Entry<PersistenceInfoKey, PersistenceInfo> entry: map.entrySet()) result.add(entry.getValue().getInputStream());
       return result;
-    } catch (JobPersistenceException e) {
+    } catch (final JobPersistenceException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
       throw new JobPersistenceException(e);
     }
@@ -167,7 +167,7 @@ public class CacheablePersistence implements JobPersistence {
 
   @Override
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
-    PersistenceInfoKey key = new PersistenceInfoKey(jobUuid, PersistenceObjectType.JOB_HEADER, -1);
+    final PersistenceInfoKey key = new PersistenceInfoKey(jobUuid, PersistenceObjectType.JOB_HEADER, -1);
     synchronized (cache) {
       cache.remove(key);
     }
@@ -176,7 +176,7 @@ public class CacheablePersistence implements JobPersistence {
 
   @Override
   public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
-    PersistenceInfoKey key = new PersistenceInfoKey(jobUuid, PersistenceObjectType.JOB_HEADER, -1);
+    final PersistenceInfoKey key = new PersistenceInfoKey(jobUuid, PersistenceObjectType.JOB_HEADER, -1);
     synchronized (cache) {
       if (cache.get(key) != null) return true;
     }

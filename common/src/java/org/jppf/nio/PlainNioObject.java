@@ -120,7 +120,7 @@ public class PlainNioObject extends AbstractNioObject {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("channel id=").append(channel.getId());
     sb.append(", size=").append(size);

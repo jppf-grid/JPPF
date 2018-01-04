@@ -39,6 +39,10 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean, AutoCloseable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /** Logger for this class. */
   private static Logger log = LoggerFactory.getLogger(AbstractJMXConnectionWrapper.class);
   /** Determines whether debug log statements are enabled. */
@@ -126,7 +130,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
       if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
       else initJPPF();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     local = false;
@@ -176,7 +180,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   void performConnection() throws Exception {
     connected.set(false);
-    long elapsed;
+    final long elapsed;
     synchronized(this) {
       elapsed = (System.nanoTime() - connectionStart) / 1_000_000L;
     }
@@ -196,7 +200,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try {
         setHost(InetAddress.getByName(host).getHostName());
-      } catch (@SuppressWarnings("unused") UnknownHostException e) {
+      } catch (@SuppressWarnings("unused") final UnknownHostException e) {
       }
     }
     connected.set(true);
@@ -213,7 +217,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     if (jmxc != null) {
       try {
         jmxc.close();
-      } catch(Exception e2) {
+      } catch(final Exception e2) {
         if (debugEnabled) log.debug(e2.getMessage(), e2);
       }
       jmxc = null;
@@ -281,7 +285,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   protected void fireConnected() {
     final JMXWrapperEvent event = new JMXWrapperEvent(this);
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
@@ -295,8 +299,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Notify all listeners that the connection could not be established before reaching the timeout.
    */
   protected void fireTimeout() {
-    JMXWrapperEvent event = new JMXWrapperEvent(this);
-    for (JMXWrapperListener listener: listeners) listener.jmxWrapperTimeout(event);
+    final JMXWrapperEvent event = new JMXWrapperEvent(this);
+    for (final JMXWrapperListener listener: listeners) listener.jmxWrapperTimeout(event);
   }
 
   /**

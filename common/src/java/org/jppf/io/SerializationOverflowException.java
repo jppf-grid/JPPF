@@ -26,6 +26,11 @@ import java.io.IOException;
  */
 public class SerializationOverflowException extends IOException {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Default constructor.
    */
   public SerializationOverflowException() {

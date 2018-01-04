@@ -28,8 +28,8 @@ import java.util.zip.*;
 public class ZLIBSerialization extends JPPFCompositeSerialization {
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
-    Deflater deflater = new Deflater();
-    DeflaterOutputStream zlibos = new DeflaterOutputStream(os, deflater);
+    final Deflater deflater = new Deflater();
+    final DeflaterOutputStream zlibos = new DeflaterOutputStream(os, deflater);
     try {
       getDelegate().serialize(o, zlibos);
     } finally {
@@ -41,8 +41,8 @@ public class ZLIBSerialization extends JPPFCompositeSerialization {
 
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    Inflater inflater = new Inflater();
-    InflaterInputStream zlibis = new InflaterInputStream(is, inflater);
+    final Inflater inflater = new Inflater();
+    final InflaterInputStream zlibis = new InflaterInputStream(is, inflater);
     try {
       return getDelegate().deserialize(zlibis);
     } finally {

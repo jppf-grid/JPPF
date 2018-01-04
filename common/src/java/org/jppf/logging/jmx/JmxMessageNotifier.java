@@ -97,11 +97,11 @@ public class JmxMessageNotifier {
   private void initObjectName(final String name) {
     try {
       if (objectName == null) objectName = new ObjectName(name);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       try {
         System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + ExceptionUtils.getMessage(e) + ')');
         objectName = new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
-      } catch (Exception e2) {
+      } catch (final Exception e2) {
         System.out.println("Failed to initialize jmx based logging with default MBean name:" + ExceptionUtils.getMessage(e2));
       }
     }
@@ -113,7 +113,7 @@ public class JmxMessageNotifier {
   private void initializeProxy() {
     try {
       if (jmxLogger == null) jmxLogger = MBeanServerInvocationHandler.newProxyInstance(server, objectName, JmxLogger.class, true);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println("Error initializing the JMX logger MBean '" + objectName + "' : " + ExceptionUtils.getMessage(e));
     }
   }
@@ -131,10 +131,10 @@ public class JmxMessageNotifier {
       if (server == null) return;
       if (server.isRegistered(objectName)) return;
       try {
-        JmxLoggerImpl impl = new JmxLoggerImpl();
-        StandardEmitterMBean mbean = new StandardEmitterMBean(impl, JmxLogger.class, impl);
+        final JmxLoggerImpl impl = new JmxLoggerImpl();
+        final StandardEmitterMBean mbean = new StandardEmitterMBean(impl, JmxLogger.class, impl);
         server.registerMBean(mbean, objectName);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         System.out.println("Error registering the JMX logger MBean '" + objectName + "' : " + ExceptionUtils.getMessage(e));
       }
     } finally {
@@ -150,7 +150,7 @@ public class JmxMessageNotifier {
   private static MBeanServer obtainMBeanServer() {
     try {
       return ManagementFactory.getPlatformMBeanServer();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println("Failed to obtain the MBean server: " + ExceptionUtils.getMessage(e));
       return null;
     }

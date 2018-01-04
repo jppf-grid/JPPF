@@ -45,8 +45,8 @@ public class SerializationHelperImpl implements SerializationHelper {
   public ObjectSerializer getSerializer() throws Exception {
     synchronized(this) {
       if (serializer == null) {
-        ClassLoader cl = getClass().getClassLoader();
-        Class<?> clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
+        final ClassLoader cl = getClass().getClassLoader();
+        final Class<?> clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
         serializer = (ObjectSerializer) clazz.newInstance();
       }
     }

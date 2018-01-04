@@ -136,24 +136,24 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     if (debugEnabled) log.debug("storing {}", infos);
     try (Connection connection = dataSource.getConnection()) {
-      boolean autocommit = connection.getAutoCommit();
-      int isolation  = connection.getTransactionIsolation();
+      final boolean autocommit = connection.getAutoCommit();
+      final int isolation  = connection.getTransactionIsolation();
       connection.setAutoCommit(false);
       try {
         connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         for (PersistenceInfo info: infos) storeElement(connection, info, null);
         connection.commit();
         if (debugEnabled) log.debug("commit done");
-      } catch(Exception e) {
+      } catch(final Exception e) {
         connection.rollback();
         throw new JobPersistenceException(e);
       } finally {
         connection.setAutoCommit(autocommit);
         connection.setTransactionIsolation(isolation);
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -162,10 +162,10 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   public List<InputStream> load(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     if (debugEnabled) log.debug("loading {}", infos);
     try (Connection connection = dataSource.getConnection()) {
-      boolean autocommit = connection.getAutoCommit();
+      final boolean autocommit = connection.getAutoCommit();
       connection.setAutoCommit(false);
       try {
-        List<InputStream> result = new ArrayList<>(infos.size());
+        final List<InputStream> result = new ArrayList<>(infos.size());
         for (PersistenceInfo info: infos) {
           try (PreparedStatement ps = prepareLoadStatement(connection, info)) {
             try (ResultSet rs= ps.executeQuery()) {
@@ -175,15 +175,15 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
         }
         connection.commit();
         return result;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         connection.rollback();
         throw e;
       } finally {
         connection.setAutoCommit(autocommit);
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -193,15 +193,15 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
     try (Connection connection = dataSource.getConnection()) {
       try (PreparedStatement ps = prepareGetAllUUidsStatement(connection)) {
         try (ResultSet rs= ps.executeQuery()) {
-          List<String> uuids = new ArrayList<>();
+          final List<String> uuids = new ArrayList<>();
           while (rs.next()) uuids.add(rs.getString(1));
           if (debugEnabled) log.debug("uuids of persisted jobs: {}", uuids);
           return uuids;
         }
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -227,18 +227,18 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
     try (Connection connection = dataSource.getConnection()) {
       try (PreparedStatement ps = prepareGetPositionsStatement(connection, jobUuid, type)) {
         try (ResultSet rs= ps.executeQuery()) {
-          List<Integer> positions = new ArrayList<>();
+          final List<Integer> positions = new ArrayList<>();
           while (rs.next()) positions.add(rs.getInt(1));
-          int[] result = new int[positions.size()];
+          final int[] result = new int[positions.size()];
           int i = 0;
           for (Integer n: positions) result[i++] = n;
           if (debugEnabled) log.debug(String.format("positions of %s for job uuid=%s : %s", type, jobUuid, StringUtils.buildString(", ", "{", "}", result)));
           return result;
         }
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -249,9 +249,9 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
     try (Connection connection = dataSource.getConnection();
       PreparedStatement ps = prepareDeleteJobStatement(connection, jobUuid)) {
       ps.executeUpdate();
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -259,17 +259,17 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   @Override
   public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
     try (Connection connection = dataSource.getConnection()) {
-      try (PreparedStatement ps = prepareJobHeaderCountStatement(connection, jobUuid)) {
-        try (ResultSet rs= ps.executeQuery()) {
+      try (final PreparedStatement ps = prepareJobHeaderCountStatement(connection, jobUuid)) {
+        try (final ResultSet rs= ps.executeQuery()) {
           if (rs.next()) {
-            int n = rs.getInt(1);
+            final int n = rs.getInt(1);
             return n > 0;
           }
         }
       }
-    } catch(JobPersistenceException e) {
+    } catch(final JobPersistenceException e) {
       throw e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JobPersistenceException(e);
     }
     return false;
@@ -278,7 +278,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   /** @exclude */
   @Override
   protected boolean lockForUpdate(final Connection connection, final PersistenceInfo info) throws Exception {
-    try (PreparedStatement ps = connection.prepareStatement(getSQL("store.select.for.update"))) {
+    try (final PreparedStatement ps = connection.prepareStatement(getSQL("store.select.for.update"))) {
       ps.setString(1, info.getJobUuid());
       ps.setString(2, info.getType().name());
       ps.setInt(3, info.getPosition());
@@ -291,8 +291,8 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   /** @exclude */
   @Override
   protected void insertElement(final Connection connection, final PersistenceInfo info, final byte[] bytes) throws Exception {
-    try (PreparedStatement ps = connection.prepareStatement(getSQL("store.insert.sql"))) {
-      InputStream is = getInputStream(info.getInputStream());
+    try (final PreparedStatement ps = connection.prepareStatement(getSQL("store.insert.sql"))) {
+      final InputStream is = getInputStream(info.getInputStream());
       ps.setString(1, info.getJobUuid());
       ps.setString(2, info.getType().name());
       ps.setInt(3, info.getPosition());
@@ -305,7 +305,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
   @Override
   protected void updateElement(final Connection connection, final PersistenceInfo info, final byte[] bytes) throws Exception {
     try (PreparedStatement ps2 = connection.prepareStatement(getSQL("store.update.sql"))) {
-      InputStream is = getInputStream(info.getInputStream());
+      final InputStream is = getInputStream(info.getInputStream());
       ps2.setBlob(1, is);
       ps2.setString(2, info.getJobUuid());
       ps2.setString(3, info.getType().name());
@@ -322,7 +322,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
    * @throws Exception if any error occurs.
    */
   private PreparedStatement prepareLoadStatement(final Connection connection, final PersistenceInfo info) throws Exception {
-    PreparedStatement ps = connection.prepareStatement(getSQL("load.sql"));
+    final PreparedStatement ps = connection.prepareStatement(getSQL("load.sql"));
     ps.setString(1, info.getJobUuid());
     ps.setString(2, info.getType().name());
     ps.setInt(3, info.getPosition());
@@ -338,7 +338,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
    * @throws Exception if any error occurs.
    */
   private PreparedStatement prepareGetPositionsStatement(final Connection connection, final String uuid, final PersistenceObjectType type) throws Exception {
-    PreparedStatement ps = connection.prepareStatement(getSQL("get.positions.sql"));
+    final PreparedStatement ps = connection.prepareStatement(getSQL("get.positions.sql"));
     ps.setString(1, uuid);
     ps.setString(2, type.name());
     return ps;
@@ -362,7 +362,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
    * @throws Exception if any error occurs.
    */
   private PreparedStatement prepareDeleteJobStatement(final Connection connection, final String uuid) throws Exception {
-    PreparedStatement ps = connection.prepareStatement(getSQL("delete.job.sql"));
+    final PreparedStatement ps = connection.prepareStatement(getSQL("delete.job.sql"));
     ps.setString(1, uuid);
     return ps;
   }
@@ -375,7 +375,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
    * @throws Exception if any error occurs.
    */
   private PreparedStatement prepareJobHeaderCountStatement(final Connection connection, final String uuid) throws Exception {
-    PreparedStatement ps = connection.prepareStatement(getSQL("exists.job.sql"));
+    final PreparedStatement ps = connection.prepareStatement(getSQL("exists.job.sql"));
     ps.setString(1, uuid);
     ps.setString(2, PersistenceObjectType.JOB_HEADER.name());
     return ps;

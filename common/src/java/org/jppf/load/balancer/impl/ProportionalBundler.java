@@ -76,14 +76,6 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
     if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + state.bundleSize + ", profile: " + profile);
   }
 
-  /**
-   * Get local mapping of individual bundler to corresponding performance data.
-   * @return a {@code Set<AbstractProportionalBundler>}.
-   */
-  protected final Set<ProportionalBundler> getBundlers() {
-    return bundlers;
-  }
-
   @Override
   public int getBundleSize() {
     lock.lock();
@@ -116,7 +108,7 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
   public void feedback(final int size, final double time) {
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
     if (size <= 0) return;
-    PerformanceSample sample = new PerformanceSample(time / size, size);
+    final PerformanceSample sample = new PerformanceSample(time / size, size);
     synchronized (bundlers) {
       lock.lock();
       try {
@@ -179,10 +171,10 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
         }
         meanSum += normalize(m);
       }
-      int max = maxSize();
+      final int max = maxSize();
       int sum = 0;
       double p;
-      for (ProportionalBundler b : bundlers) {
+      for (final ProportionalBundler b : bundlers) {
         b.getStateLock().lock();
         try {
           p = normalize(b.state.performanceCache.getMean()) / meanSum;
@@ -195,11 +187,11 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
         sum += size;
       }
       if ((sum < max) && (minBundler != null)) {
-        int size = minBundler.getBundleSize();
+        final int size = minBundler.getBundleSize();
         minBundler.setBundleSize(size + (max - sum));
       }
       if (traceEnabled) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append("bundler info:\n");
         getStateLock().lock();
         try {
@@ -244,7 +236,7 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
 
   @Override
   public void setState(final Object o) {
-    BundlerState other = (BundlerState) o;
+    final BundlerState other = (BundlerState) o;
     lock.lock();
     try {
       state.bundleSize = other.bundleSize;

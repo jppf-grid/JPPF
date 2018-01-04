@@ -26,8 +26,11 @@ import java.util.*;
  * This class encapsulates a JVM thread dump, including dealocks information when available.
  * @author Laurent Cohen
  */
-public class ThreadDump implements Serializable
-{
+public class ThreadDump implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Information on the threads.
    */
@@ -41,16 +44,14 @@ public class ThreadDump implements Serializable
    * Create this thread dump from the specified thread mxbean.
    * @param threadMXBean the thread MXBean to get the information from.
    */
-  public ThreadDump(final ThreadMXBean threadMXBean)
-  {
-    ThreadInfo[] tis = threadMXBean.dumpAllThreads(threadMXBean.isObjectMonitorUsageSupported(), threadMXBean.isSynchronizerUsageSupported());
+  public ThreadDump(final ThreadMXBean threadMXBean) {
+    final ThreadInfo[] tis = threadMXBean.dumpAllThreads(threadMXBean.isObjectMonitorUsageSupported(), threadMXBean.isSynchronizerUsageSupported());
     if ((tis == null) || (tis.length <= 0)) threads = null;
-    else
-    {
+    else {
       threads = new TreeMap<>();
-      for (ThreadInfo ti: tis) threads.put(ti.getThreadId(), new ThreadInformation(ti));
+      for (final ThreadInfo ti: tis) threads.put(ti.getThreadId(), new ThreadInformation(ti));
     }
-    long[] ids = threadMXBean.isSynchronizerUsageSupported() ? threadMXBean.findDeadlockedThreads() : null;
+    final long[] ids = threadMXBean.isSynchronizerUsageSupported() ? threadMXBean.findDeadlockedThreads() : null;
     this.deadlockedThreads = (ids == null) || (ids.length <= 0) ? null : ids;
   }
 
@@ -58,8 +59,7 @@ public class ThreadDump implements Serializable
    * Get information on the threads.
    * @return a mapping of {@link ThreadInformation} objects to their thread id, or <code>null</code> if no thread information is available.
    */
-  public Map<Long, ThreadInformation> getThreads()
-  {
+  public Map<Long, ThreadInformation> getThreads() {
     return threads;
   }
 
@@ -67,14 +67,12 @@ public class ThreadDump implements Serializable
    * Get the ids of the deadlock threads, if any.
    * @return the ids as an array of <code>long</code> values, or <code>null</code> if none exists.
    */
-  public long[] getDeadlockedThreads()
-  {
+  public long[] getDeadlockedThreads() {
     return deadlockedThreads;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return TextThreadDumpWriter.printToString(this, "ThreadDump");
   }
 }

@@ -26,6 +26,10 @@ import java.util.EventObject;
  */
 public class IdleStateEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The idle state when this event was emitted.
    */
   private IdleState state = null;

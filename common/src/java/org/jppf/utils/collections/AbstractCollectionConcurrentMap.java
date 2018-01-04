@@ -29,6 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractCollectionMap<K, V> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Default constructor.
    */
   public AbstractCollectionConcurrentMap() {
@@ -42,7 +47,7 @@ public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractColl
 
   @Override
   public void putValue(final K key, final V value) {
-    Collection<V> newColl = newCollection();
+    final Collection<V> newColl = newCollection();
     Collection<V> coll = ((ConcurrentHashMap<K, Collection<V>>) map).putIfAbsent(key, newColl);
     if (coll == null) coll = newColl;
     coll.add(value);
@@ -50,10 +55,9 @@ public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractColl
 
   @Override
   public void addValues(final K key, @SuppressWarnings("unchecked") final V... values) {
-    Collection<V> newColl = newCollection();
+    final Collection<V> newColl = newCollection();
     Collection<V> coll = ((ConcurrentHashMap<K, Collection<V>>) map).putIfAbsent(key, newColl);
     if (coll == null) coll = newColl;
-    for (V value : values)
-      coll.add(value);
+    for (final V value : values) coll.add(value);
   }
 }

@@ -73,21 +73,21 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
    * @throws Exception if an error occurs while initializing the datagram packet or socket.
    */
   private void init() throws Exception {
-    TypedProperties props = JPPFConfiguration.getProperties();
+    final TypedProperties props = JPPFConfiguration.getProperties();
     broadcastInterval = props.get(JPPFProperties.DISCOVERY_BROADCAST_INTERVAL);
-    String group = props.get(JPPFProperties.DISCOVERY_GROUP);
-    int port = props.get(JPPFProperties.DISCOVERY_PORT);
+    final String group = props.get(JPPFProperties.DISCOVERY_GROUP);
+    final int port = props.get(JPPFProperties.DISCOVERY_PORT);
 
-    List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+    final List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
     addresses.addAll(NetworkUtils.getNonLocalIPV6Addresses());
     if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
-    IPFilter filter = new IPFilter(props, true);
-    List<InetAddress> filteredAddresses = new LinkedList<>();
-    for (InetAddress addr: addresses) {
+    final IPFilter filter = new IPFilter(props, true);
+    final List<InetAddress> filteredAddresses = new LinkedList<>();
+    for (final InetAddress addr: addresses) {
       if (filter.isAddressAccepted(addr)) filteredAddresses.add(addr);
     }
     if (debugEnabled) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append("Found ").append(filteredAddresses.size()).append(" address");
       if (filteredAddresses.size() > 1) sb.append("es");
       sb.append(':');
@@ -95,19 +95,19 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
       log.debug(sb.toString());
     }
     socketsInfo = new ArrayList<>(filteredAddresses.size());
-    for (InetAddress addr: addresses) {
+    for (final InetAddress addr: addresses) {
       try {
-        JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
+        final JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
         ci.host = addr.getHostAddress();
-        byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
-        ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
+        final byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
+        final ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
         buffer.putInt(infoBytes.length);
         buffer.put(infoBytes);
-        DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
-        MulticastSocket socket = new MulticastSocket(port);
+        final DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
+        final MulticastSocket socket = new MulticastSocket(port);
         socket.setInterface(addr);
         socketsInfo.add(new Pair<>(socket, packet));
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error("Unable to bind to interface " + addr.getHostAddress() + " on port " + port, e);
       }
     }
@@ -117,7 +117,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
   public void run() {
     try {
       init();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       close();
       return;
@@ -129,7 +129,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
             if (isStopped()) break;
             si.first().send(si.second());
             if (socketsInError.contains(si)) socketsInError.remove(si);
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (!isStopped() && !socketsInError.contains(si)) {
               socketsInError.add(si);
               log.error(e.getMessage(), e);

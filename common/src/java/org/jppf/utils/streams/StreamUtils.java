@@ -61,9 +61,9 @@ public final class StreamUtils {
     if (closeable != null) {
       try {
         closeable.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (log != null) {
-          String s = "unable to close stream/reader/writer: " + ExceptionUtils.getMessage(e);
+          final String s = "unable to close stream/reader/writer: " + ExceptionUtils.getMessage(e);
           if (log.isDebugEnabled()) log.debug(s, e);
           else log.warn(s);
         }
@@ -79,7 +79,7 @@ public final class StreamUtils {
    * @throws IOException if an IO error occurs.
    */
   public static byte[] getInputStreamAsByte(final InputStream is) throws IOException {
-    ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+    final ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
     copyStream(is, baos, true);
     return baos.toByteArray();
   }
@@ -93,7 +93,7 @@ public final class StreamUtils {
    * @throws IOException if an I/O error occurs.
    */
   public static long copyFile(final File src, final File dest) throws IOException {
-    try (InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) {
+    try (final InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) {
       return copyStream(is, os);
     }
   }
@@ -120,11 +120,11 @@ public final class StreamUtils {
    * @throws IOException if an I/O error occurs.
    */
   public static long copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
-    byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
+    final byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
     long count = 0L;
     try {
       while(true) {
-        int n = is.read(bytes);
+        final int n = is.read(bytes);
         if (n <= 0) break;
         os.write(bytes, 0, n);
         count += n;
@@ -179,7 +179,7 @@ public final class StreamUtils {
    * @param params the formatted message parameters.
    */
   public static void printf(final Logger logger, final String format, final Object...params) {
-    String message = String.format(format, params);
+    final String message = String.format(format, params);
     System.out.println(message);
     if (logger != null) logger.info(message);
   }

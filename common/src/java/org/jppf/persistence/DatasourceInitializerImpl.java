@@ -81,20 +81,20 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
     if (initSuccess) {
       try {
         props.setString("poolName", dsName);
-        TypedProperties cleanProps = props.filter(new TypedProperties.Filter() {
+        final TypedProperties cleanProps = props.filter(new TypedProperties.Filter() {
           @Override
           public boolean accepts(final String name, final String value) {
-            boolean b = (name != null) && allowedProperties.contains(name);
+            final boolean b = (name != null) && allowedProperties.contains(name);
             if (!b && log.isWarnEnabled() && !StringUtils.isOneOf(name, false, "scope", "name", "policy", "policy.text"))
               log.warn(String.format("property '%s' not supported in definition of datasource with name=%s. Will be ignored", name, dsName));
             return b;
           }
         });
-        Object cfg = hikariConfigConstructor.newInstance(cleanProps);
-        DataSource ds = (DataSource) hikariDatasourceConstructor.newInstance(cfg);
+        final Object cfg = hikariConfigConstructor.newInstance(cleanProps);
+        final DataSource ds = (DataSource) hikariDatasourceConstructor.newInstance(cfg);
         if (debugEnabled) log.debug(String.format("defined datasource with name=%s, properties=%s", dsName, cleanProps));
         return ds;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(String.format("defined datasource with name=%s, properties=%s:%n%s", dsName, props, ExceptionUtils.getStackTrace(e)));
       }
     }
@@ -105,7 +105,7 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
   public void close(final DataSource datasource) {
     try {
       if (hikariDatasourceCloseMethod != null) hikariDatasourceCloseMethod.invoke(datasource);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("error closing datasource {}: {}", datasource, ExceptionUtils.getStackTrace(e));
     }
   }
@@ -118,24 +118,24 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
     try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) cl = DatasourceInitializerImpl.class.getClassLoader();
-      Class<?> hikariConfigClass;
+      final Class<?> hikariConfigClass;
       try {
         hikariConfigClass = Class.forName(HIKARI_CONFIG_CLASS, true, cl);
-      } catch(ClassNotFoundException e) {
-        String msg = "HikariCP libraries are not in the classpath, no datasource will be defined";
+      } catch(final ClassNotFoundException e) {
+        final String msg = "HikariCP libraries are not in the classpath, no datasource will be defined";
         if (debugEnabled) log.debug(msg, e);
         else log.warn(msg);
         return;
       }
       hikariConfigConstructor = ReflectionHelper.findConstructor(hikariConfigClass, Properties.class);
-      Class<?> hikariDatasourceClass = cl.loadClass(HIKARI_DS_CLASS);
+      final Class<?> hikariDatasourceClass = cl.loadClass(HIKARI_DS_CLASS);
       hikariDatasourceConstructor = ReflectionHelper.findConstructor(hikariDatasourceClass, hikariConfigClass);
       hikariDatasourceCloseMethod = ReflectionHelper.findMethod(hikariDatasourceClass, "close");
-      Class<?> elfPropertyClass = cl.loadClass(PROPERTY_ELF_CLASS);
-      Method getAllowedPropertiesMethod = ReflectionHelper.findMethod(elfPropertyClass, "getPropertyNames", Class.class);
+      final Class<?> elfPropertyClass = cl.loadClass(PROPERTY_ELF_CLASS);
+      final Method getAllowedPropertiesMethod = ReflectionHelper.findMethod(elfPropertyClass, "getPropertyNames", Class.class);
       allowedProperties = (Set<String>) getAllowedPropertiesMethod.invoke(null, hikariConfigClass);
       initSuccess = true;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }      
   }

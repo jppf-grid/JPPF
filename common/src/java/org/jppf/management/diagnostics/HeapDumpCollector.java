@@ -24,8 +24,7 @@ package org.jppf.management.diagnostics;
  * @author Laurent Cohen
  * @exclude
  */
-public interface HeapDumpCollector
-{
+public interface HeapDumpCollector {
   /**
    * Call this method from your application whenever you want to dump the heap snapshot into a file.
    * @return a message describing the outcome.
@@ -38,15 +37,13 @@ public interface HeapDumpCollector
    * the vendor name found in <code>System.getProperty("java.vm.vendor")</code>.
    * @exclude
    */
-  public static class Factory
-  {
+  public static class Factory {
     /**
      * Create a heap dump collector for the current JVM.
      * @return a <code>HeapDumpCollector</code> instance, or <code>null</code> if none could be created.
      */
-    public static HeapDumpCollector newInstance()
-    {
-      String vendor = System.getProperty("java.vm.vendor", "").toLowerCase();
+    public static HeapDumpCollector newInstance() {
+      final String vendor = System.getProperty("java.vm.vendor", "").toLowerCase();
       if (vendor.indexOf("ibm") >= 0) return new HeapDumpCollectorIBM();
       else if (vendor.indexOf("oracle") >= 0) return new HeapDumpCollectorOracle();
       return null;

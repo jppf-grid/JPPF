@@ -29,6 +29,10 @@ import org.jppf.utils.*;
  */
 abstract class AbstractCLIArguments<T extends AbstractCLIArguments<?>> extends TypedProperties {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The argument definitions.
    */
   final Map<String, CLIArgument> argDefs = new LinkedHashMap<>();
@@ -110,10 +114,10 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments<?>> extends T
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
-      String key = entry.getKey();
-      String value = getString(key);
+    final StringBuilder sb = new StringBuilder();
+    for (final Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      final String key = entry.getKey();
+      final String value = getString(key);
       if (value != null) {
         sb.append("  ").append(key);
         if (!entry.getValue().isSwitch()) sb.append(" ").append(value);

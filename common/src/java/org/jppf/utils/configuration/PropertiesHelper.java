@@ -34,9 +34,9 @@ public class PropertiesHelper {
    * @throws IOException if any error occurs.
    */
   public static void store(final Properties props, final Writer writer) throws IOException {
-    Set<String> keys = new TreeSet<>(props.stringPropertyNames());
-    for (String k: keys) {
-      Object v = props.get(k);
+    final Set<String> keys = new TreeSet<>(props.stringPropertyNames());
+    for (final String k: keys) {
+      final Object v = props.get(k);
       if (v instanceof String) {
         writer.write(k);
         writer.write(" = ");
@@ -55,13 +55,13 @@ public class PropertiesHelper {
   public static int toInt(final String val, final int defValue) {
     int intVal = defValue;
     if (val != null) {
-      String s = val.trim();
+      final String s = val.trim();
       try {
         intVal = Integer.valueOf(s);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
         try {
           intVal = Double.valueOf(s).intValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+        } catch(@SuppressWarnings("unused") final NumberFormatException ignore) { }
       }
     }
     return intVal;
@@ -76,13 +76,13 @@ public class PropertiesHelper {
   public static long toLong(final String val, final long defValue) {
     long longVal = defValue;
     if (val != null) {
-      String s = val.trim();
+      final String s = val.trim();
       try {
         longVal = Long.valueOf(s);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
         try {
           longVal = Double.valueOf(s).longValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+        } catch(@SuppressWarnings("unused") final NumberFormatException ignore) { }
       }
     }
     return longVal;
@@ -97,13 +97,13 @@ public class PropertiesHelper {
   public static float toFloat(final String val, final float defValue) {
     float floatVal = defValue;
     if (val != null) {
-      String s = val.trim();
+      final String s = val.trim();
       try {
         floatVal = Float.valueOf(s);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
         try {
           floatVal = Double.valueOf(s).floatValue();
-        } catch(@SuppressWarnings("unused") NumberFormatException ignore) { }
+        } catch(@SuppressWarnings("unused") final NumberFormatException ignore) { }
       }
     }
     return floatVal;
@@ -118,10 +118,10 @@ public class PropertiesHelper {
   public static double toDouble(final String val, final double defValue) {
     double doubleVal = defValue;
     if (val != null) {
-      String s = val.trim();
+      final String s = val.trim();
       try {
         doubleVal = Double.valueOf(s);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
       }
     }
     return doubleVal;

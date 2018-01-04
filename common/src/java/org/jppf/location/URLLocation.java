@@ -84,7 +84,7 @@ public class URLLocation extends AbstractLocation<URL> {
     // URLConnection.getOutputStream() throws an UnknownServiceException for file urls.
     // see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4485313
     if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedOutputStream(new FileOutputStream(StringUtils.getDecodedURLPath(path)));
-    URLConnection conn = path.openConnection();
+    final URLConnection conn = path.openConnection();
     conn.setDoOutput(true);
     return conn.getOutputStream();
   }
@@ -101,15 +101,15 @@ public class URLLocation extends AbstractLocation<URL> {
         // for file URLs, opening a connection causes an input stream
         // to be created, which is never released
         if ("file".equalsIgnoreCase(path.getProtocol())) {
-          File file = new File(StringUtils.getDecodedURLPath(path));
+          final File file = new File(StringUtils.getDecodedURLPath(path));
           size = file.length();
         } else {
-          URLConnection c = path.openConnection();
+          final URLConnection c = path.openConnection();
           c.connect();
           size = c.getContentLengthLong();
         }
-      } catch (Exception e) {
-        String msg = "Error while trying to get the content length of {} : {}";
+      } catch (final Exception e) {
+        final String msg = "Error while trying to get the content length of {} : {}";
         if (debugEnabled) log.debug(msg, this, ExceptionUtils.getStackTrace(e));
         else log.warn(msg, this, ExceptionUtils.getMessage(e));
       } finally {

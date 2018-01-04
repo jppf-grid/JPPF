@@ -80,12 +80,11 @@ public class AcceptChannelTask implements Runnable {
       channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
       intercept();
       if (channel.isBlocking()) channel.configureBlocking(false);
-    } catch (Exception e) {
+      server.accept(serverSocketChannel, channel, null, ssl, false);
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
       StreamUtils.close(channel, log);
-      return;
     }
-    server.accept(serverSocketChannel, channel, null, ssl, false);
   }
 
   /**

@@ -76,6 +76,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * An optional action to perform upon closing this context or its associated channel.
    */
   protected Runnable onCloseAction;
+  /**
+   * 
+   */
+  public long byteCount;
 
   @Override
   public S getState() {
@@ -162,7 +166,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", uuid=").append(uuid);
@@ -240,7 +244,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     if (onCloseAction != null) {
       try {
         onCloseAction.run();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(String.format("error in onClose action for %s", this), e);
       }
     }

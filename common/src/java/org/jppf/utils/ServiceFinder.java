@@ -54,14 +54,14 @@ public class ServiceFinder {
     ClassLoader cl = loader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
-    List<Class<? extends T>> list = new ArrayList<>();
-    String name = providerClass.getName();
-    List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
-    Set<String> alreadyLoaded = new HashSet<>();
+    final List<Class<? extends T>> list = new ArrayList<>();
+    final String name = providerClass.getName();
+    final List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
+    final Set<String> alreadyLoaded = new HashSet<>();
     for (String s: lines) {
       if (alreadyLoaded.contains(s)) continue;
       try {
-        Class<? extends T> clazz = (Class<? extends T>) cl.loadClass(s);
+        final Class<? extends T> clazz = (Class<? extends T>) cl.loadClass(s);
         list.add(clazz);
         if (single) break;
         alreadyLoaded.add(s);
@@ -82,11 +82,11 @@ public class ServiceFinder {
    * @return a list of concrete providers of the specified type.
    */
   public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single) {
-    List<Class<? extends T>> classes = findProviderClassess(providerClass, cl, single);
-    List<T> list = new ArrayList<>();
+    final List<Class<? extends T>> classes = findProviderClassess(providerClass, cl, single);
+    final List<T> list = new ArrayList<>();
     for (Class<? extends T> c: classes) {
       try {
-        T t = c.newInstance();
+        final T t = c.newInstance();
         list.add(t);
       } catch(Exception|NoClassDefFoundError e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
@@ -125,13 +125,13 @@ public class ServiceFinder {
    * @param cl the class loader to user for the lookup.
    * @return a list of URLs.
    */
-  private List<URL> resourcesList(final String path, final ClassLoader cl) {
-    List<URL> urls = new ArrayList<>();
+  private static List<URL> resourcesList(final String path, final ClassLoader cl) {
+    final List<URL> urls = new ArrayList<>();
     try {
-      Enumeration<URL> enu = cl.getResources(path);
+      final Enumeration<URL> enu = cl.getResources(path);
       while (enu.hasMoreElements()) urls.add(enu.nextElement());
-    } catch(IOException e) {
-      String s = ExceptionUtils.getMessage(e);
+    } catch(final IOException e) {
+      final String s = ExceptionUtils.getMessage(e);
       if (debugEnabled) log.debug(s, e);
       else log.warn(s);
     }
@@ -145,22 +145,22 @@ public class ServiceFinder {
    * @return the definitions found as a list of strings.
    */
   public List<String> findServiceDefinitions(final String path, final ClassLoader cl) {
-    List<String> lines = new ArrayList<>();
+    final List<String> lines = new ArrayList<>();
     try {
-      List<URL> urls = resourcesList(path, cl);
-      for (URL url: urls) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-          List<String> fileLines = FileUtils.textFileAsLines(reader);
+      final List<URL> urls = resourcesList(path, cl);
+      for (final URL url: urls) {
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+          final List<String> fileLines = FileUtils.textFileAsLines(reader);
           for (String s: fileLines) {
-            int idx = s.indexOf('#');
+            final int idx = s.indexOf('#');
             if (idx > 0) s = s.substring(0, idx);
             s = s.trim();
             if (!s.startsWith("#")&& (s.length() > 0)) lines.add(s);
           }
         }
       }
-    } catch(IOException e) {
-      String s = ExceptionUtils.getMessage(e);
+    } catch(final IOException e) {
+      final String s = ExceptionUtils.getMessage(e);
       if (debugEnabled) log.debug(s, e);
       else log.warn(s);
     }

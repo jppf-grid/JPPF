@@ -126,7 +126,7 @@ public interface JPPFSnapshot extends Serializable {
 
     @Override
     public boolean accept(final JPPFSnapshot snapshot) {
-      boolean b = labels.contains(snapshot.getLabel());
+      final boolean b = labels.contains(snapshot.getLabel());
       return includeFlag ? b : !b;
     }
   }

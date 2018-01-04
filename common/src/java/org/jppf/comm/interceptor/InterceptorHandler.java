@@ -48,13 +48,13 @@ public class InterceptorHandler {
   static {
     // using reflection because slf4j jars may not be in the classpath
     try {
-      Class<?> loggerFactoryClass = Class.forName("org.slf4j.LoggerFactory");
+      final Class<?> loggerFactoryClass = Class.forName("org.slf4j.LoggerFactory");
       Method m = loggerFactoryClass.getMethod("getLogger", Class.class);
       log = m.invoke(null, InterceptorHandler.class);
       m = log.getClass().getMethod("isDebugEnabled");
       debugEnabled = (Boolean) m.invoke(log);
       logDebugMethod = log.getClass().getMethod("debug", String.class);
-    } catch(Throwable ignore) {
+    } catch(final Throwable ignore) {
       ignore.printStackTrace();
     }
   }
@@ -68,8 +68,8 @@ public class InterceptorHandler {
    * @return a list of {@link NetworkConnectionInterceptor} instances, possibly empty.
    */
   private static List<NetworkConnectionInterceptor> loadInterceptors() {
-    ServiceFinder sf = new ServiceFinder();
-    List<NetworkConnectionInterceptor> result = sf.findProviders(NetworkConnectionInterceptor.class);
+    final ServiceFinder sf = new ServiceFinder();
+    final List<NetworkConnectionInterceptor> result = sf.findProviders(NetworkConnectionInterceptor.class);
     if (debugEnabled) debugLog("found %d interceptors in the classpath", result.size());
     return result;
   }
@@ -163,7 +163,7 @@ public class InterceptorHandler {
     if (logDebugMethod != null) {
       try {
         logDebugMethod.invoke(log, String.format(format, params));
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }
   }

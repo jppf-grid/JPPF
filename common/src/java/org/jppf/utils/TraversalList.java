@@ -149,7 +149,7 @@ public class TraversalList<E> implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("position=").append(position);
     sb.append(", list=").append(list);
     sb.append(']');

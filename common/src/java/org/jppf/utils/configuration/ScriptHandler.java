@@ -112,10 +112,9 @@ public class ScriptHandler {
    */
   public void process(final Properties props) {
     this.config = props;
-    Map<String, Object> bindings = new HashMap<>();
+    final Map<String, Object> bindings = new HashMap<>();
     bindings.put("thisProperties", config);
-
-    boolean hasDefaultScriptLanguage = config.containsKey(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName());
+    final boolean hasDefaultScriptLanguage = config.containsKey(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName());
     String value = config.getProperty(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getDefaultValue());
     value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value, bindings).trim();
     if ("".equals(value)) value = "javascript";
@@ -139,14 +138,14 @@ public class ScriptHandler {
    */
   public String evaluate(final String name, final String value, final Map<String, Object> bindings) {
     if (value == null) return null;
-    Matcher matcher = SCRIPT_PATTERN.matcher(value);
-    StringBuilder sb = new StringBuilder();
+    final Matcher matcher = SCRIPT_PATTERN.matcher(value);
+    final StringBuilder sb = new StringBuilder();
     int pos = 0;
     int matches = 0;
     while (matcher.find()) {
       matches++;
       if (matcher.start() > pos) sb.append(value.substring(pos, matcher.start()));
-      String matched = value.substring(matcher.start(), matcher.end());
+      final String matched = value.substring(matcher.start(), matcher.end());
       String result = null;
       String language = matcher.group(1);
       if (language != null) language = language.trim();
@@ -158,19 +157,19 @@ public class ScriptHandler {
       if (source != null) source = source.trim();
       if ((source == null) || "".equals(source)) result = matched;
       else {
-        String script = loadScript(name, language, type, source);
+        final String script = loadScript(name, language, type, source);
         if (script == null) result = matched;
         else {
-          ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
+          final ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
           if (runner == null) {
             log.warn("property '{}' : could not obtain a '{}' script engine", name, language);
             result = matched;
           } else {
             try {
-              Object res = runner.evaluate(script, bindings);
+              final Object res = runner.evaluate(script, bindings);
               result = res == null ? null : res.toString();
-            } catch(Exception e) {
-              String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
+            } catch(final Exception e) {
+              final String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
               if (debugEnabled) log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
               else log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getMessage(e)});
               result = matched;
@@ -198,9 +197,9 @@ public class ScriptHandler {
    * @param source the script source.
    * @return the text of the script, or {@code null} if th script could not be loaded.
    */
-  private String loadScript(final String name, final String language, final String type, final String source) {
+  private static String loadScript(final String name, final String language, final String type, final String source) {
     String script = null;
-    char c = type.charAt(0);
+    final char c = type.charAt(0);
     switch(c) {
       case 'i':
       case 'I':
@@ -211,7 +210,7 @@ public class ScriptHandler {
       case 'F':
         try {
           script = FileUtils.readTextFile(source);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.warn("property '{}' : a '{}' script could not be read from the file '{}', exception is: {}", new Object[] {name, language, source, ExceptionUtils.getMessage(e)});
         }
         break;
@@ -219,10 +218,10 @@ public class ScriptHandler {
       case 'u':
       case 'U':
         try {
-          Location<?> location = new URLLocation(source);
-          Reader reader = new InputStreamReader(location.getInputStream());
+          final Location<?> location = new URLLocation(source);
+          final Reader reader = new InputStreamReader(location.getInputStream());
           script = FileUtils.readTextFile(reader);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.warn("property '{}' : a '{}' script could not be read from the url '{}', exception is: {}", new Object[] {name, language, source, ExceptionUtils.getMessage(e)});
         }
         break;

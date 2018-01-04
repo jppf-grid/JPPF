@@ -23,6 +23,11 @@ package org.jppf.node.policy;
  */
 abstract class LogicalRule extends ExecutionPolicy {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this binary logical operator with the specified operands.
    * @param rules the first operand.
    */
@@ -37,10 +42,10 @@ abstract class LogicalRule extends ExecutionPolicy {
   @Override
   public String toString(final int indentLevel) {
     synchronized(ExecutionPolicy.class) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       if (children == null) sb.append(indent(indentLevel)).append("null\n");
       else {
-        for (ExecutionPolicy ep: children) sb.append(ep.toString(indentLevel));
+        for (final ExecutionPolicy ep: children) sb.append(ep.toString(indentLevel));
       }
       return sb.toString();
     }

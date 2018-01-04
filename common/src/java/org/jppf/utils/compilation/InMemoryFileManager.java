@@ -28,8 +28,7 @@ import javax.tools.*;
  * @param <M> the type of file manager to delegate to.
  * @author Laurent Cohen
  */
-class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileManager<M>
-{
+class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileManager<M> {
   /**
    * Map of class names to JavaFileObject instances for the bytecode.
    */
@@ -39,8 +38,7 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
    * Construct this file manager.
    * @param fileManager the file manager to delegate to.
    */
-  public InMemoryFileManager(final M fileManager)
-  {
+  public InMemoryFileManager(final M fileManager) {
     super(fileManager);
   }
 
@@ -49,15 +47,11 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
    * <p>{@inheritDoc}
    */
   @Override
-  public JavaFileObject getJavaFileForOutput(final Location location, final String className,
-    final JavaFileObject.Kind kind, final FileObject sibling) throws IOException
-  {
+  public JavaFileObject getJavaFileForOutput(final Location location, final String className, final JavaFileObject.Kind kind, final FileObject sibling) throws IOException {
     // special processing for class files only
-    if (kind == JavaFileObject.Kind.CLASS)
-    {
+    if (kind == JavaFileObject.Kind.CLASS) {
       BytecodeObject bytecode = classMap.get(className);
-      if (bytecode == null)
-      {
+      if (bytecode == null) {
         bytecode = new BytecodeObject(className);
         classMap.put(className, bytecode);
       }
@@ -71,11 +65,9 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
    * Get the bytecode of all classes compiled with this file manager.
    * @return a mapping of class names to the corresponding bytecode expressed as a byte[].
    */
-  public Map<String, byte[]> getAllByteCodes()
-  {
-    Map<String, byte[]> result = new HashMap<>();
-    for (Map.Entry<String, BytecodeObject> entry: classMap.entrySet())
-    {
+  public Map<String, byte[]> getAllByteCodes() {
+    final Map<String, byte[]> result = new HashMap<>();
+    for (final Map.Entry<String, BytecodeObject> entry: classMap.entrySet()) {
       result.put(entry.getKey(), entry.getValue().getBytecode());
     }
     return result;
@@ -89,8 +81,7 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
    * @throws IOException if any I/O error occurs.
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     classMap.clear();
     super.close();
   }

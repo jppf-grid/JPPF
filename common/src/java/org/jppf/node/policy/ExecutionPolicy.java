@@ -86,10 +86,10 @@ public abstract class ExecutionPolicy implements Serializable {
   public boolean evaluate(final PropertiesCollection<String> info) {
     try {
       return accepts(info);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (!hadException) {
         hadException = true;
-        String msg = String.format("exception occurred while evaluating execution policy of type %s%nExecution policy is:%n%s%nException: %s",
+        final String msg = String.format("exception occurred while evaluating execution policy of type %s%nExecution policy is:%n%s%nException: %s",
           getClass().getName(), this, ExceptionUtils.getStackTrace(e));
         log.error(msg);
       }
@@ -218,10 +218,10 @@ public abstract class ExecutionPolicy implements Serializable {
    * @return an array of <code>ExecutionPolicy</code> instances.
    */
   private static ExecutionPolicy[] makeRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray) {
-    ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
+    final ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
     int count = 0;
     result[count++] = rule;
-    for (ExecutionPolicy r: ruleArray) result[count++] = r;
+    for (final ExecutionPolicy r: ruleArray) result[count++] = r;
     return result;
   }
 
@@ -233,10 +233,10 @@ public abstract class ExecutionPolicy implements Serializable {
    * @return an array of <code>ExecutionPolicy</code> instances.
    */
   private static ExecutionPolicy[] makeNotRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray) {
-    ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
+    final ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
     int count = 0;
     result[count++] = rule;
-    for (ExecutionPolicy r: ruleArray) result[count++] = r.not();
+    for (final ExecutionPolicy r: ruleArray) result[count++] = r.not();
     return result;
   }
 
@@ -247,8 +247,8 @@ public abstract class ExecutionPolicy implements Serializable {
    * @return the value of the property, or null if it could not be found.
    */
   public String getProperty(final PropertiesCollection<String> info, final String name) {
-    for (TypedProperties props: info.getPropertiesArray()) {
-      String value = props.getString(name);
+    for (final TypedProperties props: info.getPropertiesArray()) {
+      final String value = props.getString(name);
       if (value != null) return value;
     }
     return null;
@@ -261,7 +261,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @exclude
    */
   protected String indent(final int indentSize) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<indentSize; i++) sb.append("  ");
     return sb.toString();
   }
@@ -293,6 +293,11 @@ public abstract class ExecutionPolicy implements Serializable {
    * An execution policy that realizes a logical "AND" combination of multiple policies specified as operands.
    */
   public static class AndRule extends LogicalRule {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this AND operator with the specified operands.
      * @param rules the rules to combine.
@@ -328,6 +333,11 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   public static class OrRule extends LogicalRule {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Initialize this OR operator with the specified operands.
      * @param rules the rules to combine.
      */
@@ -356,6 +366,11 @@ public abstract class ExecutionPolicy implements Serializable {
    * An execution policy that realizes a logical "XOR" combination of multiple policies specified as operands.
    */
   public static class XorRule extends LogicalRule {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this OR operator with the specified operands.
      * @param rules the rules to combine.
@@ -386,6 +401,11 @@ public abstract class ExecutionPolicy implements Serializable {
    * An execution policy that realizes the negation of a policy specified as operand.
    */
   public static class NotRule extends ExecutionPolicy {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this binary logical operator with the specified operands.
      * @param rule the operand.

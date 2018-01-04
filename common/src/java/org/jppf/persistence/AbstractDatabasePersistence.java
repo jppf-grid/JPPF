@@ -116,16 +116,16 @@ public abstract class AbstractDatabasePersistence<I> {
     this.dataSource = JPPFDatasourceFactory.getInstance().getDataSource(dataSourceName);
     if (dataSource == null) throw new IllegalArgumentException("datasource '" + dataSourceName + "' is undefined");
     checkTable(tableName);
-    TypedProperties props = new TypedProperties();
-    String path = getClass().getPackage().getName().replace('.', '/') + "/sql_statements.properties";
-    ClassLoader cl = getClass().getClassLoader();
+    final TypedProperties props = new TypedProperties();
+    final String path = getClass().getPackage().getName().replace('.', '/') + "/sql_statements.properties";
+    final ClassLoader cl = getClass().getClassLoader();
     if (debugEnabled) log.debug("loading SQL statements from path={}, with classloader={}", path, cl);
-    try (Reader reader = new InputStreamReader(cl.getResourceAsStream(path), "utf-8")) {
+    try (final Reader reader = new InputStreamReader(cl.getResourceAsStream(path), "utf-8")) {
       props.load(reader);
     }
     props.setString(TABLE_PROP, tableName);
     sqlStatements = new TypedProperties();
-    try (Reader reader = new StringReader(props.asString())) {
+    try (final Reader reader = new StringReader(props.asString())) {
       sqlStatements.loadAndResolve(reader);
     }
   }
@@ -154,7 +154,7 @@ public abstract class AbstractDatabasePersistence<I> {
     } else {
       try {
         insertElement(connection, info, bytes);
-      } catch (SQLException e) {
+      } catch (final SQLException e) {
         if ((e instanceof SQLIntegrityConstraintViolationException) || ((e.getMessage() != null) && e.getMessage().toLowerCase(Locale.US).contains("violation"))) {
           if (traceEnabled) log.trace("Insert of element failed with constraint violation, attempting update instead, element={}", info);
           updateElement(connection, info, bytes);
@@ -200,9 +200,9 @@ public abstract class AbstractDatabasePersistence<I> {
    */
   private void checkTable(final String tableName) throws Exception {
     if (debugEnabled) log.debug("checking table {}", tableName);
-    try (Connection connection = dataSource.getConnection()) {
-      boolean autoCommit = connection.getAutoCommit();
-      int isolation  = connection.getTransactionIsolation();
+    try (final Connection connection = dataSource.getConnection()) {
+      final boolean autoCommit = connection.getAutoCommit();
+      final int isolation  = connection.getTransactionIsolation();
       try {
         connection.setAutoCommit(false);
         connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
@@ -211,7 +211,7 @@ public abstract class AbstractDatabasePersistence<I> {
             connection.commit();
             return;
           }
-        } catch(@SuppressWarnings("unused") SQLException e) {
+        } catch(@SuppressWarnings("unused") final SQLException e) {
         }
         if (debugEnabled) log.debug(String.format("table '%s' does not exist in the database, creating it", tableName));
         
@@ -219,7 +219,7 @@ public abstract class AbstractDatabasePersistence<I> {
           ps.executeUpdate();
         }
         connection.commit();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.warn("failed to create table '{}', load-balancer persistence may not work: {}", tableName, ExceptionUtils.getMessage(e));
         connection.rollback();
       } finally {
@@ -237,8 +237,8 @@ public abstract class AbstractDatabasePersistence<I> {
    * load_balancer_persistence.sql
    */
   private String getTableDDL(final String tableName) throws Exception {
-    String path = JPPFConfiguration.get(ddlProp);
-    String ddl = FileUtils.readTextFile(path).replace("${" + TABLE_PROP + "}", tableName);
+    final String path = JPPFConfiguration.get(ddlProp);
+    final String ddl = FileUtils.readTextFile(path).replace("${" + TABLE_PROP + "}", tableName);
     if (debugEnabled) log.debug("Read DDL file from {} :\n{}", path, ddl);
     return ddl;
   }

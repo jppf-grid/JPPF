@@ -45,7 +45,7 @@ public class TypedPropertiesSimilarityEvaluator {
    * @param rhs the second char sequence to compare.
    * @return the Levenshtein distance between the 2 character sequences as an int.
    */
-  private int levenshteinDistance(final CharSequence lhs, final CharSequence rhs) {
+  private static int levenshteinDistance(final CharSequence lhs, final CharSequence rhs) {
     if (lhs == rhs) return 0;
     else if (lhs == null) return rhs.length();
     else if (rhs == null) return lhs.length();
@@ -53,8 +53,8 @@ public class TypedPropertiesSimilarityEvaluator {
     else if (lhs.length() <= 0) return rhs.length();
     else if (rhs.length() <= 0) return lhs.length();
 
-    int len0 = lhs.length() + 1;
-    int len1 = rhs.length() + 1;
+    final int len0 = lhs.length() + 1;
+    final int len1 = rhs.length() + 1;
     // the array of distances
     int[] cost = new int[len0];
     int[] newcost = new int[len0];
@@ -70,17 +70,17 @@ public class TypedPropertiesSimilarityEvaluator {
       // transformation cost for each letter in s0
       for (int i = 1; i < len0; i++) {
         // matching current letters in both strings
-        int match = (lhs.charAt(i - 1) == rhs.charAt(j - 1)) ? 0 : 1;
+        final int match = (lhs.charAt(i - 1) == rhs.charAt(j - 1)) ? 0 : 1;
         // computing cost for each transformation
-        int cost_replace = cost[i - 1] + match;
-        int cost_insert = cost[i] + 1;
-        int cost_delete = newcost[i - 1] + 1;
+        final int cost_replace = cost[i - 1] + match;
+        final int cost_insert = cost[i] + 1;
+        final int cost_delete = newcost[i - 1] + 1;
         // keep minimum cost
         newcost[i] = Math.min(Math.min(cost_insert, cost_delete), cost_replace);
       }
 
       // swap cost/newcost arrays
-      int[] swap = cost;
+      final int[] swap = cost;
       cost = newcost;
       newcost = swap;
     }

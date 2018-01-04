@@ -112,10 +112,10 @@ public class Base64InputStream extends FilterInputStream {
     // Do we need to get data?
     if( position < 0 ) {
       if( encode ) {
-        byte[] b3 = new byte[3];
+        final byte[] b3 = new byte[3];
         int numBinaryBytes = 0;
         for( int i = 0; i < 3; i++ ) {
-          int b = in.read();
+          final int b = in.read();
 
           // If end of stream, b is -1.
           if( b >= 0 ) {
@@ -133,7 +133,7 @@ public class Base64InputStream extends FilterInputStream {
       }   // end if: encoding
       // Else decoding
       else {
-        byte[] b4 = new byte[4];
+        final byte[] b4 = new byte[4];
         int i = 0;
         for( i = 0; i < 4; i++ ) {
           // Read four "meaningful" bytes:
@@ -166,7 +166,7 @@ public class Base64InputStream extends FilterInputStream {
       }   // end if
       else {
         lineLength++;   // This isn't important when decoding but throwing an extra "if" seems just as wasteful.
-        int b = buffer[ position++ ];
+        final int b = buffer[ position++ ];
         if( position >= bufferLength ) position = -1;
         return b & 0xFF; // This is how you "cast" a byte that's intended to be unsigned.
       }   // end else

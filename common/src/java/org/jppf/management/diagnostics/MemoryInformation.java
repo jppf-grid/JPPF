@@ -21,13 +21,11 @@ package org.jppf.management.diagnostics;
 import java.io.Serializable;
 import java.lang.management.*;
 
-
 /**
  * Instances of this class hold memory usage information.
  * @author Laurent Cohen
  */
-public class MemoryInformation implements Serializable
-{
+public class MemoryInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -44,25 +42,22 @@ public class MemoryInformation implements Serializable
   /**
    * Create this object and initialize its data.
    */
-  public MemoryInformation()
-  {
+  public MemoryInformation() {
     collectMemoryUsage();
   }
 
   /**
    * Collect the memory usage information.
    */
-  private void collectMemoryUsage()
-  {
-    MemoryMXBean bean = ManagementFactory.getMemoryMXBean();
+  private void collectMemoryUsage() {
+    final MemoryMXBean bean = ManagementFactory.getMemoryMXBean();
     this.heapMemoryUsage = new MemoryUsageInformation(bean.getHeapMemoryUsage());
     this.nonHeapMemoryUsage = new MemoryUsageInformation(bean.getNonHeapMemoryUsage());
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append("heap    : ").append(heapMemoryUsage).append('\n');
     sb.append("non-heap: ").append(nonHeapMemoryUsage).append('\n');
     return sb.toString();
@@ -72,8 +67,7 @@ public class MemoryInformation implements Serializable
    * Get the heap memory usage.
    * @return a <code>JPPFMemoryUsage</code> instance.
    */
-  public MemoryUsageInformation getHeapMemoryUsage()
-  {
+  public MemoryUsageInformation getHeapMemoryUsage() {
     return heapMemoryUsage;
   }
 
@@ -81,8 +75,7 @@ public class MemoryInformation implements Serializable
    * Get the non-heap memory usage.
    * @return a <code>JPPFMemoryUsage</code> instance.
    */
-  public MemoryUsageInformation getNonHeapMemoryUsage()
-  {
+  public MemoryUsageInformation getNonHeapMemoryUsage() {
     return nonHeapMemoryUsage;
   }
 }

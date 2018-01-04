@@ -21,15 +21,18 @@ package org.jppf;
  * Class of exceptions for JPPF-specific exceptions.
  * @author Laurent Cohen
  */
-public class JPPFException extends Exception
-{
+public class JPPFException extends Exception {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JPPFException(final String message, final Throwable cause)
-  {
+  public JPPFException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -37,8 +40,7 @@ public class JPPFException extends Exception
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JPPFException(final String message)
-  {
+  public JPPFException(final String message) {
     super(message);
   }
 
@@ -46,8 +48,7 @@ public class JPPFException extends Exception
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFException(final Throwable cause)
-  {
+  public JPPFException(final Throwable cause) {
     super(cause);
   }
 }

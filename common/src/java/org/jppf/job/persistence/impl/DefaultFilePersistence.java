@@ -95,18 +95,18 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   public void store(final Collection<PersistenceInfo> infos) throws JobPersistenceException {
     try {
       if (debugEnabled) log.debug("storing {}", infos);
-      Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
+      final Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
       checkDirectory(jobDir);
-      for (PersistenceInfo info: infos) {
-        Path path = getPathFor(jobDir, info, false);
-        Path tmpPath = getPathFor(jobDir, info, true);
+      for (final PersistenceInfo info: infos) {
+        final Path path = getPathFor(jobDir, info, false);
+        final Path tmpPath = getPathFor(jobDir, info, true);
         try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(tmpPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
           InputStream in = info.getInputStream()) {
           StreamUtils.copyStream(in, out, false);
         }
         Files.move(tmpPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -116,16 +116,16 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
     if ((infos == null) || infos.isEmpty()) return null;
     try {
       if (debugEnabled) log.debug("loading {}", infos);
-      Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
-      List<InputStream> result = new ArrayList<>(infos.size());
+      final Path jobDir = getSubDir(infos.iterator().next().getJobUuid());
+      final List<InputStream> result = new ArrayList<>(infos.size());
       if (Files.exists(jobDir)) {
         for (PersistenceInfo info: infos) {
-          Path path = getPathFor(jobDir, info, false);
+          final Path path = getPathFor(jobDir, info, false);
           result.add(new BufferedInputStream(Files.newInputStream(path, StandardOpenOption.READ)));
         }
       }
       return result;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -133,7 +133,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   @Override
   public List<String> getPersistedJobUuids() throws JobPersistenceException {
     try {
-      List<String> result = new ArrayList<>();
+      final List<String> result = new ArrayList<>();
       if (Files.exists(rootPath)) {
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(rootPath, new DirectoryFilter())) {
           for (Path path : ds) {
@@ -143,21 +143,21 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
       }
       if (debugEnabled) log.debug("uuids of persisted jobs: {}", result);
       return result;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
 
   @Override
   public int[] getTaskPositions(final String jobUuid) throws JobPersistenceException {
-    int[] result = getPositions(jobUuid, PersistenceObjectType.TASK);
+    final int[] result = getPositions(jobUuid, PersistenceObjectType.TASK);
     if (debugEnabled) log.debug("positions of tasks for job uuid={} : {}", jobUuid, StringUtils.buildString(", ", "{", "}", result));
     return result;
   }
 
   @Override
   public int[] getTaskResultPositions(final String jobUuid) throws JobPersistenceException {
-    int[] result = getPositions(jobUuid, PersistenceObjectType.TASK_RESULT);
+    final int[] result = getPositions(jobUuid, PersistenceObjectType.TASK_RESULT);
     if (debugEnabled) log.debug("positions of results for job uuid={} : {}", jobUuid, StringUtils.buildString(", ", "{", "}", result));
     return result;
   }
@@ -166,9 +166,9 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   public void deleteJob(final String jobUuid) throws JobPersistenceException {
     try {
       if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
-      Path jobDir = getSubDir(jobUuid);
+      final Path jobDir = getSubDir(jobUuid);
       if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new FileUtils.DeleteFileVisitor());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -176,9 +176,9 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   @Override
   public boolean isJobPersisted(final String jobUuid) throws JobPersistenceException {
     try {
-      Path path = getPathFor(getSubDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
+      final Path path = getPathFor(getSubDir(jobUuid), PersistenceObjectType.JOB_HEADER, -1, false);
       return (path != null) && Files.exists(path);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new JobPersistenceException(e);
     }
   }
@@ -194,25 +194,25 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
   private int[] getPositions(final String jobUuid, final PersistenceObjectType type) throws JobPersistenceException {
     int[] positions = null;
     try {
-      Path jobDir = getSubDir(jobUuid);
+      final Path jobDir = getSubDir(jobUuid);
       if (!Files.exists(jobDir)) positions = new int[0];
       else {
-        List<Path> list = getPathsFor(jobDir, type);
+        final List<Path> list = getPathsFor(jobDir, type);
         positions = new int[list.size()];
         int count = 0;
         for (Path path : list) {
-          String s = pathname(path.getFileName());
-          String prefix = getPrefixForType(type);
-          String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
+          final String s = pathname(path.getFileName());
+          final String prefix = getPrefixForType(type);
+          final String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
           try {
             positions[count++] = Integer.valueOf(s2);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (debugEnabled) log.debug(String.format("positions of %s for job %s (path=%s, s=%s, prefix=%s, s2=%s) : %s", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e)));
             throw e;
           }
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }
     return positions;
@@ -240,8 +240,8 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    * @throws IOException if any I/O error occurs.
    */
   private Path getPathFor(final Path jobDir, final PersistenceObjectType type, final int position, final boolean isTemp) throws IOException {
-    String dir = pathname(jobDir);
-    String ext = isTemp ? TEMP_EXTENSION : DEFAULT_EXTENSION;
+    final String dir = pathname(jobDir);
+    final String ext = isTemp ? TEMP_EXTENSION : DEFAULT_EXTENSION;
     switch (type) {
       case JOB_HEADER:    return Paths.get(dir, HEADER_PREFIX + ext);
       case DATA_PROVIDER: return Paths.get(dir, DATA_PROVIDER_PREFIX + ext);
@@ -259,16 +259,16 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    * @throws IOException if any I/O error occurs.
    */
   private List<Path> getPathsFor(final Path jobDir, final PersistenceObjectType type) throws IOException {
-    List<Path> result = new ArrayList<>();
-    try (DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, new DirectoryStream.Filter<Path>() {
+    final List<Path> result = new ArrayList<>();
+    try (final DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, new DirectoryStream.Filter<Path>() {
       @Override
       public boolean accept(final Path entry) throws IOException {
-        String fileName = pathname(entry.getFileName());
-        String prefix = getPrefixForType(type);
+        final String fileName = pathname(entry.getFileName());
+        final String prefix = getPrefixForType(type);
         return fileName.startsWith(prefix) && fileName.endsWith(DEFAULT_EXTENSION);
       }
     })) {
-      for (Path path : ds) {
+      for (final Path path : ds) {
         if (path != null) result.add(path);
       }
     }
@@ -280,7 +280,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    * @param type the type of object for which to find a file.
    * @return the prefix as a string.
    */
-  private String getPrefixForType(final PersistenceObjectType type) {
+  private static String getPrefixForType(final PersistenceObjectType type) {
     switch (type) {
       case JOB_HEADER:    return HEADER_PREFIX;
       case DATA_PROVIDER: return DATA_PROVIDER_PREFIX;

@@ -83,11 +83,11 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
 
   @Override
   protected final void writeObjectOverride(final Object obj) throws IOException {
-    boolean alreadyWriting = writingObject;
+    final boolean alreadyWriting = writingObject;
     try {
       if (!alreadyWriting) writingObject = true;
       serializer.writeObject(obj);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e.getMessage(), e);
     } finally {
       if (!alreadyWriting) {
@@ -176,7 +176,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
   public void defaultWriteObject() throws IOException {
     try {
       serializer.writeDeclaredFields(serializer.currentObject, serializer.currentClassDescriptor);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e.getMessage(), e);
     }
@@ -201,10 +201,10 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
   @Override
   public void writeFields() throws IOException {
     try {
-      JPPFPutField f = (JPPFPutField) currentPutField;
+      final JPPFPutField f = (JPPFPutField) currentPutField;
       writeFields0(f.primitiveFields);
       writeFields0(f.objectFields);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e);
     }

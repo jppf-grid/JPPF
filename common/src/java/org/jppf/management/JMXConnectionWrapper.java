@@ -28,6 +28,7 @@ import javax.management.remote.*;
 import org.jppf.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.DebuggableThread;
 import org.slf4j.*;
 
 /**
@@ -35,9 +36,17 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
-  /** Logger for this class. */
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Logger for this class.
+   */
   private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
-  /** Determines whether debug log statements are enabled. */
+  /**
+   * Determines whether debug log statements are enabled.
+   */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
@@ -73,7 +82,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
         if ((jct = connectionThread.get()) == null) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
-          Thread t = new DebuggableThread(jct, CONNECTION_NAME_PREFIX + getId());
+          final Thread t = new DebuggableThread(jct, CONNECTION_NAME_PREFIX + getId());
           t.setDaemon(true);
           connectionStart = System.nanoTime();
           t.start();
@@ -91,8 +100,8 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   @Override
   public boolean connectAndWait(final long timeout) {
     if (isConnected()) return true;
-    long start = System.nanoTime();
-    long max = timeout > 0 ? timeout : Long.MAX_VALUE;
+    final long start = System.nanoTime();
+    final long max = timeout > 0 ? timeout : Long.MAX_VALUE;
     connect();
     long elapsed;
     while (!isConnected() && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < max)) goToSleep(Math.min(10L, max - elapsed));
@@ -103,7 +112,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   public void close() throws Exception {
     connected.compareAndSet(true, false);
     listeners.clear();
-    JMXConnectionThread jct = connectionThread.get();
+    final JMXConnectionThread jct = connectionThread.get();
     if (jct != null) {
       jct.close();
       connectionThread.set(null);
@@ -111,12 +120,12 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     if (jmxc != null) {
       final JMXConnector connector = jmxc;
       jmxc = null;
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
           try {
             connector.close();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (debugEnabled) log.debug(e.getMessage(), e);
           }
         }
@@ -145,10 +154,10 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     */
     Object result = null;
     try {
-      ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = new ObjectName(name);
       result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-    } catch(IOException e) {
-      String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
+    } catch(final IOException e) {
+      final String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
       if (debugEnabled) log.debug(msg);
       reset();
     }
@@ -186,9 +195,9 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     */
     Object result = null;
     try {
-      ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = new ObjectName(name);
       result = getMbeanConnection().getAttribute(mbeanName, attribute);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
       reset();
       throw e;
@@ -213,9 +222,9 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     }
     */
     try {
-      ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = new ObjectName(name);
       getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
-    } catch(IOException e) {
+    } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
       reset();
       throw e;
@@ -277,7 +286,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception {
     if (!isConnected()) connect();
     if (isConnected()) {
-      MBeanServerConnection mbsc = getMbeanConnection();
+      final MBeanServerConnection mbsc = getMbeanConnection();
       return JMX.newMBeanProxy(mbsc, objectName, inf, true);
     }
     return null;

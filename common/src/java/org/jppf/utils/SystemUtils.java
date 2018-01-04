@@ -105,7 +105,7 @@ public final class SystemUtils {
    */
   public static synchronized TypedProperties getSystemProperties() {
     if (systemProps == null) {
-      TypedProperties props = new TypedProperties();
+      final TypedProperties props = new TypedProperties();
       addOtherSystemProperties(props);
       systemProps = props;
     }
@@ -119,23 +119,23 @@ public final class SystemUtils {
   private static void addOtherSystemProperties(final TypedProperties props) {
     try {
       // run as privileged so we don't have to set write access on all properties in the security policy file.
-      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
+      final Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
         @Override
         public Properties run() {
           return System.getProperties();
         }
       });
-      Enumeration<?> en = sysProps.propertyNames();
+      final Enumeration<?> en = sysProps.propertyNames();
       while (en.hasMoreElements()) {
-        String name = (String) en.nextElement();
+        final String name = (String) en.nextElement();
         try {
           if (!props.contains(name)) props.setProperty(name, System.getProperty(name));
-        } catch(SecurityException e) {
+        } catch(final SecurityException e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.info(e.getMessage());
         }
       }
-    } catch(SecurityException e) {
+    } catch(final SecurityException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
@@ -146,27 +146,27 @@ public final class SystemUtils {
    * @return a <code>TypedProperties</code> instance holding the requested information.
    */
   public static TypedProperties getRuntimeInformation() {
-    TypedProperties props = new TypedProperties();
+    final TypedProperties props = new TypedProperties();
     try {
-      Runtime rt = Runtime.getRuntime();
+      final Runtime rt = Runtime.getRuntime();
       props.setInt("availableProcessors", rt.availableProcessors());
       props.setLong("freeMemory", rt.freeMemory());
       props.setLong("totalMemory", rt.totalMemory());
       props.setLong("maxMemory", rt.maxMemory());
-      long usedMemory = rt.totalMemory() - rt.freeMemory();
+      final long usedMemory = rt.totalMemory() - rt.freeMemory();
       props.setLong("usedMemory", usedMemory);
       props.setLong("availableMemory", rt.maxMemory() - usedMemory);
       if (ManagementUtils.isManagementAvailable()) {
-        Object mbeanServer = ManagementUtils.getPlatformServer();
-        String mbeanName = "java.lang:type=Runtime";
+        final Object mbeanServer = ManagementUtils.getPlatformServer();
+        final String mbeanName = "java.lang:type=Runtime";
         String s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "StartTime"));
         props.setProperty("startTime", s);
         s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "Uptime"));
         props.setProperty("uptime", s);
-        String[] inputArgs = (String[]) ManagementUtils.getAttribute(mbeanServer, mbeanName, "InputArguments");
+        final String[] inputArgs = (String[]) ManagementUtils.getAttribute(mbeanServer, mbeanName, "InputArguments");
         props.setProperty("inputArgs", StringUtils.arrayToString(", ", null, null, inputArgs));
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
@@ -181,22 +181,22 @@ public final class SystemUtils {
    * @return TypedProperties object with storage information.
    */
   public static synchronized TypedProperties getStorageInformation() {
-    TypedProperties props = new TypedProperties();
-    File[] roots = File.listRoots();
+    final TypedProperties props = new TypedProperties();
+    final File[] roots = File.listRoots();
     props.setInt("host.roots.number", roots == null ? 0 : roots.length);
     if ((roots == null) || (roots.length <= 0)) return props;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<roots.length; i++) {
       try {
         if (i > 0) sb.append(' ');
-        String s = roots[i].getCanonicalPath();
+        final String s = roots[i].getCanonicalPath();
         sb.append(s);
-        String prefix = "root." + i;
+        final String prefix = "root." + i;
         props.setProperty(prefix + ".name", s);
         props.setLong(prefix + ".space.total", roots[i].getTotalSpace());
         props.setLong(prefix + ".space.free", roots[i].getFreeSpace());
         props.setLong(prefix + ".space.usable", roots[i].getUsableSpace());
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(e.getMessage());
       }
@@ -213,11 +213,11 @@ public final class SystemUtils {
     if (env == null) {
       env = new TypedProperties();
       try {
-        Map<String, String> props = System.getenv();
+        final Map<String, String> props = System.getenv();
         for (Map.Entry<String, String> entry: props.entrySet()) {
           env.setProperty(entry.getKey(), entry.getValue());
         }
-      } catch(SecurityException e) {
+      } catch(final SecurityException e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.info(e.getMessage());
       }
@@ -235,7 +235,7 @@ public final class SystemUtils {
       try {
         network.setProperty("ipv4.addresses", formatAddresses(NetworkUtils.getIPV4Addresses()));
         network.setProperty("ipv6.addresses", formatAddresses(NetworkUtils.getIPV6Addresses()));
-      } catch(SecurityException e) {
+      } catch(final SecurityException e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.info(e.getMessage());
       }
@@ -249,10 +249,10 @@ public final class SystemUtils {
    * @return a string containing a space-separated list of <i>hostname</i>|<i>ip_address</i> pairs.
    */
   private static String formatAddresses(final List<? extends InetAddress> addresses) {
-    StringBuilder sb = new StringBuilder();
-    for (InetAddress addr: addresses) {
-      String name = addr.getHostName();
-      String ip = addr.getHostAddress();
+    final StringBuilder sb = new StringBuilder();
+    for (final InetAddress addr: addresses) {
+      final String name = addr.getHostName();
+      final String ip = addr.getHostAddress();
       if (sb.length() > 0) sb.append(' ');
       sb.append(name).append('|').append(ip);
     }
@@ -289,7 +289,7 @@ public final class SystemUtils {
    * @return an int value identifying the type of OS.
    */
   private static int determineOSType() {
-    String name = System.getProperty("os.name");
+    final String name = System.getProperty("os.name");
     if (StringUtils.startsWithOneOf(name, true, "Linux", "SunOS", "Solaris", "FreeBSD", "OpenBSD")) return X11_OS;
     else if (StringUtils.startsWithOneOf(name, true, "Mac", "Darwin")) return MAC_OS;
     else if (name.startsWith("Windows") && !name.startsWith("Windows CE")) return WINDOWS_OS;
@@ -329,21 +329,21 @@ public final class SystemUtils {
     // we expect the name to be in '<pid>@hostname' format - this is JVM dependent
     try {
       if (ManagementUtils.isManagementAvailable()) {
-        String name = String.valueOf(ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=Runtime", "Name"));
-        int idx = name.indexOf('@');
+        final String name = String.valueOf(ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=Runtime", "Name"));
+        final int idx = name.indexOf('@');
         if (idx >= 0) {
-          String sub = name.substring(0, idx);
+          final String sub = name.substring(0, idx);
           try {
             pid = Integer.valueOf(sub);
             if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
-          } catch (Exception e) {
-            String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
+          } catch (final Exception e) {
+            final String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
             if (debugEnabled) log.debug(msg, e);
             else log.warn(msg);
           }
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
@@ -372,7 +372,7 @@ public final class SystemUtils {
    * @param key the hokk's key.
    */
   public static void removeShutdownHook(final String key) {
-    Thread hook = shutdownHooks.remove(key);
+    final Thread hook = shutdownHooks.remove(key);
     if (hook != null) Runtime.getRuntime().removeShutdownHook(hook);
   }
 
@@ -383,7 +383,7 @@ public final class SystemUtils {
    */
   public static void printPidAndUuid(final String component, final String uuid) {
     StringBuilder sb = new StringBuilder(component == null ? "<unknown component type>" : component);
-    int pid = getPID();
+    final int pid = getPID();
     if (pid >= 0) sb = sb.append(" process id: ").append(pid).append(',');
     sb.append(" uuid: ").append(uuid);
     System.out.println(sb.toString());
@@ -411,7 +411,7 @@ public final class SystemUtils {
           capture("Arch", os, STRING);
           capture("AvailableProcessors", os, INT);
           //capture("SystemLoadAverage", os, DOUBLE);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.info(e.getMessage());
         }
@@ -431,7 +431,7 @@ public final class SystemUtils {
     Object value = null;
     try {
       value = ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=OperatingSystem", name);
-    } catch(@SuppressWarnings("unused") Exception ignore) {
+    } catch(@SuppressWarnings("unused") final Exception ignore) {
       return;
     }
     switch(type) {
@@ -454,7 +454,7 @@ public final class SystemUtils {
    * @return the currently used heap memory.
    */
   public static long getUsedMemory() {
-    Runtime rt = Runtime.getRuntime();
+    final Runtime rt = Runtime.getRuntime();
     return rt.totalMemory() - rt.freeMemory();
   }
 
@@ -462,7 +462,7 @@ public final class SystemUtils {
    * @return the currently used heap memory.
    */
   public static double getPctUsedMemory() {
-    Runtime rt = Runtime.getRuntime();
+    final Runtime rt = Runtime.getRuntime();
     return (double) (rt.totalMemory() - rt.freeMemory()) / (double) rt.maxMemory();
   }
 
@@ -488,13 +488,13 @@ public final class SystemUtils {
    * @return the system properties printed one per line.
    */
   public static String printSystemProperties() {
-    Enumeration<?> names = System.getProperties().propertyNames();
-    Map<String, String> props = new TreeMap<>();
+    final Enumeration<?> names = System.getProperties().propertyNames();
+    final Map<String, String> props = new TreeMap<>();
     while (names.hasMoreElements()) {
-      String name = (String) names.nextElement();
+      final String name = (String) names.nextElement();
       props.put(name, System.getProperty(name));
     }
-    StringBuilder sb = new StringBuilder("{\n");
+    final StringBuilder sb = new StringBuilder("{\n");
     for (Map.Entry<String, String> entry: props.entrySet()) {
       sb.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
     }

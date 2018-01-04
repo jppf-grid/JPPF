@@ -30,7 +30,7 @@ import net.jpountz.lz4.*;
 public class LZ4Serialization extends JPPFCompositeSerialization {
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
-    LZ4BlockOutputStream lz4os = new LZ4BlockOutputStream(os, 32*1024, LZ4Factory.fastestInstance().fastCompressor());
+    final LZ4BlockOutputStream lz4os = new LZ4BlockOutputStream(os, 32*1024, LZ4Factory.fastestInstance().fastCompressor());
     try {
       getDelegate().serialize(o, lz4os);
     } finally {
@@ -40,7 +40,7 @@ public class LZ4Serialization extends JPPFCompositeSerialization {
 
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    LZ4BlockInputStream lz4is = new LZ4BlockInputStream(is, LZ4Factory.fastestInstance().fastDecompressor());
+    final LZ4BlockInputStream lz4is = new LZ4BlockInputStream(is, LZ4Factory.fastestInstance().fastDecompressor());
     return getDelegate().deserialize(lz4is);
   }
 

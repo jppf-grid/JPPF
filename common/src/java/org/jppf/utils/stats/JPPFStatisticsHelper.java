@@ -173,7 +173,7 @@ public final class JPPFStatisticsHelper {
    * @return a translation of the label, or the label itself if no translation could be found.
    */
   public static String getLocalizedLabel(final JPPFSnapshot snapshot, final Locale locale) {
-    String label = snapshot.getLabel();
+    final String label = snapshot.getLabel();
     return LocalizationUtils.getLocalized(I18N_BASE, label, label, locale);
   }
 
@@ -200,10 +200,10 @@ public final class JPPFStatisticsHelper {
    * @exclude
    */
   public static JPPFStatistics createServerStatistics() {
-    JPPFStatistics statistics = new JPPFStatistics();
-    Iterator<JPPFFilteredStatisticsListener> it = ServiceFinder.lookupProviders(JPPFFilteredStatisticsListener.class);
+    final JPPFStatistics statistics = new JPPFStatistics();
+    final Iterator<JPPFFilteredStatisticsListener> it = ServiceFinder.lookupProviders(JPPFFilteredStatisticsListener.class);
     while (it.hasNext()) {
-      JPPFFilteredStatisticsListener listener = it.next();
+      final JPPFFilteredStatisticsListener listener = it.next();
       statistics.addListener(listener, listener.getFilter());
     }
     statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,

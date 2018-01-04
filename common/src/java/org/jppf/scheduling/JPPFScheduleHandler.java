@@ -103,8 +103,8 @@ public class JPPFScheduleHandler {
         log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
       }
     }
-    Date date = schedule.toDate(start);
-    ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
+    final Date date = schedule.toDate(start);
+    final ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
     futureMap.put(key, future);
     if (debugEnabled) {
       synchronized(sdf) {
@@ -137,7 +137,7 @@ public class JPPFScheduleHandler {
    */
   public void cancelAction(final Object key, final boolean mayInterruptIfRunning) {
     if (key == null) return;
-    ScheduledFuture<?> future = futureMap.remove(key);
+    final ScheduledFuture<?> future = futureMap.remove(key);
     if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", future=" + future);
     if (future != null) future.cancel(mayInterruptIfRunning);
   }
@@ -154,8 +154,8 @@ public class JPPFScheduleHandler {
    * @param shutdown flag indicating whether this schedule handler should be shutdown.
    */
   public void clear(final boolean shutdown) {
-    for (Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet()) {
-      ScheduledFuture<?> f = entry.getValue();
+    for (final Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet()) {
+      final ScheduledFuture<?> f = entry.getValue();
       if (f != null) f.cancel(true);
     }
     futureMap.clear();

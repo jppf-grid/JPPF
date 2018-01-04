@@ -29,6 +29,10 @@ import javax.management.Notification;
  */
 public class JPPFNodeForwardingNotification extends Notification {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Internal notification sequence number.
    */
   private final static AtomicLong sequence = new AtomicLong(0L);

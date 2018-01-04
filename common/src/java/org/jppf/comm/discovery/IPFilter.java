@@ -79,7 +79,7 @@ public class IPFilter {
    * Configure this IP filter from the JPPF configuration.
    */
   public void configure() {
-    String prefix = "jppf.discovery." + (broadcaster ? "broadcast." : "");
+    final String prefix = "jppf.discovery." + (broadcaster ? "broadcast." : "");
     configureIPAddressPatterns(config.getString(prefix + "include.ipv4"), true, true);
     configureIPAddressPatterns(config.getString(prefix + "include.ipv6"), false, true);
     configureIPAddressPatterns(config.getString(prefix + "exclude.ipv4"), true, false);
@@ -94,17 +94,17 @@ public class IPFilter {
    */
   private void configureIPAddressPatterns(final String source, final boolean ipv4, final boolean inclusive) {
     if (source == null) return;
-    String src = source.trim();
+    final String src = source.trim();
     if ("".equals(src)) return;
-    String[] p = RegexUtils.COMMA_OR_SEMICOLUMN_PATTERN.split(src);
+    final String[] p = RegexUtils.COMMA_OR_SEMICOLUMN_PATTERN.split(src);
     if ((p == null) || (p.length == 0)) return;
-    for (String s: p) {
+    for (final String s: p) {
       try {
-        AbstractIPAddressPattern pattern = ipv4 ? new IPv4AddressNetmask(s) : new IPv6AddressNetmask(s);
+        final AbstractIPAddressPattern pattern = ipv4 ? new IPv4AddressNetmask(s) : new IPv6AddressNetmask(s);
         if (inclusive) includePatterns.add(pattern);
         else excludePatterns.add(pattern);
         if (debugEnabled) log.debug("added pattern {}, inclusive={}", pattern, inclusive);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.warn("invalid pattern in '[}' : {}", source, ExceptionUtils.getMessage(e));
       }
     }
@@ -116,9 +116,9 @@ public class IPFilter {
    * @return true if the address passes the filters, false otherwise.
    */
   public boolean isAddressAccepted(final InetAddress ip) {
-    int[] ipComps = NetworkUtils.toIntArray(ip);
-    boolean included = matches(ipComps, includePatterns, true);
-    boolean excluded = matches(ipComps, excludePatterns, false);
+    final int[] ipComps = NetworkUtils.toIntArray(ip);
+    final boolean included = matches(ipComps, includePatterns, true);
+    final boolean excluded = matches(ipComps, excludePatterns, false);
     return included && !excluded;
   }
 
@@ -129,7 +129,7 @@ public class IPFilter {
    * @param defIfEmpty the value to return if the list of patterns is empty.
    * @return <code>true</code> if the IP address matches one of the filter, <code>false</code> otherwise.
    */
-  private boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty) {
+  private static boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty) {
     if ((patterns == null) || patterns.isEmpty()) return defIfEmpty;
     for (AbstractIPAddressPattern p: patterns) {
       if (p.matches(ipComps)) return true;

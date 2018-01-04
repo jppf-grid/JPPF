@@ -71,14 +71,14 @@ class SerializationCaches {
    * @return a mapping of primitive types to their class descriptor.
    */
   private static Map<Class<?>, ClassDescriptor> initGlobalTypes() {
-    Map<Class<?>, ClassDescriptor> map = createClassKeyMap();
-    AtomicInteger counter = new AtomicInteger(0);
+    final Map<Class<?>, ClassDescriptor> map = createClassKeyMap();
+    final AtomicInteger counter = new AtomicInteger(0);
     try {
-      for (Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(c, counter, map, null);
+      for (final Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(c, counter, map, null);
       //for (Class<?> c: WRAPPER_TYPES) getClassDescriptorGeneric(c, counter, map, null);
       getClassDescriptorGeneric(Object.class, counter, map, null);
       getClassDescriptorGeneric(String.class, counter, map, null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("error initializing global types", e);
     }
     return map;
@@ -118,9 +118,9 @@ class SerializationCaches {
    * @return the handle as an int value.
    */
   int newObjectHandle(final Object o) {
-    int handle = objectHandleCount.incrementAndGet();
+    final int handle = objectHandleCount.incrementAndGet();
     objectHandleMap.put(o, handle);
-    if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(@SuppressWarnings("unused") Exception e) {}
+    if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(@SuppressWarnings("unused") final Exception e) {}
     return handle;
   }
 
@@ -151,12 +151,12 @@ class SerializationCaches {
    */
   static ClassDescriptor addClassGeneric(final Class<?> clazz, final AtomicInteger counter,
       final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception {
-    ClassDescriptor cd = new ClassDescriptor(clazz);
+    final ClassDescriptor cd = new ClassDescriptor(clazz);
     //if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
     map.put(clazz, cd);
     if (map2 != null) map2.put(clazz, cd);
-    for (FieldDescriptor fd: cd.fields) fd.type = getClassDescriptorGeneric(fd.field.getType(), counter, map, map2);
-    Class<?> tmpClazz = clazz.getSuperclass();
+    for (final FieldDescriptor fd: cd.fields) fd.type = getClassDescriptorGeneric(fd.field.getType(), counter, map, map2);
+    final Class<?> tmpClazz = clazz.getSuperclass();
     if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
     if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
     return cd;

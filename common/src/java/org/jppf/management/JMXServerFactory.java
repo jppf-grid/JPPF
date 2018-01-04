@@ -47,7 +47,7 @@ public class JMXServerFactory {
    * @throws Exception if the server could not be created.
    */
   public static JMXServer createServer(final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception {
-    String protocol = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
+    final String protocol = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
     JMXServer server = null;
     if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) {
       server = new JPPFJMXServer(uuid, ssl, portProperty);

@@ -31,6 +31,10 @@ import org.jppf.utils.streams.*;
  */
 public abstract class AbstractLocation<T> implements Location<T> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The path for this location.
    */
   protected final T path;
@@ -65,14 +69,14 @@ public abstract class AbstractLocation<T> implements Location<T> {
 
   @Override
   public byte[] toByteArray() throws Exception {
-    JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
+    final JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
     copyStream(getInputStream(), os, false);
     return os.toByteArray();
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("path=").append(path);
     sb.append(']');
@@ -99,9 +103,8 @@ public abstract class AbstractLocation<T> implements Location<T> {
    */
   protected void fireLocationEvent(final long n) {
     if (listeners.isEmpty()) return;
-    LocationEvent event = new LocationEvent(this, n);
-    for (LocationEventListener l : listeners)
-      l.dataTransferred(event);
+    final LocationEvent event = new LocationEvent(this, n);
+    for (final LocationEventListener l : listeners) l.dataTransferred(event);
   }
 
   /**
@@ -112,7 +115,7 @@ public abstract class AbstractLocation<T> implements Location<T> {
    * @throws IOException if an I/O error occurs.
    */
   private void copyStream(final InputStream is, final OutputStream os, final boolean withEvt) throws IOException {
-    OutputStream tmpos = !withEvt ? os : new NotifyingOutputStream(os, new NotifyingStreamCallback() {
+    final OutputStream tmpos = !withEvt ? os : new NotifyingOutputStream(os, new NotifyingStreamCallback() {
       @Override
       public void bytesNotification(final long length) throws IOException {
         fireLocationEvent(length);

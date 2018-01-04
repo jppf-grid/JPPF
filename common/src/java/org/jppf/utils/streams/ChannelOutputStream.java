@@ -58,22 +58,19 @@ public class ChannelOutputStream extends OutputStream {
     ByteBuffer tmpBuffer = null;
     try {
       tmpBuffer = DirectBufferPool.provideBuffer();
-      int cap = tmpBuffer.capacity();
+      final int cap = tmpBuffer.capacity();
       int count = 0;
       while (count < len) {
         tmpBuffer.clear();
-        int size = Math.min(cap, len - count);
+        final int size = Math.min(cap, len - count);
         tmpBuffer.put(data, offset + count, size);
         tmpBuffer.flip();
-        int n = channel.write(tmpBuffer);
+        final int n = channel.write(tmpBuffer);
         if (n < 0) break;
         count += n;
       }
     } finally {
-      if (tmpBuffer != null) {
-        DirectBufferPool.releaseBuffer(tmpBuffer);
-        tmpBuffer = null;
-      }
+      if (tmpBuffer != null) DirectBufferPool.releaseBuffer(tmpBuffer);
     }
   }
 }

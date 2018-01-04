@@ -78,7 +78,7 @@ public final class PermissionsFactory {
    */
   public static synchronized PermissionCollection getPermissions(final ClassLoader classLoader) {
     if (permList == null) {
-      ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
+      final ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
       createPermissions(cl);
       if (debugEnabled) log.debug("created normal permissions");
     }
@@ -94,7 +94,7 @@ public final class PermissionsFactory {
    */
   public static synchronized PermissionCollection getExtendedPermissions(final ClassLoader classLoader) {
     if (permList == null) {
-      ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
+      final ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
       createPermissions(cl);
       if (debugEnabled) log.debug("created extended permissions");
     }
@@ -127,17 +127,17 @@ public final class PermissionsFactory {
    */
   private static void createDynamicPermissions() {
     try {
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       String host = config.get(JPPFProperties.SERVER_HOST);
-      boolean sslEnabled = config.get(JPPFProperties.SSL_ENABLED);
+      final boolean sslEnabled = config.get(JPPFProperties.SSL_ENABLED);
       // for backward compatibility with v2.x configurations
       //int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
-      int port = config.get(sslEnabled ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT);
+      final int port = config.get(sslEnabled ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT);
       addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
       host = config.get(JPPFProperties.DISCOVERY_GROUP);
       //port = props.getInt("jppf.discovery.port", 11111);
       addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -147,9 +147,9 @@ public final class PermissionsFactory {
    */
   private static void createManagementPermissions() {
     try {
-      TypedProperties props = JPPFConfiguration.getProperties();
+      final TypedProperties props = JPPFConfiguration.getProperties();
       //String host = props.getString("jppf.management.host", "localhost");
-      int port = props.get(JPPFProperties.MANAGEMENT_PORT);
+      final int port = props.get(JPPFProperties.MANAGEMENT_PORT);
       // TODO: find a way to be more restrictive on RMI permissions
       //addPermission(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"), "management");
       addPermission(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"), "management");
@@ -158,7 +158,7 @@ public final class PermissionsFactory {
       addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
       // TODO: find a way to be more restrictive on RMI permissions
       addPermission(new SocketPermission("*:1024-", "accept,connect,listen,resolve"), "management");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -171,11 +171,11 @@ public final class PermissionsFactory {
     InputStream is = null;
     LineNumberReader reader = null;
     try {
-      String file = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
+      final String file = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
       if (file == null) return;
       try {
         is = new FileInputStream(file);
-      } catch (FileNotFoundException e) {
+      } catch (final FileNotFoundException e) {
         if (debugEnabled) log.debug("jppf policy file '{}' not found locally: {}", file, e);
       }
       if (is == null) is = classLoader.getResourceAsStream(file);
@@ -185,7 +185,7 @@ public final class PermissionsFactory {
       }
       reader = new LineNumberReader(new InputStreamReader(is));
       int count = 0;
-      boolean end = false;
+      final boolean end = false;
       while (!end) {
         String line = reader.readLine();
         if (line == null) break;
@@ -203,10 +203,10 @@ public final class PermissionsFactory {
         }
         line = line.substring(0, line.length() - 1);
         line = line.trim();
-        Permission p = parsePermission(line, file, count);
+        final Permission p = parsePermission(line, file, count);
         if (p != null) addPermission(p, "static");
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     } finally {
       StreamUtils.closeSilent(reader);
@@ -284,7 +284,7 @@ public final class PermissionsFactory {
     Class<?> c = null;
     try {
       c = Class.forName(className);
-    } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+    } catch (@SuppressWarnings("unused") final ClassNotFoundException e) {
       return new UnresolvedPermission(className, name, actions, null);
     }
 
@@ -301,16 +301,16 @@ public final class PermissionsFactory {
         params = new Object[] { name };
       }
       permission = (Permission) constructor.newInstance(params);
-    } catch (InstantiationException e) {
+    } catch (final InstantiationException e) {
       ex = e;
       msg = "could not instantiate";
-    } catch (IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       ex = e;
       msg = "could not instantiate";
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       ex = e;
       msg = "could not instantiate";
-    } catch (NoSuchMethodException e) {
+    } catch (final NoSuchMethodException e) {
       ex = e;
       msg = "could not find a proper constructor for";
     }
@@ -330,8 +330,8 @@ public final class PermissionsFactory {
    * @return the token with its properties expanded.
    */
   private static String expandProperties(final String source, final String file, final int line) {
-    StringBuilder sb = new StringBuilder();
-    int length = source.length();
+    final StringBuilder sb = new StringBuilder();
+    final int length = source.length();
     int pos = 0;
     while (pos < length) {
       int idx = source.indexOf("${", pos);
@@ -350,7 +350,7 @@ public final class PermissionsFactory {
       if (s == null) return source;
       s = s.trim();
       if ("".equals(s)) return source;
-      String value = System.getProperty(s);
+      final String value = System.getProperty(s);
       if (value == null) return source;
       sb.append(value);
       pos = idx + 1;

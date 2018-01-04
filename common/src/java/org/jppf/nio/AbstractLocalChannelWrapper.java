@@ -194,7 +194,7 @@ public abstract class AbstractLocalChannelWrapper<S, T extends AbstractNioContex
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(1000);
+    final StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
     sb.append("id=").append(getId());

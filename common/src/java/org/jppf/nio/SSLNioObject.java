@@ -92,7 +92,7 @@ public class SSLNioObject extends AbstractNioObject {
   @Override
   public boolean read() throws Exception {
     if (count >= size) return true;
-    ByteBuffer buf = sslHandler.getApplicationReceiveBuffer();
+    final ByteBuffer buf = sslHandler.getApplicationReceiveBuffer();
     if (os == null) os = location.getOutputStream();
 
     int n = 0;
@@ -115,7 +115,7 @@ public class SSLNioObject extends AbstractNioObject {
       if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + sslHandler.getChannelReceiveBuffer());
     }
 
-    boolean b = count >= size;
+    final boolean b = count >= size;
     if (b) {
       StreamUtils.close(os, log);
       os = null;
@@ -126,15 +126,15 @@ public class SSLNioObject extends AbstractNioObject {
   @Override
   public boolean write() throws Exception {
     if (count >= size) return true;
-    ByteBuffer buf = sslHandler.getApplicationSendBuffer();
+    final ByteBuffer buf = sslHandler.getApplicationSendBuffer();
     if (is == null) {
       is = location.getInputStream();
       statefulCount = 0;
     }
     //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     if (buf.hasRemaining() && (statefulCount < size)) {
-      int min = Math.min(size - statefulCount, buf.remaining());
-      int read = is.read(buf.array(), buf.position(), min);
+      final int min = Math.min(size - statefulCount, buf.remaining());
+      final int read = is.read(buf.array(), buf.position(), min);
       if (read > 0) {
         statefulCount += read;
         buf.position(buf.position() + read);
@@ -150,7 +150,7 @@ public class SSLNioObject extends AbstractNioObject {
       //if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     } while (n > 0);
 
-    boolean b = count >= size;
+    final boolean b = count >= size;
     if (b) {
       sslHandler.flush();
       buf.clear();

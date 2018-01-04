@@ -85,7 +85,7 @@ public abstract class AbstractFilePersistence<I, E extends Exception> {
     if (!Files.exists(dir)) {
       try {
         Files.createDirectories(dir);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw convertException(e);
       }
     }
@@ -108,7 +108,7 @@ public abstract class AbstractFilePersistence<I, E extends Exception> {
       }
       Files.walkFileTree(channelPath, new FileUtils.DeleteFileVisitor());
       return true;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw convertException(e);
     }
   }

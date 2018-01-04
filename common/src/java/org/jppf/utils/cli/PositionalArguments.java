@@ -25,17 +25,22 @@ import java.util.Map;
  * @author Laurent Cohen
  */
 public class PositionalArguments extends AbstractCLIArguments<PositionalArguments> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public PositionalArguments printUsage() {
     if (title != null) System.out.println(title);
     int maxLen = 0;
-    for (CLIArgument arg: argDefs.values()) {
-      int len = arg.getName().length();
+    for (final CLIArgument arg: argDefs.values()) {
+      final int len = arg.getName().length();
       if (len > maxLen) maxLen = len;
     }
-    String format = "%-" + maxLen + "s : %s%n";
-    for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
-      CLIArgument arg = entry.getValue();
+    final String format = "%-" + maxLen + "s : %s%n";
+    for (final Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      final CLIArgument arg = entry.getValue();
       System.out.printf(format, arg.getName(), arg.getUsage());
     }
     return this;
@@ -50,7 +55,7 @@ public class PositionalArguments extends AbstractCLIArguments<PositionalArgument
         if (pos >= clArgs.length) break;
         setString(Integer.toString(pos), clArgs[pos++]);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       printError(null, e, clArgs);
       throw e;
     }

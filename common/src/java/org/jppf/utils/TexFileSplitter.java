@@ -37,7 +37,7 @@ public class TexFileSplitter {
   public static void main(final String[] args) {
     try {
       processArguments(args);
-      File file = new File(props.getString("inputFile"));
+      final File file = new File(props.getString("inputFile"));
       int lines = 0;
       String s = "";
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -48,14 +48,14 @@ public class TexFileSplitter {
       }
       System.out.println("counted " + lines  + " lines");
       try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-        int nbFiles = props.getInt("nbFiles");
-        int n = lines/nbFiles;
+        final int nbFiles = props.getInt("nbFiles");
+        final int n = lines/nbFiles;
         for (int i=0; i<nbFiles; i++) {
-          int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
+          final int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
           s = "";
-          File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
+          final File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
           FileUtils.mkdirs(out);
-          try (BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
+          try (final BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
             for (int j=0; j<nb && s != null; j++) {
               s = reader.readLine();
               if (s != null) writer.write(s + '\n');
@@ -66,7 +66,7 @@ public class TexFileSplitter {
         }
       }
       System.out.println("wrote all files");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println(e.getMessage());
       displayOptions();
     }
@@ -81,7 +81,7 @@ public class TexFileSplitter {
     if ((args == null) || (args.length < 1)) throw new Exception("you must specify at least the input file (-i option)");
     int i = 0;
     while (i <args.length) {
-      String s = args[i++];
+      final String s = args[i++];
       if (StringUtils.isOneOf(s, false, "-?", "-h", "-help")) throw new Exception("\nFile splitter help");
       else if ("-i".equals(s)) props.setProperty("inputFile", args[i++]);
       else if ("-o".equals(s)) props.setProperty("outputDir", args[i++]);

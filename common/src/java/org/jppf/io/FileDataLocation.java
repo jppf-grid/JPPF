@@ -132,10 +132,10 @@ public class FileDataLocation extends AbstractDataLocation {
       count = 0;
     }
     try {
-      int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
+      final int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
       if ((n < 0) || (count >= size)) transferring = false;
       return n;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       transferring = false;
       throw e;
     }
@@ -158,15 +158,15 @@ public class FileDataLocation extends AbstractDataLocation {
    * @throws Exception if an IO error occurs.
    */
   private int nonBlockingTransferFrom(final InputSource source) throws Exception {
-    int remaining = size - count;
+    final int remaining = size - count;
     if (remaining < buffer.remaining()) buffer.limit(buffer.position() + remaining);
-    int n = source.read(buffer);
+    final int n = source.read(buffer);
     if (n > 0) {
       count += n;
       buffer.flip();
       int tempCount = 0;
       while (tempCount < n) {
-        int tmp = fileChannel.write(buffer);
+        final int tmp = fileChannel.write(buffer);
         if (tmp < 0) {
           transferring = false;
           return -1;
@@ -188,9 +188,9 @@ public class FileDataLocation extends AbstractDataLocation {
    */
   private int blockingTransferFrom(final InputSource source) throws Exception {
     while (count < size) {
-      int remaining = size - count;
+      final int remaining = size - count;
       if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
-      int n = source.read(buffer);
+      final int n = source.read(buffer);
       if (n < 0) {
         transferring = false;
         return -1;
@@ -199,7 +199,7 @@ public class FileDataLocation extends AbstractDataLocation {
         buffer.flip();
         int tempCount = 0;
         while (tempCount < n) {
-          int tmp = fileChannel.write(buffer);
+          final int tmp = fileChannel.write(buffer);
           if (tmp < 0) {
             transferring = false;
             return -1;
@@ -230,7 +230,7 @@ public class FileDataLocation extends AbstractDataLocation {
     }
     try {
       return blocking ? blockingTransferTo(dest) : nonBlockingTransferTo(dest);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       transferring = false;
       throw e;
     } finally {
@@ -255,7 +255,7 @@ public class FileDataLocation extends AbstractDataLocation {
       blockSize = fileChannel.read(buffer);
       buffer.flip();
     }
-    int n = dest.write(buffer);
+    final int n = dest.write(buffer);
     if (n < 0) {
       transferring = false;
       return -1;
@@ -280,7 +280,7 @@ public class FileDataLocation extends AbstractDataLocation {
       blockSize = fileChannel.read(buffer);
       buffer.flip();
       while(buffer.hasRemaining()) {
-        int n = dest.write(buffer);
+        final int n = dest.write(buffer);
         if (n < 0) {
           transferring = false;
           return -1;
@@ -302,7 +302,7 @@ public class FileDataLocation extends AbstractDataLocation {
     try {
       if (traceEnabled) log.trace("finalizing " + this);
       if (copyCount.decrementAndGet() <= 0) {
-        File file = new File(filePath);
+        final File file = new File(filePath);
         if (file.exists()) file.delete();
       }
     } finally {

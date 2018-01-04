@@ -26,6 +26,11 @@ import org.jppf.node.protocol.JPPFDistributedJob;
  * @since 5.1
  */
 public class AllJobsSelector implements JobSelector {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public boolean accepts(final JPPFDistributedJob job) {
     return true;

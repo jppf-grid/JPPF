@@ -28,6 +28,11 @@ import org.jppf.utils.PropertiesCollection;
  */
 public class Preference extends LogicalRule {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this policy with the specified array of children polices.
    * @param policies the polcies in order of preference.
    */

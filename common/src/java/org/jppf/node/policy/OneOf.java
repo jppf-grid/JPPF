@@ -53,7 +53,7 @@ public class OneOf extends LeftOperandRule {
   public OneOf(final String propertyNameOrExpression, final double... values) {
     super(ValueType.NUMERIC, propertyNameOrExpression);
     numbers = new ArrayList<>(values.length);
-    for (double value: values) numbers.add(new NumericExpression(value));
+    for (final double value: values) numbers.add(new NumericExpression(value));
   }
 
   /**
@@ -64,7 +64,7 @@ public class OneOf extends LeftOperandRule {
   public OneOf(final String propertyNameOrExpression, final String... values) {
     super(ValueType.NUMERIC, propertyNameOrExpression);
     numbers = new ArrayList<>(values.length);
-    for (String value: values) numbers.add(new NumericExpression(value));
+    for (final String value: values) numbers.add(new NumericExpression(value));
   }
 
   /**
@@ -76,7 +76,7 @@ public class OneOf extends LeftOperandRule {
   public OneOf(final String propertyNameOrExpression, final boolean ignoreCase, final String... values) {
     super(ValueType.STRING, propertyNameOrExpression);
     strings = new ArrayList<>(values.length);
-    for (String value: values) strings.add(new StringExpression(value));
+    for (final String value: values) strings.add(new StringExpression(value));
     this.ignoreCase = ignoreCase;
   }
 
@@ -87,16 +87,16 @@ public class OneOf extends LeftOperandRule {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    Object o = getLeftOperandValue(info);
+    final Object o = getLeftOperandValue(info);
     if (numbers != null) {
       if (o != null) {
-        for (Expression<Double> expr: numbers) {
+        for (final Expression<Double> expr: numbers) {
           if (o.equals(expr.evaluate(info))) return true;
         }
       }
     } else if (strings != null) {
-      for (Expression<String> expr : strings) {
-        String value = expr.evaluate(info);
+      for (final Expression<String> expr : strings) {
+        final String value = expr.evaluate(info);
         if ((value == null) && (o == null)) return true;
         else if ((value != null) && (o != null)) {
           if (!ignoreCase && o.equals(value) || ignoreCase && ((String) o).equalsIgnoreCase(value)) return true;
@@ -112,13 +112,13 @@ public class OneOf extends LeftOperandRule {
    */
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder(indent(n)).append("<OneOf valueType=\"");
+    final StringBuilder sb = new StringBuilder(indent(n)).append("<OneOf valueType=\"");
     if (strings != null) sb.append("string");
     else if (numbers != null) sb.append("numeric");
     sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
     sb.append(indent(n + 1)).append(xmlElement("Property", leftOperand.getExpression())).append('\n');
-    List<? extends Expression<?>> list = (strings != null) ? strings : numbers;
-    for (Expression<?> expr: list) sb.append(indent(n + 1)).append(xmlElement("Value", expr.getExpression())).append('\n');
+    final List<? extends Expression<?>> list = (strings != null) ? strings : numbers;
+    for (final Expression<?> expr: list) sb.append(indent(n + 1)).append(xmlElement("Value", expr.getExpression())).append('\n');
     sb.append(indent(n)).append("</OneOf>\n");
     return sb.toString();
   }

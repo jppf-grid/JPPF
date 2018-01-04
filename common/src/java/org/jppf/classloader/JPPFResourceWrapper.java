@@ -265,7 +265,7 @@ public class JPPFResourceWrapper implements Serializable {
    * @return the id as a long.
    */
   public long getCallableID() {
-    Long id = (Long) getData(CALLABLE_ID);
+    final Long id = (Long) getData(CALLABLE_ID);
     return id == null ? NO_CALLABLE_ID : id;
   }
 
@@ -288,7 +288,7 @@ public class JPPFResourceWrapper implements Serializable {
    */
   public Object getData(final ResourceIdentifier key, final Object def) {
     synchronized (dataMap) {
-      Object o = dataMap.get(key);
+      final Object o = dataMap.get(key);
       return o == null ? def : o;
     }
   }
@@ -323,7 +323,7 @@ public class JPPFResourceWrapper implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("dynamic=").append(dynamic);
     sb.append(", name=").append(getName());
@@ -344,7 +344,7 @@ public class JPPFResourceWrapper implements Serializable {
   @Override
   public boolean equals(final Object obj) {
     if ((obj == null) || (obj.getClass() != this.getClass())) return false;
-    JPPFResourceWrapper other = (JPPFResourceWrapper) obj;
+    final JPPFResourceWrapper other = (JPPFResourceWrapper) obj;
     if (dynamic != other.dynamic) return false;
     if (getCallableID() != other.getCallableID()) return false;
     if (uuidPath == null) {
@@ -352,8 +352,8 @@ public class JPPFResourceWrapper implements Serializable {
     } else {
       if (!uuidPath.equals(other.uuidPath)) return false;
     }
-    String name = getName();
-    String otherName = other.getName();
+    final String name = getName();
+    final String otherName = other.getName();
     if (name == null) {
       if (otherName != null) return false;
     }
@@ -362,8 +362,8 @@ public class JPPFResourceWrapper implements Serializable {
 
   @Override
   public int hashCode() {
-    long id = getCallableID();
-    String name = getName();
+    final long id = getCallableID();
+    final String name = getName();
     return 31 + (dynamic ? 1 : 0) + (uuidPath == null ? 0 : uuidPath.hashCode()) + (int) id + (name == null ? 0 : name.hashCode());
   }
 

@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.concurrent;
 
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -27,11 +28,11 @@ public class DebuggableThread extends Thread {
   /**
     * Logger for this class.
     */
-  private static Logger log = LoggerFactory.getLogger(DebuggableThread.class);
+  private static final Logger log = LoggerFactory.getLogger(DebuggableThread.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private final static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Construct this thread.

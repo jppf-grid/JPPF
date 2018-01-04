@@ -24,6 +24,11 @@ package org.jppf.utils;
  */
 public class HostIP extends Pair<String, String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this HostIP object with the specified host name and IP address.
    * @param hostName the host name.
    * @param ipAddress the corresponding IP address.

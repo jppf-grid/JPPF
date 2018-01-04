@@ -24,15 +24,18 @@ package org.jppf;
  * application chooses not to exit, in response to the problem.
  * @author Laurent Cohen
  */
-public class JPPFError extends Error
-{
+public class JPPFError extends Error {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this error with a specified message and cause exception.
    * @param message the message for this error.
    * @param cause the cause exception.
    */
-  public JPPFError(final String message, final Throwable cause)
-  {
+  public JPPFError(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -40,8 +43,7 @@ public class JPPFError extends Error
    * Initialize this error with a specified message.
    * @param message the message for this error.
    */
-  public JPPFError(final String message)
-  {
+  public JPPFError(final String message) {
     super(message);
   }
 
@@ -49,8 +51,7 @@ public class JPPFError extends Error
    * Initialize this error with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFError(final Throwable cause)
-  {
+  public JPPFError(final Throwable cause) {
     super(cause);
   }
 }

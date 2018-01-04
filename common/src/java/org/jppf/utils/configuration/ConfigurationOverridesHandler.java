@@ -51,7 +51,7 @@ public class ConfigurationOverridesHandler {
         }
       }
       else log.error("config overrides file is null");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -62,9 +62,9 @@ public class ConfigurationOverridesHandler {
    * @return the overrides as a {@link TypedProperties} instance.
    */
   public TypedProperties load(final boolean delete) {
-    TypedProperties overrides = new TypedProperties();
+    final TypedProperties overrides = new TypedProperties();
     try {
-      File file = JPPFConfiguration.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
+      final File file = JPPFConfiguration.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
       if ((file != null) && file.exists()) {
         try {
           try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -74,7 +74,7 @@ public class ConfigurationOverridesHandler {
           if (delete) file.delete();
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return overrides;

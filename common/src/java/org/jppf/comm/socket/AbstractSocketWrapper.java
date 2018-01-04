@@ -107,7 +107,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
       this.socket = socket;
       initStreams();
       opened = true;
-    } catch (IOException ioe) {
+    } catch (final IOException ioe) {
       throw new JPPFException(ioe.getMessage(), ioe);
     }
   }
@@ -187,8 +187,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
     try {
       if (timeout > 0) socket.setSoTimeout(timeout);
       //int len = dis.readInt();
-      int len = readInt();
-      byte[] buffer = new byte[len];
+      final int len = readInt();
+      final byte[] buffer = new byte[len];
       read(buffer, 0, len);
       buf = new JPPFBuffer(buffer, len);
     } finally {
@@ -214,7 +214,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
     checkOpened();
     int count = 0;
     while (count < len) {
-      int n = dis.read(data, count + offset, len - count);
+      final int n = dis.read(data, count + offset, len - count);
       if (n < 0) break;
       else count += n;
     }
@@ -225,7 +225,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   @Override
   public int readPartial(final byte[] data, final int offset, final int len) throws IOException {
     checkOpened();
-    int n = dis.read(data, offset, len);
+    final int n = dis.read(data, offset, len);
     updateSocketTimestamp();
     return n;
   }
@@ -238,7 +238,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   @Override
   public int readInt() throws IOException {
     //int intRead = dis.readInt();
-    int intRead = SerializationUtils.readInt(dis);
+    final int intRead = SerializationUtils.readInt(dis);
     updateSocketTimestamp();
     return intRead;
   }
@@ -254,7 +254,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
       if ((host == null) || "".equals(host.trim())) throw new ConnectException("You must specify the host name");
       else if (port <= 0) throw new ConnectException("You must specify the port number");
       socket = new Socket();
-      InetSocketAddress addr = new InetSocketAddress(host, port);
+      final InetSocketAddress addr = new InetSocketAddress(host, port);
       socket.setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       socket.setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
       socket.setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
@@ -273,8 +273,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * @throws IOException if an error occurs during the streams initialization.
    */
   protected final void initStreams() throws IOException {
-    OutputStream os = socket.getOutputStream();
-    InputStream is = socket.getInputStream();
+    final OutputStream os = socket.getOutputStream();
+    final InputStream is = socket.getInputStream();
     dos = new DataOutputStream(new BufferedOutputStream(os));
     dis = new DataInputStream(new BufferedInputStream(is));
   }
@@ -395,7 +395,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
     else if (n == 0) return 0;
     int count = 0;
     while (count < n) {
-      long p = dis.skip(n - count);
+      final long p = dis.skip(n - count);
       //if (p < 0) break;
       if (p <= 0) break;
       else count += p;
@@ -424,7 +424,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("socket=").append(socket);
     sb.append(']');
     return sb.toString();

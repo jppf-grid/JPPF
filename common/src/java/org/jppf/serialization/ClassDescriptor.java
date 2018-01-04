@@ -128,8 +128,8 @@ class ClassDescriptor {
    * @throws Exception if any error occurs.
    */
   boolean handleReadOrWriteObjectMethod(final boolean serializing) throws Exception {
-    Method m = SerializationReflectionHelper.getReadOrWriteObjectMethod(clazz, !serializing);
-    boolean found = (m != null);
+    final Method m = SerializationReflectionHelper.getReadOrWriteObjectMethod(clazz, !serializing);
+    final boolean found = (m != null);
     if (found) {
       m.setAccessible(true);
       if (serializing) writeObjectMethod = m;
@@ -160,7 +160,7 @@ class ClassDescriptor {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("signature=").append(signature).append(", ");
     sb.append("clazz=").append(clazz == null ? "null" : clazz.getName()).append(", ");

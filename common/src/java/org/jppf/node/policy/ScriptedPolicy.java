@@ -32,6 +32,10 @@ import org.slf4j.*;
  */
 public class ScriptedPolicy extends ExecutionPolicy {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ScriptedPolicy.class);
@@ -102,9 +106,9 @@ public class ScriptedPolicy extends ExecutionPolicy {
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
     if ((script == null) || evaluationError) return false;
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("jppfSystemInfo", info);
-    PolicyContext ctx = getContext();
+    final PolicyContext ctx = getContext();
     if (ctx != null) {
       variables.put("jppfSla", ctx.getSLA());
       variables.put("jppfClientSla", ctx.getClientSLA());
@@ -116,7 +120,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
     try {
       runner = ScriptRunnerFactory.getScriptRunner(language);
       if (runner != null) {
-        Object result = runner.evaluate(id, script, variables);
+        final Object result = runner.evaluate(id, script, variables);
         if (!(result instanceof Boolean)) throw new JPPFException("result of scripted policy should be a boolean but instead is " + result);
         return (Boolean) result;
       }
@@ -131,7 +135,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder(indent(n)).append("<Script language=\"").append(language).append("\"><![CDATA[\n");
+    final StringBuilder sb = new StringBuilder(indent(n)).append("<Script language=\"").append(language).append("\"><![CDATA[\n");
     if (script != null) sb.append(script).append('\n');
     return sb.append(indent(n)).append("]]></Script>\n").toString();
   }

@@ -42,14 +42,13 @@ public class JPPFLogFormatter extends Formatter {
    */
   @Override
   public String format(final LogRecord record) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(sdf.format(new Date(record.getMillis())));
     sb.append('[');
-    String name = record.getLevel().getName();
+    final String name = record.getLevel().getName();
     sb.append(name);
     // pad to 7 chars
-    for (int i = 0; i < 7 - name.length(); i++)
-      sb.append(' ');
+    for (int i = 0; i < 7 - name.length(); i++) sb.append(' ');
     sb.append(']');
 
     sb.append('[');
@@ -61,10 +60,10 @@ public class JPPFLogFormatter extends Formatter {
     /* String s = record.getSourceClassName();
      * if (s != null) sb.append(s); */
     s = record.getSourceClassName();
-    String shortName = getShortName(s);
-    StackTraceElement[] elts = new Throwable().getStackTrace();
+    final String shortName = getShortName(s);
+    final StackTraceElement[] elts = new Throwable().getStackTrace();
     StackTraceElement elt = null;
-    for (StackTraceElement elt1 : elts) {
+    for (final StackTraceElement elt1 : elts) {
       if (getShortName(elt1.getClassName()).equals(shortName)) {
         elt = elt1;
         break;
@@ -85,7 +84,7 @@ public class JPPFLogFormatter extends Formatter {
     sb.append(": ");
     s = record.getMessage();
     if (s != null) sb.append(s);
-    Object[] params = record.getParameters();
+    final Object[] params = record.getParameters();
     if (params != null) for (Object o : params)
       sb.append('|').append(o);
     sb.append('\n');
@@ -100,7 +99,7 @@ public class JPPFLogFormatter extends Formatter {
    */
   private static String getShortName(final String fqn) {
     if (fqn == null) return "";
-    int idx = fqn.lastIndexOf('.');
+    final int idx = fqn.lastIndexOf('.');
     return idx >= 0 ? fqn.substring(idx + 1) : fqn;
   }
 }

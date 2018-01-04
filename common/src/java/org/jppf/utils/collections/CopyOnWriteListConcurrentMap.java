@@ -29,6 +29,11 @@ import java.util.concurrent.*;
  */
 public class CopyOnWriteListConcurrentMap<K, V> extends AbstractCollectionConcurrentMap<K, V> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Default constructor.
    */
   public CopyOnWriteListConcurrentMap() {

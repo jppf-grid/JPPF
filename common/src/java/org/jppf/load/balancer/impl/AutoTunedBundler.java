@@ -118,7 +118,7 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
         bundleSample = new PerformanceSample();
         state.samplesMap.put(bundleSize, bundleSample);
       }
-      long samples = bundleSample.samples + bundleSize;
+      final long samples = bundleSample.samples + bundleSize;
       bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
       bundleSample.samples = samples;
       if (samples > profile.getMinSamplesToAnalyse()) {
@@ -136,7 +136,7 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
   private void performAnalysis() {
     double stableMean = 0;
     int bestSize = searchBestSize();
-    int max = maxSize();
+    final int max = maxSize();
     if ((max > 0) && (bestSize > max)) bestSize = max;
     int counter = 0;
     while (counter < profile.getMaxGuessToStable()) {
@@ -154,7 +154,7 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
     }
 
     state.bundleSize = Math.max(1, bestSize);
-    PerformanceSample sample = state.samplesMap.get(state.bundleSize);
+    final PerformanceSample sample = state.samplesMap.get(state.bundleSize);
     if (sample != null) {
       stableMean = sample.mean;
       state.samplesMap.clear();
@@ -170,8 +170,8 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
   private int searchBestSize() {
     int bestSize = 0;
     double minorMean = Double.POSITIVE_INFINITY;
-    for (Integer size : state.samplesMap.keySet()) {
-      PerformanceSample sample = state.samplesMap.get(size);
+    for (final Integer size : state.samplesMap.keySet()) {
+      final PerformanceSample sample = state.samplesMap.get(size);
       if (sample.mean < minorMean) {
         bestSize = size;
         minorMean = sample.mean;
@@ -193,7 +193,7 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfi
 
   @Override
   public void setState(final Object persistedState) {
-    BundlerState other = (BundlerState) persistedState;
+    final BundlerState other = (BundlerState) persistedState;
     lock.lock();
     try {
       state.bundleSize = other.bundleSize;

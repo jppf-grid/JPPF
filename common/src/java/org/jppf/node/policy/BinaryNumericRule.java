@@ -62,7 +62,7 @@ abstract class BinaryNumericRule extends LeftOperandRule {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    double value = (Double) getLeftOperandValue(info);
+    final double value = (Double) getLeftOperandValue(info);
     return accepts(value, expression.evaluate(info));
   }
 

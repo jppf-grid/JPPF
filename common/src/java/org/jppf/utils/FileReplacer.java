@@ -87,7 +87,7 @@ public class FileReplacer {
     if (args.getBoolean("-r", false)) pattern = Pattern.compile(src);
     else pattern = Pattern.compile(src, Pattern.LITERAL);
     filter = new ReplacerFilter(args.getStringArray("-e", ","), args.getStringArray("-ef", ","));
-    File f = new File(args.getString("-f"));
+    final File f = new File(args.getString("-f"));
     nbFilesChanged = 0;
     nbReplacements = 0;
     if (f.isDirectory()) replaceFolder(f);
@@ -104,15 +104,15 @@ public class FileReplacer {
   private void replaceFolder(final File folder) throws Exception {
     //if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
     if (debugEnabled) StreamUtils.printf(log, "Processing folder %s", folder.getAbsolutePath());
-    File[] fileList = folder.listFiles(filter);
-    List<File> folders = new ArrayList<>();
-    List<File> files = new ArrayList<>();
-    for (File f: fileList) {
+    final File[] fileList = folder.listFiles(filter);
+    final List<File> folders = new ArrayList<>();
+    final List<File> files = new ArrayList<>();
+    for (final File f: fileList) {
       if (f.isDirectory()) folders.add(f);
       else files.add(f);
     }
-    for (File f: files) replaceFile(f);
-    for (File f: folders) replaceFolder(f);
+    for (final File f: files) replaceFile(f);
+    for (final File f: folders) replaceFolder(f);
   }
 
 
@@ -122,8 +122,8 @@ public class FileReplacer {
    * @throws Exception if an error occurs while processing the folder.
    */
   private void replaceFile(final File file) throws Exception {
-    String content = FileUtils.readTextFile(file.getPath());
-    Matcher matcher = pattern.matcher(content);
+    final String content = FileUtils.readTextFile(file.getPath());
+    final Matcher matcher = pattern.matcher(content);
     boolean b = true;
     int nbFound = 0;
     int start = 0;
@@ -138,7 +138,7 @@ public class FileReplacer {
       nbFilesChanged++;
       nbReplacements += nbFound;
       StreamUtils.printf(log, "Found %d ocurrence%s of the sequence in file '%s'", nbFound, (nbFound > 1 ? "s" : ""), file);
-      String s = matcher.replaceAll(dest);
+      final String s = matcher.replaceAll(dest);
       if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
       if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
     }
@@ -159,7 +159,7 @@ public class FileReplacer {
   public static void main(final String...args) {
     try {
       System.out.println("using " + Arrays.asList(args));
-      NamedArguments namedArgs = new NamedArguments()
+      final NamedArguments namedArgs = new NamedArguments()
         .addArg("-i", "The input file containing the text or expression to match")
         .addArg("-o", "The input file containing the replacement text")
         .addArg("-f", "The root folder in which to perform the search")
@@ -171,7 +171,7 @@ public class FileReplacer {
       System.out.println("parsed arguments:\n" + namedArgs);
       //namedArgs.printUsage();
       new FileReplacer().replace(namedArgs);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -221,16 +221,16 @@ public class FileReplacer {
     public boolean accept(final File file) {
       if (file.isDirectory()) {
         if (folderExlusionPatterns != null) {
-          String name = file.getPath();
-          for (Pattern p: folderExlusionPatterns) {
+          final String name = file.getPath();
+          for (final Pattern p: folderExlusionPatterns) {
             if (p.matcher(name).find()) return false;
           }
         }
         return true;
       }
-      String ext = FileUtils.getFileExtension(file);
+      final String ext = FileUtils.getFileExtension(file);
       if (ext == null) return false;
-      for (String s: extensions) {
+      for (final String s: extensions) {
         if (ext.equalsIgnoreCase(s)) return true;
       }
       return false;

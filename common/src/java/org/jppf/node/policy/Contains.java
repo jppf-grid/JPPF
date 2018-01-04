@@ -58,9 +58,9 @@ public class Contains extends LeftOperandRule {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    String value = this.value.evaluate(info);
+    final String value = this.value.evaluate(info);
     if (value == null) return false;
-    String s = (String) getLeftOperandValue(info);
+    final String s = (String) getLeftOperandValue(info);
     if (s == null) return false;
     if (ignoreCase) return s.toLowerCase().contains(value.toLowerCase());
     return s.contains(value);

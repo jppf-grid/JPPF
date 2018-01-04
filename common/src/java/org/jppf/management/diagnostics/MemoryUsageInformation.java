@@ -27,8 +27,7 @@ import java.util.Locale;
  * A <code>Serializable</code> implementation of {@link MemoryUsage}.
  * @author Laurent Cohen
  */
-public class MemoryUsageInformation implements Serializable
-{
+public class MemoryUsageInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -54,8 +53,7 @@ public class MemoryUsageInformation implements Serializable
    * Initialize this object from a {@link MemoryUsage} instance.
    * @param memUsage contains the memroy usage information to use.
    */
-  public MemoryUsageInformation(final MemoryUsage memUsage)
-  {
+  public MemoryUsageInformation(final MemoryUsage memUsage) {
     this.init = memUsage.getInit();
     this.committed = memUsage.getCommitted();
     this.used = memUsage.getUsed();
@@ -66,8 +64,7 @@ public class MemoryUsageInformation implements Serializable
    * Get the initial memory size.
    * @return the initial memory size.
    */
-  public long getInit()
-  {
+  public long getInit() {
     return init;
   }
 
@@ -75,8 +72,7 @@ public class MemoryUsageInformation implements Serializable
    * Get the current memory size.
    * @return the current memory size.
    */
-  public long getCommitted()
-  {
+  public long getCommitted() {
     return committed;
   }
 
@@ -84,8 +80,7 @@ public class MemoryUsageInformation implements Serializable
    * Get the used memory size.
    * @return the used memory size.
    */
-  public long getUsed()
-  {
+  public long getUsed() {
     return used;
   }
 
@@ -93,28 +88,25 @@ public class MemoryUsageInformation implements Serializable
    * Get the maximum memory size.
    * @return the maximum memory size.
    */
-  public long getMax()
-  {
+  public long getMax() {
     return max;
   }
 
   /**
    * Return the ratio of used memory over maximum available memory.
-   * @return the ratio as a double value in the range [0, 1], or -1 if the maximum memory information is not available. 
+   * @return the ratio as a double value in the range [0, 1], or -1 if the maximum memory information is not available.
    */
-  public double getUsedRatio()
-  {
+  public double getUsedRatio() {
     if (max <= 0) return -1d;
     return (double) used / (double) max;
   }
 
   @Override
-  public String toString()
-  {
-    NumberFormat nf = NumberFormat.getIntegerInstance(Locale.US);
+  public String toString() {
+    final NumberFormat nf = NumberFormat.getIntegerInstance(Locale.US);
     nf.setGroupingUsed(true);
     nf.setMinimumIntegerDigits(9);
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append('[');
     sb.append("init=").append(nf.format(init));
     sb.append(", committed=").append(nf.format(committed));

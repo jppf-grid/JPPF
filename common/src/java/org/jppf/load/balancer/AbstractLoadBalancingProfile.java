@@ -23,4 +23,9 @@ package org.jppf.load.balancer;
  * @author Laurent Cohen
  */
 public class AbstractLoadBalancingProfile implements LoadBalancingProfile {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
 }

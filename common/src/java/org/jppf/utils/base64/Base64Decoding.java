@@ -60,13 +60,13 @@ public final class Base64Decoding
     if( destOffset < 0 || destOffset +2 >= destination.length )
       throw new IllegalArgumentException( String.format("Destination array with length %d cannot have offset of %d and still store three bytes.", destination.length, destOffset ) );
 
-    byte[] DECODABET = getDecodabet( options );
+    final byte[] DECODABET = getDecodabet( options );
     // Example: Dk==
     if( source[ srcOffset + 2] == EQUALS_SIGN ) {
       // Two ways to do the same thing. Don't know which way I like best.
       //int outBuff =   ( ( DECODABET[ source[ srcOffset    ] ] << 24 ) >>>  6 )
       //              | ( ( DECODABET[ source[ srcOffset + 1] ] << 24 ) >>> 12 );
-      int outBuff =   ( ( DECODABET[ source[ srcOffset    ] ] & 0xFF ) << 18 )
+      final int outBuff =   ( ( DECODABET[ source[ srcOffset    ] ] & 0xFF ) << 18 )
       | ( ( DECODABET[ source[ srcOffset + 1] ] & 0xFF ) << 12 );
       destination[ destOffset ] = (byte)( outBuff >>> 16 );
       return 1;
@@ -77,7 +77,7 @@ public final class Base64Decoding
       //int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] << 24 ) >>>  6 )
       //              | ( ( DECODABET[ source[ srcOffset + 1 ] ] << 24 ) >>> 12 )
       //              | ( ( DECODABET[ source[ srcOffset + 2 ] ] << 24 ) >>> 18 );
-      int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] & 0xFF ) << 18 )
+      final int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] & 0xFF ) << 18 )
       | ( ( DECODABET[ source[ srcOffset + 1 ] ] & 0xFF ) << 12 )
       | ( ( DECODABET[ source[ srcOffset + 2 ] ] & 0xFF ) <<  6 );
 
@@ -92,7 +92,7 @@ public final class Base64Decoding
       //              | ( ( DECODABET[ source[ srcOffset + 1 ] ] << 24 ) >>> 12 )
       //              | ( ( DECODABET[ source[ srcOffset + 2 ] ] << 24 ) >>> 18 )
       //              | ( ( DECODABET[ source[ srcOffset + 3 ] ] << 24 ) >>> 24 );
-      int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] & 0xFF ) << 18 )
+      final int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] & 0xFF ) << 18 )
       | ( ( DECODABET[ source[ srcOffset + 1 ] ] & 0xFF ) << 12 )
       | ( ( DECODABET[ source[ srcOffset + 2 ] ] & 0xFF ) <<  6)
       | ( ( DECODABET[ source[ srcOffset + 3 ] ] & 0xFF )      );
@@ -141,16 +141,16 @@ public final class Base64Decoding
       throw new IllegalArgumentException(
           "Base64-encoded string must have at least four characters, but length specified was " + len );
     }   // end if
-    byte[] DECODABET = getDecodabet( options );
-    int    len34   = len * 3 / 4;       // Estimate on array size
-    byte[] outBuff = new byte[ len34 ]; // Upper limit on size of output
+    final byte[] DECODABET = getDecodabet( options );
+    final int    len34   = len * 3 / 4;       // Estimate on array size
+    final byte[] outBuff = new byte[ len34 ]; // Upper limit on size of output
     int    outBuffPosn = 0;             // Keep track of where we're writing
-    byte[] b4        = new byte[4];     // Four byte buffer from source, eliminating white space
+    final byte[] b4        = new byte[4];     // Four byte buffer from source, eliminating white space
     int    b4Posn    = 0;               // Keep track of four byte input buffer
     int    i         = 0;               // Source array counter
     byte   sbiDecode = 0;               // Special value from DECODABET
 
-    for( i = off; i < off+len; i++ ) {  // Loop through source
+    for (i = off; i < off+len; i++) {  // Loop through source
       sbiDecode = DECODABET[ source[i]&0xFF ];
       // White space, Equals sign, or legit Base64 character
       // Note the values such as -5 and -9 in the DECODABETs at the top of the file.
@@ -170,7 +170,7 @@ public final class Base64Decoding
         throw new IOException( String.format("Bad Base64 input character decimal %d in array position %d", (source[i])&0xFF, i ) );
       }   // end else:
     }   // each input character
-    byte[] out = new byte[ outBuffPosn ];
+    final byte[] out = new byte[ outBuffPosn ];
     System.arraycopy( outBuff, 0, out, 0, outBuffPosn );
     return out;
   }   // end decode
@@ -202,21 +202,21 @@ public final class Base64Decoding
     try {
       bytes = s.getBytes( PREFERRED_ENCODING );
     }   // end try
-    catch( UnsupportedEncodingException uee ) {
+    catch(final UnsupportedEncodingException uee ) {
       bytes = s.getBytes();
     }   // end catch
 
     // Decode
     bytes = decode( bytes, 0, bytes.length, options );
     // Check to see if it's gzip-compressed GZIP Magic Two-Byte Number: 0x8b1f (35615)
-    boolean dontGunzip = (options & DONT_GUNZIP) != 0;
+    final boolean dontGunzip = (options & DONT_GUNZIP) != 0;
     if( (bytes != null) && (bytes.length >= 4) && (!dontGunzip) ) {
-      int head = (bytes[0] & 0xff) | ((bytes[1] << 8) & 0xff00);
+      final int head = (bytes[0] & 0xff) | ((bytes[1] << 8) & 0xff00);
       if( java.util.zip.GZIPInputStream.GZIP_MAGIC == head )  {
         ByteArrayInputStream  bais = null;
         java.util.zip.GZIPInputStream gzis = null;
         ByteArrayOutputStream baos = null;
-        byte[] buffer = new byte[2048];
+        final byte[] buffer = new byte[2048];
         int    length = 0;
         try {
           baos = new ByteArrayOutputStream();
@@ -228,14 +228,14 @@ public final class Base64Decoding
           // No error? Get new bytes.
           bytes = baos.toByteArray();
         }   // end try
-        catch( IOException e ) {
+        catch(final IOException e ) {
           e.printStackTrace();
           // Just return originally-decoded bytes
         }   // end catch
         finally {
-          try{ baos.close(); } catch( Exception e ){}
-          try{ gzis.close(); } catch( Exception e ){}
-          try{ bais.close(); } catch( Exception e ){}
+          try{ baos.close(); } catch(final Exception e ){}
+          try{ gzis.close(); } catch(final Exception e ){}
+          try{ bais.close(); } catch(final Exception e ){}
         }   // end finally
       }   // end if: gzipped
     }   // end if: bytes.length >= 2
@@ -270,7 +270,7 @@ public final class Base64Decoding
   @SuppressWarnings("unused")
   public static Object decodeToObject(final String encodedObject, final int options, final ClassLoader loader ) throws IOException, java.lang.ClassNotFoundException {
     // Decode and gunzip if necessary
-    byte[] objBytes = decode( encodedObject, options );
+    final byte[] objBytes = decode( encodedObject, options );
     ByteArrayInputStream  bais = null;
     ObjectInputStream     ois  = null;
     Object obj = null;
@@ -284,7 +284,7 @@ public final class Base64Decoding
           @Override
           public Class<?> resolveClass(final ObjectStreamClass streamClass)
           throws IOException, ClassNotFoundException {
-            Class<?> c = Class.forName(streamClass.getName(), false, loader);
+            final Class<?> c = Class.forName(streamClass.getName(), false, loader);
             if( c == null ) return super.resolveClass(streamClass);
             else return c;   // Class loader knows of this class.
           }   // end resolveClass
@@ -292,15 +292,15 @@ public final class Base64Decoding
       }   // end else: no custom class loader
       obj = ois.readObject();
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e;    // Catch and throw in order to execute finally{}
     }   // end catch
-    catch( java.lang.ClassNotFoundException e ) {
+    catch(final ClassNotFoundException e ) {
       throw e;    // Catch and throw in order to execute finally{}
     }   // end catch
     finally {
-      try{ bais.close(); } catch( Exception e ){}
-      try{ ois.close();  } catch( Exception e ){}
+      try{ bais.close(); } catch(final Exception e ){}
+      try{ ois.close();  } catch(final Exception e ){}
     }   // end finally
     return obj;
   }   // end decodeObject
@@ -324,11 +324,11 @@ public final class Base64Decoding
           new FileOutputStream( filename ), Base64.ENCODE );
       bos.write( dataToEncode );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and throw to execute finally{} block
     }   // end catch: IOException
     finally {
-      try{ bos.close(); } catch( @SuppressWarnings("unused") Exception e ){}
+      try{ bos.close(); } catch( @SuppressWarnings("unused") final Exception e ){}
     }   // end finally
   }   // end encodeToFile
 
@@ -347,11 +347,11 @@ public final class Base64Decoding
       bos = new Base64OutputStream(new FileOutputStream( filename ), Base64.DECODE );
       bos.write( dataToDecode.getBytes( PREFERRED_ENCODING ) );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and throw to execute finally{} block
     }   // end catch: IOException
     finally {
-      try{ bos.close(); } catch( @SuppressWarnings("unused") Exception e ){}
+      try{ bos.close(); } catch( @SuppressWarnings("unused") final Exception e ){}
     }   // end finally
   }   // end decodeToFile
 
@@ -368,10 +368,9 @@ public final class Base64Decoding
   throws IOException {
     byte[] decodedData = null;
     Base64InputStream bis = null;
-    try
-    {
+    try {
       // Set up some useful variables
-      File file = new File( filename );
+      final File file = new File( filename );
       byte[] buffer = null;
       int length   = 0;
       int numBytes = 0;
@@ -386,11 +385,11 @@ public final class Base64Decoding
       decodedData = new byte[ length ];
       System.arraycopy( buffer, 0, decodedData, 0, length );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and release to execute finally{}
     }   // end catch: IOException
     finally {
-      try{ bis.close(); } catch( @SuppressWarnings("unused") Exception e) {}
+      try{ bis.close(); } catch( @SuppressWarnings("unused") final Exception e) {}
     }   // end finally
     return decodedData;
   }   // end decodeFromFile
@@ -407,10 +406,9 @@ public final class Base64Decoding
   public static String encodeFromFile(final String filename) throws IOException {
     String encodedData = null;
     Base64InputStream bis = null;
-    try
-    {
-      File file = new File( filename );
-      byte[] buffer = new byte[ Math.max((int)(file.length() * 1.4+1),40) ]; // Need max() for math on small files (v2.2.1); Need +1 for a few corner cases (v2.3.5)
+    try {
+      final File file = new File( filename );
+      final byte[] buffer = new byte[ Math.max((int)(file.length() * 1.4+1),40) ]; // Need max() for math on small files (v2.2.1); Need +1 for a few corner cases (v2.3.5)
       int length   = 0;
       int numBytes = 0;
       bis = new Base64InputStream(new BufferedInputStream(new FileInputStream( file ) ), Base64.ENCODE );
@@ -419,11 +417,11 @@ public final class Base64Decoding
       // Save in a variable to return
       encodedData = new String( buffer, 0, length, Base64.PREFERRED_ENCODING );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and release to execute finally{}
     }   // end catch: IOException
     finally {
-      try{ bis.close(); } catch( @SuppressWarnings("unused") Exception e) {}
+      try{ bis.close(); } catch( @SuppressWarnings("unused") final Exception e) {}
     }   // end finally
     return encodedData;
   }   // end encodeFromFile
@@ -436,18 +434,18 @@ public final class Base64Decoding
    * @since 2.2
    */
   public static void encodeFileToFile( final String infile, final String outfile ) throws IOException {
-    String encoded = encodeFromFile( infile );
+    final String encoded = encodeFromFile( infile );
     OutputStream out = null;
     try{
       out = new BufferedOutputStream(new FileOutputStream( outfile ) );
       out.write( encoded.getBytes("US-ASCII") ); // Strict, 7-bit output.
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and release to execute finally{}
     }   // end catch
     finally {
       try { out.close(); }
-      catch( @SuppressWarnings("unused") Exception ex ){}
+      catch( @SuppressWarnings("unused") final Exception ex ){}
     }   // end finally
   }   // end encodeFileToFile
 
@@ -459,18 +457,18 @@ public final class Base64Decoding
    * @since 2.2
    */
   public static void decodeFileToFile( final String infile, final String outfile ) throws IOException {
-    byte[] decoded = decodeFromFile( infile );
+    final byte[] decoded = decodeFromFile( infile );
     OutputStream out = null;
     try{
       out = new BufferedOutputStream(new FileOutputStream( outfile ) );
       out.write( decoded );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       throw e; // Catch and release to execute finally{}
     }   // end catch
     finally {
       try { out.close(); }
-      catch( @SuppressWarnings("unused") Exception ex ){}
+      catch( @SuppressWarnings("unused") final Exception ex ){}
     }   // end finally
   }   // end decodeFileToFile
 }

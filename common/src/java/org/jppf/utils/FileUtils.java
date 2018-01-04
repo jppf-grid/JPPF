@@ -54,7 +54,7 @@ public final class FileUtils {
    * @throws IOException if the file can't be found or read.
    */
   public static String readTextFile(final Reader aReader) throws IOException {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     try (BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader)) {
       String s = "";
       while (s != null) {
@@ -73,7 +73,7 @@ public final class FileUtils {
    * @throws IOException if the file can't be found or read.
    */
   public static List<String> textFileAsLines(final Reader aReader) throws IOException {
-    List<String> lines = new ArrayList<>();
+    final List<String> lines = new ArrayList<>();
     try (BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader)) {
       String s;
       while ((s = reader.readLine()) != null) {
@@ -101,10 +101,10 @@ public final class FileUtils {
    */
   public static String readTextFile(final String filename) throws IOException {
     Reader reader = null;
-    File f = new File(filename);
+    final File f = new File(filename);
     if (f.exists()) reader = new FileReader(filename);
     else {
-      InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(filename);
+      final InputStream is = FileUtils.class.getClassLoader().getResourceAsStream(filename);
       if (is == null) return null;
       reader = new InputStreamReader(is);
     }
@@ -171,7 +171,7 @@ public final class FileUtils {
    */
   public static InputStream getFileInputStream(final String path) throws IOException {
     InputStream is = null;
-    File file = new File(path);
+    final File file = new File(path);
     if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
     if (is == null) {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -208,7 +208,7 @@ public final class FileUtils {
    * @throws IOException if an IO error occurs while looking up the file.
    */
   public static Reader getFileReader(final String path) throws IOException {
-    InputStream is = getFileInputStream(path);
+    final InputStream is = getFileInputStream(path);
     if (is == null) return null;
     return new InputStreamReader(is);
   }
@@ -230,11 +230,11 @@ public final class FileUtils {
    * @throws IOException if an error occurs while looking up or reading the file.
    */
   public static List<String> getFilePathList(final String fileListPath) throws IOException {
-    List<String> filePaths = new ArrayList<>();
+    final List<String> filePaths = new ArrayList<>();
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(getFileInputStream(fileListPath)))) {
       boolean end = false;
       while (!end) {
-        String s = reader.readLine();
+        final String s = reader.readLine();
         if (s != null) filePaths.add(s);
         else end = true;
       }
@@ -252,10 +252,10 @@ public final class FileUtils {
     String filePath = null;
     try {
       filePath = file.getCanonicalPath();
-    } catch(@SuppressWarnings("unused") IOException e) {
+    } catch(@SuppressWarnings("unused") final IOException e) {
       return null;
     }
-    int idx = filePath.lastIndexOf('.');
+    final int idx = filePath.lastIndexOf('.');
     if (idx >=0) return filePath.substring(idx+1);
     return null;
   }
@@ -266,7 +266,7 @@ public final class FileUtils {
    * @return the file name without path information.
    */
   public static String getFileName(final String filePath) {
-    int idx = getLastFileSeparatorPosition(filePath);
+    final int idx = getLastFileSeparatorPosition(filePath);
     return idx >= 0 ? filePath.substring(idx + 1) : filePath;
   }
 
@@ -276,8 +276,8 @@ public final class FileUtils {
    * @return the position as an positive integer, or -1 if no separator was found.
    */
   private static int getLastFileSeparatorPosition(final String path) {
-    int idx1 = path.lastIndexOf('/');
-    int idx2 = path.lastIndexOf('\\');
+    final int idx1 = path.lastIndexOf('/');
+    final int idx2 = path.lastIndexOf('\\');
     if ((idx1 < 0) && (idx2 < 0)) return -1;
     return idx1 < 0 ? idx2 : (idx2 < 0 ? idx1 : Math.max(idx1, idx2));
   }
@@ -296,7 +296,7 @@ public final class FileUtils {
       String s = "";
       while (true) {
         if (writer == null) {
-          String name = file + '.' + count;
+          final String name = file + '.' + count;
           writer = new BufferedWriter(new FileWriter(name));
         }
         s = reader.readLine();
@@ -331,8 +331,8 @@ public final class FileUtils {
    * @throws IOException if an IO error occurs.
    */
   public static byte[] getFileAsByte(final File file) throws IOException {
-    InputStream is = new BufferedInputStream(new FileInputStream(file));
-    byte[] data = StreamUtils.getInputStreamAsByte(is);
+    final InputStream is = new BufferedInputStream(new FileInputStream(file));
+    final byte[] data = StreamUtils.getInputStreamAsByte(is);
     return data;
   }
 
@@ -343,8 +343,8 @@ public final class FileUtils {
    * @return an array of <code>File</code> objects.
    */
   public static File[] toFiles(final File dir, final String...names) {
-    int len = names.length;
-    File[] files = new File[len];
+    final int len = names.length;
+    final File[] files = new File[len];
     for (int i=0; i<len; i++) files[i] = new File(dir.getPath(), names[i]);
     return files;
   }
@@ -355,11 +355,11 @@ public final class FileUtils {
    * @return an array of <code>URL</code> objects.
    */
   public static URL[] toURLs(final File...files) {
-    URL[] urls = new URL[files.length];
+    final URL[] urls = new URL[files.length];
     for (int i=0; i<files.length; i++) {
       try {
         urls[i] = files[i].toURI().toURL();
-      } catch(@SuppressWarnings("unused") MalformedURLException ignored) {
+      } catch(@SuppressWarnings("unused") final MalformedURLException ignored) {
       }
     }
     return urls;
@@ -372,8 +372,8 @@ public final class FileUtils {
    * @throws IOException if an I/O error occurs.
    */
   public static void writeBytesToFile(final byte[] data, final File path) throws IOException {
-    ByteArrayInputStream bais = new ByteArrayInputStream(data);
-    OutputStream os = new BufferedOutputStream(new FileOutputStream(path));
+    final ByteArrayInputStream bais = new ByteArrayInputStream(data);
+    final OutputStream os = new BufferedOutputStream(new FileOutputStream(path));
     StreamUtils.copyStream(bais, os);
   }
 
@@ -397,7 +397,7 @@ public final class FileUtils {
     boolean success = true;
     try {
       if (path.isDirectory()) {
-        File[] files = path.listFiles();
+        final File[] files = path.listFiles();
         if (files != null) {
           for (File child: files) {
             if (!deletePath(child)) success = false;
@@ -407,7 +407,7 @@ public final class FileUtils {
       if (!childrenOnly) {
         if (!path.delete()) success = false;
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       success = false;
     }
     return success;
@@ -419,7 +419,7 @@ public final class FileUtils {
    * @throws IOException if the folders could not be created.
    */
   public static void mkdirs(final File file) throws IOException {
-    File folder = file.isDirectory() ? file : file.getParentFile();
+    final File folder = file.isDirectory() ? file : file.getParentFile();
     if (!folder.exists()) {
       if (!folder.mkdirs()) throw new IOException("could not create folder " + folder);
     }
@@ -431,10 +431,10 @@ public final class FileUtils {
    * @return the path expressed as a URL.
    */
   public static URL getURLFromFilePath(final String path) {
-    File file = new File(path);
+    final File file = new File(path);
     try {
       return file.toURI().toURL();
-    } catch (@SuppressWarnings("unused") MalformedURLException ignore) {
+    } catch (@SuppressWarnings("unused") final MalformedURLException ignore) {
     }
     return null;
   }
@@ -447,7 +447,7 @@ public final class FileUtils {
   public static URL getURLFromFilePath(final File path) {
     try {
       return path.toURI().toURL();
-    } catch (@SuppressWarnings("unused") MalformedURLException ignore) {
+    } catch (@SuppressWarnings("unused") final MalformedURLException ignore) {
       return null;
     }
   }
@@ -490,7 +490,7 @@ public final class FileUtils {
         FileUtils.mkdirs(baseDir);
       }
       log.info("JPPF temp folder " + base);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return baseDir;
@@ -503,7 +503,7 @@ public final class FileUtils {
    */
   public static Pair<String, String> getFileNameAndExtension(final String imageName) {
     if (imageName == null) return null;
-    int idx = imageName.lastIndexOf('.');
+    final int idx = imageName.lastIndexOf('.');
     if (idx <= 0) return new Pair<>(imageName, null);
     return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
   }

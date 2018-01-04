@@ -23,8 +23,7 @@ import java.io.FileFilter;
  * Filter that only accepts directories.
  * It is possible to include or excluded specific directory names, in which case the including filter is applied before the excluding one.
  */
-public abstract class AbstractFileFilter implements FileFilter
-{
+public abstract class AbstractFileFilter implements FileFilter {
   /**
    * Included names. If specified, only these directories will be included.
    */
@@ -37,8 +36,7 @@ public abstract class AbstractFileFilter implements FileFilter
   /**
    * Initialize a filter accepting all names.
    */
-  public AbstractFileFilter()
-  {
+  public AbstractFileFilter() {
   }
 
   /**
@@ -47,8 +45,7 @@ public abstract class AbstractFileFilter implements FileFilter
    * @param ignoreCase determines whether name comparisons should ignore case.
    * @return true if the name is included, false otherwise.
    */
-  protected boolean included(final String name, final boolean ignoreCase)
-  {
+  protected boolean included(final String name, final boolean ignoreCase) {
     return checkFilter(name, ignoreCase, includes, true);
   }
 
@@ -58,8 +55,7 @@ public abstract class AbstractFileFilter implements FileFilter
    * @param ignoreCase determines whether name comparisons should ignore case.
    * @return true if the name is excluded, false otherwise.
    */
-  protected boolean excluded(final String name, final boolean ignoreCase)
-  {
+  protected boolean excluded(final String name, final boolean ignoreCase) {
     return checkFilter(name, ignoreCase, excludes, false);
   }
 
@@ -71,13 +67,11 @@ public abstract class AbstractFileFilter implements FileFilter
    * @param returnValueIfEmpty the value to return if the array is null or empty.
    * @return true if the name matches one of the values in the array, false otherwise.
    */
-  private static boolean checkFilter(final String name, final boolean ignoreCase, final String[] array, final boolean returnValueIfEmpty)
-  {
+  private static boolean checkFilter(final String name, final boolean ignoreCase, final String[] array, final boolean returnValueIfEmpty) {
     if ((array == null) || (array.length == 0)) return returnValueIfEmpty;
-    for (String s: array)
-    {
+    for (final String s: array) {
       if (s == null) continue;
-      boolean b = ignoreCase ? s.equalsIgnoreCase(name) : s.equals(name);
+      final boolean b = ignoreCase ? s.equalsIgnoreCase(name) : s.equals(name);
       if (b) return true;
     }
     return false;

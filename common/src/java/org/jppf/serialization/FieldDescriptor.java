@@ -57,7 +57,7 @@ class FieldDescriptor {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name).append(", ");
     sb.append("type=");

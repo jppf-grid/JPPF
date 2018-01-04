@@ -167,7 +167,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    */
   public void incrementSizeCount(final int size) {
     synchronized(sizeMap) {
-      AtomicInteger count = sizeMap.get(size);
+      final AtomicInteger count = sizeMap.get(size);
       if (count == null) sizeMap.put(size, new AtomicInteger(1));
       else count.incrementAndGet();
     }
@@ -179,9 +179,9 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    */
   public void decrementSizeCount(final int size) {
     synchronized(sizeMap) {
-      AtomicInteger count = sizeMap.get(size);
+      final AtomicInteger count = sizeMap.get(size);
       if (count == null) return;
-      int n = count.decrementAndGet();
+      final int n = count.decrementAndGet();
       if (n <= 0) sizeMap.remove(size);
     }
   }

@@ -33,6 +33,10 @@ import org.slf4j.*;
  */
 public class ScriptedJobSelector extends BaseScriptEvaluator implements JobSelector {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ScriptedJobSelector.class);
@@ -68,9 +72,9 @@ public class ScriptedJobSelector extends BaseScriptEvaluator implements JobSelec
 
   @Override
   public boolean accepts(final JPPFDistributedJob job) {
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("jppfJob", job);
-    Object result = evaluate(variables);
+    final Object result = evaluate(variables);
     if (result instanceof Boolean) return (Boolean) result;
     log.error("result of scripted job selector should be a boolean but instead is " + result);
     return false;

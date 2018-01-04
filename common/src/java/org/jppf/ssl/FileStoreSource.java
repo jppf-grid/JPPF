@@ -27,8 +27,7 @@ import org.jppf.utils.FileUtils;
  * A secure store source that uses a file as source.
  * @author Laurent Cohen
  */
-public class FileStoreSource implements Callable<InputStream>
-{
+public class FileStoreSource implements Callable<InputStream> {
   /**
    * Optional arguments that may be specified in the configuration.
    */
@@ -39,16 +38,14 @@ public class FileStoreSource implements Callable<InputStream>
    * @param args the firt argument represents the path to the key or trust store
    * @throws SSLConfigurationException if there is less than 1 argument.
    */
-  public FileStoreSource(final String... args) throws SSLConfigurationException
-  {
+  public FileStoreSource(final String... args) throws SSLConfigurationException {
     this.args = args;
     if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing parameter: keystore or trustore path");
   }
 
   @Override
-  public InputStream call() throws Exception
-  {
-    InputStream is = FileUtils.getFileInputStream(args[0]);
+  public InputStream call() throws Exception {
+    final InputStream is = FileUtils.getFileInputStream(args[0]);
     //if (is == null) throw new SSLConfigurationException("could not find secure store " + args[0]); 
     return is;
   }

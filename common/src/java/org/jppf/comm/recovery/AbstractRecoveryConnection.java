@@ -105,7 +105,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
         success = true;
         message = buffer.asString();
         if (traceEnabled) log.trace("received '{}' for {}", message, this);
-      } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
+      } catch (@SuppressWarnings("unused") final SocketTimeoutException e) {
         retries++;
         if (debugEnabled) log.debug("retry #{} failed for {}", retries, this);
       }
@@ -120,7 +120,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @throws Exception if any error occurs while sending the message.
    */
   public void sendMessage(final String message) throws Exception {
-    JPPFBuffer buffer = new JPPFBuffer(message);
+    final JPPFBuffer buffer = new JPPFBuffer(message);
     socketWrapper.sendBytes(buffer);
     if (traceEnabled) log.trace("sent '{}' from {}", message, this);
   }
@@ -172,7 +172,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("socketWrapper=").append(socketWrapper);
     sb.append(", maxRetries=").append(maxRetries);
     sb.append(", socketReadTimeout=").append(socketReadTimeout);

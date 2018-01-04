@@ -26,9 +26,5 @@ public enum AcceptorState {
   /**
    * Identifying the type of the remote peer (classloader channel client or node, job data channel client or node).
    */
-  IDENTIFYING_PEER,
-  /**
-   * Idle state for an acceptor channel.
-   */
-  IDLE
+  IDENTIFYING_PEER
 }

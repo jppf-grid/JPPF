@@ -43,8 +43,8 @@ class DeserializationCaches {
    * Default constructor.
    */
   DeserializationCaches() {
-    for (Map.Entry<Class<?>, ClassDescriptor> entry: SerializationCaches.globalTypesMap.entrySet()) {
-      ClassDescriptor cd = entry.getValue();
+    for (final Map.Entry<Class<?>, ClassDescriptor> entry: SerializationCaches.globalTypesMap.entrySet()) {
+      final ClassDescriptor cd = entry.getValue();
       classToDescMap.put(cd.clazz, cd);
     }
   }
@@ -57,7 +57,7 @@ class DeserializationCaches {
    * @throws Exception if any error occurs.
    */
   ClassDescriptor getDescriptor(final String handle, final ClassLoader cl) throws Exception {
-    Class<?> c = getClassFromHandle(handle, cl);
+    final Class<?> c = getClassFromHandle(handle, cl);
     ClassDescriptor cd = classToDescMap.get(c);
     if (cd == null) {
       cd = createDescriptor(c, handle);
@@ -73,7 +73,7 @@ class DeserializationCaches {
    * @throws Exception if any error occurs.
    */
   ClassDescriptor createDescriptor(final Class<?> clazz, final String signature) throws Exception {
-    ClassDescriptor cd = new ClassDescriptor();
+    final ClassDescriptor cd = new ClassDescriptor();
     cd.signature = (signature == null) ? SerializationReflectionHelper.getSignatureFromType(clazz) : signature;
     cd.fillIn(clazz, false);
     setupClassDescriptors(cd, clazz.getClassLoader());
@@ -108,17 +108,17 @@ class DeserializationCaches {
     if (!classToDescMap.containsKey(cd.clazz)) {
       classToDescMap.put(cd.clazz, cd);
       if (cd.array) {
-        Class<?> clazz = cd.clazz.getComponentType();
+        final Class<?> clazz = cd.clazz.getComponentType();
         if (cd.componentType == null) cd.componentType = descriptorFromClass(clazz);
         if ((cd.componentType != null) && (cd.componentType.clazz == null)) setupClassDescriptors(cd.componentType, cl);
       }
       if (cd.superClass == null) {
-        Class<?> clazz = cd.clazz.getSuperclass();
+        final Class<?> clazz = cd.clazz.getSuperclass();
         if ((clazz != null) && (clazz != Object.class)) cd.superClass = descriptorFromClass(clazz);
       }
       if ((cd.superClass != null) && (cd.superClass.clazz == null)) setupClassDescriptors(cd.superClass, cl);
       if (cd.fields != null) {
-        for (FieldDescriptor fd: cd.fields) {
+        for (final FieldDescriptor fd: cd.fields) {
           if (fd.type == null) fd.type = descriptorFromClass(fd.field.getType());
           if (fd.type.clazz == null) setupClassDescriptors(fd.type, cl);
         }
@@ -134,7 +134,7 @@ class DeserializationCaches {
    */
   private ClassDescriptor descriptorFromClass(final Class<?> clazz) throws Exception {
     ClassDescriptor cd = classToDescMap.get(clazz);
-    String sig = SerializationReflectionHelper.getSignatureFromType(clazz);
+    final String sig = SerializationReflectionHelper.getSignatureFromType(clazz);
     if (cd == null) cd = createDescriptor(clazz, sig);
     return cd;
   }

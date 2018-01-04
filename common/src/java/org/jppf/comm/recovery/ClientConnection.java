@@ -95,12 +95,12 @@ public class ClientConnection extends AbstractRecoveryConnection {
         return;
       }
       while (!isStopped()) {
-        String message = receiveMessage(maxRetries, socketReadTimeout);
+        final String message = receiveMessage(maxRetries, socketReadTimeout);
         if ((message != null) && message.startsWith("handshake")) setInitialized(true);
-        String response = "checked;" + uuid;
+        final String response = "checked;" + uuid;
         sendMessage(response);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
       if (!(e instanceof InterruptedException)) fireClientConnectionEvent();
       close();
@@ -113,7 +113,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    */
   private void configure() {
     if (debugEnabled) log.debug("configuring connection");
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     if (host == null) host = config.get(JPPFProperties.SERVER_HOST);
     if (port < 0) port = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
     maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
@@ -132,13 +132,13 @@ public class ClientConnection extends AbstractRecoveryConnection {
     if (runThread != null) runThread.interrupt();
     try {
       if (debugEnabled) log.debug("closing connection");
-      SocketWrapper tmp = socketWrapper;
+      final SocketWrapper tmp = socketWrapper;
       socketWrapper = null;
       if (tmp != null) tmp.close();
       if (socketInitializer != null) socketInitializer.close();
       socketInitializer = null;
       listeners.clear();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -165,7 +165,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    * Notify all listeners that an event has occurred.
    */
   private void fireClientConnectionEvent() {
-    ClientConnectionEvent event = new ClientConnectionEvent(this);
+    final ClientConnectionEvent event = new ClientConnectionEvent(this);
     for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
   }
 }

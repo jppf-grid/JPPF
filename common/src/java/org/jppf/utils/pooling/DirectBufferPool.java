@@ -20,6 +20,8 @@ package org.jppf.utils.pooling;
 
 import java.nio.ByteBuffer;
 
+import org.jppf.io.IO;
+
 /**
  * Static factory for pool of direct byte buffers.
  * @author Laurent Cohen
@@ -29,14 +31,23 @@ public class DirectBufferPool {
   /**
    * 
    */
-  private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue();
+  private static final ThreadLocal<ByteBuffer> threadLocalBuffer = new ThreadLocal<>();
+  /**
+   * 
+   */
+  //private static final ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue().init(100);
 
   /**
    * Get a buffer from the pool, or a new buffer if the pool is empty.
    * @return a {@link ByteBuffer} instance.
    */
   public static ByteBuffer provideBuffer() {
-    return pool.get();
+    ByteBuffer bb = threadLocalBuffer.get();
+    if (bb == null) {
+      threadLocalBuffer.set(bb = ByteBuffer.allocateDirect(IO.TEMP_BUFFER_SIZE));
+      //threadLocalBuffer.set(bb = pool.get());
+    }
+    return bb;
   }
 
   /**
@@ -44,6 +55,19 @@ public class DirectBufferPool {
    * @param buffer the buffer to release.
    */
   public static void releaseBuffer(final ByteBuffer buffer) {
-    pool.put(buffer);
+    buffer.clear();
   }
+
+  /**
+   * Release a buffer into the pool and make it available.
+   */
+  /*
+  public static void removeBuffer() {
+    ByteBuffer bb = threadLocalBuffer.get();
+    if (bb != null) {
+      threadLocalBuffer.remove();
+      pool.put(bb);
+    }
+  }
+  */
 }

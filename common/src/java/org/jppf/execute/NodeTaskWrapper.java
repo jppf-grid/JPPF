@@ -109,12 +109,12 @@ public class NodeTaskWrapper implements Runnable {
     this.cancelled = true;
     this.callOnCancel |= callOnCancel;
     if (task instanceof Future) {
-      Future<?> future = (Future<?>) task;
+      final Future<?> future = (Future<?>) task;
       if (!future.isDone()) future.cancel(true);
     } else if (task instanceof CancellationHandler) {
       try {
         ((CancellationHandler) task).doCancelAction();
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         if (task.getThrowable() == null) task.setThrowable(t);
         if (traceEnabled) log.trace("throwable raised in doCancelAction()", t);
       }
@@ -128,12 +128,12 @@ public class NodeTaskWrapper implements Runnable {
     this.timeout |= !this.cancelled;
     if (!this.cancelled && !started) cancelTimeoutAction();
     if (task instanceof Future) {
-      Future<?> future = (Future<?>) task;
+      final Future<?> future = (Future<?>) task;
       if (!future.isDone()) future.cancel(true);
     } else if (task instanceof TimeoutHandler) {
       try {
         ((TimeoutHandler) task).doTimeoutAction();
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         if (task.getThrowable() == null) task.setThrowable(t);
         if (traceEnabled) log.trace("throwable raised in doCancelAction()", t);
       }
@@ -149,8 +149,8 @@ public class NodeTaskWrapper implements Runnable {
   {
     if (traceEnabled) log.trace(toString());
     started = true;
-    long id = Thread.currentThread().getId();
-    long startTime = System.nanoTime();
+    final long id = Thread.currentThread().getId();
+    final long startTime = System.nanoTime();
     ClassLoader oldCl = null;
     try {
       oldCl = Thread.currentThread().getContextClassLoader();
@@ -158,9 +158,9 @@ public class NodeTaskWrapper implements Runnable {
       Thread.currentThread().setContextClassLoader(taskClassLoader);
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
-    } catch(JPPFReconnectionNotification t) {
+    } catch(final JPPFReconnectionNotification t) {
       reconnectionNotification = t;
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       task.setThrowable(t);
       if (t instanceof UnsatisfiedLinkError) task.setResult(ExceptionUtils.getStackTrace(t));
       if (traceEnabled) log.trace(t.getMessage(), t);
@@ -169,16 +169,16 @@ public class NodeTaskWrapper implements Runnable {
       try {
         elapsedTime = System.nanoTime() - startTime;
         if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
-      } catch(JPPFReconnectionNotification t) {
+      } catch(final JPPFReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
-      } catch(@SuppressWarnings("unused") Throwable ignore) {
+      } catch(@SuppressWarnings("unused") final Throwable ignore) {
       }
       try {
         silentTimeout();
         silentCancel();
-      } catch(JPPFReconnectionNotification t) {
+      } catch(final JPPFReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         task.setThrowable(t);
       }
       if (task.getThrowable() instanceof InterruptedException) task.setThrowable(null);
@@ -225,16 +225,16 @@ public class NodeTaskWrapper implements Runnable {
    * @throws Exception if any error occurs.
    */
   private void handleTimeout() throws Exception {
-    JPPFSchedule schedule = task.getTimeoutSchedule();
+    final JPPFSchedule schedule = task.getTimeoutSchedule();
     if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) {
-      TimeoutTimerTask tt = new TimeoutTimerTask(this);
+      final TimeoutTimerTask tt = new TimeoutTimerTask(this);
       timeoutHandler.scheduleAction(future, getTask().getTimeoutSchedule(), tt);
     }
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("task=").append(task);
     if (task.getTaskObject() != task) {
       sb.append(", taskObject=").append(task.getTaskObject());

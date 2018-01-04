@@ -44,10 +44,10 @@ public class TournamentSelector implements Selector {
 
   @Override
   public Chromosome[] select(final Chromosome[] population, final int nbSelect) {
-    int length = population.length;
-    Chromosome[] result = new Chromosome[nbSelect];
+    final int length = population.length;
+    final Chromosome[] result = new Chromosome[nbSelect];
     for (int i=0; i<nbSelect; i++) {
-      Chromosome[] temp = new Chromosome[size];
+      final Chromosome[] temp = new Chromosome[size];
       for (int j=0; j<size; j++) temp[j] = population[random.nextInt(length)];
       double max = -Double.MAX_VALUE;
       Chromosome best = null;

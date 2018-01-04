@@ -23,8 +23,7 @@ import java.lang.reflect.Constructor;
  * Class used to invoke a constructor through reflection when a security manager is present.
  * @exclude
  */
-class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
-{
+class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object> {
   /**
    * The method to invoke.
    */
@@ -35,8 +34,7 @@ class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
    * @param constructor the constructor to invoke.
    * @param args the parameters of the constructor to invoke.
    */
-  public PrivilegedConstructorAction(final Constructor<?> constructor, final Object[] args)
-  {
+  public PrivilegedConstructorAction(final Constructor<?> constructor, final Object[] args) {
     this.constructor = constructor;
     this.args = args;
   }
@@ -47,15 +45,11 @@ class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
    * @see java.security.PrivilegedAction#run()
    */
   @Override
-  public Object run()
-  {
+  public Object run() {
     Object result = null;
-    try
-    {
+    try {
       result = constructor.newInstance(args);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       exception = e;
     }
     return result;

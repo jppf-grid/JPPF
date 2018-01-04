@@ -87,7 +87,7 @@ class ScriptRunnerImpl implements ScriptRunner {
    * @throws JPPFScriptingException if the engine oculd not be created.
    */
   private ScriptEngine createEngine () throws JPPFScriptingException {
-    ScriptEngine engine = new ScriptEngineManager().getEngineByName(language);
+    final ScriptEngine engine = new ScriptEngineManager().getEngineByName(language);
     if (engine == null) {
       engineNotFound = true;
       throw new JPPFScriptingException("an engine could not be instanciated for script language '" + language + "'");
@@ -103,11 +103,11 @@ class ScriptRunnerImpl implements ScriptRunner {
   @Override
   public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException {
     if (engine == null) return null;
-    Bindings bindings = engine.createBindings();
+    final Bindings bindings = engine.createBindings();
     if (variables != null) bindings.putAll(variables);
     CompiledScript cs = null;
     if ((scriptId != null) && (engine instanceof Compilable)) {
-      String key = new StringBuilder().append(language).append(':').append(scriptId).toString();
+      final String key = new StringBuilder().append(language).append(':').append(scriptId).toString();
       cs = map.get(key);
       cacheRequests.incrementAndGet();
       if (cs == null) {
@@ -115,16 +115,16 @@ class ScriptRunnerImpl implements ScriptRunner {
         try {
           cs = ((Compilable) engine).compile(script);
           if (cs != null) map.put(key, cs);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           throw buildScriptingException(e);
         }
       } else cacheHits.incrementAndGet();
     }
     if (debugEnabled) log.debug(String.format("script cache statistics for '%s': requests=%d, hits=%d, misses=%d", language, cacheRequests.get(), cacheHits.get(), cacheMisses.get()));
     try {
-      Object res = (cs != null) ? cs.eval(bindings) : engine.eval(script, bindings);
+      final Object res = (cs != null) ? cs.eval(bindings) : engine.eval(script, bindings);
       return res;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw buildScriptingException(e);
     }
   }
@@ -150,8 +150,8 @@ class ScriptRunnerImpl implements ScriptRunner {
    * @param t the exception from the script engine.
    * @return a {@link JPPFScriptingException} instance.
    */
-  private JPPFScriptingException buildScriptingException(final Throwable t) {
-    JPPFScriptingException jfe = new JPPFScriptingException(ExceptionUtils.getMessage(t));
+  private static JPPFScriptingException buildScriptingException(final Throwable t) {
+    final JPPFScriptingException jfe = new JPPFScriptingException(ExceptionUtils.getMessage(t));
     jfe.setStackTrace(t.getStackTrace());
     return jfe;
   }

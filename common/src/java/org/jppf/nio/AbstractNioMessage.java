@@ -164,7 +164,7 @@ public abstract class AbstractNioMessage implements NioMessage {
     if (currentLength < 0) {
       try {
         if (!currentLengthObject.read()) return false;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         channelCount += currentLengthObject.getChannelCount();
         throw e;
       }
@@ -176,12 +176,12 @@ public abstract class AbstractNioMessage implements NioMessage {
     }
     if (currentLength > 0) {
       if (currentObject == null) {
-        DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
+        final DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
         currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
       }
       try {
         if (!currentObject.read()) return false;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         channelCount += currentObject.getChannelCount();
         throw e;
       }
@@ -211,7 +211,7 @@ public abstract class AbstractNioMessage implements NioMessage {
     if (currentLength < 0) {
       try {
         if (!currentLengthObject.write()) return false;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         channelCount += currentLengthObject.getChannelCount();
         throw e;
       }
@@ -221,12 +221,12 @@ public abstract class AbstractNioMessage implements NioMessage {
     }
     if (currentLength > 0) {
       if (currentObject == null) {
-        DataLocation loc = currentDataLocation.copy();
+        final DataLocation loc = currentDataLocation.copy();
         currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel, loc);
       }
       try {
         if (!currentObject.write()) return false;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         channelCount += currentObject.getChannelCount();
         throw e;
       }
@@ -274,7 +274,7 @@ public abstract class AbstractNioMessage implements NioMessage {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);

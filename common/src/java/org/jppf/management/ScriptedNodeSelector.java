@@ -33,6 +33,10 @@ import org.slf4j.*;
  */
 public class ScriptedNodeSelector extends BaseScriptEvaluator implements NodeSelector {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ScriptedNodeSelector.class);
@@ -68,9 +72,9 @@ public class ScriptedNodeSelector extends BaseScriptEvaluator implements NodeSel
 
   @Override
   public boolean accepts(final JPPFManagementInfo nodeInfo) {
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("nodeInfo", nodeInfo);
-    Object result = evaluate(variables);
+    final Object result = evaluate(variables);
     if (result instanceof Boolean) return (Boolean) result;
     log.error("result of scripted node selector should be a boolean but instead is " + result);
     return false;

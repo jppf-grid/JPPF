@@ -72,7 +72,7 @@ public class FileLocation extends AbstractLocation<String> {
   @Override
   public long size() {
     if (size < 0) {
-      File file = new File(path);
+      final File file = new File(path);
       if (file.exists()) size = file.length();
     }
     return size;

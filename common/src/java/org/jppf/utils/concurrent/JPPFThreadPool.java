@@ -20,7 +20,7 @@ package org.jppf.utils.concurrent;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.client.Operator;
@@ -37,23 +37,15 @@ public class JPPFThreadPool extends AbstractExecutorService {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggingUtils.getLogger(JPPFThreadPool.class, false);
+  private static final Logger log = LoggingUtils.getLogger(JPPFThreadPool.class, false);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Possible worker states.
-   */
-  private final static int NEW = 0, BUSY = 1, IDLE = 2, TERMINATED = 3;
-  /**
-   * Performance monitor capacity.
-   */
-  //private final static int PERFMON_CAPACITY = 5000;
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The tasks queue.
    */
-  private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+  private final BlockingQueue<Runnable> queue;
   /**
    * The thread factory.
    */
@@ -65,23 +57,27 @@ public class JPPFThreadPool extends AbstractExecutorService {
   /**
    * The maximum number of threads.
    */
-  private SynchronizedInteger maxThreads = new SynchronizedInteger(Integer.MAX_VALUE);
+  private volatile int maxThreads = Integer.MAX_VALUE;
   /**
    * The thread time-to-live.
    */
-  private AtomicLong ttl = new AtomicLong(Long.MAX_VALUE);
-  /**
-   * Used to synchronize access to the maps.
-   */
-  private final Lock mainLock = new ReentrantLock();
+  private volatile long ttl = Long.MAX_VALUE;
   /**
    * The live workers.
    */
-  private final Set<Worker> workers = new HashSet<>();
+  private final Map<Worker, Boolean> workers = new HashMap<>();
+  /**
+   * Synchronizes access to the workers map.
+   */
+  private final Lock workersLock = new ReentrantLock();
+  /**
+   * Synchronizes access to the workers map.
+   */
+  private final Lock mainLock = new ReentrantLock();
   /**
    * Generates sequential worker ids.
    */
-  private final SynchronizedInteger workerIdSequence = new SynchronizedInteger(0);
+  private final AtomicInteger workerIdSequence = new AtomicInteger(0);
   /**
    * Peak count of threads.
    */
@@ -89,23 +85,27 @@ public class JPPFThreadPool extends AbstractExecutorService {
   /**
    * Whether this executor has been shutdown.
    */
-  private final SynchronizedBoolean shutdown = new SynchronizedBoolean(false);
+  private final AtomicBoolean shutdown = new AtomicBoolean(false);
   /**
    * Whether this executor has been shutdown immediately.
    */
-  private final SynchronizedBoolean immediateShutdown = new SynchronizedBoolean(false);
+  private volatile boolean immediateShutdown;
   /**
    * Whether this executor is terminated.
    */
-  private final SynchronizedBoolean terminated = new SynchronizedBoolean(false);
-  /**
-   * Maintains a count of the workers in each possible state.
-   */
-  private final int[] stateCount = { 0, 0, 0, 0 };
+  private final AtomicBoolean terminated = new AtomicBoolean(false);
   /**
    *
    */
   private final Stats stats = new Stats();
+  /**
+   * Current number of idle workers.
+   */
+  private int idleWorkers;
+  /**
+   * Current number of busy workers.
+   */
+  private int busyWorkers;
 
   /**
    * Create a fixed size thread pool with the specified number of threads, infinite thread time-to-live and a {@link Executors#defaultThreadFactory() default thread factory}.
@@ -113,6 +113,15 @@ public class JPPFThreadPool extends AbstractExecutorService {
    */
   public JPPFThreadPool(final int coreThreads) {
     this(coreThreads, coreThreads, Long.MAX_VALUE, Executors.defaultThreadFactory());
+  }
+
+  /**
+   * Initialize with the specified number of core threads and thread factory.
+   * @param coreThreads the number of core threads.
+   * @param threadFactory the thread factory.
+   */
+  public JPPFThreadPool(final int coreThreads, final ThreadFactory threadFactory) {
+    this(coreThreads, coreThreads, -1L, threadFactory);
   }
 
   /**
@@ -133,18 +142,31 @@ public class JPPFThreadPool extends AbstractExecutorService {
    * @param threadFactory the thread factory.
    */
   public JPPFThreadPool(final int coreThreads, final int maxThreads, final long ttl, final ThreadFactory threadFactory) {
+    this(coreThreads, maxThreads, ttl, threadFactory, new LinkedBlockingQueue<Runnable>());
+  }
+
+  /**
+   * Initialize with the specified number of core threads, maximum number of threads, ttl and thread factory.
+   * @param coreThreads the number of core threads.
+   * @param maxThreads the maximum number of threads.
+   * @param ttl the thread time-to-live in milliseconds.
+   * @param threadFactory the thread factory.
+   * @param queue the queue to use.
+   */
+  public JPPFThreadPool(final int coreThreads, final int maxThreads, final long ttl, final ThreadFactory threadFactory, final BlockingQueue<Runnable> queue) {
+    this.queue = queue;
     this.coreThreads = coreThreads;
-    this.maxThreads.set(maxThreads);
-    this.ttl.set(ttl);
+    this.maxThreads = maxThreads;
+    this.ttl = ((ttl <= 0L) || (ttl == Long.MAX_VALUE) ? -1L : ttl);
     this.threadFactory = threadFactory;
-    for (int i=0; i<coreThreads; i++) new Worker(null);
+    //for (int i=0; i<coreThreads; i++) new Worker(null);
   }
 
   /**
    * @return the maximum number of threads.
    */
   public int getMaxThreads() {
-    return maxThreads.get();
+    return maxThreads;
   }
 
   /**
@@ -152,14 +174,14 @@ public class JPPFThreadPool extends AbstractExecutorService {
    * @param maxThreads the new maximum number of threads.
    */
   public void setMaxThreads(final int maxThreads) {
-    this.maxThreads.set(maxThreads);
+    this.maxThreads = maxThreads;
   }
 
   /**
    * @return the non-threads' time-to-live.
    */
   public long getTtl() {
-    return ttl.get();
+    return ttl;
   }
 
   /**
@@ -167,7 +189,7 @@ public class JPPFThreadPool extends AbstractExecutorService {
    * @param ttl the ttl in millis.
    */
   public void setTtl(final long ttl) {
-    this.ttl.set(ttl);
+    this.ttl = ttl;
   }
 
   /**
@@ -178,44 +200,30 @@ public class JPPFThreadPool extends AbstractExecutorService {
   }
 
   /**
-   * @return the number of live workers.
-   */
-  private int workerCount() {
-    synchronized(mainLock) {
-      return stateCount[IDLE] + stateCount[BUSY];
-    }
-  }
-
-  /**
-   * Called when a worker changes state.
-   * @param worker the worker whose state is changing.
-   * @param oldState the worker's old state.
-   * @param newState the worker's new state.
-   */
-  private void stateTransition(final Worker worker, final int oldState, final int newState) {
-    synchronized(mainLock) {
-      if (newState == NEW) {
-        peakThreadCount.compareAndSet(Operator.LESS_THAN, stateCount[BUSY] + stateCount[IDLE] + 1);
-        workers.add(worker);
-      } else if (newState == TERMINATED) {
-        workers.remove(worker);
-      }
-      if (oldState >= 0) stateCount[oldState]--;
-      if (newState >= 0) stateCount[newState]++;
-    }
-  }
-
-  /**
    * Execute the specified task some time in the future.
    * @param task the task to execute.
    */
   @Override
   public void execute(final Runnable task) {
     if (task == null) throw new NullPointerException("the task cannot be null");
-    if (shutdown.get()) throw new RejectedExecutionException("this executor has been shut down");
+    int count = 0;
+    for (;;) {
+      if (!queue.offer(task)) {
+        if (addWorker() || (++count >= 10)) {
+          new Worker(task);
+          break;
+        }
+      } else {
+        stats.queued.incrementAndGet();
+        break;
+      }
+    }
+    /*
     if (addWorker()) new Worker(task);
-    else queue.offer(task);
-    stats.queued.incrementAndGet();
+    else if (!queue.offer(task)) new Worker(task);
+    else stats.queued.incrementAndGet();
+    */
+    stats.submitted.incrementAndGet();
     if (traceEnabled) log.trace("adding task {} to queue", task);
   }
 
@@ -223,27 +231,30 @@ public class JPPFThreadPool extends AbstractExecutorService {
    * @return whether to start a new worker.
    */
   private boolean addWorker() {
+    final int idle, busy;
     synchronized(mainLock) {
-      int idle = stateCount[IDLE];
-      return (idle <= 0) && (idle + stateCount[BUSY] < getMaxThreads());
+      idle = idleWorkers;
+      busy = busyWorkers;
     }
+    return (idle + busy < coreThreads) || ((idle <= 0) && (busy < maxThreads));
   }
 
   @Override
   public void shutdown() {
     if (shutdown.compareAndSet(false, true)) {
-      if (traceEnabled) log.trace(String.format("shutdown requested: queue size = %,d; worker count = %,d", queue.size(), workerCount()));
+      notifyWorkers(false);
+      if (traceEnabled) log.trace(String.format("shutdown requested: queue size = %,d; worker count = %,d", queue.size(), idleWorkers + busyWorkers));
     }
   }
 
   @Override
   public List<Runnable> shutdownNow() {
     if (shutdown.compareAndSet(false, true)) {
-      immediateShutdown.set(true);
+      immediateShutdown = true;
+      notifyWorkers(true);
       if (traceEnabled) log.trace("immediate shutdown requested");
-      List<Runnable> remainingTasks = new ArrayList<>(queue.size());
+      final List<Runnable> remainingTasks = new ArrayList<>(queue.size());
       queue.drainTo(remainingTasks);
-      interruptWorkers();
       return remainingTasks;
     }
     return null;
@@ -251,10 +262,15 @@ public class JPPFThreadPool extends AbstractExecutorService {
 
   /**
    * Interrupt the remaining live workers.
+   * @param interrupt whether to interrupt the workers.
    */
-  private void interruptWorkers() {
-    synchronized(mainLock) {
-      for (Worker worker: workers) worker.interrupt();
+  private void notifyWorkers(final boolean interrupt) {
+    synchronized(workersLock) {
+      for (final Map.Entry<Worker, Boolean> workerEntry: workers.entrySet()) {
+        final Worker worker = workerEntry.getKey();
+        worker.workerShutdown = true;
+        if (interrupt || worker.idle) worker.interrupt();
+      }
     }
   }
 
@@ -267,17 +283,20 @@ public class JPPFThreadPool extends AbstractExecutorService {
   public boolean isTerminated() {
     if (!shutdown.get()) return false;
     if (terminated.get()) return true;
-    synchronized(mainLock) {
-      terminated.set((workerCount() <= 0) && queue.isEmpty());
+    final int size;
+    synchronized(workersLock) {
+      size = workers.size();
     }
-    return terminated.get();
+    final boolean b = (size <= 0) && queue.isEmpty();
+    terminated.set(b);
+    return b;
   }
 
   @Override
   public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
     if (isTerminated()) return true;
-    long millis = unit.toMillis(timeout);
-    ConcurrentUtils.Condition condition = new ConcurrentUtils.Condition() {
+    final long millis = unit.toMillis(timeout);
+    final ConcurrentUtils.Condition condition = new ConcurrentUtils.Condition() {
       @Override
       public boolean evaluate() {
         return isTerminated();
@@ -290,17 +309,17 @@ public class JPPFThreadPool extends AbstractExecutorService {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("coreThreads=").append(coreThreads)
-      .append(", maxThreads=").append(maxThreads.get())
-      .append(", ttl=").append(ttl.get())
+      .append(", maxThreads=").append(maxThreads)
+      .append(", ttl=").append(ttl)
       .append(", peakThreads=").append(peakThreadCount.get())
       .append(", stats={").append(stats).append('}')
       .append(']').toString();
   }
 
   /**
-   * Instances of this class represent the worker threads in the poool.
+   * Instances of this class represent the worker threads in the pool.
    */
-  private final class Worker implements Runnable {
+  private final class Worker implements Runnable, Comparable<Worker> {
     /**
      * The associated thread.
      */
@@ -308,15 +327,23 @@ public class JPPFThreadPool extends AbstractExecutorService {
     /**
      * This worker's id.
      */
-    private final Integer id;
+    private final int id;
     /**
      * The state of this worker.
      */
-    private int state = -1;
+    private boolean idle;
+    /**
+     * First task assigned to this worker at construction time, if any.
+     */
+    private Runnable firstTask;
+    /**
+     * Whether this worker was notified of an executor shutdown.
+     */
+    volatile boolean workerShutdown;
     /**
      * 
      */
-    private Runnable firstTask;
+    private boolean hasBusy;
 
     /**
      * Initialize this worker with its first task to execute.
@@ -324,55 +351,71 @@ public class JPPFThreadPool extends AbstractExecutorService {
      * @param firstTask .
      */
     private Worker(final Runnable firstTask) {
-      id = Integer.valueOf(workerIdSequence.incrementAndGet());
+      id = workerIdSequence.incrementAndGet();
       this.thread = threadFactory.newThread(this);
       this.firstTask = firstTask;
-      setState(NEW);
+      this.idle = (firstTask == null);
+      final int size;
+      synchronized(workersLock) {
+        workers.put(this, Boolean.TRUE);
+        size = workers.size();
+      }
+      peakThreadCount.compareAndSet(Operator.LESS_THAN, size);
+      synchronized(mainLock) {
+        if (idle) idleWorkers++;
+        else busyWorkers++;
+        hasBusy = busyWorkers > 0;
+      }
       thread.start();
     }
 
     @Override
     public void run() {
+      Runnable task = firstTask;
+      firstTask = null;
       while (!shouldStop()) {
-        Runnable task = firstTask;
-        if (firstTask != null) firstTask = null;
-        if (traceEnabled) log.trace("{} entering IDLE state", this);
-        try {
-          setState(IDLE);
-          long ttl = getTtl();
-          long start = System.currentTimeMillis();
-          while ((task == null) && (System.currentTimeMillis() - start < ttl) && !shouldStop()) {
-            task = queue.poll(1L, TimeUnit.MILLISECONDS);
-          }
-        } catch (InterruptedException e) {
-          if (traceEnabled) log.trace("terminating {} due to interrupt: {}", this, ExceptionUtils.getStackTrace(e));
-          break;
-        }
-        if (task != null) {
-          if (traceEnabled) log.trace("{} executing task {}", this, task);
-          setState(BUSY);
+        if (task == null) {
           try {
-            task.run();
-          } catch (Exception e) {
-            if (traceEnabled) log.trace(String.format("%s caught exception while executing task %s:%n%s", this, task, ExceptionUtils.getStackTrace(e)));
-          } finally {
-            stats.completed.incrementAndGet();
-          }
-        } else {
-          if (id > coreThreads) {
-            if (traceEnabled) log.trace("terminating {}", this);
+            setIdle(true);
+            if (traceEnabled) log.trace("{} entering IDLE state", this);
+            final long timeout = ttl;
+            task = (timeout <= 0L) ? queue.take() : queue.poll(timeout, TimeUnit.MILLISECONDS);
+            if ((task == null) && (id > coreThreads)) break;
+          } catch (final InterruptedException e) {
+            if (traceEnabled) log.trace("terminating {} due to interrupt: {}", this, ExceptionUtils.getStackTrace(e));
             break;
           }
         }
+        if (task != null) {
+          setIdle(false);
+          if (traceEnabled) log.trace("{} executing task {}", this, task);
+          try {
+            task.run();
+          } catch (final Exception e) {
+            if (traceEnabled) log.trace(String.format("%s caught exception while executing task %s:%n%s", this, task, ExceptionUtils.getStackTrace(e)));
+          } finally {
+            task = null;
+            stats.completed.incrementAndGet();
+          }
+        }
       }
-      setState(TERMINATED);
+      synchronized(workersLock) {
+        workers.remove(this);
+      }
+      synchronized(mainLock) {
+        if (idle) idleWorkers--;
+        else busyWorkers--;
+        hasBusy = busyWorkers > 0;
+      }
+      if (traceEnabled) log.trace("terminating {}", this);
     }
 
     /**
      * @return whether this worker should stop processing tasks.
      */
     private boolean shouldStop() {
-      return immediateShutdown.get() || (shutdown.get() && queue.isEmpty());
+      return immediateShutdown || (this.workerShutdown && queue.isEmpty() && hasBusy);
+      //return this.workerShutdown && (immediateShutdown || (queue.isEmpty() && !hasBusy));
     }
 
     /**
@@ -384,19 +427,47 @@ public class JPPFThreadPool extends AbstractExecutorService {
 
     /**
      * Set the state of this worker.
-     * @param newState the new state.
+     * @param idle the new state.
      */
-    private void setState(final int newState) {
-      if (this.state == newState) return;
-      int oldState = state;
-      this.state = newState;
-      if (traceEnabled) log.trace(String.format("%s transitioning from %s to %s", this, this.state, newState));
-      stateTransition(this, oldState, newState);
+    private void setIdle(final boolean idle) {
+      if (this.idle == idle) return;
+      if (traceEnabled) log.trace(String.format("%s transitioning from %s to %s", this, this.idle, idle));
+      this.idle = idle;
+      updateWorkerCounts(this.idle ? -1 : 1);
+    }
+
+    /**
+     * Called when a worker changes state.
+     * @param update .
+     */
+    private void updateWorkerCounts(final int update) {
+      synchronized(mainLock) {
+        idleWorkers -= update;
+        busyWorkers += update;
+        hasBusy = busyWorkers > 0;
+      }
     }
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "[id=" + id + ']';
+    }
+
+    @Override
+    public int compareTo(final Worker other) {
+      //return id < other.id ? -1 : (id > other.id ? 1 : 0);
+      if (idle) return other.idle ? compare(id, other.id) : -1;
+      return other.idle ? 1 : compare(id, other.id); 
+    }
+
+    /**
+     * 
+     * @param i1 .
+     * @param i2 .
+     * @return .
+     */
+    private int compare(final int i1, final int i2) {
+      return i1 < i2 ? -1 : (i1 > i2 ? 1 : 0);
     }
   }
 
@@ -407,11 +478,11 @@ public class JPPFThreadPool extends AbstractExecutorService {
     /**
      * 
      */
-    private SynchronizedInteger queued = new SynchronizedInteger(), completed = new SynchronizedInteger();
+    private AtomicInteger submitted = new AtomicInteger(), queued = new AtomicInteger(), completed = new AtomicInteger();
 
     @Override
     public String toString() {
-      return String.format("queued: %,d, completed: %,d", queued.get(), completed.get());
+      return String.format("submitted: %,d, queued=%,d, completed: %,d", submitted.get(), queued.get(), completed.get());
     }
   }
 }

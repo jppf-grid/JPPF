@@ -63,8 +63,8 @@ public class StreamOutputDestination implements OutputDestination {
    */
   @Override
   public int write(final ByteBuffer buffer) throws Exception {
-    int pos = buffer.position();
-    byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
+    final int pos = buffer.position();
+    final byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
     try {
       while (buffer.remaining() > 0) {
         int n = buffer.position();
@@ -86,7 +86,7 @@ public class StreamOutputDestination implements OutputDestination {
    */
   @Override
   public void writeInt(final int value) throws Exception {
-    byte[] bytes = SerializationUtils.writeInt(value);
+    final byte[] bytes = SerializationUtils.writeInt(value);
     os.write(bytes);
   }
 

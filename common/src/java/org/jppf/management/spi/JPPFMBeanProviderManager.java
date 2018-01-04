@@ -59,25 +59,25 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
    */
   public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final Object server, final Object...createParams) throws Exception {
     this.server = (MBeanServer) server;
-    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    final ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     ClassLoader loader = cl == null ? tmp : cl;
     if (loader == null) loader = getClass().getClassLoader();
-    Hook<S> hook = HookFactory.registerSPIMultipleHook(clazz, null, loader);
+    final Hook<S> hook = HookFactory.registerSPIMultipleHook(clazz, null, loader);
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      for (HookInstance<S> hookInstance: hook.getInstances()) {
-        S concrete = hookInstance.getInstance();
+      for (final HookInstance<S> hookInstance: hook.getInstances()) {
+        final S concrete = hookInstance.getInstance();
         try {
-          Object mbean = hookInstance.invoke("createMBean", createParams);
+          final Object mbean = hookInstance.invoke("createMBean", createParams);
           if (mbean == null) continue;
-          String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
-          Class<?> inf = Class.forName(infName, true, loader);
-          String mbeanName = (String) hookInstance.invoke("getMBeanName");
-          boolean b = registerProviderMBean(mbean, inf, mbeanName);
+          final String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
+          final Class<?> inf = Class.forName(infName, true, loader);
+          final String mbeanName = (String) hookInstance.invoke("getMBeanName");
+          final boolean b = registerProviderMBean(mbean, inf, mbeanName);
           if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanName + ']');
           if (b) registeredMBeanNames.add(mbeanName);
-        } catch (Exception e) {
-          String message = "error processing MBean provider {} : {}";
+        } catch (final Exception e) {
+          final String message = "error processing MBean provider {} : {}";
           if (debugEnabled) log.debug(message, concrete, ExceptionUtils.getStackTrace(e));
           else log.warn(message, concrete, ExceptionUtils.getMessage(e));
         }
@@ -97,12 +97,12 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   private boolean registerProviderMBean(final Object impl, final Class<?> intf, final String name) {
     try {
       if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
-      ObjectName objectName = new ObjectName(name);
+      final ObjectName objectName = new ObjectName(name);
       if (!server.isRegistered(objectName)) {
         server.registerMBean(impl, objectName);
         return true;
       } else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return false;
@@ -114,12 +114,12 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   public void unregisterProviderMBeans() {
     if (debugEnabled) log.debug("list of registered MBeans {}", registeredMBeanNames);
     while (!registeredMBeanNames.isEmpty()) {
-      String s = registeredMBeanNames.remove(0);
+      final String s = registeredMBeanNames.remove(0);
       try {
         server.unregisterMBean(new ObjectName(s));
         if (debugEnabled) log.debug("MBean un-registration succeeded for [{}]", s);
-      } catch(Exception e) {
-        String format = "MBean un-registration failed for [{}] : {}";
+      } catch(final Exception e) {
+        final String format = "MBean un-registration failed for [{}] : {}";
         if (debugEnabled) log.debug(format, s, ExceptionUtils.getStackTrace(e));
         else log.warn(format, s, ExceptionUtils.getMessage(e));
       }

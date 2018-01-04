@@ -81,7 +81,7 @@ public class JPPFErrorReporter {
    * @return a concatenation of all messages in the list, separated by new lines.
    */
   protected String concatenateMessages(final List<String> list) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<list.size(); i++) {
       if (i > 0) sb.append('\n');
       sb.append(list.get(i));

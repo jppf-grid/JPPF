@@ -23,8 +23,7 @@ import java.lang.reflect.Method;
  * Class used to invoke a method through reflection when a security manager is present.
  * @exclude
  */
-class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
-{
+class PrivilegedMethodAction extends AbstractPrivilegedAction<Object> {
   /**
    * The method to invoke.
    */
@@ -40,8 +39,7 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
    * @param invoker the object on which to invoke the method, or null for static methods.
    * @param args the parameters of the method to invoke.
    */
-  public PrivilegedMethodAction(final Method method, final Object invoker, final Object[] args)
-  {
+  public PrivilegedMethodAction(final Method method, final Object invoker, final Object[] args) {
     this.method = method;
     this.invoker = invoker;
     this.args = args;
@@ -53,15 +51,11 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
    * @see java.security.PrivilegedAction#run()
    */
   @Override
-  public Object run()
-  {
+  public Object run() {
     Object result = null;
-    try
-    {
+    try {
       result = method.invoke(invoker, args);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       exception = e;
     }
     return result;

@@ -126,10 +126,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
       count = 0;
     }
     try {
-      int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
+      final int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
       if ((n < 0) || (count >= size)) transferring = false;
       return n;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       transferring = false;
       throw e;
     }
@@ -144,8 +144,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   private int blockingTransferFrom(final InputSource source) throws Exception {
     //if (traceEnabled) log.trace("blocking transfer: size=" + size);
     while (count < size) {
-      int remaining = size - count;
-      int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
+      final int remaining = size - count;
+      final int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
       //if (traceEnabled) log.trace("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
       //	", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
       if (n < 0) throw new EOFException();
@@ -163,9 +163,9 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @throws Exception if an IO error occurs.
    */
   private int nonBlockingTransferFrom(final InputSource source) throws Exception {
-    int remaining = size - count;
+    final int remaining = size - count;
     //if (traceEnabled) log.trace("blocking transfer: size="+size+", remaining="+remaining);
-    int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
+    final int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
     if (n > 0) {
       count += n;
       currentBuffer.pos += n;
@@ -186,10 +186,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
       count = 0;
     }
     try {
-      int n = blocking ? blockingTransferTo(dest) : nonBlockingTransferTo(dest);
+      final int n = blocking ? blockingTransferTo(dest) : nonBlockingTransferTo(dest);
       if ((n < 0) || (count >= size)) transferring = false;
       return n;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       transferring = false;
       throw e;
     }
@@ -207,8 +207,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
       int nbRead = 0;
       buf.pos = 0;
       while (nbRead < buf.length) {
-        int remaining = buf.remainingFromPos();
-        int n = dest.write(buf.buffer, buf.pos, remaining);
+        final int remaining = buf.remainingFromPos();
+        final int n = dest.write(buf.buffer, buf.pos, remaining);
         if (n <= 0) break;
         if (n < remaining) buf.pos += n;
         count += n;
@@ -226,12 +226,12 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    */
   private int nonBlockingTransferTo(final OutputDestination dest) throws Exception {
     if (currentBuffer == null) return -1;
-    int remaining = currentBuffer.remainingFromPos();
+    final int remaining = currentBuffer.remainingFromPos();
     int n = 0;
     if (remaining > 0) {
       try {
         n = dest.write(currentBuffer.buffer, currentBuffer.pos, remaining);
-      } catch (Error e) {
+      } catch (final Error e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -273,7 +273,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @return a list of {@link JPPFBuffer} instances.
    */
   private List<JPPFBuffer> copyList() {
-    List<JPPFBuffer> copy = new ArrayList<>();
+    final List<JPPFBuffer> copy = new ArrayList<>(list.size());
     for (JPPFBuffer buf : list) copy.add(new JPPFBuffer(buf.buffer, buf.length));
     return copy;
   }
@@ -308,7 +308,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("size=").append(size);
     sb.append(", count=").append(count);

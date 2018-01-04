@@ -88,7 +88,7 @@ public class MultipleBuffersInputStream extends InputStream {
   public int read() throws IOException {
     if (eofReached) return -1;
     if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
-    byte b = currentBuffer.buffer[currentBuffer.pos];
+    final byte b = currentBuffer.buffer[currentBuffer.pos];
     currentBuffer.pos++;
     if (traceEnabled) log.trace("read one byte '" + b + "' from " + this);
     return b & 0xff;
@@ -109,7 +109,7 @@ public class MultipleBuffersInputStream extends InputStream {
     while (count < len) {
       if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
       if (eofReached) break;
-      int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
+      final int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
       int bPos = off + count;
       if (n >= ARRAYCOPY_MIN_LENGTH) System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, bPos, n);
       else {
@@ -148,7 +148,7 @@ public class MultipleBuffersInputStream extends InputStream {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     if (totalSize < 0) {
       totalSize = 0;

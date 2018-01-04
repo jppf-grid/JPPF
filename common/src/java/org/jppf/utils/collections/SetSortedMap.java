@@ -26,13 +26,16 @@ import java.util.*;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public class SetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
-{
+public class SetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default cosntructor.
    */
-  public SetSortedMap()
-  {
+  public SetSortedMap() {
     super();
   }
 
@@ -40,14 +43,12 @@ public class SetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    * Default cosntructor.
    * @param comparator comparator used to sort the keys.
    */
-  public SetSortedMap(final Comparator<K> comparator)
-  {
+  public SetSortedMap(final Comparator<K> comparator) {
     super(comparator);
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new HashSet<>();
   }
 }

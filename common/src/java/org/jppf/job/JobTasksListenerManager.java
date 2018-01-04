@@ -23,7 +23,6 @@ package org.jppf.job;
  * of {@link JobTasksListener job tasks listeners} and notify these listeners of job tasks events.
  * @author Laurent Cohen
  */
-@SuppressWarnings("deprecation")
 public interface JobTasksListenerManager {
   /**
    * Add a listener to the list of job tasks listeners.

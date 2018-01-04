@@ -38,7 +38,7 @@ public class NumericExpression extends AbstractExpression<Double> {
       value = Double.valueOf(expression);
       literal = true;
       this.expression = null;
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
   }
 
@@ -56,7 +56,7 @@ public class NumericExpression extends AbstractExpression<Double> {
   Double valueOf(final String value) {
     try {
       return Double.valueOf(value);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return 0d;
     }
   }

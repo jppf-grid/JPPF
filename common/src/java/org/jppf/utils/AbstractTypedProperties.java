@@ -62,7 +62,7 @@ public abstract class AbstractTypedProperties extends Properties {
     try (Writer writer = new StringWriter()) {
       store(writer, null);
       result = writer.toString();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage());
     }
     return result;
@@ -95,7 +95,7 @@ public abstract class AbstractTypedProperties extends Properties {
     clear();
     try (Reader reader = new StringReader(source)) {
       loadAndResolve(reader);
-    } catch (@SuppressWarnings("unused") Exception e) { }
+    } catch (@SuppressWarnings("unused") final Exception e) { }
     return (T) this;
   }
 }

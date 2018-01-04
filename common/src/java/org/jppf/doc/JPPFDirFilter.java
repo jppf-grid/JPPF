@@ -65,7 +65,7 @@ public class JPPFDirFilter extends AbstractFileFilter {
   @Override
   public boolean accept(final File path) {
     if (!path.isDirectory()) return false;
-    String name = path.getName();
+    final String name = path.getName();
     return included(name, true) && !excluded(name, true);
   }
 }

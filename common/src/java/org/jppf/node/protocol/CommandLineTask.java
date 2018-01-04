@@ -106,15 +106,14 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
    * @throws Exception if an error occurs.
    */
   public int launchProcess() throws Exception {
-    ProcessBuilder builder = new ProcessBuilder();
+    final ProcessBuilder builder = new ProcessBuilder();
     builder.command(commandList);
     if (startDir != null) builder.directory(new File(startDir));
     if (env != null) {
-      Map<String, String> map = builder.environment();
-      for (Map.Entry<String, String> e : env.entrySet())
-        map.put(e.getKey(), e.getValue());
+      final Map<String, String> map = builder.environment();
+      for (final Map.Entry<String, String> e : env.entrySet()) map.put(e.getKey(), e.getValue());
     }
-    ProcessWrapper wrapper = new ProcessWrapper();
+    final ProcessWrapper wrapper = new ProcessWrapper();
     if (captureOutput) wrapper.addListener(this);
     try {
       process = builder.start();

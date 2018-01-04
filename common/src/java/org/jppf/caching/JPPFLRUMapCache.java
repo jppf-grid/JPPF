@@ -52,6 +52,11 @@ public class JPPFLRUMapCache<K, V> extends AbstractJPPFMapCache<K, V> {
   @Override
   protected Map<K, V> createMap() {
     return new LinkedHashMap<K, V>(capacity, 0.75f, true) {
+      /**
+       * Explicit serialVersionUID.
+       */
+      private static final long serialVersionUID = 1L;
+
       @Override
       protected boolean removeEldestEntry(final Entry<K, V> eldest) {
         return size() > capacity;

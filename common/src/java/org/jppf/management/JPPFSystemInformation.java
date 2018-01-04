@@ -95,10 +95,10 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     this.local = local;
     this.resolveInetAddressesNow = resolveInetAddressesNow;
     this.stats = stats;
-    TypedProperties uuidProps = new TypedProperties();
+    final TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
     uuidProps.setInt("jppf.pid", SystemUtils.getPID());
-    VersionUtils.Version v = VersionUtils.getVersion();
+    final VersionUtils.Version v = VersionUtils.getVersion();
     uuidProps.setProperty("jppf.version.number", v.getVersionNumber());
     uuidProps.setProperty("jppf.build.number", v.getBuildNumber());
     uuidProps.setProperty("jppf.build.date", v.getBuildDate());
@@ -274,7 +274,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    */
   public JPPFSystemInformation populate() {
     if (traceEnabled) {
-      Exception e = new Exception("call stack for JPPFSystemInformation.populate(" + resolveInetAddressesNow + ")");
+      final Exception e = new Exception("call stack for JPPFSystemInformation.populate(" + resolveInetAddressesNow + ")");
       log.trace(e.getMessage(), e);
     }
     addProperties("system", SystemUtils.getSystemProperties());
@@ -282,7 +282,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("env", SystemUtils.getEnvironment());
     addProperties("jppf", new TypedProperties(JPPFConfiguration.getProperties()));
     getJppf().setProperty("jppf.channel.local", String.valueOf(local));
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         addProperties("network", SystemUtils.getNetwork());
@@ -293,7 +293,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("storage", SystemUtils.getStorageInformation());
     if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
     addProperties("os", SystemUtils.getOS());
-    TypedProperties statsProperties = new TypedProperties();
+    final TypedProperties statsProperties = new TypedProperties();
     addProperties("stats", statsProperties);
     if (stats != null) {
       for (JPPFSnapshot snapshot: stats) JPPFStatisticsHelper.toProperties(statsProperties, snapshot);
@@ -324,7 +324,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("local=").append(local);
     sb.append(", resolveInetAddressesNow=").append(resolveInetAddressesNow);
     sb.append(", map=").append(map);

@@ -62,11 +62,11 @@ public class AuthorsFileExplorer extends FileExplorer {
 
   @Override
   public void afterReadFile(final File file, final String content) {
-    Matcher matcher = AUTHOR_PATTERN.matcher(content);
+    final Matcher matcher = AUTHOR_PATTERN.matcher(content);
     int count = 0;
-    Set<String> temp = new HashSet<>();
+    final Set<String> temp = new HashSet<>();
     while (matcher.find()) {
-      String author = matcher.group(1);
+      final String author = matcher.group(1);
       if (!authors.contains(author)) {
         count++;
         temp.add(author);
@@ -109,11 +109,11 @@ public class AuthorsFileExplorer extends FileExplorer {
    */
   public static void main(final String[] args) {
     try {
-      File root = new File("C:/Workspaces/SourceForgeSVN");
-      AuthorsFileExplorer explorer = new AuthorsFileExplorer(root);
+      final File root = new File("C:/Workspaces/SourceForgeSVN");
+      final AuthorsFileExplorer explorer = new AuthorsFileExplorer(root);
       explorer.explore();
       System.out.printf("Found a total of %d authors under '%s' : %s%n", explorer.getMatches(), root, explorer.getAuthors());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

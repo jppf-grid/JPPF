@@ -100,14 +100,14 @@ public class SubstitutionsHandler {
   public <T extends Properties> T resolve(final T props) {
     int i = 0;
     if (traceEnabled) log.trace("starting substitution handling");
-    Set<String> set = props.stringPropertyNames();
+    final Set<String> set = props.stringPropertyNames();
     do {
       resolutionCount = 0;
       unresolvedCount = 0;
       i++;
       for (String key: set) {
         if (!resolvedProps.containsKey(key)) {
-          String value = evaluateProp(key, props.getProperty(key));
+          final String value = evaluateProp(key, props.getProperty(key));
           props.setProperty(key, value);
         }
       }
@@ -125,8 +125,8 @@ public class SubstitutionsHandler {
    * @return the new value of the property after 0 or more substitutions have been handled.
    */
   private String evaluateProp(final String key, final String value) {
-    Matcher matcher = SUBST_PATTERN.matcher(value);
-    StringBuilder sb = new StringBuilder();
+    final Matcher matcher = SUBST_PATTERN.matcher(value);
+    final StringBuilder sb = new StringBuilder();
     int pos = 0;
     int matches = 0;
     int resolvedRefCount = 0;
@@ -167,7 +167,7 @@ public class SubstitutionsHandler {
       pos = matcher.end();
     }
     if (pos < value.length()) sb.append(value.substring(pos, value.length()));
-    String s = sb.toString();
+    final String s = sb.toString();
     if (resolvedRefCount > 0) resolutionCount++;
     if (matches - resolvedRefCount > 0) unresolvedCount++;
     if ((matches <= 0) || (matches - resolvedRefCount <= 0)) {
@@ -188,8 +188,8 @@ public class SubstitutionsHandler {
    * @return the new value of the property after 0 or more substitutions have been handled.
    */
   public String evaluateProp(final PropertiesCollection<String> resolvedProps, final String value) {
-    Matcher matcher = SUBST_PATTERN.matcher(value);
-    StringBuilder sb = new StringBuilder();
+    final Matcher matcher = SUBST_PATTERN.matcher(value);
+    final StringBuilder sb = new StringBuilder();
     int pos = 0;
     if (traceEnabled) log.trace("evaluating value={}", value);
     while (matcher.find()) {
@@ -222,7 +222,7 @@ public class SubstitutionsHandler {
       pos = matcher.end();
     }
     if (pos < value.length()) sb.append(value.substring(pos, value.length()));
-    String s = sb.toString();
+    final String s = sb.toString();
     if (traceEnabled) log.trace("final value = {}", s);
     return s;
   }

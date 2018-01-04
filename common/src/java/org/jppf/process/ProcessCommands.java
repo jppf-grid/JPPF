@@ -76,7 +76,7 @@ public final class ProcessCommands {
    * @return a related name.
    */
   public static String getCommandName(final int command) {
-    String s = commandMap.get(command);
+    final String s = commandMap.get(command);
     return s == null ? Integer.valueOf(command).toString() : s;
   }
 }

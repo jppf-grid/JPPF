@@ -60,17 +60,15 @@ public class RangePattern {
     String src = preProcess(source);
     src = RegexUtils.SPACES_PATTERN.matcher(src).replaceAll("");
     src = postProcess(src);
-    String[] rangeArray = config.compSeparatorPattern.split(src);
+    final String[] rangeArray = config.compSeparatorPattern.split(src);
     if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
     if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + '\"');
     try {
-      for (String s : rangeArray)
-        ranges.add(parseRangePattern(s));
+      for (final String s : rangeArray) ranges.add(parseRangePattern(s));
       if (rangeArray.length < config.nbComponents) {
-        for (int i = rangeArray.length; i < config.nbComponents; i++)
-          ranges.add(config.fullRange);
+        for (int i = rangeArray.length; i < config.nbComponents; i++) ranges.add(config.fullRange);
       }
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       throw new IllegalArgumentException(build("error in pattern \"", source, "\" : ", e.getMessage()));
     }
   }
@@ -105,7 +103,7 @@ public class RangePattern {
       for (int i = 0; i < values.length; i++) {
         if (!ranges.get(i).isValueInRange(values[i])) return false;
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return false;
     }
     return true;
@@ -120,7 +118,7 @@ public class RangePattern {
   private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException {
     if ((src == null) || "".equals(src)) return config.fullRange;
     if (src.indexOf('-') < 0) return new Range<>(parseValue(src));
-    String[] vals = RegexUtils.MINUS_PATTERN.split(src);
+    final String[] vals = RegexUtils.MINUS_PATTERN.split(src);
     if ((vals == null) || vals.length == 0) return config.fullRange;
     if (vals.length > 2) throw new IllegalArgumentException(build("invalid range pattern (pattern: ", src, ")"));
     int lower = 0;
@@ -149,18 +147,18 @@ public class RangePattern {
    */
   private int parseValue(final String src) throws IllegalArgumentException {
     try {
-      int value = Integer.decode(config.valuePrefix + src.toLowerCase());
+      final int value = Integer.decode(config.valuePrefix + src.toLowerCase());
       if ((value < config.minValue) || (value > config.maxValue))
         throw new IllegalArgumentException(build("value must be in [", config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
       return value;
-    } catch (@SuppressWarnings("unused") NumberFormatException e) {
+    } catch (@SuppressWarnings("unused") final NumberFormatException e) {
       throw new IllegalArgumentException(build("invalid value format (value: ", src, ")"));
     }
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i = 0; i < ranges.size(); i++) {
       if (i > 0) sb.append(config.getCompSeparator());
       sb.append(ranges.get(i));

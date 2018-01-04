@@ -24,6 +24,11 @@ package org.jppf.node.protocol;
  */
 public class JPPFTaskSerializationException extends Throwable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this exception.
    * @param message the exception message.
    * @param stackTrace the stack trace to set onto this exception.
@@ -39,7 +44,7 @@ public class JPPFTaskSerializationException extends Throwable {
    */
   public JPPFTaskSerializationException(final Throwable throwable) {
     super(String.format("[%s: %s]", throwable.getClass().getName(), throwable.getMessage()), null, false, true);
-    StackTraceElement[] stackTrace = throwable.getStackTrace();
+    final StackTraceElement[] stackTrace = throwable.getStackTrace();
     if (stackTrace != null) setStackTrace(stackTrace);
   }
 }

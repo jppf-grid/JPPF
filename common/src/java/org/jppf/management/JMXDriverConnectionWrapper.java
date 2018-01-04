@@ -39,6 +39,10 @@ import org.slf4j.*;
  */
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JMXDriverConnectionWrapper.class);
@@ -49,7 +53,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    *
    */
-  private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
+  private static Map<String, Map<String, ListenerWrapper>> forwardingListeners = new HashMap<>();
 
   /**
    * Initialize a local connection to the MBean server.
@@ -108,8 +112,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
   @Override
   public JPPFStatistics statistics() throws Exception {
-    JPPFStatistics stats = (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
-    return stats;
+    return (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
   }
 
   @Override
@@ -319,14 +322,14 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName,
       final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
-    String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
-    InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
+    final String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
+    final InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
     addNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
-    synchronized(listeners) {
-      Map<String, ListenerWrapper> map = listeners.get(getId());
+    synchronized(forwardingListeners) {
+      Map<String, ListenerWrapper> map = forwardingListeners.get(getId());
       if (map == null) {
         map = new HashMap<>();
-        listeners.put(getId(), map);
+        forwardingListeners.put(getId(), map);
       }
       map.put(listenerID, new ListenerWrapper(listener, internalFilter, handback));
     }
@@ -339,16 +342,16 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if the listener with this id was not found or if any other error occurss.
    */
   public void unregisterForwardingNotificationListener(final String listenerID) throws Exception {
-    synchronized(listeners) {
-      Map<String, ListenerWrapper> map = listeners.get(getId());
+    synchronized(forwardingListeners) {
+      final Map<String, ListenerWrapper> map = forwardingListeners.get(getId());
       if (map != null) {
-        ListenerWrapper wrapper = map.get(listenerID);
+        final ListenerWrapper wrapper = map.get(listenerID);
         if (wrapper != null) {
           map.remove(listenerID);
-          if (map.isEmpty()) listeners.remove(getId());
+          if (map.isEmpty()) forwardingListeners.remove(getId());
           try {
             removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

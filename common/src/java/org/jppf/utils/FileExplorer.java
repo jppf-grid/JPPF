@@ -102,7 +102,7 @@ public abstract class FileExplorer {
     String content = null;
     try {
       content = FileUtils.readTextFile(file);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
     }
     afterReadFile(file, content);
@@ -114,8 +114,8 @@ public abstract class FileExplorer {
    */
   private void exploreDirectory(final File dir) {
     beforeExploreDir(dir);
-    File[] children = dir.listFiles(filter);
-    for (File child: children) {
+    final File[] children = dir.listFiles(filter);
+    for (final File child: children) {
       if (child.isDirectory()) exploreDirectory(child);
       else exploreFile(child);
     }
@@ -130,9 +130,9 @@ public abstract class FileExplorer {
     @Override
     public boolean accept(final File file) {
       if (file.isDirectory()) return true;
-      String ext = FileUtils.getFileExtension(file);
+      final String ext = FileUtils.getFileExtension(file);
       if (ext == null) return false;
-      for (String s: exts) {
+      for (final String s: exts) {
         if (ext.equalsIgnoreCase(s)) return true;
       }
       return false;

@@ -75,10 +75,10 @@ public final class StringUtils {
    * @return a string formatted to the specified length.
    */
   public static String padLeft(final String source, final char padChar, final int maxLen) {
-    String src = (source == null) ? "" : source;
-    int length = src.length();
+    final String src = (source == null) ? "" : source;
+    final int length = src.length();
     if (length > maxLen) return source;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<maxLen-length; i++) sb.append(padChar);
     sb.append(src);
     return sb.toString();
@@ -95,10 +95,10 @@ public final class StringUtils {
    * @return a string formatted to the specified length.
    */
   public static String padLeft(final String source, final char padChar, final int maxLen, final boolean truncate) {
-    String src = (source == null) ? "" : source;
-    int length = src.length();
+    final String src = (source == null) ? "" : source;
+    final int length = src.length();
     if (length > maxLen) return source;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<maxLen-length; i++) sb.append(padChar);
     sb.append(src);
     return sb.toString();
@@ -133,7 +133,7 @@ public final class StringUtils {
     String s = source;
     if (s == null) s = "";
     if (s.length() > maxLen) return truncate ? s = s.substring(0, maxLen) : s;
-    StringBuilder sb = new StringBuilder(s);
+    final StringBuilder sb = new StringBuilder(s);
     while (sb.length() < maxLen) sb.append(padChar);
     return sb.toString();
   }
@@ -157,12 +157,12 @@ public final class StringUtils {
    * @return the converted bytes as a string of space-separated hexadecimal numbers.
    */
   public static String toHexString(final byte[] bytes, final int start, final int length, final String sep) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     if (length >= 0) {
-      boolean sepNotNull = sep != null;
+      final boolean sepNotNull = sep != null;
       for (int i=start; i<Math.min(bytes.length, start+length); i++) {
         if (sepNotNull && (i > start)) sb.append(sep);
-        byte b = bytes[i];
+        final byte b = bytes[i];
         sb.append(HEX_DIGITS[(b & 0xF0) >> 4]);
         sb.append(HEX_DIGITS[b & 0x0F]);
       }
@@ -176,9 +176,9 @@ public final class StringUtils {
    * @return the resulting array of bytes.
    */
   public static byte[] toBytes(final String hexString) {
-    String[] bytes = RegexUtils.SPACES_PATTERN.split(hexString);
-    List<Byte> list = new ArrayList<>(bytes.length);
-    byte[] result = new byte[list.size()];
+    final String[] bytes = RegexUtils.SPACES_PATTERN.split(hexString);
+    final List<Byte> list = new ArrayList<>(bytes.length);
+    final byte[] result = new byte[list.size()];
     for (int i=0; i<bytes.length; i++) {
       int n = Byte.parseByte(bytes[i].substring(0, 1), 16);
       n = 16 * n + Byte.parseByte(bytes[i].substring(1), 16);
@@ -194,7 +194,7 @@ public final class StringUtils {
    */
   public static String toStringDuration(final long duration) {
     long elapsed = duration;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(padLeft("" + (elapsed / 3_600_000L), '0', 2)).append(':');
     elapsed = elapsed % 3_600_000L;
     sb.append(padLeft("" + (elapsed / 60_000L), '0', 2)).append(':');
@@ -226,7 +226,7 @@ public final class StringUtils {
    */
   @SafeVarargs
   public static <T> String arrayToString(final String sep, final String prefix, final String suffix, final T...array) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     if (array == null) sb.append("null");
     else {
       if (prefix != null) sb.append(prefix);
@@ -245,13 +245,12 @@ public final class StringUtils {
    * @return an array of int port numbers.
    */
   public static int[] parseIntValues(final String s) {
-    String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
-    int[] ports = new int[strPorts.length];
+    final String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
+    final int[] ports = new int[strPorts.length];
     for (int i=0; i<strPorts.length; i++) {
       try {
-        int n = Integer.valueOf(strPorts[i].trim());
-        ports[i] = n;
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+        ports[i] = Integer.valueOf(strPorts[i].trim());
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
         return null;
       }
     }
@@ -265,7 +264,7 @@ public final class StringUtils {
    */
   public static String buildString(final int[] ports) {
     if ((ports == null) || (ports.length == 0)) return "";
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<ports.length; i++) {
       if (i > 0) sb.append(' ');
       sb.append(ports[i]);
@@ -282,7 +281,7 @@ public final class StringUtils {
    * @return the array's content as a string.
    */
   public static String buildString(final String sep, final String prefix, final String suffix, final int[] array) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     if (array == null) sb.append("null");
     else {
       if (prefix != null) sb.append(prefix);
@@ -302,7 +301,7 @@ public final class StringUtils {
    */
   public static String build(final Object...args) {
     if (args == null) return null;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (Object o: args) sb.append(o);
     return sb.toString();
   }
@@ -316,10 +315,10 @@ public final class StringUtils {
    */
   public static boolean startsWithOneOf(final String source, final boolean ignoreCase, final String...values) {
     if ((source == null) || (values == null)) return false;
-    String s = ignoreCase ? source.toLowerCase(): source;
+    final String s = ignoreCase ? source.toLowerCase(): source;
     for (String val: values) {
       if (val == null) continue;
-      String s2 = ignoreCase ? val.toLowerCase() : val;
+      final String s2 = ignoreCase ? val.toLowerCase() : val;
       if (s.startsWith(s2)) return true;
     }
     return false;
@@ -334,10 +333,10 @@ public final class StringUtils {
    */
   public static boolean isOneOf(final String source, final boolean ignoreCase, final String...values) {
     if ((source == null) || (values == null)) return false;
-    String s = ignoreCase ? source.toLowerCase(): source;
+    final String s = ignoreCase ? source.toLowerCase(): source;
     for (String val: values) {
       if (val == null) continue;
-      String s2 = ignoreCase ? val.toLowerCase() : val;
+      final String s2 = ignoreCase ? val.toLowerCase() : val;
       if (s.equals(s2)) return true;
     }
     return false;
@@ -352,10 +351,10 @@ public final class StringUtils {
    */
   public static boolean hasOneOf(final String source, final boolean ignoreCase, final String...values) {
     if ((source == null) || (values == null)) return false;
-    String s = ignoreCase ? source.toLowerCase(): source;
+    final String s = ignoreCase ? source.toLowerCase(): source;
     for (String val: values) {
       if (val == null) continue;
-      String s2 = ignoreCase ? val.toLowerCase() : val;
+      final String s2 = ignoreCase ? val.toLowerCase() : val;
       if (s.contains(s2)) return true;
     }
     return false;
@@ -368,7 +367,7 @@ public final class StringUtils {
   private static Charset makeUTF8() {
     try {
       return Charset.forName("UTF-8");
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }
@@ -379,11 +378,11 @@ public final class StringUtils {
    * @return a string representation of the class loader hierarchy.
    */
   public static String printClassLoaderHierarchy(final ClassLoader leafClassLoader) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     ClassLoader cl = leafClassLoader;
     if (cl != null) {
       sb.append("class loader hierarchy:\n");
-      Stack<String> stack = new Stack<>();
+      final Stack<String> stack = new Stack<>();
       while (cl != null) {
         if ("org.jppf.classloader.AbstractJPPFClassLoader".equals(cl.getClass().getName())) stack.push(cl.toString());
         else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));
@@ -408,9 +407,9 @@ public final class StringUtils {
    * @return a string representation of the input class loader.
    */
   public static String toString(final URLClassLoader cl) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(cl.getClass().getSimpleName()).append("[classpath=");
-    URL[] urls = cl.getURLs();
+    final URL[] urls = cl.getURLs();
     if ((urls != null) && (urls.length > 0)) {
       for (int i=0; i<urls.length; i++) {
         if (i > 0) sb.append(';');
@@ -429,12 +428,12 @@ public final class StringUtils {
    */
   public static Number parseNumber(final String source, final Number def) {
     if (source == null) return def;
-    NumberFormat nf = NumberFormat.getInstance();
+    final NumberFormat nf = NumberFormat.getInstance();
     try {
-      Number n = nf.parse(source);
+      final Number n = nf.parse(source);
       //System.out.printf("source=%s, n=%s, locale=%s%n", source, n, Locale.getDefault());
       return n;
-    } catch (@SuppressWarnings("unused") ParseException ignore) {
+    } catch (@SuppressWarnings("unused") final ParseException ignore) {
     }
     return null;
   }
@@ -467,15 +466,15 @@ public final class StringUtils {
    * @return a list of strings, possibly empty but never null;
    */
   public static List<String> parseStrings(final String source, final String separator, final boolean regex) {
-    List<String> list = new ArrayList<>();
+    final List<String> list = new ArrayList<>();
     if (source != null) {
       if (separator == null) list.add(source);
       else {
-        Pattern pattern = regex ? Pattern.compile(separator) : Pattern.compile(separator, Pattern.LITERAL);
-        String[] tokens = pattern.split(source);
+        final Pattern pattern = regex ? Pattern.compile(separator) : Pattern.compile(separator, Pattern.LITERAL);
+        final String[] tokens = pattern.split(source);
         for (String token: tokens) {
           if (token == null) continue;
-          String s = token.trim();
+          final String s = token.trim();
           if (!s.isEmpty()) list.add(s);
         }
       }
@@ -501,7 +500,7 @@ public final class StringUtils {
    * @return a list of strings, possibly empty but never null;
    */
   public static String[] parseStringArray(final String source, final String separator, final boolean regex) {
-    List<String> list = parseStrings(source, separator, regex);
+    final List<String> list = parseStrings(source, separator, regex);
     return list.toArray(new String[list.size()]);
   }
 
@@ -513,7 +512,7 @@ public final class StringUtils {
   public static String getDecodedURLPath(final URL url) {
     try {
       return URLDecoder.decode(url.getPath(), "UTF-8");
-    } catch (@SuppressWarnings("unused") UnsupportedEncodingException ignore) {
+    } catch (@SuppressWarnings("unused") final UnsupportedEncodingException ignore) {
       return null;
     }
   }

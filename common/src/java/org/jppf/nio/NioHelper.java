@@ -18,6 +18,7 @@
 
 package org.jppf.nio;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -51,7 +52,11 @@ public class NioHelper {
   /**
    * Global thread pool used by all NIO servers.
    */
-  private static final ExecutorService globalExecutor = initExecutor();
+  private static final ExecutorService globalExecutor = createExecutorFromConfig(NIO_THREAD_NAME_PREFIX);
+  /**
+   * 
+   */
+  private static Method getJMXServerMethod;
 
   /**
    * Map the specified server tot he specified identifier.
@@ -68,9 +73,14 @@ public class NioHelper {
    * Get the server mapped to the specified identifier.
    * @param identifier the JPPF identifier to lookup.
    * @return a {@link NioServer} instance.
+   * @throws Exception if any error occurs.
    */
-  public static synchronized NioServer<?, ?> getServer(final int identifier) {
+  public static synchronized NioServer<?, ?> getServer(final int identifier) throws Exception {
     synchronized(identifiedServers) {
+      if (identifier == JPPFIdentifiers.JMX_REMOTE_CHANNEL) {
+        if (getJMXServerMethod == null) initializeJMXServerPool();
+        return (NioServer<?, ?>) getJMXServerMethod.invoke(null); 
+      }
       return identifiedServers.get(identifier);
     }
   }
@@ -96,29 +106,31 @@ public class NioHelper {
 
   /**
    * Initialize the executor for this transition manager.
+   * @param prefix name of the thread group and prefix for the thread names.
    * @return an {@link ExecutorService} object.
    * @since 5.0
    */
-  private static ExecutorService initExecutor() {
-    int core = NioConstants.THREAD_POOL_SIZE;
-    String poolType = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_POOL_TYPE);
+  public static ExecutorService createExecutorFromConfig(final String prefix) {
+    final int core = NioConstants.THREAD_POOL_SIZE;
+    final String poolType = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_POOL_TYPE);
     ThreadPoolExecutor tpe = null;
     ExecutorService executor = null;
     if ("dynamic".equals(poolType)) {
-      int queueSize = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_QUEUE_SIZE);
-      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      executor = tpe = ConcurrentUtils.newBoundedQueueExecutor(core, queueSize, ttl, NIO_THREAD_NAME_PREFIX);
+      final int queueSize = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_QUEUE_SIZE);
+      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      executor = tpe = ConcurrentUtils.newBoundedQueueExecutor(core, queueSize, ttl, prefix);
       if (debugEnabled) log.debug(String.format(Locale.US, "dynamic globalExecutor: core=%,d; queueSize=%,d; ttl=%,d; maxSize=%,d", core, queueSize, ttl, tpe.getMaximumPoolSize()));
     } else if ("sync".equals(poolType)) {
-      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      executor = tpe = ConcurrentUtils.newDirectHandoffExecutor(core, ttl, NIO_THREAD_NAME_PREFIX);
+      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      executor = tpe = ConcurrentUtils.newDirectHandoffExecutor(core, ttl, prefix);
       if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, tpe.getMaximumPoolSize()));
     } else if ("jppf".equals(poolType)) {
-      long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
-      executor = ConcurrentUtils.newJPPFThreadPool(core, Integer.MAX_VALUE, ttl, NIO_THREAD_NAME_PREFIX);
+      final long ttl = JPPFConfiguration.get(JPPFProperties.NIO_THREAD_TTL);
+      //executor = ConcurrentUtils.newJPPFThreadPool(core, Integer.MAX_VALUE, ttl, prefix);
+      executor = ConcurrentUtils.newJPPFDirectHandoffExecutor(core, Integer.MAX_VALUE, ttl, prefix);
       if (debugEnabled) log.debug(String.format(Locale.US, "sync globalExecutor: core=%,d; ttl=%,d; maxSize=%,d", core, ttl, Integer.MAX_VALUE));
     } else {
-      executor = tpe = ConcurrentUtils.newFixedExecutor(core, NIO_THREAD_NAME_PREFIX);
+      executor = tpe = ConcurrentUtils.newFixedExecutor(core, prefix);
       if (debugEnabled) log.debug(String.format(Locale.US, "fixed globalExecutor: core=%,d; maxSize=%,d", core, tpe.getMaximumPoolSize()));
     }
     return executor;
@@ -138,5 +150,15 @@ public class NioHelper {
   public static void shutdown(final boolean now) {
     if (now) globalExecutor.shutdownNow();
     else globalExecutor.shutdown();
+  }
+
+  /**
+   * Initialize the JMX server pool.
+   * @throws Exception if any error occurs.
+   */
+  private static void initializeJMXServerPool() throws Exception {
+    final String className = "org.jppf.jmxremote.nio.JMXNioServerPool";
+    final Class<?> clazz = Class.forName(className);
+    getJMXServerMethod = clazz.getDeclaredMethod("getServer");
   }
 }

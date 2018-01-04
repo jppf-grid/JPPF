@@ -25,8 +25,11 @@ import java.util.*;
  * @param <S> the type of enumeration handled by this map.
  * @author Laurent Cohen
  */
-public class EnumSetEnumMap<S extends Enum<S>> extends AbstractCollectionMap<S, S>
-{
+public class EnumSetEnumMap<S extends Enum<S>> extends AbstractCollectionMap<S, S> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The class of the enumeration handled by this map.
    */
@@ -36,21 +39,18 @@ public class EnumSetEnumMap<S extends Enum<S>> extends AbstractCollectionMap<S, 
    * Initialize this map with the specified enumeration class.
    * @param enumClass the class of the enumeration handled by this map.
    */
-  public EnumSetEnumMap(final Class<S> enumClass)
-  {
+  public EnumSetEnumMap(final Class<S> enumClass) {
     this.enumClass = enumClass;
     map = createMap();
   }
 
   @Override
-  protected Map<S, Collection<S>> createMap()
-  {
+  protected Map<S, Collection<S>> createMap() {
     return new EnumMap<>(enumClass);
   }
 
   @Override
-  protected Collection<S> newCollection()
-  {
+  protected Collection<S> newCollection() {
     return EnumSet.noneOf(enumClass);
   }
 }

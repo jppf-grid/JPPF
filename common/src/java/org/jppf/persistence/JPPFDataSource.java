@@ -88,7 +88,7 @@ public class JPPFDataSource implements DataSource {
       this.user = config.get(DATASOURCE_USER);
       this.pwd = config.get(DATASOURCE_PASSWORD);
       this.url = config.get(DATASOURCE_URL);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw new SQLException(e);
     }
@@ -109,7 +109,7 @@ public class JPPFDataSource implements DataSource {
       this.user = user;
       this.pwd = pwd;
       this.url = url;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw new SQLException(e);
     }

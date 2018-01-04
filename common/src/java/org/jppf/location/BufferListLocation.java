@@ -31,6 +31,10 @@ import org.jppf.utils.streams.*;
  */
 public class BufferListLocation extends AbstractLocation<List<JPPFBuffer>> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The size of the data.
    */
   private long length = 0L;

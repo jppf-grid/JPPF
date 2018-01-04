@@ -60,8 +60,8 @@ public class Project {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[').append("name=").append(name);
-    for (Build build: builds) sb.append("\n  ").append(build);
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[').append("name=").append(name);
+    for (final Build build: builds) sb.append("\n  ").append(build);
     sb.append("\n]");
     return sb.toString();
   }

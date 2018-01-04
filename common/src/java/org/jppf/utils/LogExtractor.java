@@ -69,7 +69,7 @@ public class LogExtractor {
         }
       }
       System.out.printf("found %,d lines matching pattern '%s' out of %,d in file '%s'%n", nbLinesMatching, pattern, count, inFile);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

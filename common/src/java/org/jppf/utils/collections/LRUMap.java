@@ -29,6 +29,10 @@ import java.util.Map.Entry;
  */
 public class LRUMap<K, V> extends LinkedHashMap<K, V> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The maximum cache capacity
    */
   private final int maxCapacity;

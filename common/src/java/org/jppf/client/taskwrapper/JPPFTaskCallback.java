@@ -30,6 +30,11 @@ import org.jppf.node.protocol.Task;
  */
 public abstract class JPPFTaskCallback<T> implements Runnable, Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The task this callback is associated with.
    */
   private Task<T> task = null;

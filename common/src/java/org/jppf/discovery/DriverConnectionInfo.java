@@ -146,7 +146,7 @@ public class DriverConnectionInfo {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    DriverConnectionInfo other = (DriverConnectionInfo) obj;
+    final DriverConnectionInfo other = (DriverConnectionInfo) obj;
     if (name == null) {
       if (other.name != null) return false;
     }
@@ -162,7 +162,7 @@ public class DriverConnectionInfo {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", secure=").append(secure);
     sb.append(", host=").append(host);

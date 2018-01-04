@@ -56,13 +56,13 @@ public class CloseableHandler {
    * @param name the type of closeable to handle.
    */
   public static void handleCloseables(final String name) {
-    Collection<Closeable> coll = handlerMap.getValues(name);
+    final Collection<Closeable> coll = handlerMap.getValues(name);
     if (coll == null) return;
     try {
-      for (Closeable c : coll) {
+      for (final Closeable c : coll) {
         try {
           if (c != null) c.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }

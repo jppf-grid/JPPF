@@ -119,17 +119,17 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
    */
   protected static ThreadManager createThreadManager(final int poolSize) {
     ThreadManager result = null;
-    TypedProperties config = JPPFConfiguration.getProperties();
-    String s = config.get(JPPFProperties.THREAD_MANAGER_CLASS);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final String s = config.get(JPPFProperties.THREAD_MANAGER_CLASS);
     if (!"default".equalsIgnoreCase(s) && !ThreadManagerThreadPool.class.getName().equals(s) && s != null) {
       try {
-        Class<?> clazz = Class.forName(s);
-        Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
+        final Class<?> clazz = Class.forName(s);
+        final Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
         if (instance instanceof ThreadManager) {
           result = (ThreadManager) instance;
           log.info("Using custom thread manager: " + s);
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -139,7 +139,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     }
     config.set(JPPFProperties.PROCESSING_THREADS, result.getPoolSize());
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-    boolean cpuTimeEnabled = result.isCpuTimeEnabled();
+    final boolean cpuTimeEnabled = result.isCpuTimeEnabled();
     config.setBoolean("cpuTimeSupported", cpuTimeEnabled);
     log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
     return result;
@@ -153,12 +153,12 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       setup(bundle, taskList);
       if (!isJobCancelled()) {
         int count = 0;
-        ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
+        final ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
         synchronized(taskWrapperList) {
-          for (Task<?> task : taskList) {
+          for (final Task<?> task : taskList) {
             if (!(task instanceof JPPFExceptionResult)) {
               if (task instanceof AbstractTask) ((AbstractTask<?>) task).setExecutionDispatcher(taskNotificationDispatcher);
-              NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
+              final NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
               taskWrapperList.add(taskWrapper);
               ecs.submit(taskWrapper, taskWrapper);
               count++;
@@ -167,10 +167,10 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
         }
         for (int i=0; i<count; i++) {
           try {
-            Future<NodeTaskWrapper> future = ecs.take();
+            final Future<NodeTaskWrapper> future = ecs.take();
             if (!future.isCancelled()) {
-              NodeTaskWrapper taskWrapper = future.get();
-              JPPFReconnectionNotification notif = taskWrapper.getReconnectionNotification();
+              final NodeTaskWrapper taskWrapper = future.get();
+              final JPPFReconnectionNotification notif = taskWrapper.getReconnectionNotification();
               if (notif != null) {
                 cancelAllTasks(true, false);
                 throw notif;
@@ -210,7 +210,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
    */
   private void cancelTask(final NodeTaskWrapper taskWrapper, final boolean callOnCancel) {
     if (debugEnabled) log.debug("cancelling task = " + taskWrapper);
-    Future<?> future = taskWrapper.getFuture();
+    final Future<?> future = taskWrapper.getFuture();
     if (!future.isDone()) {
       if (debugEnabled) log.debug("calling future.cancel(true) for task = " + taskWrapper);
       taskWrapper.cancel(callOnCancel);
@@ -245,11 +245,11 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
    * @exclude
    */
   protected void taskEnded(final NodeTaskWrapper taskWrapper) {
-    long elapsedTime = taskWrapper.getElapsedTime();
+    final long elapsedTime = taskWrapper.getElapsedTime();
     accumulatedElapsed.addAndGet(elapsedTime);
-    ExecutionInfo info = taskWrapper.getExecutionInfo();
-    long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
-    Task<?> task = taskWrapper.getTask();
+    final ExecutionInfo info = taskWrapper.getExecutionInfo();
+    final long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
+    final Task<?> task = taskWrapper.getTask();
     taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), getCurrentJobName(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
   }
 
@@ -287,9 +287,9 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
       return;
     }
-    int oldSize = getThreadPoolSize();
+    final int oldSize = getThreadPoolSize();
     threadManager.setPoolSize(size);
-    int newSize = getThreadPoolSize();
+    final int newSize = getThreadPoolSize();
     if (oldSize != newSize) {
       log.info("Node thread pool size changed from " + oldSize + " to " + size);
       JPPFConfiguration.set(JPPFProperties.PROCESSING_THREADS, size);

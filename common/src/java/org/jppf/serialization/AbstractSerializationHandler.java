@@ -35,8 +35,8 @@ public abstract class AbstractSerializationHandler implements SerializationHandl
   protected void copyFields(final Object src, final Object dest, final ClassDescriptor cd) throws Exception {
     if (src.getClass() != dest.getClass())
       throw new IllegalArgumentException(String.format("source and destination object classes are different: src class = %s, dest class = %s", src.getClass(), dest.getClass()));
-    for (FieldDescriptor fd: cd.fields) {
-      Object val = fd.field.get(src);
+    for (final FieldDescriptor fd: cd.fields) {
+      final Object val = fd.field.get(src);
       fd.field.set(dest, val);
     }
   }

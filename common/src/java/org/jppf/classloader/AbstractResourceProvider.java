@@ -58,27 +58,27 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
 
   @Override
   public byte[] getResource(final String resName, final ClassLoader classloader, final boolean lookupInFileSystem) {
-    ClassLoader cl = resolveClassLoader(classloader);
+    final ClassLoader cl = resolveClassLoader(classloader);
     InputStream is = null;
     try {
-      Enumeration<URL> urls = cl.getResources(resName);
+      final Enumeration<URL> urls = cl.getResources(resName);
       if ((urls != null) && urls.hasMoreElements()) {
         while (urls.hasMoreElements() && (is == null)) {
-          URL url = urls.nextElement();
+          final URL url = urls.nextElement();
           if (url != null) is = url.openStream();
         }
       } else {
         is = cl.getResourceAsStream(resName);
       }
       if ((is == null) && lookupInFileSystem) {
-        File file = new File(resName);
+        final File file = new File(resName);
         if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
       }
       if (is != null) {
         if (debugEnabled) log.debug("resource [" + resName + "] found");
         return StreamUtils.getInputStreamAsByte(is);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     if (debugEnabled) log.debug("resource [{}] not found for class laoder {}", resName, classloader);
@@ -100,22 +100,22 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   public byte[] computeCallable(final byte[] serializedCallable) {
     if (debugEnabled) log.debug("before deserialization");
     JPPFCallable<?> callable = null;
-    ObjectSerializer ser = new ObjectSerializerImpl();
+    final ObjectSerializer ser = new ObjectSerializerImpl();
     Object result = null;
     try {
       callable = (JPPFCallable<?>) ser.deserialize(serializedCallable);
       result = callable.call();
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       result = (t instanceof Exception) ? t : new JPPFException(t);
     }
     byte[] bytes = null;
     try {
       bytes = ser.serialize(result).getBuffer();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       try {
         bytes = ser.serialize(e).getBuffer();
-      } catch(Exception e2) {
+      } catch(final Exception e2) {
         log.error(e2.getMessage(), e2);
       }
     }
@@ -124,42 +124,42 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
 
   @Override
   public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classloader, final boolean lookupInFileSystem) {
-    ClassLoader cl = resolveClassLoader(classloader);
+    final ClassLoader cl = resolveClassLoader(classloader);
     if (debugEnabled) log.debug(String.format("before lookup: name=%s, resolved classloader=%s, lookupInFileSystem=%b", name, cl, lookupInFileSystem));
     List<byte[]> result = null;
     try {
-      Enumeration<URL> urlEnum = cl.getResources(name);
+      final Enumeration<URL> urlEnum = cl.getResources(name);
       if ((urlEnum != null) && urlEnum.hasMoreElements()) {
         while (urlEnum.hasMoreElements()) {
-          URL url = urlEnum.nextElement();
+          final URL url = urlEnum.nextElement();
           if (url != null) {
-            InputStream is = url.openStream();
-            byte[] b = StreamUtils.getInputStreamAsByte(is);
+            final InputStream is = url.openStream();
+            final byte[] b = StreamUtils.getInputStreamAsByte(is);
             if (result == null) result = new ArrayList<>();
             result.add(b);
           }
         }
       } else {
-        InputStream is = cl.getResourceAsStream(name);
+        final InputStream is = cl.getResourceAsStream(name);
         if (is != null) {
-          byte[] b = StreamUtils.getInputStreamAsByte(is);
+          final byte[] b = StreamUtils.getInputStreamAsByte(is);
           result = new ArrayList<>();
           result.add(b);
         }
       }
     }
-    catch(Exception e) {
+    catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     if (lookupInFileSystem) {
       try {
-        File file = new File(name);
+        final File file = new File(name);
         if (file.exists()) {
           if (result == null) result = new ArrayList<>();
           result.add(FileUtils.getFileAsByte(file));
         }
       }
-      catch(Exception e) {
+      catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -180,10 +180,10 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
 
   @Override
   public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader classloader, final boolean lookupInFileSystem, final String...names) {
-    ClassLoader cl = resolveClassLoader(classloader);
-    Map<String, List<byte[]>> result = new HashMap<>();
+    final ClassLoader cl = resolveClassLoader(classloader);
+    final Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names) {
-      List<byte[]> resources = getMultipleResourcesAsBytes(name, cl, lookupInFileSystem);
+      final List<byte[]> resources = getMultipleResourcesAsBytes(name, cl, lookupInFileSystem);
       if (resources != null) result.put(name, resources);
     }
     return result;
@@ -192,9 +192,9 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
 
   @Override
   public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final Collection<ClassLoader> classLoaders, final boolean lookupInFileSystem, final String...names) {
-    Map<String, List<byte[]>> result = new HashMap<>();
+    final Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names) {
-      List<byte[]> resources = getMultipleResourcesAsBytes(name, classLoaders, lookupInFileSystem);
+      final List<byte[]> resources = getMultipleResourcesAsBytes(name, classLoaders, lookupInFileSystem);
       if (resources != null) result.put(name, resources);
     }
     return result;

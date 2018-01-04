@@ -31,6 +31,10 @@ import org.jppf.utils.*;
  */
 public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Location of the localization resource bundles.
    */
   private  static final String I18N_BASE = "org.jppf.utils.configuration.i18n.JPPFProperties";
@@ -103,7 +107,7 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", default=").append(defaultValue);
     sb.append(", aliases=").append(Arrays.asList(aliases));
@@ -141,10 +145,10 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   public Set<String> getTags() {
     if (tags == null) {
       tags = new TreeSet<>();
-      List<String> tokens = StringUtils.parseStrings(LocalizationUtils.getLocalized(I18N_BASE, name + ".tags"), ",", false);
+      final List<String> tokens = StringUtils.parseStrings(LocalizationUtils.getLocalized(I18N_BASE, name + ".tags"), ",", false);
       if (tokens != null) {
         for (String token: tokens) {
-          String t = token.trim();
+          final String t = token.trim();
           if (!tags.contains(t)) tags.add(t);
         }
       } else tags.add("");
@@ -190,10 +194,10 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * @return an array of parameter names, possibly empty.
    */
   private static String[] parseParams(final String name) {
-    List<String> params = new ArrayList<>();
-    Matcher matcher = PARAM_PATTERN.matcher(name);
+    final List<String> params = new ArrayList<>();
+    final Matcher matcher = PARAM_PATTERN.matcher(name);
     while (matcher.find()) {
-      String param = matcher.group(1);
+      final String param = matcher.group(1);
       params.add(param);
     }
     return params.isEmpty() ? NO_PARAM : params.toArray(new String[params.size()]);

@@ -130,7 +130,7 @@ public final class JPPFDatasourceFactory {
    */
   public DataSource createDataSource(final String name, final Properties props) {
     if (name != null) props.setProperty("name", name);
-    Pair<String, DataSource> p = createDataSourceInternal(props, null, null);
+    final Pair<String, DataSource> p = createDataSourceInternal(props, null, null);
     return (p == null) ? null : p.second();
   }
 
@@ -142,7 +142,7 @@ public final class JPPFDatasourceFactory {
    * @return a {@link Map} whose keys are the names of the created data sources and whose values are the corresponding {@link DataSource} objects.
    */
   public Map<String, DataSource> createDataSources(final Properties props) {
-    TypedProperties config = (props instanceof TypedProperties) ? (TypedProperties) props : new TypedProperties(props);
+    final TypedProperties config = (props instanceof TypedProperties) ? (TypedProperties) props : new TypedProperties(props);
     return configure(extractDefinitions(config, Scope.LOCAL), null);
   }
 
@@ -153,7 +153,7 @@ public final class JPPFDatasourceFactory {
    */
   public boolean removeDataSource(final String name) {
     synchronized(dsMap) {
-      DataSource ds = dsMap.remove(name);
+      final DataSource ds = dsMap.remove(name);
       if (ds != null) initializer.close(ds);
       return ds != null;
     }
@@ -209,9 +209,9 @@ public final class JPPFDatasourceFactory {
    * @exclude
    */
   public Map<String, DataSource> configure(final Map<String, TypedProperties> definitionsMap, final JPPFSystemInformation info) {
-    Map<String, DataSource> result = new HashMap<>();
-    for (Map.Entry<String, TypedProperties> entry: definitionsMap.entrySet()) {
-      Pair<String, DataSource> p = createDataSourceInternal(entry.getValue(), entry.getKey(), info);
+    final Map<String, DataSource> result = new HashMap<>();
+    for (final Map.Entry<String, TypedProperties> entry: definitionsMap.entrySet()) {
+      final Pair<String, DataSource> p = createDataSourceInternal(entry.getValue(), entry.getKey(), info);
       if (p != null) result.put(p.first(), p.second());
     }
     return result;
@@ -224,20 +224,20 @@ public final class JPPFDatasourceFactory {
    * @return a mapping of config ids to the corresponding properties.
    * @exclude
    */
-  public Map<String, TypedProperties> extractDefinitions(final TypedProperties config, final Scope requestedScope) {
-    Scope reqScope = (requestedScope == null) ? Scope.LOCAL : requestedScope;
-    TypedProperties allDSProps = config.filter(new TypedProperties.Filter() {
+  public static Map<String, TypedProperties> extractDefinitions(final TypedProperties config, final Scope requestedScope) {
+    final Scope reqScope = (requestedScope == null) ? Scope.LOCAL : requestedScope;
+    final TypedProperties allDSProps = config.filter(new TypedProperties.Filter() {
       @Override
       public boolean accepts(final String name, final String value) {
         return (name != null) && name.startsWith(DS_PROP_PREFIX);
       }
     });
-    List<String> ids = getConfigIds(allDSProps, reqScope);
+    final List<String> ids = getConfigIds(allDSProps, reqScope);
     if (debugEnabled) log.debug("found datasource configuration ids with scope={}: {}", reqScope, ids);
-    Map<String, TypedProperties> result = new HashMap<>(ids.size());
+    final Map<String, TypedProperties> result = new HashMap<>(ids.size());
     for (final String id: ids) {
       final String prefix = DS_PROP_PREFIX + id + ".";
-      TypedProperties dsProps = allDSProps.filter(new TypedProperties.Filter() {
+      final TypedProperties dsProps = allDSProps.filter(new TypedProperties.Filter() {
         @Override
         public boolean accepts(final String name, final String value) {
           return (name != null) && name.startsWith(prefix);
@@ -255,15 +255,15 @@ public final class JPPFDatasourceFactory {
    * @param reqScope in a driver, determines whether the definitions are intended for the nodes ({@code true}) or for the local JVM ({@code false}).
    * @return a list of datasource configuration ids, possibly empty but never null.
    */
-  private List<String> getConfigIds(final TypedProperties allDSProps, final Scope reqScope) {
-    List<String> ids = new ArrayList<>();
-    for (String name: allDSProps.stringPropertyNames()) {
-      Matcher matcher = DS_NAME_PATTERN.matcher(name);
+  private static List<String> getConfigIds(final TypedProperties allDSProps, final Scope reqScope) {
+    final List<String> ids = new ArrayList<>();
+    for (final String name: allDSProps.stringPropertyNames()) {
+      final Matcher matcher = DS_NAME_PATTERN.matcher(name);
       if (matcher.matches()) {
-        String id = matcher.group(1);
-        String s = allDSProps.getString(DS_PROP_PREFIX + id + ".scope", Scope.LOCAL.name());
+        final String id = matcher.group(1);
+        final String s = allDSProps.getString(DS_PROP_PREFIX + id + ".scope", Scope.LOCAL.name());
         Scope actualScope = Scope.LOCAL;
-        for (Scope sc: Scope.values()) {
+        for (final Scope sc: Scope.values()) {
           if (sc.name().equalsIgnoreCase(s)) {
             actualScope = sc;
             break;
@@ -285,8 +285,8 @@ public final class JPPFDatasourceFactory {
    * @return a {@link Pair} made of the datasource name and its corresponding {@link DataSource} instance.
    */
   private Pair<String, DataSource> createDataSourceInternal(final Properties props, final String configId, final JPPFSystemInformation info) {
-    String prefix = (configId == null) ? null : DS_PROP_PREFIX + configId + ".";
-    String start = (prefix == null) ? "" : prefix;
+    final String prefix = (configId == null) ? null : DS_PROP_PREFIX + configId + ".";
+    final String start = (prefix == null) ? "" : prefix;
     final String dsName = props.getProperty(start + "name");
     if (dsName == null) return null;
     if (getDataSource(dsName) != null) {
@@ -294,30 +294,30 @@ public final class JPPFDatasourceFactory {
       return null;
     }
     if (info != null) {
-      String policyDef = props.getProperty(start + "policy");
-      String policyText = props.getProperty(start + "policy.text");
+      final String policyDef = props.getProperty(start + "policy");
+      final String policyText = props.getProperty(start + "policy.text");
       if ((policyDef != null) && (policyText != null)) {
         try {
-          ExecutionPolicy policy = PolicyParser.parsePolicy(policyText);
+          final ExecutionPolicy policy = PolicyParser.parsePolicy(policyText);
           if (policy != null) {
             if (!policy.evaluate(info)) {
               if (debugEnabled) log.debug("datasource '{}' execution policy does not macth for this node, it will be ignored", dsName);
               return null;
             }
           }
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(String.format("failed to parse execution policy for datasource '%'%npolicy defintion: %s%npolicy text: %s%nException: %s",
             dsName, policyDef, policyText, ExceptionUtils.getStackTrace(e)));
         }
       }
     }
-    TypedProperties cleanProps = new TypedProperties();
-    for (String key: props.stringPropertyNames()) {
-      String newKey = (prefix != null) && key.startsWith(prefix) ? key.substring(prefix.length()) : key;
+    final TypedProperties cleanProps = new TypedProperties();
+    for (final String key: props.stringPropertyNames()) {
+      final String newKey = (prefix != null) && key.startsWith(prefix) ? key.substring(prefix.length()) : key;
       cleanProps.put(newKey, props.getProperty(key));
     }
     synchronized(dsMap) {
-      DataSource ds = initializer.createDataSource(cleanProps, dsName);
+      final DataSource ds = initializer.createDataSource(cleanProps, dsName);
       dsMap.put(dsName, ds);
       if (debugEnabled) log.debug(String.format("defined datasource with configId=%s, name=%s, properties=%s", configId, dsName, cleanProps));
       return new Pair<>(dsName, ds);
@@ -330,16 +330,16 @@ public final class JPPFDatasourceFactory {
    * @param configId the identifier of the datasource in the configuration.
    * @return an {@link ExecutionPolicy} instance, or {@code null} if none could be created.
    */
-  private String resolvePolicy(final TypedProperties props, final String configId) {
+  private static  String resolvePolicy(final TypedProperties props, final String configId) {
     String policy = null;
     try {
-      String prefix = (configId == null) ? "" : "jppf.datasource." + configId + ".";
-      String s = props.getString(prefix + "policy");
+      final String prefix = (configId == null) ? "" : "jppf.datasource." + configId + ".";
+      final String s = props.getString(prefix + "policy");
       if (s == null) return null;
-      String[] tokens = s.split("\\|");
+      final String[] tokens = s.split("\\|");
       for (int i=0; i<tokens.length; i++) tokens[i] = tokens[i].trim();
-      String type;
-      String source;
+      final String type;
+      final String source;
       if (tokens.length >= 2) {
         type = tokens[0].toLowerCase();
         source = tokens[1];
@@ -347,11 +347,11 @@ public final class JPPFDatasourceFactory {
         type = "inline";
         source = tokens[0];
       }
-      try (Reader reader = getPolicyReader(type, source)) {
+      try (final Reader reader = getPolicyReader(type, source)) {
         policy = FileUtils.readTextFile(reader);
         if (policy != null) props.setString(prefix + "policy.text", policy);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("error resolving the execution policy for datasource definition with configId=" + configId, e);
     }
     return policy;
@@ -364,7 +364,7 @@ public final class JPPFDatasourceFactory {
    * @return an execution policy parsed from the source.
    * @throws Exception if any error occurs.
    */
-  private Reader getPolicyReader(final String type, final String source) throws Exception {
+  private static Reader getPolicyReader(final String type, final String source) throws Exception {
     Reader reader = null;
     switch(type) {
       case "inline":
@@ -376,7 +376,7 @@ public final class JPPFDatasourceFactory {
         break;
 
       case "url":
-        URL url = new URL(source);
+        final URL url = new URL(source);
         reader = new InputStreamReader(url.openConnection().getInputStream(), "utf-8");
         break;
 

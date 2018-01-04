@@ -26,19 +26,21 @@ import java.util.*;
  * @param <V> the type of the objects in the map"'s collection values.
  * @author Laurent Cohen
  */
-public class VectorHashtable<K, V> extends AbstractCollectionHashtable<K, V>
-{
+public class VectorHashtable<K, V> extends AbstractCollectionHashtable<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public VectorHashtable()
-  {
+  public VectorHashtable() {
     super();
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new Vector<>();
   }
 }

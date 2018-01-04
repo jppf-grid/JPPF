@@ -74,11 +74,11 @@ public class IdleDetector implements Runnable {
    */
   private void init() throws Exception {
     log.debug("initializing IdleTimeDetectorFactory");
-    TypedProperties config = JPPFConfiguration.getProperties();
-    String factoryName = "org.jppf.node.idle.IdleTimeDetectorFactoryImpl";
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final String factoryName = "org.jppf.node.idle.IdleTimeDetectorFactoryImpl";
     idleTimeout = config.get(JPPFProperties.IDLE_TIMEOUT);
     pollInterval = config.get(JPPFProperties.IDLE_POLL_INTEFRVAL);
-    Class<?> c = Class.forName(factoryName);
+    final Class<?> c = Class.forName(factoryName);
     factory = (IdleTimeDetectorFactory) c.newInstance();
     log.debug("IdleTimeDetectorFactory initialized");
   }
@@ -87,7 +87,7 @@ public class IdleDetector implements Runnable {
   public void run() {
     try {
       if (factory == null) init();
-      IdleStateListener tmp = new IdleStateListener() {
+      final IdleStateListener tmp = new IdleStateListener() {
         @Override
         public void idleStateChanged(final IdleStateEvent event) {
           System.out.println("System is now " + event.getState());
@@ -96,7 +96,7 @@ public class IdleDetector implements Runnable {
       task = new IdleDetectionTask(factory, idleTimeout, listener, tmp);
       timer = new Timer(IdleDetector.class.getSimpleName() + " Timer");
       timer.schedule(task, 0L, pollInterval);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.debug(e.getMessage(), e);
     }
   }
@@ -107,13 +107,13 @@ public class IdleDetector implements Runnable {
    */
   public static void main(final String[] args) {
     try {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      String factoryName = config.getProperty("jppf.idle.detector.factory", null);
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final String factoryName = config.getProperty("jppf.idle.detector.factory", null);
       if (factoryName == null) throw new JPPFException("Idle detector factory name not specified");
-      Class<?> c = Class.forName(factoryName);
-      IdleTimeDetectorFactory factory = (IdleTimeDetectorFactory) c.newInstance();
-      Timer timer = new Timer(IdleDetector.class.getSimpleName() + " Timer");
-      IdleDetectionTask task = new IdleDetectionTask(factory, 6000L);
+      final Class<?> c = Class.forName(factoryName);
+      final IdleTimeDetectorFactory factory = (IdleTimeDetectorFactory) c.newInstance();
+      final Timer timer = new Timer(IdleDetector.class.getSimpleName() + " Timer");
+      final IdleDetectionTask task = new IdleDetectionTask(factory, 6000L);
       task.addIdleStateListener(new IdleStateListener() {
         @Override
         public void idleStateChanged(final IdleStateEvent event) {
@@ -123,7 +123,7 @@ public class IdleDetector implements Runnable {
       });
       timer.schedule(task, 0L, 200L);
       Thread.sleep(60000L);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
   }

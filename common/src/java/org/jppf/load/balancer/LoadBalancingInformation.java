@@ -92,7 +92,7 @@ public class LoadBalancingInformation implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[algorithm=").append(algorithm);
     sb.append(", algorithmNames=").append(algorithmNames);

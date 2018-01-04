@@ -77,7 +77,7 @@ public class OffloadableNotification extends Notification {
         if (debugEnabled) log.debug("getting offloaded user data: dataLocation={}", dataLocation);
         try {
           o = IOHelper.unwrappedData(dataLocation);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -89,7 +89,7 @@ public class OffloadableNotification extends Notification {
   @Override
   public void setUserData(final Object userData) {
     try {
-      long used = SystemUtils.getUsedMemory();
+      final long used = SystemUtils.getUsedMemory();
       if (debugEnabled) log.debug(String.format("used memory=%,d, threshold=%,d", used, THRESHOLD));
       if ((userData != null) && (used >= THRESHOLD)) {
         super.setUserData(null);
@@ -97,7 +97,7 @@ public class OffloadableNotification extends Notification {
         try {
           dataLocation = IOHelper.serializeDataToFile(userData, IOHelper.getDefaultserializer());
           if (debugEnabled) log.debug(String.format("offloading user data: used memory=%,d, threshold=%,d, dataLocation=%s", used, THRESHOLD, dataLocation));
-        } catch (Exception e) {
+        } catch (final Exception e) {
           dataLocation = null;
           log.error(e.getMessage(), e);
         }
@@ -105,7 +105,7 @@ public class OffloadableNotification extends Notification {
         userDataOffloaded = false;
         super.setUserData(userData);
       }
-    } catch (Error e) {
+    } catch (final Error e) {
       log.error(e.getMessage(), e);
       throw e;
     }
@@ -119,12 +119,12 @@ public class OffloadableNotification extends Notification {
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
     if (userDataOffloaded) {
-      OutputDestination dest = new StreamOutputDestination(out);
+      final OutputDestination dest = new StreamOutputDestination(out);
       try {
         IOHelper.writeData(dataLocation, dest);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw e;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new IOException(e);
       }
     }
@@ -143,7 +143,7 @@ public class OffloadableNotification extends Notification {
         dataLocation = IOHelper.readData(new StreamInputSource(in));
       } catch (IOException|ClassNotFoundException e) {
         throw e;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new IOException(e);
       }
     }
@@ -159,11 +159,11 @@ public class OffloadableNotification extends Notification {
    * @return parse the used memory threshold that triggers user data offloading, from the configuration.
    */
   private static long parseThreshold() {
-    String s = JPPFConfiguration.get(JPPFProperties.NOTIFICATION_OFFLOAD_MEMORY_THRESHOLD);
+    final String s = JPPFConfiguration.get(JPPFProperties.NOTIFICATION_OFFLOAD_MEMORY_THRESHOLD);
     char unit = 0;
     int i;
     for (i=0; i<s.length(); i++) {
-      char c = s.charAt(i);
+      final char c = s.charAt(i);
       if (!Character.isDigit(c)) {
         unit = Character.toLowerCase(c);
         break;
@@ -172,7 +172,7 @@ public class OffloadableNotification extends Notification {
     long threshold = 0;
     try {
       threshold = Long.valueOf(s.substring(0, i));
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       threshold = (long) (0.8d * Runtime.getRuntime().maxMemory());
     }
     switch(unit) {

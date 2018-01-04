@@ -388,6 +388,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> GC_ON_DISK_OVERFLOW = new BooleanProperty("jppf.gc.on.disk.overflow", true);
   /** Minimum heap size in MB below which disk overflow is systematically triggered, to avoid heap fragmentation and ensure there's enough memory to deserialize job headers. */
   public static final JPPFProperty<Long> LOW_MEMORY_THRESHOLD = new LongProperty("jppf.low.memory.threshold", 32L);
+  /** Whether to check for low memory and trigger disk offloading. */
+  public static final JPPFProperty<Boolean> CHECK_LOW_MEMORY = new BooleanProperty("jppf.check.low.memory", true);
   /** Used heap in bytes above which notifications from task are offloaded to file. Defaults to 0.8 * maxHeapSize.. */
   public static final JPPFProperty<String> NOTIFICATION_OFFLOAD_MEMORY_THRESHOLD = new StringProperty("jppf.notification.offload.memory.threshold", "" + (long) (0.8d * Runtime.getRuntime().maxMemory()) + "b" );
   /** Determines the frequency at which the JVM's cpu load is recomputed, in ms. */
@@ -457,16 +459,16 @@ public class JPPFProperties {
     if (properties == null) {
       properties = new ArrayList<>();
       try {
-        Field[] fields = JPPFProperties.class.getDeclaredFields();
+        final Field[] fields = JPPFProperties.class.getDeclaredFields();
         for (Field field: fields) {
-          int mod = field.getModifiers();
+          final int mod = field.getModifiers();
           if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && (JPPFProperty.class == field.getType())) {
             if (!field.isAccessible()) field.setAccessible(true);
-            JPPFProperty<?> prop = (JPPFProperty<?>) field.get(null);
+            final JPPFProperty<?> prop = (JPPFProperty<?>) field.get(null);
             properties.add(prop);
           }
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

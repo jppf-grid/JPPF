@@ -68,7 +68,7 @@ public class Handler extends DefaultHandler {
   @Override
   public void characters(final char[] ch, final int start, final int length) throws SAXException {
     if (currentElement == null) return;
-    String s = new String(ch, start, length).trim();
+    final String s = new String(ch, start, length).trim();
     //System.out.printf("characters(chars=%s)%n", s);
     switch(currentElement) {
       case "failCount":

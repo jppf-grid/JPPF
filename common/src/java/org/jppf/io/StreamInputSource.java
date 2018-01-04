@@ -50,7 +50,7 @@ public class StreamInputSource implements InputSource {
    */
   @Override
   public int read(final byte[] data, final int offset, final int len) throws Exception {
-    int n = is.read(data, offset, len);
+    final int n = is.read(data, offset, len);
     if (n < 0) throw new EOFException();
     return n;
   }
@@ -63,11 +63,11 @@ public class StreamInputSource implements InputSource {
    */
   @Override
   public int read(final ByteBuffer buffer) throws Exception {
-    int pos = buffer.position();
-    byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
+    final int pos = buffer.position();
+    final byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
     try {
       while (buffer.remaining() > 0) {
-        int n = read(bytes, 0, Math.min(buffer.remaining(), bytes.length));
+        final int n = read(bytes, 0, Math.min(buffer.remaining(), bytes.length));
         if (n <= 0) break;
         buffer.put(bytes, 0, n);
       }
@@ -84,7 +84,7 @@ public class StreamInputSource implements InputSource {
    */
   @Override
   public int readInt() throws Exception {
-    byte[] data = IO.LENGTH_BUFFER_POOL.get();
+    final byte[] data = IO.LENGTH_BUFFER_POOL.get();
     try {
       read(data, 0, 4);
       int result = 0;

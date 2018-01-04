@@ -26,8 +26,7 @@ import org.slf4j.*;
  * Instances of this class perform the selection loop for a local (in-VM) channel.
  * @author Laurent Cohen
  */
-public class ChannelSelectorThread extends ThreadSynchronization implements Runnable
-{
+public class ChannelSelectorThread extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -54,8 +53,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
    * @param selector the channel selector associated with this thread.
    * @param server the nio server that own this thread.
    */
-  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server)
-  {
+  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server) {
     this(selector, server, 0L);
   }
 
@@ -65,8 +63,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
    * @param server the nio server that own this thread.
    * @param timeout the maximum time a select() operation can block.
    */
-  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server, final long timeout)
-  {
+  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server, final long timeout) {
     if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
     this.selector = selector;
     this.server = server;
@@ -78,15 +75,11 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    while (!isStopped())
-    {
-      if (selector.select(timeout))
-      {
-        ChannelWrapper<?> channel = selector.getChannel();
-        synchronized(channel)
-        {
+  public void run() {
+    while (!isStopped()) {
+      if (selector.select(timeout)) {
+        final ChannelWrapper<?> channel = selector.getChannel();
+        synchronized (channel) {
           if (debugEnabled) log.debug("selected channel " + channel);
           server.getTransitionManager().submitTransition(channel);
         }
@@ -97,8 +90,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
   /**
    * Closes this channel selector. If <code>close()</code> was already called, then this method has no effect.
    */
-  public void close()
-  {
+  public void close() {
     setStopped(true);
     selector.wakeUp();
   }

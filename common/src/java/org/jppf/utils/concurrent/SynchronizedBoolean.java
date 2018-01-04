@@ -78,7 +78,7 @@ public class SynchronizedBoolean {
    * @return the value before the set.
    */
   public synchronized boolean getAndSet(final boolean newValue) {
-    boolean oldValue = value;
+    final boolean oldValue = value;
     value = newValue;
     return oldValue;
   }
@@ -86,7 +86,7 @@ public class SynchronizedBoolean {
   /**
    * Run an action if the value is the expected one.
    * @param expected the expected value.
-   * @param action the aciton to run.
+   * @param action the action to run.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
   public synchronized boolean compareAndRun(final boolean expected, final Runnable action) {
@@ -95,5 +95,13 @@ public class SynchronizedBoolean {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Run an action while synchronizing on this object.
+   * @param action the action to run.
+   */
+  public synchronized void run(final Runnable action) {
+    if (action != null) action.run();
   }
 }

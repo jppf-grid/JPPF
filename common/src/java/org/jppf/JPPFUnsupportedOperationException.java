@@ -21,15 +21,18 @@ package org.jppf;
  * Exception raised to indicate that a call to a JPPF method is not supported.
  * @author Laurent Cohen
  */
-public class JPPFUnsupportedOperationException extends Exception
-{
+public class JPPFUnsupportedOperationException extends Exception {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JPPFUnsupportedOperationException(final String message, final Throwable cause)
-  {
+  public JPPFUnsupportedOperationException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -37,8 +40,7 @@ public class JPPFUnsupportedOperationException extends Exception
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JPPFUnsupportedOperationException(final String message)
-  {
+  public JPPFUnsupportedOperationException(final String message) {
     super(message);
   }
 
@@ -46,8 +48,7 @@ public class JPPFUnsupportedOperationException extends Exception
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFUnsupportedOperationException(final Throwable cause)
-  {
+  public JPPFUnsupportedOperationException(final Throwable cause) {
     super(cause);
   }
 }

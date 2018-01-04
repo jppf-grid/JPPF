@@ -26,6 +26,11 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class CrossoverTask extends AbstractTask<Chromosome> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The chromosomes to crossover.
    */
   Chromosome c1,c2;

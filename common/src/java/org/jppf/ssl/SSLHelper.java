@@ -114,9 +114,9 @@ public final class SSLHelper {
   private static void loadSSLProperties() throws Exception {
     if (helper == null) {
       String source = null;
-      TypedProperties sslConfig = new TypedProperties();
+      final TypedProperties sslConfig = new TypedProperties();
       InputStream is = null;
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       source = config.get(JPPFProperties.SSL_CONFIGURATION_SOURCE);
       if (source != null) is = SSLHelper2.callSource(source);
       else {
@@ -159,7 +159,7 @@ public final class SSLHelper {
    * @return an {@link SSLHelper2} instance.
    */
   public static SSLHelper2 getJPPFJMXremoteSSLHelper(final Map<String, ?> env) {
-    TypedProperties props = new TypedProperties();
+    final TypedProperties props = new TypedProperties();
     String s = null;
     Boolean b = null;
     b = (Boolean) env.get("jppf.jmx.remote.tls.enabled");

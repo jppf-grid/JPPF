@@ -111,7 +111,7 @@ public class Equal extends LeftOperandRule {
    */
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
-    Object o = getLeftOperandValue(info);
+    final Object o = getLeftOperandValue(info);
     if (numberValue != null) return (o == null) ? false : o.equals(numberValue.evaluate(info));
     else if (stringValue != null) return ignoreCase ? stringValue.evaluate(info).equalsIgnoreCase((String) o) : stringValue.evaluate(info).equals(o);
     else if (booleanValue != null) return (o == null) ? false : o.equals(booleanValue.evaluate(info));
@@ -120,7 +120,7 @@ public class Equal extends LeftOperandRule {
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder(indent(n)).append("<Equal valueType=\"");
+    final StringBuilder sb = new StringBuilder(indent(n)).append("<Equal valueType=\"");
     if (stringValue != null) sb.append("string");
     else if (numberValue != null) sb.append("numeric");
     else if (booleanValue != null) sb.append("boolean");

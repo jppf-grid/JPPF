@@ -32,10 +32,6 @@ import org.jppf.utils.*;
  */
 public class JPPFThreadFactory implements ThreadFactory {
   /**
-   * Prefix used in the thread name.
-   */
-  private static final String THREAD_PREFIX = "-";
-  /**
    * The name used as prefix for the constructed threads name.
    */
   private String name = null;
@@ -133,9 +129,9 @@ public class JPPFThreadFactory implements ThreadFactory {
 
   @Override
   public synchronized Thread newThread(final Runnable r) {
-    Thread thread;
-    final String threadName = name + THREAD_PREFIX + String.format("%04d", + incrementCount());
-    if(doPrivileged) {
+    final Thread thread;
+    final String threadName = String.format("%s-%04d", name, count.incrementAndGet());
+    if (doPrivileged) {
       thread = AccessController.doPrivileged(new PrivilegedAction<Thread>() {
         @Override
         public Thread run() {
@@ -143,6 +139,7 @@ public class JPPFThreadFactory implements ThreadFactory {
         }
       });
     } else thread = new DebuggableThread(threadGroup, r, threadName);
+    //System.out.printf("created thread = %s for thred group = %s%n", thread, threadGroup);
     if (monitoringEnabled) {
       threadIDs.add(thread.getId());
       computeThreadIDs();
@@ -172,23 +169,15 @@ public class JPPFThreadFactory implements ThreadFactory {
   }
 
   /**
-   * Increment and return the created thread count.
-   * @return the created thread count.
-   */
-  private int incrementCount() {
-    return count.incrementAndGet();
-  }
-
-  /**
    * Update the priority of all threads created by this factory.
    * @param newPriority the new priority to set.
    */
   public synchronized void updatePriority(final int newPriority) {
     if ((newPriority < Thread.MIN_PRIORITY) || (newPriority > Thread.MAX_PRIORITY) || (priority == newPriority)) return;
-    int count = threadGroup.activeCount();
+    final int count = threadGroup.activeCount();
     // count is an estimate only, so we play it safe and take 2x its value.
-    Thread[] threads = new Thread[2 * count];
-    int n = threadGroup.enumerate(threads);
+    final Thread[] threads = new Thread[2 * count];
+    final int n = threadGroup.enumerate(threads);
     for (int i=0; i<n; i++) threads[i].setPriority(newPriority);
     priority = newPriority;
   }

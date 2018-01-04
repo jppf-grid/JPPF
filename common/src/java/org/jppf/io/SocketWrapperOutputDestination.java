@@ -63,12 +63,12 @@ public class SocketWrapperOutputDestination implements OutputDestination {
    */
   @Override
   public int write(final ByteBuffer data) throws Exception {
-    byte[] buf = IO.TEMP_BUFFER_POOL.get();
+    final byte[] buf = IO.TEMP_BUFFER_POOL.get();
     try {
-    int size = Math.min(buf.length, data.remaining());
-    data.get(buf, 0, size);
-    socketWrapper.write(buf, 0, size);
-    return size;
+      final int size = Math.min(buf.length, data.remaining());
+      data.get(buf, 0, size);
+      socketWrapper.write(buf, 0, size);
+      return size;
     } finally {
       IO.TEMP_BUFFER_POOL.put(buf);
     }

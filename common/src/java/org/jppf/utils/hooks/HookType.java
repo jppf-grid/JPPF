@@ -22,8 +22,7 @@ package org.jppf.utils.hooks;
  * This enum defines the possible types of hooks that can be defined.
  * @author Laurent Cohen
  */
-public enum HookType
-{
+public enum HookType {
   /**
    * A single instance of the hook is discovered and created, based on a configurtion property.
    */

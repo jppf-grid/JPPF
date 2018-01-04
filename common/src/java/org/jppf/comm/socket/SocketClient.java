@@ -79,7 +79,7 @@ public class SocketClient extends AbstractSocketWrapper {
    */
   @Override
   public void send(final Object o) throws Exception {
-    JPPFBuffer buf = getSerializer().serialize(o);
+    final JPPFBuffer buf = getSerializer().serialize(o);
     sendBytes(buf);
   }
 
@@ -96,7 +96,7 @@ public class SocketClient extends AbstractSocketWrapper {
     Object o = null;
     try {
       if (timeout > 0) socket.setSoTimeout(timeout);
-      JPPFBuffer buf = receiveBytes(timeout);
+      final JPPFBuffer buf = receiveBytes(timeout);
       o = getSerializer().deserialize(buf);
     } finally {
       // disable the timeout on subsequent read operations.
@@ -113,7 +113,7 @@ public class SocketClient extends AbstractSocketWrapper {
   public ObjectSerializer getSerializer() {
     if (serializer == null) {
       // serializer = new ObjectSerializerImpl();
-      String name = "org.jppf.utils.ObjectSerializerImpl";
+      final String name = "org.jppf.utils.ObjectSerializerImpl";
       try {
         serializer = (ObjectSerializer) Class.forName(name).newInstance();
       } catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {

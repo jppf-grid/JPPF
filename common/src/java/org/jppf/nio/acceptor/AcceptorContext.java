@@ -50,6 +50,10 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    * The server socket channel that accepted the connection.
    */
   private final ServerSocketChannel serverSocketChannel;
+  /**
+   * The socket channel's interest ops.
+   */
+  private int interestOps;
 
   /**
    * 
@@ -76,7 +80,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
     boolean b = false;
     try {
       b = nioObject.read();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (stats != null) stats.addValue(JPPFStatisticsHelper.UNIDENTIFIED_IN_TRAFFIC, nioObject.getChannelCount());
       throw e;
     }
@@ -106,5 +110,20 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    */
   public ServerSocketChannel getServerSocketChannel() {
     return serverSocketChannel;
+  }
+
+  /**
+   * @return the socket channel's interest ops.
+   */
+  public int getInterestOps() {
+    return interestOps;
+  }
+
+  /**
+   * Set the socket channel's interest ops.
+   * @param interestOps the interest ops to set.
+   */
+  public void setInterestOps(final int interestOps) {
+    this.interestOps = interestOps;
   }
 }

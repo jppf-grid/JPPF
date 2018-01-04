@@ -35,6 +35,10 @@ import org.jppf.utils.FileUtils;
  */
 public class ScriptedTask<T> extends AbstractTask<T> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The JSR 223 script language to use.
    */
   protected String language;
@@ -111,17 +115,14 @@ public class ScriptedTask<T> extends AbstractTask<T> {
     try {
       runner = ScriptRunnerFactory.getScriptRunner(language);
       if (runner != null) {
-        Map<String, Object> bnd = new HashMap<>(bindings);
+        final Map<String, Object> bnd = new HashMap<>(bindings);
         bnd.put("jppfTask", this);
         @SuppressWarnings("unchecked")
-        T result = (T) runner.evaluate(reusableId, script, bnd);
-        if (result != null) {
-          System.out.println("language=" + language + ", result=" + result + ", class=" + result.getClass().getName());
-        }
+        final T result = (T) runner.evaluate(reusableId, script, bnd);
         // may have been set from the script
         if ((getResult() == null) && (result != null)) setResult(result);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     } finally {
       ScriptRunnerFactory.releaseScriptRunner(runner);

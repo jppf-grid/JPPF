@@ -50,11 +50,11 @@ public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper {
    * @throws Exception if any error occurs.
    */
   Class<?> getTaskobjectClass(final String classname) throws Exception {
-    ClassLoader[] loaders = { Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
+    final ClassLoader[] loaders = { Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
     for (ClassLoader cl : loaders) {
       try {
         return Class.forName(classname, true, cl);
-      } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+      } catch (@SuppressWarnings("unused") final ClassNotFoundException e) {
       }
     }
     throw new ClassNotFoundException(classname);

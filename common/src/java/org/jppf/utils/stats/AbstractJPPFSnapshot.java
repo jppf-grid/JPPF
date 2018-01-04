@@ -109,7 +109,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
 
   @Override
   public synchronized String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(JPPFStatisticsHelper.getLocalizedLabel(this)).append(": type=").append(getClass().getSimpleName());
     sb.append(": total=").append(total);
     sb.append(", latest=").append(latest);

@@ -33,8 +33,7 @@ import org.slf4j.*;
  * the remote peer side, which cannot be detected otherwise.
  * @author Laurent Cohen
  */
-public class ServerConnection extends AbstractRecoveryConnection
-{
+public class ServerConnection extends AbstractRecoveryConnection {
   /**
    * Logger for this class.
    */
@@ -51,8 +50,7 @@ public class ServerConnection extends AbstractRecoveryConnection
    * @param socketReadTimeout the maximum wait time on a response from the remote peer.
    * @throws Exception if any error occurs while initializing the socket connection.
    */
-  public ServerConnection(final Socket socket, final int maxRetries, final int socketReadTimeout) throws Exception
-  {
+  public ServerConnection(final Socket socket, final int maxRetries, final int socketReadTimeout) throws Exception {
     this.ok = true;
     this.initialized = false;
     this.maxRetries = maxRetries;
@@ -64,8 +62,7 @@ public class ServerConnection extends AbstractRecoveryConnection
    * {@inheritDoc}
    */
   @Override
-  public synchronized void run()
-  {
+  public synchronized void run() {
     if (!isOk()) return;
     if (!initialized) performHandshake();
     else performCheck();
@@ -74,13 +71,11 @@ public class ServerConnection extends AbstractRecoveryConnection
   /**
    * Perform the initial handshake with the remote peer.
    */
-  private void performHandshake()
-  {
-    String response = doSendReceive("handshake");
+  private void performHandshake() {
+    final String response = doSendReceive("handshake");
     if (!isOk()) return;
-    int idx = response.indexOf(';');
-    if (idx < 0)
-    {
+    final int idx = response.indexOf(';');
+    if (idx < 0) {
       setOk(false);
       return;
     }
@@ -91,8 +86,7 @@ public class ServerConnection extends AbstractRecoveryConnection
   /**
    * Perform the initial handshake with the remote peer.
    */
-  private void performCheck()
-  {
+  private void performCheck() {
     doSendReceive("check");
   }
 
@@ -102,18 +96,14 @@ public class ServerConnection extends AbstractRecoveryConnection
    * @param message the string message to send to the remote peer.
    * @return the response as a string.
    */
-  private String doSendReceive(final String message)
-  {
+  private String doSendReceive(final String message) {
     String response = null;
-    try
-    {
+    try {
       if (socketWrapper == null) return null;
       sendMessage(message);
       response = receiveMessage();
       //sendMessage("final");
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       close();
       if (debugEnabled) log.debug("error checking " + this, e);
     }
@@ -124,20 +114,15 @@ public class ServerConnection extends AbstractRecoveryConnection
    * Close this server connection and release the resources it is using.
    */
   @Override
-  public synchronized void close()
-  {
-    try
-    {
-      if (socketWrapper != null)
-      {
-        SocketWrapper tmp = socketWrapper;
+  public synchronized void close() {
+    try {
+      if (socketWrapper != null) {
+        final SocketWrapper tmp = socketWrapper;
         socketWrapper = null;
         setOk(false);
         tmp.close();
       }
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug("error closing " + this, e);
     }
   }
@@ -146,8 +131,7 @@ public class ServerConnection extends AbstractRecoveryConnection
    * {@inheritDoc}
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return StringUtils.build("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");
   }
 }

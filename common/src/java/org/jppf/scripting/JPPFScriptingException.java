@@ -24,15 +24,18 @@ import org.jppf.JPPFException;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFScriptingException extends JPPFException
-{
+public class JPPFScriptingException extends JPPFException {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JPPFScriptingException(final String message, final Throwable cause)
-  {
+  public JPPFScriptingException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -40,8 +43,7 @@ public class JPPFScriptingException extends JPPFException
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JPPFScriptingException(final String message)
-  {
+  public JPPFScriptingException(final String message) {
     super(message);
   }
 
@@ -49,8 +51,7 @@ public class JPPFScriptingException extends JPPFException
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFScriptingException(final Throwable cause)
-  {
+  public JPPFScriptingException(final Throwable cause) {
     super(cause);
   }
 }

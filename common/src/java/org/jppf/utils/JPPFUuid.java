@@ -104,8 +104,8 @@ public class JPPFUuid implements Serializable {
    * @return the uuid as a string.
    */
   private String generateUuid() {
-    int len = codes_char.length;
-    StringBuilder sb = new StringBuilder(length);
+    final int len = codes_char.length;
+    final StringBuilder sb = new StringBuilder(length);
     for (int i=0; i<length; i++) sb.append(codes_char[rand.nextInt(len)]);
     return sb.toString();
   }
@@ -115,8 +115,8 @@ public class JPPFUuid implements Serializable {
    * @return the uuid as a string.
    */
   private String generateNormalUuid() {
-    int len = codes_char.length;
-    char[] uuidChars = new char[length];
+    final int len = codes_char.length;
+    final char[] uuidChars = new char[length];
     for (int i=0; i<length; i++) {
       if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) uuidChars[i] = '-';
       else uuidChars[i] = codes_char[rand.nextInt(len)];
@@ -133,7 +133,7 @@ public class JPPFUuid implements Serializable {
    * Create a pseudo random number generator.
    * @return a {@link Random} instance.
    */
-  private Random createRandom() {
+  private static Random createRandom() {
     return new Random(System.nanoTime() + SEED_SEQUENCE.incrementAndGet());
   }
 

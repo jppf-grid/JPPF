@@ -26,6 +26,10 @@ import java.util.EventObject;
  */
 public class JPPFStatisticsEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The snapshot that was created, removed or updated.
    */
   private final JPPFSnapshot snapshot;

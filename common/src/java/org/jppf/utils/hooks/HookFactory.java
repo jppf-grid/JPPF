@@ -22,13 +22,11 @@ import java.util.*;
 
 import org.jppf.utils.configuration.JPPFProperty;
 
-
 /**
  * Factcory methods for the registration and invocation of hooks.
  * @author Laurent Cohen
  */
-public class HookFactory
-{
+public class HookFactory {
   /**
    * Mapping of the hooks to their interface name.
    */
@@ -43,8 +41,7 @@ public class HookFactory
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerConfigSingleHook(final JPPFProperty<String> property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
-  {
+  public static <T> Hook<T> registerConfigSingleHook(final JPPFProperty<String> property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader) {
     return register(new Hook<>(property, infClass, defaultImpl, classLoader));
   }
 
@@ -56,8 +53,7 @@ public class HookFactory
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
-  {
+  public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader) {
     return register(new Hook<>(infClass, defaultImpl, classLoader, true));
   }
 
@@ -69,8 +65,7 @@ public class HookFactory
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
-  {
+  public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader) {
     return register(new Hook<>(infClass, defaultImpl, classLoader, false));
   }
 
@@ -80,8 +75,7 @@ public class HookFactory
    * @param hook the hhook to register.
    * @return the supplied hook.
    */
-  private static <T> Hook<T> register(final Hook<T> hook)
-  {
+  private static <T> Hook<T> register(final Hook<T> hook) {
     hookMap.put(hook.getInterfaceName(), hook);
     return hook;
   }
@@ -91,8 +85,7 @@ public class HookFactory
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
    */
-  public static <T> void unregister(final Class<T> infClass)
-  {
+  public static <T> void unregister(final Class<T> infClass) {
     unregister(hookMap.get(infClass.getName()));
   }
 
@@ -101,10 +94,8 @@ public class HookFactory
    * @param <T> the type of the hook interface.
    * @param hook the hhook to unregister.
    */
-  private static <T> void unregister(final Hook<T> hook)
-  {
-    if (hook != null)
-    {
+  private static <T> void unregister(final Hook<T> hook) {
+    if (hook != null) {
       hookMap.remove(hook.getInterfaceName());
       hook.dispose();
     }
@@ -117,9 +108,8 @@ public class HookFactory
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
    */
-  public static Object[] invokeHook(final String inf, final String methodName, final Object...parameters)
-  {
-    Hook<?> hook = hookMap.get(inf);
+  public static Object[] invokeHook(final String inf, final String methodName, final Object... parameters) {
+    final Hook<?> hook = hookMap.get(inf);
     if (hook != null) return hook.invoke(methodName, parameters);
     return null;
   }
@@ -131,8 +121,7 @@ public class HookFactory
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
    */
-  public static Object[] invokeHook(final Class<?> inf, final String methodName, final Object...parameters)
-  {
+  public static Object[] invokeHook(final Class<?> inf, final String methodName, final Object... parameters) {
     return invokeHook(inf.getName(), methodName, parameters);
   }
 
@@ -143,9 +132,8 @@ public class HookFactory
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
    */
-  public static Object invokeSingleHook(final String inf, final String methodName, final Object...parameters)
-  {
-    Hook<?> hook = hookMap.get(inf);
+  public static Object invokeSingleHook(final String inf, final String methodName, final Object... parameters) {
+    final Hook<?> hook = hookMap.get(inf);
     if (hook != null) return hook.invoke(methodName, parameters)[0];
     return null;
   }
@@ -157,8 +145,7 @@ public class HookFactory
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
    */
-  public static Object invokeSingleHook(final Class<?> inf, final String methodName, final Object...parameters)
-  {
+  public static Object invokeSingleHook(final Class<?> inf, final String methodName, final Object... parameters) {
     return invokeSingleHook(inf.getName(), methodName, parameters);
   }
 }

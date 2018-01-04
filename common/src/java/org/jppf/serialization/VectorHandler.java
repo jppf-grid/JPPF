@@ -39,15 +39,15 @@ public class VectorHandler extends AbstractSerializationHandler {
   @Override
   public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
     if (traceEnabled) log.trace("writing declared fields for cd={}", cd);
-    Vector<?>  vector = (Vector<?>) obj;
+    final Vector<?>  vector = (Vector<?>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = serializer.currentClassDescriptor;
       serializer.currentClassDescriptor = cd;
       synchronized(vector) {
         serializer.writeInt(vector.size());
-        List<Object> list = new ArrayList<>(vector);
-        for (Object o: list) serializer.writeObject(o);
+        final List<Object> list = new ArrayList<>(vector);
+        for (final Object o: list) serializer.writeObject(o);
       }
     } finally {
       serializer.currentClassDescriptor = tmpDesc;
@@ -58,15 +58,15 @@ public class VectorHandler extends AbstractSerializationHandler {
   public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
     if (traceEnabled) log.trace("reading declared fields for cd={}", cd);
     @SuppressWarnings("unchecked")
-    Vector<? super Object> vector = (Vector<? super Object>) obj;
+    final Vector<? super Object> vector = (Vector<? super Object>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
       deserializer.currentClassDescriptor = cd;
       copyFields(new Vector<>(), vector, cd);
-      int size = deserializer.readInt();
+      final int size = deserializer.readInt();
       for (int i=0; i<size; i++) {
-        Object value = deserializer.readObject();
+        final Object value = deserializer.readObject();
         vector.add(value);
       }
     } finally {

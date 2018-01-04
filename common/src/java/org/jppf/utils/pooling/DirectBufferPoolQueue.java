@@ -39,4 +39,14 @@ public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer> {
     //super.put(buffer);
     queue.offer(buffer);
   }
+
+  /**
+   * Initialize with size buffers.
+   * @param size the number of buffers to create.
+   * @return this pool.
+   */
+  public DirectBufferPoolQueue init(final int size) {
+    for (int i=0; i<size; i++) put(create());
+    return this;
+  }
 }

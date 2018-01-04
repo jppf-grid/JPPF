@@ -41,10 +41,10 @@ public class Downloader {
    */
   public static void main(final String... args) {
     try {
-      Downloader downloader = new Downloader();
+      final Downloader downloader = new Downloader();
       downloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip", "lib", "jfreechart-1.0.12.jar", "jcommon-1.0.15.jar");
       System.out.println("done");
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
   }
@@ -65,14 +65,14 @@ public class Downloader {
   public void extractFiles(final String sourceUrl, final String destPath, final String... names) throws Exception {
     File tmp = null;
     try {
-      File dir = new File(destPath);
+      final File dir = new File(destPath);
       if (checkFilesPresent(dir, names)) {
         System.out.println("The files are already present in the destination folder");
         return;
       }
-      Location<?> source = new URLLocation(sourceUrl);
+      final Location<?> source = new URLLocation(sourceUrl);
       tmp = File.createTempFile("jppf_", ".tmp", FileUtils.getJPPFTempDir());
-      Location<?> dest = new FileLocation(tmp);
+      final Location<?> dest = new FileLocation(tmp);
       System.out.println("downloading " + source);
       LocationEventListener l = listener;
       if (l == null) l = new LocationEventListener() {
@@ -80,9 +80,9 @@ public class Downloader {
 
         @Override
         public void dataTransferred(final LocationEvent event) {
-          long oneMB = 1024 * 1024;
-          long n = event.getTransferredBytes();
-          long p = count % oneMB;
+          final long oneMB = 1024 * 1024;
+          final long n = event.getTransferredBytes();
+          final long p = count % oneMB;
           if (n + p >= oneMB) System.out.println(String.valueOf(((n + count) / oneMB)) + " MB downloaded");
           count += n;
         }
@@ -90,15 +90,16 @@ public class Downloader {
       source.addLocationEventListener(l);
       source.copyTo(dest);
       System.out.println("downloaded to " + dest);
-      ZipFile zip = new ZipFile(tmp);
-      if (!dir.mkdirs()) throw new IOException("Could not create the directories for " + dir);
-      for (String name : names) {
-        ZipEntry entry = zip.getEntry("jfreechart-1.0.12/lib/" + name);
-        InputStream is = zip.getInputStream(entry);
-        File f = new File("lib/" + name);
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-        StreamUtils.copyStream(is, os);
-        System.out.println("extracted " + entry.getName() + " to " + f);
+      try (ZipFile zip = new ZipFile(tmp)) {
+        if (!dir.mkdirs()) throw new IOException("Could not create the directories for " + dir);
+        for (final String name : names) {
+          final ZipEntry entry = zip.getEntry("jfreechart-1.0.12/lib/" + name);
+          final InputStream is = zip.getInputStream(entry);
+          final File f = new File("lib/" + name);
+          final OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+          StreamUtils.copyStream(is, os);
+          System.out.println("extracted " + entry.getName() + " to " + f);
+        }
       }
       source.removeLocationEventListener(l);
     } finally {
@@ -114,8 +115,8 @@ public class Downloader {
    */
   public boolean checkFilesPresent(final File folder, final String... names) {
     if (!folder.exists() || !folder.isDirectory()) return false;
-    File[] files = FileUtils.toFiles(folder, names);
-    for (File f : files)
+    final File[] files = FileUtils.toFiles(folder, names);
+    for (final File f : files)
       if (!f.exists()) return false;
     return true;
   }

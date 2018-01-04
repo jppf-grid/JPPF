@@ -97,7 +97,7 @@ public class MemoryLocation extends AbstractLocation<byte[]> {
   @Override
   public byte[] toByteArray() {
     if ((offset == 0) && (len == path.length)) return path;
-    byte[] buf = new byte[len];
+    final byte[] buf = new byte[len];
     System.arraycopy(path, offset, buf, 0, len);
     return buf;
   }

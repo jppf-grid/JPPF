@@ -22,7 +22,6 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.*;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.serialization.ObjectSerializer;
@@ -49,13 +48,10 @@ public final class IOHelper {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Lock used to check if there is sufficient free memory to read an object, AND reserve the memory, in a single atomic operation. 
-   */
-  private static final Lock lock = new ReentrantLock();
-  /**
    * This is used to reserve the memory for an object about to be read, so that we don't have to lock the JVM while reading the object. 
    */
   private static final AtomicLong footprint = new AtomicLong(0L);
+  //private static final SynchronizedLong footprint = new SynchronizedLong(0L);
   /**
    * A number formatter for debugging and tracing purposes.
    */
@@ -84,17 +80,17 @@ public final class IOHelper {
    * @throws Exception if an IO error occurs.
    */
   public static DataLocation createDataLocationMemorySensitive(final int size) throws Exception {
-    if (fitsInMemory(size)) {
+    if (!IO.CHECK_LOW_MEMORY || fitsInMemory(size)) {
       try {
-        DataLocation dl = new MultipleBuffersLocation(size);
+        final DataLocation dl = new MultipleBuffersLocation(size);
         return dl;
-      } catch (OutOfMemoryError oome) {
+      } catch (final OutOfMemoryError oome) {
         if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
       } finally {
         footprint.addAndGet(-size);
       }
     }
-    File file = createTempFile(size);
+    final File file = createTempFile(size);
     return new FileDataLocation(file, size);
   }
 
@@ -120,7 +116,7 @@ public final class IOHelper {
   public static DataLocation readData(final InputSource source, final int size) throws Exception {
     if (size <= 0) return null;
     if (traceEnabled) log.trace("read data size = {}", nf.format(size));
-    DataLocation dl = createDataLocationMemorySensitive(size);
+    final DataLocation dl = createDataLocationMemorySensitive(size);
     dl.transferFrom(source, true);
     return dl;
   }
@@ -143,7 +139,7 @@ public final class IOHelper {
    * @throws Exception if an IO error occurs.
    */
   public static File createTempFile(final int size) throws Exception {
-    File file = File.createTempFile("jppf", ".tmp", FileUtils.getJPPFTempDir());
+    final File file = File.createTempFile("jppf", ".tmp", FileUtils.getJPPFTempDir());
     if (debugEnabled) log.debug("disk overflow: creating temp file '{}' with size={}", file.getCanonicalPath(), nf.format(size));
     file.deleteOnExit();
     return file;
@@ -155,34 +151,18 @@ public final class IOHelper {
    * @return true if the data would fit in memory, false otherwise.
    */
   public static boolean fitsInMemory(final int size) {
-    lock.lock();
-    try {
-      if (traceEnabled) {
-        long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
-        log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
-      }
-      boolean b = fitsInMemory0(size);
-      if (!b && IO.GC_ON_DISK_OVERFLOW) {
+    final long unavailable = (long) Math.max(IO.FREE_MEM_TO_SIZE_RATIO * size, IO.LOW_MEMORY_THRESHOLD);
+    boolean success = true;
+    final long fp = footprint.get();
+    if (fp > SystemUtils.maxFreeHeap() - unavailable) {
+      if (IO.GC_ON_DISK_OVERFLOW) {
         if (debugEnabled) log.debug("triggering GC to avoid disk overflow, requested size={}", size);
         System.gc();
-        b = fitsInMemory0(size);
-      }
-      if (b) footprint.addAndGet(size);
-      return b;
-    } finally {
-      lock.unlock();
+        success = fp < SystemUtils.maxFreeHeap() - unavailable;
+      } else success = false;
     }
-  }
-
-  /**
-   * Determines whether the data of the specified size would fit in memory.
-   * @param size the data size to check.
-   * @return true if the data would fit in memory, false otherwise.
-   */
-  private static boolean fitsInMemory0(final int size) {
-    long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
-    //if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
-    return ((long) (IO.FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > IO.LOW_MEMORY_THRESHOLD);
+    if (success) footprint.addAndGet(size);
+    return success;
   }
 
   /**
@@ -194,10 +174,10 @@ public final class IOHelper {
    */
   public static Object unwrappedData(final SocketWrapper socketWrapper, final ObjectSerializer ser) throws Exception {
     //if (traceEnabled) log.trace("unwrapping from network connection");
-    InputSource sis = new SocketWrapperInputSource(socketWrapper);
-    DataLocation dl = IOHelper.readData(sis);
+    final InputSource sis = new SocketWrapperInputSource(socketWrapper);
+    final DataLocation dl = IOHelper.readData(sis);
     if (dl == null) return null;
-    Object o = unwrappedData(dl, ser);
+    final Object o = unwrappedData(dl, ser);
     if (traceEnabled) log.trace("unwrapping from network connection, serialized size=" + dl.getSize() + " : object=" + o);
     return o;
   }
@@ -234,10 +214,10 @@ public final class IOHelper {
    * @throws Exception if any error occurs.
    */
   public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception {
-    DataLocation dl = serializeData(o, ser);
+    final DataLocation dl = serializeData(o, ser);
     if (traceEnabled) log.trace("sending object with serialized size=" + dl.getSize() + " : " + o);
     socketWrapper.writeInt(dl.getSize());
-    OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
+    final OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
     dl.transferTo(od, true);
   }
 
@@ -273,7 +253,7 @@ public final class IOHelper {
     DataLocation dl = null;
     try {
       dl = serializeDataToMemory(o, ser);
-    } catch(@SuppressWarnings("unused") OutOfMemoryError e) {
+    } catch(@SuppressWarnings("unused") final OutOfMemoryError e) {
       dl = serializeDataToFile(o, ser);
     }
     return dl;
@@ -288,7 +268,7 @@ public final class IOHelper {
    */
   public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to memory " + o);
-    MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+    final MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
     //NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
     //ser.serialize(o, nos);
     ser.serialize(o, mbos);
@@ -304,11 +284,11 @@ public final class IOHelper {
    */
   public static DataLocation serializeDataToFile(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to file " + o);
-    File file = IOHelper.createTempFile(-1);
-    OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-    NotifyingOutputStream nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
+    final File file = IOHelper.createTempFile(-1);
+    final OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+    final NotifyingOutputStream nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
     ser.serialize(o, nos);
-    DataLocation dl = new FileDataLocation(file);
+    final DataLocation dl = new FileDataLocation(file);
     return dl;
   }
 

@@ -26,6 +26,11 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class FitnessTask extends AbstractTask<Double> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Chromosome whose fitness to compute.
    */
   private Chromosome c;

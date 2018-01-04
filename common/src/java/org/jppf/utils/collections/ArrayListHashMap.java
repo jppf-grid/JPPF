@@ -26,25 +26,26 @@ import java.util.*;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public class ArrayListHashMap<K, V> extends AbstractCollectionMap<K, V>
-{
+public class ArrayListHashMap<K, V> extends AbstractCollectionMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public ArrayListHashMap()
-  {
+  public ArrayListHashMap() {
     map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new HashMap<>();
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new ArrayList<>();
   }
 }

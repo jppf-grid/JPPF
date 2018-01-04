@@ -66,10 +66,9 @@ public abstract class CustomPolicy extends ExecutionPolicy {
 
   @Override
   public String toString(final int n) {
-    StringBuilder sb = new StringBuilder(indent(n)).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
+    final StringBuilder sb = new StringBuilder(indent(n)).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
     if (args != null) {
-      for (String s : args)
-        sb.append(indent(n + 1)).append("<Arg>").append(s).append("</Arg>\n");
+      for (String s : args) sb.append(indent(n + 1)).append("<Arg>").append(s).append("</Arg>\n");
     }
     sb.append(indent(n)).append("</CustomRule>\n");
     return sb.toString();

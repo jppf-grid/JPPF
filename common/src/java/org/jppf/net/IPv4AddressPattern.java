@@ -20,7 +20,6 @@ package org.jppf.net;
 
 import java.net.*;
 
-
 /**
  * Represents a pattern used for IP addresses include or exclude lists.<br/>
  * A pattern represents a single value or a range of values for each component of an IP address.<br/>
@@ -51,15 +50,13 @@ import java.net.*;
  * <p>4. A pattern describing more than 4 components or containing characters other than decimal digits, '-', '.' or spaces will be ignored.
  * @author Laurent Cohen
  */
-public class IPv4AddressPattern extends AbstractIPAddressPattern
-{
+public class IPv4AddressPattern extends AbstractIPAddressPattern {
   /**
    * Initialize this object with the specified string pattern.
    * @param source the source pattern as a string.
    * @throws IllegalArgumentException if the pattern is null or invalid.
    */
-  public IPv4AddressPattern(final String source) throws IllegalArgumentException
-  {
+  public IPv4AddressPattern(final String source) throws IllegalArgumentException {
     super(source, PatternConfiguration.IPV4_CONFIGURATION);
   }
 
@@ -67,8 +64,7 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
    * {@inheritDoc}
    */
   @Override
-  public boolean matches(final InetAddress ip)
-  {
+  public boolean matches(final InetAddress ip) {
     if (!(ip instanceof Inet4Address)) return false;
     return super.matches(ip);
   }
@@ -77,25 +73,18 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
    * Main method.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     System.out.println("***** IP v4 *****");
-    String[] ipv4patterns = {
-        "192.168.1.10", "192.168.1.11", "192.168.1", "192.168", "192.168-170.1", "192.168-170.1.1-32",
-        ".2.3.4", "1.2..4", "1.2.3.", "1.2.3.4-", "1.2.3.-4", " 1. 2 .  3. 4 - 8 ", "1.-.3.", "1.2.3.-",
-    };
+    final String[] ipv4patterns = { "192.168.1.10", "192.168.1.11", "192.168.1", "192.168", "192.168-170.1", "192.168-170.1.1-32", ".2.3.4", "1.2..4", "1.2.3.", "1.2.3.4-", "1.2.3.-4", " 1. 2 .  3. 4 - 8 ",
+      "1.-.3.", "1.2.3.-", };
     //String[] patterns = { " 1. 2 .  3. 4 - 8 " };
-    String ip = "192.168.1.11";
-    for (int i=0; i<ipv4patterns.length; i++)
-    {
-      try
-      {
-        IPv4AddressPattern p = new IPv4AddressPattern(ipv4patterns[i]);
-        InetAddress addr = InetAddress.getByName(ip);
+    final String ip = "192.168.1.11";
+    for (int i = 0; i < ipv4patterns.length; i++) {
+      try {
+        final IPv4AddressPattern p = new IPv4AddressPattern(ipv4patterns[i]);
+        final InetAddress addr = InetAddress.getByName(ip);
         System.out.println("pattern " + i + " for source '" + ipv4patterns[i] + "' = '" + p + "', ip match = " + p.matches(addr));
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         System.out.println("#" + i + " : " + e.getMessage());
       }
     }

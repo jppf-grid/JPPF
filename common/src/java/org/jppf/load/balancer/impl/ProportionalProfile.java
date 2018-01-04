@@ -164,7 +164,7 @@ public class ProportionalProfile extends AbstractLoadBalancingProfile {
    */
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("profileName=").append(name);
     sb.append(", performanceCacheSize=").append(performanceCacheSize);
     sb.append(", proportionalityFactor=").append(proportionalityFactor);

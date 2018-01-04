@@ -202,7 +202,7 @@ public class LoadBalancerPersistenceInfo {
   private static byte[] initNullBytes() {
     try {
       return JPPFSerializationHelper.serializeToBytes(null);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new ExceptionInInitializerError(e);
     }
   }

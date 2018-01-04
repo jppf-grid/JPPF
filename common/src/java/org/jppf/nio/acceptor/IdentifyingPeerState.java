@@ -55,23 +55,25 @@ class IdentifyingPeerState extends AcceptorServerState {
    */
   @Override
   public AcceptorTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    AcceptorContext context = (AcceptorContext) channel.getContext();
+    final AcceptorContext context = (AcceptorContext) channel.getContext();
     if (log.isTraceEnabled()) log.trace("about to read from channel {}", channel);
-    if (context.readMessage(channel)) {
-      if (!(channel instanceof SelectionKeyWrapper)) return null;
-      int id = context.getId();
-      if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
-      NioServer<?, ?> server = NioHelper.getServer(id);
-      if (server == null) throw new JPPFException("unknown JPPF identifier: " + id);
-      if (debugEnabled) log.debug("cancelling key for {}", channel);
-      SelectionKey key = (SelectionKey) channel.getChannel();
-      SocketChannel socketChannel = (SocketChannel) key.channel();
-      key.cancel();
-      if (debugEnabled) log.debug("transfering channel to new server {}", server);
-      server.accept(context.getServerSocketChannel(), socketChannel, context.getSSLHandler(), context.isSsl(), false);
-      if (debugEnabled) log.debug("channel accepted: {}", socketChannel);
-      context.setSSLHandler(null);
-      return null;
+    while (true) {
+      if (context.readMessage(channel)) {
+        if (!(channel instanceof SelectionKeyWrapper)) return null;
+        final int id = context.getId();
+        if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
+        final NioServer<?, ?> server = NioHelper.getServer(id);
+        if (server == null) throw new JPPFException("unknown JPPF identifier: " + id);
+        if (debugEnabled) log.debug("cancelling key for {}", channel);
+        final SelectionKey key = (SelectionKey) channel.getChannel();
+        final SocketChannel socketChannel = (SocketChannel) key.channel();
+        key.cancel();
+        if (debugEnabled) log.debug("transfering channel to new server {}", server);
+        server.accept(context.getServerSocketChannel(), socketChannel, context.getSSLHandler(), context.isSsl(), false);
+        if (debugEnabled) log.debug("channel accepted: {}", socketChannel);
+        context.setSSLHandler(null);
+        return null;
+      } else if (context.byteCount <= 0L) break;
     }
     return AcceptorTransition.TO_IDENTIFYING_PEER;
   }

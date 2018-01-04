@@ -79,7 +79,7 @@ public class SynchronizedReference<T> {
    * @return the value before the set.
    */
   public synchronized Object getAndSet(final T newValue) {
-    Object oldValue = value;
+    final Object oldValue = value;
     value = newValue;
     return oldValue;
   }

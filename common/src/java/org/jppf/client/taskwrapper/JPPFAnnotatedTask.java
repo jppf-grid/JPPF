@@ -75,9 +75,9 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> implements Cancellat
   @Override
   public void run() {
     try {
-      Object result = taskObjectWrapper.execute();
+      final Object result = taskObjectWrapper.execute();
       if ((getResult() == null) && ((taskObjectWrapper instanceof RunnableTaskWrapper) || (result != null))) setResult(result);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -135,7 +135,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> implements Cancellat
    */
   @Override
   public JPPFAnnotatedTask setDataProvider(final DataProvider dataProvider) {
-    Object o = taskObjectWrapper.getTaskObject();
+    final Object o = taskObjectWrapper.getTaskObject();
     if (o instanceof DataProviderHolder) ((DataProviderHolder) o).setDataProvider(dataProvider);
     else super.setDataProvider(dataProvider);
     return this;
@@ -143,14 +143,14 @@ public class JPPFAnnotatedTask extends AbstractTask<Object> implements Cancellat
 
   @Override
   public boolean isInterruptible() {
-    Object o = getTaskObject();
+    final Object o = getTaskObject();
     if (o instanceof Interruptibility) return ((Interruptibility) o).isInterruptible();
     return super.isInterruptible();
   }
 
   @Override
   public void doCancelAction() throws Exception {
-    Object o = getTaskObject();
+    final Object o = getTaskObject();
     if (o instanceof CancellationHandler) ((CancellationHandler) o).doCancelAction();
   }
 }

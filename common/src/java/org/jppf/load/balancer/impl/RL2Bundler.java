@@ -108,7 +108,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
    * @param totalTime the total round-trip time of the bundle between the driver and the node.
    */
   private void computeBundleSize(final int size, final double totalTime) {
-    double diff = (rl2State.performanceCache.getPreviousMean() - rl2State.performanceCache.getMean()) / rl2State.performanceCache.getPreviousMean();
+    final double diff = (rl2State.performanceCache.getPreviousMean() - rl2State.performanceCache.getMean()) / rl2State.performanceCache.getPreviousMean();
     // if a negative difference in performance is beyond the configured threshold,
     // assume the performance profile has changed and re-learn it from scratch
     if (diff < -profile.getPerformanceVariationThreshold()) {
@@ -126,7 +126,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
       rl2State.statesBySize.put(rl2State.bundleSize, state);
     } else {
       rl2State.statesByTime.removeValue(state.mean, state);
-      double mean = totalTime / size;
+      final double mean = totalTime / size;
       //if (mean < state.mean) state.mean = mean;
       state.count++;
       state.total += mean;
@@ -134,7 +134,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
     }
     rl2State.statesByTime.putValue(state.mean, state);
     boolean choseRandom = true;
-    int nbStates = rl2State.statesBySize.size();
+    final int nbStates = rl2State.statesBySize.size();
     double p = 0d;
     // if nbStates < minSamples, keep building the set of states by chosing the next bundle size randomly
     if (nbStates < profile.getMinSamples()) choseRandom = true;
@@ -155,10 +155,10 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
       } while (rl2State.statesBySize.get(n) != null);
       rl2State.bundleSize = n;
     } else {
-      double key = rl2State.statesByTime.firstKey();
-      List<State> list = new ArrayList<>(rl2State.statesByTime.getValues(key));
-      int listSize = list.size();
-      int idx = (listSize == 1) ? 0 : rand.nextInt(list.size());
+      final double key = rl2State.statesByTime.firstKey();
+      final List<State> list = new ArrayList<>(rl2State.statesByTime.getValues(key));
+      final int listSize = list.size();
+      final int idx = (listSize == 1) ? 0 : rand.nextInt(list.size());
       rl2State.bundleSize = list.get(idx).size;
     }
     if (traceEnabled) log.trace(format("bundleSize=%,4d, nbStates=%,4d, choseRandom=%5b, p=%1.3f, feedback=(size=%,4d, totalTIme=%,10d)",
@@ -169,15 +169,15 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
   @Override
   public void setJob(final JPPFDistributedJob job) {
     super.setJob(job);
-    int n = job.getTaskCount();
+    final int n = job.getTaskCount();
     maxSize = (int) Math.round(n * profile.getMaxRelativeSize());
     if (maxSize < 1) maxSize = 1;
     lock.lock();
     try {
       if (!rl2State.statesBySize.isEmpty() && (rl2State.statesBySize.lastKey() > maxSize)) {
-        Map<Integer, State> map = new HashMap<>(rl2State.statesBySize.tailMap(maxSize + 1));
-        for (Map.Entry<Integer, State> entry: map.entrySet()) {
-          State state = rl2State.statesBySize.remove(entry.getKey());
+        final Map<Integer, State> map = new HashMap<>(rl2State.statesBySize.tailMap(maxSize + 1));
+        for (final Map.Entry<Integer, State> entry: map.entrySet()) {
+          final State state = rl2State.statesBySize.remove(entry.getKey());
           if (state != null) rl2State.statesByTime.removeValue(state.mean, state);
         }
       }
@@ -211,7 +211,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
    * @return a formatted string with this bundler's name as prefix.
    */
   private String format(final String format, final Object...params) {
-    String s = name + format;
+    final String s = name + format;
     return String.format(s, params);
   }
 
@@ -254,7 +254,7 @@ public class RL2Bundler extends AbstractAdaptiveBundler<RL2Profile> implements P
 
   @Override
   public void setState(final Object persistedState) {
-    RL2State other = (RL2State) persistedState;
+    final RL2State other = (RL2State) persistedState;
     lock.lock();
     try {
       rl2State.bundleSize = other.bundleSize;

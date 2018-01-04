@@ -67,9 +67,9 @@ public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> ex
   @Override
   public void setChannelConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.channelConfiguration = nodeConfiguration;
-    TypedProperties jppf = nodeConfiguration.getJppf();
-    boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
-    JPPFProperty<Integer> prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+    final TypedProperties jppf = nodeConfiguration.getJppf();
+    final boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
+    final JPPFProperty<Integer> prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
     int nbThreads = jppf.getInt(prop.getName(), -1);
     // if number of threads is not defined, we assume it is the number of available processors
     if (nbThreads <= 0) nbThreads = getChannelConfiguration().getRuntime().getInt("availableProcessors");
@@ -78,9 +78,9 @@ public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> ex
 
   @Override
   public void feedback(final int size, final double totalTime, final double accumulatedElapsed, final double overheadTime) {
-    int n1 = size / nbThreads;
-    int n2 = size % nbThreads;
-    double mean = accumulatedElapsed / size;
+    final int n1 = size / nbThreads;
+    final int n2 = size % nbThreads;
+    final double mean = accumulatedElapsed / size;
     double t = 0d;
     if (n1 == 0) t = mean;
     else {

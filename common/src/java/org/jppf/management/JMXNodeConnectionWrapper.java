@@ -33,6 +33,10 @@ import org.slf4j.*;
  */
 public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JPPFNodeAdminMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JMXNodeConnectionWrapper.class);
@@ -224,7 +228,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   public NodePendingAction pendingAction() {
     try {
       return (NodePendingAction) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "pendingAction");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
     }
     return null;
@@ -234,7 +238,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   public boolean cancelPendingAction() {
     try {
       return (Boolean) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "hasPendingAction");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
     }
     return false;

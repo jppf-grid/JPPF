@@ -25,47 +25,38 @@ import java.util.*;
  * @param <E> the type of the cache elements.
  * @author Laurent Cohen
  */
-public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E>
-{
+public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E> {
   /**
    * The backing set for this cache.
    */
   private final Set<E> set = new HashSet<>();
 
   @Override
-  public void add(final E element)
-  {
-    synchronized(set)
-    {
+  public void add(final E element) {
+    synchronized (set) {
       set.add(element);
     }
   }
 
   @Override
-  public boolean has(final E element)
-  {
-    synchronized(set)
-    {
+  public boolean has(final E element) {
+    synchronized (set) {
       return set.contains(element);
     }
   }
 
   @Override
-  public E remove(final E element)
-  {
-    boolean b;
-    synchronized(set)
-    {
+  public E remove(final E element) {
+    final boolean b;
+    synchronized (set) {
       b = set.remove(element);
     }
     return b ? element : null;
   }
 
   @Override
-  public void clear()
-  {
-    synchronized(set)
-    {
+  public void clear() {
+    synchronized (set) {
       set.clear();
     }
   }

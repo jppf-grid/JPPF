@@ -127,7 +127,7 @@ public class MultipleBuffersOutputStream extends OutputStream {
       currentBuffer = list.get(bufferIndex++);
       currentBuffer.length = 0;
     } else {
-      byte[] bytes = (size == IO.TEMP_BUFFER_SIZE) ? IO.TEMP_BUFFER_POOL.get() : new byte[size];
+      final byte[] bytes = (size == IO.TEMP_BUFFER_SIZE) ? IO.TEMP_BUFFER_POOL.get() : new byte[size];
       currentBuffer = new JPPFBuffer(bytes, 0);
       list.add(currentBuffer);
     }
@@ -151,7 +151,7 @@ public class MultipleBuffersOutputStream extends OutputStream {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append(", totalSize=").append(totalSize);
     sb.append(", nbBuffers=").append(list.size());

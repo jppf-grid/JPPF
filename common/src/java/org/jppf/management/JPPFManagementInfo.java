@@ -80,11 +80,12 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Maps type values to readable strings.
    */
-  private static final Map<Integer, String> typeMap = new HashMap<Integer, String>() {{
-    put(DRIVER, "driver");
-    put(NODE, "node");
-    put(PEER, "peer");
-  }};
+  private static final Map<Integer, String> typeMap = new HashMap<>();
+  static {
+    typeMap.put(DRIVER, "driver");
+    typeMap.put(NODE, "node");
+    typeMap.put(PEER, "peer");
+  }
   /**
    * The name of the host on which the node or driver is running.
    */
@@ -203,14 +204,14 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     if (o == null) return 1;
     if (this.equals(o)) return 0;
     // we want ascending alphabetical order
-    int n = -1 * host.compareTo(o.getHost());
+    final int n = -1 * host.compareTo(o.getHost());
     if (n != 0) return n;
     return port - o.getPort();
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append(host).append(':').append(port);
     sb.append(", type=").append(typeToString());
     sb.append(", local=").append(isLocal());
@@ -353,9 +354,9 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @return a string representing the type.
    */
   private String typeToString() {
-    int b = (type & TYPE_MASK);
-    StringBuilder sb = new StringBuilder();
-    String s = typeMap.get(b);
+    final int b = (type & TYPE_MASK);
+    final StringBuilder sb = new StringBuilder();
+    final String s = typeMap.get(b);
     sb.append(s == null ? "?" : s);
     if (isMasterNode()) sb.append("|MASTER");
     if (isSlaveNode()) sb.append("|SLAVE");

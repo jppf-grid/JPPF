@@ -144,7 +144,7 @@ public class Base64OutputStream extends FilterOutputStream {
       if( decodabet[ theByte & 0x7f ] > Base64.WHITE_SPACE_ENC ) {
         buffer[ position++ ] = (byte)theByte;
         if( position >= bufferLength ) { // Enough to output.
-          int len = Base64Decoding.decode4to3( buffer, 0, b4, 0, options );
+          final int len = Base64Decoding.decode4to3( buffer, 0, b4, 0, options );
           out.write( b4, 0, len );
           position = 0;
         }   // end if: enough to output

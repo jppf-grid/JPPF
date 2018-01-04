@@ -157,7 +157,7 @@ public abstract class AbstractJMXServer implements JMXServer {
         managementHost = url.getHost();
         forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
         if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         nbTries++;
         if (nbTries > 65530 - 1024) throw e;
         if ((e instanceof BindException) || StringUtils.hasOneOf(e.getMessage(), true, "bind", "address already in use")) {

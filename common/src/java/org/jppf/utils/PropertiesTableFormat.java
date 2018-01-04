@@ -68,8 +68,8 @@ public abstract class PropertiesTableFormat {
    * @param title the title of the formatted table.
    */
   public void formatTable(final Properties props, final String title) {
-    Set<String> orderedProps = new TreeSet<>();
-    Enumeration<?> en = props.propertyNames();
+    final Set<String> orderedProps = new TreeSet<>();
+    final Enumeration<?> en = props.propertyNames();
     while (en.hasMoreElements()) orderedProps.add((String) en.nextElement());
     tableStart(title);
     for (String name: orderedProps) {

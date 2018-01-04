@@ -24,8 +24,7 @@ import org.jppf.utils.concurrent.ThreadSynchronization;
  * Instances of this class act as a NIO selector for local (in-VM) channels.
  * @author Laurent Cohen
  */
-public class LocalChannelSelector extends ThreadSynchronization implements ChannelSelector
-{
+public class LocalChannelSelector extends ThreadSynchronization implements ChannelSelector {
   /**
    * The channel polled by this selector.
    */
@@ -35,27 +34,23 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
    * Initialize this selector with the specified channel.
    * @param channel the channel polled by this selector.
    */
-  public LocalChannelSelector(final ChannelWrapper<?> channel)
-  {
+  public LocalChannelSelector(final ChannelWrapper<?> channel) {
     this.channel = (AbstractLocalChannelWrapper<?, ?>) channel;
   }
 
   @Override
-  public boolean select()
-  {
+  public boolean select() {
     return select(0);
   }
 
   @Override
-  public boolean select(final long timeout)
-  {
+  public boolean select(final long timeout) {
     if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     final long timeoutNanos = timeout * 1000000L;
     long elapsed = 0;
-    boolean selected =  channel.isSelectable();
-    while (((timeout == 0L) || (elapsed < timeoutNanos)) && !selected)
-    {
+    boolean selected = channel.isSelectable();
+    while (((timeout == 0L) || (elapsed < timeoutNanos)) && !selected) {
       goToSleep(1000L, 0);
       elapsed = System.nanoTime() - start;
       selected = channel.isSelectable();
@@ -64,14 +59,12 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
   }
 
   @Override
-  public boolean selectNow()
-  {
+  public boolean selectNow() {
     return channel.isSelectable();
   }
 
   @Override
-  public ChannelWrapper<?> getChannel()
-  {
+  public ChannelWrapper<?> getChannel() {
     return channel;
   }
 }

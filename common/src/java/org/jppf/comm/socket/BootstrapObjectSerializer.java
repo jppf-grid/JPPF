@@ -60,9 +60,9 @@ public class BootstrapObjectSerializer implements ObjectSerializer {
    */
   @Override
   public JPPFBuffer serialize(final Object o, final boolean noCopy) throws Exception {
-    JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+    final JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
     serialize(o, baos);
-    byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
+    final byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
     return new JPPFBuffer(data, baos.size());
   }
 

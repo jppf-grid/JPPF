@@ -27,6 +27,11 @@ import java.io.File;
  */
 public class FileProperty extends AbstractJPPFProperty<File> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this property with the specified name and default value.
    * @param name the name of this property.
    * @param defaultValue the default value of this property, used when the property is not defined.

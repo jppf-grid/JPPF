@@ -49,12 +49,12 @@ public class SchemaValidator {
   public static void main(final String...args) {
     try {
       if ((args == null) || (args.length != 2)) usageAndExit();
-      List<String> docPaths = FileUtils.getFilePathList(args[1]);
+      final List<String> docPaths = FileUtils.getFilePathList(args[1]);
       for (String path: docPaths) {
-        JPPFErrorReporter reporter = new JPPFErrorReporter(path);
-        SchemaValidator validator = new SchemaValidator(reporter);
-        boolean b = validator.validate(path, args[0]);
-        String s = "the document " + path;
+        final JPPFErrorReporter reporter = new JPPFErrorReporter(path);
+        final SchemaValidator validator = new SchemaValidator(reporter);
+        final boolean b = validator.validate(path, args[0]);
+        final String s = "the document " + path;
         System.out.println(s + (b ? " is valid." : " has errors."));
         if (!b) {
           System.out.println("fatal errors: " + reporter.allFatalErrorsAsStrings());
@@ -62,7 +62,7 @@ public class SchemaValidator {
           System.out.println("warnings    : " + reporter.allWarningsAsStrings());
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -73,7 +73,7 @@ public class SchemaValidator {
    * Show usage instructions for this validation toll, and exit the JVM.
    */
   public static void usageAndExit() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("Usage:\n\n");
     sb.append("    SchemaValidator <xml schema> <xml document list>\n\n");
     sb.append("Where:\n\n");
@@ -104,9 +104,9 @@ public class SchemaValidator {
    * @throws SAXException if an error occurs while loading the schema.
    */
   public Schema loadSchema(final String schemaPath) throws IOException, SAXException {
-    InputStream is = FileUtils.getFileInputStream(schemaPath);
+    final InputStream is = FileUtils.getFileInputStream(schemaPath);
     if (is == null) return null;
-    Schema schema = getSchemaFactory().newSchema(new StreamSource(is));
+    final Schema schema = getSchemaFactory().newSchema(new StreamSource(is));
     return schema;
   }
 
@@ -160,10 +160,10 @@ public class SchemaValidator {
    */
   public boolean validate(final Reader docReader, final Reader schemaReader) throws IOException, SAXException {
     if (docReader == null) return false;
-    Schema schema = loadSchema(schemaReader);
+    final Schema schema = loadSchema(schemaReader);
     if (schema == null) return false;
-    Validator validator = schema.newValidator();
-    ValidatorErrorHandler handler = new ValidatorErrorHandler(reporter);
+    final Validator validator = schema.newValidator();
+    final ValidatorErrorHandler handler = new ValidatorErrorHandler(reporter);
     validator.setErrorHandler(handler);
     validator.validate(new SAXSource(new InputSource(docReader)));
     return handler.errorCount + handler.fatalCount <= 0;
@@ -190,7 +190,7 @@ public class SchemaValidator {
    * @return the resulting message as a string.
    */
   public String printSAXParseException(final SAXParseException e, final String name) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("Document ").append(name).append(" at ");
     sb.append(e.getLineNumber()).append(':').append(e.getColumnNumber()).append('\n');
     sb.append(e.getMessage());
@@ -212,14 +212,14 @@ public class SchemaValidator {
     /**
      * Used to collect validation error and warning messages.
      */
-    public JPPFErrorReporter reporter = null;
+    public JPPFErrorReporter handlerReporter = null;
 
     /**
      * Initialize this error handler with the specified error reporter.
      * @param reporter used to collect validation error and warning messages.
      */
     public ValidatorErrorHandler(final JPPFErrorReporter reporter) {
-      this.reporter = (reporter == null) ? new JPPFErrorReporter("Error Reporter") : reporter;
+      this.handlerReporter = (reporter == null) ? new JPPFErrorReporter("Error Reporter") : reporter;
     }
 
     /**
@@ -230,7 +230,7 @@ public class SchemaValidator {
     @Override
     public void error(final SAXParseException exception) throws SAXException {
       errorCount++;
-      reporter.errors.add(printSAXParseException(exception, reporter.name));
+      handlerReporter.errors.add(printSAXParseException(exception, handlerReporter.name));
     }
 
     /**
@@ -241,7 +241,7 @@ public class SchemaValidator {
     @Override
     public void fatalError(final SAXParseException exception) throws SAXException {
       fatalCount++;
-      reporter.fatalErrors.add(printSAXParseException(exception, reporter.name));
+      handlerReporter.fatalErrors.add(printSAXParseException(exception, handlerReporter.name));
     }
 
     /**
@@ -251,7 +251,7 @@ public class SchemaValidator {
      */
     @Override
     public void warning(final SAXParseException exception) throws SAXException {
-      reporter.warnings.add(printSAXParseException(exception, reporter.name));
+      handlerReporter.warnings.add(printSAXParseException(exception, handlerReporter.name));
     }
   }
 }

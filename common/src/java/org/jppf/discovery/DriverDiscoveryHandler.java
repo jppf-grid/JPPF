@@ -66,10 +66,10 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
    * @param clazz the class of driver discoveries to llokup via SPI.
    */
   public DriverDiscoveryHandler(final Class<DriverDiscovery<E>> clazz) {
-    ServiceFinder sf = new ServiceFinder();
-    List<DriverDiscovery<E>> list = sf.findProviders(clazz);
+    final ServiceFinder sf = new ServiceFinder();
+    final List<DriverDiscovery<E>> list = sf.findProviders(clazz);
     if (list != null) {
-      for (DriverDiscovery<E> discovery: list) discoveriesMap.put(discovery, createThread(discovery));
+      for (final DriverDiscovery<E> discovery: list) discoveriesMap.put(discovery, createThread(discovery));
     }
   }
 
@@ -89,7 +89,7 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
    * @return the converted data.
    */
   public static JPPFConnectionInformation toJPPFConnectionInformation(final DriverConnectionInfo driverInfo) {
-    JPPFConnectionInformation info = new JPPFConnectionInformation();
+    final JPPFConnectionInformation info = new JPPFConnectionInformation();
     info.host = driverInfo.getHost();
     if (driverInfo.isSecure()) {
       info.sslServerPorts = new int[1];
@@ -108,8 +108,8 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
   public void addDiscovery(final DriverDiscovery<E> discovery) {
     if (discovery != null) {
       synchronized(discoveriesMap) {
-        for (DriverDiscoveryListener<E> listener: listeners) discovery.addListener(listener);
-        DiscoveryThread thread = createThread(discovery);
+        for (final DriverDiscoveryListener<E> listener: listeners) discovery.addListener(listener);
+        final DiscoveryThread thread = createThread(discovery);
         discoveriesMap.put(discovery, thread);
         if (started.get()) thread.start();
       }
@@ -124,7 +124,7 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
     if (discovery != null) {
       synchronized(discoveriesMap) {
         if (discoveriesMap.containsKey(discovery)) {
-          DiscoveryThread thread = discoveriesMap.remove(discovery);
+          final DiscoveryThread thread = discoveriesMap.remove(discovery);
           discovery.stop();
           if (thread.isAlive()) thread.interrupt();
         }
@@ -184,8 +184,8 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
       listeners.clear();
       synchronized(discoveriesMap) {
         for (DriverDiscovery<E> discovery: discoveriesMap.keySet()) discovery.stop();
-        for (Map.Entry<DriverDiscovery<E>, DiscoveryThread> entry: discoveriesMap.entrySet()) {
-          DiscoveryThread thread = entry.getValue();
+        for (final Map.Entry<DriverDiscovery<E>, DiscoveryThread> entry: discoveriesMap.entrySet()) {
+          final DiscoveryThread thread = entry.getValue();
           if (thread.isAlive()) thread.interrupt();
         }
         discoveriesMap.clear();
@@ -226,8 +226,8 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
     public void run() {
       try {
         discovery.discover();
-      } catch (@SuppressWarnings("unused") InterruptedException  ignore) {
-      } catch (Throwable t) {
+      } catch (@SuppressWarnings("unused") final InterruptedException  ignore) {
+      } catch (final Throwable t) {
         log.error(String.format("Error while running discovery %s in thread %s: %s", discovery, this, ExceptionUtils.getStackTrace(t)));
       }
     }

@@ -65,7 +65,7 @@ public class SingleValueSnapshot implements JPPFSnapshot {
    */
   @Override
   public synchronized JPPFSnapshot copy() {
-    SingleValueSnapshot svs = new SingleValueSnapshot(label);
+    final SingleValueSnapshot svs = new SingleValueSnapshot(label);
     svs.total = total;
     return svs;
   }

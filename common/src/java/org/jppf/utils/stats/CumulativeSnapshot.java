@@ -60,7 +60,7 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
       valueCount += count;
       if (debugEnabled && (label == JPPFStatisticsHelper.TASK_QUEUE_COUNT)) {
         log.debug(String.format("latest=%5d; adding %4d; new value=%5d", (long) latest, (long) accumulatedValues, (long) (latest + accumulatedValues)));
-        String name = Thread.currentThread().getName();
+        final String name = Thread.currentThread().getName();
         if ((accumulatedValues <= 0d) && (name != null) && name.startsWith("JPPF NIO-")) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
       }
       latest += accumulatedValues;

@@ -25,14 +25,17 @@ import java.util.EventObject;
  * its output or error stream.
  * @author Laurent Cohen
  */
-public class ProcessWrapperEvent extends EventObject
-{
+public class ProcessWrapperEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this event with the specified source.
    * @param content the source of this event, in effect the content of the corresponding process stream.
    */
-  public ProcessWrapperEvent(final String content)
-  {
+  public ProcessWrapperEvent(final String content) {
     super(content);
   }
 
@@ -40,8 +43,7 @@ public class ProcessWrapperEvent extends EventObject
    * Get the content of this event.
    * @return the content as a string, which may include a line terminator.
    */
-  public String getContent()
-  {
+  public String getContent() {
     return (String) getSource();
   }
 }

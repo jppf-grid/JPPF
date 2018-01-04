@@ -24,14 +24,17 @@ import java.util.EventObject;
  * Event emitted when a remote peer detects the connection with the server is broken.
  * @author Laurent Cohen
  */
-public class ClientConnectionEvent extends EventObject
-{
+public class ClientConnectionEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this event with the specified client-side connection.
    * @param connection the connection to which the event applies.
    */
-  public ClientConnectionEvent(final ClientConnection connection)
-  {
+  public ClientConnectionEvent(final ClientConnection connection) {
     super(connection);
   }
 
@@ -39,8 +42,7 @@ public class ClientConnectionEvent extends EventObject
    * Get the connection from which the event originated.
    * @return a {@link ClientConnection} instance.
    */
-  public ClientConnection getConnection()
-  {
+  public ClientConnection getConnection() {
     return (ClientConnection) getSource();
   }
 }

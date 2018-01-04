@@ -69,9 +69,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @since 5.0
    */
   public boolean hasValidPort(final boolean secure) {
-    int[] ports = secure ? sslServerPorts: serverPorts;
+    final int[] ports = secure ? sslServerPorts: serverPorts;
     if (ports != null) {
-      for (int port: ports) {
+      for (final int port: ports) {
         if (port > 0) return true;
       }
     }
@@ -85,9 +85,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @since 5.0
    */
   public int getValidPort(final boolean secure) {
-    int[] ports = secure ? sslServerPorts: serverPorts;
+    final int[] ports = secure ? sslServerPorts: serverPorts;
     if (ports != null) {
-      for (int port: ports) {
+      for (final int port: ports) {
         if (port > 0) return port;
       }
     }
@@ -126,7 +126,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (obj == null) return false;
     if (this == obj) return true;
     if (getClass() != obj.getClass()) return false;
-    JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
+    final JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
     if (uuid == null) return other.uuid == null;
     return uuid.equals(other.uuid);
   }
@@ -162,7 +162,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    JPPFConnectionInformation ci = new JPPFConnectionInformation();
+    final JPPFConnectionInformation ci = new JPPFConnectionInformation();
     ci.uuid = uuid;
     ci.host = host;
     ci.recoveryPort = recoveryPort;
@@ -183,7 +183,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", host=").append(host);
@@ -215,7 +215,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @throws Exception if an error is raised while serializing.
    */
   public static byte[] toBytes(final JPPFConnectionInformation info) throws Exception {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
       oos.writeObject(info);
     }

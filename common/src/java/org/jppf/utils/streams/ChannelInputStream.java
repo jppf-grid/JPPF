@@ -44,7 +44,7 @@ public class ChannelInputStream extends InputStream {
 
   @Override
   public int read() throws IOException {
-    byte[] buf = new byte[1];
+    final byte[] buf = new byte[1];
     read(buf, 0, 1);
     return buf[0] & 0xff;
   }
@@ -56,15 +56,15 @@ public class ChannelInputStream extends InputStream {
 
   @Override
   public int read(final byte[] buffer, final int offset, final int len) throws IOException {
-    ByteBuffer data = ByteBuffer.wrap(buffer, offset, len);
+    final ByteBuffer data = ByteBuffer.wrap(buffer, offset, len);
     ByteBuffer tmpBuffer = null;
     try {
       tmpBuffer = DirectBufferPool.provideBuffer();
-      int remaining = data.remaining();
+      final int remaining = data.remaining();
       int count = 0;
       while (count < remaining) {
         if (data.remaining() < tmpBuffer.remaining()) tmpBuffer.limit(data.remaining());
-        int n = channel.read(tmpBuffer);
+        final int n = channel.read(tmpBuffer);
         if (n < 0) throw new EOFException();
         else if (n > 0) {
           count += n;
@@ -75,10 +75,7 @@ public class ChannelInputStream extends InputStream {
       }
       return count;
     } finally {
-      if (tmpBuffer != null) {
-        DirectBufferPool.releaseBuffer(tmpBuffer);
-        tmpBuffer = null;
-      }
+      if (tmpBuffer != null) DirectBufferPool.releaseBuffer(tmpBuffer);
     }
   }
 }

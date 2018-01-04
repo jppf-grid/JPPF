@@ -52,14 +52,14 @@ public final class VersionUtils {
    * @return a {@link Version} instance.
    */
   private static Version createVersionInfo() {
-    TypedProperties props = new TypedProperties();
+    final TypedProperties props = new TypedProperties();
     Version v = null;
     try {
-      InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
+      final InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
       props.load(is);
       v = new Version(props.getString("version.number", ""), props.getString("build.number", ""), props.getString("build.date", ""));
-    } catch (Exception e) {
-      String s = "JPPF version information could not be determined";
+    } catch (final Exception e) {
+      final String s = "JPPF version information could not be determined";
       if (debugEnabled) log.debug(s, e);
       else log.warn(s + ": " + ExceptionUtils.getMessage(e));
       v = new Version(s, "", "");
@@ -73,9 +73,9 @@ public final class VersionUtils {
    * @param uuid the component uuid.
    */
   public static void logVersionInformation(final String component, final String uuid) {
-    String comp = component == null ? "<unknown component type>" : component;
-    int pid = SystemUtils.getPID();
-    String hrule = StringUtils.padRight("", '-', 80);
+    final String comp = component == null ? "<unknown component type>" : component;
+    final int pid = SystemUtils.getPID();
+    final String hrule = StringUtils.padRight("", '-', 80);
     log.info(hrule);
     log.info(VersionUtils.VERSION.toString());
     log.info("starting "+ comp + " with PID=" + pid + ", UUID=" + uuid);
@@ -94,6 +94,10 @@ public final class VersionUtils {
    * Describes the available version information.
    */
   public static class Version implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * The JPPF version number.
      */
@@ -146,7 +150,7 @@ public final class VersionUtils {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append("JPPF Version: ").append(versionNumber);
       sb.append(", Build number: ").append(buildNumber);
       sb.append(", Build date: ").append(buildDate);

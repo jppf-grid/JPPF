@@ -119,15 +119,15 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
       if (groupInetAddress == null) {
         groupInetAddress = InetAddress.getByName(group);
         //List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-        List<InetAddress> addresses = NetworkUtils.getNonLocalIPAddresses();
+        final List<InetAddress> addresses = NetworkUtils.getNonLocalIPAddresses();
         if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
-        int len = addresses.size();
+        final int len = addresses.size();
         if (debugEnabled) {
-          StringBuilder sb = new StringBuilder();
+          final StringBuilder sb = new StringBuilder();
           sb.append("Found ").append(len).append(" address");
           if (len > 1) sb.append("es");
           sb.append(':');
-          for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
+          for (final InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
           log.debug(sb.toString());
         }
         receivers = new Receiver[len];
@@ -137,7 +137,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
       if (!hasConnectionInfo()) wait(timeout);
       else wait(50);
       info = getMostRecent();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
     }
     if (traceEnabled) log.trace("Auto-discovery of the driver connection information: " + info);
@@ -152,7 +152,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
   private synchronized void addConnectionInfo(final JPPFConnectionInformation info) {
     try {
       if ((ipFilter != null) && !ipFilter.isAddressAccepted(InetAddress.getByName(info.host))) return;
-    } catch (@SuppressWarnings("unused") UnknownHostException e) {
+    } catch (@SuppressWarnings("unused") final UnknownHostException e) {
       return;
     }
     infoList.remove(info);
@@ -190,7 +190,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
     /**
      * Port the multicast socket listens to.
      */
-    private int port = 0;
+    private int udpPort = 0;
     /**
      * Connection information retrieved by the multicast socket.
      */
@@ -204,41 +204,41 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
     public Receiver(final InetAddress addr, final int port) {
       super("Receiver@" + addr.getHostAddress() + ':' + port);
       this.addr = addr;
-      this.port = port;
+      this.udpPort = port;
     }
 
     @Override
     public void run() {
       MulticastSocket socket = null;
       try {
-        int t = 1000;
-        socket = new MulticastSocket(port);
+        final int t = 1000;
+        socket = new MulticastSocket(udpPort);
         socket.setInterface(addr);
         socket.joinGroup(getGroupInetAddress());
         socket.setSoTimeout(timeout);
-        byte[] buf = new byte[512];
-        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        final byte[] buf = new byte[512];
+        final DatagramPacket packet = new DatagramPacket(buf, buf.length);
         while (!isStopped()) {
-          long start = System.nanoTime();
-          long elapsed = 0L;
+          final long start = System.nanoTime();
+          long elapsed;
           while ((elapsed = (System.nanoTime() - start) / 1_000_000L) < t) {
             try {
               socket.receive(packet);
               if (isStopped()) break;
-              ByteBuffer buffer = ByteBuffer.wrap(buf);
-              int len = buffer.getInt();
-              byte[] bytes = new byte[len];
+              final ByteBuffer buffer = ByteBuffer.wrap(buf);
+              final int len = buffer.getInt();
+              final byte[] bytes = new byte[len];
               buffer.get(bytes);
               info = JPPFConnectionInformation.fromBytes(bytes);
               addConnectionInfo(info);
-            } catch(SocketTimeoutException e) {
+            } catch(final SocketTimeoutException e) {
               if (traceEnabled) log.trace(e.getMessage(), e);
             }
             if (elapsed < t) Thread.sleep(50L);
           }
         }
         socket.leaveGroup(getGroupInetAddress());
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
       }
       if (socket != null) socket.close();

@@ -154,7 +154,7 @@ public class ServerTaskInformation implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("jobPosition=").append(jobPosition);
     sb.append(", throwable=").append(throwable);
     sb.append(", expirationCount=").append(expirationCount);

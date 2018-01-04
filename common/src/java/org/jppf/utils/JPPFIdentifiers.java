@@ -87,7 +87,7 @@ public final class JPPFIdentifiers {
    * @return a readable string for the id.
    */
   public static String asString(final int id) {
-    String s = idMap.get(id);
+    final String s = idMap.get(id);
     return s == null ? "UNKNOWN" : s;
   }
 
@@ -97,7 +97,7 @@ public final class JPPFIdentifiers {
    * @return a readable string for the server name.
    */
   public static String serverName(final int id) {
-    String s = serverMap.get(id);
+    final String s = serverMap.get(id);
     return s == null ? "UNKNOWN" : s;
   }
 }

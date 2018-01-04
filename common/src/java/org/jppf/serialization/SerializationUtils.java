@@ -69,7 +69,7 @@ public final class SerializationUtils {
    * @return an array of bytes filled with the value's representation.
    */
   public static byte[] writeInt(final int value) {
-    byte[] bytes = new byte[4];
+    final byte[] bytes = new byte[4];
     writeInt(value, bytes, 0);
     return bytes;
   }
@@ -143,7 +143,7 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while writing the data.
    */
   public static void writeInt(final int value, final OutputStream os) throws IOException {
-    byte[] buf = new byte[4];
+    final byte[] buf = new byte[4];
     for (int i=24, pos=0; i>=0; i-=8) buf[pos++] = (byte) ((value >>> i) & 0xFF);
     os.write(buf, 0, buf.length);
   }
@@ -155,7 +155,7 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while writing the data.
    */
   public static void writeInt(final WritableByteChannel channel, final int value) throws IOException {
-    ByteBuffer buf = ByteBuffer.allocate(4);
+    final ByteBuffer buf = ByteBuffer.allocate(4);
     buf.putInt(value);
     buf.flip();
     int count = 0;
@@ -174,7 +174,7 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static int readInt(final ReadableByteChannel channel) throws IOException {
-    ByteBuffer buf = ByteBuffer.allocate(4);
+    final ByteBuffer buf = ByteBuffer.allocate(4);
     int count = 0;
     while (count < 4) {
       int n = 0;
@@ -253,7 +253,7 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static int readInt(final InputStream is) throws IOException {
-    byte[] buf = new byte[4];
+    final byte[] buf = new byte[4];
     readToBuf(is, buf, 0, buf.length);
     return readInt(buf, 0);
   }
@@ -265,7 +265,7 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static long readLong(final InputStream is) throws IOException {
-    byte[] buf = new byte[8];
+    final byte[] buf = new byte[8];
     readToBuf(is, buf, 0, buf.length);
     return readLong(buf, 0);
   }
@@ -286,7 +286,7 @@ public final class SerializationUtils {
       os.write(data[0] = MIN_VALUE_BIT);
       return 1;
     }
-    int absValue = (value > 0) ? value : -value;
+    final int absValue = (value > 0) ? value : -value;
     byte n = 4;
     for (int i=0; i<INT_MAX_VALUES.length; i++) {
       if (absValue < INT_MAX_VALUES[i]) {
@@ -318,7 +318,7 @@ public final class SerializationUtils {
       os.write(data[0] = MIN_VALUE_BIT);
       return 1;
     }
-    long absValue = (value > 0L) ? value : -value;
+    final long absValue = (value > 0L) ? value : -value;
     byte n = 8;
     for (int i=0; i<LONG_MAX_VALUES.length; i++) {
       if (absValue < LONG_MAX_VALUES[i]) {
@@ -342,10 +342,10 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static int readVarInt(final InputStream is, final byte[] buf) throws IOException {
-    byte b = (byte) (is.read() & 0xFF);
+    final byte b = (byte) (is.read() & 0xFF);
     if (b == ZERO_BIT) return 0;
     else if (b == MIN_VALUE_BIT) return Integer.MIN_VALUE;
-    byte n = (byte) (b & 0x0F);
+    final byte n = (byte) (b & 0x0F);
     int result = 0;
     readToBuf(is, buf, 0, n);
     for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (buf[pos++] & 0xFF) << i;
@@ -361,10 +361,10 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static long readVarLong(final InputStream is, final byte[] buf) throws IOException {
-    byte b = (byte) (is.read() & 0xFF);
+    final byte b = (byte) (is.read() & 0xFF);
     if (b == ZERO_BIT) return 0L;
     else if (b == MIN_VALUE_BIT) return Long.MIN_VALUE;
-    byte n = (byte) (b & 0x0F);
+    final byte n = (byte) (b & 0x0F);
     long result = 0L;
     readToBuf(is, buf, 0, n);
     for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (long) (buf[pos++] & 0xFF) << i;
@@ -379,7 +379,7 @@ public final class SerializationUtils {
    * @throws Exception if any error occurs.
    */
   public static boolean isASCII(final char[] chars) throws Exception {
-    for (char c: chars) {
+    for (final char c: chars) {
       if ((c & 0xFF80) != 0) return false;
     }
     return true;
@@ -398,7 +398,7 @@ public final class SerializationUtils {
       os.write(data[0] = ZERO_BIT);
       return;
     }
-    int absValue = (value > 0) ? value : -value;
+    final int absValue = (value > 0) ? value : -value;
     byte n = 4;
     for (int i=0; i<INT_MAX_VALUES.length; i++) {
       if (absValue < INT_MAX_VALUES[i]) {
@@ -423,9 +423,9 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static StringLengthDesc readStringLength(final InputStream is, final byte[] buf) throws IOException {
-    byte b = (byte) (is.read() & 0xFF);
+    final byte b = (byte) (is.read() & 0xFF);
     if (b == ZERO_BIT) return new StringLengthDesc(0, true);
-    byte n = (byte) (b & 0x0F);
+    final byte n = (byte) (b & 0x0F);
     int result = 0;
     readToBuf(is, buf, 0, n);
     for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (buf[pos++] & 0xFF) << i;
@@ -441,9 +441,9 @@ public final class SerializationUtils {
    * @param len the number of bytes to read.
    * @throws IOException if any error occurs.
    */
-  static void readToBuf(final InputStream in, final byte[] buf, final int offset, final int len) throws IOException {
+  public static void readToBuf(final InputStream in, final byte[] buf, final int offset, final int len) throws IOException {
     for (int pos=offset, count=0; count<len; ) {
-      int n = in.read(buf, pos, len - count);
+      final int n = in.read(buf, pos, len - count);
       if (n > 0) {
         pos += n;
         count += n;

@@ -96,7 +96,7 @@ public class SSLHandler {
   public SSLHandler(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception {
     this.channel = channel.getSocketChannel();
     this.sslEngine = sslEngine;
-    SSLSession session = sslEngine.getSession();
+    final SSLSession session = sslEngine.getSession();
     this.applicationSendBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
     this.channelSendBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize()]);
     this.applicationReceiveBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
@@ -174,7 +174,7 @@ public class SSLHandler {
 
         case BUFFER_OVERFLOW:
           if (traceEnabled) log.trace("buffer overflow, before flush() channelSendBuffer=" + channelSendBuffer);
-          int flushCount = flush();
+          final int flushCount = flush();
           if (traceEnabled) log.trace("buffer overflow, after  flush() channelSendBuffer=" + channelSendBuffer + ", flushCount=" + flushCount);
           if (flushCount == 0) return 0;
           continue;
@@ -183,7 +183,7 @@ public class SSLHandler {
           throw new SSLException("outbound closed");
 
         case OK:
-          int n = sslEngineResult.bytesConsumed();
+          final int n = sslEngineResult.bytesConsumed();
           writeCount += n;
           remaining -= n;
           break;
@@ -200,7 +200,7 @@ public class SSLHandler {
    */
   public int flush() throws IOException {
     channelSendBuffer.flip();
-    int n = channel.write(channelSendBuffer);
+    final int n = channel.write(channelSendBuffer);
     if (n > 0) channelWriteCount += n;
     channelSendBuffer.compact();
     return n;
@@ -212,7 +212,7 @@ public class SSLHandler {
    * @throws IOException if any error occurs.
    */
   private int doRead() throws IOException {
-    int n = channel.read(channelReceiveBuffer);
+    final int n = channel.read(channelReceiveBuffer);
     if (n > 0) channelReadCount += n;
     else if (n < 0) throw new EOFException("EOF reading inbound stream");
     return n;
@@ -234,7 +234,7 @@ public class SSLHandler {
   public void close() throws Exception {
     if (!sslEngine.isInboundDone() && !channel.isBlocking()) read();
     while (channelSendBuffer.position() > 0) {
-      int n = flush();
+      final int n = flush();
       if (n == 0) {
         log.error("unable to flush remaining " + channelSendBuffer.remaining() + " bytes");
         break;
@@ -300,7 +300,7 @@ public class SSLHandler {
    * @throws Exception if any error occurs.
    */
   boolean processEngineResultStatus() throws Exception {
-    int count;
+    final int count;
     if (traceEnabled) log.trace("sslEngineResult=" + sslEngineResult);
     switch (sslEngineResult.getStatus()) {
       case OK:
@@ -340,7 +340,7 @@ public class SSLHandler {
    */
   private void performDelegatedTasks() {
     Runnable delegatedTask;
-    CompletionService<?> completer = new ExecutorCompletionService<>(executor);
+    final CompletionService<?> completer = new ExecutorCompletionService<>(executor);
     int total = 0;
     while ((delegatedTask = sslEngine.getDelegatedTask()) != null) {
       if (traceEnabled) log.trace("running delegated task " + delegatedTask);
@@ -350,7 +350,7 @@ public class SSLHandler {
     for (int i=0; i<total; i++) {
       try {
         completer.take();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (traceEnabled) log.trace(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }
@@ -395,7 +395,7 @@ public class SSLHandler {
    * @return a string representation of the buffers states.
    */
   private String printBuffers() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("applicationSendBuffer=").append(applicationSendBuffer);
     sb.append(", channelSendBuffer=").append(channelSendBuffer);
     sb.append(", applicationReceiveBuffer=").append(applicationReceiveBuffer);
@@ -409,7 +409,7 @@ public class SSLHandler {
    * @return a string representation of the send buffers states.
    */
   private String printSendBuffers() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("applicationSendBuffer=").append(applicationSendBuffer);
     sb.append(", channelSendBuffer=").append(channelSendBuffer);
     return sb.toString();
@@ -436,10 +436,10 @@ public class SSLHandler {
    * @return an {@link ExecutorService} instance.
    */
   private static ExecutorService createExecutor() {
-    int n = JPPFConfiguration.get(JPPFProperties.SSL_THREAD_POOL_SIZE);
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    JPPFThreadFactory tf = new JPPFThreadFactory("SSLDelegatedTasks");
-    ThreadPoolExecutor exec = new ThreadPoolExecutor(n, n, 10L, TimeUnit.SECONDS, queue, tf);
+    final int n = JPPFConfiguration.get(JPPFProperties.SSL_THREAD_POOL_SIZE);
+    final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    final JPPFThreadFactory tf = new JPPFThreadFactory("SSLDelegatedTasks");
+    final ThreadPoolExecutor exec = new ThreadPoolExecutor(n, n, 10L, TimeUnit.SECONDS, queue, tf);
     exec.allowCoreThreadTimeOut(true);
     return exec;
   }

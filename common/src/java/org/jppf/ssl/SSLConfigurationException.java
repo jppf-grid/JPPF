@@ -21,15 +21,18 @@ package org.jppf.ssl;
  * This exception is thrown when a problem is detected while loading the SSL configuration.
  * @author Laurent Cohen
  */
-public class SSLConfigurationException extends Exception
-{
+public class SSLConfigurationException extends Exception {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public SSLConfigurationException(final String message, final Throwable cause)
-  {
+  public SSLConfigurationException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -37,8 +40,7 @@ public class SSLConfigurationException extends Exception
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public SSLConfigurationException(final String message)
-  {
+  public SSLConfigurationException(final String message) {
     super(message);
   }
 
@@ -46,8 +48,7 @@ public class SSLConfigurationException extends Exception
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public SSLConfigurationException(final Throwable cause)
-  {
+  public SSLConfigurationException(final Throwable cause) {
     super(cause);
   }
 }

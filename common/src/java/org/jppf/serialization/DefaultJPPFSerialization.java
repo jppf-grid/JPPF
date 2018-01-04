@@ -40,12 +40,13 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
    */
   private ObjectPool<Deserializer> deserializerPool =  new DeserializerPool();
 
+  @SuppressWarnings("resource")
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
     //new JPPFObjectOutputStream(os).writeObject(o);
     synchronized(this) {
-      ClassLoader refCl = ref.get();
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      final ClassLoader refCl = ref.get();
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if ((refCl == null) || (cl != refCl)) {
         ref = new SoftReference<>(cl);
         serializerPool = new SerializerPool();
@@ -61,12 +62,13 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Object deserialize(final InputStream is) throws Exception {
     //return new JPPFObjectInputStream(is).readObject();
     synchronized(this) {
-      ClassLoader refCl = ref.get();
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      final ClassLoader refCl = ref.get();
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if ((refCl == null) || (cl != refCl)) {
         ref = new SoftReference<>(cl);
         deserializerPool = new DeserializerPool();
@@ -88,8 +90,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
   private static class SerializerPool extends AbstractObjectPoolQueue<Serializer> {
     @Override
     protected Serializer create() {
-      Serializer serializer = new Serializer(null);
-      return serializer;
+      return new Serializer(null);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
   private static class DeserializerPool extends AbstractObjectPoolQueue<Deserializer> {
     @Override
     protected Deserializer create() {
-      Deserializer deserializer = new Deserializer(null);
+      final Deserializer deserializer = new Deserializer(null);
       return deserializer;
     }
 

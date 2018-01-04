@@ -27,8 +27,7 @@ import java.util.Date;
  * This includes duration, date, date format.
  * @author Laurent Cohen
  */
-public class JPPFSchedule implements Serializable
-{
+public class JPPFSchedule implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -55,8 +54,7 @@ public class JPPFSchedule implements Serializable
    * Initialize this schedule configuration with the specified duration.
    * @param duration the duration in milliseconds.
    */
-  public JPPFSchedule(final long duration)
-  {
+  public JPPFSchedule(final long duration) {
     this.duration = duration;
     this.date = null;
     this.format = null;
@@ -68,8 +66,7 @@ public class JPPFSchedule implements Serializable
    * @param format the format in which the date is expressed (including locale and time zone information),
    * as specified in the description of {@link SimpleDateFormat}.
    */
-  public JPPFSchedule(final String date, final String format)
-  {
+  public JPPFSchedule(final String date, final String format) {
     this.duration = 0L;
     this.date = date;
     this.format = format;
@@ -81,8 +78,7 @@ public class JPPFSchedule implements Serializable
    * For instance, for scheduling a job, it starts when the job is inserted into the job queue by the server.
    * @return the timeout in milliseconds.
    */
-  public long getDuration()
-  {
+  public long getDuration() {
     return duration;
   }
 
@@ -90,8 +86,7 @@ public class JPPFSchedule implements Serializable
    * Get the scheduled date for this configuration.
    * @return the date in string format.
    */
-  public String getDate()
-  {
+  public String getDate() {
     return date;
   }
 
@@ -99,8 +94,7 @@ public class JPPFSchedule implements Serializable
    * Get the format of timeout date for this task.
    * @return the date format as a string pattern.
    */
-  public String getFormat()
-  {
+  public String getFormat() {
     return format;
   }
 
@@ -110,12 +104,10 @@ public class JPPFSchedule implements Serializable
    * @return this schedule expressed as a {@link Date}.
    * @throws ParseException if parsing using the simple date format fails.
    */
-  public Date toDate(final long startDate) throws ParseException
-  {
+  public Date toDate(final long startDate) throws ParseException {
     Date dt = null;
     if ((date == null) || (format == null)) dt = new Date(startDate + duration);
-    else
-    {
+    else {
       if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
       dt = dateFormat.parse(date);
     }
@@ -128,23 +120,20 @@ public class JPPFSchedule implements Serializable
    * @return this schedule expressed as a long.
    * @throws ParseException if parsing using the simple date format fails.
    */
-  public long toLong(final long startDate) throws ParseException
-  {
+  public long toLong(final long startDate) throws ParseException {
     long result = 0L;
     if ((date == null) || (format == null)) result = startDate + duration;
-    else
-    {
+    else {
       if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
-      Date dt = dateFormat.parse(date);
+      final Date dt = dateFormat.parse(date);
       result = dt.getTime();
     }
     return result;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder("schedule[");
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("schedule[");
     if (date != null) sb.append("date=").append(date).append(", format=").append(format == null ? "null" : format);
     else sb.append("delay=").append(duration);
     sb.append(']');
@@ -155,8 +144,7 @@ public class JPPFSchedule implements Serializable
    * Determine whether this schedule was initialized with a date or not.
    * @return true if a date was specified when constructing this schedule, false otherwise.
    */
-  public boolean hasDate()
-  {
+  public boolean hasDate() {
     return (date != null) && (format != null);
   }
 
@@ -164,8 +152,7 @@ public class JPPFSchedule implements Serializable
    * Determine whether this schedule was initialized with a duration or not.
    * @return true if a duration (or timeout) was specified when constructing this schedule, false otherwise.
    */
-  public boolean hasDuration()
-  {
+  public boolean hasDuration() {
     return duration > 0;
   }
 }

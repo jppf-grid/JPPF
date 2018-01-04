@@ -92,7 +92,7 @@ public class SynchronizedLong {
    * @return the value before the set.
    */
   public synchronized long getAndSet(final long newValue) {
-    long oldValue = value;
+    final long oldValue = value;
     value = newValue;
     return oldValue;
   }
@@ -135,6 +135,51 @@ public class SynchronizedLong {
   public synchronized boolean compareAndSet(final Operator operator, final long expectedUpdate) {
     if (operator.evaluate(value, expectedUpdate)) {
       value = expectedUpdate;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Compare the value with the expected value, and run the action if they are equal.
+   * @param operator the comparison operator.
+   * @param expected the expected value.
+   * @param action the action to run if the comparison succeeds.
+   * @return {@code true} if the update was performed, {@code false} otherwise.
+   */
+  public synchronized boolean compareAndRun(final Operator operator, final long expected, final Runnable action) {
+    if (operator.evaluate(value, expected)) {
+      if (action != null) action.run();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Run the specified action if the value is within the specified bounds.
+   * @param lower the lower bound of the between comparison.
+   * @param upper the upper bound of the between comparison.
+   * @param action the action to run if the comparison succeeds.
+   * @return {@code true} if the update was performed, {@code false} otherwise.
+   */
+  public synchronized boolean runIfBetween(final long lower, final long upper, final Runnable action) {
+    if ((value > lower) && (value < upper)) {
+      if (action != null) action.run();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Run the specified action if the value is outside the specified bounds.
+   * @param lower the lower bound of the between comparison.
+   * @param upper the upper bound of the between comparison.
+   * @param action the action to run if the comparison succeeds.
+   * @return {@code true} if the update was performed, {@code false} otherwise.
+   */
+  public synchronized boolean runIfNotBetween(final long lower, final long upper, final Runnable action) {
+    if ((value <= lower) || (value >= upper)) {
+      if (action != null) action.run();
       return true;
     }
     return false;

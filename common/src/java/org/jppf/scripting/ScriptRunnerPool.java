@@ -43,7 +43,7 @@ class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
   protected ScriptRunner create() {
     try {
     return new ScriptRunnerImpl(language);
-    } catch(@SuppressWarnings("unused") JPPFScriptingException e) {
+    } catch(@SuppressWarnings("unused") final JPPFScriptingException e) {
       return null;
     }
   }

@@ -53,7 +53,7 @@ public class ChannelInputSource implements InputSource {
    */
   @Override
   public int read(final byte[] data, final int offset, final int len) throws Exception {
-    ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
+    final ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
     return read(buffer);
   }
 
@@ -74,11 +74,11 @@ public class ChannelInputSource implements InputSource {
     ByteBuffer tmpBuffer = null;
     try {
       tmpBuffer = DirectBufferPool.provideBuffer();
-      int remaining = data.remaining();
+      final int remaining = data.remaining();
       int count = 0;
       while (count < remaining) {
         if (data.remaining() < tmpBuffer.remaining()) tmpBuffer.limit(data.remaining());
-        int n = channel.read(tmpBuffer);
+        final int n = channel.read(tmpBuffer);
         if (n < 0) throw new EOFException();
         else if (n == 0) break;
         else {
@@ -112,7 +112,7 @@ public class ChannelInputSource implements InputSource {
    */
   @Override
   public int skip(final int n) throws Exception {
-    ByteBuffer buf = ByteBuffer.allocate(n);
+    final ByteBuffer buf = ByteBuffer.allocate(n);
     read(buf);
     return buf.position();
   }
@@ -127,7 +127,7 @@ public class ChannelInputSource implements InputSource {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("ChannelInputSource[channel=").append(channel).append("]");
     return sb.toString();
   }

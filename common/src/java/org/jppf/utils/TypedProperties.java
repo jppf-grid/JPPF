@@ -214,7 +214,7 @@ public class TypedProperties extends AbstractTypedProperties {
    */
   public boolean getBoolean(final String key, final boolean defValue) {
     boolean booleanVal = defValue;
-    String val = getProperty(key, null);
+    final String val = getProperty(key, null);
     if (val != null) booleanVal = Boolean.valueOf(val.trim()).booleanValue();
     return booleanVal;
   }
@@ -248,7 +248,7 @@ public class TypedProperties extends AbstractTypedProperties {
    */
   public char getChar(final String key, final char defValue) {
     char charVal = defValue;
-    String val = getProperty(key, null);
+    final String val = getProperty(key, null);
     if ((val != null) && (val.length() > 0)) charVal = val.charAt(0);
     return charVal;
   }
@@ -279,7 +279,7 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return an abstract file path based on the value of the property, or the default value if the property is not defined.
    */
   public File getFile(final String key, final File defValue) {
-    String s = getProperty(key);
+    final String s = getProperty(key);
     return (s == null) || s.trim().isEmpty() ? defValue : new File(s);
   }
 
@@ -314,9 +314,9 @@ public class TypedProperties extends AbstractTypedProperties {
    * @since 5.2
    */
   public String[] getStringArray(final String key, final String delimiter, final String[] defValue) {
-    String s = getProperty(key);
+    final String s = getProperty(key);
     if ((s == null) || s.trim().isEmpty()) return defValue;
-    String[] array = StringUtils.parseStringArray(s, delimiter, false);
+    final String[] array = StringUtils.parseStringArray(s, delimiter, false);
     return (array == null) ? defValue : array;
   }
 
@@ -330,7 +330,7 @@ public class TypedProperties extends AbstractTypedProperties {
    */
   public TypedProperties setStringArray(final String key, final String delimiter, final String[] value) {
     if (value != null) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       for (int i=0; i<value.length; i++) {
         if (i > 0) sb.append(delimiter);
         if (value[i] != null) sb.append(value[i]);
@@ -359,10 +359,10 @@ public class TypedProperties extends AbstractTypedProperties {
    */
   public TypedProperties getProperties(final String key, final TypedProperties def) {
     try (InputStream is = FileUtils.getFileInputStream(getString(key))) {
-      TypedProperties res = new TypedProperties();
+      final TypedProperties res = new TypedProperties();
       res.load(is);
       return res;
-    } catch(@SuppressWarnings("unused") IOException e) {
+    } catch(@SuppressWarnings("unused") final IOException e) {
       return def;
     }
   }
@@ -383,11 +383,11 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return the property as an {@link InetAddress} instance, or the specified default value if the property is not defined.
    */
   public InetAddress getInetAddress(final String key, final InetAddress def) {
-    String val = getString(key);
+    final String val = getString(key);
     if (val == null) return def;
     try {
       return InetAddress.getByName(val);
-    } catch(@SuppressWarnings("unused") UnknownHostException e) {
+    } catch(@SuppressWarnings("unused") final UnknownHostException e) {
       return def;
     }
   }
@@ -398,9 +398,9 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return a new {@code TypedProperties} object containing only the properties matching the filter.
    */
   public TypedProperties filter(final Filter filter) {
-    TypedProperties result = new TypedProperties();
+    final TypedProperties result = new TypedProperties();
     for (String key: stringPropertyNames()) {
-      String value = getProperty(key);
+      final String value = getProperty(key);
       if ((filter == null) || filter.accepts(key, value)) result.put(key, value);
     }
     return result;
@@ -455,7 +455,7 @@ public class TypedProperties extends AbstractTypedProperties {
    */
   public <T> T get(final JPPFProperty<T> property) {
     if (this.containsKey(property.getName())) return property.valueOf(getProperty(property.getName()));
-    String[] aliases = property.getAliases();
+    final String[] aliases = property.getAliases();
     if ((aliases != null) && (aliases.length > 0)) {
       for (String alias: aliases) {
         if (this.containsKey(alias)) return property.valueOf(getProperty(alias));
@@ -475,7 +475,7 @@ public class TypedProperties extends AbstractTypedProperties {
   public <T> T get(final JPPFProperty<T> property, final String...parameters) {
     String name = property.resolveName(parameters);
     if (this.containsKey(name)) return property.valueOf(getProperty(name));
-    String[] aliases = property.getAliases();
+    final String[] aliases = property.getAliases();
     if ((aliases != null) && (aliases.length > 0)) {
       for (String alias: aliases) {
         name = property.resolveName(alias, parameters);
@@ -492,9 +492,8 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return the old value of the property, or {@code null} if it wasn't defined.
    * @since 5.2
    */
-  @SuppressWarnings("unchecked")
   public <T> T remove(final JPPFProperty<T> property) {
-    Object o = remove(property.getName());
+    final Object o = remove(property.getName());
     if (!(o instanceof String)) return null; 
     return property.valueOf((String) o);
   }
@@ -524,9 +523,8 @@ public class TypedProperties extends AbstractTypedProperties {
    * @return the old value of the property, or {@code null} if it wasn't defined.
    * @since 6.0
    */
-  @SuppressWarnings("unchecked")
   public <T> T remove(final JPPFProperty<T> property, final String...parameters) {
-    Object o = remove(property.resolveName(parameters));
+    final Object o = remove(property.resolveName(parameters));
     if (!(o instanceof String)) return null; 
     return property.valueOf((String) o);
   }

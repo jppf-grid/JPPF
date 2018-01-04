@@ -77,7 +77,7 @@ public final class LocalizationUtils {
    */
   public static String[] getLocalized(final String baseName, final Locale locale, final String...keys) {
     if (keys == null) return new String[0];
-    String[] localized = new String[keys.length];
+    final String[] localized = new String[keys.length];
     for (int i=0; i<keys.length; i++) localized[i] = getLocalized(baseName, keys[i], keys[i], locale);
     return localized;
   }
@@ -117,7 +117,7 @@ public final class LocalizationUtils {
     ResourceBundle bundle = null;
     try {
       bundle = ResourceBundle.getBundle(baseName, locale);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       notFoundBundleCache.put(baseName, Boolean.TRUE);
       if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find resource bundle \"" + baseName +  '\"', e);
       return def;
@@ -125,7 +125,7 @@ public final class LocalizationUtils {
     String result = def;
     try {
       result = bundle.getString(key);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find key \"" + key + "\" in resource bundle \"" + baseName +  '\"', e);
     }
     return result;
@@ -144,7 +144,7 @@ public final class LocalizationUtils {
     String result = getLocalized(baseName, key, def, locale);
     try {
       if ((params != null) && (params.length > 0)) result = MessageFormat.format(result, params);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find key \"" + key + "\" in resource bundle \"" + baseName +  '\"', e);
     }
     return result;
@@ -159,12 +159,12 @@ public final class LocalizationUtils {
   public static String getLocalisationBase(final String base, final String filename) {
     String result = null;
     try {
-      File file = new File(filename);
+      final File file = new File(filename);
       result = file.getName();
-      int idx = result.lastIndexOf('.');
+      final int idx = result.lastIndexOf('.');
       if (idx >= 0) result = result.substring(0, idx);
       result = base + '/' + result;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return result;

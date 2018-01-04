@@ -84,13 +84,13 @@ public interface JPPFSerialization {
      * Initialize the serialization.
      */
     private static void init() {
-      List<Class<? extends JPPFCompositeSerialization>> list = new ServiceFinder().findProviderClassess(JPPFCompositeSerialization.class, null, false);
-      for (Class<? extends JPPFCompositeSerialization> c: list) {
+      final List<Class<? extends JPPFCompositeSerialization>> list = new ServiceFinder().findProviderClassess(JPPFCompositeSerialization.class, null, false);
+      for (final Class<? extends JPPFCompositeSerialization> c: list) {
         try {
-          JPPFCompositeSerialization jcs = c.newInstance();
+          final JPPFCompositeSerialization jcs = c.newInstance();
           compositeMap.put(jcs.getName().toUpperCase(), c);
-        } catch (Exception e) {
-          StringBuilder sb = new StringBuilder("Could not instantiate composite serialization '");
+        } catch (final Exception e) {
+          final StringBuilder sb = new StringBuilder("Could not instantiate composite serialization '");
           sb.append(c.getName()).append("', terminating this application");
           log.error(sb.toString(), e);
           throw new JPPFError(sb.toString(), e);
@@ -104,16 +104,16 @@ public interface JPPFSerialization {
      */
     @SuppressWarnings("unchecked")
     private static void configure() {
-      JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
+      final JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
       String className = null;
-      String value  = JPPFConfiguration.get(prop);
+      final String value  = JPPFConfiguration.get(prop);
       if (value != null) {
-        String[] elts = RegexUtils.SPACES_PATTERN.split(value);
+        final String[] elts = RegexUtils.SPACES_PATTERN.split(value);
         if (elts.length == 1) className = elts[0];
         else if (elts.length >= 2) {
           for (int i=0; i<elts.length-1; i++) {
-            String name = elts[i].toUpperCase();
-            Class<? extends JPPFCompositeSerialization> c = compositeMap.get(name);
+            final String name = elts[i].toUpperCase();
+            final Class<? extends JPPFCompositeSerialization> c = compositeMap.get(name);
             compositeClasses.add(c);
           }
           className = elts[elts.length - 1];
@@ -124,8 +124,8 @@ public interface JPPFSerialization {
         if (debugEnabled) log.debug(String.format("serializationClass=%s, compositeClasses=%s, compositeMap=%s", className, compositeClasses, compositeMap));
         try {
           serializationClass = (Class<? extends JPPFSerialization>) Class.forName(className);
-        } catch (Exception e) {
-          StringBuilder sb = new StringBuilder("Could not instantiate JPPF serialization [");
+        } catch (final Exception e) {
+          final StringBuilder sb = new StringBuilder("Could not instantiate JPPF serialization [");
           sb.append(prop.getName()).append(" = ").append(className);
           sb.append(", terminating this application");
           log.error(sb.toString(), e);
@@ -143,19 +143,19 @@ public interface JPPFSerialization {
      */
     public static JPPFSerialization getSerialization() {
       try {
-        JPPFSerialization serialization = serializationClass.newInstance();
+        final JPPFSerialization serialization = serializationClass.newInstance();
         JPPFCompositeSerialization composite = null;
         JPPFCompositeSerialization prev = null;
         for (Class<? extends JPPFCompositeSerialization> c: compositeClasses) {
-          JPPFCompositeSerialization tmp = c.newInstance();
+          final JPPFCompositeSerialization tmp = c.newInstance();
           if (composite == null) composite = tmp;
           if (prev != null) prev.delegateTo(tmp);
           prev = tmp;
         }
         if (prev != null) prev.delegateTo(serialization);
         return (composite == null) ? serialization : composite;
-      } catch (Exception e) {
-        String msg = String.format("error instantiating serialization scheme '%s'", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
+      } catch (final Exception e) {
+        final String msg = String.format("error instantiating serialization scheme '%s'", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
         log.error(String.format(msg + " :%n%s", ExceptionUtils.getStackTrace(e)));
         throw new JPPFError(msg, e);
       }

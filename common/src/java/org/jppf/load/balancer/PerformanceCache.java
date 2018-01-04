@@ -28,6 +28,10 @@ import java.util.LinkedList;
  */
 public class PerformanceCache implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Holds the samples required for calculating the moving average.
    */
   private final LinkedList<PerformanceSample> samples = new LinkedList<>();
@@ -86,7 +90,7 @@ public class PerformanceCache implements Serializable {
    * Remove the least recent sample from the list of samples.
    */
   private void removeHeadSample() {
-    PerformanceSample sample = samples.removeFirst();
+    final PerformanceSample sample = samples.removeFirst();
     if (sample != null) {
       nbSamples -= sample.samples;
       totalTime -= sample.samples * sample.mean;

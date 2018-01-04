@@ -74,34 +74,34 @@ public class IPv4AddressNetmask extends IPv4AddressPattern {
     if (!source.contains("/")) {
       return source;
     }
-    String[] ipAndNetmask = RegexUtils.SLASH_PATTERN.split(source);
+    final String[] ipAndNetmask = RegexUtils.SLASH_PATTERN.split(source);
     // Ensure IP address has four parts
-    String[] ip = RegexUtils.DOT_PATTERN.split(ipAndNetmask[0]);
+    final String[] ip = RegexUtils.DOT_PATTERN.split(ipAndNetmask[0]);
     if (ip.length != 4) {
       return source;
     }
     // Ensure netmask in valid range
-    int netmask = Integer.parseInt(ipAndNetmask[1]);
+    final int netmask = Integer.parseInt(ipAndNetmask[1]);
     if (netmask < 0 || netmask > 32) {
       throw new IllegalArgumentException("Netmask " + netmask
           + " must be between 0 and 32");
     }
     // Construct IP range from source. Significant bits left untouched.
     for (int i = 0; i < 4; i++) {
-      int maskBits = 8 * (i + 1) - netmask;
+      final int maskBits = 8 * (i + 1) - netmask;
       // If <= 0, all bits are significant; do nothing to this element
       // If >= 8, no bits are significant; leave blank in pattern
       if (maskBits >= 8) {
         ip[i] = "";
       } else if (maskBits > 0) {
         // Mask the insignificant bits
-        int b = Integer.parseInt(ip[i]);
-        int mask = (1 << maskBits) - 1;
+        final int b = Integer.parseInt(ip[i]);
+        final int mask = (1 << maskBits) - 1;
         ip[i] = String.format("%d-%d", b & ~mask, b | mask);
       }
     }
     // Build a string from the ip array, stopping at insignificant elements
-    StringBuilder pattern = new StringBuilder(ip[0]);
+    final StringBuilder pattern = new StringBuilder(ip[0]);
     for (int i = 1; i < 4; i++) {
       if (!ip[i].equals("")) {
         pattern.append(".").append(ip[i]);
@@ -118,19 +118,19 @@ public class IPv4AddressNetmask extends IPv4AddressPattern {
    */
   public static void main(final String[] args) {
     System.out.println("***** IP v4 *****");
-    String[] ipv4patterns = {"192.168.1.10", "192.168.1.11", "192.168.1.0/24",
+    final String[] ipv4patterns = {"192.168.1.10", "192.168.1.11", "192.168.1.0/24",
         "192.168.0.0/16", "192.160.0.0/13", "192.0.0.0/4", "1.2.0.0/16",
         "1.2.3.0/8", "1.2.3.4/32", "1.2.3.4/31", "1.2.3.4/30", "1.2.3.4/29",
         "1.2.3.4/28", "1.2.3.4/27", "1.2.3.4/26", "1.2.3.4/25"};
     // String[] patterns = { " 1. 2 .  3. 4 - 8 " };
-    String ip = "192.168.1.11";
+    final String ip = "192.168.1.11";
     for (int i = 0; i < ipv4patterns.length; i++) {
       try {
-        IPv4AddressNetmask p = new IPv4AddressNetmask(ipv4patterns[i]);
-        InetAddress addr = InetAddress.getByName(ip);
+        final IPv4AddressNetmask p = new IPv4AddressNetmask(ipv4patterns[i]);
+        final InetAddress addr = InetAddress.getByName(ip);
         System.out.println("pattern " + i + " for source '" + ipv4patterns[i]
             + "' = '" + p + "', ip match = " + p.matches(addr));
-      } catch (Exception e) {
+      } catch (final Exception e) {
         System.out.println("#" + i + " : " + e.getMessage());
       }
     }

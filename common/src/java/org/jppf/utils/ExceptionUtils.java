@@ -44,15 +44,15 @@ public final class ExceptionUtils {
     StringBuilder result = null;
     try (StringWriter writer = new StringWriter(); PrintWriter pw = new PrintWriter(writer)) {
       t.printStackTrace(pw);
-      String s = writer.toString();
+      final String s = writer.toString();
       result = new StringBuilder(s);
-      int n = result.length();
+      final int n = result.length();
       if (s.endsWith("\r\n")) result.setLength(n-2);
       else {
-        char c = result.charAt(n-1);
+        final char c = result.charAt(n-1);
         if ((c == '\n') || (c == '\r')) result.setLength(n-1);
       }
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       result = new StringBuilder(getStackTrace2(t));
     }
     return result.toString();
@@ -65,8 +65,8 @@ public final class ExceptionUtils {
    */
   private static String getStackTrace2(final Throwable t) {
     Throwable ct = t;
-    Set<Throwable> set = new HashSet<>();
-    StringBuilder sb = new StringBuilder();
+    final Set<Throwable> set = new HashSet<>();
+    final StringBuilder sb = new StringBuilder();
     while (ct != null) {
       set.add(ct);
       sb.append(getMessage(ct));
@@ -83,9 +83,9 @@ public final class ExceptionUtils {
    * @return the call stack as a string.
    */
   public static String getCallStack() {
-    Throwable t = new Throwable();
-    StringBuilder sb = new StringBuilder();
-    StackTraceElement[] st = t.getStackTrace();
+    final Throwable t = new Throwable();
+    final StringBuilder sb = new StringBuilder();
+    final StackTraceElement[] st = t.getStackTrace();
     for (int i=1; i<st.length; i++) {
       if (i > 1) sb.append("\n");
       sb.append("  at ").append(st[i]);
@@ -163,9 +163,9 @@ public final class ExceptionUtils {
     if (clazz == null) return null;
     try {
       if ((throwable != null) && clazz.isAssignableFrom(throwable.getClass())) return (E) throwable;
-      Constructor<E> constructor = clazz.getConstructor(Throwable.class);
+      final Constructor<E> constructor = clazz.getConstructor(Throwable.class);
       return constructor.newInstance(throwable);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return null;
   }
@@ -183,9 +183,9 @@ public final class ExceptionUtils {
   public static <E extends Exception> E toException(final String message, final Throwable throwable, final Class<E> clazz) {
     if (clazz == null) return null;
     try {
-      Constructor<E> constructor = clazz.getConstructor(String.class, Throwable.class);
+      final Constructor<E> constructor = clazz.getConstructor(String.class, Throwable.class);
       return constructor.newInstance(message, throwable);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return null;
   }

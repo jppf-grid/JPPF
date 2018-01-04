@@ -56,26 +56,26 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable {
    * Default constructor.
    */
   public RecoveryServer() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int reaperPoolSize = config.get(JPPFProperties.RECOVERY_REAPER_POOL_SIZE);
-    long reaperRunInterval = config.get(JPPFProperties.RECOVERY_REAPER_RUN_INTERVAL);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int reaperPoolSize = config.get(JPPFProperties.RECOVERY_REAPER_POOL_SIZE);
+    final long reaperRunInterval = config.get(JPPFProperties.RECOVERY_REAPER_RUN_INTERVAL);
     reaper = new Reaper(this, reaperPoolSize, reaperRunInterval);
   }
 
   @Override
   public void run() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
-    int socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
-    int recoveryPort = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
+    final int socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
+    final int recoveryPort = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
     try {
       serverSocket = new ServerSocket(recoveryPort);
       while (!isStopped()) {
-        Socket socket = serverSocket.accept();
-        ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
+        final Socket socket = serverSocket.accept();
+        final ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
         reaper.newConnection(connection);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     close();
@@ -90,7 +90,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable {
     synchronized(connections) {
       try {
         serverSocket.close();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (debugEnabled) log.debug("error closing the recovery server socket", e);
       }
       for (ServerConnection c: connections) c.close();

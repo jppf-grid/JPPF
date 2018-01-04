@@ -63,7 +63,7 @@ public final class ConcurrentUtils {
     if (sleepInterval < 0L) throw new IllegalArgumentException("sleepInterval must be > 0");
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
-    long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
+    final long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
     boolean fulfilled = false;
     final long start = System.nanoTime();
     synchronized(monitor) {
@@ -106,9 +106,9 @@ public final class ConcurrentUtils {
   public static boolean awaitCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout) throws IllegalArgumentException, JPPFTimeoutException {
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
-    long timeout = millis > 0L ? millis : Long.MAX_VALUE;
-    long start = System.nanoTime();
-    ThreadSynchronization monitor = new ThreadSynchronization() { };
+    final long timeout = millis > 0L ? millis : Long.MAX_VALUE;
+    final long start = System.nanoTime();
+    final ThreadSynchronization monitor = new ThreadSynchronization() { };
     boolean fulfilled = false;
     long elapsed = 0L;
     while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
@@ -136,14 +136,14 @@ public final class ConcurrentUtils {
     final CountDownLatch countDown = new CountDownLatch(1);
     final ThreadSynchronization monitor = new ThreadSynchronization() { };
     final AtomicBoolean fulfilled = new AtomicBoolean(false);
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         boolean ok = false;
         synchronized(monitor) {
           try {
             while (!(ok = condition.evaluate())) monitor.wait(1L);
-          } catch (@SuppressWarnings("unused") Exception e) {
+          } catch (@SuppressWarnings("unused") final Exception e) {
             ok = false;
           }
           fulfilled.set(ok);
@@ -151,11 +151,11 @@ public final class ConcurrentUtils {
         }
       }
     };
-    Thread thread = new Thread(r);
+    final Thread thread = new Thread(r);
     thread.start();
     try {
       countDown.await(timeout, TimeUnit.MILLISECONDS);
-    } catch (@SuppressWarnings("unused") InterruptedException e) {
+    } catch (@SuppressWarnings("unused") final InterruptedException e) {
       thread.interrupt();
       countDown.countDown();
     }
@@ -178,7 +178,7 @@ public final class ConcurrentUtils {
     if (waitTime < 0L) throw new IllegalArgumentException("waitTime must be > 0");
     if (condition == null) return;
     if (timeout < 0L) throw new IllegalArgumentException("millis cannot be negative");
-    long millis = (timeout > 0L) ? timeout : Long.MAX_VALUE;
+    final long millis = (timeout > 0L) ? timeout : Long.MAX_VALUE;
     long elapsed = 0L;
     final long start = System.nanoTime();
     synchronized(monitor) {
@@ -206,7 +206,7 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newDirectHandoffExecutor(final int coreThreads, final long ttl, final String threadNamePrefix) {
-    ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
     return executor;
@@ -221,7 +221,7 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newDirectHandoffExecutor(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
-    ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, maxThreads, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(coreThreads, maxThreads, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory(threadNamePrefix));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
     return executor;
@@ -236,7 +236,7 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newBoundedQueueExecutor(final int coreThreads, final int queueSize, final long ttl, final String threadNamePrefix) {
-    ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(
       coreThreads, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(queueSize), new JPPFThreadFactory(threadNamePrefix));
     executor.allowCoreThreadTimeOut(false);
     executor.prestartAllCoreThreads();
@@ -250,9 +250,21 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newFixedExecutor(final int coreThreads, final String threadNamePrefix) {
-    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
-    executor.allowCoreThreadTimeOut(false);
-    executor.prestartAllCoreThreads();
+    final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
+    executor.setKeepAliveTime(15000L, TimeUnit.MILLISECONDS);
+    executor.allowCoreThreadTimeOut(true);
+    //executor.prestartAllCoreThreads();
+    return executor;
+  }
+
+  /**
+   * Create a {@link JPPFThreadPool}.
+   * @param coreThreads the number of core threads.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link JPPFThreadPool} instance.
+   */
+  public static ExecutorService newJPPFFixedThreadPool(final int coreThreads, final String threadNamePrefix) {
+    final JPPFThreadPool executor = new JPPFThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
     return executor;
   }
 
@@ -260,12 +272,24 @@ public final class ConcurrentUtils {
    * Create a {@link JPPFThreadPool}.
    * @param coreThreads the number of core threads.
    * @param maxThreads the maximum number of threads.
-   * @param ttl the non-core threads' time-to -live in millis.
+   * @param ttl the non-core threads' time-to-live in millis.
    * @param threadNamePrefix name prefix for created threads.
    * @return a new {@link JPPFThreadPool} instance.
    */
   public static ExecutorService newJPPFThreadPool(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
-    JPPFThreadPool executor = new JPPFThreadPool(coreThreads, maxThreads, ttl, new JPPFThreadFactory(threadNamePrefix));
+    final JPPFThreadPool executor = new JPPFThreadPool(coreThreads, maxThreads, ttl, new JPPFThreadFactory(threadNamePrefix));
     return executor;
+  }
+
+  /**
+   * Create a pool that directly hands off new tasks, creating new threads as required.
+   * @param coreThreads the number of core threads.
+   * @param maxThreads the maximum number of threads.
+   * @param ttl the threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ExecutorService newJPPFDirectHandoffExecutor(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
+    return new JPPFThreadPool(coreThreads, maxThreads, ttl, new JPPFThreadFactory(threadNamePrefix), new SynchronousQueue<Runnable>());
   }
 }

@@ -78,4 +78,8 @@ public interface IO extends Closeable {
    * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
    */
   long LOW_MEMORY_THRESHOLD = JPPFConfiguration.get(JPPFProperties.LOW_MEMORY_THRESHOLD) * 1024L * 1024L;
+  /**
+   * Whether to check for low memory and trigger disk offloading.
+   */
+  boolean CHECK_LOW_MEMORY = JPPFConfiguration.get(JPPFProperties.CHECK_LOW_MEMORY);
 }

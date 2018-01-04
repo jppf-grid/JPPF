@@ -43,7 +43,7 @@ public class MetadataImpl implements Metadata {
   @Override
   public <T> T getParameter(final Object key, final T defaultValue) {
     @SuppressWarnings("unchecked")
-    T res = (T) parameters.get(key);
+    final T res = (T) parameters.get(key);
     return res == null ? defaultValue : res;
   }
 

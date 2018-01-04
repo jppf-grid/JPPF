@@ -64,7 +64,7 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
    * @return a {@link JobClientSLA} instance.
    */
   public JobClientSLA copy() {
-    JobClientSLA sla = new JobClientSLA();
+    final JobClientSLA sla = new JobClientSLA();
     copyTo(sla);
     sla.setMaxChannels(maxChannels);
     return sla;

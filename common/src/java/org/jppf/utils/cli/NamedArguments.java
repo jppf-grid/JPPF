@@ -25,6 +25,11 @@ import java.util.Map;
  * @author Laurent Cohen
  */
 public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
   public NamedArguments addSwitch(final String name, final String usage) {
     return super.addSwitch(name, usage);
@@ -34,14 +39,14 @@ public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
   public NamedArguments printUsage() {
     if (title != null) System.out.println(title);
     int maxLen = 0;
-    for (CLIArgument arg: argDefs.values()) {
-      String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
+    for (final CLIArgument arg: argDefs.values()) {
+      final String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
       if (s.length() > maxLen) maxLen = s.length();
     }
-    String format = "%-" + maxLen + "s : %s%n";
-    for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
-      CLIArgument arg = entry.getValue();
-      String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
+    final String format = "%-" + maxLen + "s : %s%n";
+    for (final Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      final CLIArgument arg = entry.getValue();
+      final String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
       System.out.printf(format, s, arg.getUsage());
     }
     return this;
@@ -52,13 +57,13 @@ public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
     int pos = 0;
     try {
       while (pos < clArgs.length) {
-        String name = clArgs[pos++];
-        CLIArgument arg = argDefs.get(name);
+        final String name = clArgs[pos++];
+        final CLIArgument arg = argDefs.get(name);
         if (arg == null) throw new IllegalArgumentException("Unknown argument: " + name);
         if (arg.isSwitch()) setBoolean(name, true);
         else setString(name, clArgs[pos++]);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       printError(null, e, clArgs);
       throw e;
     }

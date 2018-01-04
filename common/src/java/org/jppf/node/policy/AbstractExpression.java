@@ -36,6 +36,10 @@ import org.jppf.utils.configuration.*;
  */
 public abstract class AbstractExpression<E> implements Expression<E> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The expression to evaluate.
    */
   String expression;
@@ -68,8 +72,8 @@ public abstract class AbstractExpression<E> implements Expression<E> {
    * @return the resulting value as a string.
    */
   String compute(final PropertiesCollection<String> properties) {
-    String s = new SubstitutionsHandler().evaluateProp(properties, expression);
-    Map<String, Object> bindings = new HashMap<>();
+    final String s = new SubstitutionsHandler().evaluateProp(properties, expression);
+    final Map<String, Object> bindings = new HashMap<>();
     bindings.put("jppfSystemInfo", properties);
     return  new ScriptHandler().evaluate(expression, s, bindings);
   }

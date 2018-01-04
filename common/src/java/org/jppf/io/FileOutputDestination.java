@@ -40,6 +40,7 @@ public class FileOutputDestination extends ChannelOutputDestination {
    * @param file the file to read from.
    * @throws Exception if an IO error occurs.
    */
+  @SuppressWarnings("resource")
   public FileOutputDestination(final File file) throws Exception {
     super(new FileOutputStream(file).getChannel());
   }

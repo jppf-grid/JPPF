@@ -23,6 +23,11 @@ package org.jppf;
  */
 public class JPPFRuntimeException extends RuntimeException {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.

@@ -91,14 +91,14 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
       nbThreads = Integer.valueOf(params[0]);
       forwardParams = new String[params.length - 1];
       System.arraycopy(params, 1, forwardParams, 0, params.length - 1);
-    } catch (@SuppressWarnings("unused") NumberFormatException e) {
+    } catch (@SuppressWarnings("unused") final NumberFormatException e) {
       forwardParams = params;
     }
     if (nbThreads < 1) nbThreads = 1;
     this.delegate = ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, getClass().getSimpleName(), forwardParams);
     if (delegate == null) throw new LoadBalancerPersistenceException("could not create load-balancer persistence " + Arrays.asList(params));
     executor = createExecutor(nbThreads);
-    Thread thread = new Thread(new PendingTasksThread(), "PendingTasksThread");
+    final Thread thread = new Thread(new PendingTasksThread(), "PendingTasksThread");
     thread.setDaemon(true);
     thread.start();
   }
@@ -121,7 +121,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
         pendingTasks.put(new Pair<>(info.getChannelID(), info.getAlgorithmID()), info);
         pendingTasks.notifyAll();
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }
@@ -151,8 +151,8 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    * @param max the maximum thread pool size.
    * @return an {@link ExecutorService}.
    */
-  private ExecutorService createExecutor(final int max) {
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+  private static ExecutorService createExecutor(final int max) {
+    final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncLBPersistence"));
   }
 
@@ -165,12 +165,12 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    */
   private <T> T submit(final PersistenceTask<T> task) throws LoadBalancerPersistenceException {
     try {
-      Future<PersistenceTask<T>> f = executor.submit(task, task);
-      PersistenceTask<T> t = f.get();
+      final Future<PersistenceTask<T>> f = executor.submit(task, task);
+      final PersistenceTask<T> t = f.get();
       if (t.exception != null) throw t.exception;
       if (debugEnabled) log.debug("got result = " + t.result);
       return t.result;
-    } catch (ClassCastException e) {
+    } catch (final ClassCastException e) {
       log.error(e.getMessage(), e);
       throw new LoadBalancerPersistenceException(e);
     } catch (InterruptedException | ExecutionException e) {
@@ -196,7 +196,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
     /**
      * Logger for this class.
      */
-    private static Logger log = LoggerFactory.getLogger(PersistenceTask.class);
+    private static Logger logger = LoggerFactory.getLogger(PersistenceTask.class);
     /**
      * The optional result of this task's execution.
      */
@@ -221,9 +221,9 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
     public void run() {
       try {
         result = execute();
-      } catch (LoadBalancerPersistenceException e) {
+      } catch (final LoadBalancerPersistenceException e) {
         exception = e;
-        if (!hasResult) log.error(e.getMessage(), e);
+        if (!hasResult) logger.error(e.getMessage(), e);
       }
     }
 
@@ -246,7 +246,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
           synchronized(pendingTasks) {
             while (pendingTasks.isEmpty()) pendingTasks.wait(50L);
             if (debugEnabled) log.debug("PendingTasksThread processing {} pending tasks", pendingTasks.size());
-            Map<Pair<String, String>, LoadBalancerPersistenceInfo> temp = new HashMap<>(pendingTasks);
+            final Map<Pair<String, String>, LoadBalancerPersistenceInfo> temp = new HashMap<>(pendingTasks);
             pendingTasks.clear();
             for (Map.Entry<Pair<String, String>, LoadBalancerPersistenceInfo> entry: temp.entrySet()) {
               final Pair<String, String> id = entry.getKey();
@@ -265,7 +265,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
             }
           }
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

@@ -26,8 +26,7 @@ import java.io.*;
  * 
  * @author Laurent Cohen
  */
-public final class Base64Encoding
-{
+public final class Base64Encoding {
   /* ********  E N C O D I N G   M E T H O D S  ******** */
 
   /**
@@ -64,7 +63,7 @@ public final class Base64Encoding
    * @since 1.3
    */
   static byte[] encode3to4(final byte[] source, final int srcOffset, final int numSigBytes, final byte[] destination, final int destOffset, final int options ) {
-    byte[] ALPHABET = getAlphabet( options );
+    final byte[] ALPHABET = getAlphabet( options );
 
     //           1         2         3
     // 01234567890123456789012345678901 Bit position
@@ -77,11 +76,10 @@ public final class Base64Encoding
     // significant bytes passed in the array.
     // We have to shift left 24 in order to flush out the 1's that appear
     // when Java treats a value as negative that is cast from a byte to an int.
-    int inBuff =   ( numSigBytes > 0 ? ((source[ srcOffset     ] << 24) >>>  8) : 0 )
+    final int inBuff =   ( numSigBytes > 0 ? ((source[ srcOffset     ] << 24) >>>  8) : 0 )
     | ( numSigBytes > 1 ? ((source[ srcOffset + 1 ] << 24) >>> 16) : 0 )
     | ( numSigBytes > 2 ? ((source[ srcOffset + 2 ] << 24) >>> 24) : 0 );
-    switch( numSigBytes )
-    {
+    switch( numSigBytes ) {
       case 3:
         destination[ destOffset     ] = ALPHABET[ (inBuff >>> 18)        ];
         destination[ destOffset + 1 ] = ALPHABET[ (inBuff >>> 12) & 0x3f ];
@@ -113,10 +111,10 @@ public final class Base64Encoding
    * @since 2.3
    */
   public static void encode( final java.nio.ByteBuffer raw, final java.nio.ByteBuffer encoded ){
-    byte[] raw3 = new byte[3];
-    byte[] enc4 = new byte[4];
-    while( raw.hasRemaining() ){
-      int rem = Math.min(3,raw.remaining());
+    final byte[] raw3 = new byte[3];
+    final byte[] enc4 = new byte[4];
+    while(raw.hasRemaining()) {
+      final int rem = Math.min(3,raw.remaining());
       raw.get(raw3,0,rem);
       encode3to4(enc4, raw3, rem, Base64.NO_OPTIONS );
       encoded.put(enc4);
@@ -131,10 +129,10 @@ public final class Base64Encoding
    * @since 2.3
    */
   public static void encode( final java.nio.ByteBuffer raw, final java.nio.CharBuffer encoded ){
-    byte[] raw3 = new byte[3];
-    byte[] enc4 = new byte[4];
+    final byte[] raw3 = new byte[3];
+    final byte[] enc4 = new byte[4];
     while( raw.hasRemaining() ){
-      int rem = Math.min(3,raw.remaining());
+      final int rem = Math.min(3,raw.remaining());
       raw.get(raw3,0,rem);
       encode3to4(enc4, raw3, rem, Base64.NO_OPTIONS );
       for( int i = 0; i < 4; i++ ) encoded.put( (char)(enc4[i] & 0xFF) );
@@ -201,22 +199,22 @@ public final class Base64Encoding
       }
       oos.writeObject( serializableObject );
     }   // end try
-    catch( IOException e ) {
+    catch(final IOException e ) {
       // Catch it and then throw it immediately so that
       // the finally{} block is called for cleanup.
       throw e;
     }   // end catch
     finally {
-      try{ oos.close();   } catch( Exception e ){}
-      try{ gzos.close();  } catch( Exception e ){}
-      try{ b64os.close(); } catch( Exception e ){}
-      try{ baos.close();  } catch( Exception e ){}
+      try{ oos.close();   } catch(final Exception e ){}
+      try{ gzos.close();  } catch(final Exception e ){}
+      try{ b64os.close(); } catch(final Exception e ){}
+      try{ baos.close();  } catch(final Exception e ){}
     }   // end finally
     // Return value according to relevant encoding.
     try {
       return new String( baos.toByteArray(), PREFERRED_ENCODING );
     }   // end try
-    catch (UnsupportedEncodingException uue){
+    catch (final UnsupportedEncodingException uue){
       // Fall back to some Java default
       return new String( baos.toByteArray() );
     }   // end catch
@@ -235,7 +233,7 @@ public final class Base64Encoding
     String encoded = null;
     try {
       encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       assert false : ex.getMessage();
     }   // end catch
     assert encoded != null;
@@ -284,7 +282,7 @@ public final class Base64Encoding
     String encoded = null;
     try {
       encoded = encodeBytes( source, off, len, NO_OPTIONS );
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       assert false : ex.getMessage();
     }   // end catch
     assert encoded != null;
@@ -315,12 +313,12 @@ public final class Base64Encoding
    * @since 2.0
    */
   public static String encodeBytes( final byte[] source, final int off, final int len, final int options ) throws IOException {
-    byte[] encoded = encodeBytesToBytes( source, off, len, options );
+    final byte[] encoded = encodeBytesToBytes( source, off, len, options );
     // Return value according to relevant encoding.
     try {
       return new String( encoded, PREFERRED_ENCODING );
     }   // end try
-    catch (@SuppressWarnings("unused") UnsupportedEncodingException uue) {
+    catch (@SuppressWarnings("unused") final UnsupportedEncodingException uue) {
       return new String( encoded );
     }   // end catch
   }   // end encodeBytes
@@ -337,7 +335,7 @@ public final class Base64Encoding
     byte[] encoded = null;
     try {
       encoded = encodeBytesToBytes( source, 0, source.length, Base64.NO_OPTIONS );
-    } catch( IOException ex ) {
+    } catch(final IOException ex ) {
       assert false : "IOExceptions only come from GZipping, which is turned off: " + ex.getMessage();
     }
     return encoded;
@@ -378,20 +376,20 @@ public final class Base64Encoding
         gzos.write( source, off, len );
         gzos.close();
       }   // end try
-      catch( IOException e ) {
+      catch(final IOException e ) {
         // Catch it and then throw it immediately so that the finally{} block is called for cleanup.
         throw e;
       }   // end catch
       finally {
-        try{ gzos.close();  } catch( Exception e ){}
-        try{ b64os.close(); } catch( Exception e ){}
-        try{ baos.close();  } catch( Exception e ){}
+        try{ gzos.close();  } catch(final Exception e ){}
+        try{ b64os.close(); } catch(final Exception e ){}
+        try{ baos.close();  } catch(final Exception e ){}
       }   // end finally
       return baos.toByteArray();
     }   // end if: compress
     // Else, don't compress. Better not to use streams at all then.
     else {
-      boolean breakLines = (options & DO_BREAK_LINES) != 0;
+      final boolean breakLines = (options & DO_BREAK_LINES) != 0;
       //int    len43   = len * 4 / 3;
       //byte[] outBuff = new byte[   ( len43 )                      // Main 4:3
       //                           + ( (len % 3) > 0 ? 4 : 0 )      // Account for padding
@@ -402,16 +400,15 @@ public final class Base64Encoding
       if( breakLines ){
         encLen += encLen / MAX_LINE_LENGTH; // Plus extra newline characters
       }
-      byte[] outBuff = new byte[ encLen ];
+      final byte[] outBuff = new byte[ encLen ];
       int d = 0;
       int e = 0;
-      int len2 = len - 2;
+      final int len2 = len - 2;
       int lineLength = 0;
-      for( ; d < len2; d+=3, e+=4 ) {
+      for ( ; d < len2; d+=3, e+=4 ) {
         encode3to4( source, d+off, 3, outBuff, e, options );
         lineLength += 4;
-        if( breakLines && lineLength >= MAX_LINE_LENGTH )
-        {
+        if( breakLines && lineLength >= MAX_LINE_LENGTH ) {
           outBuff[e+4] = NEW_LINE;
           e++;
           lineLength = 0;
@@ -426,7 +423,7 @@ public final class Base64Encoding
       if( e <= outBuff.length - 1 ){
         // If breaking lines and the last byte falls right at the line length (76 bytes per line), there will be
         // one extra byte, and the array will need to be resized. Not too bad of an estimate on array size, I'd say.
-        byte[] finalOut = new byte[e];
+        final byte[] finalOut = new byte[e];
         System.arraycopy(outBuff,0, finalOut,0,e);
         //System.err.println("Having to resize array from " + outBuff.length + " to " + e );
         return finalOut;

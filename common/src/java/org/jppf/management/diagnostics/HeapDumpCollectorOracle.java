@@ -48,9 +48,9 @@ public class HeapDumpCollectorOracle implements HeapDumpCollector {
   @Override
   public String dumpHeap() throws Exception {
     if (hotspotDiagnosticsMXBean == null) throw new JPPFException("hotspot diagnostics MBean is not avaialable - no heap dump taken");
-    Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-    Method m = clazz.getMethod("dumpHeap", String.class, boolean.class);
-    String filename = "heapdump-" + dumpCount.incrementAndGet() + ".hprof";
+    final Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+    final Method m = clazz.getMethod("dumpHeap", String.class, boolean.class);
+    final String filename = "heapdump-" + dumpCount.incrementAndGet() + ".hprof";
     m.invoke(hotspotDiagnosticsMXBean, filename, true);
     return "heap dump saved at '" + filename + "'";
   }
@@ -61,11 +61,11 @@ public class HeapDumpCollectorOracle implements HeapDumpCollector {
    */
   private static Object getHotspotDiagnosticsMXBean() {
     try {
-      Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      Object bean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
+      final Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      final Object bean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
       return bean;
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }

@@ -24,8 +24,11 @@ import java.io.Serializable;
  * nformation about a frame in a thread stack trace.
  * @author Laurent Cohen
  */
-public class StackFrameInformation implements Serializable
-{
+public class StackFrameInformation implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The stack trace element.
    */
@@ -40,8 +43,7 @@ public class StackFrameInformation implements Serializable
    * @param stackTraceElement the stack trace element.
    * @param lock the associated lock, may be null if none exists.
    */
-  public StackFrameInformation(final StackTraceElement stackTraceElement, final LockInformation lock)
-  {
+  public StackFrameInformation(final StackTraceElement stackTraceElement, final LockInformation lock) {
     super();
     this.stackTraceElement = stackTraceElement;
     this.lock = lock;
@@ -51,8 +53,7 @@ public class StackFrameInformation implements Serializable
    * Get the stack trace element.
    * @return a {@link StackTraceElement} instance.
    */
-  public StackTraceElement getStackTraceElement()
-  {
+  public StackTraceElement getStackTraceElement() {
     return stackTraceElement;
   }
 
@@ -60,18 +61,14 @@ public class StackFrameInformation implements Serializable
    * Get the associated lock.
    * @return a {@link LockInformation} instance, or <code>null</code> if no lock is associated with the frame.
    */
-  public LockInformation getLock()
-  {
+  public LockInformation getLock() {
     return lock;
   }
 
   @Override
-  public String toString()
-  {
-    /*
-    return new StringBuilder().append(getClass().getSimpleName()).append("[stackTraceElement=").append(stackTraceElement)
-        .append(", lock=").append(lock).append(']').toString();
-    */
+  public String toString() {
+    /* return new StringBuilder().append(getClass().getSimpleName()).append("[stackTraceElement=").append(stackTraceElement)
+     * .append(", lock=").append(lock).append(']').toString(); */
     return new StringBuilder().append(stackTraceElement).toString();
   }
 }

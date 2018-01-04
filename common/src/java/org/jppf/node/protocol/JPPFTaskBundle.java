@@ -154,7 +154,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   @Override
   public int compareTo(final JPPFTaskBundle bundle) {
     if (bundle == null) return 1;
-    int otherPriority = bundle.getSLA().getPriority();
+    final int otherPriority = bundle.getSLA().getPriority();
     if (jobSLA.getPriority() < otherPriority) return -1;
     if (jobSLA.getPriority() > otherPriority) return 1;
     return 0;
@@ -162,7 +162,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
 
   @Override
   public synchronized JPPFTaskBundle copy() {
-    JPPFTaskBundle bundle = new JPPFTaskBundle(uuidPath);
+    final JPPFTaskBundle bundle = new JPPFTaskBundle(uuidPath);
     bundle.setUuid(uuid);
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
@@ -204,7 +204,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", uuid=").append(uuid);
     sb.append(", initialTaskCount=").append(initialTaskCount);

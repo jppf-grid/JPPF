@@ -77,7 +77,7 @@ public final class SSLHelper2 {
    * @throws Exception if any error occurs.
    */
   public SSLContext getSSLContext(final int identifier) throws Exception {
-    boolean b = sslConfig.get(JPPFProperties.SSL_CLIENT_DISTINCT_TRUSTSTORE);
+    final boolean b = sslConfig.get(JPPFProperties.SSL_CLIENT_DISTINCT_TRUSTSTORE);
     if (debugEnabled) log.debug("using {} trust store for clients, identifier = {}", b ? "distinct" : "same", JPPFIdentifiers.asString(identifier));
     switch(identifier) {
       case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
@@ -99,24 +99,24 @@ public final class SSLHelper2 {
    */
   private SSLContext getSSLContext(final String trustStorePropertyPrefix) throws Exception {
     try {
-      char[] keyPwd = getPassword("jppf.ssl.keystore.password");
-      KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
+      final char[] keyPwd = getPassword("jppf.ssl.keystore.password");
+      final KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
       KeyManagerFactory kmf = null;
       if (keyStore != null) {
         kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(keyStore, keyPwd);
       }
-      char[] trustPwd = getPassword(trustStorePropertyPrefix + ".truststore.password");
-      KeyStore trustStore = getStore(trustStorePropertyPrefix + ".truststore", trustPwd);
+      final char[] trustPwd = getPassword(trustStorePropertyPrefix + ".truststore.password");
+      final KeyStore trustStore = getStore(trustStorePropertyPrefix + ".truststore", trustPwd);
       TrustManagerFactory tmf = null;
       if (trustStore != null) {
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(trustStore);
       }
-      SSLContext sslContext = SSLContext.getInstance(sslConfig.get(JPPFProperties.SSL_CONTEXT_PROTOCOL));
+      final SSLContext sslContext = SSLContext.getInstance(sslConfig.get(JPPFProperties.SSL_CONTEXT_PROTOCOL));
       sslContext.init(kmf == null ? null : kmf.getKeyManagers(), tmf == null ? null : tmf.getTrustManagers(), null);
       return sslContext;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw (e instanceof SSLConfigurationException) ? e : new SSLConfigurationException(e);
     }
   }
@@ -127,12 +127,12 @@ public final class SSLHelper2 {
    * @throws Exception if any error occurs.
    */
   public SSLParameters getSSLParameters() throws Exception {
-    SSLParameters params = new SSLParameters();
+    final SSLParameters params = new SSLParameters();
     String[] tokens = sslConfig.get(JPPFProperties.SSL_CIPHER_SUITES);
     params.setCipherSuites(tokens);
     tokens = sslConfig.get(JPPFProperties.SSL_PROTOCOLS);
     params.setProtocols(tokens);
-    String s = sslConfig.get(JPPFProperties.SSL_CLIENT_AUTH).toLowerCase();
+    final String s = sslConfig.get(JPPFProperties.SSL_CLIENT_AUTH).toLowerCase();
     params.setWantClientAuth("want".equals(s));
     params.setNeedClientAuth("need".equals(s));
     if (log.isTraceEnabled()) log.trace(String.format("SSL parameters : protocols=%s, needCLientAuth=%b, wantClientAuth=%b, cipher suites=%", 
@@ -148,16 +148,16 @@ public final class SSLHelper2 {
    */
   public SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception {
     if (debugEnabled) log.debug("creating client SSL connection from {}", socketClient);
-    SSLContext context = getSSLContext();
-    SSLSocketFactory factory = context.getSocketFactory();
-    SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), socketClient.getHost(), socketClient.getPort(), true);
-    SSLParameters params = getSSLParameters();
+    final SSLContext context = getSSLContext();
+    final SSLSocketFactory factory = context.getSocketFactory();
+    final SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), socketClient.getHost(), socketClient.getPort(), true);
+    final SSLParameters params = getSSLParameters();
     sslSocket.setSSLParameters(params);
     sslSocket.setUseClientMode(true);
-    ObjectSerializer serializer = socketClient.getSerializer();
-    Class<? extends SocketWrapper> clazz = socketClient.getClass();
-    Constructor<? extends SocketWrapper> c = clazz.getConstructor(Socket.class);
-    SocketWrapper target = c.newInstance(sslSocket);
+    final ObjectSerializer serializer = socketClient.getSerializer();
+    final Class<? extends SocketWrapper> clazz = socketClient.getClass();
+    final Constructor<? extends SocketWrapper> c = clazz.getConstructor(Socket.class);
+    final SocketWrapper target = c.newInstance(sslSocket);
     target.setSerializer(serializer);
     target.setHost(socketClient.getHost());
     target.setPort(socketClient.getPort());
@@ -181,12 +181,12 @@ public final class SSLHelper2 {
    * @throws Exception if any error occurs.
    */
   private void configureJMXMPProperties(final Map<String, Object> env) throws Exception {
-    Map<String, Object> newProps = new LinkedHashMap<>();
-    SSLContext sslContext = getSSLContext();
-    SSLSocketFactory factory = sslContext.getSocketFactory();
+    final Map<String, Object> newProps = new LinkedHashMap<>();
+    final SSLContext sslContext = getSSLContext();
+    final SSLSocketFactory factory = sslContext.getSocketFactory();
     newProps.put("jmx.remote.profiles", "TLS");
     newProps.put("jmx.remote.tls.socket.factory", factory);
-    SSLParameters params = getSSLParameters();
+    final SSLParameters params = getSSLParameters();
     newProps.put("jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(" ", null, null, params.getProtocols()));
     newProps.put("jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
     newProps.put("jmx.remote.tls.need.client.authentication", "" + params.getNeedClientAuth());
@@ -201,11 +201,11 @@ public final class SSLHelper2 {
    * @throws Exception if any error occurs.
    */
   private void configureJPPFJMXProperties(final Map<String, Object> env) throws Exception {
-    Map<String, Object> newProps = new LinkedHashMap<>();
-    SSLContext sslContext = getSSLContext();
+    final Map<String, Object> newProps = new LinkedHashMap<>();
+    final SSLContext sslContext = getSSLContext();
     newProps.put("jppf.jmx.remote.tls.enabled", true);
     newProps.put("jppf.jmx.remote.tls.socket.factory", sslContext.getSocketFactory());
-    SSLParameters params = getSSLParameters();
+    final SSLParameters params = getSSLParameters();
     newProps.put("jppf.jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(" ", null, null, params.getProtocols()));
     newProps.put("jppf.jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
     if (params.getNeedClientAuth()) newProps.put("jppf.jmx.remote.tls.client.authentication", "need");
@@ -240,7 +240,7 @@ public final class SSLHelper2 {
    * @return a {@link KeyStore} instance.
    * @throws Exception if any error occurs.
    */
-  private KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd, final String storeType) throws Exception {
+  private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd, final String storeType) throws Exception {
     if (is == null) return null;
     KeyStore ks = null;
     try {
@@ -273,8 +273,8 @@ public final class SSLHelper2 {
    * @throws Exception if any error occurs.
    */
   private KeyStore getStore(final String baseProperty, final char[] pwd) throws Exception {
-    String storeType = sslConfig.getString(baseProperty + ".type", KeyStore.getDefaultType());
-    String keyOrTrust = baseProperty.contains("keystore") ? "keystore" : "truststore";
+    final String storeType = sslConfig.getString(baseProperty + ".type", KeyStore.getDefaultType());
+    final String keyOrTrust = baseProperty.contains("keystore") ? "keystore" : "truststore";
     String s = sslConfig.getString(baseProperty + ".file", null);
     if (s != null) {
       if (debugEnabled) log.debug(String.format("getting %s of type %s from file %s", keyOrTrust, storeType, s));
@@ -297,8 +297,8 @@ public final class SSLHelper2 {
   @SuppressWarnings("unchecked")
   static <E> E callSource(final String value) throws Exception {
     if (value == null) return null;
-    String[] tokens = RegexUtils.SPACES_PATTERN.split(value);
-    Class<? extends Callable<E>> clazz = (Class<? extends Callable<E>>) Class.forName(tokens[0]);
+    final String[] tokens = RegexUtils.SPACES_PATTERN.split(value);
+    final Class<? extends Callable<E>> clazz = (Class<? extends Callable<E>>) Class.forName(tokens[0]);
     String[] args = null;
     if (tokens.length > 1) {
       args = new String[tokens.length - 1];
@@ -307,9 +307,9 @@ public final class SSLHelper2 {
     Constructor<? extends Callable<E>> c = null;
     try {
       c = clazz.getConstructor(String[].class);
-    } catch (@SuppressWarnings("unused") NoSuchMethodException ignore) {
+    } catch (@SuppressWarnings("unused") final NoSuchMethodException ignore) {
     }
-    Callable<E> callable = c == null ? clazz.newInstance() : c.newInstance((Object) args);
+    final Callable<E> callable = c == null ? clazz.newInstance() : c.newInstance((Object) args);
     return callable.call();
   }
 
@@ -319,8 +319,8 @@ public final class SSLHelper2 {
    * @return an id composed of a property name and its value, in the form "driverName.property_suffix=value".
    */
   public static String getClientConfigId(final String driverName) {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    String suffix = (driverName == null) || "".equals(driverName) ? "" : driverName + ".";
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final String suffix = (driverName == null) || "".equals(driverName) ? "" : driverName + ".";
     String name = suffix + JPPFProperties.SSL_CONFIGURATION_FILE.getName();
     String value = config.getString(name);
     if ((value == null) || "".equals(value.trim())) {

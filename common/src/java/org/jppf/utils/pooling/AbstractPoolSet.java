@@ -40,7 +40,7 @@ public abstract class AbstractPoolSet<T> implements ObjectPool<T> {
 
   @Override
   public synchronized T get() {
-    Iterator<Map.Entry<T, Void>> it = queue.entrySet().iterator();
+    final Iterator<Map.Entry<T, Void>> it = queue.entrySet().iterator();
     T t = null;
     if (it.hasNext()) {
       t = it.next().getKey();

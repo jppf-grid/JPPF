@@ -40,8 +40,8 @@ public final class CollectionUtils {
    */
   @SafeVarargs
   public static <T> Set<T> set(final T... array) {
-    Set<T> newSet = new HashSet<>(array.length);
-    for (T element : array) newSet.add(element);
+    final Set<T> newSet = new HashSet<>(array.length);
+    for (final T element : array) newSet.add(element);
     return newSet;
   }
 
@@ -53,8 +53,8 @@ public final class CollectionUtils {
    */
   @SafeVarargs
   public static <T> List<T> list(final T... array) {
-    List<T> list = new ArrayList<>(array.length);
-    for (T element : array) list.add(element);
+    final List<T> list = new ArrayList<>(array.length);
+    for (final T element : array) list.add(element);
     return list;
   }
 
@@ -71,9 +71,9 @@ public final class CollectionUtils {
     int size = 0;
     for (T[] array : arrays)
       size += array.length;
-    List<T> result = new ArrayList<>(size);
+    final List<T> result = new ArrayList<>(size);
     T[] tmp = null;
-    for (T[] array : arrays) {
+    for (final T[] array : arrays) {
       if (array.length > 0) {
         tmp = array;
         break;
@@ -95,7 +95,7 @@ public final class CollectionUtils {
    * @return a string containing information about the number of elements in the map.
    */
   public static <T, U> String formatSizeMapInfo(final String name, final CollectionMap<T, U> map) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(name).append("[shallow size=").append(map.size());
     sb.append(", total elements=").append(map.size()).append(']');
     return sb.toString();
@@ -111,7 +111,7 @@ public final class CollectionUtils {
    * @return the resulting list.
    */
   public static <T> List<T> getAllElements(final List<T> source, final int start, final int size) {
-    List<T> result = new ArrayList<>(size);
+    final List<T> result = new ArrayList<>(size);
     for (int i = 0; i < size; i++) result.add(source.get(i + start));
     return result;
   }
@@ -144,14 +144,14 @@ public final class CollectionUtils {
    * @param <V> the type of the values in the map.
    */
   public static <K, V> String prettyPrint(final CollectionMap<K, V> map) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("{\n");
     int count1 = 0;
-    for (K key : map.keySet()) {
+    for (final K key : map.keySet()) {
       if (count1 > 0) sb.append(",\n");
       sb.append("  ").append(key).append(" = [\n");
       int count2 = 0;
-      for (V value : map.getValues(key)) {
+      for (final V value : map.getValues(key)) {
         if (count2 > 0) sb.append(",\n");
         sb.append("    ").append(value);
         count2++;

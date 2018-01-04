@@ -64,7 +64,7 @@ public class RegExp extends LeftOperandRule {
   @Override
   public boolean accepts(final PropertiesCollection<String> info) {
     if (regExp == null) return false;
-    Object o = getLeftOperandValue(info);
+    final Object o = getLeftOperandValue(info);
     if (o == null) return false;
     return pattern.matcher((String) o).matches();
   }
@@ -83,6 +83,7 @@ public class RegExp extends LeftOperandRule {
    * @throws IOException if any I/O error occurs.
    * @since 5.2
    */
+  @SuppressWarnings("static-method")
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
   }

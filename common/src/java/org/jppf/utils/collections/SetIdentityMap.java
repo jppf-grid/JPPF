@@ -27,25 +27,26 @@ import java.util.*;
  * @param <V> the type of values in each Set mapped to a key.
  * @author Laurent Cohen
  */
-public class SetIdentityMap<K, V> extends AbstractCollectionMap<K, V>
-{
+public class SetIdentityMap<K, V> extends AbstractCollectionMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public SetIdentityMap()
-  {
+  public SetIdentityMap() {
     map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new IdentityHashMap<>();
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new HashSet<>();
   }
 }

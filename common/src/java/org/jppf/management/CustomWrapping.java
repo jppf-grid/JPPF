@@ -44,7 +44,7 @@ public class CustomWrapping implements ObjectWrapping {
       return IOHelper.unwrappedData(new MultipleBuffersLocation((byte[]) wrapped), serializer);
     } catch (IOException|ClassNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -52,11 +52,11 @@ public class CustomWrapping implements ObjectWrapping {
   @Override
   public Object wrap(final Object obj) throws IOException {
     try {
-      DataLocation dl = IOHelper.serializeData(obj, serializer);
+      final DataLocation dl = IOHelper.serializeData(obj, serializer);
       return StreamUtils.getInputStreamAsByte(dl.getInputStream());
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }

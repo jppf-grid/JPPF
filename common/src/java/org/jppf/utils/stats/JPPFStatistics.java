@@ -101,9 +101,9 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot createSnapshot(final boolean cumulative, final String label) {
-    JPPFSnapshot newSnapshot = cumulative ? new CumulativeSnapshot(label) : new NonCumulativeSnapshot(label);
-    JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
-    JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
+    final JPPFSnapshot newSnapshot = cumulative ? new CumulativeSnapshot(label) : new NonCumulativeSnapshot(label);
+    final JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
+    final JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
     if (!listeners.isEmpty()) fireEvent(snapshot, EventType.ADDED);
     return snapshot;
   }
@@ -116,9 +116,9 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot createSingleValueSnapshot(final String label) {
-    JPPFSnapshot newSnapshot = new SingleValueSnapshot(label);
-    JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
-    JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
+    final JPPFSnapshot newSnapshot = new SingleValueSnapshot(label);
+    final JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
+    final JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
     if (!listeners.isEmpty()) fireEvent(snapshot, EventType.ADDED);
     return snapshot;
   }
@@ -143,7 +143,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot[] createSnapshots(final boolean cumulative, final String...labels) {
-    JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
+    final JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
     for (int i=0; i<labels.length; i++) snapshots[i] = createSnapshot(cumulative, labels[i]);
     return snapshots;
   }
@@ -156,7 +156,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot[] createSingleValueSnapshots(final String...labels) {
-    JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
+    final JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
     for (int i=0; i<labels.length; i++) snapshots[i] = createSingleValueSnapshot(labels[i]);
     return snapshots;
   }
@@ -169,7 +169,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot removeSnapshot(final String label) {
-    JPPFSnapshot snapshot = snapshots.remove(label);
+    final JPPFSnapshot snapshot = snapshots.remove(label);
     if (!listeners.isEmpty()) fireEvent(snapshot, EventType.REMOVED);
     return snapshot;
   }
@@ -196,7 +196,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public JPPFSnapshot addValues(final String label, final double accumulatedValues, final long count) {
-    JPPFSnapshot snapshot = snapshots.get(label);
+    final JPPFSnapshot snapshot = snapshots.get(label);
     if (snapshot == null) throw new IllegalStateException("snapshot '" + label + "' was either not created or removed!");
     snapshot.addValues(accumulatedValues, count);
     if (!listeners.isEmpty()) fireEvent(snapshot, EventType.UPDATED);
@@ -215,9 +215,9 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("JPPF statistics:");
-    for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) sb.append('\n').append(entry.getValue());
+    for (final Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) sb.append('\n').append(entry.getValue());
     return sb.toString();
   }
 
@@ -235,8 +235,8 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @exclude
    */
   public void reset(final JPPFStatistics.Filter filter) {
-    for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) {
-      JPPFSnapshot snapshot = entry.getValue();
+    for (final Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) {
+      final JPPFSnapshot snapshot = entry.getValue();
       if ((filter == null) || filter.accept(snapshot)) snapshot.reset();
     }
   }
@@ -263,9 +263,9 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @return a collection of {@link JPPFSnapshot} instances, possibly empty but never null.
    */
   public Collection<JPPFSnapshot> getSnapshots(final Filter filter) {
-    List<JPPFSnapshot> list = new ArrayList<>(snapshots.size());
-    for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) {
-      JPPFSnapshot snapshot = entry.getValue();
+    final List<JPPFSnapshot> list = new ArrayList<>(snapshots.size());
+    for (final Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) {
+      final JPPFSnapshot snapshot = entry.getValue();
       if ((filter == null) || filter.accept(snapshot)) list.add(snapshot);
     }
     return list;
@@ -296,7 +296,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
   public void removeListener(final JPPFStatisticsListener listener) {
     if (listener != null) {
       ListenerInfo toDelete = null;
-      for (ListenerInfo info: listeners) {
+      for (final ListenerInfo info: listeners) {
         if (listener.equals(info.listener) && (info.filter == NOOP_FILTER)) {
           toDelete = info;
           break;
@@ -324,9 +324,9 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
     executor.execute(new Runnable() {
       @Override
       public void run() {
-        JPPFStatisticsEvent event = new JPPFStatisticsEvent(JPPFStatistics.this, snapshot);
-        List<ListenerInfo> accepted = new ArrayList<>(listeners.size());
-        for (ListenerInfo info: listeners) {
+        final JPPFStatisticsEvent event = new JPPFStatisticsEvent(JPPFStatistics.this, snapshot);
+        final List<ListenerInfo> accepted = new ArrayList<>(listeners.size());
+        for (final ListenerInfo info: listeners) {
           if (info.filter.accept(snapshot)) accepted.add(info);
         }
         switch(type) {
@@ -409,7 +409,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
       if (this == obj) return true;
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
-      ListenerInfo other = (ListenerInfo) obj;
+      final ListenerInfo other = (ListenerInfo) obj;
       return listener.equals(other.listener) && filter.equals(other.filter);
     }
   }
@@ -419,6 +419,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
    * @param oos the stream to write to.
    * @throws IOException if an I/O error occurs.
    */
+  @SuppressWarnings("static-method")
   private void writeObject(final ObjectOutputStream oos) throws IOException {
     oos.defaultWriteObject();
   }

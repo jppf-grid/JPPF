@@ -29,8 +29,11 @@ import org.slf4j.*;
  * Information about a thread, including the stack trace and associated locks.
  * @author Laurent Cohen
  */
-public class ThreadInformation implements Serializable
-{
+public class ThreadInformation implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Logger for this class.
    */
@@ -96,8 +99,7 @@ public class ThreadInformation implements Serializable
    * Initialize this object from the specified {@link ThreadInfo}.
    * @param ti the <code>ThreadInfo</code> from which to get the information.
    */
-  public ThreadInformation(final ThreadInfo ti)
-  {
+  public ThreadInformation(final ThreadInfo ti) {
     this.id = ti.getThreadId();
     this.name = ti.getThreadName();
     this.state = ti.getThreadState();
@@ -108,18 +110,15 @@ public class ThreadInformation implements Serializable
     this.suspended = ti.isSuspended();
     this.inNative = ti.isInNative();
     this.lockOwnerId = ti.getLockOwnerId();
-    LockInfo linfo = ti.getLockInfo();
+    final LockInfo linfo = ti.getLockInfo();
     this.lockInformation = linfo != null ? new LockInformation(linfo) : null;
     this.stackTrace = fillStackTrace(ti);
-    LockInfo[] sync = ti.getLockedSynchronizers();
-    if (sync.length > 0)
-    {
+    final LockInfo[] sync = ti.getLockedSynchronizers();
+    if (sync.length > 0) {
       ownableSynchronizers = new ArrayList<>();
-      for (LockInfo li: sync) ownableSynchronizers.add(new LockInformation(li));
+      for (final LockInfo li: sync) ownableSynchronizers.add(new LockInformation(li));
       if (debugEnabled) log.debug("thread '" + name + "' ownable synchronizers: " + ownableSynchronizers);
-    }
-    else
-    {
+    } else {
       ownableSynchronizers = null;
       if (debugEnabled) log.debug("thread '" + name + "' has no ownable synchronizer");
     }
@@ -130,18 +129,17 @@ public class ThreadInformation implements Serializable
    * @param ti the ThreadInfo from hich to get the information.
    * @return a list of {@link StackFrameInformation} objects.
    */
-  private List<StackFrameInformation> fillStackTrace(final ThreadInfo ti)
-  {
-    StackTraceElement[] ste = ti.getStackTrace();
+  private static List<StackFrameInformation> fillStackTrace(final ThreadInfo ti) {
+    final StackTraceElement[] ste = ti.getStackTrace();
     if (ste.length <= 0) return null;
-    List<StackFrameInformation> result = new ArrayList<>();
-    SortedMap<Integer, LockInformation> lockInfoMap = new TreeMap<>();
-    for (MonitorInfo mi: ti.getLockedMonitors())
-    {
-      int idx = mi.getLockedStackDepth();
+    final List<StackFrameInformation> result = new ArrayList<>();
+    final SortedMap<Integer, LockInformation> lockInfoMap = new TreeMap<>();
+    for (final MonitorInfo mi: ti.getLockedMonitors()) {
+      final int idx = mi.getLockedStackDepth();
       if (idx >= 0) lockInfoMap.put(idx, new LockInformation(mi));
     }
-    for (int i=0; i<ste.length; i++) result.add(new StackFrameInformation(ste[i], lockInfoMap.get(i)));
+    for (int i = 0; i < ste.length; i++)
+      result.add(new StackFrameInformation(ste[i], lockInfoMap.get(i)));
     return result;
   }
 
@@ -149,8 +147,7 @@ public class ThreadInformation implements Serializable
    * Get the id of this thread.
    * @return the id as a long.
    */
-  public long getId()
-  {
+  public long getId() {
     return id;
   }
 
@@ -158,8 +155,7 @@ public class ThreadInformation implements Serializable
    * Get the name of this thread.
    * @return the name as a string.
    */
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -167,8 +163,7 @@ public class ThreadInformation implements Serializable
    * Get the state of this thread.
    * @return a {@link java.lang.Thread.State Thread.State} enum value.
    */
-  public Thread.State getState()
-  {
+  public Thread.State getState() {
     return state;
   }
 
@@ -176,8 +171,7 @@ public class ThreadInformation implements Serializable
    * Get the stack trace of this thread.
    * @return a list of {@link StackFrameInformation} elements, or <code>null</code> if no stack trace is available.
    */
-  public List<StackFrameInformation> getStackTrace()
-  {
+  public List<StackFrameInformation> getStackTrace() {
     return stackTrace;
   }
 
@@ -185,8 +179,7 @@ public class ThreadInformation implements Serializable
    * Get the ownable synchronizers held by this thread.
    * @return a list of {@link LockInformation}, or null if this thread holds no ownable synchrnizer.
    */
-  public List<LockInformation> getOwnableSynchronizers()
-  {
+  public List<LockInformation> getOwnableSynchronizers() {
     return ownableSynchronizers;
   }
 
@@ -194,8 +187,7 @@ public class ThreadInformation implements Serializable
    * Get the count of times this thread has been waiting.
    * @return the wait count as a long.
    */
-  public long getWaitCount()
-  {
+  public long getWaitCount() {
     return waitCount;
   }
 
@@ -203,8 +195,7 @@ public class ThreadInformation implements Serializable
    * Get the total cumulated wait time.
    * @return the wait time as a long.
    */
-  public long getWaitTime()
-  {
+  public long getWaitTime() {
     return waitTime;
   }
 
@@ -212,8 +203,7 @@ public class ThreadInformation implements Serializable
    * Get the count of times this thread has been blocked.
    * @return the blocked count as a long.
    */
-  public long getBlockedCount()
-  {
+  public long getBlockedCount() {
     return blockedCount;
   }
 
@@ -221,8 +211,7 @@ public class ThreadInformation implements Serializable
    * Get the total cumulated block time.
    * @return the blocked time as a long.
    */
-  public long getBlockedTime()
-  {
+  public long getBlockedTime() {
     return blockedTime;
   }
 
@@ -230,8 +219,7 @@ public class ThreadInformation implements Serializable
    * Get whether this thread is suspended.
    * @return <code>true</code> if this thread is suspended, <code>false</code> otherwise.
    */
-  public boolean isSuspended()
-  {
+  public boolean isSuspended() {
     return suspended;
   }
 
@@ -239,8 +227,7 @@ public class ThreadInformation implements Serializable
    * Get whether this thread is in native code.
    * @return <code>true</code> if this thread is in native code, <code>false</code> otherwise.
    */
-  public boolean isInNative()
-  {
+  public boolean isInNative() {
     return inNative;
   }
 
@@ -248,8 +235,7 @@ public class ThreadInformation implements Serializable
    * Get the lock this thread is waiting for, if any.
    * @return a {@link LockInformation} instance, or <code>null</code> if this thread is not waiting on a lock.
    */
-  public LockInformation getLockInformation()
-  {
+  public LockInformation getLockInformation() {
     return lockInformation;
   }
 
@@ -257,8 +243,7 @@ public class ThreadInformation implements Serializable
    * Get the id of the owner of the lock this thread is waiting for, if any.
    * @return the owner thread id as positive long value, or -1 if this thread is not waiting on a lock.
    */
-  public long getLockOwnerId()
-  {
+  public long getLockOwnerId() {
     return lockOwnerId;
   }
 }

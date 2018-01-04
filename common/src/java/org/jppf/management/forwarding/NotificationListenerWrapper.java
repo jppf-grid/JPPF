@@ -20,15 +20,13 @@ package org.jppf.management.forwarding;
 
 import org.jppf.management.NodeSelector;
 
-
 /**
  * Instances of this class represent an association between a notification listener id
  * and the corresponding node selector and MBean name.
  * @author Laurent Cohen
  * @exclude
  */
-class NotificationListenerWrapper
-{
+class NotificationListenerWrapper {
   /**
    * The notification listener for the client side.
    */
@@ -48,8 +46,7 @@ class NotificationListenerWrapper
    * @param selector the node selector.
    * @param mBeanName the node MBean name.
    */
-  public NotificationListenerWrapper(final String listenerID, final NodeSelector selector, final String mBeanName)
-  {
+  public NotificationListenerWrapper(final String listenerID, final NodeSelector selector, final String mBeanName) {
     this.listenerID = listenerID;
     this.selector = selector;
     this.mBeanName = mBeanName;
@@ -59,8 +56,7 @@ class NotificationListenerWrapper
    * Get the notification listener ID for the client side.
    * @return a listener ID as a string.
    */
-  public String getListenerID()
-  {
+  public String getListenerID() {
     return listenerID;
   }
 
@@ -68,8 +64,7 @@ class NotificationListenerWrapper
    * Get the node selector.
    * @return a {@link NodeSelector} instance.
    */
-  public NodeSelector getSelector()
-  {
+  public NodeSelector getSelector() {
     return selector;
   }
 
@@ -77,15 +72,13 @@ class NotificationListenerWrapper
    * Get the node MBean name.
    * @return the MBean name as a string.
    */
-  public String getMBeanName()
-  {
+  public String getMBeanName() {
     return mBeanName;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("listenerID=").append(listenerID);
     sb.append(", selector=").append(selector);

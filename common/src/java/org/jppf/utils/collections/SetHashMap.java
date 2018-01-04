@@ -21,30 +21,31 @@ package org.jppf.utils.collections;
 import java.util.*;
 
 /**
- * A  hash map whose values are sets of a specified component type.
+ * A hash map whose values are sets of a specified component type.
  * @param <K> the type of the keys in this map.
  * @param <V> the type of values in each Set mapped to a key.
  * @author Laurent Cohen
  */
-public class SetHashMap<K, V> extends AbstractCollectionMap<K, V>
-{
+public class SetHashMap<K, V> extends AbstractCollectionMap<K, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Default constructor.
    */
-  public SetHashMap()
-  {
+  public SetHashMap() {
     map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return new HashMap<>();
   }
 
   @Override
-  protected Collection<V> newCollection()
-  {
+  protected Collection<V> newCollection() {
     return new HashSet<>();
   }
 }

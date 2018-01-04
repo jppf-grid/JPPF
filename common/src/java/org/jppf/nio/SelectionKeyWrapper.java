@@ -44,7 +44,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey> {
    */
   @Override
   public void close() throws Exception {
-    SelectableChannel ch = channel.channel();
+    final SelectableChannel ch = channel.channel();
     channel.cancel();
     ch.close();
   }
@@ -64,26 +64,23 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey> {
    */
   @Override
   public String toString() {
-    //if ((channel == null) || !channel.isValid()) {
-      StringBuilder sb = new StringBuilder(1000);
-      sb.append(getClass().getSimpleName());
-      sb.append('[');
-      sb.append("id=").append(getId());
-      sb.append(", channel=");
-      if (channel == null) sb.append("null");
+    final StringBuilder sb = new StringBuilder(1000);
+    sb.append(getClass().getSimpleName());
+    sb.append('[');
+    sb.append("id=").append(getId());
+    sb.append(", channel=");
+    if (channel == null) sb.append("null");
+    else {
+      if (!channel.isValid() || !isOpen()) sb.append("invalid channel");
       else {
-        if (!channel.isValid() || !isOpen()) sb.append("invalid channel");
-        else {
-          sb.append(channel.channel());
-          sb.append(", readyOps=").append(getReadyOps());
-          sb.append(", interestOps=").append(getInterestOps());
-        }
+        sb.append(channel.channel());
+        sb.append(", readyOps=").append(getReadyOps());
+        sb.append(", interestOps=").append(getInterestOps());
       }
-      sb.append(", context=").append(getContext());
-      sb.append(']');
-      return sb.toString();
-    //}
-    //return super.toString();
+    }
+    sb.append(", context=").append(getContext());
+    sb.append(']');
+    return sb.toString();
   }
 
   /**

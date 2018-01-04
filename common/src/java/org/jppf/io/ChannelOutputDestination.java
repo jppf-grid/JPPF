@@ -56,24 +56,21 @@ public class ChannelOutputDestination implements OutputDestination {
     ByteBuffer tmpBuffer = null;
     try {
       tmpBuffer = DirectBufferPool.provideBuffer();
-      int cap = tmpBuffer.capacity();
+      final int cap = tmpBuffer.capacity();
       int count = 0;
       while (count < len) {
         tmpBuffer.clear();
-        int size = Math.min(cap, len - count);
+        final int size = Math.min(cap, len - count);
         tmpBuffer.put(data, offset + count, size);
         tmpBuffer.flip();
-        int n = channel.write(tmpBuffer);
+        final int n = channel.write(tmpBuffer);
         if (n <= 0) break;
         count += n;
         if (n < size) break;
       }
       return count;
     } finally {
-      if (tmpBuffer != null) {
-        DirectBufferPool.releaseBuffer(tmpBuffer);
-        tmpBuffer = null;
-      }
+      if (tmpBuffer != null) DirectBufferPool.releaseBuffer(tmpBuffer);
     }
   }
 
@@ -108,7 +105,7 @@ public class ChannelOutputDestination implements OutputDestination {
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     builder.append("ChannelOutputDestination[channel=").append(channel).append("]");
     return builder.toString();
   }

@@ -77,24 +77,24 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);
       socketWrapper.close();
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
     }
     long delay = 1000L * config.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
     if (delay <= 0L) delay = 1L + rand.nextInt(10);
-    long maxTime = config.get(JPPFProperties.RECONNECT_MAX_TIME);
-    long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
+    final long maxTime = config.get(JPPFProperties.RECONNECT_MAX_TIME);
+    final long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
     long period = 1000L * config.get(JPPFProperties.RECONNECT_INTERVAL);
     if (period <= 0L) period = 1000L;
     goToSleep(delay);
     long elapsed = 0L;
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     while ((elapsed < maxDuration) && !successful && !closed) {
       try {
         if (traceEnabled) log.trace("{} opening the socket connection", name);
         socketWrapper.open();
         successful = true;
         if (traceEnabled) log.trace("{} socket connection successfully opened", name);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
         lastException = e;
       }

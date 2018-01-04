@@ -26,8 +26,7 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
  * A handler that prints log messages as JMX notifications.
  * @author Laurent Cohen
  */
-public class JmxHandler extends Handler
-{
+public class JmxHandler extends Handler {
   /**
    * The notifier that sends formatted log messages as JMX notifications.
    */
@@ -40,9 +39,8 @@ public class JmxHandler extends Handler
   /**
    * Initialize this appender from its configuration.
    */
-  private void init()
-  {
-    LogManager lm = LogManager.getLogManager();
+  private void init() {
+    final LogManager lm = LogManager.getLogManager();
     mbeanName = lm.getProperty(getClass().getName() + ".mbeanName");
     notifier = new JmxMessageNotifier(mbeanName);
   }
@@ -51,12 +49,11 @@ public class JmxHandler extends Handler
    * {@inheritDoc}
    */
   @Override
-  public void publish(final LogRecord record)
-  {
+  public void publish(final LogRecord record) {
     if (notifier == null) init();
     Formatter f = getFormatter();
     if (f == null) f = new JPPFLogFormatter();
-    String s = f.format(record);
+    final String s = f.format(record);
     notifier.sendMessage(s);
   }
 
@@ -64,15 +61,13 @@ public class JmxHandler extends Handler
    * {@inheritDoc}
    */
   @Override
-  public void flush()
-  {
+  public void flush() {
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void close() throws SecurityException
-  {
+  public void close() throws SecurityException {
   }
 }

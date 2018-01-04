@@ -27,8 +27,11 @@ import javax.management.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class InternalNotificationFilter implements NotificationFilter
-{
+public class InternalNotificationFilter implements NotificationFilter {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The ID of the associated listener.
    */
@@ -43,24 +46,19 @@ public class InternalNotificationFilter implements NotificationFilter
    * @param listenerID ID of the associated listener.
    * @param filter user-provided notification filter.
    */
-  public InternalNotificationFilter(final String listenerID, final NotificationFilter filter)
-  {
+  public InternalNotificationFilter(final String listenerID, final NotificationFilter filter) {
     if (listenerID == null) throw new IllegalArgumentException("listener ID cannot be null");
     this.listenerID = listenerID;
     this.filter = filter;
   }
 
   @Override
-  public boolean isNotificationEnabled(final Notification notification)
-  {
+  public boolean isNotificationEnabled(final Notification notification) {
     if (!(notification instanceof JPPFNodeForwardingNotification)) return false;
-    JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
-    NodeForwardingHelper helper = NodeForwardingHelper.getInstance();
-    String uuid = notif.getNodeUuid();
-    NotificationListenerWrapper wrapper = helper.getListener(listenerID);
-    return
-        helper.isNodeAccepted(uuid, wrapper.getSelector()) &&
-        wrapper.getMBeanName().equals(notif.getMBeanName()) &&
-        ((filter == null) || filter.isNotificationEnabled(notif.getNotification()));
+    final JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
+    final NodeForwardingHelper helper = NodeForwardingHelper.getInstance();
+    final String uuid = notif.getNodeUuid();
+    final NotificationListenerWrapper wrapper = helper.getListener(listenerID);
+    return helper.isNodeAccepted(uuid, wrapper.getSelector()) && wrapper.getMBeanName().equals(notif.getMBeanName()) && ((filter == null) || filter.isNotificationEnabled(notif.getNotification()));
   }
 }

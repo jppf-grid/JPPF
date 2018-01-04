@@ -28,14 +28,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
   @Override
   public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
-    Map<?, ?> map = (Map<?, ?>) obj;
+    final Map<?, ?> map = (Map<?, ?>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = serializer.currentClassDescriptor;
       serializer.currentClassDescriptor = cd;
       serializer.writeInt(map.size());
-      for (Object o: map.entrySet()) {
-        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
+      for (final Object o: map.entrySet()) {
+        final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
         serializer.writeObject(entry.getKey());
         serializer.writeObject(entry.getValue());
       }
@@ -47,16 +47,16 @@ public class ConcurrentHashMapHandler extends AbstractSerializationHandler {
   @Override
   public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
     @SuppressWarnings("unchecked")
-    Map<? super Object, ? super Object> map = (Map<? super Object, ? super Object>) obj;
+    final Map<? super Object, ? super Object> map = (Map<? super Object, ? super Object>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
       deserializer.currentClassDescriptor = cd;
       if (map instanceof ConcurrentHashMap) copyFields(new ConcurrentHashMap<>(), obj, cd);
-      int size = deserializer.readInt();
+      final int size = deserializer.readInt();
       for (int i=0; i<size; i++) {
-        Object key = deserializer.readObject();
-        Object value = deserializer.readObject();
+        final Object key = deserializer.readObject();
+        final Object value = deserializer.readObject();
         map.put(key, value);
       }
     } finally {

@@ -21,15 +21,13 @@ package org.jppf.classloader;
 import java.util.*;
 import java.util.concurrent.Future;
 
-
 /**
  * Instances of this class are intended for grouping multiple class loading requests together.
  * @author Laurent Cohen
  * @author Martin JANDA
  * @exclude
  */
-public class CompositeResourceWrapper extends JPPFResourceWrapper
-{
+public class CompositeResourceWrapper extends JPPFResourceWrapper {
   /**
    * Explicit serialVersionUID.
    */
@@ -42,16 +40,14 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   /**
    *
    */
-  public CompositeResourceWrapper()
-  {
+  public CompositeResourceWrapper() {
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public JPPFResourceWrapper[] getResources()
-  {
+  public JPPFResourceWrapper[] getResources() {
     synchronized (getMonitor()) {
-      Set<JPPFResourceWrapper> set = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
+      final Set<JPPFResourceWrapper> set = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
       if ((set == null) || set.isEmpty()) return EMPTY_RESOURCE_WRAPPER_ARRAY;
       else return set.toArray(new JPPFResourceWrapper[set.size()]);
     }
@@ -65,7 +61,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   public void addOrReplaceResource(final JPPFResourceWrapper resource) {
     synchronized (getMonitor()) {
       Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
-      if(resources == null) {
+      if (resources == null) {
         resources = new HashSet<>();
         setData(ResourceIdentifier.RESOURCES_KEY, resources);
       } else resources.remove(resource);
@@ -78,11 +74,9 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
    * @param resource the request to add.
    * @return a future for getting the response at a later time.
    */
-  public Future<JPPFResourceWrapper> addResource(final JPPFResourceWrapper resource)
-  {
+  public Future<JPPFResourceWrapper> addResource(final JPPFResourceWrapper resource) {
     Future<JPPFResourceWrapper> f = futureMap.get(resource);
-    if (f == null)
-    {
+    if (f == null) {
       addOrReplaceResource(resource);
       f = new ResourceFuture<>();
       futureMap.put(resource, f);
@@ -94,15 +88,13 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
    * Get the mapping of futures to corresponding resource requests.
    * @return a map of resource definitions to their corresponding future.
    */
-  public Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> getFutureMap()
-  {
+  public Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> getFutureMap() {
     return futureMap;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     synchronized (getMonitor()) {
       sb.append("resources=").append(getData(ResourceIdentifier.RESOURCES_KEY));

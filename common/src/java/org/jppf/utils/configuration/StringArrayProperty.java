@@ -27,6 +27,10 @@ import org.jppf.utils.StringUtils;
  */
 public class StringArrayProperty extends AbstractJPPFProperty<String[]> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The delimiter used to split the value into an array of strings. It MUST be a litteral string, i.e. not a regex.
    */
   private final String delimiter;
@@ -51,7 +55,7 @@ public class StringArrayProperty extends AbstractJPPFProperty<String[]> {
   @Override
   public String toString(final String[] value) {
     if (value == null) return null;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<value.length; i++) {
       if (i > 0) sb.append(delimiter);
       if (value[i] != null) sb.append(value[i]);

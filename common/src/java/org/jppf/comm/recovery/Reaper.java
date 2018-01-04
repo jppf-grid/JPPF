@@ -75,7 +75,7 @@ public class Reaper {
    * @param connection the connection to check.
    */
   void newConnection(final ServerConnection connection) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         if (!InterceptorHandler.invokeOnAccept(connection.getSocketWrapper())) {
@@ -117,7 +117,7 @@ public class Reaper {
    * @param connection the server-side connection that failed.
    */
   private void fireReaperEvent(final ServerConnection connection) {
-    ReaperEvent event = new ReaperEvent(connection);
+    final ReaperEvent event = new ReaperEvent(connection);
     synchronized (listeners) {
       for (ReaperListener listener : listeners) listener.connectionFailed(event);
     }
@@ -146,13 +146,13 @@ public class Reaper {
      */
     @Override
     public void run() {
-      ServerConnection[] connections = server.connections();
-      CompletionService<?> completer = new ExecutorCompletionService<>(threadPool, new ArrayBlockingQueue<Future<Object>>(connections.length));
+      final ServerConnection[] connections = server.connections();
+      final CompletionService<?> completer = new ExecutorCompletionService<>(threadPool, new ArrayBlockingQueue<Future<Object>>(connections.length));
       for (ServerConnection c : connections) completer.submit(c, null);
       for (int i=0; i<connections.length; i++) {
         try {
           completer.take();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }

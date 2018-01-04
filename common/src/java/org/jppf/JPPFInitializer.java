@@ -46,11 +46,11 @@ public final class JPPFInitializer {
     if (initCalled) return;
     try {
       initCalled = true;
-      String protocolHandlerProperty = "java.protocol.handler.pkgs";
+      final String protocolHandlerProperty = "java.protocol.handler.pkgs";
       String s = System.getProperty(protocolHandlerProperty, null);
       if (s == null) System.setProperty(protocolHandlerProperty, PROTOCOL_PACKAGE);
       else if (s.indexOf(PROTOCOL_PACKAGE) < 0) {
-        StringBuilder sb = new StringBuilder(s);
+        final StringBuilder sb = new StringBuilder(s);
         if (sb.charAt(sb.length() - 1) != '|') sb.append('|');
         sb.append(PROTOCOL_PACKAGE);
         s = sb.toString();
@@ -63,7 +63,7 @@ public final class JPPFInitializer {
       }
       //long elapsed = System.nanoTime() - start;
       //System.out.printf("System.nanoTime() warmup in %,d ns%n", elapsed);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

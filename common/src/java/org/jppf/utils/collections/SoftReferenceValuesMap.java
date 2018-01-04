@@ -88,21 +88,21 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   @Override
   public V get(final Object key) {
     cleanup();
-    SoftReference<V> ref = map.get(key);
+    final SoftReference<V> ref = map.get(key);
     return ref == null ? null : ref.get();
   }
 
   @Override
   public V put(final K key, final V value) {
     cleanup();
-    SoftReference<V> ref = map.put(key, new SoftValue<>(key, value, refQueue));
+    final SoftReference<V> ref = map.put(key, new SoftValue<>(key, value, refQueue));
     return ref == null ? null : ref.get();
   }
 
   @Override
   public V remove(final Object key) {
     cleanup();
-    SoftReference<V> ref = map.remove(key);
+    final SoftReference<V> ref = map.remove(key);
     return ref == null ? null : ref.get();
   }
 
@@ -125,7 +125,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
     SoftValue<K, V> ref;
     while ((ref = (SoftValue<K, V>) refQueue.poll()) != null) {
       // NPE on this line ==>
-      K key = ref.key;
+      final K key = ref.key;
       if (key == null) continue;
       if (traceEnabled) log.trace("removing entry for key=" + key);
       map.remove(key);

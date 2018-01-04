@@ -121,7 +121,7 @@ public class HtmlDocGenerator {
     System.out.println("Processing source file " + source);
     String s = FileUtils.readTextFile(source);
     s = processTemplates(new HashMap<String, String>(), s, templateFolder);
-    File targetFile = new File(target);
+    final File targetFile = new File(target);
     FileUtils.mkdirs(targetFile);
     FileUtils.writeTextFile(target, s);
   }
@@ -136,8 +136,8 @@ public class HtmlDocGenerator {
    * @throws Exception if an error occurs while parsing the template or building its instance.
    */
   private String processTemplates(final Map<String, String> parameterMap, final String content, final String templateFolder) throws Exception {
-    StringBuilder sb = new StringBuilder();
-    boolean end = false;
+    final StringBuilder sb = new StringBuilder();
+    final boolean end = false;
     int pos = 0;
     while (!end && (pos >= 0) && (pos < content.length())) {
       int index = content.indexOf(TEMPLATE_START, pos);
@@ -149,7 +149,7 @@ public class HtmlDocGenerator {
       pos = index;
       index = content.indexOf(TEMPLATE_END, pos + TEMPLATE_START.length());
       if (index >= 0) {
-        String templateCall = content.substring(pos, index + TEMPLATE_END.length());
+        final String templateCall = content.substring(pos, index + TEMPLATE_END.length());
         sb.append(processTemplateCall(templateCall, parameterMap, templateFolder));
         pos = index + TEMPLATE_END.length();
       }
@@ -171,16 +171,16 @@ public class HtmlDocGenerator {
   private String processTemplateCall(final String templateCall, final Map<String, String> callerMap, final String templateFolder) throws Exception {
     int pos = TEMPLATE_START.length();
     int index = pos;
-    Map<String, String> parameterMap = new HashMap<>();
+    final Map<String, String> parameterMap = new HashMap<>();
     while (index > 0) {
       index = templateCall.indexOf(EQUALS, pos);
       if (index >= 0) {
-        String paramName = templateCall.substring(pos, index).trim();
+        final String paramName = templateCall.substring(pos, index).trim();
         String paramValue = "";
         index = templateCall.indexOf(QUOTE, pos);
         if (index < 0) throw new Exception("Missing opening quote for parameter '" + paramName + '\'');
         pos = index + QUOTE.length();
-        String sub = templateCall.substring(pos);
+        final String sub = templateCall.substring(pos);
         if (sub.startsWith(CONTENT_START)) {
           pos += CONTENT_START.length();
           index = templateCall.indexOf(CONTENT_END + QUOTE, pos);
@@ -202,8 +202,8 @@ public class HtmlDocGenerator {
         break;
       }
     }
-    String tf = !templateFolder.endsWith("/") ? templateFolder + "/" : templateFolder;
-    String templateFile = tf + parameterMap.get("name") + ".html";
+    final String tf = !templateFolder.endsWith("/") ? templateFolder + "/" : templateFolder;
+    final String templateFile = tf + parameterMap.get("name") + ".html";
     if (!(new File(templateFile).exists())) throw new Exception("Could not find template file " + templateFile);
     String content = readTextFileStripComments(templateFile);
     content = processTemplates(parameterMap, content, tf);
@@ -221,8 +221,8 @@ public class HtmlDocGenerator {
    */
   private static String processParameters(final Map<String, String> parameterMap, final String content) throws Exception {
     String template = readTextStripComments(new StringReader(content));
-    for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
-      String param = PARAM_START + entry.getKey() + PARAM_END;
+    for (final Map.Entry<String, String> entry : parameterMap.entrySet()) {
+      final String param = PARAM_START + entry.getKey() + PARAM_END;
       template = template.replace(param, entry.getValue());
     }
     return template;
@@ -245,12 +245,12 @@ public class HtmlDocGenerator {
    * @throws Exception if an error occurs while parsing the template or building its instance.
    */
   private static String readTextStripComments(final Reader reader) throws Exception {
-    BufferedReader bufferedReader = new BufferedReader(reader);
-    StringBuilder sb = new StringBuilder();
+    final BufferedReader bufferedReader = new BufferedReader(reader);
+    final StringBuilder sb = new StringBuilder();
     try {
       String s = "";
       while ((s = bufferedReader.readLine()) != null) {
-        String s2 = s.trim();
+        final String s2 = s.trim();
         if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
         sb.append(s).append('\n');
       }
@@ -267,7 +267,7 @@ public class HtmlDocGenerator {
   public static void main(final String... args) {
     NamedArguments namedArgs = null;
     try {
-      StringBuilder title = new StringBuilder("HtmlDocGenerator usage: java ")
+      final StringBuilder title = new StringBuilder("HtmlDocGenerator usage: java ")
         .append(HtmlDocGenerator.class.getName())
         .append(" -s sourceDir -d destDir -t templatesDir").append('\n')
         .append("  [[-r] [-fi includedFiles] [-fe excludedFiles] [-di includedDirs] [-de excludedDirs]]").append('\n')
@@ -283,17 +283,17 @@ public class HtmlDocGenerator {
         .addArg(DIR_INCLUDES, "specifies the names of the directories to include; if unspecified all are included")
         .addArg(DIR_EXCLUDES, "specifies the names of the directories to include; if unspecified default 'CVS,.svn' are excluded")
         .parseArguments(args);
-      File sourceDir = namedArgs.getFile(SOURCE_DIR);
+      final File sourceDir = namedArgs.getFile(SOURCE_DIR);
       if (!sourceDir.exists() || !sourceDir.isDirectory()) showUsageAndExit("Source location must be an existing folder", namedArgs);
-      File destDir = namedArgs.getFile(DEST_DIR);
+      final File destDir = namedArgs.getFile(DEST_DIR);
       if (!destDir.exists() || !destDir.isDirectory()) showUsageAndExit("Target location must be an existing folder", namedArgs);
-      File templateDir = namedArgs.getFile(TEMPLATES_DIR);
+      final File templateDir = namedArgs.getFile(TEMPLATES_DIR);
       if (!templateDir.exists() || !templateDir.isDirectory()) showUsageAndExit("Templates location must be an existing folder", namedArgs);
-      boolean recursive = namedArgs.getBoolean(RECURSIVE);
+      final boolean recursive = namedArgs.getBoolean(RECURSIVE);
       System.out.println("Running with args:\n" + namedArgs);
       if (recursive) generateDocRecursive(sourceDir, destDir, templateDir, namedArgs);
       else generateDoc(sourceDir, destDir, templateDir,namedArgs);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       showUsageAndExit(e.getMessage(), namedArgs);
     }
@@ -320,13 +320,13 @@ public class HtmlDocGenerator {
    */
   private static void generateDocRecursive(final File sourceDir, final File destDir, final File templateDir, final NamedArguments parameters) throws Exception {
     generateDoc(sourceDir, destDir, templateDir, parameters);
-    List<File> allSourceDirs = new ArrayList<>();
+    final List<File> allSourceDirs = new ArrayList<>();
     allDirsRecursive(sourceDir, allSourceDirs, parameters);
-    String rootSourceName = sourceDir.getCanonicalPath();
-    String rootTargetName = destDir.getCanonicalPath();
+    final String rootSourceName = sourceDir.getCanonicalPath();
+    final String rootTargetName = destDir.getCanonicalPath();
     for (File source : allSourceDirs) {
-      String s = source.getCanonicalPath().substring(rootSourceName.length());
-      File target = new File(rootTargetName + s);
+      final String s = source.getCanonicalPath().substring(rootSourceName.length());
+      final File target = new File(rootTargetName + s);
       generateDoc(source, target, templateDir, parameters);
     }
   }
@@ -340,9 +340,9 @@ public class HtmlDocGenerator {
    * @throws Exception if any error occurs.
    */
   private static void generateDoc(final File sourceDir, final File destDir, final File templateDir, final NamedArguments parameters) throws Exception {
-    HtmlDocGenerator docGen = new HtmlDocGenerator();
-    JPPFFileFilter filter = new JPPFFileFilter(parameters.getStringArray(FILE_INCLUDES, ","), parameters.getStringArray(FILE_EXCLUDES, ","));
-    for (File file : sourceDir.listFiles(filter)) {
+    final HtmlDocGenerator docGen = new HtmlDocGenerator();
+    final JPPFFileFilter filter = new JPPFFileFilter(parameters.getStringArray(FILE_INCLUDES, ","), parameters.getStringArray(FILE_EXCLUDES, ","));
+    for (final File file : sourceDir.listFiles(filter)) {
       FileUtils.mkdirs(destDir);
       String target = destDir.getPath();
       if (!target.endsWith("/") && !target.endsWith("\\")) target += '/';
@@ -359,8 +359,8 @@ public class HtmlDocGenerator {
    * @throws Exception if any error occurs.
    */
   private static void allDirsRecursive(final File root, final List<File> list, final NamedArguments parameters) throws Exception {
-    JPPFDirFilter filter = new JPPFDirFilter(parameters.getStringArray(DIR_INCLUDES, ","), parameters.getStringArray(DIR_EXCLUDES, ","));
-    for (File file : root.listFiles(filter)) {
+    final JPPFDirFilter filter = new JPPFDirFilter(parameters.getStringArray(DIR_INCLUDES, ","), parameters.getStringArray(DIR_EXCLUDES, ","));
+    for (final File file : root.listFiles(filter)) {
       list.add(file);
       allDirsRecursive(file, list, parameters);
     }
