@@ -36,6 +36,11 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class TemplateJPPFTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Perform initializations on the client side,
    * before the task is executed by the node.
    */

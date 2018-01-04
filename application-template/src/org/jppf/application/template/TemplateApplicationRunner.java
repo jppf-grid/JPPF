@@ -39,10 +39,10 @@ public class TemplateApplicationRunner {
 
     // create the JPPFClient. This constructor call causes JPPF to read the configuration file
     // and connect with one or multiple JPPF drivers.
-    try (JPPFClient jppfClient = new JPPFClient()) {
+    try (final JPPFClient jppfClient = new JPPFClient()) {
 
       // create a runner instance.
-      TemplateApplicationRunner runner = new TemplateApplicationRunner();
+      final TemplateApplicationRunner runner = new TemplateApplicationRunner();
 
       // create and execute a blocking job
       runner.executeBlockingJob(jppfClient);
@@ -53,7 +53,7 @@ public class TemplateApplicationRunner {
       // create and execute 3 jobs concurrently
       //runner.executeMultipleConcurrentJobs(jppfClient, 3);
 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -66,12 +66,12 @@ public class TemplateApplicationRunner {
    */
   public JPPFJob createJob(final String jobName) throws Exception {
     // create a JPPF job
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     // give this job a readable name that we can use to monitor and manage it.
     job.setName(jobName);
 
     // add a task to the job.
-    Task<?> task = job.add(new TemplateJPPFTask());
+    final Task<?> task = job.add(new TemplateJPPFTask());
     // provide a user-defined name for the task
     task.setId(jobName + " - Template task");
 
@@ -89,7 +89,7 @@ public class TemplateApplicationRunner {
    */
   public void executeBlockingJob(final JPPFClient jppfClient) throws Exception {
     // Create a job
-    JPPFJob job = createJob("Template blocking job");
+    final JPPFJob job = createJob("Template blocking job");
 
     // set the job in blocking mode.
     job.setBlocking(true);
@@ -97,7 +97,7 @@ public class TemplateApplicationRunner {
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of Task<?> instances,
     // in the same order as the one in which the tasks where initially added to the job.
-    List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
 
     // process the results
     processExecutionResults(job.getName(), results);
@@ -111,7 +111,7 @@ public class TemplateApplicationRunner {
    */
   public void executeNonBlockingJob(final JPPFClient jppfClient) throws Exception {
     // Create a job
-    JPPFJob job = createJob("Template non-blocking job");
+    final JPPFJob job = createJob("Template non-blocking job");
 
     // set the job in non-blocking (or asynchronous) mode.
     job.setBlocking(false);
@@ -128,7 +128,7 @@ public class TemplateApplicationRunner {
     // We are now ready to get the results of the job execution.
     // We use JPPFJob.awaitResults() for this. This method returns immediately with
     // the results if the job has completed, otherwise it waits until the job execution is complete.
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
 
     // process the results
     processExecutionResults(job.getName(), results);
@@ -161,7 +161,7 @@ public class TemplateApplicationRunner {
     // create and submit all the jobs
     for (int i=1; i<=numberOfJobs; i++) {
       // create a job with a distinct name
-      JPPFJob job = createJob("Template concurrent job " + i);
+      final JPPFJob job = createJob("Template concurrent job " + i);
 
       // set the job in non-blocking (or asynchronous) mode.
       job.setBlocking(false);
@@ -178,9 +178,9 @@ public class TemplateApplicationRunner {
     // ...
 
     // wait until the jobs are finished and process their results.
-    for (JPPFJob job: jobList) {
+    for (final JPPFJob job: jobList) {
       // wait if necessary for the job to complete and collect its results
-      List<Task<?>> results = job.awaitResults();
+      final List<Task<?>> results = job.awaitResults();
 
       // process the job results
       processExecutionResults(job.getName(), results);
@@ -195,7 +195,7 @@ public class TemplateApplicationRunner {
    */
   public void ensureNumberOfConnections(final JPPFClient jppfClient, final int numberOfConnections) throws Exception {
     // wait until the client has at least one connection pool with at least one avaialable connection
-    JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
+    final JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
 
     // if the pool doesn't have the expected number of connections, change its size
     if (pool.getConnections().size() != numberOfConnections) {
@@ -216,8 +216,8 @@ public class TemplateApplicationRunner {
     // print a results header
     System.out.printf("Results for job '%s' :\n", jobName);
     // process the results
-    for (Task<?> task: results) {
-      String taskName = task.getId();
+    for (final Task<?> task: results) {
+      final String taskName = task.getId();
       // if the task execution resulted in an exception
       if (task.getThrowable() != null) {
         // process the exception here ...
