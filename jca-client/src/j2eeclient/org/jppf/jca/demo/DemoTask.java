@@ -47,20 +47,20 @@ public class DemoTask extends AbstractTask<String> {
    */
   @Override
   public void run() {
-    String execType = isInNode() ? "remotely" : "locally";
-    long start = System.nanoTime();
+    final String execType = isInNode() ? "remotely" : "locally";
+    final long start = System.nanoTime();
     try {
       synchronized(this) {
         wait(duration);
       }
-      double elapsed = (System.nanoTime() - start) / 1e9d;
-      String s = String.format("JPPF task [%s] successfully completed %s after %.3f seconds", getId(), execType, elapsed);
+      final double elapsed = (System.nanoTime() - start) / 1e9d;
+      final String s = String.format("JPPF task [%s] successfully completed %s after %.3f seconds", getId(), execType, elapsed);
       System.out.println(s);
       setResult(s);
-    } catch (InterruptedException e) {
-      double elapsed = (System.nanoTime() - start) / 1e9d;
+    } catch (final InterruptedException e) {
+      final double elapsed = (System.nanoTime() - start) / 1e9d;
       setThrowable(e);
-      String s = String.format("Exception for task [%s] executed %s after %.3f seconds : %s: %s", getId(), execType, elapsed, e.getClass().getName(), e.getMessage());
+      final String s = String.format("Exception for task [%s] executed %s after %.3f seconds : %s: %s", getId(), execType, elapsed, e.getClass().getName(), e.getMessage());
       setResult(s);
       System.out.println(s);
     }

@@ -78,7 +78,7 @@ public class JPPFHelper {
    * @throws ResourceException if a connection could not be obtained.
    */
   public static JPPFConnection getConnection(final String jndiName) throws NamingException, ResourceException {
-    JPPFConnection c = (JPPFConnection) getConnectionFactory(jndiName).getConnection();
+    final JPPFConnection c = (JPPFConnection) getConnectionFactory(jndiName).getConnection();
     if (debugEnabled) log.debug("got connection {}", c);
     return c;
   }
@@ -91,8 +91,8 @@ public class JPPFHelper {
    * @throws ResourceException if a connection could not be obtained.
    */
   public static JPPFConnectionFactory getConnectionFactory(final String jndiName) throws NamingException, ResourceException {
-    InitialContext context = new InitialContext();
-    Object objref = context.lookup(jndiName);
+    final InitialContext context = new InitialContext();
+    final Object objref = context.lookup(jndiName);
     JPPFConnectionFactory cf;
     if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
     else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
@@ -123,9 +123,9 @@ public class JPPFHelper {
    * @return a mapping of jobs to their uuid.
    */
   public static String getStatus(final String uuid) {
-    JPPFJob job = statusMap.get(uuid);
+    final JPPFJob job = statusMap.get(uuid);
     if (job == null) return "no job with this uuid";
-    JobStatus status = job.getStatus();
+    final JobStatus status = job.getStatus();
     return status == null ? "unknown" : status.toString();
   }
 
@@ -135,7 +135,7 @@ public class JPPFHelper {
    * @return a mapping of jobs to their uuid.
    */
   public static String getJobName(final String uuid) {
-    JPPFJob job = statusMap.get(uuid);
+    final JPPFJob job = statusMap.get(uuid);
     if (job == null) return "no job with this uuid";
     return job.getName();
   }
@@ -147,13 +147,13 @@ public class JPPFHelper {
    */
   public static String getMessage(final String uuid) {
     String msg = null;
-    JPPFJob job = statusMap.remove(uuid);
+    final JPPFJob job = statusMap.remove(uuid);
     if (job == null) return "no job with this id";
-    List<Task<?>> results = job.getAllResults();
+    final List<Task<?>> results = job.getAllResults();
     if (results == null) msg = "job is not in queue anymore";
     else {
-      StringBuilder sb = new StringBuilder();
-      for (Task<?> task: results) {
+      final StringBuilder sb = new StringBuilder();
+      for (final Task<?> task: results) {
         if (task.getThrowable() == null) sb.append(task.getResult());
         else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
         sb.append("<br/>");

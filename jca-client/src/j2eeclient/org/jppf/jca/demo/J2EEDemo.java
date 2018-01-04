@@ -53,7 +53,7 @@ public class J2EEDemo {
     String id = null;
     try {
       connection = JPPFHelper.getConnection(jndiBinding);
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.add(new DemoTask(duration));
       id = connection.submit(job);
     } finally {
@@ -79,7 +79,7 @@ public class J2EEDemo {
       job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++) {
-        DemoTask task = new DemoTask(duration);
+        final DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i + 1));
         job.add(task);
       }
@@ -107,17 +107,17 @@ public class J2EEDemo {
     if (duration <= 0L) return "Error: the duration must be >= 1";
     JPPFConnection connection = null;
     String id = null;
-    List<String> idList = new ArrayList<>();
+    final List<String> idList = new ArrayList<>();
     try {
-      JPPFConnectionFactory factory = JPPFHelper.getConnectionFactory(jndiBinding);
-      boolean available = factory.isJPPFDriverAvailable();
+      final JPPFConnectionFactory factory = JPPFHelper.getConnectionFactory(jndiBinding);
+      final boolean available = factory.isJPPFDriverAvailable();
       // enable local execution, depending on whether a remote connection is available or not.
       if (!available) System.out.println("No available JPPF driver, jobs will be executed locally");
       factory.enableLocalExecution(!available);
       connection = (JPPFConnection) factory.getConnection();
       for (int n=1; n<=nbJobs; n++) {
-        JPPFJob job = new JPPFJob();
-        String name = jobNamePrefix + ' ' + n;
+        final JPPFJob job = new JPPFJob();
+        final String name = jobNamePrefix + ' ' + n;
         job.setName(name);
         job.setBlocking(false);
         for (int i=1; i<=nbTasks; i++) job.add(new DemoTask(duration)).setId(name + " task " + i);
@@ -150,12 +150,12 @@ public class J2EEDemo {
       job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++) {
-        DemoTask task = new DemoTask(duration);
+        final DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i + 1));
         job.add(task);
       }
       id = connection.submit(job);
-      List<Task<?>> results = connection.awaitResults(id);
+      final List<Task<?>> results = connection.awaitResults(id);
       System.out.println("received " + results.size() + " results for job '" + job.getName() + "'");
     } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
@@ -170,14 +170,14 @@ public class J2EEDemo {
    * @throws Exception if the call to JPPF failed.
    */
   public Map<String, String> getStatusMap() throws Exception {
-    Map<String, String> map = new HashMap<>();
+    final Map<String, String> map = new HashMap<>();
     JPPFConnection connection = null;
     try {
       connection = JPPFHelper.getConnection(jndiBinding);
-      Collection<String> coll = connection.getAllJobIds();
-      for (String id: coll) {
-        JobStatus status = connection.getJobStatus(id);
-        String s = (status == null) ? "Unknown" : status.toString();
+      final Collection<String> coll = connection.getAllJobIds();
+      for (final String id: coll) {
+        final JobStatus status = connection.getJobStatus(id);
+        final String s = (status == null) ? "Unknown" : status.toString();
         map.put(id, s);
       }
     } finally {
@@ -197,11 +197,11 @@ public class J2EEDemo {
     String msg = null;
     try {
       connection = JPPFHelper.getConnection(jndiBinding);
-      List<Task<?>> results = connection.getResults(id);
+      final List<Task<?>> results = connection.getResults(id);
       if (results == null) msg = "submission is not in queue anymore";
       else {
-        StringBuilder sb = new StringBuilder();
-        for (Task<?> task: results) {
+        final StringBuilder sb = new StringBuilder();
+        for (final Task<?> task: results) {
           if (task.getThrowable() == null) sb.append(task.getResult());
           else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
           sb.append("<br/>");

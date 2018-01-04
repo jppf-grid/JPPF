@@ -76,14 +76,14 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   @Override
   public Object createConnectionFactory(final ConnectionManager manager) throws ResourceException {
     if (debugEnabled) log.debug("creating connection factory with connection manager");
-    JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
+    final JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
     return jcf;
   }
 
   @Override
   public ManagedConnection createManagedConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException {
     if (debugEnabled) log.debug("creating managed connection");
-    JPPFManagedConnection conn = new JPPFManagedConnection(this);
+    final JPPFManagedConnection conn = new JPPFManagedConnection(this);
     if (conn.retrieveJppfClient() == null) conn.assignJppfClient(jppfClient);
     return conn;
   }
@@ -119,7 +119,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   public void setConfigurationSource(final String configurationSource) {
     this.configurationSource = configurationSource;
     log.info("Starting JPPF managed connection factory");
-    TypedProperties config = new JPPFConfigurationParser(configurationSource).parse();
+    final TypedProperties config = new JPPFConfigurationParser(configurationSource).parse();
     syncConfig(config);
     if (debugEnabled) log.debug("Initializing JPPF client with config=" + config);
     jppfClient = new JPPFClient(null, config, (ConnectionPoolListener[]) null) {
@@ -128,7 +128,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
         JobManager jobManager = null;
         try {
           jobManager = new JcaJobManager(this, getBundlerFactory());
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error("Can't initialize Job Manager", e);
         }
         return jobManager;
@@ -148,7 +148,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    */
   void resetClient() {
     if (jppfClient == null) return;
-    TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
+    final TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
     syncConfig(config);
     jppfClient.reset(config);
   }
@@ -157,8 +157,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    * Synchronize the global JPPF config with the one read from the source specfied in the ra.xml.
    * @param config the config to synch with.
    */
-  private void syncConfig(final TypedProperties config) {
-    TypedProperties globalConfig = JPPFConfiguration.getProperties();
+  private static void syncConfig(final TypedProperties config) {
+    final TypedProperties globalConfig = JPPFConfiguration.getProperties();
     if (config != globalConfig) {
       globalConfig.clear();
       globalConfig.putAll(config);

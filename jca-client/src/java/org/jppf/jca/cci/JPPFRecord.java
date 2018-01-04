@@ -26,16 +26,19 @@ import javax.resource.cci.Record;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFRecord implements Record
-{
+public class JPPFRecord implements Record {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Get this record's name.
    * @return null.
    * @see javax.resource.cci.Record#getRecordName()
    */
   @Override
-  public String getRecordName()
-  {
+  public String getRecordName() {
     return null;
   }
 
@@ -45,8 +48,7 @@ public class JPPFRecord implements Record
    * @see javax.resource.cci.Record#setRecordName(java.lang.String)
    */
   @Override
-  public void setRecordName(final String name)
-  {
+  public void setRecordName(final String name) {
   }
 
   /**
@@ -55,8 +57,7 @@ public class JPPFRecord implements Record
    * @see javax.resource.cci.Record#getRecordShortDescription()
    */
   @Override
-  public String getRecordShortDescription()
-  {
+  public String getRecordShortDescription() {
     return null;
   }
 
@@ -66,8 +67,7 @@ public class JPPFRecord implements Record
    * @see javax.resource.cci.Record#setRecordShortDescription(java.lang.String)
    */
   @Override
-  public void setRecordShortDescription(final String desc)
-  {
+  public void setRecordShortDescription(final String desc) {
   }
 
   /**
@@ -77,8 +77,7 @@ public class JPPFRecord implements Record
    * @see java.lang.Object#clone()
    */
   @Override
-  public Object clone() throws CloneNotSupportedException
-  {
+  public Object clone() throws CloneNotSupportedException {
     throw new CloneNotSupportedException();
   }
 }

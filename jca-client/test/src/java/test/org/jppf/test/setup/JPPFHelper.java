@@ -28,8 +28,7 @@ import org.jppf.jca.cci.*;
  * Utility class for obtaining and releasing Resource adapter connections.
  * @author Laurent Cohen
  */
-public class JPPFHelper
-{
+public class JPPFHelper {
   /**
    * JNDI name of the connection factory for JBoss app server.
    */
@@ -50,10 +49,9 @@ public class JPPFHelper
    * @throws NamingException if the connection factory lookup failed.
    * @throws ResourceException if a connection could not be obtained.
    */
-  public static JPPFConnection getConnection() throws NamingException, ResourceException
-  {
-    InitialContext context = new InitialContext();
-    Object objref = context.lookup(jndiName);
+  public static JPPFConnection getConnection() throws NamingException, ResourceException {
+    final InitialContext context = new InitialContext();
+    final Object objref = context.lookup(jndiName);
     JPPFConnectionFactory cf;
     if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
     else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
@@ -65,8 +63,7 @@ public class JPPFHelper
    * @param connection the connection to close.
    * @throws ResourceException if the connection could not be closed.
    */
-  public static void closeConnection(final JPPFConnection connection) throws ResourceException
-  {
+  public static void closeConnection(final JPPFConnection connection) throws ResourceException {
     connection.close();
   }
 

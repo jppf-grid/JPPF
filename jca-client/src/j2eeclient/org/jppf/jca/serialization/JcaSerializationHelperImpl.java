@@ -50,7 +50,7 @@ public class JcaSerializationHelperImpl extends SerializationHelperImpl {
       if (cl != null) {
         try {
           clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
-        } catch (@SuppressWarnings("unused") ClassNotFoundException ignore) {
+        } catch (@SuppressWarnings("unused") final ClassNotFoundException ignore) {
         }
       }
       if (clazz == null) {

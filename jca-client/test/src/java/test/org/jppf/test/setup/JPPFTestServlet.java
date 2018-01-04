@@ -29,17 +29,19 @@ import test.org.jppf.test.runner.*;
  * 
  * @author Laurent Cohen
  */
-public class JPPFTestServlet extends HttpServlet
-{
+public class JPPFTestServlet extends HttpServlet {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   @Override
-  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
-  {
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     perform(request, response);
   }
 
   @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
-  {
+  protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     perform(request, response);
   }
 
@@ -50,22 +52,21 @@ public class JPPFTestServlet extends HttpServlet
    * @throws ServletException if a servlet error occurs.
    * @throws IOException if an I/O error occurs.
    */
-  private void perform(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
-  {
-    JPPFTestRunner runner = new JPPFTestRunner();
-    ResultHolder result = runner.runTests("TestClasses.txt", null);
+  private static void perform(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    final JPPFTestRunner runner = new JPPFTestRunner();
+    final ResultHolder result = runner.runTests("TestClasses.txt", null);
     try {
-      String server = request.getParameter("server");
+      final String server = request.getParameter("server");
       if ("jboss".equalsIgnoreCase(server)) JPPFHelper.setJndiName(JPPFHelper.JNDI_NAME_JBOSS);
       if ("geronimo".equalsIgnoreCase(server)) JPPFHelper.setJndiName(JPPFHelper.JNDI_NAME_GERONIMO);
-      String remoteClient = request.getParameter("remoteClient");
+      final String remoteClient = request.getParameter("remoteClient");
       if (remoteClient != null) {
         // send the results to the remote java client
         runner.sendResults(result, response.getOutputStream());
       } else {
         // render the results in a web page.
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
   }

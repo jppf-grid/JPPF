@@ -27,8 +27,11 @@ import javax.resource.cci.InteractionSpec;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFInteractionSpec implements InteractionSpec
-{
+public class JPPFInteractionSpec implements InteractionSpec {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Support for java bean properties changes.
    */
@@ -43,8 +46,7 @@ public class JPPFInteractionSpec implements InteractionSpec
    * Initialize this interaction spec with the specified function.
    * @param functionName the name of the function.
    */
-  public JPPFInteractionSpec(final String functionName)
-  {
+  public JPPFInteractionSpec(final String functionName) {
     this.functionName = functionName;
   }
 
@@ -52,8 +54,7 @@ public class JPPFInteractionSpec implements InteractionSpec
    * Add a property change listener.
    * @param listener the listener to add.
    */
-  public void addPropertyChangeListener(final PropertyChangeListener listener)
-  {
+  public void addPropertyChangeListener(final PropertyChangeListener listener) {
     support.addPropertyChangeListener(listener);
   }
 
@@ -61,8 +62,7 @@ public class JPPFInteractionSpec implements InteractionSpec
    * Remove a property change listener.
    * @param listener the listener to add.
    */
-  public void removePropertyChangeListener(final PropertyChangeListener listener)
-  {
+  public void removePropertyChangeListener(final PropertyChangeListener listener) {
     support.removePropertyChangeListener(listener);
   }
 
@@ -70,8 +70,7 @@ public class JPPFInteractionSpec implements InteractionSpec
    * Get the name of the function associated with this interaction spec.
    * @return the function name as a string.
    */
-  public String getFunctionName()
-  {
+  public String getFunctionName() {
     return functionName;
   }
 
@@ -79,8 +78,7 @@ public class JPPFInteractionSpec implements InteractionSpec
    * Set the name of the function associated with this interaction spec.
    * @param newFunctionName the function name as a string.
    */
-  public void setFunctionName(final String newFunctionName)
-  {
+  public void setFunctionName(final String newFunctionName) {
     final String oldFunctionName = functionName;
     functionName = newFunctionName;
     support.firePropertyChange("functionName", oldFunctionName, newFunctionName);

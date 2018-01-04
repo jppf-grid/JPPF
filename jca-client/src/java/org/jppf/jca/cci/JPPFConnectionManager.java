@@ -26,8 +26,12 @@ import javax.resource.spi.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFConnectionManager implements ConnectionManager
-{
+public class JPPFConnectionManager implements ConnectionManager {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Get a connection from the pool.
    * @param mcf the managed connection factory that requested the connection.
@@ -37,10 +41,8 @@ public class JPPFConnectionManager implements ConnectionManager
    * @see javax.resource.spi.ConnectionManager#allocateConnection(javax.resource.spi.ManagedConnectionFactory, javax.resource.spi.ConnectionRequestInfo)
    */
   @Override
-  public Object allocateConnection(final ManagedConnectionFactory mcf, final ConnectionRequestInfo cxRequestInfo)
-  throws ResourceException
-  {
-    ManagedConnection conn = mcf.createManagedConnection(null, cxRequestInfo);
+  public Object allocateConnection(final ManagedConnectionFactory mcf, final ConnectionRequestInfo cxRequestInfo) throws ResourceException {
+    final ManagedConnection conn = mcf.createManagedConnection(null, cxRequestInfo);
     return conn.getConnection(null, cxRequestInfo);
   }
 }

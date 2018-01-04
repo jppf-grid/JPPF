@@ -35,6 +35,10 @@ import org.jppf.jca.spi.*;
  */
 public class JPPFConnectionFactory implements ConnectionFactory {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The default managed factory.
    */
   private JPPFManagedConnectionFactory factory = new JPPFManagedConnectionFactory();
@@ -67,7 +71,7 @@ public class JPPFConnectionFactory implements ConnectionFactory {
 
   @Override
   public Connection getConnection() throws ResourceException {
-    JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
+    final JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
     if (conn == null) return null;
     return conn;
   }
@@ -103,9 +107,9 @@ public class JPPFConnectionFactory implements ConnectionFactory {
    */
   public boolean isJPPFDriverAvailable() {
     if (factory == null) return false;
-    AbstractGenericClient client = factory.retrieveJppfClient();
+    final AbstractGenericClient client = factory.retrieveJppfClient();
     if (client != null) {
-      List<JPPFConnectionPool> list = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+      final List<JPPFConnectionPool> list = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
       return (list != null) && !list.isEmpty();
     }
     return false;
@@ -117,7 +121,7 @@ public class JPPFConnectionFactory implements ConnectionFactory {
    */
   public void enableLocalExecution(final boolean enabled) {
     if (factory != null) {
-      AbstractGenericClient client = factory.retrieveJppfClient();
+      final AbstractGenericClient client = factory.retrieveJppfClient();
       if (client != null) client.setLocalExecutionEnabled(enabled);
     }
   }

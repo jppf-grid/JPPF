@@ -37,8 +37,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFConnectionImpl implements JPPFConnection
-{
+public class JPPFConnectionImpl implements JPPFConnection {
   /**
    * Logger for this class.
    */
@@ -56,20 +55,17 @@ public class JPPFConnectionImpl implements JPPFConnection
    * Initialize this connection from a managed connection.
    * @param conn a <code>ManagedConnection</code> instance.
    */
-  public JPPFConnectionImpl(final JPPFManagedConnection conn)
-  {
+  public JPPFConnectionImpl(final JPPFManagedConnection conn) {
     this.managedConnection = conn;
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     if (managedConnection != null) managedConnection.fireConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED, null);
   }
 
   @Override
-  public Interaction createInteraction()
-  {
+  public Interaction createInteraction() {
     return new JPPFInteraction(this);
   }
 
@@ -79,14 +75,12 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @throws ResourceException this method always throws a NotSupportedException.
    */
   @Override
-  public LocalTransaction getLocalTransaction() throws ResourceException
-  {
+  public LocalTransaction getLocalTransaction() throws ResourceException {
     throw new NotSupportedException("Method not supported");
   }
 
   @Override
-  public ConnectionMetaData getMetaData()
-  {
+  public ConnectionMetaData getMetaData() {
     return new JPPFConnectionMetaData(null);
   }
 
@@ -96,20 +90,17 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @throws ResourceException this method always throws a NotSupportedException.
    */
   @Override
-  public ResultSetInfo getResultSetInfo() throws ResourceException
-  {
+  public ResultSetInfo getResultSetInfo() throws ResourceException {
     throw new NotSupportedException("Method not supported");
   }
 
   @Override
-  public String submit(final JPPFJob job) throws Exception
-  {
+  public String submit(final JPPFJob job) throws Exception {
     return submit(job, null);
   }
 
   @Override
-  public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception
-  {
+  public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception {
     job.setBlocking(false);
     if (listener != null) job.addJobStatusListener(listener);
     managedConnection.retrieveJppfClient().submitJob(job);
@@ -117,23 +108,20 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
-  public void addJobStatusListener(final String jobUuid, final JobStatusListener listener)
-  {
-    JPPFJob res = getJob(jobUuid);
+  public void addJobStatusListener(final String jobUuid, final JobStatusListener listener) {
+    final JPPFJob res = getJob(jobUuid);
     if (res != null) res.addJobStatusListener(listener);
   }
 
   @Override
-  public void removeJobStatusListener(final String jobUuid, final JobStatusListener listener)
-  {
-    JPPFJob res = getJob(jobUuid);
+  public void removeJobStatusListener(final String jobUuid, final JobStatusListener listener) {
+    final JPPFJob res = getJob(jobUuid);
     if (res != null) res.removeJobStatusListener(listener);
   }
 
   @Override
-  public JobStatus getJobStatus(final String jobUuid) throws Exception
-  {
-    JPPFJob res = getJob(jobUuid);
+  public JobStatus getJobStatus(final String jobUuid) throws Exception {
+    final JPPFJob res = getJob(jobUuid);
     if (res == null) return null;
     return res.getStatus();
   }
@@ -149,9 +137,8 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @throws Exception if an error occurs while submitting the request.
    */
   @Override
-  public List<Task<?>> getResults(final String jobUuid) throws Exception
-  {
-    JcaJobManager mgr = (JcaJobManager) managedConnection.retrieveJppfClient().getJobManager();
+  public List<Task<?>> getResults(final String jobUuid) throws Exception {
+    final JcaJobManager mgr = (JcaJobManager) managedConnection.retrieveJppfClient().getJobManager();
     JPPFJob res = mgr.peekJob(jobUuid);
     if (res == null) return null;
     res = mgr.pollJob(jobUuid);
@@ -163,20 +150,17 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @param jobUuid the id of the job to find.
    * @return a {@link JPPFJob} instance, or null if no job can be found for the specified uuid.
    */
-  private JPPFJob getJob(final String jobUuid)
-  {
+  private JPPFJob getJob(final String jobUuid) {
     return ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).peekJob(jobUuid);
   }
 
   @Override
-  public Collection<String> getAllJobIds()
-  {
+  public Collection<String> getAllJobIds() {
     return ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).getAllJobUuids();
   }
 
   @Override
-  public boolean cancelJob(final String jobUuid) throws Exception
-  {
+  public boolean cancelJob(final String jobUuid) throws Exception {
     return managedConnection.retrieveJppfClient().cancelJob(jobUuid);
   }
 
@@ -185,25 +169,22 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @param conn a <code>JPPFManagedConnection</code> instance.
    * @exclude
    */
-  public void setManagedConnection(final JPPFManagedConnection conn)
-  {
+  public void setManagedConnection(final JPPFManagedConnection conn) {
     this.managedConnection = conn;
   }
 
   @Override
-  public List<Task<?>> awaitResults(final String jobUuid) throws Exception
-  {
-    JPPFJob job = getJob(jobUuid);
+  public List<Task<?>> awaitResults(final String jobUuid) throws Exception {
+    final JPPFJob job = getJob(jobUuid);
     if (debugEnabled) log.debug("job = " + job);
     if (job == null) return null;
-    List<Task<?>> tasks = job.awaitResults();
+    final List<Task<?>> tasks = job.awaitResults();
     ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).pollJob(jobUuid);
     return tasks;
   }
 
   @Override
-  public void resetClient()
-  {
+  public void resetClient() {
     if (managedConnection != null) managedConnection.resetClient();
   }
 }

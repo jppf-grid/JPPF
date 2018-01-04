@@ -77,11 +77,11 @@ class JPPFConfigurationParser {
    * @return the config as a {@link TypedProperties} object.
    */
   private TypedProperties parseFromSource(final String src) {
-    TypedProperties config = new TypedProperties();
-    int idx = src.indexOf('|');
+    final TypedProperties config = new TypedProperties();
+    final int idx = src.indexOf('|');
     if (idx <= 0) return config;
-    String type = src.substring(0, idx).trim();
-    String path = src.substring(idx + 1).trim();
+    final String type = src.substring(0, idx).trim();
+    final String path = src.substring(idx + 1).trim();
     InputStream is = null;
     Reader reader = null;
     try {
@@ -94,7 +94,7 @@ class JPPFConfigurationParser {
       if (is != null) reader = new InputStreamReader(is);
       if (reader != null) config.loadAndResolve(reader);
       log.info("read configuration from source '{}': {}", src, config);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Error while initializing the JPPF client configuration", e);
     } finally {
       if (is != null) StreamUtils.closeSilent(is);
