@@ -52,17 +52,17 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   public void testDispatchExpirationSchedule() throws Exception {
     String listenerId = null;
     checkNodes();
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
-    LoadBalancingInformation lbInfo = jmx.loadBalancerInformation();
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final LoadBalancingInformation lbInfo = jmx.loadBalancerInformation();
     try {
-      Map<Object, Object> map = new HashMap<>();
+      final Map<Object, Object> map = new HashMap<>();
       map.put("size", "1");
       jmx.changeLoadBalancerSettings("manual", map);
-      NotifyingTaskListener listener = new NotifyingTaskListener();
+      final NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
-      JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
+      final JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 2);
       Task<?> task = results.get(0);
@@ -75,13 +75,13 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       Thread.sleep(1000L);
       assertNotNull(listener.notifs);
       assertEquals(1, listener.notifs.size());
-      Notification notification = listener.notifs.get(0);
+      final Notification notification = listener.notifs.get(0);
       assertTrue(notification instanceof JPPFNodeForwardingNotification);
-      JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
+      final JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
       assertEquals(NodeTestMBean.MBEAN_NAME, outerNotif.getMBeanName());
-      Notification notif = outerNotif.getNotification();
+      final Notification notif = outerNotif.getNotification();
       assertTrue(notif.getUserData() instanceof UserObject);
-      UserObject userObject = (UserObject) notif.getUserData();
+      final UserObject userObject = (UserObject) notif.getUserData();
       assertNotNull(userObject.nodeUuid);
       task = job.getJobTasks().get(0);
       assertEquals(NotifyingTask.END_PREFIX + task.getId(), userObject.taskId);
@@ -98,19 +98,19 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   @Test(timeout=8000)
   public void testMaxDispatchExpirations() throws Exception {
     String listenerId = null;
-    int maxExpirations = 2;
+    final int maxExpirations = 2;
     checkNodes();
     BaseTestHelper.printToAll(client, false, "trace 0");
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     try {
       BaseTestHelper.printToAll(client, false, "trace 1");
-      NotifyingTaskListener listener = new NotifyingTaskListener();
+      final NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       BaseTestHelper.printToAll(client, false, "trace 2");
       //Thread.sleep(250);
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotifyingTask.class, 5000L, true, true);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotifyingTask.class, 5000L, true, true);
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(750L)).setMaxDispatchExpirations(maxExpirations);
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       BaseTestHelper.printToAll(client, false, "trace 3");
       assertNotNull(results);
       assertEquals(results.size(), 1);
@@ -121,13 +121,13 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       assertNotNull(listener.notifs);
       BaseTestHelper.printToAll(client, false, "trace 4");
       assertEquals(maxExpirations + 1, listener.notifs.size());
-      for (Notification notification: listener.notifs) {
+      for (final Notification notification: listener.notifs) {
         assertTrue(notification instanceof JPPFNodeForwardingNotification);
-        JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
+        final JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
         assertEquals(NodeTestMBean.MBEAN_NAME, outerNotif.getMBeanName());
-        Notification notif = outerNotif.getNotification();
+        final Notification notif = outerNotif.getNotification();
         assertTrue(notif.getUserData() instanceof UserObject);
-        UserObject userObject = (UserObject) notif.getUserData();
+        final UserObject userObject = (UserObject) notif.getUserData();
         assertNotNull(userObject.nodeUuid);
         task = job.getJobTasks().get(0);
         assertEquals(NotifyingTask.START_PREFIX + task.getId(), userObject.taskId);
@@ -143,15 +143,15 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
    * Wait until all nodes are connected to the driver via JMX.
    * @throws Exception if any error occurs.
    */
-  private void checkNodes() throws Exception {
-    int nbNodes = BaseSetup.nbNodes();
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
-    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
+  private static void checkNodes() throws Exception {
+    final int nbNodes = BaseSetup.nbNodes();
+    final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
+    final JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
     while (true) {
-      Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+      final Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
       if (result.size() == nbNodes) {
         int count = 0;
-        for (Map.Entry<String, Object>entry: result.entrySet()) {
+        for (final Map.Entry<String, Object>entry: result.entrySet()) {
           if (entry.getValue() instanceof JPPFNodeState) count++;
           else break;
         }

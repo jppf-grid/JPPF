@@ -70,20 +70,20 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
       for (ExceptionHolder exh: result.getExceptions()) renderException(exh);
     }
     body.append("Tests results:\n\n");
-    for (String className: result.getClasses()) {
+    for (final String className: result.getClasses()) {
       body.append("class ").append(className).append('\n');
       incIndentation();
-      Collection<Failure> failures = result.getFailures().getValues(className);
+      final Collection<Failure> failures = result.getFailures().getValues(className);
       if (failures != null) {
-        for (Failure failure: failures) renderFailure(failure);
+        for (final Failure failure: failures) renderFailure(failure);
       }
       Collection<Description> descriptions = result.getSuccesses().getValues(className);
       if (descriptions != null) {
-        for (Description d: descriptions) renderDescription(d, "OK");
+        for (final Description d: descriptions) renderDescription(d, "OK");
       }
       descriptions = result.getIngored().getValues(className);
       if (descriptions != null) {
-        for (Description d: descriptions) renderDescription(d, "Ignored");
+        for (final Description d: descriptions) renderDescription(d, "Ignored");
       }
       decIndentation();
     }
@@ -96,7 +96,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
   private void renderException(final ExceptionHolder exh) {
     body.append(getIndentation()).append(exh.getClassName()).append('\n');
     incIndentation();
-    String s = ExceptionUtils.getStackTrace(exh.getThrowable());
+    final String s = ExceptionUtils.getStackTrace(exh.getThrowable());
     body.append(indent(s, getIndentation())).append("\n\n");
     decIndentation();
   }
@@ -109,7 +109,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
     renderDescription(failure.getDescription(), "Failure");
     if (failure.getException() != null) {
       incIndentation();
-      String s = ExceptionUtils.getStackTrace(failure.getException());
+      final String s = ExceptionUtils.getStackTrace(failure.getException());
       body.append(indent(s, getIndentation())).append("\n");
       decIndentation();
     }
@@ -132,10 +132,10 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
    * @param indentation the indentation to use.
    * @return the indented string.
    */
-  private String indent(final String source, final String indentation) {
+  private static String indent(final String source, final String indentation) {
     if (source == null) throw new IllegalArgumentException("source can't be null");
     if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new StringReader(source));
@@ -147,11 +147,11 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
       //boolean endsWithNewline = false;
       //if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
       while (true) {
-        char c = sb.charAt(sb.length()-1);
+        final char c = sb.charAt(sb.length()-1);
         if ((c == '\n') || (c == '\r')) sb.deleteCharAt(sb.length()-1);
         else break;
       }
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
     } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }

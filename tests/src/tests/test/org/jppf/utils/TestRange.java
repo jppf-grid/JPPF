@@ -36,7 +36,7 @@ public class TestRange extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testIsValueInRange() throws Exception {
-    Range<Integer> range = new Range<>(10, 23);
+    final Range<Integer> range = new Range<>(10, 23);
     assertTrue(range.isValueInRange(10));
     assertFalse(range.isValueInRange(10, false));
     assertTrue(range.isValueInRange(23));
@@ -55,7 +55,7 @@ public class TestRange extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testIntersects() throws Exception {
-    Range<Double> r1 = new Range<>(10d, 23d);
+    final Range<Double> r1 = new Range<>(10d, 23d);
     Range<Double> other = new Range<>(-10d, 2.5d);
     assertFalse(other.intersects(r1));
     assertFalse(other.intersects(r1, false));
@@ -82,7 +82,7 @@ public class TestRange extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testIncludes() throws Exception {
-    Range<Double> r1 = new Range<>(10d, 23d);
+    final Range<Double> r1 = new Range<>(10d, 23d);
     Range<Double> other = new Range<>(11d, 22d);
     assertFalse(other.includes(r1));
     assertTrue(r1.includes(other));
@@ -100,7 +100,7 @@ public class TestRange extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testMerge() throws Exception {
-    Range<Integer> r1 = new Range<>(10, 23);
+    final Range<Integer> r1 = new Range<>(10, 23);
     assertEquals(new Range<>(10, 23), r1.merge(new Range<>(10, 23)));
     assertEquals(new Range<>(10, 23), r1.merge(new Range<>(12, 21)));
     assertEquals(new Range<>(-5, 23), r1.merge(new Range<>(-5, 5)));
@@ -115,7 +115,7 @@ public class TestRange extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testIntersection() throws Exception {
-    Range<Integer> r1 = new Range<>(10, 23);
+    final Range<Integer> r1 = new Range<>(10, 23);
     assertEquals(new Range<>(10, 23), r1.intersection(new Range<>(10, 23)));
     assertEquals(new Range<>(12, 21), r1.intersection(new Range<>(12, 21)));
     assertEquals(new Range<>(10, 23), r1.intersection(new Range<>(-51, 51)));

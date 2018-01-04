@@ -39,8 +39,8 @@ public class TestKryoWithLZ4 extends AbstractTestSerialization {
   @BeforeClass
   public static void setup() throws Exception {
     allowsNonSerializable = true;
-    TestConfiguration config = createConfig("serialization/kryo_lz4");
-    List<String> commonCP = new ArrayList<>();
+    final TestConfiguration config = createConfig("serialization/kryo_lz4");
+    final List<String> commonCP = new ArrayList<>();
     commonCP.add("../samples-pack/KryoSerializer/classes");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-2.22-all.jar");

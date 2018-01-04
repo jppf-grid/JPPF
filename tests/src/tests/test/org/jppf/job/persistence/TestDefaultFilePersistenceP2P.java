@@ -46,8 +46,8 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "job_persistence_p2p";
-    TestConfiguration config = createConfig(prefix);
+    final String prefix = "job_persistence_p2p";
+    final TestConfiguration config = createConfig(prefix);
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }
@@ -58,12 +58,12 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
   @After
   public void tearDownInstance() throws Exception {
     for (int i=1; i<=BaseSetup.nbDrivers(); i++) {
-      try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11200 + i, false)) {
+      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11200 + i, false)) {
         jmx.connectAndWait(5_000L);
-        boolean b = jmx.isConnected();
+        final boolean b = jmx.isConnected();
         print(false, false, "tearDownInstance() for driver %d : jmx connected = %b", i, b);
         if (b) {
-          JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+          final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
           mgr.deleteJobs(JobSelector.ALL_JOBS);
         }
       }
@@ -76,43 +76,43 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testJobNotPersistedInPeer() throws Exception {
-    int nbTasks = 10;
-    String method = ReflectionUtils.getCurrentMethodName();
-    JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
+    final int nbTasks = 10;
+    final String method = ReflectionUtils.getCurrentMethodName();
+    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
     job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
     client.submitJob(job);
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     showDirContent("persistence1/" + job.getUuid());
     showDirContent("persistence2/" + job.getUuid());
     checkJobResults(nbTasks, results, false);
     // check that tasks were dispatched to both drivers and attached nodes
-    Set<String> set = new HashSet<>();
-    for (Task<?> task: results) {
+    final Set<String> set = new HashSet<>();
+    for (final Task<?> task: results) {
       assertTrue(task instanceof LifeCycleTask);
-      LifeCycleTask lct = (LifeCycleTask) task;
+      final LifeCycleTask lct = (LifeCycleTask) task;
       if (!set.contains(lct.getNodeUuid())) set.add(lct.getNodeUuid());
     }
     assertEquals(2, set.size());
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
       jmx.connectAndWait(5000L);
       assertTrue(jmx.isConnected());
-      JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-      List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
+      final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+      final List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(uuids);
       assertEquals(1, uuids.size());
       assertEquals(job.getUuid(), uuids.get(0));
       assertTrue(mgr.isJobComplete(job.getUuid()));
-      JPPFJob job2 = mgr.retrieveJob(job.getUuid());
+      final JPPFJob job2 = mgr.retrieveJob(job.getUuid());
       compareJobs(job, job2, true);
       checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
       assertTrue(mgr.deleteJob(job.getUuid()));
     }
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11202)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11202)) {
       jmx.connectAndWait(5000L);
       assertTrue(jmx.isConnected());
-      JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-      List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
+      final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+      final List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(uuids);
       assertTrue(uuids.isEmpty());
     }
@@ -122,12 +122,12 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
    * @param path .
    * @throws Exception if any error occurs.
    */
-  private void showDirContent(final String path) throws Exception {
-    File dir = new File(path);
-    List<String> list = new ArrayList<>();
+  private static void showDirContent(final String path) throws Exception {
+    final File dir = new File(path);
+    final List<String> list = new ArrayList<>();
     if (dir.exists()) {
-      File[] files = dir.listFiles();
-      for (File file: files) list.add(file.getName());
+      final File[] files = dir.listFiles();
+      for (final File file: files) list.add(file.getName());
     }
     print(true, false, "content of dir '%s': %s", path, list);
   }

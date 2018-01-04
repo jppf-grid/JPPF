@@ -75,17 +75,17 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs
    */
-  private void testNotifications(final NodeSelector selector, final String...expectedNodes) throws Exception {
-    int nbNodes = allNodes.size();
-    int nbTasks = 5 * nbNodes;
+  private static void testNotifications(final NodeSelector selector, final String...expectedNodes) throws Exception {
+    final int nbNodes = allNodes.size();
+    final int nbTasks = 5 * nbNodes;
     NotifyingTaskListener listener = null;
     String listenerID = null;
     try {
       configureLoadBalancer();
       listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
-      String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
-      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
+      final String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
+      final JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
       client.submitJob(job);
       Thread.sleep(1500L);
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
@@ -129,9 +129,9 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs
    */
-  private void testNoNotifcationReceived(final NodeSelector selector, final String...expectedNodes) throws Exception {
-    int nbNodes = expectedNodes.length;
-    int nbTasks = 5 * nbNodes;
+  private static void testNoNotifcationReceived(final NodeSelector selector, final String...expectedNodes) throws Exception {
+    final int nbNodes = expectedNodes.length;
+    final int nbTasks = 5 * nbNodes;
     NotifyingTaskListener listener = null;
     String listenerID = null;
     try {
@@ -139,8 +139,8 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       driverJmx.unregisterForwardingNotificationListener(listenerID);
-      String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
-      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
+      final String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
+      final JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
       client.submitJob(job);
       assertTrue(listener.notifs.isEmpty());
       assertNull(listener.exception);
@@ -162,28 +162,28 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
    * @param expectedNodes the nodes from which notifications should have been received.
    * @throws Exception if any error occurs.
    */
-  private void checkNotifs(final List<Notification> notifs, final int nbTasks, final String...expectedNodes) throws Exception {
+  private static void checkNotifs(final List<Notification> notifs, final int nbTasks, final String...expectedNodes) throws Exception {
     assertNotNull(expectedNodes);
     assertTrue(expectedNodes.length > 0);
-    Set<String> expectedNodesSet = CollectionUtils.set(expectedNodes);
+    final Set<String> expectedNodesSet = CollectionUtils.set(expectedNodes);
     assertNotNull(notifs);
-    int nbNotifsPerNode = nbTasks / allNodes.size();
+    final int nbNotifsPerNode = nbTasks / allNodes.size();
     assertEquals(expectedNodes.length * nbNotifsPerNode, notifs.size());
-    Map<String, AtomicInteger> notifCounts = new HashMap<>();
-    for (String uuid: expectedNodes) notifCounts.put(uuid, new AtomicInteger(0));
-    for (Notification notification: notifs) {
+    final Map<String, AtomicInteger> notifCounts = new HashMap<>();
+    for (final String uuid: expectedNodes) notifCounts.put(uuid, new AtomicInteger(0));
+    for (final Notification notification: notifs) {
       assertTrue(notification instanceof JPPFNodeForwardingNotification);
-      JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
+      final JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
       assertEquals(NodeTestMBean.MBEAN_NAME, outerNotif.getMBeanName());
-      Notification notif = outerNotif.getNotification();
+      final Notification notif = outerNotif.getNotification();
       assertTrue(notif.getUserData() instanceof UserObject);
-      UserObject userObject = (UserObject) notif.getUserData();
+      final UserObject userObject = (UserObject) notif.getUserData();
       assertNotNull(userObject.nodeUuid);
       assertTrue(expectedNodesSet.contains(userObject.nodeUuid));
       assertEquals(outerNotif.getNodeUuid(), userObject.nodeUuid);
       notifCounts.get(userObject.nodeUuid).incrementAndGet();
     }
-    for (Map.Entry<String, AtomicInteger> entry: notifCounts.entrySet()) {
+    for (final Map.Entry<String, AtomicInteger> entry: notifCounts.entrySet()) {
       assertEquals(nbNotifsPerNode, entry.getValue().get());
     }
   }

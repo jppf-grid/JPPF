@@ -42,11 +42,11 @@ public class TestJobSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testAllJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
-    List<JPPFJob> jobs = createJobs(6, prefix);
-    JobSelector selector = new AllJobsSelector();
+    final String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    final List<JPPFJob> jobs = createJobs(6, prefix);
+    final JobSelector selector = new AllJobsSelector();
     checkSerialization(selector);
-    List<JPPFJob> filtered = filter(jobs, selector);
+    final List<JPPFJob> filtered = filter(jobs, selector);
     assertNotNull(filtered);
     assertEquals(jobs, filtered);
   }
@@ -56,14 +56,14 @@ public class TestJobSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testJobUuidSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
-    List<JPPFJob> jobs = createJobs(6, prefix);
+    final String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    final List<JPPFJob> jobs = createJobs(6, prefix);
     // select jobs with an even number
-    List<String> uuids = new ArrayList<>();
+    final List<String> uuids = new ArrayList<>();
     for (int i=1; i<jobs.size(); i+=2) uuids.add(jobs.get(i).getUuid());
-    JobSelector selector = new JobUuidSelector(uuids);
+    final JobSelector selector = new JobUuidSelector(uuids);
     checkSerialization(selector);
-    List<JPPFJob> filtered = filter(jobs, selector);
+    final List<JPPFJob> filtered = filter(jobs, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -76,17 +76,17 @@ public class TestJobSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
-    List<JPPFJob> jobs = createJobs(6, prefix);
+    final String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    final List<JPPFJob> jobs = createJobs(6, prefix);
     // select jobs with an even number
-    StringBuilder script = new StringBuilder()
+    final StringBuilder script = new StringBuilder()
       .append("var test = jppfJob.getMetadata().getParameter('test', -1);\n")
       .append("test % 2 == 0;\n");
-    ScriptedJobSelector selector = new ScriptedJobSelector("javascript", script.toString());
-    ScriptedJobSelector selector2 = (ScriptedJobSelector) checkSerialization(selector);
+    final ScriptedJobSelector selector = new ScriptedJobSelector("javascript", script.toString());
+    final ScriptedJobSelector selector2 = (ScriptedJobSelector) checkSerialization(selector);
     assertEquals(selector.getLanguage(), selector2.getLanguage());
     assertEquals(selector.getScript(), selector2.getScript());
-    List<JPPFJob> filtered = filter(jobs, selector);
+    final List<JPPFJob> filtered = filter(jobs, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -99,12 +99,12 @@ public class TestJobSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testScriptedJobSelector2() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
-    List<JPPFJob> jobs = createJobs(6, prefix);
+    final String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    final List<JPPFJob> jobs = createJobs(6, prefix);
     // select jobs with an even number
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     checkSerialization(selector);
-    List<JPPFJob> filtered = filter(jobs, selector);
+    final List<JPPFJob> filtered = filter(jobs, selector);
     assertNotNull(filtered);
     assertEquals(jobs, filtered);
   }
@@ -114,12 +114,12 @@ public class TestJobSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testCustomJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
-    List<JPPFJob> jobs = createJobs(6, prefix);
+    final String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    final List<JPPFJob> jobs = createJobs(6, prefix);
     // select jobs with an even number
-    JobSelector selector = new MyJobSelector();
+    final JobSelector selector = new MyJobSelector();
     checkSerialization(selector);
-    List<JPPFJob> filtered = filter(jobs, selector);
+    final List<JPPFJob> filtered = filter(jobs, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -133,9 +133,9 @@ public class TestJobSelector extends BaseTest {
    * @param selector the selector to apply.
    * @return a list of {@link JPPFJob} instances.
    */
-  private List<JPPFJob> filter(final List<JPPFJob> jobs, final JobSelector selector) {
-    List<JPPFJob> list = new ArrayList<>(jobs.size());
-    for (JPPFJob job: jobs) {
+  private static List<JPPFJob> filter(final List<JPPFJob> jobs, final JobSelector selector) {
+    final List<JPPFJob> list = new ArrayList<>(jobs.size());
+    for (final JPPFJob job: jobs) {
       if (selector.accepts(job)) list.add(job);
     }
     return list;
@@ -148,10 +148,10 @@ public class TestJobSelector extends BaseTest {
    * @return a list of {@link JPPFJob} instances.
    * @throws Exception if any error occurs.
    */
-  private List<JPPFJob> createJobs(final int nbJobs, final String namePrefix) throws Exception {
-    List<JPPFJob> jobs = new ArrayList<>();
+  private static List<JPPFJob> createJobs(final int nbJobs, final String namePrefix) throws Exception {
+    final List<JPPFJob> jobs = new ArrayList<>();
     for (int i=1; i<= nbJobs; i++) {
-      JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, 1, LifeCycleTask.class, 0L);
       job.getMetadata().setParameter("test", i);
       jobs.add(job);
     }
@@ -164,18 +164,23 @@ public class TestJobSelector extends BaseTest {
    * @return a deep copy of the input selector via serialization.
    * @throws Exception if any error occurs.
    */
-  private JobSelector checkSerialization(final JobSelector selector) throws Exception {
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    JPPFBuffer buf = ser.serialize(selector);
-    JobSelector selector2 = (JobSelector) ser.deserialize(buf);
+  private static JobSelector checkSerialization(final JobSelector selector) throws Exception {
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final JPPFBuffer buf = ser.serialize(selector);
+    final JobSelector selector2 = (JobSelector) ser.deserialize(buf);
     return selector2;
   }
 
   /** */
   public static class MyJobSelector implements JobSelector {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean accepts(final JPPFDistributedJob job) {
-      int n = job.getMetadata().getParameter("test", -1);
+      final int n = job.getMetadata().getParameter("test", -1);
       return n % 2 == 0;
     }
   }

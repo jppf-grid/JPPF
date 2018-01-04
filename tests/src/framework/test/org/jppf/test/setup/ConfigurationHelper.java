@@ -44,7 +44,7 @@ public class ConfigurationHelper {
     String path = null;
     try {
       //System.err.println("jppf temp dir: " + FileUtils.getJPPFTempDir());
-      File file = File.createTempFile("config", ".properties", FileUtils.getJPPFTempDir());
+      final File file = File.createTempFile("config", ".properties", FileUtils.getJPPFTempDir());
       file.deleteOnExit();
       Writer writer = null;
       try {
@@ -55,7 +55,7 @@ public class ConfigurationHelper {
       }
       path = file.getCanonicalPath().replace('\\', '/');
       tempFiles.add(file);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
     }
@@ -69,7 +69,7 @@ public class ConfigurationHelper {
    * @return a configuration object where the string "${n}" was replace with the driver or node number.
    */
   public static TypedProperties createConfigFromTemplate(final String templatePath, final int n) {
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("$n", n);
     return createConfigFromTemplate(templatePath, variables);
   }
@@ -81,28 +81,28 @@ public class ConfigurationHelper {
    * @return a configuration object where the string "${n}" was replace with the driver or node number.
    */
   public static TypedProperties createConfigFromTemplate(final String templatePath, final Map<String, Object> variables) {
-    TypedProperties result = new TypedProperties();
+    final TypedProperties result = new TypedProperties();
     Reader reader = null;
     try {
-      TypedProperties props = new TypedProperties();
+      final TypedProperties props = new TypedProperties();
       reader = FileUtils.getFileReader(templatePath);
       if (reader == null) throw new FileNotFoundException("could not load config file '" + templatePath + '\'');
       //props.load(reader);
       props.loadAndResolve(reader);
-      for (Map.Entry<Object, Object> entry : props.entrySet()) {
+      for (final Map.Entry<Object, Object> entry : props.entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-          String key = (String) entry.getKey();
+          final String key = (String) entry.getKey();
           String value = (String) entry.getValue();
           try {
-            String s = "[" + templatePath + ", " + key + "]";
+            final String s = "[" + templatePath + ", " + key + "]";
             value = parseValue(s, value, variables);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             throw new RuntimeException("Invalid expression for template file: '" + templatePath + "', property: '" + key + " = " + value + '\'', e);
           }
           result.setProperty(key, value);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
     } finally {
@@ -122,11 +122,11 @@ public class ConfigurationHelper {
   private static String parseValue(final String key, final String source, final Map<String, Object> variables) throws Exception {
     String value = source.trim();
     if (value.startsWith("expr:")) {
-      String expr = value.substring("expr:".length()).trim();
+      final String expr = value.substring("expr:".length()).trim();
       ScriptRunner runner = null;
       try {
         runner = ScriptRunnerFactory.getScriptRunner("groovy");
-        Object o = runner.evaluate(key, expr, variables);
+        final Object o = runner.evaluate(key, expr, variables);
         if (o != null) value = o.toString();
       } finally {
         ScriptRunnerFactory.releaseScriptRunner(runner);
@@ -156,7 +156,7 @@ public class ConfigurationHelper {
       reader = new BufferedReader(new FileReader(path));
       //properties.load(reader);
       properties.loadAndResolve(reader);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
     } finally {

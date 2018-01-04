@@ -47,7 +47,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = createConfig("p2p");
+    final TestConfiguration config = createConfig("p2p");
     config.driverLog4j = "classes/tests/config/p2p/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }
@@ -97,7 +97,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @Test(timeout = 5000)
   public void testServerConnections() throws Exception {
-    List<JPPFConnectionPool> pools = client.getConnectionPools();
+    final List<JPPFConnectionPool> pools = client.getConnectionPools();
     Collections.sort(pools, new Comparator<JPPFConnectionPool>() {
       @Override
       public int compare(final JPPFConnectionPool o1, final JPPFConnectionPool o2) {
@@ -107,14 +107,14 @@ public class TestMultiServer extends AbstractNonStandardSetup {
     assertNotNull(pools);
     assertEquals(2, pools.size());
     for (int i=1; i<=2; i++) {
-      JPPFConnectionPool pool = pools.get(i-1);
+      final JPPFConnectionPool pool = pools.get(i-1);
       assertNotNull(pool);
       assertEquals("driver" + i, pool.getName());
       assertEquals(11100 + i, pool.getDriverPort());
-      List<JPPFClientConnection> connections = pool.getConnections();
+      final List<JPPFClientConnection> connections = pool.getConnections();
       assertNotNull(connections);
       assertEquals(1, connections.size());
-      for (JPPFClientConnection c: connections) {
+      for (final JPPFClientConnection c: connections) {
         assertNotNull(c);
         assertNotNull(c.getStatus());
         assertEquals(JPPFClientConnectionStatus.ACTIVE, c.getStatus());
@@ -130,23 +130,24 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   @Test(timeout = TIMEOUT)
   public void testTopologyMonitoring() throws Exception {
     client.awaitConnectionPools(Operator.EQUAL, 2, Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.workingStatuses());
-    final TopologyManager mgr = new TopologyManager(client);
-    ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
-      @Override
-      public boolean evaluate() {
-        List<TopologyDriver> drivers = mgr.getDrivers();
-        if ((drivers != null) && (drivers.size() == 2)) {
-          for (TopologyDriver driver: drivers) {
-            List<TopologyPeer> peers = driver.getPeers();
-            if ((peers == null) || (peers.size() != 1)) return false;
+    try (final TopologyManager mgr = new TopologyManager(client)) {
+      final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
+        @Override
+        public boolean evaluate() {
+          final List<TopologyDriver> drivers = mgr.getDrivers();
+          if ((drivers != null) && (drivers.size() == 2)) {
+            for (final TopologyDriver driver: drivers) {
+              final List<TopologyPeer> peers = driver.getPeers();
+              if ((peers == null) || (peers.size() != 1)) return false;
+            }
+            return true;
           }
-          return true;
+          return false;
         }
-        return false;
-      }
-    };
-    do {
-      Thread.sleep(50L);
-    } while (!cond.evaluate());
+      };
+      do {
+        Thread.sleep(50L);
+      } while (!cond.evaluate());
+    }
   }
 }

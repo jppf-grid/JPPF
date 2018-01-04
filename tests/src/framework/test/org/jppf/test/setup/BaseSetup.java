@@ -134,7 +134,7 @@ public class BaseSetup {
     TestConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();
-    Map<String, Object> bindings = new HashMap<>();
+    final Map<String, Object> bindings = new HashMap<>();
     bindings.put("$nbDrivers", nbDrivers);
     bindings.put("$nbNodes", nbNodes);
     drivers = new DriverProcessLauncher[nbDrivers];
@@ -230,7 +230,7 @@ public class BaseSetup {
       System.gc();
       stopProcesses();
       ConfigurationHelper.cleanup();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -240,8 +240,10 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void generateClientThreadDump() throws Exception {
-    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
-    FileUtils.writeTextFile("client_thread_dump.log", text);
+    try (final Diagnostics diag = new Diagnostics("client")) {
+      final String text = TextThreadDumpWriter.printToString(diag.threadDump(), "client thread dump");
+      FileUtils.writeTextFile("client_thread_dump.log", text);
+    }
   }
 
   /**
@@ -251,8 +253,8 @@ public class BaseSetup {
    */
   public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
     if (client == null) return;
-    List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
-    JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
+    final List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
+    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
     for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();
     generateDriverThreadDump(jmxArray);
   }
@@ -266,10 +268,10 @@ public class BaseSetup {
     for (JMXDriverConnectionWrapper jmx: jmxConnections) {
       if ((jmx != null) && jmx.isConnected()) {
         try {
-          DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
-          String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+          final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+          final String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
           FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error("failed to generate driver thread dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
         }
       }
@@ -307,21 +309,21 @@ public class BaseSetup {
    */
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes, final boolean printEpilogue) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
+    final Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected) {
-      List<JPPFConnectionPool> list = client.getConnectionPools();
+      final List<JPPFConnectionPool> list = client.getConnectionPools();
       if (list != null) {
-        for (JPPFConnectionPool pool: list) {
+        for (final JPPFConnectionPool pool: list) {
           if (!connectionMap.containsKey(pool.getDriverPort())) connectionMap.put(pool.getDriverPort(), pool);
         }
       }
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
-    Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
-    for (Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
+    for (final Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
+      final JMXDriverConnectionWrapper wrapper = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       if (!wrapperMap.containsKey(wrapper.getURL())) {
         wrapperMap.put(wrapper.getURL(), wrapper);
       }
@@ -329,8 +331,8 @@ public class BaseSetup {
     int sum = 0;
     while (sum < nbNodes) {
       sum = 0;
-      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
-        Integer n = entry.getValue().nbNodes();
+      for (final Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
+        final Integer n = entry.getValue().nbNodes();
         if (n != null) sum += n;
         else break;
       }
@@ -355,7 +357,7 @@ public class BaseSetup {
           d.stopProcess();
         }
       }
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       t.printStackTrace();
     }
   }
@@ -369,7 +371,7 @@ public class BaseSetup {
       public void run() {
         try {
           close();
-        } catch(@SuppressWarnings("unused") Exception ignore) {
+        } catch(@SuppressWarnings("unused") final Exception ignore) {
         }
       }
     };
@@ -397,8 +399,8 @@ public class BaseSetup {
    * @return a {@link TestConfiguration} instance.
    */
   public static TestConfiguration createDefaultConfiguration() {
-    TestConfiguration config = new TestConfiguration();
-    List<String> commonCP = new ArrayList<>();
+    final TestConfiguration config = new TestConfiguration();
+    final List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
     commonCP.add("classes/tests/config");
     commonCP.add("../node/classes");
@@ -409,10 +411,10 @@ public class BaseSetup {
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
     commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
-    List<String> driverCP = new ArrayList<>(commonCP);
+    final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
-    String dir = "classes/tests/config";
+    final String dir = "classes/tests/config";
     config.driverJppf = dir + "/driver.template.properties";
     config.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     config.driverClasspath = driverCP;
@@ -440,8 +442,8 @@ public class BaseSetup {
    * @param names the names of the log4j loggers to configure.
    */
   public static void setLoggerLevel(final Level level, final String...names) {
-    for (String name: names) {
-      org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
+    for (final String name: names) {
+      final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
       if (logger != null) logger.setLevel(level);
     }
   }

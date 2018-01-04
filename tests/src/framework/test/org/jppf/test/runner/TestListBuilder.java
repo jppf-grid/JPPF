@@ -87,15 +87,15 @@ public class TestListBuilder {
    */
   public List<String> buildList(final String prefix, final File dir) throws Exception {
     //System.out.println("exploring directory " + dir);
-    File[] files = dir.listFiles();
+    final File[] files = dir.listFiles();
     if (files == null) return names;
-    for (File file: files) {
+    for (final File file: files) {
       if (file.isDirectory()) buildList(prefix + file.getName() + ".", file);
       else {
         String s = file.getName();
-        int i = s.lastIndexOf(".");
+        final int i = s.lastIndexOf(".");
         if (i >= 0) s = s.substring(0, i);
-        String name = prefix + s;
+        final String name = prefix + s;
         if (filter.accept(file) && hasJUnitTest(name)) {
           //System.out.println(name  + " is accepted");
           names.add(name);
@@ -113,11 +113,11 @@ public class TestListBuilder {
    * @throws Exception if any error occurs.
    */
   protected boolean hasJUnitTest(final String className) throws Exception {
-    Class<?> clazz = Class.forName(className);
+    final Class<?> clazz = Class.forName(className);
     int mod = clazz.getModifiers();
     if (Modifier.isAbstract(mod) || !Modifier.isPublic(mod)) return false;
-    Method[] methods = clazz.getDeclaredMethods();
-    for (Method m: methods) {
+    final Method[] methods = clazz.getDeclaredMethods();
+    for (final Method m: methods) {
       mod = m.getModifiers();
       if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) continue;
       if (m.getAnnotation(Test.class) != null) return true;
@@ -131,7 +131,7 @@ public class TestListBuilder {
    * @throws IOException if I/O error occurs.
    */
   public void writeTestList(final File dest) throws IOException {
-    BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
+    final BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
     try {
       for (String name: names) writer.write(name + '\n');
     } finally {
@@ -149,12 +149,12 @@ public class TestListBuilder {
    */
   public static void main(final String[] args) {
     try {
-      File srcDir = new File(args[0]);
-      TestListBuilder builder = new TestListBuilder(srcDir);
+      final File srcDir = new File(args[0]);
+      final TestListBuilder builder = new TestListBuilder(srcDir);
       builder.buildList();
-      File dest = new File(args[1]);
+      final File dest = new File(args[1]);
       builder.writeTestList(dest);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

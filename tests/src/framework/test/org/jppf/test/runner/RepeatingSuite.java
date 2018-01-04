@@ -61,18 +61,18 @@ public class RepeatingSuite extends Suite {
   private static List<Runner> getRunners(final Class<?> suiteClass) throws InitializationError {
     final RepeatingSuiteClasses annotation = suiteClass.getAnnotation(RepeatingSuiteClasses.class);
     if (annotation == null) throw new InitializationError(String.format("class '%s' must have a RepeatingSuiteClasses annotation", suiteClass.getName()));
-    int repeat = annotation.repeat();
+    final int repeat = annotation.repeat();
     if (repeat <= 0) throw new InitializationError(String.format("class '%s' must have a repeat >= 1, currently %d", suiteClass.getName(), repeat));
-    List<Class<?>> classes = Arrays.asList(annotation.classes());
+    final List<Class<?>> classes = Arrays.asList(annotation.classes());
     System.out.printf("Repeating tests with repeat=%d, shuffleClasses=%b, shuffleMethods=%b, classes=%s%n", repeat, annotation.shuffleClasses(), annotation.shuffleMethods(), classes);
-    List<Runner> runners = new ArrayList<>(repeat * classes.size());
+    final List<Runner> runners = new ArrayList<>(repeat * classes.size());
     // compute the max number of digits for the iteration numbers
-    int nbDigits = (repeat > 1) ? (int) Math.ceil(Math.log10(repeat)) : 1;
+    final int nbDigits = (repeat > 1) ? (int) Math.ceil(Math.log10(repeat)) : 1;
     // iteration numbers are 0-padded up to the max number of digits
-    String format = "[%0" + nbDigits + "d]";
+    final String format = "[%0" + nbDigits + "d]";
     for (int i=0; i<repeat; i++) {
       final String suffix = String.format(format, i);
-      List<Class<?>> tmp = new ArrayList<>(classes);
+      final List<Class<?>> tmp = new ArrayList<>(classes);
       if (annotation.shuffleClasses() && !tmp.isEmpty()) Collections.shuffle(tmp);
       for (final Class<?> testClass: tmp) {
         runners.add(new BlockJUnit4ClassRunner(testClass) {
@@ -88,7 +88,7 @@ public class RepeatingSuite extends Suite {
 
           @Override
           protected List<FrameworkMethod> getChildren() {
-            List<FrameworkMethod> children = super.getChildren();
+            final List<FrameworkMethod> children = super.getChildren();
             if (annotation.shuffleMethods()) Collections.shuffle(children);
             return children;
           }

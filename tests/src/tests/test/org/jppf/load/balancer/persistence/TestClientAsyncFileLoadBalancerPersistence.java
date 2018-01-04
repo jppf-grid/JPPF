@@ -33,8 +33,8 @@ public class TestClientAsyncFileLoadBalancerPersistence extends AbstractClientLo
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "lb_persistence_client";
-    TestConfiguration config = dbSetup(prefix, false);
+    final String prefix = "lb_persistence_client";
+    final TestConfiguration config = dbSetup(prefix, false);
     config.clientConfig = "classes/tests/config/" + prefix + "/client_async_file.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 1, true, true, config);

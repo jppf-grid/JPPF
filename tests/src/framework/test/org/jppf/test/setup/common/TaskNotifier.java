@@ -32,16 +32,13 @@ public class TaskNotifier {
    */
   private static NodeTestMBean mbean = null;
   static {
-    JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
-    jmxWrapper.connect();
-    if (!jmxWrapper.isConnected()) {
-      System.out.println("Error: could not connect to the local MBean server");
-    } else {
-      try {
-        mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
-      } catch (Exception e) {
-        System.out.println("Error: " + ExceptionUtils.getMessage(e));
-      }
+    try (JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper()) {
+      jmxWrapper.connect();
+      if (!jmxWrapper.isConnected()) {
+        System.out.println("Error: could not connect to the local MBean server");
+      } else mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
+    } catch (final Exception e) {
+      System.out.println("Error: " + ExceptionUtils.getMessage(e));
     }
   }
 

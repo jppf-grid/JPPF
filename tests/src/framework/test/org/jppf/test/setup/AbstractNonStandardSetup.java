@@ -58,7 +58,7 @@ public class AbstractNonStandardSetup extends BaseTest {
   protected static TestConfiguration createConfig(final String prefix) throws Exception {
     SSLHelper.resetConfig();
     testConfig = new TestConfiguration();
-    List<String> commonCP = new ArrayList<>();
+    final List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
     commonCP.add("classes/tests/config");
     commonCP.add("../common/classes");
@@ -69,9 +69,9 @@ public class AbstractNonStandardSetup extends BaseTest {
     commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
     commonCP.add("../jmxremote/classes");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
-    List<String> driverCP = new ArrayList<>(commonCP);
+    final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
-    String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
+    final String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
     testConfig.driverJppf = dir + "/driver.properties";
     testConfig.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     testConfig.driverClasspath = driverCP;
@@ -114,21 +114,21 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected void testSimpleJob(final ExecutionPolicy policy, final String nodePrefix) throws Exception {
     System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection(client).loadBalancerInformation());
-    int tasksPerNode = 5;
-    int nbNodes = getNbNodes();
-    int nbTasks = tasksPerNode * nbNodes;
-    String name = ReflectionUtils.getCurrentClassAndMethod();
-    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 250L);
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int nbTasks = tasksPerNode * nbNodes;
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 250L);
     job.getClientSLA().setExecutionPolicy(policy);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();
-    for (Task<?> t: results) {
+    final CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();
+    for (final Task<?> t: results) {
       assertTrue("task = " + t, t instanceof LifeCycleTask);
-      LifeCycleTask task = (LifeCycleTask) t;
+      final LifeCycleTask task = (LifeCycleTask) t;
       map.putValue(task.getNodeUuid(), task);
-      Throwable throwable = t.getThrowable();
+      final Throwable throwable = t.getThrowable();
       assertNull("throwable for task '" + t.getId() + "' : " + ExceptionUtils.getStackTrace(throwable), throwable);
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
@@ -136,7 +136,7 @@ public class AbstractNonStandardSetup extends BaseTest {
     BaseTest.printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
-      String key = nodePrefix + (i+1);
+      final String key = nodePrefix + (i+1);
       assertTrue(map.containsKey(key));
       assertEquals(tasksPerNode, map.getValues(key).size());
     }
@@ -147,25 +147,25 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testMultipleJobs() throws Exception {
-    int tasksPerNode = 5;
-    int nbNodes = getNbNodes();
-    int nbTasks = tasksPerNode * nbNodes;
-    int nbJobs = 3;
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int nbTasks = tasksPerNode * nbNodes;
+    final int nbJobs = 3;
     try {
       if (client != null) client.close();
       JPPFConfiguration.set(JPPFProperties.POOL_SIZE, 2);
       client = BaseSetup.createClient(null, false);
-      String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
-      List<JPPFJob> jobs = new ArrayList<>(nbJobs);
+      final String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
+      final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
-      for (JPPFJob job: jobs) client.submitJob(job);
-      for (JPPFJob job: jobs) {
-        List<Task<?>> results = job.awaitResults();
+      for (final JPPFJob job: jobs) client.submitJob(job);
+      for (final JPPFJob job: jobs) {
+        final List<Task<?>> results = job.awaitResults();
         assertNotNull(results);
         assertEquals(nbTasks, results.size());
-        for (Task<?> task: results) {
+        for (final Task<?> task: results) {
           assertTrue("task = " + task, task instanceof LifeCycleTask);
-          Throwable t = task.getThrowable();
+          final Throwable t = task.getThrowable();
           assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
           assertNotNull(task.getResult());
           assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
@@ -182,19 +182,19 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testCancelJob() throws Exception {
-    int tasksPerNode = 5;
-    int nbNodes = getNbNodes();
-    int nbTasks = tasksPerNode * nbNodes;
-    JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int nbTasks = tasksPerNode * nbNodes;
+    final JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
     client.submitJob(job);
     Thread.sleep(1500L);
     client.cancelJob(job.getUuid());
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals("results size should be " + nbTasks + " but is " + results.size(), nbTasks, results.size());
     int count = 0;
-    for (Task<?> task: results) {
-      Throwable t = task.getThrowable();
+    for (final Task<?> task: results) {
+      final Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
       if (task.getResult() == null) count++;
     }
@@ -206,14 +206,14 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testNotSerializableExceptionFromNode() throws Exception {
-    int tasksPerNode = 5;
-    int nbNodes = getNbNodes();
-    int nbTasks = tasksPerNode * nbNodes;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
-    List<Task<?>> results = client.submitJob(job);
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int nbTasks = tasksPerNode * nbNodes;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results) {
+    for (final Task<?> task: results) {
       assertTrue(task instanceof NotSerializableTask);
       assertNull(task.getResult());
       assertNotNull(task.getThrowable());
@@ -226,14 +226,14 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testNotSerializableWorkingInNode() throws Exception {
-    int tasksPerNode = 5;
-    int nbNodes = getNbNodes();
-    int nbTasks = tasksPerNode * nbNodes;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
-    List<Task<?>> results = client.submitJob(job);
+    final int tasksPerNode = 5;
+    final int nbNodes = getNbNodes();
+    final int nbTasks = tasksPerNode * nbNodes;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results) {
+    for (final Task<?> task: results) {
       assertTrue(task instanceof NotSerializableTask);
       assertNotNull(task.getResult());
       assertEquals("success", task.getResult());
@@ -246,19 +246,19 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected void testForwardingMBean() throws Exception {
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
-    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
+    final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
+    final JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
     long elapsed = 0L;
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     while (!ready) {
       elapsed = DateTimeUtils.elapsedFrom(start);
       assertTrue((elapsed < 20_000L));
       try {
-        Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
+        final Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
         assertNotNull(result);
         assertEquals(getNbNodes(), result.size());
-        for (Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
+        for (final Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
         ready = true;
       } catch (@SuppressWarnings("unused") Exception|AssertionError e) {
         Thread.sleep(100L);
@@ -272,8 +272,8 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {
-    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-    for (JPPFConnectionPool pool: pools) awaitNbIdleNodes(pool.awaitWorkingJMXConnection(), Operator.EQUAL, 1, 5000L);
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    for (final JPPFConnectionPool pool: pools) awaitNbIdleNodes(pool.awaitWorkingJMXConnection(), Operator.EQUAL, 1, 5000L);
   }
 
 
@@ -292,7 +292,7 @@ public class AbstractNonStandardSetup extends BaseTest {
           try {
             operator.evaluate(jmx.nbIdleNodes(NON_PEER_SELECTOR), nbNodes);
             return jmx.nbIdleNodes(NON_PEER_SELECTOR) == 1;
-          } catch (@SuppressWarnings("unused") Exception e) {
+          } catch (@SuppressWarnings("unused") final Exception e) {
             return false;
           }
         }

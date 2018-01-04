@@ -62,7 +62,7 @@ public class TestConfiguration {
    * @return a {@link TestConfiguration} instance.
    */
   public TestConfiguration copy() {
-    TestConfiguration copy = new TestConfiguration();
+    final TestConfiguration copy = new TestConfiguration();
     copy.driverJppf = driverJppf;
     copy.driverLog4j = driverLog4j;
     copy.driverClasspath = new ArrayList<>(driverClasspath);

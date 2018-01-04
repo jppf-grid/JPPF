@@ -33,8 +33,8 @@ public class TestDefaultDatabasePersistenceCacheableAsync extends AbstractJobPer
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "job_persistence";
-    TestConfiguration config = dbSetup(prefix);
+    final String prefix = "job_persistence";
+    final TestConfiguration config = dbSetup(prefix);
     config.driverJppf = "classes/tests/config/" + prefix + "/driver_cacheable_async_db.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 2, true, true, config);

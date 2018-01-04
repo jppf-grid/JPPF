@@ -41,20 +41,20 @@ public class TestScriptedTask extends Setup1D1N1C {
    */
   @Test(timeout = 8000)
   public void testSimpleGroovyScript() throws Exception {
-    int nbTasks = 10;
-    String msg = "Hello JPPF ";
-    String script = "return '" + msg + "' + jppfTask.getId()";
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 10;
+    final String msg = "Hello JPPF ";
+    final String script = "return '" + msg + "' + jppfTask.getId()";
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     for (int i = 0; i < nbTasks; i++) {
       job.add(new ScriptedTask<String>("groovy", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i = 0; i < nbTasks; i++) {
-      Task<?> task = results.get(i);
-      Throwable t = task.getThrowable();
+      final Task<?> task = results.get(i);
+      final Throwable t = task.getThrowable();
       assertNull("task has throwable: " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
       assertEquals(msg + '(' + (i + 1) + ')', task.getResult());
@@ -67,20 +67,20 @@ public class TestScriptedTask extends Setup1D1N1C {
    */
   @Test(timeout = 8000)
   public void testSimpleJavascript() throws Exception {
-    int nbTasks = 10;
-    String msg = "Hello JPPF ";
-    String script = "function myFunc() { return '" + msg + "' + jppfTask.getId(); } myFunc();";
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 10;
+    final String msg = "Hello JPPF ";
+    final String script = "function myFunc() { return '" + msg + "' + jppfTask.getId(); } myFunc();";
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     for (int i = 0; i < nbTasks; i++) {
       job.add(new ScriptedTask<String>("javascript", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i = 0; i < nbTasks; i++) {
-      Task<?> task = results.get(i);
-      Throwable t = task.getThrowable();
+      final Task<?> task = results.get(i);
+      final Throwable t = task.getThrowable();
       assertNull("task has throwable: " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
       assertEquals(msg + '(' + (i + 1) + ')', task.getResult());

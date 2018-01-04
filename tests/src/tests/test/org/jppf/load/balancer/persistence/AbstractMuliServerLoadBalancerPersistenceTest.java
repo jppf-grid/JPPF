@@ -56,9 +56,9 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @After
   public void tearDownInstance() throws Exception {
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
       jmx.connectAndWait(5_000L);
-      boolean b = jmx.isConnected();
+      final boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
       if (b) jmx.getLoadBalancerPersistenceManagement().deleteAll();
     }
@@ -71,22 +71,22 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @Test(timeout = 10000)
   public void testNonPersistentAlgos() throws Exception {
-    List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
-    LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
+    final List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
+    final LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
     for (int i=0; i<jmxList.size(); i++) lbi[i] = jmxList.get(i).loadBalancerInformation();
-    LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
+    final LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "manual", "nodethreads" };
-      int nbTasks = 100;
-      for (String algo: algos) {
+      final String[] algos = { "manual", "nodethreads" };
+      final int nbTasks = 100;
+      for (final String algo: algos) {
         for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbi[i].getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        List<String> channels = mgt.listAllChannels();
+        final List<String> channels = mgt.listAllChannels();
         assertNotNull(channels);
         assertTrue(channels.isEmpty());
       }
@@ -102,26 +102,26 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @Test(timeout = 10000)
   public void testPersistentAlgos() throws Exception {
-    List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
-    LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
+    final List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
+    final LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
     for (int i=0; i<jmxList.size(); i++) lbi[i] = jmxList.get(i).loadBalancerInformation();
-    LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
+    final LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "proportional", "autotuned", "rl2" };
-      int nbTasks = 100;
+      final String[] algos = { "proportional", "autotuned", "rl2" };
+      final int nbTasks = 100;
       for (String algo: algos) {
         for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbi[i].getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        List<String> channels = mgt.listAllChannels();
+        final List<String> channels = mgt.listAllChannels();
         print(true, false, "list of nodes for algo=%s : %s", algo, channels);
         assertNotNull(channels);
         assertEquals(BaseSetup.nbNodes(), channels.size());
-        for (String channel: channels) {
+        for (final String channel: channels) {
           List<String> channelAlgos = mgt.listAlgorithms(channel);
           assertNotNull(channelAlgos);
           assertEquals(String.format("algo=%s, node=%s", algo, channel), 1, channelAlgos.size());
@@ -132,7 +132,7 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
           assertTrue(channelAlgos.isEmpty());
         }
       }
-      List<String> channels = mgt.listAllChannels();
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertTrue(channels.isEmpty());
     } finally {
@@ -146,27 +146,27 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @Test(timeout = 10000)
   public void testDifferentAlgosPerNode() throws Exception {
-    List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
-    LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
+    final List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
+    final LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
     for (int i=0; i<jmxList.size(); i++) lbi[i] = jmxList.get(i).loadBalancerInformation();
-    LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
+    final LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "proportional", "autotuned", "rl2" };
-      int nbTasks = 100;
+      final String[] algos = { "proportional", "autotuned", "rl2" };
+      final int nbTasks = 100;
       for (int i=0; i<algos.length; i++) {
-        String algo = algos[i];
+        final String algo = algos[i];
         for (int j=0; j<jmxList.size(); j++) jmxList.get(j).changeLoadBalancerSettings(algo, lbi[j].getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
         if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.driver.uuid", true, "d" + i));
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
       }
-      Map<Integer, String> uuidToChannelID = new HashMap<>();
+      final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
-        List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
+        final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         assertNotNull(channels);
         if (i == 0) {
           assertEquals(BaseSetup.nbNodes(), channels.size());
@@ -176,8 +176,8 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
         }
       }
       // check that channel1 has algos[0] + algos[1] and channel2 has algos[0] + algos[2]
-      for (Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
-        List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
+      for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
+        final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
         assertEquals(2, channelAlgos.size());
         assertTrue(channelAlgos.contains(algos[0]));
@@ -185,15 +185,15 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
-      for (Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
-        List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
+      for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
+        final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
         assertEquals(1, channelAlgos.size());
         assertFalse(channelAlgos.contains(algos[0]));
         assertTrue(channelAlgos.contains(algos[entry.getKey()]));
         mgt.deleteChannel(entry.getValue());
       }
-      List<String> channels = mgt.listAllChannels();
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertTrue(channels.isEmpty());
     } finally {
@@ -207,24 +207,24 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @Test(timeout = 10000)
   public void testDeleteSingleAlgo() throws Exception {
-    List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
-    LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
+    final List<JMXDriverConnectionWrapper> jmxList = getJMXConnections();
+    final LoadBalancingInformation[] lbi = new LoadBalancingInformation[jmxList.size()];
     for (int i=0; i<jmxList.size(); i++) lbi[i] = jmxList.get(i).loadBalancerInformation();
-    LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
+    final LoadBalancerPersistenceManagement mgt = jmxList.get(0).getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String algo = "proportional";
-      int nbTasks = 100;
+      final String algo = "proportional";
+      final int nbTasks = 100;
       for (int j=0; j<jmxList.size(); j++) jmxList.get(j).changeLoadBalancerSettings(algo, lbi[j].getParameters());
-      JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
       job.getClientSLA().setMaxChannels(2);
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
       List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertEquals(BaseSetup.nbNodes(), channels.size());
-      for (String channel: channels) {
+      for (final String channel: channels) {
         List<String> channelAlgos = mgt.listAlgorithms(channel);
         assertNotNull(channelAlgos);
         assertEquals(String.format("algo=%s, node=%s", algo, channel), 1, channelAlgos.size());
@@ -249,10 +249,10 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    * @return a list of jmx connections, one for each pool.
    * @throws Exception if any error occurs.
    */
-  private List<JMXDriverConnectionWrapper> getJMXConnections() throws Exception {
-    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.EQUAL, 2, Operator.EQUAL, 1, 10_000L, JPPFClientConnectionStatus.ACTIVE);
-    List<JMXDriverConnectionWrapper> result = new ArrayList<>();
-    for (JPPFConnectionPool pool: pools) result.add(pool.awaitWorkingJMXConnection());
+  private static List<JMXDriverConnectionWrapper> getJMXConnections() throws Exception {
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.EQUAL, 2, Operator.EQUAL, 1, 10_000L, JPPFClientConnectionStatus.ACTIVE);
+    final List<JMXDriverConnectionWrapper> result = new ArrayList<>();
+    for (final JPPFConnectionPool pool: pools) result.add(pool.awaitWorkingJMXConnection());
     return result;
   }
 }

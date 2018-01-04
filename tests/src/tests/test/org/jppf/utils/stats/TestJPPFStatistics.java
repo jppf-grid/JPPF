@@ -48,7 +48,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   public TestWatcher testJPPFStatisticsWatcher = new TestWatcher() {
     @Override
     protected void finished(final Description description) {
-      String message = String.format("end of method %s()", description.getMethodName());
+      final String message = String.format("end of method %s()", description.getMethodName());
       BaseTestHelper.printToAll(client, true, true, true, true, message);
     }
   };
@@ -59,14 +59,14 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=15000)
   public void testLatestQueueTaskCountUponNodeRestart() throws Exception {
-    int nbTasks = 2;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final int nbTasks = 2;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     client.submitJob(job);
     Thread.sleep(1000L);
     jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
@@ -77,13 +77,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testLatestQueueTaskCountUponTaskResubmit() throws Exception {
-    int nbTasks = 2;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, CustomTask.class, 100L);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final int nbTasks = 2;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, CustomTask.class, 100L);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setMaxTaskResubmits(1);
     client.submitJob(job);
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
@@ -94,13 +94,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskAndJobCountUponClientClose() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(true);
     job.getSLA().setSuspended(true);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_QUEUED);
+    final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_QUEUED);
     client.submitJob(job);
     listener.await();
     try {
@@ -118,15 +118,15 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskAndJobCountUponClientCloseWithoutCancel() throws Exception {
-    int nbTasks = 1;
-    long duration = 3000L;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, duration);
+    final int nbTasks = 1;
+    final long duration = 3000L;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, duration);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
+    final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
     client.submitJob(job);
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     listener.await();
     try {
       client.close();
@@ -134,8 +134,8 @@ public class TestJPPFStatistics extends Setup1D1N1C {
       client = BaseSetup.createClient(null);
     }
     jmx = BaseSetup.getJMXConnection();
-    long elapsed = (System.nanoTime() - start) / 1_000_000L;
-    long waitTime = duration - elapsed + 500L;
+    final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    final long waitTime = duration - elapsed + 500L;
     // make sure the job has time to complete
     if (waitTime > 0L) Thread.sleep(waitTime);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
@@ -147,11 +147,11 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskAndJobCountUponCompletion() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
@@ -162,16 +162,16 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskAndJobCountUponCancel() throws Exception {
-    int nbTasks = 1;
-    String notif = "task notif";
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    final int nbTasks = 1;
+    final String notif = "task notif";
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
-    AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
+    final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
     client.submitJob(job);
     taskListener.await();
     jmx.cancelJob(job.getUuid());
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
@@ -180,6 +180,11 @@ public class TestJPPFStatistics extends Setup1D1N1C {
    * A task that resubmits itself. Be careful to call job.getSLA().setMaxTaskResubmit(1) or with another appropriate value.
    */
   public static class CustomTask extends LifeCycleTask {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this task.
      * @param duration duration of the task in ms.
@@ -209,7 +214,7 @@ public class TestJPPFStatistics extends Setup1D1N1C {
 
     @Override
     public Object call() throws Exception {
-      JPPFStatistics stats = jmx.statistics();
+      final JPPFStatistics stats = jmx.statistics();
       JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
       assertEquals(Double.valueOf(0d), Double.valueOf(snapshot.getLatest()));
       snapshot = stats.getSnapshot(JPPFStatisticsHelper.JOB_COUNT);

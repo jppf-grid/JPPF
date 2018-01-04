@@ -85,7 +85,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
     try {
       PolicyParser.validatePolicy(invalidXML);
       throw new IllegalStateException("the policy is invalid but passes the validation");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       assertTrue("e = " + e, e instanceof JPPFException);
     }
   }
@@ -97,7 +97,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testSimpleTruePolicy() throws Exception {
-    ExecutionPolicy p = PolicyParser.parsePolicy(validTrueXML);
+    final ExecutionPolicy p = PolicyParser.parsePolicy(validTrueXML);
     assertTrue(p instanceof ScriptedPolicy);
     assertTrue(p.accepts(null));
   }
@@ -108,7 +108,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testSimpleFalsePolicy() throws Exception {
-    ExecutionPolicy p = PolicyParser.parsePolicy(validFalseXML);
+    final ExecutionPolicy p = PolicyParser.parsePolicy(validFalseXML);
     assertTrue(p instanceof ScriptedPolicy);
     assertFalse(p.accepts(null));
   }
@@ -119,13 +119,13 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testComplexPolicyGroovy() throws Exception {
-    String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.groovy");
-    ScriptedPolicy p = new ScriptedPolicy("groovy", script);
+    final String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.groovy");
+    final ScriptedPolicy p = new ScriptedPolicy("groovy", script);
     printOut("the policy is: %s", p);
-    JPPFStatistics stats = new JPPFStatistics();
-    JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
+    final JPPFStatistics stats = new JPPFStatistics();
+    final JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
     sn.addValues(10, 10);
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.getSLA().setPriority(7);
     p.setContext(job.getSLA(), job.getClientSLA(), null, 3, stats);
     assertTrue(p.accepts(null));
@@ -139,13 +139,13 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testComplexPolicyJavascript() throws Exception {
-    String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.js");
-    ScriptedPolicy p = new ScriptedPolicy("javascript", script);
+    final String script = FileUtils.readTextFile(getClass().getPackage().getName().replace('.', '/') + "/TestScriptedPolicy.js");
+    final ScriptedPolicy p = new ScriptedPolicy("javascript", script);
     printOut("the policy is: %s", p);
-    JPPFStatistics stats = new JPPFStatistics();
-    JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
+    final JPPFStatistics stats = new JPPFStatistics();
+    final JPPFSnapshot sn = stats.createSnapshot(true, "nodes");
     sn.addValues(10, 10);
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.getSLA().setPriority(7);
     p.setContext(job.getSLA(), job.getClientSLA(), null, 3, stats);
     assertTrue(p.accepts(null));
@@ -159,14 +159,14 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testInServerGroovy() throws Exception {
-    ScriptedPolicy p = new ScriptedPolicy("groovy", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+    final ScriptedPolicy p = new ScriptedPolicy("groovy", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
     job.getSLA().setExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
-    Task<?> task = results.get(0);
+    final Task<?> task = results.get(0);
     assertNotNull(task.getResult());
     assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
     assertEquals("n2", ((LifeCycleTask) task).getNodeUuid());
@@ -178,14 +178,14 @@ public class TestScriptedPolicy extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testInServerJavascript() throws Exception {
-    ScriptedPolicy p = new ScriptedPolicy("javascript", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+    final ScriptedPolicy p = new ScriptedPolicy("javascript", "jppfSystemInfo.getJppf().getString('jppf.node.uuid') == 'n2'");
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
     job.getSLA().setExecutionPolicy(p);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), 1);
-    Task<?> task = results.get(0);
+    final Task<?> task = results.get(0);
     assertNotNull(task.getResult());
     assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
     assertEquals("n2", ((LifeCycleTask) task).getNodeUuid());
@@ -199,14 +199,14 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   public void testInClient() throws Exception {
     try {
       client.setLocalExecutionEnabled(true);
-      ExecutionPolicy p = new Equal("jppf.channel.local", true).and(new ScriptedPolicy("groovy", "true"));
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
+      final ExecutionPolicy p = new Equal("jppf.channel.local", true).and(new ScriptedPolicy("groovy", "true"));
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, 0L);
       job.getClientSLA().setExecutionPolicy(p);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(4000L)); // to avoid the job being stuck
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      Task<?> task = results.get(0);
+      final Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       assertEquals("local_client", ((LifeCycleTask) task).getNodeUuid());

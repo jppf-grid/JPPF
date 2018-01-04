@@ -68,13 +68,13 @@ public class TestJPPFConfiguration extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testAlternateConfigurationSource() throws Exception {
-    JPPFConfiguration.ConfigurationSource source = new TestConfigurationSource();
+    final JPPFConfiguration.ConfigurationSource source = new TestConfigurationSource();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
     System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
     JPPFConfiguration.reset();
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     assertNotNull(config);
-    String s = config.getString("jppf.config.source.origin", null);
+    final String s = config.getString("jppf.config.source.origin", null);
     assertNotNull(s);
     assertEquals(s, "stream");
   }
@@ -85,13 +85,13 @@ public class TestJPPFConfiguration extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testAlternateConfigurationSourceReader() throws Exception {
-    JPPFConfiguration.ConfigurationSourceReader source = new TestConfigurationSourceReader();
+    final JPPFConfiguration.ConfigurationSourceReader source = new TestConfigurationSourceReader();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
     System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
     JPPFConfiguration.reset();
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     assertNotNull(config);
-    String s = config.getString("jppf.config.source.reader.origin", null);
+    final String s = config.getString("jppf.config.source.reader.origin", null);
     assertNotNull(s);
     assertEquals(s, "reader");
   }
@@ -102,8 +102,8 @@ public class TestJPPFConfiguration extends BaseTest {
   public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource {
     @Override
     public InputStream getPropertyStream() throws IOException {
-      String props = "jppf.config.source.origin = stream";
-      JPPFBuffer buffer = new JPPFBuffer(props);
+      final String props = "jppf.config.source.origin = stream";
+      final JPPFBuffer buffer = new JPPFBuffer(props);
       return new ByteArrayInputStream(buffer.getBuffer());
     }
   }
@@ -114,7 +114,7 @@ public class TestJPPFConfiguration extends BaseTest {
   public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader {
     @Override
     public Reader getPropertyReader() throws IOException {
-      String props = "jppf.config.source.reader.origin = reader";
+      final String props = "jppf.config.source.reader.origin = reader";
       return new StringReader(props);
     }
   }

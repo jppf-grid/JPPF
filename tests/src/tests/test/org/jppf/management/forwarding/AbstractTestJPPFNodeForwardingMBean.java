@@ -70,23 +70,22 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    int nbNodes = 2;
+    final int nbNodes = 2;
     client = BaseSetup.setup(2);
-    for (int i = 1; i <= nbNodes; i++)
-      allNodes.add("n" + i);
+    for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
     driverJmx = BaseSetup.getJMXConnection(client);
     nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
-    NodeSelector selector = new AllNodesSelector();
-    String[] array = new String[nbNodes];
+    final NodeSelector selector = new AllNodesSelector();
+    final String[] array = new String[nbNodes];
     while (!ready) {
       try {
-        Map<String, Object> result = nodeForwarder.state(selector);
+        final Map<String, Object> result = nodeForwarder.state(selector);
         checkNodes(result, JPPFNodeState.class, allNodes.toArray(array));
         ready = true;
-      } catch (@SuppressWarnings("unused") Exception e) {
+      } catch (@SuppressWarnings("unused") final Exception e) {
         Thread.sleep(100L);
-      } catch (@SuppressWarnings("unused") AssertionError e) {
+      } catch (@SuppressWarnings("unused") final AssertionError e) {
         Thread.sleep(100L);
       }
     }
@@ -112,9 +111,9 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
-    for (String uuid : expectedNodes) {
+    for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      Object value = result.get(uuid);
+      final Object value = result.get(uuid);
       assertNotNull(value);
       assertEquals(expectedClass, value.getClass());
     }
@@ -130,12 +129,12 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
-    for (String node: expectedNodes) {
+    for (final String node: expectedNodes) {
       assertTrue(result.keySet().contains(node));
     }
-    for (String uuid : expectedNodes) {
+    for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      Object value = result.get(uuid);
+      final Object value = result.get(uuid);
       assertNull(value);
     }
   }
@@ -160,9 +159,9 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
-    for (String uuid : expectedNodes) {
+    for (final String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
-      Object value = result.get(uuid);
+      final Object value = result.get(uuid);
       assertFalse(value instanceof Exception);
     }
   }
@@ -173,7 +172,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
    */
   public static void configureLoadBalancer() throws Exception {
     oldLbi = driverJmx.loadBalancerInformation();
-    TypedProperties newConfig = new TypedProperties();
+    final TypedProperties newConfig = new TypedProperties();
     newConfig.setProperty("size", "1");
     driverJmx.changeLoadBalancerSettings("manual", newConfig);
   }

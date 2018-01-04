@@ -95,15 +95,15 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
       print(false, false, "H2 server started, creating table");
       // create the test table
       Class.forName(DB_DRIVER_CLASS);
-      try (Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD)) {
-        String sql = FileUtils.readTextFile(AbstractDatabaseSetup.class.getPackage().getName().replace('.', '/') + "/create_table.sql");
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+      try (final Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD)) {
+        final String sql = FileUtils.readTextFile(AbstractDatabaseSetup.class.getPackage().getName().replace('.', '/') + "/create_table.sql");
+        try (final PreparedStatement ps = c.prepareStatement(sql)) {
           ps.executeUpdate();
         }
       }
       print(false, false, "table created");
     }
-    TestConfiguration config = createConfig(prefix);
+    final TestConfiguration config = createConfig(prefix);
     config.driverClasspath.add("lib/h2.jar");
     return config;
   }
@@ -140,9 +140,9 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   protected void checkJobResults(final int nbTasks, final Collection<Task<?>> results, final boolean cancelled) throws Exception {
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results) {
+    for (final Task<?> task: results) {
       assertNotNull(task);
-      Throwable t = task.getThrowable();
+      final Throwable t = task.getThrowable();
       assertNull(String.format("task '%s' has a throwable: %s", task.getId(), (t == null) ? "none" : ExceptionUtils.getMessage(t)), t);
       if (!cancelled) {
         assertNotNull(String.format("task %s has a null result", task.getId()), task.getResult());
@@ -158,8 +158,8 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @throws Exception if any error occurs.
    */
   protected JMXDriverConnectionWrapper newJmx(final JPPFClient client) throws Exception {
-    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverHost(), pool.getJmxPort(), pool.isSslEnabled());
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverHost(), pool.getJmxPort(), pool.isSslEnabled());
     jmx.connectAndWait(10_000L);
     return jmx;
   }

@@ -50,7 +50,7 @@ public class BaseTest {
     @Override
     public boolean accept(final File path) {
       if (path.isDirectory()) return false;
-      String s = path.getName();
+      final String s = path.getName();
       return (s != null) && s.endsWith(".log");
     }
   };
@@ -75,19 +75,19 @@ public class BaseTest {
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
-    FileLocation src = new FileLocation("jppf-client.log");
+    final FileLocation src = new FileLocation("jppf-client.log");
     try {
       src.copyTo(new FileLocation(new File("client.log")));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
-    File dir = new File(System.getProperty("user.dir"));
-    File[] logFiles = dir.listFiles(logFileFilter);
+    final File dir = new File(System.getProperty("user.dir"));
+    final File[] logFiles = dir.listFiles(logFileFilter);
     if ((logFiles == null) || (logFiles.length <= 0)) return;
-    File logDir = new File(dir, "logs/");
+    final File logDir = new File(dir, "logs/");
     if (!logDir.exists()) logDir.mkdirs();
-    File outZip = new File(logDir, className + ".zip");
-    String[] logPaths = new String[logFiles.length];
+    final File outZip = new File(logDir, className + ".zip");
+    final String[] logPaths = new String[logFiles.length];
     for (int i=0; i<logFiles.length; i++) logPaths[i] = logFiles[i].getPath();
     ZipUtils.zipFile(outZip.getPath(), logPaths);
   }
@@ -128,12 +128,12 @@ public class BaseTest {
    * @param params the parameter values.
    */
   public static void print(final boolean systemOutOnly, final boolean decorate, final String format, final Object...params) {
-    String message = String.format(Locale.US, format, params);
+    final String message = String.format(Locale.US, format, params);
     System.out.printf(Locale.US, "[  client] [%s] %s%n", getFormattedTimestamp(), message);
     if (!systemOutOnly) {
       String s = "";
       if (decorate) {
-        StringBuilder sb = new StringBuilder("*****");
+        final StringBuilder sb = new StringBuilder("*****");
         for (int i=0; i<message.length()-10; i++) sb.append('-');
         sb.append("*****");
         s = sb.toString();
@@ -202,7 +202,7 @@ public class BaseTest {
    * @throws Exception if any error occurs.
    */
   public static void logInServer(final JMXDriverConnectionWrapper jmx, final String msg, final Object...params) throws Exception {
-    String[] messages = { String.format(msg, params) };
+    final String[] messages = { String.format(msg, params) };
     jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
   }
 
@@ -222,16 +222,16 @@ public class BaseTest {
     protected void starting(final Description description) {
       // delete the drivers and nodes log files if they exist
       org.apache.log4j.LogManager.resetConfiguration();
-      File dir = new File(System.getProperty("user.dir"));
-      File[] logFiles = dir.listFiles(logFileFilter);
+      final File dir = new File(System.getProperty("user.dir"));
+      final File[] logFiles = dir.listFiles(logFileFilter);
       if (logFiles != null) {
-        for (File file: logFiles) {
+        for (final File file: logFiles) {
           if (file.exists()) {
             if (!file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
           }
         }
       }
-      File slavesDir = new File(dir, "slave_nodes");
+      final File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists()) {
         if (!FileUtils.deletePath(slavesDir)) print("Could not delete '%s'", slavesDir);
       }
@@ -242,7 +242,7 @@ public class BaseTest {
       try {
         System.setOut(new PrintStream("std_out.log"));
         System.setErr(new PrintStream("std_err.log"));
-      } catch (Exception e) {
+      } catch (final Exception e) {
         print("Error redirecting std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
       print("***** start of class %s *****", description.getClassName());
@@ -255,36 +255,36 @@ public class BaseTest {
         //if (client != null) BaseSetup.generateDriverThreadDump(client);
         // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) {
-          PrintStream tmp = System.out;
+          final PrintStream tmp = System.out;
           System.setOut(stdOut);
           tmp.close();
         }
         if ((stdErr != null) && (stdErr != System.err)) {
-          PrintStream tmp = System.err;
+          final PrintStream tmp = System.err;
           System.setErr(stdErr);
           tmp.close();
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         print("Error restoring std_out or std_err: %s", ExceptionUtils.getStackTrace(e));
       }
-      File dir = new File(System.getProperty("user.dir"));
-      File slavesDir = new File(dir, "slave_nodes");
+      final File dir = new File(System.getProperty("user.dir"));
+      final File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists() && slavesDir.isDirectory()) {
-        File[] subdirs = slavesDir.listFiles(new FileFilter() {
+        final File[] subdirs = slavesDir.listFiles(new FileFilter() {
           @Override
           public boolean accept(final File file) {
             return file.isDirectory();
           }
         });
         if (subdirs != null) {
-          for (File subdir: subdirs) {
-            File[] logFiles = subdir.listFiles(logFileFilter);
+          for (final File subdir: subdirs) {
+            final File[] logFiles = subdir.listFiles(logFileFilter);
             if (logFiles != null) {
-              for (File logFile: logFiles) {
-                String path = subdir.getName() + "_" + logFile.getName();
+              for (final File logFile: logFiles) {
+                final String path = subdir.getName() + "_" + logFile.getName();
                 try {
                   StreamUtils.copyFile(logFile, new File(dir, path));
-                } catch (IOException e) {
+                } catch (final IOException e) {
                   print("Error copying '%s' to '%s': %s", ExceptionUtils.getStackTrace(e));
                 }
               }

@@ -35,9 +35,9 @@ public class TestPeerDriverDiscovery extends PeerDriverDiscovery {
 
   @Override
   public void discover() throws InterruptedException {
-    int port = JPPFConfiguration.get(SERVER_PORT);
-    String host = JPPFConfiguration.get(SERVER_HOST);
-    DriverConnectionInfo info = new DriverConnectionInfo("custom_discovery", host, (port == 11101 ? 11102 : 11101));
+    final int port = JPPFConfiguration.get(SERVER_PORT);
+    final String host = JPPFConfiguration.get(SERVER_HOST);
+    final DriverConnectionInfo info = new DriverConnectionInfo("custom_discovery", host, (port == 11101 ? 11102 : 11101));
     System.out.printf("%s 'discovering' %s%n", getClass().getSimpleName(), info);
     newConnection(info);
   }

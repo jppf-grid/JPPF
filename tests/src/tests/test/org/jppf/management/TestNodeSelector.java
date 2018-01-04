@@ -40,10 +40,10 @@ public class TestNodeSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testAllNodesSelector() throws Exception {
-    List<JPPFManagementInfo> nodes = createNodes(3);
-    NodeSelector selector = new AllNodesSelector();
+    final List<JPPFManagementInfo> nodes = createNodes(3);
+    final NodeSelector selector = new AllNodesSelector();
     checkSerialization(selector);
-    List<JPPFManagementInfo> filtered = filter(nodes, selector);
+    final List<JPPFManagementInfo> filtered = filter(nodes, selector);
     assertNotNull(filtered);
     assertEquals(nodes, filtered);
   }
@@ -53,11 +53,11 @@ public class TestNodeSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testExecutionPolicySelector() throws Exception {
-    List<JPPFManagementInfo> nodes = createNodes(6);
+    final List<JPPFManagementInfo> nodes = createNodes(6);
     // select nodes whose uuid ends with an even number
-    NodeSelector selector = new ExecutionPolicySelector(new OneOf("jppf.uuid", true, "node2", "node4", "node6"));
+    final NodeSelector selector = new ExecutionPolicySelector(new OneOf("jppf.uuid", true, "node2", "node4", "node6"));
     checkSerialization(selector);
-    List<JPPFManagementInfo> filtered = filter(nodes, selector);
+    final List<JPPFManagementInfo> filtered = filter(nodes, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -70,11 +70,11 @@ public class TestNodeSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testUuidSelector() throws Exception {
-    List<JPPFManagementInfo> nodes = createNodes(6);
+    final List<JPPFManagementInfo> nodes = createNodes(6);
     // select nodes whose uuid ends with an even number
-    NodeSelector selector = new UuidSelector("node2", "node4", "node6");
+    final NodeSelector selector = new UuidSelector("node2", "node4", "node6");
     checkSerialization(selector);
-    List<JPPFManagementInfo> filtered = filter(nodes, selector);
+    final List<JPPFManagementInfo> filtered = filter(nodes, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -87,14 +87,14 @@ public class TestNodeSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testScriptedNodeSelector() throws Exception {
-    List<JPPFManagementInfo> nodes = createNodes(6);
+    final List<JPPFManagementInfo> nodes = createNodes(6);
     // select nodes whose uuid ends with an even number
-    StringBuilder script = new StringBuilder()
+    final StringBuilder script = new StringBuilder()
       .append("var uuid = nodeInfo.getUuid();\n")
       .append("uuid.equals('node2') || uuid.equals('node4') || uuid.equals('node6');\n");
-    NodeSelector selector = new ScriptedNodeSelector("javascript", script.toString());
+    final NodeSelector selector = new ScriptedNodeSelector("javascript", script.toString());
     checkSerialization(selector);
-    List<JPPFManagementInfo> filtered = filter(nodes, selector);
+    final List<JPPFManagementInfo> filtered = filter(nodes, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -107,11 +107,11 @@ public class TestNodeSelector extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testCustomNodeSelector() throws Exception {
-    List<JPPFManagementInfo> nodes = createNodes(6);
+    final List<JPPFManagementInfo> nodes = createNodes(6);
     // select nodes whose uuid ends with an even number
-    NodeSelector selector = new EvenNodeSelector();
+    final NodeSelector selector = new EvenNodeSelector();
     checkSerialization(selector);
-    List<JPPFManagementInfo> filtered = filter(nodes, selector);
+    final List<JPPFManagementInfo> filtered = filter(nodes, selector);
     assertNotNull(filtered);
     assertEquals(3, filtered.size());
     for (int i=1; i<=filtered.size(); i+=2) {
@@ -125,8 +125,8 @@ public class TestNodeSelector extends BaseTest {
    * @param selector the selector to apply.
    * @return a list of {@link JPPFManagementInfo} instances.
    */
-  private List<JPPFManagementInfo> filter(final List<JPPFManagementInfo> nodes, final NodeSelector selector) {
-    List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
+  private static List<JPPFManagementInfo> filter(final List<JPPFManagementInfo> nodes, final NodeSelector selector) {
+    final List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
     for (JPPFManagementInfo node: nodes) {
       if (selector.accepts(node)) list.add(node);
     }
@@ -138,8 +138,8 @@ public class TestNodeSelector extends BaseTest {
    * @param nbNodes the number of nodes to create.
    * @return a list of {@link JPPFManagementInfo} instances.
    */
-  private List<JPPFManagementInfo> createNodes(final int nbNodes) {
-    List<JPPFManagementInfo> list = new ArrayList<>(nbNodes);
+  private static List<JPPFManagementInfo> createNodes(final int nbNodes) {
+    final List<JPPFManagementInfo> list = new ArrayList<>(nbNodes);
     for (int i=1; i<=nbNodes; i++) list.add(createNodeInfo(i, JPPFManagementInfo.NODE|JPPFManagementInfo.MASTER));
     return list;
   }
@@ -150,11 +150,11 @@ public class TestNodeSelector extends BaseTest {
    * @param type the type of node, a bit-wise comination of the constants defined in {@link JPPFManagementInfo}.
    * @return a new {@link JPPFManagementInfo} instance.
    */
-  private JPPFManagementInfo createNodeInfo(final int index, final int type) {
-    String uuid = "node" + index;
-    HostIP hostIP = new HostIP("www" + index + ".jppf.org", "1.1.1." + index);
-    int port = 12000 + index;
-    JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, false);
+  private static JPPFManagementInfo createNodeInfo(final int index, final int type) {
+    final String uuid = "node" + index;
+    final HostIP hostIP = new HostIP("www" + index + ".jppf.org", "1.1.1." + index);
+    final int port = 12000 + index;
+    final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, false);
     info.setSystemInfo(new MySystemInfo(uuid));
     return info;
   }
@@ -164,20 +164,24 @@ public class TestNodeSelector extends BaseTest {
    * @param selector the selector to check.
    * @throws Exception if any error occurs.
    */
-  private void checkSerialization(final NodeSelector selector) throws Exception {
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    JPPFBuffer buf = ser.serialize(selector);
+  private static void checkSerialization(final NodeSelector selector) throws Exception {
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final JPPFBuffer buf = ser.serialize(selector);
     ser.deserialize(buf);
   }
 
   /** */
   public static class MySystemInfo extends JPPFSystemInformation {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * @param uuid the uuid to assign.
      */
     public MySystemInfo(final String uuid) {
       super(uuid, false, false);
-      TypedProperties test = new TypedProperties();
+      final TypedProperties test = new TypedProperties();
       for (int i=1; i<=5; i++) test.setString("prop." + i, "value " + i);
       this.addProperties("test", test);
     }
@@ -185,14 +189,19 @@ public class TestNodeSelector extends BaseTest {
 
   /** Selects only the nodes whose IP address ends with an even number. */
   public static class EvenNodeSelector implements NodeSelector {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean accepts(final JPPFManagementInfo nodeInfo) {
-      String ip = nodeInfo.getIpAddress();
-      int idx = ip.lastIndexOf('.');
+      final String ip = nodeInfo.getIpAddress();
+      final int idx = ip.lastIndexOf('.');
       int n = -1;
       try {
         n = Integer.valueOf(ip.substring(idx + 1));
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
       return n % 2 == 0;
     }

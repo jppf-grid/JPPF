@@ -56,8 +56,8 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
   public static void setup() throws Exception {
     client = BaseSetup.setup(1);
     driverJmx = BaseSetup.getJMXConnection(client);
-    Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
-    JPPFManagementInfo info = coll.iterator().next();
+    final Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
+    final JPPFManagementInfo info = coll.iterator().next();
     nodeJmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
     nodeJmx.connectAndWait(5000L);
     if (!nodeJmx.isConnected()) {
@@ -76,7 +76,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
     if (nodeJmx != null) {
       try {
         nodeJmx.close();
-      } catch(Exception e2) {
+      } catch(final Exception e2) {
         e = e2;
       } finally {
         nodeJmx = null;
@@ -99,7 +99,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
     assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
     assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
     assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
     client.submitJob(job);
     Thread.sleep(750L);
     state = nodeJmx.state();
@@ -158,11 +158,11 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testResetTaskCounter() throws Exception {
-    int nbTasks = 12;
+    final int nbTasks = 12;
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
     client.submitJob(job);
     state = nodeJmx.state();
     assertNotNull(state);
@@ -198,7 +198,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testSystemInformation() throws Exception {
-    JPPFSystemInformation info = nodeJmx.systemInformation();
+    final JPPFSystemInformation info = nodeJmx.systemInformation();
     assertNotNull(info);
     assertNotNull(info.getEnv());
     assertFalse(info.getEnv().isEmpty());
@@ -225,7 +225,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
   public void testUpdateConfiguration() throws Exception {
     JPPFSystemInformation info = nodeJmx.systemInformation();
     assertNotNull(info);
-    TypedProperties config = info.getJppf();
+    final TypedProperties config = info.getJppf();
     assertNotNull(config);
     assertFalse(config.isEmpty());
     assertEquals(1, (int) config.get(JPPFProperties.PROCESSING_THREADS));
@@ -249,15 +249,15 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testCancelJob() throws Exception {
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 5000L);
-    String uuid = job.getUuid();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 5000L);
+    final String uuid = job.getUuid();
     client.submitJob(job);
     Thread.sleep(750L);
     nodeJmx.cancelJob(uuid, false);
-    List<Task<?>> result = job.awaitResults();
+    final List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
     assertEquals(1, result.size());
-    LifeCycleTask task = (LifeCycleTask) result.get(0);
+    final LifeCycleTask task = (LifeCycleTask) result.get(0);
     assertTrue(task.isCancelled());
     assertNull(task.getResult());
     nodeJmx.resetTaskCounter();
@@ -269,7 +269,7 @@ public class TestJPPFNodeAdminMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testGetDelegationModel() throws Exception {
-    DelegationModel model = nodeJmx.getDelegationModel();
+    final DelegationModel model = nodeJmx.getDelegationModel();
     assertEquals(DelegationModel.PARENT_FIRST, model);
   }
 

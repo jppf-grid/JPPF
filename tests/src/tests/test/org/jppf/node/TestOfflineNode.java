@@ -56,11 +56,11 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration testConfig = createConfig("offline_node");
+    final TestConfiguration testConfig = createConfig("offline_node");
     testConfig.nodeClasspath.add("../server/classes");
     testConfig.driverLog4j = "classes/tests/config/offline_node/log4j-driver.properties";
     client = BaseSetup.setup(1, 2, true, false, testConfig);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
     while (jmx.nbNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
   }
 
@@ -71,15 +71,15 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJobDeserializationError() throws Exception {
-    int nbTasks = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    final int nbTasks = 5;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().getClassPath().setForceClassLoaderReset(true);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task : results) {
+    for (final Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
-      Throwable t = task.getThrowable();
+      final Throwable t = task.getThrowable();
       assertNotNull("throwable for task '" + task.getId() + "' is null", t);
       assertNull(task.getResult());
     }
@@ -91,16 +91,16 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
-    int nbTasks = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
-    Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
+    final int nbTasks = 5;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task : results) {
+    for (final Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
-      Throwable t = task.getThrowable();
+      final Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
@@ -113,17 +113,17 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testJobDispatchExpiration() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
-    Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
+    final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task : results) {
+    for (final Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
-      Throwable t = task.getThrowable();
+      final Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
       assertNull(task.getResult());
     }
@@ -137,8 +137,8 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testNumberOfNodes() throws Exception {
     BaseSetup.checkDriverAndNodesInitialized(client, 1, 2);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
     assertEquals(BaseSetup.nbNodes(), (int) jmx.nbNodes());
     assertEquals(1, (int) jmx.nbNodes(node1Selector));
     assertEquals(BaseSetup.nbNodes(), (int) jmx.nbIdleNodes());
@@ -153,8 +153,8 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testNodesInformation() throws Exception {
     BaseSetup.checkDriverAndNodesInitialized(client, 1, 2);
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final NodeSelector node1Selector = new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1"));
     checkNodesInfo(jmx.nodesInformation(), "n1", "n2");
     checkNodesInfo(jmx.nodesInformation(node1Selector), "n1");
     checkNodesInfo(jmx.idleNodesInformation(), "n1", "n2");
@@ -167,11 +167,11 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
    * @param expectedUuids the expected uuids of the nodes.
    * @throws Exception if any error occurs.
    */
-  private void checkNodesInfo(final Collection<JPPFManagementInfo> nodesInfo, final String...expectedUuids) throws Exception {
+  private static void checkNodesInfo(final Collection<JPPFManagementInfo> nodesInfo, final String...expectedUuids) throws Exception {
     assertNotNull(nodesInfo);
     assertNotNull(expectedUuids);
     assertEquals(expectedUuids.length, nodesInfo.size());
-    List<JPPFManagementInfo> list = new ArrayList<>(nodesInfo);
+    final List<JPPFManagementInfo> list = new ArrayList<>(nodesInfo);
     Collections.sort(list, new Comparator<JPPFManagementInfo>() {
       @Override
       public int compare(final JPPFManagementInfo o1, final JPPFManagementInfo o2) {
@@ -180,7 +180,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
     });
     Arrays.sort(expectedUuids);
     for (int i=0; i<expectedUuids.length; i++) {
-      JPPFManagementInfo info = list.get(i);
+      final JPPFManagementInfo info = list.get(i);
       assertEquals(expectedUuids[i], info.getUuid());
     }
   }

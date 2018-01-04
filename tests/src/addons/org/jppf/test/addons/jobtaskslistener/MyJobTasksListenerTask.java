@@ -25,6 +25,10 @@ import org.jppf.utils.ExceptionUtils;
  * @author Laurent Cohen
  */
 public class MyJobTasksListenerTask extends AbstractTask<String> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /** */
   public static final String RESULT_SUCCESS = "success";
   /** */
@@ -57,7 +61,7 @@ public class MyJobTasksListenerTask extends AbstractTask<String> {
       if (duration > 0L) Thread.sleep(duration);
       setResult(RESULT_SUCCESS);
       System.out.printf("task %s success%n", getId());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setResult(RESULT_FAILURE);
       setThrowable(e);
       System.out.printf("task %s failure: %s%n", getId(), ExceptionUtils.getMessage(e));

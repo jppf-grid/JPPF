@@ -46,8 +46,8 @@ public class TestServerEnvironmentProvider implements ServerEnvironmentProvider 
    * @return a map of string keys to proerty values.
    */
   private static Map<String, Object> getPopulatedMap() {
-    Object[] values = { "value1", 2, true, '4'};
-    Map<String, Object> map = new HashMap<>();
+    final Object[] values = { "value1", 2, true, '4'};
+    final Map<String, Object> map = new HashMap<>();
     for (int i=0; i<values.length; i++) map.put("server.env.prop." + (i+1), values[i]);
     return map;
   }

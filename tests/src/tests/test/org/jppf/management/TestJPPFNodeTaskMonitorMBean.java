@@ -60,8 +60,8 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
   public static void setup() throws Exception {
     client = BaseSetup.setup(1);
     driverJmx = BaseSetup.getJMXConnection(client);
-    Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
-    JPPFManagementInfo info = coll.iterator().next();
+    final Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
+    final JPPFManagementInfo info = coll.iterator().next();
     nodeJmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
     nodeJmx.connectAndWait(5000L);
     if (!nodeJmx.isConnected()) {
@@ -81,7 +81,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     if (nodeJmx != null) {
       try {
         nodeJmx.close();
-      } catch(Exception e2) {
+      } catch(final Exception e2) {
         e = e2;
       } finally {
         nodeJmx = null;
@@ -98,14 +98,14 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testSnapshot() throws Exception {
-    long duration = 100L;
+    final long duration = 100L;
     try {
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksSucessfull());
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskCpuTime());
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
       client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
@@ -127,9 +127,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testReset() throws Exception {
-    long duration = 100L;
+    final long duration = 100L;
     try {
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
       client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
@@ -156,14 +156,14 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testNotifications() throws Exception {
-    long duration = 100L;
-    int nbTasks = 5;
-    NodeNotificationListener listener = new NodeNotificationListener();
+    final long duration = 100L;
+    final int nbTasks = 5;
+    final NodeNotificationListener listener = new NodeNotificationListener();
     try {
       nodeMonitorProxy.addNotificationListener(listener, null, null);
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task " + nbTasks);
-      List<Task<?>> result = client.submitJob(job);
+      final List<Task<?>> result = client.submitJob(job);
       assertNull(listener.exception);
       assertEquals(nbTasks + 1, listener.notifs.size());
       assertEquals(1, listener.userObjects.size());
@@ -174,7 +174,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
         }
       });
       for (int i=0; i<nbTasks; i++) {
-        Task<?> task = result.get(i);
+        final Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
         assertEquals(job.getUuid(), ti.getJobId());
         assertEquals(task.getId(), ti.getId()); //
@@ -209,11 +209,11 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     @Override
     public synchronized void handleNotification(final Notification notification, final Object handback) {
       try {
-        TaskExecutionNotification notif = (TaskExecutionNotification) notification;
+        final TaskExecutionNotification notif = (TaskExecutionNotification) notification;
         notifs.add(notif.getTaskInformation());
         printOut("got task notification for task %s", notif.getTaskInformation().getId());
         if (notif.getUserData() != null) userObjects.add(notif.getUserData());
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (exception == null) exception = e;
       }
     }
@@ -223,6 +223,10 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    * This class throws an {@link Error} in its <code>run()</code> method.
    */
   public static class ErrorLifeCycleTask extends LifeCycleTask {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * if true, then raise an exception at the end of execution.
      */
@@ -240,13 +244,13 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
 
     @Override
     public void run() {
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       fireNotification("starting task " + getId(), true);
       fireNotification("non-JMX notification for " + getId(), false);
-      Random rand = new Random(start);
+      final Random rand = new Random(start);
       while ((elapsed = System.nanoTime() - start) < duration * 1_000_000L) {
-        double d = Math.exp(35525.36789d * rand.nextDouble());
-        String s = String.valueOf(d) + (d < 100d ? " < 100" : " >= 100");
+        final double d = Math.exp(35525.36789d * rand.nextDouble());
+        final String s = String.valueOf(d) + (d < 100d ? " < 100" : " >= 100");
         s.toString();
       }
       if (raiseException) throw new IllegalStateException("this error is thrown deliberately");

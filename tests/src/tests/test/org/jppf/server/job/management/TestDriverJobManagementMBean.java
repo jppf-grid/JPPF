@@ -62,7 +62,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Before
   public void showIdleNodes() throws Exception {
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
     // cancel currently executing jobs in all nodes
     forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "cancel");
     BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
@@ -71,7 +71,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       public boolean evaluate() {
         try {
           return jmx.nbIdleNodes() == 2;
-        } catch(@SuppressWarnings("unused") Exception e) {
+        } catch(@SuppressWarnings("unused") final Exception e) {
           return false;
         }
       }
@@ -84,18 +84,18 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJob() throws Exception {
-    int nbTasks = 10;
-    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
+    final int nbTasks = 10;
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+    final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
     client.submitJob(job);
     listener.await();
-    DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
+    final DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    for (Task<?> t : results) assertNull(t.getResult());
+    for (final Task<?> t : results) assertNull(t.getResult());
   }
 
   /**
@@ -104,7 +104,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, JobSelector.ALL_JOBS));
   }
 
@@ -114,9 +114,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
-    List<String> uuids = new ArrayList<>();
-    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<String> uuids = new ArrayList<>();
+    for (final JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new JobUuidSelector(uuids)));
   }
 
@@ -126,9 +126,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, prefix, false);
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final String prefix = ReflectionUtils.getCurrentMethodName();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, prefix, false);
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, selector));
   }
 
@@ -138,7 +138,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
+    final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, JobSelector.ALL_JOBS));
   }
 
@@ -148,9 +148,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
-    List<String> uuids = new ArrayList<>();
-    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
+    final List<String> uuids = new ArrayList<>();
+    for (final JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, new JobUuidSelector(uuids)));
   }
 
@@ -160,9 +160,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, prefix, true);
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final String prefix = ReflectionUtils.getCurrentMethodName();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, prefix, true);
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, selector));
   }
 
@@ -172,7 +172,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, JobSelector.ALL_JOBS));
   }
 
@@ -182,9 +182,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
-    List<String> uuids = new ArrayList<>();
-    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<String> uuids = new ArrayList<>();
+    for (final JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, new JobUuidSelector(uuids)));
   }
 
@@ -194,9 +194,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final String prefix = ReflectionUtils.getCurrentMethodName();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, selector));
   }
 
@@ -206,7 +206,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, JobSelector.ALL_JOBS));
   }
 
@@ -216,8 +216,8 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
-    List<String> uuids = new ArrayList<>();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    final List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, new JobUuidSelector(uuids)));
   }
@@ -228,9 +228,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final String prefix = ReflectionUtils.getCurrentMethodName();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, selector));
   }
 
@@ -240,7 +240,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new AllJobsSelector()));
   }
 
@@ -250,9 +250,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
-    List<String> uuids = new ArrayList<>();
-    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
+    final List<String> uuids = new ArrayList<>();
+    for (final JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new JobUuidSelector(uuids)));
   }
 
@@ -262,9 +262,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, prefix, true);
-    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    final String prefix = ReflectionUtils.getCurrentMethodName();
+    final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, prefix, true);
+    final JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, selector));
   }
 
@@ -278,10 +278,10 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * @return a list of {@link JPPFJob} instances.
    * @throws Exception if any error occurs.
    */
-  private List<JPPFJob> createMultipleJobs(final int nbJobs, final int nbTasks, final long taskDuration, final String namePrefix, final boolean suspended) throws Exception {
-    List<JPPFJob> jobs = new ArrayList<>();
+  private static List<JPPFJob> createMultipleJobs(final int nbJobs, final int nbTasks, final long taskDuration, final String namePrefix, final boolean suspended) throws Exception {
+    final List<JPPFJob> jobs = new ArrayList<>();
     for (int i=1; i<= nbJobs; i++) {
-      JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, nbTasks, LifeCycleTask.class, taskDuration);
+      final JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, nbTasks, LifeCycleTask.class, taskDuration);
       job.getSLA().setSuspended(suspended);
       jobs.add(job);
     }
@@ -293,9 +293,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * @param action the action to run.
    * @throws Exception if any error occurs.
    */
-  private void testJobSelectorAction(final JobSelectorAction action) throws Exception {
-    List<JPPFJob> jobs = action.getJobs();
-    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+  private static void testJobSelectorAction(final JobSelectorAction action) throws Exception {
+    final List<JPPFJob> jobs = action.getJobs();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     pool.setSize(jobs.size());
     pool.awaitWorkingConnections(Operator.EQUAL, jobs.size());
     for (JPPFJob job: jobs) client.submitJob(job);
@@ -313,12 +313,12 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testCancelJobAfterCompletion() throws Exception {
-    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
-    List<Task<?>> results = client.submitJob(job);
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
+    final List<Task<?>> results = client.submitJob(job);
     assertEquals(1, results.size());
     assertNotNull(results.get(0));
     assertNotNull(results.get(0).getResult());
-    DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
+    final DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
   }
@@ -330,19 +330,19 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testResumeAndCancelSuspendedJob() throws Exception {
-    int nbTasks = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
+    final int nbTasks = 2;
+    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
     assertNotNull(driver);
-    DriverJobManagementMBean jobManager = driver.getJobManager();
+    final DriverJobManagementMBean jobManager = driver.getJobManager();
     assertNotNull(jobManager);
-    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3500L);
+    final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3500L);
     job.getSLA().setSuspended(true);
     client.submitJob(job);
     Thread.sleep(1000L);
     jobManager.resumeJob(job.getUuid());
     Thread.sleep(1000L);
     jobManager.cancelJob(job.getUuid());
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertEquals(nbTasks, results.size());
   }
 
@@ -352,14 +352,14 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 10000L)
   public void testUpdateJobSLAAndMetadata() throws Exception {
-    int nbTasks = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
+    final int nbTasks = 2;
+    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
     assertNotNull(driver);
-    LoadBalancingInformation lbInfo = driver.loadBalancerInformation();
+    final LoadBalancingInformation lbInfo = driver.loadBalancerInformation();
     assertNotNull(lbInfo);
     try {
       driver.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
-      JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+      final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
       final JobSLA sla = job.getSLA();
       final JobMetadata metadata = job.getMetadata();
       sla.setMaxNodes(1);
@@ -367,19 +367,19 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       metadata.setParameter("node.uuid", "n1");
       final DriverJobManagementMBean jobManager = driver.getJobManager();
       assertNotNull(jobManager);
-      MyNotifListener listener = new MyNotifListener(job);
+      final MyNotifListener listener = new MyNotifListener(job);
       jobManager.addNotificationListener(listener, null, null);
       client.submitJob(job);
       listener.await();
       jobManager.removeNotificationListener(listener);
-      List<Task<?>> results = job.awaitResults();
+      final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
-      List<String> nodeUuids = new ArrayList<>();
+      final List<String> nodeUuids = new ArrayList<>();
       for (int i=0; i<nbTasks; i++) {
-        Task<?> t = results.get(i);
+        final Task<?> t = results.get(i);
         assertTrue(t instanceof LifeCycleTask);
-        LifeCycleTask task = (LifeCycleTask) t;
+        final LifeCycleTask task = (LifeCycleTask) t;
         assertNotNull(task.getResult());
         assertNull(task.getThrowable());
         nodeUuids.add(task.getNodeUuid());
@@ -408,7 +408,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
-      JobNotification notif = (JobNotification) notification;
+      final JobNotification notif = (JobNotification) notification;
       if (notif.getEventType() == JobEventType.JOB_DISPATCHED) {
         synchronized(this) {
           count++;
@@ -419,7 +419,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
             job.getMetadata().setParameter("node.uuid", "n2");
             try {
               BaseSetup.getJobManagementProxy(client).updateJobs(JobSelector.ALL_JOBS, job.getSLA(), job.getMetadata());
-            } catch (Exception e) {
+            } catch (final Exception e) {
               e.printStackTrace();
             }
           }
@@ -432,7 +432,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       synchronized(this) {
         try {
           while (count < 2) wait(10L);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }

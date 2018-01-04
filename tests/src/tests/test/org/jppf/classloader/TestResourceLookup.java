@@ -41,7 +41,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = createConfig("classloader");
+    final TestConfiguration config = createConfig("classloader");
     config.driverClasspath.add("test-resources/driver1");
     client = BaseSetup.setup(1, 1, true, config);
   }
@@ -52,13 +52,13 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
    */
   @Test(timeout=10000)
   public void resourcesLookup() throws Exception {
-    URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
+    final URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
     printOut("local url = %s", url);
-    String name = ReflectionUtils.getCurrentMethodName();
-    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, MyTask.class));
+    final String name = ReflectionUtils.getCurrentMethodName();
+    final List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, MyTask.class));
     assertNotNull(results);
     assertEquals(1, results.size());
-    MyTask task = (MyTask) results.get(0);
+    final MyTask task = (MyTask) results.get(0);
     assertNotNull(task);
     assertNull(task.getThrowable());
     assertEquals("success", task.getResult());
@@ -70,6 +70,10 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
 
   /** */
   public static class MyTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public String driverResource1 = null, driverResource2 = null, clientResource1 = null, clientResource2 = null;
 
@@ -88,7 +92,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
      * @return the url of the resource as a string, or {@code null} if the reosurce was not found.
      */
     private String lookup(final String resName) {
-      URL url = getClass().getClassLoader().getResource(resName);
+      final URL url = getClass().getClassLoader().getResource(resName);
       return (url == null) ? null : url.toString();
     }
   }

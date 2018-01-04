@@ -28,6 +28,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class ResourceLoadingTask extends AbstractTask<List<List<URL>>> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * 
    */
   public static final String RES_NAME = "test/org/jppf/classloader/some_resource.txt";
@@ -47,18 +51,18 @@ public class ResourceLoadingTask extends AbstractTask<List<List<URL>>> {
   @Override
   public void run() {
     try {
-      List<List<URL>> list = new ArrayList<>();
+      final List<List<URL>> list = new ArrayList<>();
       for (int i=0; i<nbLookups; i++) {
-        Enumeration<URL> urls = getClass().getClassLoader().getResources(RES_NAME);
+        final Enumeration<URL> urls = getClass().getClassLoader().getResources(RES_NAME);
         if (urls == null) list.add(null);
         else {
-          List<URL> sublist = new ArrayList<>();
+          final List<URL> sublist = new ArrayList<>();
           while (urls.hasMoreElements()) sublist.add(urls.nextElement());
           list.add(sublist);
         }
       }
       setResult(list);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     }
   }

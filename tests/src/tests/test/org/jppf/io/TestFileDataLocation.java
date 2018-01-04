@@ -47,12 +47,12 @@ public class TestFileDataLocation extends Setup1D1N1C {
   @Test(timeout = 20000)
   public void testSubmitLargeDataProvider() throws Exception {
     printOut("******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");
-    int size = 128 * 1024 * 1024;
-    int nbTasks = 3;
+    final int size = 128 * 1024 * 1024;
+    final int nbTasks = 3;
     try {
       configureLoadBalancing();
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      DataProvider dp = new MemoryMapDataProvider();
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      final DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("bytes", new byte[size]);
       job.setDataProvider(dp);
       client.submitJob(job);
@@ -66,12 +66,12 @@ public class TestFileDataLocation extends Setup1D1N1C {
    * @throws Exception if any error occurs
    */
   private void configureLoadBalancing() throws Exception {
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
-    JPPFSystemInformation info = driver.systemInformation();
+    final JPPFSystemInformation info = driver.systemInformation();
     printOut("runtime driver info: %s", info.getRuntime());
     oldLbi = driver.loadBalancerInformation();
-    TypedProperties newConfig = new TypedProperties();
+    final TypedProperties newConfig = new TypedProperties();
     newConfig.setProperty("size", "1");
     driver.changeLoadBalancerSettings("manual", newConfig);
   }
@@ -81,9 +81,9 @@ public class TestFileDataLocation extends Setup1D1N1C {
    * @throws Exception if any error occurs
    */
   private void resetLoadBalancing() throws Exception {
-    LoadBalancingInformation tmpLbi = oldLbi;
+    final LoadBalancingInformation tmpLbi = oldLbi;
     oldLbi = null;
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     if (tmpLbi != null) driver.changeLoadBalancerSettings(tmpLbi.getAlgorithm(), tmpLbi.getParameters());
   }
 }

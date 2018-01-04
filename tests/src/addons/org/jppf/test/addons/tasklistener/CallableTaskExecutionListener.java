@@ -46,11 +46,11 @@ public class CallableTaskExecutionListener implements TaskExecutionListener {
    * @param event the event to process.
    */
   @SuppressWarnings("unchecked")
-  private void process(final TaskExecutionEvent event) {
+  private static void process(final TaskExecutionEvent event) {
     if (event.getUserObject() instanceof Callable) {
-      Task<Object> task = (Task<Object>) event.getTask();
+      final Task<Object> task = (Task<Object>) event.getTask();
       System.out.println("Id of notifying task: " + task.getId());
-      Object o = task.getResult();
+      final Object o = task.getResult();
       if ((o != null) && !(o instanceof List)) return;
       List<Object> list = null;
       if (o == null) {
@@ -58,9 +58,9 @@ public class CallableTaskExecutionListener implements TaskExecutionListener {
         task.setResult(list);
       } else list = (List<Object>) o;
       try {
-        Callable<?> callable = (Callable<?>) event.getUserObject();
+        final Callable<?> callable = (Callable<?>) event.getUserObject();
         list.add(callable.call());
-      } catch (Exception e) {
+      } catch (final Exception e) {
         list.add(e);
       }
     }

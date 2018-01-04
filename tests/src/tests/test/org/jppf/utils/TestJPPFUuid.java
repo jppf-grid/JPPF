@@ -42,7 +42,7 @@ public class TestJPPFUuid extends BaseTest {
   public void testUuidCollisions() throws Exception {
     int nbThreads = Runtime.getRuntime().availableProcessors();
     if (nbThreads < 2) nbThreads = 2;
-    int nbTasks = 1000;
+    final int nbTasks = 1000;
     ThreadPoolExecutor executor = null;
     try {
       executor = new ThreadPoolExecutor(nbThreads, nbThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -60,13 +60,13 @@ public class TestJPPFUuid extends BaseTest {
    * @throws Exception if any error occurs
    */
   public void performExecution(final int nbTasks, final ExecutorService executor) throws Exception {
-    List<Future<String>> futures = new ArrayList<>(nbTasks);
-    Map<String, Boolean> map = new ConcurrentHashMap<>(nbTasks);
+    final List<Future<String>> futures = new ArrayList<>(nbTasks);
+    final Map<String, Boolean> map = new ConcurrentHashMap<>(nbTasks);
     for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new UuidTask()));
     int count = 0;
-    for (Future<String> future: futures) {
-      String uuid = future.get();
-      Boolean prevValue = map.put(uuid, Boolean.TRUE);
+    for (final Future<String> future: futures) {
+      final String uuid = future.get();
+      final Boolean prevValue = map.put(uuid, Boolean.TRUE);
       if (prevValue != null) {
         printOut("uuid collision for %s", uuid);
         count++;

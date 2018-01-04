@@ -39,12 +39,12 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testIncludeFile() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "file.include.prop.1", "file.include.prop.1.value");
@@ -58,13 +58,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testIncludeURL() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
-    File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
+    final File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
     sb.append("#!include url ").append("file:").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "url.include.prop.1", "url.include.prop.1.value");
@@ -78,12 +78,12 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testIncludeConfigSource() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include class ").append(TestConfigurationSourceReader.class.getName()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -97,15 +97,15 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testMultipleIncludes() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include class ").append(TestConfigurationSourceReader.class.getName()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
-    File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
+    final File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
     sb.append("#!include url ").append("file:").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -124,13 +124,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testNestedIncludes() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("prop.2 = prop.2.value\n");
-    File file = new File("classes/tests/test/org/jppf/utils/NestedURLInclude.properties");
+    final File file = new File("classes/tests/test/org/jppf/utils/NestedURLInclude.properties");
     sb.append("#!include url ").append("file:").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -148,13 +148,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=15000L)
   public void testIncludeCycle() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include file test/org/jppf/utils/CyclicFileInclude1.properties\n");
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
-      String s = props.getProperty("jppf.configuration.error");
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
+      final String s = props.getProperty("jppf.configuration.error");
       assertNotNull(s);
       assertTrue(s.indexOf(StackOverflowError.class.getName()) >= 0);
     }
@@ -166,13 +166,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testSubstitutions() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}/${prop.3}/${prop.4}\n");
     sb.append("prop.2 = 2-${prop.3}-${prop.4}\n");
     sb.append("prop.3 = 3.${prop.4}\n");
     sb.append("prop.4 = 4\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "4");
       checkProperty(props, "prop.3", "3.4");
@@ -187,13 +187,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testSubstitutions2() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = one\n");
     sb.append("prop.2 = two\n");
     sb.append("prop.3 = three\n");
     sb.append("prop.4 = ${prop.1}-${prop.2}-${prop.3}-four\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "one-two-three-four");
       checkProperty(props, "prop.3", "three");
@@ -208,13 +208,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testEmptyPropertyNameSubstitutions() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}/${prop.3}\n");
     sb.append("prop.2 = 2-${}-${prop.3}\n");
     sb.append("prop.3 = 3\n");
     sb.append("prop.4 = ${  }+${prop.3}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.4", "${  }+3");
       checkProperty(props, "prop.3", "3");
@@ -229,10 +229,10 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testUnresolvedSubstitutions() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${prop.2}");
     }
@@ -244,11 +244,11 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testSubstitutionsWithCycle() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${prop.2}");
       checkProperty(props, "prop.2", "2-${prop.1}");
@@ -261,12 +261,12 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testEnvironmentVariableSubstitution() throws Exception {
-    String path = System.getenv("PATH");
-    StringBuilder sb = new StringBuilder();
+    final String path = System.getenv("PATH");
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${env.PATH}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + path);
       checkProperty(props, "prop.2", "2-1/" + path);
@@ -279,11 +279,11 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testEmptyEnvironmentVariableNameSubstitution() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${env.  }\n");
     sb.append("prop.2 = 2-${prop.1}-${env.}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${env.  }");
       checkProperty(props, "prop.2", "2-1/${env.  }-${env.}");
@@ -296,12 +296,12 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testUnresolvedEnvironmentVariableSubstitution() throws Exception {
-    StringBuilder sb = new StringBuilder();
-    String undef = "${env.This_is_my_undefined_environment_variable}";
+    final StringBuilder sb = new StringBuilder();
+    final String undef = "${env.This_is_my_undefined_environment_variable}";
     sb.append("prop.1 = 1/" + undef + "\n");
     sb.append("prop.2 = 2-${prop.1}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + undef);
       checkProperty(props, "prop.2", "2-1/" + undef);
@@ -314,13 +314,13 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testSystemPropertySubstitution() throws Exception {
-    String value = "sys.value";
+    final String value = "sys.value";
     System.setProperty("test", value);
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${sys.test}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + value);
       checkProperty(props, "prop.2", "2-1/" + value);
@@ -333,11 +333,11 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testEmptySystemPropertyNameSubstitution() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${sys.  }\n");
     sb.append("prop.2 = 2-${prop.1}-${sys.}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/${sys.  }");
       checkProperty(props, "prop.2", "2-1/${sys.  }-${sys.}");
@@ -350,12 +350,12 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testUnresolvedSystemPropertySubstitution() throws Exception {
-    StringBuilder sb = new StringBuilder();
-    String undef = "${sys.This_is_my_undefined_system_property}";
+    final StringBuilder sb = new StringBuilder();
+    final String undef = "${sys.This_is_my_undefined_system_property}";
     sb.append("prop.1 = 1/" + undef + "\n");
     sb.append("prop.2 = 2-${prop.1}\n");
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "prop.1", "1/" + undef);
       checkProperty(props, "prop.2", "2-1/" + undef);
@@ -368,7 +368,7 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testScriptedValues() throws Exception {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("jppf.script.default.language = $script::file{ test/org/jppf/utils/test.js }$\n");
     sb.append("prop.0 = hello miscreant world\n");
     sb.append("prop.1 = hello $script:javascript{ 2 + 3 }$ world\n");
@@ -386,11 +386,11 @@ public class TestTypedProperties extends BaseTest {
     sb.append("prop.16 = hello $s{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
 
     sb.append("prop.21 = $s:js:f{ test/org/jppf/utils/test.js }$\n");
-    File file = new File("classes/tests/test/org/jppf/utils/test.js");
+    final File file = new File("classes/tests/test/org/jppf/utils/test.js");
     sb.append("prop.22 = $S:js:U{ ").append(file.toURI().toURL()).append(" }$\n");
 
-    try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = new TypedProperties().loadAndResolve(r);
+    try (final Reader r = new StringReader(sb.toString())) {
+      final TypedProperties props = new TypedProperties().loadAndResolve(r);
       printOut("%s: resolved properties: %s", ReflectionUtils.getCurrentMethodName(), props);
       checkProperty(props, "jppf.script.default.language", "groovy");
       checkProperty(props, "prop.0", "hello miscreant world");
@@ -420,26 +420,26 @@ public class TestTypedProperties extends BaseTest {
    */
   @Test(timeout=5000L)
   public void testParmetrizedProperties() throws Exception {
-    JPPFProperty<String> hostProp = new StringProperty("<driver_name>.jppf.server.host", "localhost");
+    final JPPFProperty<String> hostProp = new StringProperty("<driver_name>.jppf.server.host", "localhost");
     String[] params = hostProp.getParameters();
     assertNotNull(params);
     assertEquals(1, params.length);
     assertEquals("driver_name", params[0]);
-    JPPFProperty<Integer> portProp = new IntProperty("<driver_name>.jppf.server.port", 11111);
+    final JPPFProperty<Integer> portProp = new IntProperty("<driver_name>.jppf.server.port", 11111);
     params = portProp.getParameters();
     assertNotNull(params);
     assertEquals(1, params.length);
     assertEquals("driver_name", params[0]);
-    TypedProperties props = new TypedProperties().set(JPPFProperties.DRIVERS, new String[] { "driver1", "driver2" });
+    final TypedProperties props = new TypedProperties().set(JPPFProperties.DRIVERS, new String[] { "driver1", "driver2" });
     int i = 1;
-    for (String driver: props.get(JPPFProperties.DRIVERS)) {
+    for (final String driver: props.get(JPPFProperties.DRIVERS)) {
       props.set(hostProp, "host" + i, driver);
       props.set(portProp, 11110 + i, driver);
       i++;
     }
     print(true, true, "testing parmetrized properties: %s", props);
     i = 1;
-    for (String driver: props.get(JPPFProperties.DRIVERS)) {
+    for (final String driver: props.get(JPPFProperties.DRIVERS)) {
       assertEquals("host" + i, props.get(hostProp, driver));
       assertEquals(11110 + i, (int) props.get(portProp, driver));
       i++;
@@ -462,7 +462,7 @@ public class TestTypedProperties extends BaseTest {
    * @param value the value of the property to check.
    * @throws Exception if any error occurs.
    */
-  private void checkProperty(final TypedProperties props, final String key, final String value) throws Exception {
+  private static void checkProperty(final TypedProperties props, final String key, final String value) throws Exception {
     assertTrue("properties do not contain key=" + key, props.containsKey(key));
     assertEquals(value, props.getProperty(key));
   }
@@ -473,7 +473,7 @@ public class TestTypedProperties extends BaseTest {
   public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader {
     @Override
     public Reader getPropertyReader() throws IOException {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append("reader.include.prop.1 = reader.include.prop.1.value\n");
       sb.append("reader.include.prop.2 = reader.include.prop.2.value\n");
       return new StringReader(sb.toString());

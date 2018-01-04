@@ -24,8 +24,11 @@ import java.io.Serializable;
  * Holds an exception that occurs outside of the JUnit runner scope.
  * @author Laurent Cohen
  */
-public class ExceptionHolder implements Serializable
-{
+public class ExceptionHolder implements Serializable {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The exception that was raised.
    */
@@ -40,8 +43,7 @@ public class ExceptionHolder implements Serializable
    * @param className the name of the test class for which the exception was raised.
    * @param throwable the exception that was raised.
    */
-  public ExceptionHolder(final String className, final Throwable throwable)
-  {
+  public ExceptionHolder(final String className, final Throwable throwable) {
     this.className = className;
     this.throwable = throwable;
   }
@@ -50,8 +52,7 @@ public class ExceptionHolder implements Serializable
    * Get the exception that was raised.
    * @return a <code>Throwable</code> instance.
    */
-  public Throwable getThrowable()
-  {
+  public Throwable getThrowable() {
     return throwable;
   }
 
@@ -59,14 +60,12 @@ public class ExceptionHolder implements Serializable
    * Get the name of the test class for which the exception was raised.
    * @return the class name as a <code>String</code>.
    */
-  public String getClassName()
-  {
+  public String getClassName() {
     return className;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return "ExceptionHolder [throwable=" + throwable + ", className=" + className + "]";
   }
 }

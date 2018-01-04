@@ -25,6 +25,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class NotSerializableTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * A non-serializable object.
    */
   NotSerializableObject nso = null;

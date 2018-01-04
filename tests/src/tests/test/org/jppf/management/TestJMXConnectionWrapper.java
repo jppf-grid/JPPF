@@ -38,15 +38,15 @@ public class TestJMXConnectionWrapper extends BaseTest {
     //make sure the host is on an unreachable network
     final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("10.1.1.2", 12345, false);
     final long duration = 1400L;
-    int nbThreads = 16;
-    Thread[] threads = new Thread[nbThreads];
+    final int nbThreads = 16;
+    final Thread[] threads = new Thread[nbThreads];
     for (int i=0; i<nbThreads; i++) {
       threads[i] = new Thread("TestJmxConnect-" + i) {
         @Override
         public void run() {
-          long start = System.nanoTime();
+          final long start = System.nanoTime();
           jmx.connectAndWait(duration);
-          long elapsed = (System.nanoTime() - start) / 1_000_000L;
+          final long elapsed = (System.nanoTime() - start) / 1_000_000L;
           printOut("[%s] connectAndWait() actually waited %,d ms", getName(), elapsed);
         }
       };

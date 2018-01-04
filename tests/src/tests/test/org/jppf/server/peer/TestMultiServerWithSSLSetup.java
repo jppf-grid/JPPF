@@ -34,7 +34,7 @@ public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testSetup() throws Exception {
-    TestConfiguration cfg = createConfig("ssl2_p2p");
+    final TestConfiguration cfg = createConfig("ssl2_p2p");
     cfg.driverLog4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
     client = BaseSetup.setup(2, 2, true, cfg);
     awaitPeersInitialized();

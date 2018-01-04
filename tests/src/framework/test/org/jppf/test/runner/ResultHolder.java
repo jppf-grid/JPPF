@@ -32,6 +32,10 @@ import org.junit.runner.notification.Failure;
  */
 public class ResultHolder implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Holds exceptions that occurred outside of the JUnit runner.
    */
   private final List<ExceptionHolder> exceptions = new ArrayList<>();
@@ -103,7 +107,7 @@ public class ResultHolder implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("ResultHolder[");
+    final StringBuilder sb = new StringBuilder("ResultHolder[");
     sb.append("testsCount=").append(getTestsCount()).append(", failureCount=").append(failureCount).append(", successCount=").append(successCount);
     sb.append(", failures=").append(failureMap).append(", successes=").append(successMap);
     sb.append(", exceptions=").append(exceptions);
@@ -116,7 +120,7 @@ public class ResultHolder implements Serializable {
    * @param failure the failure to add.
    */
   public void addFailure(final Failure failure) {
-    Description d = failure.getDescription();
+    final Description d = failure.getDescription();
     //CollectionUtils.putInListMap(d.getClassName(), failure, failureMap);
     failureMap.putValue(d.getClassName(), failure);
     processDescription(d);
@@ -166,8 +170,8 @@ public class ResultHolder implements Serializable {
    * @param desc the test description.
    */
   private void processDescription(final Description desc) {
-    String name = desc.getClassName();
-    String testName = name + "." + desc.getMethodName();
+    final String name = desc.getClassName();
+    final String testName = name + "." + desc.getMethodName();
     if (!classes.contains(name)) classes.add(name);
     if (!tests.contains(testName)) tests.add(testName);
   }
@@ -250,7 +254,7 @@ public class ResultHolder implements Serializable {
    * @return <code>true</code> if the test already exists, <code>false</code> otherwise.
    */
   public boolean hasTest(final Description desc) {
-    String name = desc.getClassName() + "." + desc.getMethodName();
+    final String name = desc.getClassName() + "." + desc.getMethodName();
     return tests.contains(name);
   }
 

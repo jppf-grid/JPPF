@@ -58,13 +58,13 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
    */
   @Test(timeout = 15000)
   public void testConnectionNotifications() throws Exception {
-    int nbSlaves = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    final int nbSlaves = 2;
+    final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     print(false, false, "waiting for master node");
     while (driver.nbIdleNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
-    JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
-    NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
+    final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
+    final NodeSelector selector = new ExecutionPolicySelector(new Equal(JPPFProperties.PROVISIONING_MASTER.getName(), true));
     forwarder.provisionSlaveNodes(selector, nbSlaves);
     print(false, false, "waiting for %d slave nodes", nbSlaves);
     while (driver.nbIdleNodes() < nbSlaves + 1) Thread.sleep(10L);
@@ -99,7 +99,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    JPPFManagementInfo info = (JPPFManagementInfo) notification.getUserData();
+    final JPPFManagementInfo info = (JPPFManagementInfo) notification.getUserData();
     if (info.isMasterNode()) return;
     synchronized(notifList) {
       notifList.add(notification);

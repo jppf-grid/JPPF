@@ -62,9 +62,9 @@ public class TestConnectionPool extends Setup1D1N {
   public void testSubmitJobMultipleConnections() throws Exception {
     configure(0);
     client = BaseSetup.createClient(null, false);
-    int nbTasks = 100;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-    List<Task<?>> results = client.submitJob(job);
+    final int nbTasks = 100;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final List<Task<?>> results = client.submitJob(job);
     testJobResults(nbTasks, results);
   }
 
@@ -76,9 +76,9 @@ public class TestConnectionPool extends Setup1D1N {
   public void testSubmitJobMultipleConnectionsAndLocalExec() throws Exception {
     configure(2);
     client = BaseSetup.createClient(null, false);
-    int nbTasks = 100;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-    List<Task<?>> results = client.submitJob(job);
+    final int nbTasks = 100;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final List<Task<?>> results = client.submitJob(job);
     testJobResults(nbTasks, results);
   }
 
@@ -91,11 +91,11 @@ public class TestConnectionPool extends Setup1D1N {
     configure(0);
     client = BaseSetup.createClient(null, false);
     while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
-    int nbTasks = 100;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    final int nbTasks = 100;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
     // default max channels is 1 for backward compatibility with previous versions of the client.
     job.getClientSLA().setMaxChannels(10);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     testJobResults(nbTasks, results);
   }
 
@@ -107,7 +107,7 @@ public class TestConnectionPool extends Setup1D1N {
   public void testNumberOfPools() throws Exception {
     client = BaseSetup.createClient(null, false);
     BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
-    List<JPPFConnectionPool> pools = client.getConnectionPools();
+    final List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
     assertEquals(1, pools.size());
   }
@@ -120,7 +120,7 @@ public class TestConnectionPool extends Setup1D1N {
   public void testSetPoolSizeByAPI() throws Exception {
     client = BaseSetup.createClient(null, false);
     for (int i=1; i<=10; i++) {
-      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+      final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       try {
         pool.setSize(2);
         pool.awaitWorkingConnections(Operator.EQUAL, 2);
@@ -137,7 +137,7 @@ public class TestConnectionPool extends Setup1D1N {
    * Configure the client for a connection pool.
    * @param localThreads a value greater than 0 to enable local execution with this number of threads, 0 or less otherwise.
    */
-  private void configure(final int localThreads) {
+  private static void configure(final int localThreads) {
     JPPFConfiguration
       .set(LOAD_BALANCING_ALGORITHM, "proportional")
       .set(LOAD_BALANCING_PROFILE, "test")
@@ -153,10 +153,10 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testPoolPriority() throws Exception {
     JPPFConfiguration.set(DISCOVERY_ENABLED, false).set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, false);
-    String methodName = ReflectionUtils.getCurrentMethodName();
-    try (JPPFClient client = new JPPFClient()) {
+    final String methodName = ReflectionUtils.getCurrentMethodName();
+    try (final JPPFClient client = new JPPFClient()) {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
-      SimpleDiscovery discovery = new SimpleDiscovery();
+      final SimpleDiscovery discovery = new SimpleDiscovery();
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
@@ -164,10 +164,10 @@ public class TestConnectionPool extends Setup1D1N {
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
       // trigger close of pool1
-      JPPFConnectionPool pool = client.findConnectionPool("pool1");
+      final JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
-      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.awaitWorkingConnection();
-      AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
+      final JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.awaitWorkingConnection();
+      final AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
       csd.getSocketInitializer().close();
       csd.getSocketClient().close();
       awaitConnections(client, Operator.AT_MOST, 1);
@@ -186,20 +186,20 @@ public class TestConnectionPool extends Setup1D1N {
    * @param prefix .
    * @throws Exception if any error occurs
    */
-  private void testJobsInPool(final JPPFClient client, final String poolName, final String prefix) throws Exception {
-    int nbJobs = 5;
-    List<JPPFJob> jobs = new ArrayList<>(nbJobs);
-    MyJobListener listener = new MyJobListener();
+  private static void testJobsInPool(final JPPFClient client, final String poolName, final String prefix) throws Exception {
+    final int nbJobs = 5;
+    final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
+    final MyJobListener listener = new MyJobListener();
     for (int i=1; i<=nbJobs; i++) {
-      JPPFJob job = BaseTestHelper.createJob(prefix + i, false, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(prefix + i, false, false, 1, LifeCycleTask.class, 0L);
       job.addJobListener(listener);
       jobs.add(job);
     }
-    for (JPPFJob job: jobs) client.submitJob(job);
-    for (JPPFJob job: jobs) {
-      List<Task<?>> result = job.awaitResults();
+    for (final JPPFJob job: jobs) client.submitJob(job);
+    for (final JPPFJob job: jobs) {
+      final List<Task<?>> result = job.awaitResults();
       testJobResults(1, result);
-      String name = listener.jobToPool.get(job.getUuid());
+      final String name = listener.jobToPool.get(job.getUuid());
       assertNotNull(name);
       assertEquals(poolName, name);
     }
@@ -211,13 +211,13 @@ public class TestConnectionPool extends Setup1D1N {
    * @param results the results.
    * @throws Exception if any error occurs.
    */
-  private void testJobResults(final int nbTasks, final List<Task<?>> results) throws Exception {
+  private static void testJobResults(final int nbTasks, final List<Task<?>> results) throws Exception {
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    int count = 0;
-    for (Task<?> task : results) {
-      String prefix = "task " + count + " ";
-      Throwable t = task.getThrowable();
+    final int count = 0;
+    for (final Task<?> task : results) {
+      final String prefix = "task " + count + " ";
+      final Throwable t = task.getThrowable();
       assertNull(prefix + "has an exception", t);
       assertNotNull(prefix + "result is null", task.getResult());
     }
@@ -230,10 +230,10 @@ public class TestConnectionPool extends Setup1D1N {
    * @param nbPools the number of pools on which to apply the condition.
    * @throws Exception if any error occurs.
    */
-  private void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
+  private static void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
     BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
-    JobManagerClient mgr = (JobManagerClient) client.getJobManager();
+    final JobManagerClient mgr = (JobManagerClient) client.getJobManager();
     while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
   }
 

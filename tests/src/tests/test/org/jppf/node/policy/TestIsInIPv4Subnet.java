@@ -70,7 +70,7 @@ public class TestIsInIPv4Subnet extends BaseTest {
     try {
       PolicyParser.validatePolicy(invalidXML);
       throw new IllegalStateException("the policy is invalid but passes the validation");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       assertTrue("e = " + e, e instanceof JPPFException);
     }
   }
@@ -81,7 +81,7 @@ public class TestIsInIPv4Subnet extends BaseTest {
    */
   @Test(timeout=5000)
   public void testMatches() throws Exception {
-    JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
+    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     info.getJppf().setString("string.1", "192.168");
     info.getJppf().setString("string.2", ".1.14");
@@ -95,10 +95,10 @@ public class TestIsInIPv4Subnet extends BaseTest {
     assertTrue(new IsInIPv4Subnet("192.0.0.0/4").accepts(info));
     assertTrue(new IsInIPv4Subnet("192-207.0-255.0-10.0-127").accepts(info));
     assertTrue(new IsInIPv4Subnet("$script{ '${string.1}' + '${string.2}'; }$").accepts(info));
-    ExecutionPolicy p = new IsInIPv4Subnet("$script{ '${string.3}' + (${int.1} + ${int.13}); }$");
+    final ExecutionPolicy p = new IsInIPv4Subnet("$script{ '${string.3}' + (${int.1} + ${int.13}); }$");
     assertTrue(p.accepts(info));
-    String xml = p.toXML();
-    ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
+    final String xml = p.toXML();
+    final ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
     assertEquals(xml, p2.toXML());
   }
 }

@@ -48,7 +48,7 @@ public class Setup1D1N extends BaseTest {
   public static void cleanup() throws Exception {
     try {
       BaseSetup.cleanup();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       throw e;
     }

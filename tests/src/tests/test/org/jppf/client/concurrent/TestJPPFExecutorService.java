@@ -34,8 +34,7 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for {@link JPPFExecutorService}.
  * @author Laurent Cohen
  */
-public class TestJPPFExecutorService extends Setup1D1N1C
-{
+public class TestJPPFExecutorService extends Setup1D1N1C {
   /**
    * Default duration for tasks that use a duration. Adjust the value for slow hardware.
    */
@@ -50,8 +49,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * @throws IOException if a process could not be started.
    */
   @Before
-  public void setupTest() throws IOException
-  {
+  public void setupTest() throws IOException {
     executor = new JPPFExecutorService(client);
   }
 
@@ -60,8 +58,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * @throws IOException if a process could not be stopped.
    */
   @After
-  public void cleanupTest() throws IOException
-  {
+  public void cleanupTest() throws IOException {
     if ((executor != null) && !executor.isShutdown()) executor.shutdownNow();
   }
 
@@ -69,12 +66,11 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Runnable)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testSubmitRunnable() throws Exception
-  {
-    TaskResult result = new TaskResult();
-    SimpleRunnable sr = new SimpleRunnable(result);
-    Future<?> future = executor.submit(sr);
+  @Test(timeout = 5000)
+  public void testSubmitRunnable() throws Exception {
+    final TaskResult result = new TaskResult();
+    final SimpleRunnable sr = new SimpleRunnable(result);
+    final Future<?> future = executor.submit(sr);
     future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
@@ -84,14 +80,13 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Runnable, T)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testSubmitRunnableWithResult() throws Exception
-  {
-    TaskResult result = new TaskResult();
-    SimpleRunnable sr = new SimpleRunnable(result);
-    Future<TaskResult> future = executor.submit(sr, result);
+  @Test(timeout = 5000)
+  public void testSubmitRunnableWithResult() throws Exception {
+    final TaskResult result = new TaskResult();
+    final SimpleRunnable sr = new SimpleRunnable(result);
+    final Future<TaskResult> future = executor.submit(sr, result);
     assertNotNull(future);
-    TaskResult finalResult = future.get();
+    final TaskResult finalResult = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
@@ -102,13 +97,12 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Callable)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testSubmitCallable() throws Exception
-  {
-    SimpleCallable sc = new SimpleCallable();
-    Future<TaskResult> future = executor.submit(sc);
+  @Test(timeout = 5000)
+  public void testSubmitCallable() throws Exception {
+    final SimpleCallable sc = new SimpleCallable();
+    final Future<TaskResult> future = executor.submit(sc);
     assertNotNull(future);
-    TaskResult finalResult = future.get();
+    final TaskResult finalResult = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
@@ -119,20 +113,18 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.invokeAll(List&lt;Callable&gt;)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testInvokeAll() throws Exception
-  {
-    int n = 10;
-    List<SimpleCallable> tasks = new ArrayList<>();
-    for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
-    List<Future<TaskResult>> futures = executor.invokeAll(tasks);
+  @Test(timeout = 5000)
+  public void testInvokeAll() throws Exception {
+    final int n = 10;
+    final List<SimpleCallable> tasks = new ArrayList<>();
+    for (int i = 0; i < n; i++) tasks.add(new SimpleCallable(i));
+    final List<Future<TaskResult>> futures = executor.invokeAll(tasks);
     assertNotNull(futures);
     assertEquals(n, futures.size());
-    for (int i=0; i<n; i++)
-    {
-      Future<TaskResult> future = futures.get(i);
+    for (int i = 0; i < n; i++) {
+      final Future<TaskResult> future = futures.get(i);
       assertNotNull(future);
-      TaskResult finalResult = future.get();
+      final TaskResult finalResult = future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
       assertNotNull(finalResult);
@@ -146,18 +138,16 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, no task has enough time to execute.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testInvokeAllWithTimeout() throws Exception
-  {
-    int n = 2;
-    long timeout = TASK_DURATION / 2L;
-    List<SimpleCallable> tasks = new ArrayList<>();
-    for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-    List<Future<TaskResult>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
+  @Test(timeout = 5000)
+  public void testInvokeAllWithTimeout() throws Exception {
+    final int n = 2;
+    final long timeout = TASK_DURATION / 2L;
+    final List<SimpleCallable> tasks = new ArrayList<>();
+    for (int i = 0; i < n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
+    final List<Future<TaskResult>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNotNull(futures);
     assertEquals(n, futures.size());
-    for (Future<TaskResult> f: futures)
-    {
+    for (final Future<TaskResult> f: futures) {
       assertNull(f.get());
       assertTrue(f.isDone());
       assertTrue(f.isCancelled());
@@ -169,13 +159,12 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.invokeAny(List&lt;Callable&gt;)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testInvokeAny() throws Exception
-  {
-    int n = 10;
-    List<SimpleCallable> tasks = new ArrayList<>();
-    for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
-    TaskResult result = executor.invokeAny(tasks);
+  @Test(timeout = 5000)
+  public void testInvokeAny() throws Exception {
+    final int n = 10;
+    final List<SimpleCallable> tasks = new ArrayList<>();
+    for (int i = 0; i < n; i++) tasks.add(new SimpleCallable(i));
+    final TaskResult result = executor.invokeAny(tasks);
     assertNotNull(result);
     assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
     assertTrue(result.position >= 0);
@@ -186,14 +175,13 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, no task has enough time to complete its execution.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testInvokeAnyWithTimeout() throws Exception
-  {
-    int n = 2;
-    long timeout = TASK_DURATION / 2L;
-    List<SimpleCallable> tasks = new ArrayList<>();
-    for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-    TaskResult result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
+  @Test(timeout = 5000)
+  public void testInvokeAnyWithTimeout() throws Exception {
+    final int n = 2;
+    final long timeout = TASK_DURATION / 2L;
+    final List<SimpleCallable> tasks = new ArrayList<>();
+    for (int i = 0; i < n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
+    final TaskResult result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNull(result);
     Thread.sleep(100L + (n * TASK_DURATION) - timeout);
   }
@@ -203,9 +191,8 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, we verify that submitting a task after a shutdown is requested raises a {@link RejectedExecutionException}.
    * @throws Exception if any error occurs
    */
-  @Test(expected = RejectedExecutionException.class, timeout=5000)
-  public void testShutdown() throws Exception
-  {
+  @Test(expected = RejectedExecutionException.class, timeout = 5000)
+  public void testShutdown() throws Exception {
     executor.shutdown();
     assertTrue(executor.isShutdown());
     assertTrue(executor.isTerminated());
@@ -216,9 +203,8 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Test invocation of <code>JPPFExecutorService.shutdownNow()</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testShutdownNow() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testShutdownNow() throws Exception {
     executor.submit(new SimpleRunnable());
     executor.shutdownNow();
     assertTrue(executor.isShutdown());
@@ -230,12 +216,11 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, the termination occurs before the timeout expires.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testAwaitTermination() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testAwaitTermination() throws Exception {
     executor.submit(new SimpleCallable(0, TASK_DURATION));
     executor.shutdown();
-    assertTrue(executor.awaitTermination(3L*TASK_DURATION, TimeUnit.MILLISECONDS));
+    assertTrue(executor.awaitTermination(3L * TASK_DURATION, TimeUnit.MILLISECONDS));
     assertTrue(executor.isShutdown());
     assertTrue(executor.isTerminated());
   }
@@ -245,13 +230,12 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, the timeout expires before the termination occurs.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testAwaitTermination2() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testAwaitTermination2() throws Exception {
     executor.submit(new SimpleCallable(0, TASK_DURATION));
     Thread.sleep(100L);
     executor.shutdown();
-    assertFalse(executor.awaitTermination(TASK_DURATION/2L, TimeUnit.MILLISECONDS));
+    assertFalse(executor.awaitTermination(TASK_DURATION / 2L, TimeUnit.MILLISECONDS));
     assertTrue(executor.isShutdown());
     assertFalse(executor.isTerminated());
   }

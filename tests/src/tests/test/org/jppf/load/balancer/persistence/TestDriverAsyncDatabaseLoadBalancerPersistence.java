@@ -33,8 +33,8 @@ public class TestDriverAsyncDatabaseLoadBalancerPersistence extends AbstractDriv
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "lb_persistence_driver";
-    TestConfiguration config = dbSetup(prefix);
+    final String prefix = "lb_persistence_driver";
+    final TestConfiguration config = dbSetup(prefix);
     config.driverJppf = "classes/tests/config/" + prefix + "/driver_async_db.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 2, true, true, config);

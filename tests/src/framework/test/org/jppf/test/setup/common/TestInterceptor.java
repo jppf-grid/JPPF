@@ -64,20 +64,20 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
     if (!active) return true;
     if (debugEnabled) log.debug("start");
     try {
-      InputStream is = acceptedSocket.getInputStream();
-      OutputStream os = acceptedSocket.getOutputStream();
-      DataInputStream dis = new DataInputStream(is);
-      String msg = dis.readUTF();
+      final InputStream is = acceptedSocket.getInputStream();
+      final OutputStream os = acceptedSocket.getOutputStream();
+      final DataInputStream dis = new DataInputStream(is);
+      final String msg = dis.readUTF();
       if (debugEnabled) log.debug("read '{}'", msg);
       clientMessage = msg;
       if (CLIENT_MESSAGE.equals(msg)) {
-        DataOutputStream dos = new DataOutputStream(os);
+        final DataOutputStream dos = new DataOutputStream(os);
         dos.writeUTF(SERVER_MESSAGE);
         dos.flush();
         if (debugEnabled) log.debug("wrote '{}'", SERVER_MESSAGE);
         return true;
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       //e.printStackTrace();
     }
@@ -90,18 +90,18 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
     if (!active) return true;
     if (debugEnabled) log.debug("start");
     try {
-      InputStream is = connectedSocket.getInputStream();
-      OutputStream os = connectedSocket.getOutputStream();
-      DataOutputStream dos = new DataOutputStream(os);
+      final InputStream is = connectedSocket.getInputStream();
+      final OutputStream os = connectedSocket.getOutputStream();
+      final DataOutputStream dos = new DataOutputStream(os);
       dos.writeUTF(CLIENT_MESSAGE);
       dos.flush();
       if (debugEnabled) log.debug("wrote '{}'", CLIENT_MESSAGE);
-      DataInputStream dis = new DataInputStream(is);
-      String msg = dis.readUTF();
+      final DataInputStream dis = new DataInputStream(is);
+      final String msg = dis.readUTF();
       if (debugEnabled) log.debug("read '{}'", msg);
       serverMessage = msg;
       if (SERVER_MESSAGE.equals(msg)) return true;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     if (debugEnabled) log.debug("failed");

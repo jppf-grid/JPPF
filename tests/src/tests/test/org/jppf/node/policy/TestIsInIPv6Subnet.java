@@ -71,7 +71,7 @@ public class TestIsInIPv6Subnet extends BaseTest {
     try {
       PolicyParser.validatePolicy(invalidXML);
       throw new IllegalStateException("the policy is invalid but passes the validation");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       assertTrue("e = " + e, e instanceof JPPFException);
     }
   }
@@ -82,7 +82,7 @@ public class TestIsInIPv6Subnet extends BaseTest {
    */
   @Test(timeout=5000)
   public void testMatches() throws Exception {
-    JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
+    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv6.addresses", "localhost|0:0:0:0:8888:8888:8888:8888");
     info.getJppf().setString("string.1", "0:0:0:0:8888");
     info.getJppf().setString("string.2", ":8888:8888:8888");
@@ -95,10 +95,10 @@ public class TestIsInIPv6Subnet extends BaseTest {
     assertFalse(new IsInIPv6Subnet("0:aaaa-bbbb:0:0:0:0:0:0").accepts(info));
     assertTrue(new IsInIPv6Subnet("0:0:0:0:-:0-FFFF:7000-9000:400-A000").accepts(info));
     assertTrue(new IsInIPv6Subnet("$script{ '${string.1}' + '${string.2}'; }$").accepts(info));
-    ExecutionPolicy p = new IsInIPv6Subnet("$script{ '${string.3}' + (${int.8} + ${int.8880}); }$");
+    final ExecutionPolicy p = new IsInIPv6Subnet("$script{ '${string.3}' + (${int.8} + ${int.8880}); }$");
     assertTrue(p.accepts(info));
-    String xml = p.toXML();
-    ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
+    final String xml = p.toXML();
+    final ExecutionPolicy p2 = PolicyParser.parsePolicy(xml);
     assertEquals(xml, p2.toXML());
   }
 }

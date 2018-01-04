@@ -122,13 +122,13 @@ public class LifeCycleTask extends AbstractTask<String> {
   @Override
   public void run() {
     // System.nanoTime() has a different origin on different JVM instances, thus it can't be used to compute the start time
-    long nanoStart = System.nanoTime();
+    final long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
     start *= ONE_MILLION;
     if (startNotification != null) fireNotification(startNotification, true);
     try {
       executedInNode = isInNode();
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       synchronized(config) {
         nodeUuid = config.getString("jppf.node.uuid");
         if (nodeUuid == null) {
@@ -140,7 +140,7 @@ public class LifeCycleTask extends AbstractTask<String> {
       if (duration > 0L) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       displayTask("successful");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     } finally {
       elapsed = System.nanoTime() - nanoStart;
@@ -193,7 +193,7 @@ public class LifeCycleTask extends AbstractTask<String> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("id=").append(getId());
     sb.append(", duration=").append(duration);
     sb.append(", timedout=").append(timedout);

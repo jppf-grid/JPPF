@@ -67,12 +67,12 @@ public class NotifyingTaskListener implements NotificationListener {
     try {
       notifs.add(notification);
       if (notification instanceof JPPFNodeForwardingNotification) {
-        Notification realNotif = ((JPPFNodeForwardingNotification) notification).getNotification();
+        final Notification realNotif = ((JPPFNodeForwardingNotification) notification).getNotification();
         if (realNotif instanceof TaskExecutionNotification) {
-          TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
+          final TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
           if (notif.isUserNotification()) taskExecutionUserNotificationCount++;
           else taskExecutionJppfNotificationCount++;
-          Object o = notif.getUserData();
+          final Object o = notif.getUserData();
           if (o != null) userObjects.add(o);
         } else {
           if ("NodeTest".equals(realNotif.getType())) {
@@ -81,7 +81,7 @@ public class NotifyingTaskListener implements NotificationListener {
           }
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (exception == null) exception = e;
     }
   }

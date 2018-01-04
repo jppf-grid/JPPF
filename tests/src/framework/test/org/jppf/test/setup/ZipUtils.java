@@ -32,13 +32,13 @@ public class ZipUtils {
    * @param paths the paths of the files to add to the zip.
    */
   static void zipFile(final String zipPath, final String...paths) {
-    File zipFile = new File(zipPath);
-    try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)))) {
-      byte[] buffer = new byte[2048];
-      for (String path: paths) {
-        File inputFile = new File(path);
-        try (InputStream is = new BufferedInputStream(new FileInputStream(inputFile))) {
-          ZipEntry entry = new ZipEntry(inputFile.getName());
+    final File zipFile = new File(zipPath);
+    try (final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)))) {
+      final byte[] buffer = new byte[2048];
+      for (final String path: paths) {
+        final File inputFile = new File(path);
+        try (final InputStream is = new BufferedInputStream(new FileInputStream(inputFile))) {
+          final ZipEntry entry = new ZipEntry(inputFile.getName());
           zos.putNextEntry(entry);
           int n;
           while ((n = is.read(buffer)) > 0) {
@@ -47,7 +47,7 @@ public class ZipUtils {
         }
       }
       zos.finish();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

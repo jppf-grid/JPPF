@@ -43,17 +43,17 @@ public class TestLocalNode extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = createConfig("localnode");
+    final TestConfiguration config = createConfig("localnode");
     config.driverLog4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     final AtomicReference<Exception> ref = new AtomicReference<>(null);
-    ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
+    final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
       @Override
       public boolean evaluate() {
         try {
-          JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+          final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
           return jmx.nbNodes() > 0;
-        } catch (@SuppressWarnings("unused") Exception e) {
+        } catch (@SuppressWarnings("unused") final Exception e) {
         }
         return false;
       }
@@ -104,17 +104,17 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testServerConnections() throws Exception {
     Thread.sleep(200L);
-    List<JPPFConnectionPool> pools = client.getConnectionPools();
+    final List<JPPFConnectionPool> pools = client.getConnectionPools();
     assertNotNull(pools);
     assertEquals(1, pools.size());
-    JPPFConnectionPool pool = pools.get(0);
+    final JPPFConnectionPool pool = pools.get(0);
     assertNotNull(pool);
     assertEquals("driver1", pool.getName());
     assertEquals(11101, pool.getDriverPort());
-    List<JPPFClientConnection> connections = pool.getConnections();
+    final List<JPPFClientConnection> connections = pool.getConnections();
     assertNotNull(connections);
     assertEquals(1, connections.size());
-    for (JPPFClientConnection c: connections) {
+    for (final JPPFClientConnection c: connections) {
       assertNotNull(c);
       assertNotNull(c.getStatus());
       assertEquals(JPPFClientConnectionStatus.ACTIVE, c.getStatus());

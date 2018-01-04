@@ -33,8 +33,8 @@ public class TestDefaultFilePersistence extends AbstractJobPersistenceTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "job_persistence";
-    TestConfiguration config = dbSetup(prefix, false);
+    final String prefix = "job_persistence";
+    final TestConfiguration config = dbSetup(prefix, false);
     config.driverJppf = "classes/tests/config/" + prefix + "/driver_file.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 2, true, true, config);

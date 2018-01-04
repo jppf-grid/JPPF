@@ -68,15 +68,15 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskTimeout() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
-    List<Task<?>> tasks = job.getJobTasks();
-    JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    final List<Task<?>> tasks = job.getJobTasks();
+    final JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
     tasks.get(nbTasks-1).setTimeoutSchedule(schedule);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    final LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
   }
@@ -87,14 +87,14 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=5000)
   public void testTaskTimeoutStart() throws Exception {
-    int nbTasks = 2;
-    long timeout = 200L;
-    JPPFJob job = new JPPFJob(ReflectionUtils.getCurrentMethodName());
+    final int nbTasks = 2;
+    final long timeout = 200L;
+    final JPPFJob job = new JPPFJob(ReflectionUtils.getCurrentMethodName());
     job.add(new LifeCycleTask(2*timeout)).setId("task 1");
     MyTask task = new MyTask(2*timeout);
     task.setTimeoutSchedule(new JPPFSchedule(timeout));
     job.add(task).setId("task 2");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     task = (MyTask) results.get(1);
@@ -109,17 +109,17 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskExpirationDate() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
-    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
-    JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
-    List<Task<?>> tasks = job.getJobTasks();
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    final Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
+    final JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
+    final List<Task<?>> tasks = job.getJobTasks();
     tasks.get(0).setTimeoutSchedule(schedule);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    final LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
   }
@@ -130,13 +130,13 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testComputeCallable() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
     callableResult = "test successful";
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    final MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
     assertNotNull(task.getResult());
     assertEquals("test successful", task.getResult());
   }
@@ -147,15 +147,15 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testComputeCallableThrowingException() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
     callableResult = "test successful";
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
+    final Task<?> task = results.get(0);
     assertNull(task.getResult());
-    Throwable t = task.getThrowable();
+    final Throwable t = task.getThrowable();
     assertNotNull(t);
     assertTrue("throwable class is " + t.getClass().getName(), t instanceof UnsupportedOperationException);
   }
@@ -168,13 +168,13 @@ public class TestJPPFTask extends Setup1D1N1C {
   public void testComputeCallableInClient() throws Exception {
     try {
       configure();
-      int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
+      final int nbTasks = 1;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
       callableResult = "test successful";
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+      final MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
       if (task.getThrowable() != null) throw new Exception(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals("test successful", task.getResult());
@@ -189,12 +189,12 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testIsInNodeTrue() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
-    List<Task<?>> results = client.submitJob(job);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    final MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
     assertNotNull(task.getResult());
     assertTrue((Boolean) task.getResult());
     assertNotNull(task.nodeUuid);
@@ -210,12 +210,12 @@ public class TestJPPFTask extends Setup1D1N1C {
   public void testIsInNodeFalse() throws Exception {
     try {
       configure();
-      int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
-      List<Task<?>> results = client.submitJob(job);
+      final int nbTasks = 1;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+      final MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
       assertNotNull(task.getResult());
       assertFalse((Boolean) task.getResult());
       assertNotNull(task.nodeUuid);
@@ -232,16 +232,16 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskLocalNotifications() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask.class);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask.class);
     int count = 0;
     for (Task<?> task: job) task.setId("NotifyingTask " + ++count);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    NotifyingTask task = (NotifyingTask) results.get(0);
+    final NotifyingTask task = (NotifyingTask) results.get(0);
     assertTrue(task.getResult() instanceof List);
-    List<?> list = (List<?>) task.getResult();
+    final List<?> list = (List<?>) task.getResult();
     assertEquals(3, list.size());
     for (int i=0; i<3; i++) assertEquals("task notification " + (i+1), list.get(i));
   }
@@ -252,12 +252,12 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskJMXNotifications() throws Exception {
-    NodeSelector selector = NodeSelector.ALL_NODES;
-    int nbTasks = 20;
-    NotifyingTaskListener listener = new NotifyingTaskListener();
+    final NodeSelector selector = NodeSelector.ALL_NODES;
+    final int nbTasks = 20;
+    final NotifyingTaskListener listener = new NotifyingTaskListener();
     String listenerID = null;
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection();
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask2.class);
+    final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask2.class);
     try {
       listenerID = driverJmx.registerForwardingNotificationListener(selector, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
       client.submitJob(job);
@@ -280,19 +280,19 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskResubmit() throws Exception {
-    int nbTasks = 1;
-    int nbRuns = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    final int nbTasks = 1;
+    final int nbRuns = 5;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
     // ensure the job is only executed in a single specific node
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    String nodeUuid = coll.iterator().next().getUuid();
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    final String nodeUuid = coll.iterator().next().getUuid();
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
     job.getSLA().setMaxTaskResubmits(Integer.MAX_VALUE);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    final ResubmittingTask task = (ResubmittingTask) results.get(0);
     assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(nbRuns), task.getResult());
   }
@@ -303,20 +303,20 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testMaxTaskResubmits() throws Exception {
-    int nbTasks = 1;
-    int maxResubmits = 2;
-    int nbRuns = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    final int nbTasks = 1;
+    final int maxResubmits = 2;
+    final int nbRuns = 5;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
     // ensure the job is only executed in a single specific node
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    String nodeUuid = coll.iterator().next().getUuid();
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    final String nodeUuid = coll.iterator().next().getUuid();
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
     job.getSLA().setMaxTaskResubmits(maxResubmits);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    final ResubmittingTask task = (ResubmittingTask) results.get(0);
     assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(maxResubmits + 1), task.getResult());
   }
@@ -327,22 +327,22 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testMaxTaskResubmitsWithTaskOverride() throws Exception {
-    int nbTasks = 1;
-    int slaMaxResubmits = 2;
-    int taskMaxResubmits = slaMaxResubmits + 1;
-    int nbRuns = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    final int nbTasks = 1;
+    final int slaMaxResubmits = 2;
+    final int taskMaxResubmits = slaMaxResubmits + 1;
+    final int nbRuns = 5;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
     job.getJobTasks().get(0).setMaxResubmits(taskMaxResubmits);
     // ensure the job is only executed in a single specific node
-    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    String nodeUuid = coll.iterator().next().getUuid();
+    final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    final String nodeUuid = coll.iterator().next().getUuid();
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
     job.getSLA().setMaxTaskResubmits(slaMaxResubmits);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    final ResubmittingTask task = (ResubmittingTask) results.get(0);
     assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(taskMaxResubmits + 1), task.getResult());
   }
@@ -351,6 +351,10 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * The class name for the callable to invoke.
      */
@@ -381,20 +385,20 @@ public class TestJPPFTask extends Setup1D1N1C {
       try {
         printOut("this task's class loader = %s", getClass().getClassLoader());
         if (callableClassName != null) {
-          Class<?> clazz = Class.forName(callableClassName);
-          JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
-          String s = compute(callable);
+          final Class<?> clazz = Class.forName(callableClassName);
+          final JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
+          final String s = compute(callable);
           printOut("result of MyCallable.call() = %s", s);
           setResult(s);
         } else {
-          boolean b = isInNode();
+          final boolean b = isInNode();
           printOut("isInNode() = %b", b);
           setResult(b);
         }
         nodeUuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         if (isInNode()) uuidFromNode = getNode().getUuid();
         printOut("this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         setThrowable(e);
       }
     }
@@ -404,6 +408,11 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A simple <code>JPPFCallable</code>.
    */
   public static class MyComputeCallable implements JPPFCallable<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public String call() throws Exception {
       printOut("result of MyCallable.call() = %s", callableResult);
@@ -415,6 +424,11 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A <code>JPPFCallable</code> whixh throws an exception in its <code>call()</code> method..
    */
   public static class MyExceptionalCallable implements JPPFCallable<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public String call() throws Exception {
       throw new UnsupportedOperationException("this exception is thrown intentionally");
@@ -425,7 +439,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * Configure the client for a local execution.
    * @throws Exception if any error occurs.
    */
-  private void configure() throws Exception {
+  private static void configure() throws Exception {
     client.close();
     // enable only local execution
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
@@ -436,7 +450,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * Reset the confiugration.
    * @throws Exception if any error occurs.
    */
-  private void reset() throws Exception {
+  private static void reset() throws Exception {
     // reset the client and config
     client.close();
     client = BaseSetup.createClient(null, true);
@@ -446,6 +460,11 @@ public class TestJPPFTask extends Setup1D1N1C {
    * An extension of LifeCycleTask which sets the result before calling {@link super.run()}.
    */
   public static class MyTask extends LifeCycleTask {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this task.
      * @param duration the  task duration.
@@ -463,11 +482,16 @@ public class TestJPPFTask extends Setup1D1N1C {
 
   /** */
   public static class NotifyingTask extends AbstractTask<Object> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void run() {
       for (int i=1; i<=3; i++) {
         final int n = i;
-        Callable<Object> callable = new Callable<Object>() {
+        final Callable<Object> callable = new Callable<Object>() {
           @Override
           public Object call() throws Exception {
             return "task notification " + n;
@@ -480,6 +504,11 @@ public class TestJPPFTask extends Setup1D1N1C {
 
   /** */
   public static class NotifyingTask2 extends AbstractTask<Object> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void run() {
       fireNotification(getId() + "#1", true);
@@ -493,6 +522,10 @@ public class TestJPPFTask extends Setup1D1N1C {
    * until the counter has reached a specified value.
    */
   public static class ResubmittingTask extends AbstractTask<Integer> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * Maximum number of runs for this task = max resubmit + 1.
      */
@@ -508,13 +541,13 @@ public class TestJPPFTask extends Setup1D1N1C {
 
     @Override
     public void run() {
-      String key = getId() + "counter";
+      final String key = getId() + "counter";
       AtomicInteger counter = (AtomicInteger) NodeRunner.getPersistentData(key);
       if (counter == null) {
         counter = new AtomicInteger(0);
         NodeRunner.setPersistentData(key, counter);
       }
-      int n = counter.incrementAndGet();
+      final int n = counter.incrementAndGet();
       if (n < nbRuns) setResubmit(true);
       else NodeRunner.removePersistentData(key);
       setResult(n);

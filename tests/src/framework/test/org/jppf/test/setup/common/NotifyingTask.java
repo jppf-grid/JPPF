@@ -30,6 +30,10 @@ import org.slf4j.*;
  */
 public class NotifyingTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(NotifyingTask.class);
@@ -92,7 +96,7 @@ public class NotifyingTask extends AbstractTask<String> {
       if (debugEnabled) log.debug("sent end notification from {}", this);
       setResult(SUCCESS);
       //System.out.println("task " + getId() + " successful");
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       //System.out.println("Error on task " + getId() + " : " + ExceptionUtils.getMessage(e));
       //e.printStackTrace();
     }

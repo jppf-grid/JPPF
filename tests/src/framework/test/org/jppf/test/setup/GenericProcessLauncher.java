@@ -132,7 +132,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     addClasspathElement("../jmxremote/classes");
     addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
-    String libDir = "../JPPF/lib/";
+    final String libDir = "../JPPF/lib/";
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
@@ -171,11 +171,11 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * 
    */
   private void updateJvmOptionsFromConfig() {
-    TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
-    String s = config.get(JPPFProperties.JVM_OPTIONS);
+    final TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
+    final String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (s != null) {
-      String[] options = RegexUtils.SPACES_PATTERN.split(s);
-      for (String opt: options) addJvmOption(opt);
+      final String[] options = RegexUtils.SPACES_PATTERN.split(s);
+      for (final String opt: options) addJvmOption(opt);
     }
   }
 
@@ -298,13 +298,13 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
       while (!end) {
         if (debugEnabled) log.debug(name + "starting process");
         startProcess();
-        int exitCode = process.waitFor();
+        final int exitCode = process.waitFor();
         if (debugEnabled) log.debug(name + "exited with code " + exitCode);
         end = onProcessExit(exitCode);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
-    } catch (Error e) {
+    } catch (final Error e) {
       e.printStackTrace();
     }
     if (process != null) process.destroy();
@@ -317,7 +317,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * @param exitCode the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
-  private boolean onProcessExit(final int exitCode) {
+  private static boolean onProcessExit(final int exitCode) {
     return exitCode != 2;
   }
 
@@ -326,12 +326,12 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * @throws IOException if the process fails to start.
    */
   public void startProcess() throws IOException {
-    int processPort = startDriverSocket();
+    final int processPort = startDriverSocket();
     if (debugEnabled) log.debug("process port = {}", processPort);
-    List<String> command = new ArrayList<>();
+    final List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<classpath.size(); i++) {
       if (i > 0) sb.append(PATH_SEPARATOR);
       sb.append(classpath.get(i));
@@ -344,7 +344,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     command.add(mainClass);
     if (processPort > 0) command.add(Integer.toString(processPort));
     else command.add("noLauncher");
-    ProcessBuilder builder = new ProcessBuilder();
+    final ProcessBuilder builder = new ProcessBuilder();
     builder.command(command);
     if (dir != null) builder.directory(new File(dir));
     wrapper = new ProcessWrapper();
@@ -367,22 +367,22 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    */
   public void stopProcess() {
     if ((wrapper != null) && (wrapper.getProcess() != null)) {
-      Process process = wrapper.getProcess();
+      final Process process = wrapper.getProcess();
       if (debugEnabled) log.debug(name + "stopping process " + process);
       if (socketClient != null) {
         try {
             socketClient.close();
-          } catch (@SuppressWarnings("unused") Exception ignore) {
+          } catch (@SuppressWarnings("unused") final Exception ignore) {
           }
       }
       process.destroy();
       boolean terminated = false;
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       while (!terminated && ((System.nanoTime() - start) / 1_000_000L < TERMINATION_TIMEOUT)) {
         try {
           process.exitValue();
           terminated = true;
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
           goToSleep(50L);
         }
       }
@@ -422,9 +422,9 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
               wakeUp();
             }
             socketClient = new SocketClient(processServer.accept());
-            int n = socketClient.readInt();
+            final int n = socketClient.readInt();
             if (n == -1) throw new EOFException();
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (debugEnabled) log.debug(name, e);
           }
         }
@@ -435,12 +435,12 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
           goToSleep();
         }
       };
-      MyRunnable r = new MyRunnable();
-      Thread thread = new Thread(r, name + "ServerSocket");
+      final MyRunnable r = new MyRunnable();
+      final Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
       r.await();
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       if (processServer != null) {
         StreamUtils.closeSilent(processServer);
         processServer = null;
@@ -458,7 +458,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     URL url = null;
     try {
       url = new File(path).toURI().toURL();
-    } catch (MalformedURLException e) {
+    } catch (final MalformedURLException e) {
       throw new RuntimeException(e);
     }
     return url.toString();
@@ -469,7 +469,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * @return the current timestamp formatted as a string.
    */
   protected String formatPrologue() {
-    StringBuilder sb = new StringBuilder(name).append('[');
+    final StringBuilder sb = new StringBuilder(name).append('[');
     synchronized(sdf) {
       return sb.append(sdf.format(new Date())).append("] ").toString();
     }

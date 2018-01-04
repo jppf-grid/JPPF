@@ -70,9 +70,9 @@ public class AwaitTaskNotificationListener implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
-    TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
-    Object data = actualNotif.getUserData();
+    final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+    final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
+    final Object data = actualNotif.getUserData();
     if (expectedMessage.equals(data)) {
       if (debugEnabled) log.debug("received expected task notification {}", expectedMessage);
       synchronized(this) {

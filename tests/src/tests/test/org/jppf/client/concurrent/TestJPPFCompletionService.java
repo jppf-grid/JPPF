@@ -32,8 +32,7 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for {@link JPPFExecutorService}.
  * @author Laurent Cohen
  */
-public class TestJPPFCompletionService extends Setup1D1N1C
-{
+public class TestJPPFCompletionService extends Setup1D1N1C {
   /**
    * Default duration for tasks that use a duration. Adjust the value for slow hardware.
    */
@@ -48,8 +47,7 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Before
-  public void setupTest() throws Exception
-  {
+  public void setupTest() throws Exception {
     executor = new JPPFExecutorService(client);
   }
 
@@ -58,8 +56,7 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @After
-  public void cleanupTest() throws Exception
-  {
+  public void cleanupTest() throws Exception {
     if ((executor != null) && !executor.isShutdown()) executor.shutdownNow();
   }
 
@@ -67,27 +64,24 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * Test the invocation of <code>JPPFCompletionService.submit(Callable)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSubmitCallables() throws Exception
-  {
-    int nbTasks = 5;
+  @Test(timeout = 10000)
+  public void testSubmitCallables() throws Exception {
+    final int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
-    for (int i=0; i<nbTasks; i++)
-    {
+    final CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
+    for (int i = 0; i < nbTasks; i++) {
       Future<TaskResult> f = cs.submit(new SimpleCallable(i, TASK_DURATION));
       assertNotNull(f);
-      f = executor.submit(new SimpleCallable(100+i, TASK_DURATION));
+      f = executor.submit(new SimpleCallable(100 + i, TASK_DURATION));
       assertNotNull(f);
     }
-    for (int i=0; i<nbTasks; i++)
-    {
-      Future<TaskResult> future = cs.take();
+    for (int i = 0; i < nbTasks; i++) {
+      final Future<TaskResult> future = cs.take();
       assertNotNull(future);
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
-      TaskResult result = future.get();
+      final TaskResult result = future.get();
       assertNotNull(result);
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
       assertTrue(result.position < nbTasks);
@@ -99,28 +93,25 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * Test the invocation of <code>JPPFCompletionService.submit(Runnable, T result)</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSubmitRunnables() throws Exception
-  {
-    int nbTasks = 5;
+  @Test(timeout = 10000)
+  public void testSubmitRunnables() throws Exception {
+    final int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
-    for (int i=0; i<nbTasks; i++)
-    {
-      TaskResult result = new TaskResult();
+    final CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
+    for (int i = 0; i < nbTasks; i++) {
+      final TaskResult result = new TaskResult();
       Future<TaskResult> f = cs.submit(new SimpleRunnable(i, result), result);
       assertNotNull(f);
-      f = executor.submit(new SimpleCallable(100+i, TASK_DURATION));
+      f = executor.submit(new SimpleCallable(100 + i, TASK_DURATION));
       assertNotNull(f);
     }
-    for (int i=0; i<nbTasks; i++)
-    {
-      Future<TaskResult> future = cs.take();
+    for (int i = 0; i < nbTasks; i++) {
+      final Future<TaskResult> future = cs.take();
       assertNotNull(future);
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
-      TaskResult result = future.get();
+      final TaskResult result = future.get();
       assertNotNull(result);
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
       assertTrue(result.position < nbTasks);
@@ -132,28 +123,25 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * Test using <code>JPPFCompletionService.poll()</code> to retrieve results.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testPoll() throws Exception
-  {
-    int nbTasks = 5;
+  @Test(timeout = 10000)
+  public void testPoll() throws Exception {
+    final int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
-    for (int i=0; i<nbTasks; i++)
-    {
+    final CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
+    for (int i = 0; i < nbTasks; i++) {
       Future<TaskResult> f = cs.submit(new SimpleCallable(i, TASK_DURATION));
       assertNotNull(f);
-      f = executor.submit(new SimpleCallable(100+i, TASK_DURATION));
+      f = executor.submit(new SimpleCallable(100 + i, TASK_DURATION));
       assertNotNull(f);
     }
-    for (int i=0; i<nbTasks; i++)
-    {
+    for (int i = 0; i < nbTasks; i++) {
       Future<TaskResult> future = null;
       while ((future = cs.poll()) == null) Thread.sleep(10L);
       assertNotNull(future);
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
-      TaskResult result = future.get();
+      final TaskResult result = future.get();
       assertNotNull(result);
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
       assertTrue(result.position < nbTasks);
@@ -166,28 +154,26 @@ public class TestJPPFCompletionService extends Setup1D1N1C
    * Test using <code>JPPFCompletionService.poll(long, TimeUnit)</code> to retrieve results.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testPollWithTimeout() throws Exception
-  {
-    int nbTasks = 5;
+  @Test(timeout = 10000)
+  public void testPollWithTimeout() throws Exception {
+    final int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
-    for (int i=0; i<nbTasks; i++)
-    {
+    final CompletionService<TaskResult> cs = new JPPFCompletionService<>(executor);
+    for (int i = 0; i < nbTasks; i++) {
       Future<TaskResult> f = cs.submit(new SimpleCallable(i, TASK_DURATION));
       assertNotNull(f);
-      f = executor.submit(new SimpleCallable(100+i, TASK_DURATION));
+      f = executor.submit(new SimpleCallable(100 + i, TASK_DURATION));
       assertNotNull(f);
     }
-    for (int i=0; i<nbTasks; i++)
-    {
+    for (int i = 0; i < nbTasks; i++) {
       Future<TaskResult> future = null;
-      while ((future = cs.poll(10L, TimeUnit.MILLISECONDS)) == null);
+      while ((future = cs.poll(10L, TimeUnit.MILLISECONDS)) == null)
+        ;
       assertNotNull(future);
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
-      TaskResult result = future.get();
+      final TaskResult result = future.get();
       assertNotNull(result);
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
       assertTrue(result.position < nbTasks);

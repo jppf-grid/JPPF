@@ -81,16 +81,16 @@ public class TestTaskCancellation extends BaseTest {
    */
   @Test(timeout=10000)
   public void testInterruptibleJPPFTask() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, true);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, true);
     job.getClientSLA().setExecutionPolicy(localPolicy);
     client.submitJob(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    MyTask task = (MyTask) results.get(0);
+    final MyTask task = (MyTask) results.get(0);
     assertNotNull(task);
     assertTrue(task.getElapsedOnCancel() >= 0L);
     assertTrue(task.getElapsedOnCancel() < TIME_SHORT * 1_000_000L);
@@ -106,16 +106,16 @@ public class TestTaskCancellation extends BaseTest {
    */
   @Test(timeout=10000)
   public void testUninterruptibleJPPFTask() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, false);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyTask.class, TIME_SHORT, false);
     job.getClientSLA().setExecutionPolicy(localPolicy);
     client.submitJob(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    MyTask task = (MyTask) results.get(0);
+    final MyTask task = (MyTask) results.get(0);
     assertNotNull(task);
     assertTrue(task.getElapsedOnCancel() >= 0L);
     assertTrue(task.getElapsedOnCancel() >= TIME_SHORT * 1_000_000L);
@@ -132,18 +132,18 @@ public class TestTaskCancellation extends BaseTest {
    */
   @Test(timeout=10000)
   public void testInterruptibleCallable() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, true);
-    for (Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, true);
+    for (final Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
     job.getClientSLA().setExecutionPolicy(localPolicy);
     client.submitJob(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    MyCallable callable = (MyCallable) task.getTaskObject();
+    final Task<?> task = results.get(0);
+    final MyCallable callable = (MyCallable) task.getTaskObject();
     assertNotNull(callable);
     assertTrue(callable.getElapsedOnCancel() >= 0L);
     assertTrue(callable.getElapsedOnCancel() < TIME_SHORT * 1_000_000L);
@@ -159,18 +159,18 @@ public class TestTaskCancellation extends BaseTest {
    */
   @Test(timeout=10000)
   public void testUninterruptibleCallable() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, false);
-    for (Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, MyCallable.class, TIME_SHORT, false);
+    for (final Task<?> task: job) ((JPPFAnnotatedTask) task).setCancelCallback(new MyCancelCallback());
     job.getClientSLA().setExecutionPolicy(localPolicy);
     client.submitJob(job);
     Thread.sleep(TIME_SHORT / 2L);
     job.cancel();
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    MyCallable callable = (MyCallable) task.getTaskObject();
+    final Task<?> task = results.get(0);
+    final MyCallable callable = (MyCallable) task.getTaskObject();
     assertNotNull(callable);
     assertTrue(callable.getElapsedOnCancel() >= 0L);
     assertTrue(callable.getElapsedOnCancel() >= TIME_SHORT * 1_000_000L);
@@ -183,6 +183,10 @@ public class TestTaskCancellation extends BaseTest {
 
   /** */
   public static class MyTask extends AbstractTask<String> implements CancellationHandler {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     protected long start, duration, elapsedOnCancel=-1L, elapsedDoCancelAction=-1L;
     /** */
@@ -207,7 +211,7 @@ public class TestTaskCancellation extends BaseTest {
           lock.wait(duration + 16L);
         }
         setResult(SUCCESS);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         setThrowable(e);
       }
     }
@@ -307,9 +311,14 @@ public class TestTaskCancellation extends BaseTest {
 
   /** */
   public static class MyCancelCallback extends JPPFTaskCallback<Object> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void run() {
-      MyCallable callable = (MyCallable) getTask().getTaskObject();
+      final MyCallable callable = (MyCallable) getTask().getTaskObject();
       callable.onCancel();
     }
   }

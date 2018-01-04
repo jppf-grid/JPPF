@@ -45,15 +45,15 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testAnnotatedStaticMethod() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(AnnotatedStaticMethodTask.class, "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertNotNull(task.getResult());
     assertEquals("task ended for param testParam", task.getResult());
@@ -67,21 +67,21 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testAnnotatedInstanceMethod() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new AnnotatedInstanceMethodTask(), "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertNotNull(task.getResult());
     assertEquals("task ended for param testParam", task.getResult());
     assertTrue(task instanceof JPPFAnnotatedTask);
     assertTrue(task.getTaskObject() instanceof AnnotatedInstanceMethodTask);
-    AnnotatedInstanceMethodTask aimt = (AnnotatedInstanceMethodTask) task.getTaskObject();
+    final AnnotatedInstanceMethodTask aimt = (AnnotatedInstanceMethodTask) task.getTaskObject();
     assertNotNull(aimt.result);
     assertEquals("task ended for param testParam", aimt.result);
   }
@@ -92,21 +92,21 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testAnnotatedConstructor() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(AnnotatedConstructorTask.class, "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertTrue(task.getResult() instanceof AnnotatedConstructorTask);
     assertTrue(task instanceof JPPFAnnotatedTask);
     print(false, false, "task object: %s", task.getTaskObject());
     assertTrue(task.getTaskObject() instanceof AnnotatedConstructorTask);
-    AnnotatedConstructorTask act = (AnnotatedConstructorTask) task.getTaskObject();
+    final AnnotatedConstructorTask act = (AnnotatedConstructorTask) task.getTaskObject();
     assertNotNull(act.result);
     assertEquals("task ended for param testParam", act.result);
     assertTrue(act == task.getResult());
@@ -118,15 +118,15 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testPojoStaticMethod() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("staticMethod", PojoTask.class, "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertNotNull(task.getResult());
     assertEquals("static result for param testParam", task.getResult());
@@ -140,22 +140,22 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testPojoInstanceMethod() throws Exception {
-    int nbTasks = 1;
-    String endResult = "instance result for param testParam";
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final String endResult = "instance result for param testParam";
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("instanceMethod", new PojoTask(), "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertNotNull(task.getResult());
     assertEquals(endResult, task.getResult());
     assertTrue(task instanceof JPPFAnnotatedTask);
     assertTrue(task.getTaskObject() instanceof PojoTask);
-    PojoTask aimt = (PojoTask) task.getTaskObject();
+    final PojoTask aimt = (PojoTask) task.getTaskObject();
     assertNotNull(aimt.result);
     assertEquals(endResult, aimt.result);
   }
@@ -166,21 +166,21 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testPojoConstructor() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add("PojoTask", PojoTask.class, "testParam");
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertTrue(task.getResult() instanceof PojoTask);
     assertTrue(task instanceof JPPFAnnotatedTask);
     print(false, false, "task object: %s", task.getTaskObject());
     assertTrue("taskObject is an instance of " + task.getTaskObject().getClass(), task.getTaskObject() instanceof PojoTask);
-    PojoTask act = (PojoTask) task.getTaskObject();
+    final PojoTask act = (PojoTask) task.getTaskObject();
     assertNotNull(act.result);
     assertEquals("constructor result for param testParam", act.result);
     assertTrue(act == task.getResult());
@@ -192,20 +192,20 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testRunnableTask() throws Exception {
-    int nbTasks = 1;
-    String endResult = "runnable result for param testParam";
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final String endResult = "runnable result for param testParam";
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new RunnableTask("testParam"));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertTrue(task instanceof JPPFAnnotatedTask);
     assertTrue(task.getTaskObject() instanceof RunnableTask);
-    RunnableTask aimt = (RunnableTask) task.getTaskObject();
+    final RunnableTask aimt = (RunnableTask) task.getTaskObject();
     assertNotNull(aimt.result);
     assertEquals(endResult, aimt.result);
   }
@@ -216,22 +216,22 @@ public class TestNonStandardTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testCallableTask() throws Exception {
-    int nbTasks = 1;
-    String endResult = "callable result for param testParam";
-    JPPFJob job = new JPPFJob();
+    final int nbTasks = 1;
+    final String endResult = "callable result for param testParam";
+    final JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
     job.add(new CallableTask("testParam"));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    Task<?> task = results.get(0);
-    Throwable t = task.getThrowable();
+    final Task<?> task = results.get(0);
+    final Throwable t = task.getThrowable();
     assertNull("task exception: " + ExceptionUtils.getStackTrace(t), t);
     assertNotNull(task.getResult());
     assertEquals(endResult, task.getResult());
     assertTrue(task instanceof JPPFAnnotatedTask);
     assertTrue(task.getTaskObject() instanceof CallableTask);
-    CallableTask aimt = (CallableTask) task.getTaskObject();
+    final CallableTask aimt = (CallableTask) task.getTaskObject();
     assertNotNull(aimt.result);
     assertEquals(endResult, aimt.result);
   }
@@ -250,6 +250,10 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class AnnotatedInstanceMethodTask implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public String result;
 
@@ -266,6 +270,10 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class AnnotatedConstructorTask implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public final String result;
 
@@ -280,6 +288,10 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class PojoTask implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public String result;
 
@@ -314,6 +326,10 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class RunnableTask implements Runnable, Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public String result;
     /** */
@@ -336,6 +352,10 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class CallableTask implements Callable<String>, Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     public String result;
     /** */

@@ -83,7 +83,7 @@ public class TestConcurrentUtils extends BaseTest {
     public boolean evaluate() {
       try {
         Thread.sleep(100L);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         print(false, false, "Exception: %s", ExceptionUtils.getStackTrace(e));
       }
       evaluateCount++;

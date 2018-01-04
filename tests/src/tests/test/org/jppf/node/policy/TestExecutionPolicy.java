@@ -56,7 +56,7 @@ public class TestExecutionPolicy extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     systemInfo = new JPPFSystemInformation("test", true, false);
-    TypedProperties test = new TypedProperties()
+    final TypedProperties test = new TypedProperties()
       .setInt("int.1", 1)
       .setInt("int.2", 2)
       .setInt("int.3", 3)
@@ -338,12 +338,12 @@ public class TestExecutionPolicy extends BaseTest {
    * @param expected the policy's expected return value.
    * @throws Exception if any error occurs.
    */
-  private void checkPolicy(final ExecutionPolicy policy, final boolean expected) throws Exception {
+  private static void checkPolicy(final ExecutionPolicy policy, final boolean expected) throws Exception {
     assertEquals(expected, policy.accepts(systemInfo));
-    String s1 = policy.toString();
-    StringBuilder sb = new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
+    final String s1 = policy.toString();
+    final StringBuilder sb = new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
       .append(s1).append("</jppf:ExecutionPolicy>\n");
-    ExecutionPolicy parsed = PolicyParser.parsePolicy(sb.toString());
+    final ExecutionPolicy parsed = PolicyParser.parsePolicy(sb.toString());
     assertEquals(expected, parsed.accepts(systemInfo));
     assertEquals(s1, parsed.toString());
   }
@@ -354,14 +354,14 @@ public class TestExecutionPolicy extends BaseTest {
    */
   @Test(timeout=5000)
   public void testMatches() throws Exception {
-    JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
+    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
-    TestCustomPolicy tcp = new TestCustomPolicy();
-    ExecutionPolicy policy = new Contains("jppf.uuid", true, "AB").and(tcp);
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, LifeCycleTask.class, 0L);
-    JPPFStatistics stats = JPPFStatisticsHelper.createServerStatistics();
+    final TestCustomPolicy tcp = new TestCustomPolicy();
+    final ExecutionPolicy policy = new Contains("jppf.uuid", true, "AB").and(tcp);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, LifeCycleTask.class, 0L);
+    final JPPFStatistics stats = JPPFStatisticsHelper.createServerStatistics();
     policy.setContext(job.getSLA(), job.getClientSLA(), job.getMetadata(), 2, stats);
-    PolicyContext ctx = tcp.getContext();
+    final PolicyContext ctx = tcp.getContext();
     assertNotNull(ctx);
     assertEquals(job.getSLA(), ctx.getSLA());
     assertEquals(job.getClientSLA(), ctx.getClientSLA());
@@ -374,6 +374,11 @@ public class TestExecutionPolicy extends BaseTest {
    * 
    */
   public static class TestCustomPolicy extends CustomPolicy {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean accepts(final PropertiesCollection<String> info) {
       return false;

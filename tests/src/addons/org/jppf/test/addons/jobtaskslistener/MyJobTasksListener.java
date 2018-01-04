@@ -77,7 +77,7 @@ public class MyJobTasksListener implements JobTasksListener {
    * @param format the message format.
    * @param params the message parameters.
    */
-  private void print(final String format, final Object...params) {
+  private static void print(final String format, final Object...params) {
     System.out.printf(format + "%n", params);
   }
 
@@ -86,20 +86,20 @@ public class MyJobTasksListener implements JobTasksListener {
    * @param file the file to write to.
    * @param event contains the information to write.
    */
-  private void printEventToFile(final File file, final JobTasksEvent event) {
+  private static void printEventToFile(final File file, final JobTasksEvent event) {
     if ((file == null) || (event == null)) return;
-    List<ServerTaskInformation> tasksInfo = event.getTasks();
-    String name = event.getJobName();
-    String uuid = event.getJobUuid();
+    final List<ServerTaskInformation> tasksInfo = event.getTasks();
+    final String name = event.getJobName();
+    final String uuid = event.getJobUuid();
     synchronized(file) {
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
         acquireLock(10_000L);
-        for (ServerTaskInformation sti: tasksInfo) {
-          Task<?> task = sti.getResultAsTask();
+        for (final ServerTaskInformation sti: tasksInfo) {
+          final Task<?> task = sti.getResultAsTask();
           // print message in format "<job uuid>;<job name>;<task id>;<task result>;<expiration count>;<resubmit count>;<max resubmits>"
           writer.append(String.format("%s;%s;%s;%s;%d;%d;%d%n", uuid, name, task.getId(), task.getResult(), sti.getExpirationCount(), sti.getResubmitCount(), sti.getMaxResubmits()));
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         print("MyJobTasksListener: error wiritng tasks to file '%s': %s", file, ExceptionUtils.getStackTrace(e));
       } finally {
         releaseLock();
@@ -120,7 +120,7 @@ public class MyJobTasksListener implements JobTasksListener {
    * @throws Exception if any error occurs.
    */
   public static void acquireLock(final long timeout) throws Exception {
-    long start = System.currentTimeMillis();
+    final long start = System.currentTimeMillis();
     long elapsed = 0L;
     while (((elapsed = System.currentTimeMillis() - start) < timeout) && LOCK_FILE.exists()) Thread.sleep(50L);
     if (elapsed >= timeout) throw new TimeoutException(String.format("exceeded the timeout of %,d", timeout));

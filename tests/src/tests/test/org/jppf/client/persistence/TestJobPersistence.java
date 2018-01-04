@@ -59,8 +59,8 @@ public class TestJobPersistence extends Setup1D1N {
   public void testJobRecovery() throws Exception {
     String key = null;
     JobPersistence<String> pm = null;
-    TypedProperties config = JPPFConfiguration.getProperties();
-    long duration = 1000L;
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final long duration = 1000L;
     JPPFClient client = null;
     try {
       // send tasks 1 at a time
@@ -68,7 +68,7 @@ public class TestJobPersistence extends Setup1D1N {
         .set(JPPFProperties.LOAD_BALANCING_PROFILE, "test")
         .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".test.size", 1);
       client = BaseSetup.createClient(null, false);
-      int nbTasks = 3;
+      final int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, SimpleTask.class, duration);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
@@ -84,18 +84,18 @@ public class TestJobPersistence extends Setup1D1N {
       client.submitJob(job);
       while (!resultsReceived.get()) Thread.sleep(100L);
       client.close();
-      int n = job.getResults().size();
+      final int n = job.getResults().size();
       assertTrue(n < nbTasks);
-      String uuid = job.getUuid();
+      final String uuid = job.getUuid();
       job = null;
 
       client = BaseSetup.createClient(null);
-      JPPFJob job2 = pm.loadJob(key);
+      final JPPFJob job2 = pm.loadJob(key);
       assertEquals(uuid, job2.getUuid());
       //int n2 = job2.getResults().size();
       //assertEquals(n, n2);
       client.submitJob(job2);
-      List<Task<?>> results = job2.awaitResults();
+      final List<Task<?>> results = job2.awaitResults();
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());
     } finally {

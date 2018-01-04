@@ -24,8 +24,7 @@ import java.util.concurrent.Callable;
 /**
  * A simple callable task implementation.
  */
-public class SimpleCallable implements Callable<TaskResult>, Serializable
-{
+public class SimpleCallable implements Callable<TaskResult>, Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -42,16 +41,14 @@ public class SimpleCallable implements Callable<TaskResult>, Serializable
   /**
    * Default constructor.
    */
-  public SimpleCallable()
-  {
+  public SimpleCallable() {
   }
 
   /**
    * Initialize this task with the specified position.
    * @param position the position of this task.
    */
-  public SimpleCallable(final int position)
-  {
+  public SimpleCallable(final int position) {
     this.position = position;
   }
 
@@ -60,8 +57,7 @@ public class SimpleCallable implements Callable<TaskResult>, Serializable
    * @param position the position of this task.
    * @param duration the duration of this task.
    */
-  public SimpleCallable(final int position, final long duration)
-  {
+  public SimpleCallable(final int position, final long duration) {
     this.position = position;
     this.duration = duration;
   }
@@ -73,19 +69,14 @@ public class SimpleCallable implements Callable<TaskResult>, Serializable
    * @see java.util.concurrent.Callable#call()
    */
   @Override
-  public TaskResult call() throws Exception
-  {
-    TaskResult executionResult = new TaskResult();
+  public TaskResult call() throws Exception {
+    final TaskResult executionResult = new TaskResult();
     executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
     executionResult.position = position;
-    if (duration > 0L)
-    {
-      try
-      {
+    if (duration > 0L) {
+      try {
         Thread.sleep(duration);
-      }
-      catch(InterruptedException e)
-      {
+      } catch (final InterruptedException e) {
         executionResult.message = e.getMessage();
       }
     }

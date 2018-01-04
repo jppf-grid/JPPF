@@ -66,7 +66,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration cfg = createConfig("job_reservation");
+    final TestConfiguration cfg = createConfig("job_reservation");
     cfg.driverLog4j = "classes/tests/config/job_reservation/log4j-driver.properties";
     cfg.nodeLog4j = "classes/tests/config/job_reservation/log4j-node.properties";
     client = BaseSetup.setup(1, 3, true, cfg);
@@ -89,7 +89,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       public boolean evaluate() {
         try {
           return jmx.nbIdleNodes() == BaseSetup.nbNodes();
-        } catch(@SuppressWarnings("unused") Exception e) {
+        } catch(@SuppressWarnings("unused") final Exception e) {
           return false;
         }
       }
@@ -113,18 +113,18 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeWithRestart() throws Exception {
-    int nbTasks = 5 * BaseSetup.nbNodes();
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
-    TypedProperties props = new TypedProperties()
+    final  int nbTasks = 5 * BaseSetup.nbNodes();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
-    List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submitJob(job);
     assertNotNull(result);
     assertFalse(result.isEmpty());
-    for (Task<?> tsk: result) {
-      LifeCycleTask task = (LifeCycleTask) tsk;
+    for (final Task<?> tsk: result) {
+      final LifeCycleTask task = (LifeCycleTask) tsk;
       assertNull(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
@@ -132,7 +132,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     Thread.sleep(500L);
     while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
     assertEquals(1, myNodeListener.map.size());
-    AtomicInteger n = myNodeListener.map.get("n3");
+    final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertTrue(String.format("expected at least <%d> but was <%d>", BaseSetup.nbNodes(), n.get()), n.get() >= BaseSetup.nbNodes());
   }
@@ -143,10 +143,10 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testCancelledJobReservationSingleNodeWithRestart() throws Exception {
-    int nbTasksPerNode = 5;
-    int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 500L);
-    TypedProperties props = new TypedProperties()
+    final int nbTasksPerNode = 5;
+    final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 500L);
+    final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
@@ -155,13 +155,13 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     client.submitJob(job);
     jobNotificationListener.await();
     job.cancel();
-    List<Task<?>> result = job.awaitResults();
+    final List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
     assertFalse(result.isEmpty());
     int nbSuccessful = 0;
     int nbCancelled = 0;
-    for (Task<?> tsk: result) {
-      LifeCycleTask task = (LifeCycleTask) tsk;
+    for (final Task<?> tsk: result) {
+      final LifeCycleTask task = (LifeCycleTask) tsk;
       assertNull(task.getThrowable());
       if (task.getResult() != null) {
         assertEquals("n3", task.getNodeUuid());
@@ -173,13 +173,13 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
     Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
-    AtomicInteger n = myNodeListener.map.get("n3");
+    final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
-    String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
+    final String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
     assertNotNull(reservedJobs);
     assertEquals(0, reservedJobs.length);
-    String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
+    final String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
     assertNotNull(reservedNodes);
     assertEquals(0, reservedNodes.length);
   }
@@ -190,10 +190,10 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testExpiredJobReservationSingleNodeWithRestart() throws Exception {
-    int nbTasksPerNode = 5;
-    int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 600L);
-    TypedProperties props = new TypedProperties()
+    final int nbTasksPerNode = 5;
+    final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 600L);
+    final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
@@ -203,13 +203,13 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     jobNotificationListener.await();
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
     jmx.getJobManager().updateJobs(new JobUuidSelector(job.getUuid()), job.getSLA(), null);
-    List<Task<?>> result = job.awaitResults();
+    final List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
     assertFalse(result.isEmpty());
     int nbSuccessful = 0;
     int nbCancelled = 0;
-    for (Task<?> tsk: result) {
-      LifeCycleTask task = (LifeCycleTask) tsk;
+    for (final Task<?> tsk: result) {
+      final LifeCycleTask task = (LifeCycleTask) tsk;
       assertNull(task.getThrowable());
       if (task.getResult() != null) {
         assertEquals("n3", task.getNodeUuid());
@@ -221,13 +221,13 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     assertEquals((BaseSetup.nbNodes() - 1) * nbTasksPerNode, nbCancelled);
     Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
-    AtomicInteger n = myNodeListener.map.get("n3");
+    final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertTrue(n.get() < BaseSetup.nbNodes());
-    String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
+    final String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
     assertNotNull(reservedJobs);
     assertEquals(0, reservedJobs.length);
-    String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
+    final String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
     assertNotNull(reservedNodes);
     assertEquals(0, reservedNodes.length);
   }
@@ -238,24 +238,24 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testJobReservationTwoNodesWithRestart() throws Exception {
-    int nbTasks = 5 * BaseSetup.nbNodes();
-    Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final int nbTasks = 5 * BaseSetup.nbNodes();
+    final Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
     // Levenshtein scores: node1: 10 ; node2 : 6 ; node3 : 2
-    TypedProperties props = new TypedProperties()
+    final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(expectedNodes.size());
-    List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submitJob(job);
     assertNotNull(result);
     assertFalse(result.isEmpty());
-    Set<String> actualNodes = new HashSet<>();
-    for (Task<?> t: result) {
-      LifeCycleTask task = (LifeCycleTask) t;
+    final Set<String> actualNodes = new HashSet<>();
+    for (final Task<?> t: result) {
+      final LifeCycleTask task = (LifeCycleTask) t;
       assertNull(task.getThrowable());
       assertNotNull(task.getResult());
-      String nodeUuid = task.getNodeUuid();
+      final String nodeUuid = task.getNodeUuid();
       assertTrue(String.format("node %s is not one of %s", nodeUuid, expectedNodes), expectedNodes.contains(nodeUuid));
       if (!actualNodes.contains(nodeUuid)) actualNodes.add(nodeUuid);
     }
@@ -274,25 +274,25 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeNoRestart() throws Exception {
-    int nbTasks = 5 * BaseSetup.nbNodes();
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
-    TypedProperties props = new TypedProperties()
+    final int nbTasks = 5 * BaseSetup.nbNodes();
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props, false));
     job.getSLA().setMaxNodes(1);
-    List<Task<?>> result = client.submitJob(job);
+    final List<Task<?>> result = client.submitJob(job);
     assertNotNull(result);
     assertFalse(result.isEmpty());
-    for (Task<?> tsk: result) {
-      LifeCycleTask task = (LifeCycleTask) tsk;
+    for (final Task<?> tsk: result) {
+      final LifeCycleTask task = (LifeCycleTask) tsk;
       assertNull(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals("n3", task.getNodeUuid());
     }
     Thread.sleep(500L);
     assertEquals(1, myNodeListener.map.size());
-    AtomicInteger n = myNodeListener.map.get("n3");
+    final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
   }
@@ -312,9 +312,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
 
     @Override
     public void handleNotification(final Notification notif, final Object handback) {
-      JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
+      final JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
       if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(notif.getType())) {
-        String uuid = info.getUuid();
+        final String uuid = info.getUuid();
         synchronized (this) {
           AtomicInteger n = map.get(uuid);
           if (n == null) map.put(uuid, n = new AtomicInteger(0));
@@ -339,13 +339,17 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Task which resets the node configuration.
    */
   public static class BroadcastTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     @Override
     public void run() {
       try {
         JPPFConfiguration.reset();
         ((JPPFNode) NodeRunner.getNode()).triggerConfigChanged();
         System.out.println("reset configuration on node " + NodeRunner.getUuid());
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -358,9 +362,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     @Override
     protected void starting(final Description description) {
       try {
-        int n = BaseSetup.nbNodes();
+        final int n = BaseSetup.nbNodes();
         BaseSetup.checkDriverAndNodesInitialized(1, n);
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName("broadcast reset node config");
         job.getSLA().setBroadcastJob(true);
         job.add(new BroadcastTask());
@@ -369,7 +373,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
         BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** after resetting nodes configurations *****");
         while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
         myNodeListener.map.clear();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
         throw new IllegalStateException(e);
       }

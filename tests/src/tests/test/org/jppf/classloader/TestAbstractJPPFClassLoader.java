@@ -46,13 +46,13 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    */
   @Test(timeout = 5000)
   public void testGetResources() throws Exception {
-    String name = ReflectionUtils.getCurrentMethodName();
-    String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
+    final String name = ReflectionUtils.getCurrentMethodName();
+    final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
     results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
-    Task<?> task = results.get(0);
+    final Task<?> task = results.get(0);
     assertNotNull(task);
     assertNull(task.getThrowable());
     assertEquals("success", task.getResult());
@@ -65,23 +65,23 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    */
   @Test(timeout = 5000)
   public void testGetResourcesNoDuplicate() throws Exception {
-    int nbLookups = 3;
-    String name = ReflectionUtils.getCurrentMethodName();
-    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, ResourceLoadingTask.class, nbLookups));
+    final int nbLookups = 3;
+    final String name = ReflectionUtils.getCurrentMethodName();
+    final List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, ResourceLoadingTask.class, nbLookups));
     assertNotNull(results);
     assertEquals(1, results.size());
-    Task<?> task = results.get(0);
+    final Task<?> task = results.get(0);
     assertNotNull(task);
-    Throwable t = task.getThrowable();
+    final Throwable t = task.getThrowable();
     assertNull(t == null ? "" : "got exception: " + ExceptionUtils.getStackTrace(t), t);
-    Object o = task.getResult();
+    final Object o = task.getResult();
     assertNotNull(o);
     @SuppressWarnings("unchecked")
-    List<List<URL>> list = (List<List<URL>>) o;
+    final List<List<URL>> list = (List<List<URL>>) o;
     assertEquals(nbLookups, list.size());
     URL firstURL = null;
     for (int i = 0; i < nbLookups; i++) {
-      List<URL> sublist = list.get(i);
+      final List<URL> sublist = list.get(i);
       assertNotNull(sublist);
       assertEquals(1, sublist.size());
       if (i == 0) firstURL = sublist.get(0);
@@ -96,13 +96,13 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    */
   @Test(timeout = 5000)
   public void testClassLoadersMatch() throws Exception {
-    String name = ReflectionUtils.getCurrentMethodName();
-    String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
+    final String name = ReflectionUtils.getCurrentMethodName();
+    final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
     results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
-    MyTask task = (MyTask) results.get(0);
+    final MyTask task = (MyTask) results.get(0);
     assertNotNull(task);
     assertNull(task.getThrowable());
     assertTrue(task.isClassLoaderMatch());
@@ -137,16 +137,16 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * @param callable .
    * @throws Exception if any error occurs
    */
-  private void testInterruption(final boolean callable) throws Exception {
-    String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "Callable" : "task") + " ";
+  private static void testInterruption(final boolean callable) throws Exception {
+    final String name = ReflectionUtils.getCurrentMethodName() + "(" + (callable ? "Callable" : "task") + " ";
     for (int i=1; i<=10; i++) {
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName(name + i);
       if (callable) job.add(new MyCallable(i));
       else job.add(new MyTask2(i));
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
-      Task<?> task = client.submitJob(job).get(0);
-      Throwable t = task.getThrowable();
+      final Task<?> task = client.submitJob(job).get(0);
+      final Throwable t = task.getThrowable();
       assertNull(t);
       if (i == 1) {
         assertNull(task.getResult());
@@ -163,6 +163,10 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * 
    */
   public static class MyTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * Name of a resource to lookup.
      */
@@ -191,14 +195,14 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
     @Override
     public void run() {
       try {
-        ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
+        final ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
         contextClassLoaderStr = cl1 == null ? "null" : cl1.toString();
-        ClassLoader cl2 = getClass().getClassLoader();
+        final ClassLoader cl2 = getClass().getClassLoader();
         taskClassLoaderStr = cl2 == null ? "null" : cl2.toString();
         classLoaderMatch = cl1 == cl2;
         getClass().getClassLoader().getResources(resource);
         setResult("success");
-      } catch (Exception e) {
+      } catch (final Exception e) {
         setThrowable(e);
       }
     }
@@ -229,6 +233,10 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   }
   /** */
   public static class MyCallable implements Callable<String>, Serializable, Interruptibility {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     private final int index;
 
@@ -241,7 +249,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
 
     @Override
     public String call() throws Exception {
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       try {
         // scala-library.jar and scala-reflect.jar must be in the client's classpath
         Class.forName("scala.Predef$");
@@ -259,6 +267,10 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
 
   /** */
   public static class MyTask2 extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     private final int index;
 
@@ -271,13 +283,13 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
 
     @Override
     public void run() {
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       try {
         new Test1();
         new Test2();
         new Test3();
         setResult("result of job " + index);
-      } catch(Error e) {
+      } catch(final Error e) {
         System.out.printf("job %d has exception: %s%n", index, ExceptionUtils.getStackTrace(e));
         throw e;
       } finally {
@@ -305,7 +317,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
       try {
         System.out.println("initializing " + simpleName + ".class");
         Thread.sleep(WAIT_TIME);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         System.out.println(ExceptionUtils.getStackTrace(e));
         if (RETHROW) throw new RuntimeException(e);
       }

@@ -28,6 +28,10 @@ import javax.management.*;
  */
 public class NodeTest extends NotificationBroadcasterSupport implements NodeTestMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Notification sequence number.
    */
   private static AtomicLong sequence = new AtomicLong(0L);
@@ -41,7 +45,7 @@ public class NodeTest extends NotificationBroadcasterSupport implements NodeTest
 
   @Override
   public void sendUserObject(final Object userObject) throws Exception {
-    Notification notif = new Notification("NodeTest", NodeTestMBean.MBEAN_NAME, sequence.incrementAndGet());
+    final Notification notif = new Notification("NodeTest", NodeTestMBean.MBEAN_NAME, sequence.incrementAndGet());
     notif.setUserData(userObject);
     sendNotification(notif);
   }

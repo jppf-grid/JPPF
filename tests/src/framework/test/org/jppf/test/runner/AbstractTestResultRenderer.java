@@ -22,8 +22,7 @@ package test.org.jppf.test.runner;
  * 
  * @author Laurent Cohen
  */
-public abstract class AbstractTestResultRenderer implements TestResultRenderer
-{
+public abstract class AbstractTestResultRenderer implements TestResultRenderer {
   /**
    * The report header.
    */
@@ -57,8 +56,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
    * Initialize this renderer witht he specified results.
    * @param result the results to render.
    */
-  protected AbstractTestResultRenderer(final ResultHolder result)
-  {
+  protected AbstractTestResultRenderer(final ResultHolder result) {
     this.result = result;
   }
 
@@ -66,8 +64,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
    * {@inheritDoc}
    */
   @Override
-  public String getHeader()
-  {
+  public String getHeader() {
     return header.toString();
   }
 
@@ -75,8 +72,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
    * {@inheritDoc}
    */
   @Override
-  public String getFooter()
-  {
+  public String getFooter() {
     return footer.toString();
   }
 
@@ -84,8 +80,7 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
    * {@inheritDoc}
    */
   @Override
-  public String getBody()
-  {
+  public String getBody() {
     return body.toString();
   }
 
@@ -93,39 +88,35 @@ public abstract class AbstractTestResultRenderer implements TestResultRenderer
    * {@inheritDoc}
    */
   @Override
-  public String getIndent()
-  {
+  public String getIndent() {
     return indent;
   }
 
   /**
    * Increment the indentation level.
    */
-  protected void incIndentation()
-  {
+  protected void incIndentation() {
     indentLevel++;
-    StringBuilder sb = new StringBuilder();
-    for (int i=0; i<indentLevel; i++) sb.append(indent);
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < indentLevel; i++) sb.append(indent);
     currentIndentation = sb.toString();
   }
-  
+
   /**
    * Increment the indentation level.
    */
-  protected void decIndentation()
-  {
+  protected void decIndentation() {
     indentLevel--;
-    StringBuilder sb = new StringBuilder();
-    for (int i=0; i<indentLevel; i++) sb.append(indent);
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < indentLevel; i++) sb.append(indent);
     currentIndentation = sb.toString();
   }
-  
+
   /**
    * Get the current indentation.
    * @return the indentation as a string.
    */
-  protected String getIndentation()
-  {
+  protected String getIndentation() {
     return currentIndentation;
   }
 }

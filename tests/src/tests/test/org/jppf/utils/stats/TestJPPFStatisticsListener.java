@@ -53,11 +53,11 @@ public class TestJPPFStatisticsListener extends BaseTest {
    */
   @Test(timeout=5000)
   public void testSimpleListener() throws Exception {
-    MyStatsListener listener = new MyStatsListener(null);
+    final MyStatsListener listener = new MyStatsListener(null);
     createAndPopulateStats(listener);
-    int expectedCount = LABELS.length;
+    final int expectedCount = LABELS.length;
     checkCounts(listener, expectedCount);
-    for (String label: LABELS) assertTrue(listener.labels.contains(label));
+    for (final String label: LABELS) assertTrue(listener.labels.contains(label));
   }
 
   /**
@@ -67,17 +67,17 @@ public class TestJPPFStatisticsListener extends BaseTest {
    */
   @Test(timeout=5000)
   public void testFilteredListener() throws Exception {
-    int expectedCount = LABELS.length - 1;
-    int excludedIndex = rand.nextInt(LABELS.length);
+    final int expectedCount = LABELS.length - 1;
+    final int excludedIndex = rand.nextInt(LABELS.length);
     final String excludedLabel = LABELS[excludedIndex];
     printOut("testFilteredListener() excludedIndex=%d; excludedLabel=%s", excludedIndex, excludedLabel);
-    JPPFStatistics.Filter filter = new Filter() {
+    final JPPFStatistics.Filter filter = new Filter() {
       @Override
       public boolean accept(final JPPFSnapshot snapshot) {
         return !excludedLabel.equals(snapshot.getLabel());
       }
     };
-    MyStatsListener listener = new MyStatsListener(filter);
+    final MyStatsListener listener = new MyStatsListener(filter);
     createAndPopulateStats(listener);
     checkCounts(listener, expectedCount);
     for (int i=0; i<expectedCount; i++) {
@@ -93,7 +93,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
    * @param expectedCount the expected count of snapshots for which events were received.
    * @throws Exception if any error occurs.
    */
-  private void checkCounts(final MyStatsListener listener, final int expectedCount) throws Exception {
+  private static void checkCounts(final MyStatsListener listener, final int expectedCount) throws Exception {
     assertEquals(expectedCount, listener.createCount);
     assertEquals(UPDATES_PER_SNAPSHOT * expectedCount, listener.updateCount);
     assertEquals(expectedCount, listener.removeCount);
@@ -164,9 +164,9 @@ public class TestJPPFStatisticsListener extends BaseTest {
    * @return a populated {@link JPPFStatistics}.
    * @throws Exception if any error occurs.
    */
-  private JPPFStatistics createAndPopulateStats(final MyStatsListener listener) throws Exception {
-    JPPFStatistics stats = new JPPFStatistics();
-    JPPFStatistics.Filter filter = listener.getFilter();
+  private static JPPFStatistics createAndPopulateStats(final MyStatsListener listener) throws Exception {
+    final JPPFStatistics stats = new JPPFStatistics();
+    final JPPFStatistics.Filter filter = listener.getFilter();
     stats.addListener(listener, filter);
     for (int i=0; i<LABELS.length; i++) stats.createSnapshot(LABELS[i]);
     for (int i=0; i<UPDATES_PER_SNAPSHOT*LABELS.length; i++) stats.addValue(LABELS[i % LABELS.length], i + 1);

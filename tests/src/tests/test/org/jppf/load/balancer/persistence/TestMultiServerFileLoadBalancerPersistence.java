@@ -33,8 +33,8 @@ public class TestMultiServerFileLoadBalancerPersistence extends AbstractMuliServ
    */
   @BeforeClass
   public static void setup() throws Exception {
-    String prefix = "lb_persistence_p2p";
-    TestConfiguration config = dbSetup(prefix, false);
+    final String prefix = "lb_persistence_p2p";
+    final TestConfiguration config = dbSetup(prefix, false);
     config.driverJppf = "classes/tests/config/" + prefix + "/driver_file.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(2, 2, true, true, config);

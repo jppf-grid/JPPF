@@ -57,35 +57,35 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs
    */
-  private void testState(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    int nbNodes = expectedNodes.length;
+  private static void testState(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final int nbNodes = expectedNodes.length;
     try {
       configureLoadBalancer();
       Map<String, Object> result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (Map.Entry<String, Object> entry : result.entrySet()) {
-        JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, Object> entry : result.entrySet()) {
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
         assertEquals(1, state.getThreadPoolSize());
         assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
         assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
         assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
       }
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbNodes, LifeCycleTask.class, 2000L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbNodes, LifeCycleTask.class, 2000L);
       job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
       client.submitJob(job);
       Thread.sleep(750L);
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (Map.Entry<String, Object> entry : result.entrySet()) {
-        JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, Object> entry : result.entrySet()) {
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
         assertEquals(0, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
       }
       job.awaitResults();
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
-      for (Map.Entry<String, Object> entry : result.entrySet()) {
-        JPPFNodeState state = (JPPFNodeState) entry.getValue();
+      for (final Map.Entry<String, Object> entry : result.entrySet()) {
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
         assertEquals(1, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
       }
@@ -105,7 +105,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       testUpdateThreadPoolSize(new AllNodesSelector(), "n1", "n2");
       testUpdateThreadPoolSize(new ExecutionPolicySelector(new Equal("jppf.node.uuid", false, "n1")), "n1");
       testUpdateThreadPoolSize(new UuidSelector("n2"), "n2");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new JPPFException(e);
     }
   }
@@ -116,19 +116,19 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testUpdateThreadPoolSize(final NodeSelector selector, final String... expectedNodes) throws Exception {
+  private static void testUpdateThreadPoolSize(final NodeSelector selector, final String... expectedNodes) throws Exception {
     Map<String, Object> result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(1, state.getThreadPoolSize());
     }
     result = nodeForwarder.updateThreadPoolSize(selector, 3);
     checkNoException(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(3, state.getThreadPoolSize());
     }
     nodeForwarder.updateThreadPoolSize(selector, 1);
@@ -151,19 +151,19 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testUpdateThreadPriority(final NodeSelector selector, final String... expectedNodes) throws Exception {
+  private static void testUpdateThreadPriority(final NodeSelector selector, final String... expectedNodes) throws Exception {
     Map<String, Object> result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
     }
     result = nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY);
     checkNoException(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(Thread.MAX_PRIORITY, state.getThreadPriority());
     }
     nodeForwarder.updateThreadsPriority(selector, Thread.NORM_PRIORITY);
@@ -186,30 +186,30 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testResetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    int nbNodes = expectedNodes.length;
-    int nbTasks = 5 * nbNodes;
+  private static void testResetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final int nbNodes = expectedNodes.length;
+    final int nbTasks = 5 * nbNodes;
     Map<String, Object> result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(0, state.getNbTasksExecuted());
     }
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, true, false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     client.submitJob(job);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(5, state.getNbTasksExecuted());
     }
     result = nodeForwarder.resetTaskCounter(selector);
     checkNoException(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(0, state.getNbTasksExecuted());
     }
   }
@@ -231,11 +231,11 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testSetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
+  private static void testSetTaskCounter(final NodeSelector selector, final String... expectedNodes) throws Exception {
     Map<String, Object> result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(0, state.getNbTasksExecuted());
     }
     result = nodeForwarder.setTaskCounter(selector, 12);
@@ -243,16 +243,16 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     checkNullResults(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(12, state.getNbTasksExecuted());
     }
     result = nodeForwarder.setTaskCounter(selector, 0);
     checkNullResults(result, expectedNodes);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFNodeState state = (JPPFNodeState) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
       assertEquals(0, state.getNbTasksExecuted());
     }
   }
@@ -274,11 +274,11 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testSystemInformation(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.systemInformation(selector);
+  private static void testSystemInformation(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final Map<String, Object> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
       assertNotNull(info);
       assertNotNull(info.getEnv());
       assertFalse(info.getEnv().isEmpty());
@@ -315,16 +315,16 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testUpdateConfiguration(final NodeSelector selector, final String... expectedNodes) throws Exception {
+  private static void testUpdateConfiguration(final NodeSelector selector, final String... expectedNodes) throws Exception {
     TypedProperties oldConfig = null;
     TypedProperties newConfig = null;
     Map<String, Object> result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      String uuid = entry.getKey();
-      JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final String uuid = entry.getKey();
+      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
       assertNotNull(info);
-      TypedProperties config = info.getJppf();
+      final TypedProperties config = info.getJppf();
       assertNotNull(config);
       assertFalse(config.isEmpty());
       assertEquals(1, (int) config.get(JPPFProperties.PROCESSING_THREADS));
@@ -336,9 +336,9 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     checkNoException(result, expectedNodes);
     result = nodeForwarder.systemInformation(selector);
     checkNodes(result, JPPFSystemInformation.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
-      String uuid = entry.getKey();
-      JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
+      final String uuid = entry.getKey();
+      final JPPFSystemInformation info = (JPPFSystemInformation) entry.getValue();
       assertNotNull(info);
       newConfig = info.getJppf();
       assertNotNull(newConfig);
@@ -367,22 +367,22 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testCancelJob(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    int nbNodes = expectedNodes.length;
-    int nbTasks = 5 * nbNodes;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbTasks, LifeCycleTask.class, 5000L);
+  private static void testCancelJob(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final int nbNodes = expectedNodes.length;
+    final int nbTasks = 5 * nbNodes;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbTasks, LifeCycleTask.class, 5000L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
-    String uuid = job.getUuid();
+    final String uuid = job.getUuid();
     client.submitJob(job);
     Thread.sleep(750L);
-    Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
+    final Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);
-    List<Task<?>> jobResult = job.awaitResults();
+    final List<Task<?>> jobResult = job.awaitResults();
     assertNotNull(jobResult);
     assertEquals(nbTasks, jobResult.size());
     int count = 0;
-    for (Task<?> t : jobResult) {
-      LifeCycleTask task = (LifeCycleTask) t;
+    for (final Task<?> t : jobResult) {
+      final LifeCycleTask task = (LifeCycleTask) t;
       if (count == 0) assertTrue(task.isCancelled());
       assertNull(task.getResult());
       count++;
@@ -407,10 +407,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testGetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.getDelegationModel(selector);
+  private static void testGetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final Map<String, Object> result = nodeForwarder.getDelegationModel(selector);
     checkNodes(result, DelegationModel.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
       assertEquals(DelegationModel.PARENT_FIRST, entry.getValue());
     }
   }
@@ -432,19 +432,19 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @param expectedNodes the set of nodes the selector is expected to resilve to.
    * @throws Exception if any error occurs.
    */
-  private void testSetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
+  private static void testSetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
     Map<String, Object> result = nodeForwarder.setDelegationModel(selector, DelegationModel.URL_FIRST);
     checkNullResults(result, expectedNodes);
     result = nodeForwarder.getDelegationModel(selector);
     checkNodes(result, DelegationModel.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
       assertEquals(DelegationModel.URL_FIRST, entry.getValue());
     }
     result = nodeForwarder.setDelegationModel(selector, DelegationModel.PARENT_FIRST);
     checkNullResults(result, expectedNodes);
     result = nodeForwarder.getDelegationModel(selector);
     checkNodes(result, DelegationModel.class, expectedNodes);
-    for (Map.Entry<String, Object> entry : result.entrySet()) {
+    for (final Map.Entry<String, Object> entry : result.entrySet()) {
       assertEquals(DelegationModel.PARENT_FIRST, entry.getValue());
     }
   }

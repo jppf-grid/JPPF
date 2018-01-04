@@ -90,8 +90,8 @@ public class AwaitJobNotificationListener implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    JobNotification jobNotif = (JobNotification) notification;
-    JobInformation jobInfo = jobNotif.getJobInformation();
+    final JobNotification jobNotif = (JobNotification) notification;
+    final JobInformation jobInfo = jobNotif.getJobInformation();
     if (debugEnabled) log.debug("job {} received event {}", jobInfo.getJobName(), jobNotif.getEventType());
     try {
       synchronized(this) {
@@ -101,7 +101,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
           notifyAll();
         }
       }
-    } catch (Exception ignore) {
+    } catch (final Exception ignore) {
       ignore.printStackTrace();
     }
   }

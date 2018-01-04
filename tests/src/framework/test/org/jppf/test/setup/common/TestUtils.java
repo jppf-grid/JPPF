@@ -49,8 +49,8 @@ public class TestUtils {
    * @param params the parmaters of the formatted string.
    */
   public static void printf(final Logger log, final String format, final Object...params) {
-    String formatted = String.format(format, params);
-    String s = prefixWithTimestamp("  client", SDF, formatted);
+    final String formatted = String.format(format, params);
+    final String s = prefixWithTimestamp("  client", SDF, formatted);
     System.out.println(s);
     if (log != null) log.info(formatted);
   }
@@ -63,7 +63,7 @@ public class TestUtils {
   * @return a new string with the specified prefix and timestamp added to the begining.
   */
  public static String prefixWithTimestamp(final String prefix, final SimpleDateFormat sdf, final String formatted) {
-   StringBuilder sb = new StringBuilder();
+   final StringBuilder sb = new StringBuilder();
    if ((prefix != null) && !"".equals(prefix)) sb.append('[').append(prefix).append(']').append(' ');
    if (sdf != null) {
      synchronized(sdf) {

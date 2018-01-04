@@ -86,9 +86,9 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
     executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
-    Callable<String> task = new MyCallableTask(TASK_DURATION);
-    Future<String> future = executor.submit(task);
-    String s = future.get();
+    final Callable<String> task = new MyCallableTask(TASK_DURATION);
+    final Future<String> future = executor.submit(task);
+    final String s = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(s);
@@ -104,9 +104,9 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
     executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
-    Callable<String> task = new MyCallableTask(TASK_DURATION);
-    Future<String> future = executor.submit(task);
-    String s = future.get();
+    final Callable<String> task = new MyCallableTask(TASK_DURATION);
+    final Future<String> future = executor.submit(task);
+    final String s = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNull(s);
@@ -119,14 +119,14 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   @Test(timeout = 10000)
   public void testSubmitWithDataProvider() throws Exception {
     client.setLocalExecutionEnabled(false);
-    DataProvider dp = new MemoryMapDataProvider();
-    String key = "myKey";
-    String value = "myValue";
+    final DataProvider dp = new MemoryMapDataProvider();
+    final String key = "myKey";
+    final String value = "myValue";
     dp.setParameter(key, value);
     executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
-    MyTask task = new MyTask(key);
-    Future<String> future = executor.submit(task);
-    String s = future.get();
+    final MyTask task = new MyTask(key);
+    final Future<String> future = executor.submit(task);
+    final String s = future.get();
     assertEquals(value, s);
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
@@ -170,12 +170,12 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
       executor.setBatchTimeout(100L);
       executor.setBatchSize(2);
       executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-      int nbTasks = 10;
-      List<Future<String>> futures = new ArrayList<>();
+      final int nbTasks = 10;
+      final List<Future<String>> futures = new ArrayList<>();
       for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
       assertEquals(nbTasks, futures.size());
-      for (Future<String> future : futures) {
-        String s = future.get();
+      for (final Future<String> future : futures) {
+        final String s = future.get();
         assertTrue(future.isDone());
         assertFalse(future.isCancelled());
         assertNotNull(s);
@@ -193,15 +193,15 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   @Test(timeout = 10000)
   public void testSubmitWithJobListener() throws Exception {
     client.setLocalExecutionEnabled(false);
-    CountingJobListener listener = new CountingJobListener();
+    final CountingJobListener listener = new CountingJobListener();
     executor.setBatchTimeout(2000L);
     executor.setBatchSize(10);
     executor.getConfiguration().getJobConfiguration().addJobListener(listener);
-    int nbTasks = 20;
-    List<Future<String>> futures = new ArrayList<>();
+    final int nbTasks = 20;
+    final List<Future<String>> futures = new ArrayList<>();
     for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
     assertEquals(nbTasks, futures.size());
-    for (Future<String> future : futures) {
+    for (final Future<String> future : futures) {
       future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
@@ -219,6 +219,10 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * A callback used in lieu of JPPFTask.onCancel() and JPPFTask.onTimeout().
    */
   private static class MyTaskCallback extends JPPFTaskCallback<Object> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * A message that will be set as the task's result.
      */
@@ -243,6 +247,10 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * 
    */
   private static class MyCallableTask implements Callable<String>, Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * the duration of this task.
      */
@@ -277,6 +285,10 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    */
   private static class MyTask implements Callable<String>, Serializable, DataProviderHolder {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The key of an object to retrieve from the data provider.
      */
     private final String key;
@@ -295,7 +307,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
 
     @Override
     public String call() throws Exception {
-      String result = dataProvider.getParameter(key);
+      final String result = dataProvider.getParameter(key);
       System.out.println("task executed");
       return result;
     }

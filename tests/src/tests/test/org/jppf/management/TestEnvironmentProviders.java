@@ -43,7 +43,7 @@ public class TestEnvironmentProviders extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testClientProvider() throws Exception {
-    int port = 4444;
+    final int port = 4444;
     JMXMPServer server = null;
     JMXConnectionWrapper client = null;
     try {
@@ -54,28 +54,28 @@ public class TestEnvironmentProviders extends BaseTest {
       client = new JMXConnectionWrapper("localhost", port, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
-      GenericConnector connector = (GenericConnector) client.getJmxconnector();
-      Map<String, ?> actual = connector.getEnv();
-      Map<String, ?> expected = TestClientEnvironmentProvider.env;
-      for (Map.Entry<String, ?> entry: expected.entrySet()) {
-        String key = entry.getKey();
-        Object expectedValue = entry.getValue();
+      final GenericConnector connector = (GenericConnector) client.getJmxconnector();
+      final Map<String, ?> actual = connector.getEnv();
+      final Map<String, ?> expected = TestClientEnvironmentProvider.env;
+      for (final Map.Entry<String, ?> entry: expected.entrySet()) {
+        final String key = entry.getKey();
+        final Object expectedValue = entry.getValue();
         assertTrue(String.format("env does not contain %s", key), actual.containsKey(key));
-        Object actualValue = actual.get(key);
+        final Object actualValue = actual.get(key);
         assertEquals(String.format("value for key=%s should be %s but is %s", key, expectedValue, actualValue), expectedValue, actualValue);
       }
     } finally {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }
       if (server != null) {
         try {
           server.stop();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }
@@ -89,7 +89,7 @@ public class TestEnvironmentProviders extends BaseTest {
    */
   @Test(timeout = 10000)
   public void testServerProvider() throws Exception {
-    int port = 4444;
+    final int port = 4444;
     JMXMPServer server = null;
     JMXConnectionWrapper client = null;
     try {
@@ -100,28 +100,28 @@ public class TestEnvironmentProviders extends BaseTest {
       client = new JMXConnectionWrapper("localhost", port, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
-      GenericConnectorServer connector = (GenericConnectorServer) server.getConnectorServer();
-      Map<String, ?> actual = connector.getAttributes();
-      Map<String, ?> expected = TestServerEnvironmentProvider.env;
-      for (Map.Entry<String, ?> entry: expected.entrySet()) {
-        String key = entry.getKey();
-        Object expectedValue = entry.getValue();
+      final GenericConnectorServer connector = (GenericConnectorServer) server.getConnectorServer();
+      final Map<String, ?> actual = connector.getAttributes();
+      final Map<String, ?> expected = TestServerEnvironmentProvider.env;
+      for (final Map.Entry<String, ?> entry: expected.entrySet()) {
+        final String key = entry.getKey();
+        final Object expectedValue = entry.getValue();
         assertTrue(String.format("env does not contain %s", key), actual.containsKey(key));
-        Object actualValue = actual.get(key);
+        final Object actualValue = actual.get(key);
         assertEquals(String.format("value for key=%s should be %s but is %s", key, expectedValue, actualValue), expectedValue, actualValue);
       }
     } finally {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }
       if (server != null) {
         try {
           server.stop();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }

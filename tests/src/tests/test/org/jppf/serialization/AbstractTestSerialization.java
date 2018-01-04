@@ -79,8 +79,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
   @Test(timeout = 5000)
   public void testPrimitives() throws Exception {
     try {
-      PrimitiveStruct ps1 = new PrimitiveStruct();
-      PrimitiveStruct ps2 = (PrimitiveStruct) copyBySerialization(ps1);
+      final PrimitiveStruct ps1 = new PrimitiveStruct();
+      final PrimitiveStruct ps2 = (PrimitiveStruct) copyBySerialization(ps1);
       assertTrue(ps1.b == ps2.b);
       assertTrue(ps1.s == ps2.s);
       assertTrue(ps1.i == ps2.i);
@@ -89,7 +89,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
       assertTrue(ps1.d == ps2.d);
       assertTrue(ps1.c == ps2.c);
       assertTrue(ps1.z == ps2.z);
-    } catch(NotSerializableException e) {
+    } catch(final NotSerializableException e) {
       if (allowsNonSerializable) throw e;
     }
   }
@@ -101,8 +101,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
   @Test(timeout = 5000)
   public void testPrimitivesArrays() throws Exception {
     try {
-      PrimitiveArrayStruct ps1 = new PrimitiveArrayStruct();
-      PrimitiveArrayStruct ps2 = (PrimitiveArrayStruct) copyBySerialization(ps1);
+      final PrimitiveArrayStruct ps1 = new PrimitiveArrayStruct();
+      final PrimitiveArrayStruct ps2 = (PrimitiveArrayStruct) copyBySerialization(ps1);
       assertTrue(Arrays.equals(ps1.b, ps2.b));
       assertTrue(Arrays.equals(ps1.s, ps2.s));
       assertTrue(Arrays.equals(ps1.i, ps2.i));
@@ -111,7 +111,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
       assertTrue(Arrays.equals(ps1.d, ps2.d));
       assertTrue(Arrays.equals(ps1.c, ps2.c));
       assertTrue(Arrays.equals(ps1.z, ps2.z));
-    } catch(NotSerializableException e) {
+    } catch(final NotSerializableException e) {
       if (allowsNonSerializable) throw e;
     }
   }
@@ -234,9 +234,9 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testCharArray() throws Exception {
-    char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
+    final char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
       Character.MIN_LOW_SURROGATE, Character.MAX_LOW_SURROGATE, Character.MIN_SURROGATE, Character.MAX_SURROGATE, Character.MIN_VALUE, Character.MAX_VALUE };
-    char[] array2 = (char[]) copyBySerialization(array1);
+    final char[] array2 = (char[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -247,8 +247,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testByteArray() throws Exception {
-    byte[] array1 = { -65, 65, Byte.MIN_VALUE, Byte.MAX_VALUE};
-    byte[] array2 = (byte[]) copyBySerialization(array1);
+    final byte[] array1 = { -65, 65, Byte.MIN_VALUE, Byte.MAX_VALUE};
+    final byte[] array2 = (byte[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -258,8 +258,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testShortArray() throws Exception {
-    short[] array1 = { -12389, 12389, Short.MIN_VALUE, Short.MAX_VALUE};
-    short[] array2 = (short[]) copyBySerialization(array1);
+    final short[] array1 = { -12389, 12389, Short.MIN_VALUE, Short.MAX_VALUE};
+    final short[] array2 = (short[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -269,8 +269,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testIntArray() throws Exception {
-    int[] array1 = { -1234567890, 1234567890, Integer.MIN_VALUE, Integer.MAX_VALUE};
-    int[] array2 = (int[]) copyBySerialization(array1);
+    final int[] array1 = { -1234567890, 1234567890, Integer.MIN_VALUE, Integer.MAX_VALUE};
+    final int[] array2 = (int[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -280,8 +280,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testLongArray() throws Exception {
-    long[] array1 = { -1234567890123456789L, 1234567890123456789L, Long.MIN_VALUE, Long.MAX_VALUE};
-    long[] array2 = (long[]) copyBySerialization(array1);
+    final long[] array1 = { -1234567890123456789L, 1234567890123456789L, Long.MIN_VALUE, Long.MAX_VALUE};
+    final long[] array2 = (long[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -291,8 +291,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testFloatArray() throws Exception {
-    float[] array1 = { -123.455e-14f, 123.455e-14f, Float.MIN_VALUE, Float.MAX_VALUE, Float.NaN, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY};
-    float[] array2 = (float[]) copyBySerialization(array1);
+    final float[] array1 = { -123.455e-14f, 123.455e-14f, Float.MIN_VALUE, Float.MAX_VALUE, Float.NaN, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY};
+    final float[] array2 = (float[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -302,8 +302,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testDoubleArray() throws Exception {
-    double[] array1 = { -123.455e-14f, 123.455e-14f, Double.MIN_VALUE, Double.MAX_VALUE, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
-    double[] array2 = (double[]) copyBySerialization(array1);
+    final double[] array1 = { -123.455e-14f, 123.455e-14f, Double.MIN_VALUE, Double.MAX_VALUE, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
+    final double[] array2 = (double[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -313,8 +313,8 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = 5000)
   public void testBooleanArray() throws Exception {
-    boolean[] array1 = {true, false};
-    boolean[] array2 = (boolean[]) copyBySerialization(array1);
+    final boolean[] array1 = {true, false};
+    final boolean[] array2 = (boolean[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -323,7 +323,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * @param o1 the object to check.
    * @throws Exception if any error occurs.
    */
-  private void testObject(final Object o1) throws Exception {
+  private static void testObject(final Object o1) throws Exception {
     assertEquals(o1, copyBySerialization(o1));
   }
 
@@ -333,9 +333,9 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * @return a copy of the object.
    * @throws Exception if any error occurs.
    */
-  private Object copyBySerialization(final Object src) throws Exception {
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    byte[] bytes = ser.serialize(src).buffer;
+  private static Object copyBySerialization(final Object src) throws Exception {
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final byte[] bytes = ser.serialize(src).buffer;
     return ser.deserialize(bytes);
   }
 

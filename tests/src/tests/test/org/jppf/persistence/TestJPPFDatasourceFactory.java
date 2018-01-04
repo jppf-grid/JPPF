@@ -51,7 +51,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = dbSetup("persistence");
+    final TestConfiguration config = dbSetup("persistence");
     config.nodeLog4j = "classes/tests/config/persistence/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
   }
@@ -62,10 +62,10 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleDataSourcePrefixedDefinition() throws Exception {
-    TypedProperties props = configureDataSource(new TypedProperties(), "testDS", "myConfigId", "local");
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final TypedProperties props = configureDataSource(new TypedProperties(), "testDS", "myConfigId", "local");
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     factory.configure(props, JPPFDatasourceFactory.Scope.LOCAL);
-    DataSource ds = factory.getDataSource("testDS");
+    final DataSource ds = factory.getDataSource("testDS");
     checkHikariProperties("testDS", ds);
     List<String> names = factory.getDataSourceNames();
     assertNotNull(names);
@@ -84,9 +84,9 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleDataSourcePublicAPI() throws Exception {
-    TypedProperties props = configureDataSource(new TypedProperties(), "testDS", null, "local");
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    DataSource ds = factory.createDataSource("testDS", props);
+    final TypedProperties props = configureDataSource(new TypedProperties(), "testDS", null, "local");
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final DataSource ds = factory.createDataSource("testDS", props);
     checkHikariProperties("testDS", ds);
     List<String> names = factory.getDataSourceNames();
     assertNotNull(names);
@@ -105,25 +105,25 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testMultipleDataSourcesPublicAPI() throws Exception {
-    int nbDS = 3;
+    final int nbDS = 3;
     TypedProperties props = new TypedProperties();
     for (int i=1; i<=nbDS; i++) props = configureDataSource(props, "testDS_" + i, "test_" + i, "local");
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    Map<String, DataSource> map = factory.createDataSources(props);
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final Map<String, DataSource> map = factory.createDataSources(props);
     assertNotNull(map);
     assertEquals(nbDS, map.size());
     List<String> names = factory.getDataSourceNames();
     assertNotNull(names);
     assertEquals(nbDS, names.size());
     for (int i=1; i<=nbDS; i++) {
-      String name = "testDS_" + i;
+      final String name = "testDS_" + i;
       assertTrue(map.containsKey(name));
-      DataSource ds = map.get(name);
+      final DataSource ds = map.get(name);
       checkHikariProperties(name, ds);
       assertTrue(names.contains(name));
     }
     for (int i=1; i<=nbDS; i++) {
-      String name = "testDS_" + i;
+      final String name = "testDS_" + i;
       assertTrue(factory.removeDataSource(name));
       assertNull(factory.getDataSource(name));
     }
@@ -138,12 +138,12 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testDataSourceScopes() throws Exception {
-    TypedProperties props = new TypedProperties();
-    for (JPPFDatasourceFactory.Scope scope: JPPFDatasourceFactory.Scope.values()) {
-      String scopeName = scope.name();
+    final TypedProperties props = new TypedProperties();
+    for (final JPPFDatasourceFactory.Scope scope: JPPFDatasourceFactory.Scope.values()) {
+      final String scopeName = scope.name();
       configureDataSource(props, scopeName, scopeName + "_id", scopeName);
     }
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     factory.configure(props, LOCAL);
     List<String> names = factory.getDataSourceNames();
     assertNotNull(names);
@@ -172,12 +172,12 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testSQLStatements() throws Exception {
-    String dsName = "testDS";
-    TypedProperties props = configureDataSource(new TypedProperties(), dsName, null, "local");
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    DataSource ds = factory.createDataSource(dsName, props);
+    final String dsName = "testDS";
+    final TypedProperties props = configureDataSource(new TypedProperties(), dsName, null, "local");
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final DataSource ds = factory.createDataSource(dsName, props);
     checkHikariProperties("testDS", ds);
-    DBTask task = new DBTask(dsName, "h2dump_" + ReflectionUtils.getCurrentMethodName() + ".log");
+    final DBTask task = new DBTask(dsName, "h2dump_" + ReflectionUtils.getCurrentMethodName() + ".log");
     task.run();
     throwUnknown(task.getThrowable());
     assertNull(task.getThrowable());
@@ -193,13 +193,13 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testSQLStatementsFromTask() throws Exception {
-    String method = ReflectionUtils.getCurrentMethodName();
-    String[] dsNames = { "commonDS", "nodeDS" };
-    for (String dsName: dsNames) {
-      String name = method + "_" + dsName;
-      JPPFJob job = BaseTestHelper.createJob(name, true, false, 1, DBTask.class, dsName, "h2dump_" + name + ".log");
-      List<Task<?>> results = client.submitJob(job);
-      for (Task<?> task: results) {
+    final String method = ReflectionUtils.getCurrentMethodName();
+    final String[] dsNames = { "commonDS", "nodeDS" };
+    for (final String dsName: dsNames) {
+      final String name = method + "_" + dsName;
+      final JPPFJob job = BaseTestHelper.createJob(name, true, false, 1, DBTask.class, dsName, "h2dump_" + name + ".log");
+      final List<Task<?>> results = client.submitJob(job);
+      for (final Task<?> task: results) {
         throwUnknown(task.getThrowable());
         assertNull(task.getThrowable());
         assertNotNull(task.getResult());
@@ -214,15 +214,15 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    */
   @Test(timeout = 10000)
   public void testDatasourceExecutionPolicy() throws Exception {
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     for (int i=1; i<=BaseSetup.nbNodes(); i++) {
-      JPPFJob job = BaseTestHelper.createJob(method + "_" + i, true, false, 1, DSInfoTask.class);
-      String uuid = "n" + i;
+      final JPPFJob job = BaseTestHelper.createJob(method + "_" + i, true, false, 1, DSInfoTask.class);
+      final String uuid = "n" + i;
       job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, uuid));
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
-      DSInfoTask task = (DSInfoTask) results.get(0);
+      final DSInfoTask task = (DSInfoTask) results.get(0);
       assertNull(task.getThrowable());
       assertNotNull(task.nodeUuid);
       assertEquals(uuid, task.nodeUuid);
@@ -242,7 +242,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   static void checkHikariProperties(final String name, final DataSource ds) throws Exception {
     assertNotNull(ds);
     assertTrue(ds instanceof HikariDataSource);
-    HikariDataSource hds = (HikariDataSource) ds;
+    final HikariDataSource hds = (HikariDataSource) ds;
     assertEquals(name, hds.getPoolName());
     assertEquals(DB_DRIVER_CLASS, hds.getDriverClassName());
     assertEquals(DB_URL, hds.getJdbcUrl());
@@ -259,8 +259,8 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    * @return the provideed properties.
    * @throws Exception if any error occurs.
    */
-  private TypedProperties configureDataSource(final TypedProperties props, final String name, final String configId, final String scope) throws Exception {
-    String prefix = configId == null ? "" : "jppf.datasource." + configId + ".";
+  private static TypedProperties configureDataSource(final TypedProperties props, final String name, final String configId, final String scope) throws Exception {
+    final String prefix = configId == null ? "" : "jppf.datasource." + configId + ".";
     props.setString(prefix + "name", name).setString(prefix + "scope", (scope == null) ? "local" : scope)
       .setString(prefix + "driverClassName", DB_DRIVER_CLASS).setString(prefix + "jdbcUrl", DB_URL)
       .setString(prefix + "username", DB_USER).setString(prefix + "password", DB_PWD);
@@ -271,6 +271,10 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    * A simple task that executes SQL statements and performs JUnit assertions.
    */
   public static class DBTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * Name of the datasource to use.
      */
@@ -292,15 +296,15 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
 
     @Override
     public void run() {
-      DataSource ds = JPPFDatasourceFactory.getInstance().getDataSource(dsName);
+      final DataSource ds = JPPFDatasourceFactory.getInstance().getDataSource(dsName);
       try {
         checkHikariProperties(dsName, ds);
         try (Connection c = ds.getConnection()) {
           // insert records in the table
-          int nbRecords = 2 * 5; // we want a multiple of 2
+          final int nbRecords = 2 * 5; // we want a multiple of 2
           String sql = String.format("INSERT INTO %s (COL1, COL2, COL3) VALUES (? , ?, ?)", TABLE_NAME);
           for (int i=1; i<=nbRecords; i++) {
-            try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (final PreparedStatement ps = c.prepareStatement(sql)) {
               ps.setInt(1, i);
               ps.setString(2, "col2_" + i);
               ps.setString(3, "col3_" + i);
@@ -310,11 +314,11 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
           Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", dumpFileName);
           // fetch all records with an odd number for COL1
           sql = String.format("SELECT COL1, COL2, COL3 FROM %s WHERE COL1 %% 2 = 1 ORDER BY COL1", TABLE_NAME);
-          try (PreparedStatement ps = c.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
+          try (final PreparedStatement ps = c.prepareStatement(sql)) {
+            try (final ResultSet rs = ps.executeQuery()) {
               int count = 0;
               while (rs.next()) {
-                int i = 2 * count + 1;
+                final int i = 2 * count + 1;
                 assertEquals(i, rs.getInt(1));
                 assertEquals("col2_" + i, rs.getString(2));
                 assertEquals("col3_" + i, rs.getString(3));
@@ -337,7 +341,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
           }
           setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         setThrowable(e);
       }
     }
@@ -347,6 +351,10 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
    * A simple task that captures the names of available datasources on the node on which it executes.
    */
   public static class DSInfoTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     List<String> dsNames;
     /** */

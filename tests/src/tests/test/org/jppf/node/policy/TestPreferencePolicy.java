@@ -94,7 +94,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
     try {
       PolicyParser.validatePolicy(invalidXML);
       throw new IllegalStateException("the policy is invalid but passes the validation");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       assertTrue("e = " + e, e instanceof JPPFException);
     }
   }
@@ -106,10 +106,10 @@ public class TestPreferencePolicy extends Setup1D2N1C {
   @Test(timeout=15000)
   public void testTrueXMLPolicy() throws Exception {
     try {
-      ExecutionPolicy policy = PolicyParser.parsePolicy(validTrueXML);
+      final ExecutionPolicy policy = PolicyParser.parsePolicy(validTrueXML);
       assertTrue(policy instanceof Preference);
       testTruePolicy(ReflectionUtils.getCurrentClassAndMethod(), policy);
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       t.printStackTrace();
       if (t instanceof Exception) throw (Exception) t;
       else if (t instanceof Error) throw (Error) t;
@@ -132,28 +132,28 @@ public class TestPreferencePolicy extends Setup1D2N1C {
    * @param policy the execution policy to test.
    * @throws Exception if any error occurs
    */
-  private void testTruePolicy(final String name, final ExecutionPolicy policy) throws Exception {
+  private static void testTruePolicy(final String name, final ExecutionPolicy policy) throws Exception {
     JPPFConnectionPool pool = null;
     while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
     try {
       pool.setSize(2);
       pool.awaitActiveConnections(Operator.AT_LEAST, 2);
-      int nbTasks = 1;
-      JPPFJob job1 = BaseTestHelper.createJob(name + " 1", false, false, nbTasks, LifeCycleTask.class, 3000L);
+      final int nbTasks = 1;
+      final JPPFJob job1 = BaseTestHelper.createJob(name + " 1", false, false, nbTasks, LifeCycleTask.class, 3000L);
       job1.getSLA().setExecutionPolicy(policy);
-      JPPFJob job2 = BaseTestHelper.createJob(name + " 2", false, false, nbTasks, LifeCycleTask.class, 3000L);
+      final JPPFJob job2 = BaseTestHelper.createJob(name + " 2", false, false, nbTasks, LifeCycleTask.class, 3000L);
       job2.getSLA().setExecutionPolicy(policy);
       // ensure job 2 is started by the server while job 1 is already executing
       job2.getSLA().setJobSchedule(new JPPFSchedule(1000L));
       client.submitJob(job1);
       client.submitJob(job2);
-      List<Task<?>> results1 = job1.awaitResults();
+      final List<Task<?>> results1 = job1.awaitResults();
       assertEquals(nbTasks, results1.size());
-      LifeCycleTask task1 = (LifeCycleTask) results1.get(0);
+      final LifeCycleTask task1 = (LifeCycleTask) results1.get(0);
       assertNotNull(task1.getResult());
-      List<Task<?>> results2 = job2.awaitResults();
+      final List<Task<?>> results2 = job2.awaitResults();
       assertEquals(nbTasks, results2.size());
-      LifeCycleTask task2 = (LifeCycleTask) results2.get(0);
+      final LifeCycleTask task2 = (LifeCycleTask) results2.get(0);
       assertNotNull(task2.getResult());
       assertFalse(task1.getNodeUuid().equals(task2.getNodeUuid()));
       //assertNotSame(task1.getNodeUuid(), task2.getNodeUuid());
@@ -168,7 +168,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
    */
   @Test(timeout=10000)
   public void testFalseXMLPolicy() throws Exception {
-    ExecutionPolicy policy = PolicyParser.parsePolicy(validFalseXML);
+    final ExecutionPolicy policy = PolicyParser.parsePolicy(validFalseXML);
     assertTrue(policy instanceof Preference);
     testFalsePolicy(ReflectionUtils.getCurrentClassAndMethod(), policy);
   }
@@ -188,15 +188,15 @@ public class TestPreferencePolicy extends Setup1D2N1C {
    * @param policy the execution policy to test.
    * @throws Exception if any error occurs.
    */
-  private void testFalsePolicy(final String name, final ExecutionPolicy policy) throws Exception {
-    int nbTasks = 1;
+  private static void testFalsePolicy(final String name, final ExecutionPolicy policy) throws Exception {
+    final int nbTasks = 1;
     assertTrue(policy instanceof Preference);
-    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 10L);
+    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().setExecutionPolicy(policy);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(2000L));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertEquals(nbTasks, results.size());
-    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    final LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());
     assertNull(task.getNodeUuid());
   }

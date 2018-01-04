@@ -55,10 +55,10 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     @Override
     protected void starting(final Description description) {
       try {
-        String msg = String.format( "***** start of method %s() *****", description.getMethodName());
-        String banner = StringUtils.padLeft("", '*', msg.length(), false);
-        for (JMXDriverConnectionWrapper jmx: JMX) logInServer(jmx, banner, msg, banner);
-      } catch(Exception e) {
+        final String msg = String.format( "***** start of method %s() *****", description.getMethodName());
+        final String banner = StringUtils.padLeft("", '*', msg.length(), false);
+        for (final JMXDriverConnectionWrapper jmx: JMX) logInServer(jmx, banner, msg, banner);
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -70,11 +70,11 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = createConfig("discovery");
+    final TestConfiguration config = createConfig("discovery");
     config.driverLog4j = "classes/tests/config/discovery/log4j-driver.properties";
     BaseSetup.setup(2, 2, false, true, config);
-    long start = System.currentTimeMillis();
-    long timeout = 60_000L;
+    final long start = System.currentTimeMillis();
+    final long timeout = 60_000L;
     for (int i=0; i<JMX.length; i++) {
       BaseTest.print(false, false, "connecting to server %d", (i + 1));
       JMX[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
@@ -108,12 +108,12 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     for (int i=0; i<2; i++) {
       assertEquals("ok", executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/SetPeerDiscovery.js")));
     }
-    String[] results = new String[2];
+    final String[] results = new String[2];
     boolean good = false;
     while (!good) {
       good = true;
       for (int i=0; i<2; i++) {
-        String result = (String) executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/RetrievePeerDiscovery.js"));
+        final String result = (String) executeScriptOnServer(JMX[i], FileUtils.readTextFile(resourcePath + "/RetrievePeerDiscovery.js"));
         if (result.startsWith("ko")) {
           good = false;
           BaseTest.print(false, false, "driver response: %s", result);
@@ -126,7 +126,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     }
     for (int i=0; i<2; i++) {
       BaseTest.print(false, false, "checking server %d", (i + 1));
-      TypedProperties props = new TypedProperties();
+      final TypedProperties props = new TypedProperties();
       props.load(new StringReader(results[i]));
       assertEquals("localhost", props.getString("host"));
       assertEquals(11102 - i, props.getInt("port"));
@@ -144,7 +144,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testClientSide() throws Exception {
     JPPFConfiguration.set(JPPFProperties.REMOTE_EXECUTION_ENABLED, false);
-    ClientDiscovery discovery = new ClientDiscovery();
+    final ClientDiscovery discovery = new ClientDiscovery();
     try (JPPFClient client = new JPPFClient()) {
       AbstractNonStandardSetup.client = client;
       client.addDriverDiscovery(discovery);
@@ -155,7 +155,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         if (pools.size() < 2) Thread.sleep(100L);
         else end = true;
       }
-      for (JPPFConnectionPool pool: pools) pool.awaitActiveConnection();
+      for (final JPPFConnectionPool pool: pools) pool.awaitActiveConnection();
       Collections.sort(pools, new Comparator<JPPFConnectionPool>() {
         @Override
         public int compare(final JPPFConnectionPool p1, final JPPFConnectionPool p2) {
@@ -165,9 +165,9 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
       assertNotNull(pools);
       assertEquals(2, pools.size());
       for (int i=0; i<2; i++) {
-        JPPFConnectionPool pool = pools.get(i);
+        final JPPFConnectionPool pool = pools.get(i);
         assertNotNull(pool);
-        int port = 11101 + i;
+        final int port = 11101 + i;
         assertEquals("ClientDiscovery_" + port, pool.getName());
         assertEquals(port, pool.getDriverPort());
         assertEquals("localhost", pool.getDriverHost());
@@ -176,15 +176,15 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
         assertEquals(1, pool.getSize());
         assertEquals(1, pool.getJMXPoolSize());
       }
-      int tasksPerNode = 5;
-      int nbNodes = BaseSetup.nbNodes();
-      int nbTasks = tasksPerNode * nbNodes;
-      String name = ReflectionUtils.getCurrentMethodName();
-      JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
-      List<Task<?>> results = client.submitJob(job);
+      final int tasksPerNode = 5;
+      final int nbNodes = BaseSetup.nbNodes();
+      final int nbTasks = tasksPerNode * nbNodes;
+      final String name = ReflectionUtils.getCurrentMethodName();
+      final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
+      final List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
-      for (Task<?> t: results) {
+      for (final Task<?> t: results) {
         assertTrue("task = " + t, t instanceof LifeCycleTask);
         assertNull(t.getThrowable());
         assertNotNull(t.getResult());
@@ -209,10 +209,10 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   
     @Override
     public void discover() {
-      String className = getClass().getSimpleName();
+      final String className = getClass().getSimpleName();
       for (int i=0; i<2; i++) {
-        int port = 11101 + i;
-        ClientConnectionPoolInfo info = new ClientConnectionPoolInfo("ClientDiscovery_" + port, false, "localhost", port, 2 - i, 1, 1);
+        final int port = 11101 + i;
+        final ClientConnectionPoolInfo info = new ClientConnectionPoolInfo("ClientDiscovery_" + port, false, "localhost", port, 2 - i, 1, 1);
         BaseTest.printOut("%s 'discovering' %s", className, info);
         newConnection(info);
       }

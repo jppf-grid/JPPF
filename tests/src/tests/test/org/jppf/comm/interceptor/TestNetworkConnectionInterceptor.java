@@ -56,14 +56,14 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     SocketServer server = null;
     Socket client = null;
     try {
-      List<NetworkConnectionInterceptor> interceptors = NetworkConnectionInterceptor.INTERCEPTORS;
+      final List<NetworkConnectionInterceptor> interceptors = NetworkConnectionInterceptor.INTERCEPTORS;
       assertNotNull(interceptors);
       assertEquals(1, interceptors.size());
-      NetworkConnectionInterceptor interceptor = interceptors.get(0);
+      final NetworkConnectionInterceptor interceptor = interceptors.get(0);
       assertTrue(interceptor instanceof TestInterceptor);
       TestInterceptor.active = true;
       server = new SocketServer();
-      Thread serverThread = new Thread(server, "socket server thread");
+      final Thread serverThread = new Thread(server, "socket server thread");
       serverThread.start();
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
@@ -76,13 +76,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -102,7 +102,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new ChannelServer();
-      Thread serverThread = new Thread(server, "socket channel server thread");
+      final Thread serverThread = new Thread(server, "socket channel server thread");
       serverThread.start();
       Thread.sleep(250L);
       client = SocketChannel.open(new InetSocketAddress("localhost", PORT));
@@ -117,13 +117,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -142,7 +142,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new SocketServer();
-      Thread serverThread = new Thread(server, "socket server thread");
+      final Thread serverThread = new Thread(server, "socket server thread");
       serverThread.start();
       Thread.sleep(250L);
       client = SocketChannel.open(new InetSocketAddress("localhost", PORT));
@@ -157,13 +157,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -182,7 +182,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new ChannelServer();
-      Thread serverThread = new Thread(server, "socket channel server thread");
+      final Thread serverThread = new Thread(server, "socket channel server thread");
       serverThread.start();
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
@@ -195,13 +195,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -216,7 +216,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     /**
      * Logger for this class.
      */
-    private static Logger log = LoggerFactory.getLogger(SocketServer.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(SocketServer.class.getSimpleName());
     /**
      * The result of calling the interceptor on the accepted socket.
      */
@@ -229,17 +229,17 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
 
     @Override
     public void run() {
-      log.debug("start");
+      logger.debug("start");
       try {
         server = new ServerSocket(PORT);
-        log.debug("server bound to port {}", server.getLocalPort());
-        Socket socket = server.accept();
-        log.debug("accepted socket {}", socket);
+        logger.debug("server bound to port {}", server.getLocalPort());
+        final Socket socket = server.accept();
+        logger.debug("accepted socket {}", socket);
         synchronized(this) {
           result = InterceptorHandler.invokeOnAccept(socket);
         }
-        log.debug("result = {}", result);
-      } catch (Exception e) {
+        logger.debug("result = {}", result);
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -250,7 +250,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     public void close() {
       try {
         if (server != null) server.close();        
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -270,7 +270,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     /**
      * Logger for this class.
      */
-    private static Logger log = LoggerFactory.getLogger(ChannelServer.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(ChannelServer.class.getSimpleName());
     /**
      * The result of calling the interceptor on the accepted socket channel.
      */
@@ -283,20 +283,20 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     @Override
     public void run() {
       try {
-        log.debug("start");
+        logger.debug("start");
         server = ServerSocketChannel.open();
-        InetSocketAddress addr = new InetSocketAddress(PORT);
+        final InetSocketAddress addr = new InetSocketAddress(PORT);
         server.bind(addr);
-        log.debug("server bound to port {}", ((InetSocketAddress) server.getLocalAddress()).getPort());
+        logger.debug("server bound to port {}", ((InetSocketAddress) server.getLocalAddress()).getPort());
         server.configureBlocking(true);
-        SocketChannel channel = server.accept();
-        log.debug("accepted channel {}", channel);
+        final SocketChannel channel = server.accept();
+        logger.debug("accepted channel {}", channel);
         channel.configureBlocking(true);
         synchronized(this) {
           result = InterceptorHandler.invokeOnAccept(channel);
         }
-        log.debug("result = {}", result);
-      } catch (Exception e) {
+        logger.debug("result = {}", result);
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -307,7 +307,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     public void close() {
       try {
         if (server != null) server.close();        
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

@@ -69,20 +69,20 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testNonPersistentAlgos() throws Exception {
-    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
-    LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "manual", "nodethreads" };
-      int nbTasks = 100;
-      for (String algo: algos) {
+      final String[] algos = { "manual", "nodethreads" };
+      final int nbTasks = 100;
+      for (final String algo: algos) {
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        List<String> channels = mgt.listAllChannels();
+        final List<String> channels = mgt.listAllChannels();
         assertNotNull(channels);
         assertTrue(channels.isEmpty());
       }
@@ -98,20 +98,20 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testPersistentAlgos() throws Exception {
-    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
-    LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "proportional", "autotuned", "rl2" };
-      int nbTasks = 100;
-      for (String algo: algos) {
+      final String[] algos = { "proportional", "autotuned", "rl2" };
+      final int nbTasks = 100;
+      for (final String algo: algos) {
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        List<String> channels = mgt.listAllChannels();
+        final List<String> channels = mgt.listAllChannels();
         print(true, false, "list of nodes for algo=%s : %s", algo, channels);
         assertNotNull(channels);
         assertEquals(BaseSetup.nbDrivers() + 1, channels.size());
@@ -126,7 +126,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
           assertTrue(channelAlgos.isEmpty());
         }
       }
-      List<String> channels = mgt.listAllChannels();
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertTrue(channels.isEmpty());
     } finally {
@@ -140,25 +140,25 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testDifferentAlgosPerNode() throws Exception {
-    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
-    LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String[] algos = { "proportional", "autotuned", "rl2" };
-      int nbTasks = 100;
+      final String[] algos = { "proportional", "autotuned", "rl2" };
+      final int nbTasks = 100;
       for (int i=0; i<algos.length; i++) {
-        String algo = algos[i];
+        final String algo = algos[i];
         client.setLoadBalancerSettings(algo, lbi.getParameters());
-        JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+        final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         job.getClientSLA().setMaxChannels(2);
         if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", i == 1));
-        List<Task<?>> results = client.submitJob(job);
+        final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
       }
-      Map<Integer, String> uuidToChannelID = new HashMap<>();
+      final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
-        List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
+        final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         assertNotNull(channels);
         if (i == 0) {
           assertEquals(BaseSetup.nbDrivers() + 1, channels.size());
@@ -168,8 +168,8 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         }
       }
       // check that channel1 has algos[0] + algos[1] and channel2 has algos[0] + algos[2]
-      for (Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
-        List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
+      for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
+        final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
         assertEquals(2, channelAlgos.size());
         assertTrue(channelAlgos.contains(algos[0]));
@@ -177,15 +177,15 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
-      for (Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
-        List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
+      for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
+        final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
         assertEquals(1, channelAlgos.size());
         assertFalse(channelAlgos.contains(algos[0]));
         assertTrue(channelAlgos.contains(algos[entry.getKey()]));
         mgt.deleteChannel(entry.getValue());
       }
-      List<String> channels = mgt.listAllChannels();
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertTrue(channels.isEmpty());
     } finally {
@@ -199,17 +199,17 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testDeleteSingleAlgo() throws Exception {
-    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
-    LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
+    final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      String algo = "proportional";
-      int nbTasks = 100;
+      final String algo = "proportional";
+      final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
-      JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
       job.getClientSLA().setMaxChannels(2);
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
       List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
@@ -240,23 +240,23 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testSingleDriverMultipleConnections() throws Exception {
-    boolean localEnabled = client.isLocalExecutionEnabled();
-    LoadBalancingInformation lbi = client.getLoadBalancerSettings();
-    LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final boolean localEnabled = client.isLocalExecutionEnabled();
+    final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
+    final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    String method = ReflectionUtils.getCurrentMethodName();
-    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final String method = ReflectionUtils.getCurrentMethodName();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     try {
       client.setLocalExecutionEnabled(false);
       pool.setSize(2);
       pool.awaitWorkingConnections(Operator.EQUAL, 2);
-      JobManagerClient jmc = (JobManagerClient) client.getJobManager();
+      final JobManagerClient jmc = (JobManagerClient) client.getJobManager();
       while (jmc.getTaskQueueChecker().getNbIdleChannels() < 2) Thread.sleep(10L);
       //Thread.sleep(100L);
-      String algo = "proportional";
-      int nbTasks = 100;
+      final String algo = "proportional";
+      final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
-      JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
       job.getClientSLA().setMaxChannels(2);
       job.addJobListener(new JobListenerAdapter() {
         @Override
@@ -264,7 +264,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
           print(false, false, "job '%s' dispatching %d tasks to %s", event.getJob().getName(), event.getJobTasks().size(), event.getConnection());
         }
       });
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
       List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);

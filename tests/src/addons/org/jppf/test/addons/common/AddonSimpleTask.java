@@ -27,6 +27,10 @@ import org.slf4j.*;
  */
 public class AddonSimpleTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(AddonSimpleTask.class);
@@ -59,7 +63,7 @@ public class AddonSimpleTask extends AbstractTask<String> {
       if (duration > 0) Thread.sleep(duration);
       setResult(EXECUTION_SUCCESSFUL_MESSAGE);
       log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

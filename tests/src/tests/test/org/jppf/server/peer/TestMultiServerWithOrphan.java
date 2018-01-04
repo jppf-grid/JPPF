@@ -56,8 +56,8 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
-    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-    for (JPPFConnectionPool pool: pools) {
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    for (final JPPFConnectionPool pool: pools) {
       final int expectedNodes = "driver1".equals(pool.getName()) ? 1 : 0;
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
       ConcurrentUtils.awaitCondition(new Condition() {
@@ -65,23 +65,23 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
         public boolean evaluate() {
           try {
             return jmx.nbIdleNodes() == expectedNodes;
-          } catch (@SuppressWarnings("unused") Exception e) {
+          } catch (@SuppressWarnings("unused") final Exception e) {
             return false;
           }
         }
       }, 5000L, true);
     }
-    int nbTasks = 20;
-    String name = ReflectionUtils.getCurrentClassAndMethod();
-    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final int nbTasks = 20;
+    final String name = ReflectionUtils.getCurrentClassAndMethod();
+    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
     // execute only on 1st server
     job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> t: results) {
+    for (final Task<?> t: results) {
       assertTrue("task = " + t, t instanceof LifeCycleTask);
-      Throwable throwable = t.getThrowable();
+      final Throwable throwable = t.getThrowable();
       assertNull("throwable for task '" + t.getId() + "' : " + ExceptionUtils.getStackTrace(throwable), throwable);
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());

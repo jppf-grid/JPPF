@@ -97,12 +97,12 @@ abstract class JobSelectorAction implements Callable<Void> {
    */
   void checkResults(final boolean shouldBeNull) throws Exception {
     for (JPPFJob job: jobs) {
-      int nbTasks = job.getJobTasks().size();
-      List<Task<?>> results = job.awaitResults();
+      final int nbTasks = job.getJobTasks().size();
+      final List<Task<?>> results = job.awaitResults();
       log.info("got results for '" + job.getName() + "'");
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      for (Task<?> t : results) {
+      for (final Task<?> t : results) {
         if (shouldBeNull) assertNull(t.getResult());
         else assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
       }
@@ -157,12 +157,12 @@ abstract class JobSelectorAction implements Callable<Void> {
     public void performCall() throws Exception {
       jobManager.suspendJobs(selector, true);
       Thread.sleep(SLEEP_TIME);
-      JobInformation[] jobInfos = jobManager.getJobInformation(selector);
+      final JobInformation[] jobInfos = jobManager.getJobInformation(selector);
       assertNotNull(jobInfos);
       assertEquals(jobs.size(), jobInfos.length);
-      Set<String> jobUuids = new HashSet<>();
-      for (JPPFJob job: jobs) jobUuids.add(job.getUuid());
-      for (JobInformation info: jobInfos) {
+      final Set<String> jobUuids = new HashSet<>();
+      for (final JPPFJob job: jobs) jobUuids.add(job.getUuid());
+      for (final JobInformation info: jobInfos) {
         assertTrue(info.isSuspended());
         assertTrue(jobUuids.contains(info.getJobUuid()));
       }
@@ -183,22 +183,22 @@ abstract class JobSelectorAction implements Callable<Void> {
 
     @Override
     public void performCall() throws Exception {
-      Map<String, NodeJobInformation[]> infos = jobManager.getNodeInformation(selector);
+      final Map<String, NodeJobInformation[]> infos = jobManager.getNodeInformation(selector);
       assertNotNull(infos);
       assertEquals(jobs.size(), infos.size());
-      Map<String, JPPFJob> jobUuids = new HashMap<>();
-      for (JPPFJob job: jobs) jobUuids.put(job.getUuid(), job);
-      Set<String> nodeUuids = new HashSet<>();
-      for (Map.Entry<String, NodeJobInformation[]> entry: infos.entrySet()) {
+      final Map<String, JPPFJob> jobUuids = new HashMap<>();
+      for (final JPPFJob job: jobs) jobUuids.put(job.getUuid(), job);
+      final Set<String> nodeUuids = new HashSet<>();
+      for (final Map.Entry<String, NodeJobInformation[]> entry: infos.entrySet()) {
         assertNotNull(entry.getValue());
         assertEquals(1, entry.getValue().length);
-        NodeJobInformation nji = entry.getValue()[0];
-        JobInformation jobInfo = nji.getJobInformation();
+        final NodeJobInformation nji = entry.getValue()[0];
+        final JobInformation jobInfo = nji.getJobInformation();
         assertTrue(jobUuids.containsKey(jobInfo.getJobUuid()));
-        JPPFJob job = jobUuids.get(jobInfo.getJobUuid());
+        final JPPFJob job = jobUuids.get(jobInfo.getJobUuid());
         assertEquals(job.getJobTasks().size(), jobInfo.getInitialTaskCount());
         assertEquals(job.getJobTasks().size(), jobInfo.getTaskCount());
-        JPPFManagementInfo nodeInfo = nji.getNodeInfo();
+        final JPPFManagementInfo nodeInfo = nji.getNodeInfo();
         assertFalse(nodeUuids.contains(nodeInfo.getUuid()));
         nodeUuids.add(nodeInfo.getUuid());
       }

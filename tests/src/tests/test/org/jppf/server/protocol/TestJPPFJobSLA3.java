@@ -44,8 +44,8 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration config = BaseSetup.createDefaultConfiguration();
-    List<String> cp = new ArrayList<>();
+    final TestConfiguration config = BaseSetup.createDefaultConfiguration();
+    final List<String> cp = new ArrayList<>();
     cp.add("../common/classes");
     cp.add("../server/classes");
     config.nodeClasspath.addAll(cp);
@@ -71,16 +71,16 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @Test(timeout=8000)
   public void testOfflineJob() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 1L);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setRemoteClassLoadingEnabled(false);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
-      Task<?> task = results.get(i);
+      final Task<?> task = results.get(i);
       assertNull(task.getResult());
-      Throwable t = task.getThrowable();
+      final Throwable t = task.getThrowable();
       assertNotNull(t);
       assertEquals(ClassNotFoundException.class, t.getClass());
     }
@@ -92,14 +92,14 @@ public class TestJPPFJobSLA3 extends BaseTest {
    */
   @Test(timeout=8000)
   public void testOnlineJob() throws Exception {
-    int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, MyTask.class);
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, MyTask.class);
     job.getSLA().setRemoteClassLoadingEnabled(true);
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     for (int i=0; i<nbTasks; i++) {
-      Task<?> task = results.get(i);
+      final Task<?> task = results.get(i);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       assertNull(task.getThrowable());
@@ -110,6 +110,11 @@ public class TestJPPFJobSLA3 extends BaseTest {
    * A simple task.
    */
   public static class MyTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void run() {
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);

@@ -40,7 +40,7 @@ public class TestJobListener extends BaseTest {
   /**
    * The JPPF client.
    */
-  private JPPFClient client = null;
+  private JPPFClient jppfClient = null;
 
   /**
    * Launches 1 driver with 3 nodes and start the client.
@@ -48,7 +48,7 @@ public class TestJobListener extends BaseTest {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
+    final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driverLog4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
     BaseSetup.setup(1, 1, false, cfg);
   }
@@ -70,8 +70,8 @@ public class TestJobListener extends BaseTest {
   public void testJobListenerSingleLocalConnection() throws Exception {
     try {
       configure(false, true, 1);
-      CountingJobListener listener = new CountingJobListener();
-      int nbTasks = 20;
+      final CountingJobListener listener = new CountingJobListener();
+      final int nbTasks = 20;
       runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
@@ -90,8 +90,8 @@ public class TestJobListener extends BaseTest {
   public void testJobListenerMultipleRemoteConnections() throws Exception {
     try {
       configure(true, false, 2);
-      CountingJobListener listener = new CountingJobListener();
-      int nbTasks = 20;
+      final CountingJobListener listener = new CountingJobListener();
+      final int nbTasks = 20;
       runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
@@ -109,24 +109,24 @@ public class TestJobListener extends BaseTest {
   @Test(timeout = 10000)
   public void testJobListenerNotificationsUponRequeue() throws Exception {
     try {
-      String name = ReflectionUtils.getCurrentMethodName();
+      final String name = ReflectionUtils.getCurrentMethodName();
       configure(true, false, 1);
-      client = BaseSetup.createClient(null, false);
-      BaseTestHelper.printToServers(client, "start of %s()", name);
-      CountingJobListener listener = new CountingJobListener();
-      String startNotification = "start notification";
-      AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, startNotification);
-      int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
+      jppfClient = BaseSetup.createClient(null, false);
+      BaseTestHelper.printToServers(jppfClient, "start of %s()", name);
+      final CountingJobListener listener = new CountingJobListener();
+      final String startNotification = "start notification";
+      final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(jppfClient, startNotification);
+      final int nbTasks = 1;
+      final JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
       job.addJobListener(listener);
       print(false, false, "submitting job");
-      client.submitJob(job);
+      jppfClient.submitJob(job);
       print(false, false, "waiting for task start notification");
       taskListener.await();
-      BaseTestHelper.printToAll(client, true, true, true, false, false, "resetting client");
-      client.reset();
+      BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
+      jppfClient.reset();
       print(false, false, "getting job results");
-      List<Task<?>> results = job.awaitResults();
+      final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, results.get(0).getResult());
@@ -148,12 +148,12 @@ public class TestJobListener extends BaseTest {
    * @throws Exception if any error occurs
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
-    client = BaseSetup.createClient(null, false);
-    BaseTestHelper.printToServers(client, "start of %s()", name);
-    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    jppfClient = BaseSetup.createClient(null, false);
+    BaseTestHelper.printToServers(jppfClient, "start of %s()", name);
+    final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     print(false, false, "submitting job %s", job.getName());
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     Thread.sleep(250L);
@@ -166,7 +166,7 @@ public class TestJobListener extends BaseTest {
    * @param localEnabled specifies whether local execution is enabled.
    * @param poolSize the size of the connection pool.
    */
-  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
+  private static void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
     JPPFConfiguration.getProperties().set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled).set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
     .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4).set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual").set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
     .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5).set(JPPFProperties.POOL_SIZE, poolSize);
@@ -176,9 +176,9 @@ public class TestJobListener extends BaseTest {
    * Reset the confiugration.
    */
   private void reset() {
-    if (client != null) {
-      client.close();
-      client = null;
+    if (jppfClient != null) {
+      jppfClient.close();
+      jppfClient = null;
     }
     JPPFConfiguration.reset();
   }

@@ -44,8 +44,8 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    */
   @Test(timeout = 10000)
   public void testRestartDriverWhenIdle() throws Exception {
-    int nbTasks = 1;
-    long duration = 1L;
+    final int nbTasks = 1;
+    final long duration = 1L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     print(false, false, "submitting job 1");
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, nbTasks, LifeCycleTask.class, duration));
@@ -66,18 +66,18 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    */
   @Test(timeout = 10000)
   public void testRestartDriverWhenBusy() throws Exception {
-    int nbTasks = 1;
-    long duration = 2000L;
+    final int nbTasks = 1;
+    final long duration = 2000L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
-    AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
+    final AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
     client.submitJob(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
     restartDriver(driver, 1L, 1000L);
     BaseTestHelper.printToAll(client, true, true, true, false, "getting job results");
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
     checkResults(results, nbTasks);
   }
 
@@ -88,7 +88,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    * @param restartDelay delay before the driver restarts down after shutdown.
    * @throws Exception if any error occurs.
    */
-  private void restartDriver(final JMXDriverConnectionWrapper driver, final long shutdownDelay, final long restartDelay) throws Exception {
+  private static void restartDriver(final JMXDriverConnectionWrapper driver, final long shutdownDelay, final long restartDelay) throws Exception {
     BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver %s:%d with shutdownDelay=%,d ms, restartDelay=%,d ms",
       driver.getHost(), driver.getPort(), shutdownDelay, restartDelay);
     driver.restartShutdown(shutdownDelay, restartDelay);
@@ -100,7 +100,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    * @param expectedTasks the number of expected result tasks.
    * @throws Exception if any error occurs.
    */
-  private void checkResults(final List<Task<?>> results, final int expectedTasks) throws Exception {
+  private static void checkResults(final List<Task<?>> results, final int expectedTasks) throws Exception {
     assertNotNull(results);
     assertEquals(expectedTasks, results.size());
     for (Task<?> task: results) {

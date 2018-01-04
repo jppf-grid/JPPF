@@ -30,6 +30,10 @@ import org.slf4j.*;
  */
 public class ConnectorTest extends NotificationBroadcasterSupport implements ConnectorTestMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ConnectorTest.class);
@@ -75,8 +79,8 @@ public class ConnectorTest extends NotificationBroadcasterSupport implements Con
 
   @Override
   public void triggerNotifications(final String...messages) {
-    for (String msg: messages) {
-      Notification notif = new Notification("tesNotification", ConnectorTestMBean.MBEAN_NAME, sequence.incrementAndGet(), msg);
+    for (final String msg: messages) {
+      final Notification notif = new Notification("tesNotification", ConnectorTestMBean.MBEAN_NAME, sequence.incrementAndGet(), msg);
       notif.setUserData(msg);
       sendNotification(notif);
     }

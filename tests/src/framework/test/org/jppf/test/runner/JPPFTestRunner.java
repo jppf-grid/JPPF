@@ -40,34 +40,34 @@ public class JPPFTestRunner {
    * @return a <code>ResultHolder</code> object.
    */
   public ResultHolder runTests(final String classNamesFile, final PrintStream out) {
-    ResultHolder result = new ResultHolder();
+    final ResultHolder result = new ResultHolder();
     InputStream is = null;
     try {
       is = JPPFTestRunner.class.getClassLoader().getResourceAsStream(classNamesFile);
       if (is != null) {
-        List<String> list = FileUtils.textFileAsLines(new InputStreamReader(is));
-        List<Class<?>> classes = new ArrayList<>(list.size());
-        for (String name: list) {
-          String s = name.trim();
+        final List<String> list = FileUtils.textFileAsLines(new InputStreamReader(is));
+        final List<Class<?>> classes = new ArrayList<>(list.size());
+        for (final String name: list) {
+          final String s = name.trim();
           if ("".equals(s) || s.startsWith("#")) continue;
           try {
             System.out.println("loading " + s);
-            Class<?> clazz = Class.forName(s);
+            final Class<?> clazz = Class.forName(s);
             classes.add(clazz);
-          } catch(Exception e) {
+          } catch(final Exception e) {
             result.addException(new ExceptionHolder(s, e));
           }
         }
         randomizeList(classes);
         System.out.println("test classes " + classes);
         out.println("test classes " + classes);
-        JUnitCore core = new JUnitCore();
-        TestRunListener listener = new TestRunListener(result, out);
+        final JUnitCore core = new JUnitCore();
+        final TestRunListener listener = new TestRunListener(result, out);
         core.addListener(listener);
         core.run(classes.toArray(new Class<?>[classes.size()]));
       }
       else result.addException(new ExceptionHolder(classNamesFile, new IllegalArgumentException("class names file '" + classNamesFile + "' not found")));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       result.addException(new ExceptionHolder("Exception while attempting to run the tests", e));
     }
     return result;
@@ -80,7 +80,7 @@ public class JPPFTestRunner {
    * @throws Exception if any error occurs.
    */
   public void sendResults(final ResultHolder result, final OutputStream out) throws Exception {
-    ObjectOutputStream oos = new ObjectOutputStream(out);
+    final ObjectOutputStream oos = new ObjectOutputStream(out);
     oos.writeObject(result);
     oos.flush();
   }
@@ -93,8 +93,8 @@ public class JPPFTestRunner {
    */
   public ResultHolder sendTestRequest(final URL webAppUrl) throws Exception {
     try {
-      TestConfiguration config = new TestConfiguration();
-      List<String> commonCP = new ArrayList<>();
+      final TestConfiguration config = new TestConfiguration();
+      final List<String> commonCP = new ArrayList<>();
       commonCP.add("../jmxremote/classes");
       commonCP.add("../lib/jppf-common.jar");
       commonCP.add("../lib/jppf-node.jar");
@@ -111,13 +111,13 @@ public class JPPFTestRunner {
       config.nodeClasspath.addAll(commonCP);
       config.nodeJvmOptions.add("-Djava.util.logging.config.file=config/logging-node1.properties");
       BaseSetup.setup(1, 1, false, config);
-      HttpURLConnection conn = (HttpURLConnection) webAppUrl.openConnection();
+      final HttpURLConnection conn = (HttpURLConnection) webAppUrl.openConnection();
       conn.setDoOutput(true);
       conn.setRequestMethod("GET");
       conn.connect();
-      InputStream in = conn.getInputStream();
-      ObjectInputStream ois = new ObjectInputStream(in);
-      Object o = ois.readObject();
+      final InputStream in = conn.getInputStream();
+      final ObjectInputStream ois = new ObjectInputStream(in);
+      final Object o = ois.readObject();
       return (ResultHolder) o;
     } finally {
       BaseSetup.cleanup();
@@ -132,30 +132,30 @@ public class JPPFTestRunner {
     int exitCode = 0;
     try {
       ResultHolder result = null;
-      String type = args[0];
+      final String type = args[0];
       String outputFile = "tests-results.txt";
       if ("-s".equals(type)) {
         System.out.println("Running standalone tests");
         if ((args.length > 1) && (args[1] != null)) outputFile = args[1];
-        PrintStream out = new PrintStream(new FileOutputStream("test-output.txt"));
+        final PrintStream out = new PrintStream(new FileOutputStream("test-output.txt"));
         result = new JPPFTestRunner().runTests("TestClasses.txt", out);
         out.flush();
         out.close();
       } else if ("-u".equals(type)) {
         System.out.println("Running tests at " + args[1]);
-        URL url = new URL(args[1]);
+        final URL url = new URL(args[1]);
         if ((args.length > 2) && (args[2] != null)) outputFile = args[2];
         result = new JPPFTestRunner().sendTestRequest(url);
       }
       else printUsage();
       if (!result.getExceptions().isEmpty() || (result.getFailureCount() > 0)) exitCode = 1;
-      TestResultRenderer renderer = new TextResultRenderer(result);
+      final TestResultRenderer renderer = new TextResultRenderer(result);
       renderer.render();
-      String s = new StringBuilder(renderer.getHeader()).append(renderer.getBody()).toString();
+      final String s = new StringBuilder(renderer.getHeader()).append(renderer.getBody()).toString();
       System.out.println(s);
       FileUtils.writeTextFile(outputFile, s);
       System.out.println("test results are stored in file '" + outputFile + "'");
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
     System.exit(exitCode);
@@ -166,11 +166,11 @@ public class JPPFTestRunner {
    * @param <T> the type of the elements in the list.
    * @param list the input list.
    */
-  private <T> void randomizeList(final List<T> list) {
-    List<T> result = new ArrayList<>(list.size());
-    Random rand = new Random(System.nanoTime());
+  private static <T> void randomizeList(final List<T> list) {
+    final List<T> result = new ArrayList<>(list.size());
+    final Random rand = new Random(System.nanoTime());
     while (!list.isEmpty()) {
-      int n = rand.nextInt(list.size());
+      final int n = rand.nextInt(list.size());
       result.add(list.remove(n));
     }
     list.addAll(result);

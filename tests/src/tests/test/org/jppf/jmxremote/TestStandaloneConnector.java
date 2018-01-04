@@ -85,15 +85,15 @@ public class TestStandaloneConnector extends BaseTest {
   @Test
   public void testConnection() throws Exception {
     print(false, false, "***** starting connector server *****");
-    JMXConnectorServer server = createConnectorServer();
+    final JMXConnectorServer server = createConnectorServer();
     print(false, true, "***** starting connector client *****");
-    JMXConnector client = createConnectorClient();
-    String connectionID = client.getConnectionId();
+    final JMXConnector client = createConnectorClient();
+    final String connectionID = client.getConnectionId();
     assertNotNull(connectionID);
     assertTrue(connectionID.startsWith("jppf://"));
-    MBeanServerConnection mbsc = client.getMBeanServerConnection();
+    final MBeanServerConnection mbsc = client.getMBeanServerConnection();
     print(false, true, "***** testing invoke *****");
-    String invokeResult = (String) mbsc.invoke(connectorTestName, "test1", new Object[] { "testing", 13 }, new String[] { String.class.getName(), int.class.getName() });
+    final String invokeResult = (String) mbsc.invoke(connectorTestName, "test1", new Object[] { "testing", 13 }, new String[] { String.class.getName(), int.class.getName() });
     assertEquals("[testing - 13]", invokeResult);
     print(false, true, "***** testing string attribute *****");
     String s = (String) mbsc.getAttribute(connectorTestName, "StringParam");
@@ -110,19 +110,19 @@ public class TestStandaloneConnector extends BaseTest {
     assertEquals(13, n);
     assertTrue(mbsc.isInstanceOf(connectorTestName, ConnectorTestMBean.class.getName()));
     print(false, false, "***** default domain: %s *****", mbsc.getDefaultDomain());
-    String[] domains = mbsc.getDomains();
+    final String[] domains = mbsc.getDomains();
     print(false, false, "***** domains: %s *****", Arrays.asList(domains));
     assertNotNull(domains);
     assertTrue(StringUtils.isOneOf("org.jppf", false, domains));
 
     print(false, true, "***** testing notifications *****");
-    MyListener listener = new MyListener();
+    final MyListener listener = new MyListener();
     mbsc.addNotificationListener(connectorTestName, listener, null, "l1");
     mbsc.addNotificationListener(connectorTestName, listener, new StartsWithFilter("a"), "l2");
-    String[] messages = { "a1", "b2", "a3" };
+    final String[] messages = { "a1", "b2", "a3" };
     mbsc.invoke(connectorTestName, "triggerNotifications", new Object[] { messages }, new String[] { String[].class.getName() });
     Thread.sleep(250L);
-    CollectionMap<Object, String> infos = listener.infos;
+    final CollectionMap<Object, String> infos = listener.infos;
     assertNotNull(infos);
     assertEquals(5, infos.size());
     assertEquals(2, infos.keySet().size());
@@ -160,14 +160,14 @@ public class TestStandaloneConnector extends BaseTest {
    */
   int countJMXThreads(final long sleepTime) throws Exception {
     if (sleepTime > 0L) Thread.sleep(sleepTime);
-    ThreadMXBean mxbean = ManagementFactory.getThreadMXBean();
-    long[] ids = mxbean.getAllThreadIds();
-    ThreadInfo[] allInfo = mxbean.getThreadInfo(ids);
+    final ThreadMXBean mxbean = ManagementFactory.getThreadMXBean();
+    final long[] ids = mxbean.getAllThreadIds();
+    final ThreadInfo[] allInfo = mxbean.getThreadInfo(ids);
     int count = 0;
-    String prefix = NioHelper.NIO_THREAD_NAME_PREFIX + "-";
-    for (ThreadInfo ti: allInfo) {
+    final String prefix = NioHelper.NIO_THREAD_NAME_PREFIX + "-";
+    for (final ThreadInfo ti: allInfo) {
       if (ti == null) continue;
-      String name = ti.getThreadName();
+      final String name = ti.getThreadName();
       if (name == null) continue;
       if (name.startsWith(prefix)) count++;
     }
@@ -188,7 +188,7 @@ public class TestStandaloneConnector extends BaseTest {
    * @throws Exception if any error occurs.
    */
   static JMXConnectorServer createConnectorServer() throws Exception {
-    JMXConnectorServer server = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbeanServer);
+    final JMXConnectorServer server = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbeanServer);
     assertTrue(server instanceof JPPFJMXConnectorServer);
     server.start();
     return server;
@@ -200,7 +200,7 @@ public class TestStandaloneConnector extends BaseTest {
    * @throws Exception if any error occurs.
    */
   static JMXConnector createConnectorClient() throws Exception {
-    JMXConnector client = JMXConnectorFactory.connect(url);
+    final JMXConnector client = JMXConnectorFactory.connect(url);
     assertTrue(client instanceof JPPFJMXConnector);
     return client;
   }
@@ -212,7 +212,7 @@ public class TestStandaloneConnector extends BaseTest {
 
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
-      String msg = (String) notification.getUserData();
+      final String msg = (String) notification.getUserData();
       synchronized(infos) {
         infos.putValue(handback, msg);
       }
@@ -221,6 +221,10 @@ public class TestStandaloneConnector extends BaseTest {
 
   /** */
   static class StartsWithFilter implements NotificationFilter {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /** */
     private final String start;
 
@@ -233,7 +237,7 @@ public class TestStandaloneConnector extends BaseTest {
 
     @Override
     public boolean isNotificationEnabled(final Notification notification) {
-      String msg = (String) notification.getUserData();
+      final String msg = (String) notification.getUserData();
       return msg.startsWith(start);
     }
   }
