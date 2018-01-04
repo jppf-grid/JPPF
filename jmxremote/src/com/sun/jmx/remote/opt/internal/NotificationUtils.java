@@ -44,7 +44,7 @@ class NotificationUtils {
    * @return .
    */
   static boolean isInstanceOf(final MBeanServer mbs, final ObjectName name, final String className) {
-    PrivilegedExceptionAction<Boolean> act = new PrivilegedExceptionAction<Boolean>() {
+    final PrivilegedExceptionAction<Boolean> act = new PrivilegedExceptionAction<Boolean>() {
       @Override
       public Boolean run() throws InstanceNotFoundException {
         return new Boolean(mbs.isInstanceOf(name, className));
@@ -52,7 +52,7 @@ class NotificationUtils {
     };
     try {
       return AccessController.doPrivileged(act).booleanValue();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.fine("isInstanceOf", "failed: " + e);
       logger.debug("isInstanceOf", e);
       return false;

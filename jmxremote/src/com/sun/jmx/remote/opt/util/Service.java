@@ -141,8 +141,7 @@ public final class Service {
    * @throws IllegalArgumentException .
    */
   private static void fail(final Class<?> service, final String msg, final Throwable cause) throws IllegalArgumentException {
-    IllegalArgumentException sce = new IllegalArgumentException(service.getName() + ": " + msg);
-
+    final IllegalArgumentException sce = new IllegalArgumentException(service.getName() + ": " + msg);
     throw (IllegalArgumentException) EnvHelp.initCause(sce, cause);
   }
 
@@ -185,15 +184,15 @@ public final class Service {
     if (ln == null) {
       return -1;
     }
-    int ci = ln.indexOf('#');
+    final int ci = ln.indexOf('#');
     if (ci >= 0) ln = ln.substring(0, ci);
     ln = ln.trim();
-    int n = ln.length();
+    final int n = ln.length();
     if (n != 0) {
       if ((ln.indexOf(' ') >= 0) || (ln.indexOf('\t') >= 0)) fail(service, u, lc, "Illegal configuration-file syntax");
       if (!Character.isJavaIdentifierStart(ln.charAt(0))) fail(service, u, lc, "Illegal provider-class name: " + ln);
       for (int i = 1; i < n; i++) {
-        char c = ln.charAt(i);
+        final char c = ln.charAt(i);
         if (!Character.isJavaIdentifierPart(c) && (c != '.')) fail(service, u, lc, "Illegal provider-class name: " + ln);
       }
       if (!returned.contains(ln)) {
@@ -216,19 +215,19 @@ public final class Service {
   private static Iterator<String> parse(final Class<?> service, final URL u, final Set<String> returned) throws IllegalArgumentException {
     InputStream in = null;
     BufferedReader r = null;
-    List<String> names = new ArrayList<>();
+    final List<String> names = new ArrayList<>();
     try {
       in = u.openStream();
       r = new BufferedReader(new InputStreamReader(in, "utf-8"));
       int lc = 1;
       while ((lc = parseLine(service, u, r, lc, names, returned)) >= 0);
-    } catch (IOException x) {
+    } catch (final IOException x) {
       fail(service, ": " + x);
     } finally {
       try {
         if (r != null) r.close();
         if (in != null) in.close();
-      } catch (IOException y) {
+      } catch (final IOException y) {
         fail(service, ": " + y);
       }
     }
@@ -280,10 +279,10 @@ public final class Service {
       if (nextName != null) return true;
       if (configs == null) {
         try {
-          String fullName = prefix + service.getName();
+          final String fullName = prefix + service.getName();
           if (loader == null) configs = ClassLoader.getSystemResources(fullName);
           else configs = loader.getResources(fullName);
-        } catch (IOException x) {
+        } catch (final IOException x) {
           fail(service, ": " + x);
         }
       }
@@ -299,13 +298,13 @@ public final class Service {
     @SuppressWarnings("unchecked")
     public E next() throws IllegalArgumentException {
       if (!hasNext()) throw new NoSuchElementException();
-      String cn = nextName;
+      final String cn = nextName;
       nextName = null;
       try {
         return (E) Class.forName(cn, true, loader).newInstance();
-      } catch (@SuppressWarnings("unused") ClassNotFoundException x) {
+      } catch (@SuppressWarnings("unused") final ClassNotFoundException x) {
         fail(service, "Provider " + cn + " not found");
-      } catch (Exception x) {
+      } catch (final Exception x) {
         fail(service, "Provider " + cn + " could not be instantiated: " + x, x);
       }
       return null; /* This cannot happen */

@@ -132,7 +132,7 @@ public class SocketConnectionServer implements MessageConnectionServer {
   @Override
   public void start(final Map<String, ?> env) throws IOException {
     if (logger.traceOn()) logger.trace("start", "Starts the server now.");
-    Map<String, Object> newEnv = new HashMap<>();
+    final Map<String, Object> newEnv = new HashMap<>();
     if (this.env != null) newEnv.putAll(this.env);
     if (env != null) newEnv.putAll(env);
     final int port = addr.getPort();
@@ -145,38 +145,38 @@ public class SocketConnectionServer implements MessageConnectionServer {
     }
     Object o = null;
     try {
-      Class<?> c = Class.forName("java.net.InetSocketAddress");
+      final Class<?> c = Class.forName("java.net.InetSocketAddress");
       if (wildcard) {
-        Constructor<?> ct = c.getDeclaredConstructor(new Class[] { int.class });
+        final Constructor<?> ct = c.getDeclaredConstructor(new Class[] { int.class });
         o = ct.newInstance(new Object[] { new Integer(port) });
       } else {
-        Constructor<?> ct = c.getDeclaredConstructor(new Class[] { String.class, int.class });
+        final Constructor<?> ct = c.getDeclaredConstructor(new Class[] { String.class, int.class });
         o = ct.newInstance(new Object[] { host, new Integer(port) });
       }
-    } catch (@SuppressWarnings("unused") Exception ee) {
+    } catch (@SuppressWarnings("unused") final Exception ee) {
       // OK. we are using JDK1.3 or earlier
     }
     if (o != null && DefaultConfig.getServerReuseAddress(newEnv)) {
       try {
-        Class<?> cc = ServerSocket.class;
-        Method m1 = cc.getMethod("setReuseAddress", new Class[] { boolean.class });
-        Method m2 = cc.getMethod("bind", new Class[] { Class.forName("java.net.SocketAddress"), int.class });
+        final Class<?> cc = ServerSocket.class;
+        final Method m1 = cc.getMethod("setReuseAddress", new Class[] { boolean.class });
+        final Method m2 = cc.getMethod("bind", new Class[] { Class.forName("java.net.SocketAddress"), int.class });
         ss = (ServerSocket) cc.newInstance();
         // setReusAddress
         m1.invoke(ss, new Object[] { Boolean.TRUE });
         // bind
         m2.invoke(ss, new Object[] { o, new Integer(DEFAULT_BACKLOG) });
-      } catch (RuntimeException re) {
+      } catch (final RuntimeException re) {
         throw re;
       } catch (Exception e) {
         if (e instanceof InvocationTargetException) {
-          Throwable t = ((InvocationTargetException) e).getTargetException();
+          final Throwable t = ((InvocationTargetException) e).getTargetException();
           if (t instanceof IOException) throw (IOException) t;
           else if (t instanceof RuntimeException) throw (RuntimeException) t;
           else if (t instanceof Exception) e = (Exception) t;
         }
         // possible: ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException (getCause() == null or == Error)
-        IOException ioe = new IOException(e.toString());
+        final IOException ioe = new IOException(e.toString());
         EnvHelp.initCause(ioe, e);
         throw ioe;
       }
@@ -193,9 +193,9 @@ public class SocketConnectionServer implements MessageConnectionServer {
     if (logger.traceOn()) {
       logger.trace("accept", "Waiting a new connection...");
     }
-    Socket sock = ss.accept();
+    final Socket sock = ss.accept();
     if (!InterceptorHandlerProxy.invokeOnAccept(sock)) throw new IOException("Connection denied by interceptor: " + sock);
-    MessageConnection mc = new SocketConnection(sock);
+    final MessageConnection mc = new SocketConnection(sock);
     return mc;
   }
 

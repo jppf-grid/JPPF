@@ -114,11 +114,9 @@ public abstract class ClientCommunicatorAdmin {
    */
   public ClientCommunicatorAdmin(final long period) {
     this.period = period;
-
     if (period > 0) {
       checker = new Checker();
-
-      Thread t = new Thread(checker);
+      final Thread t = new Thread(checker);
       t.setDaemon(true);
       t.start();
     } else checker = null;
@@ -185,15 +183,13 @@ public abstract class ClientCommunicatorAdmin {
         while (state == RE_CONNECTING) {
           try {
             lock.wait();
-          } catch (InterruptedException ire) {
+          } catch (final InterruptedException ire) {
             // be asked to give up
-            InterruptedIOException iioe = new InterruptedIOException(ire.toString());
+            final InterruptedIOException iioe = new InterruptedIOException(ire.toString());
             EnvHelp.initCause(iioe, ire);
-
             throw iioe;
           }
         }
-
         if (state == TERMINATED) {
           throw new IOException("The client has been closed.");
         } else if (state != CONNECTED) {
@@ -218,31 +214,24 @@ public abstract class ClientCommunicatorAdmin {
 
         lock.notifyAll();
       }
-
       return;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.warning("restart", "Failed to restart: " + e);
       logger.debug("restart", e);
-
       synchronized (lock) {
         if (state == TERMINATED) {
           throw new IOException("The client has been closed.");
         }
-
         state = FAILED;
-
         lock.notifyAll();
       }
-
       try {
         doStop();
-      } catch (@SuppressWarnings("unused") Exception eee) {
+      } catch (@SuppressWarnings("unused") final Exception eee) {
         // OK.
         // We know there is a problem.
       }
-
       terminate();
-
       throw ioe;
     }
   }
@@ -262,7 +251,7 @@ public abstract class ClientCommunicatorAdmin {
       while (state != TERMINATED && !myThread.isInterrupted()) {
         try {
           Thread.sleep(period);
-        } catch (@SuppressWarnings("unused") InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") final InterruptedException ire) {
           // OK. We will check the state at the following steps
         }
         if (state == TERMINATED || myThread.isInterrupted()) break;
@@ -276,7 +265,7 @@ public abstract class ClientCommunicatorAdmin {
           if (e instanceof IOException && !(e instanceof InterruptedIOException)) {
             try {
               restart((IOException) e);
-            } catch (@SuppressWarnings("unused") Exception ee) {
+            } catch (@SuppressWarnings("unused") final Exception ee) {
               logger.warning("Checker-run", "Failed to check connection: " + e);
               logger.warning("Checker-run", "stopping");
               logger.debug("Checker-run", e);

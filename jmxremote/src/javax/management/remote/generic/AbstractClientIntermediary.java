@@ -103,7 +103,7 @@ abstract class AbstractClientIntermediary {
   static {
     try {
       delegateName = new ObjectName("JMImplementation:type=MBeanServerDelegate");
-    } catch (MalformedObjectNameException e) {
+    } catch (final MalformedObjectNameException e) {
       throw new RuntimeException(e.toString());
     }
   }
@@ -142,11 +142,11 @@ abstract class AbstractClientIntermediary {
     final Object[] params = new Object[] { names, filters };
     final int code = MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENERS;
     try {
-      Object o = mBeanServerRequest(code, params, delegationSubject, reconnect);
+      final Object o = mBeanServerRequest(code, params, delegationSubject, reconnect);
       return (o instanceof Integer) ? (Integer) o : ((Integer[]) o)[0]; // compatible with RI1.0: bug 4948444 
-    } catch (InstanceNotFoundException e) {
+    } catch (final InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -164,9 +164,9 @@ abstract class AbstractClientIntermediary {
     logger.trace("addNotificationListener", "called");
     try {
       mBeanServerRequest(MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENER_OBJECTNAME, new Object[] { name, listener, serialization.wrap(filter), serialization.wrap(handback) }, delegationSubject);
-    } catch (InstanceNotFoundException e) {
+    } catch (final InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -186,7 +186,7 @@ abstract class AbstractClientIntermediary {
       mBeanServerRequest(MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER, new Object[] { name, ids }, delegationSubject);
     } catch (InstanceNotFoundException|ListenerNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -209,7 +209,7 @@ abstract class AbstractClientIntermediary {
       mBeanServerRequest(MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, new Object[] { name, ids }, delegationSubject);
     } catch (InstanceNotFoundException|ListenerNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -228,7 +228,7 @@ abstract class AbstractClientIntermediary {
       mBeanServerRequest(MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER_OBJECTNAME, new Object[] { name, listener }, delegationSubject);
     } catch (InstanceNotFoundException|ListenerNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -249,7 +249,7 @@ abstract class AbstractClientIntermediary {
       mBeanServerRequest(MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK, new Object[] { name, listener, serialization.wrap(filter), serialization.wrap(handback) }, delegationSubject);
     } catch (InstanceNotFoundException|ListenerNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -291,20 +291,20 @@ abstract class AbstractClientIntermediary {
    * @throws Exception .
    */
   Object mBeanServerRequest(final int methodId, final Object[] params, final Subject delegationSubject, final boolean reconnect) throws Exception {
-    MBeanServerRequestMessage req = new MBeanServerRequestMessage(methodId, params, delegationSubject);
+    final MBeanServerRequestMessage req = new MBeanServerRequestMessage(methodId, params, delegationSubject);
     MBeanServerResponseMessage resp;
     try {
       resp = (MBeanServerResponseMessage) connection.sendWithReturn(req);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       if (terminated || !reconnect || e instanceof InterruptedIOException) throw e;
       communicatorAdmin.gotIOException(e);
       resp = (MBeanServerResponseMessage) connection.sendWithReturn(req);
     }
-    Object wrappedResult = resp.getWrappedResult(); // may throw exception
-    Object result;
+    final Object wrappedResult = resp.getWrappedResult(); // may throw exception
+    final Object result;
     try {
       result = serialization.unwrap(wrappedResult, myloader);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new IOException(e);
     }
     if (resp.isException()) throw (Exception) result;

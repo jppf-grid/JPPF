@@ -172,7 +172,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
 
   @Override
   public Map<String, ?> getAttributes() {
-    Map<String, ?> map = EnvHelp.filterAttributes(env);
+    final Map<String, ?> map = EnvHelp.filterAttributes(env);
     return Collections.unmodifiableMap(map);
   }
 
@@ -199,14 +199,14 @@ public class GenericConnectorServer extends JMXConnectorServer {
       // Check the internal access file property to see if an MBeanServerForwarder is to be provided
       if (env != null) {
         // Check if access file property is specified
-        String accessFile = (String) env.get("jmx.remote.x.access.file");
+        final String accessFile = (String) env.get("jmx.remote.x.access.file");
         if (accessFile != null) {
           // Access file property specified, create an instance
           // of the MBeanServerFileAccessController class
           MBeanServerForwarder mbsf = null;
           try {
             mbsf = new MBeanServerFileAccessController(accessFile);
-          } catch (IOException e) {
+          } catch (final IOException e) {
             throw (IllegalArgumentException) EnvHelp.initCause(new IllegalArgumentException(e.getMessage()), e);
           }
           // Set the MBeanServerForwarder
@@ -217,9 +217,9 @@ public class GenericConnectorServer extends JMXConnectorServer {
       if (tracing) logger.trace("start", "setting default ClassLoader...");
       try {
         defaultClassLoader = EnvHelp.resolveServerClassLoader(env, mbs);
-      } catch (InstanceNotFoundException infc) {
+      } catch (final InstanceNotFoundException infc) {
         if (tracing) logger.debug("start", "ClassLoader not found: " + infc);
-        IllegalArgumentException x = new IllegalArgumentException("ClassLoader not found: " + infc);
+        final IllegalArgumentException x = new IllegalArgumentException("ClassLoader not found: " + infc);
         throw (IllegalArgumentException) EnvHelp.initCause(x, infc);
       }
       if (tracing) logger.trace("start", "setting ObjectWrapping...");
@@ -249,7 +249,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
       state = STOPPED;
       final boolean debug = logger.debugOn();
       if (tracing) logger.trace("stop", "stoping.");
-      Exception re = null;
+      final Exception re = null;
       if (tracing) logger.trace("stop", "stop MessageConnectionServer...");
       // stop the transport level
       if (sMsgServer != null) sMsgServer.stop();
@@ -258,9 +258,9 @@ public class GenericConnectorServer extends JMXConnectorServer {
       if (tracing) logger.trace("stop", clientList.size() + "client(s) found...");
       while (clientList.size() > 0) {
         try {
-          ServerIntermediary inter = clientList.remove(0);
+          final ServerIntermediary inter = clientList.remove(0);
           inter.terminate();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           // Warning should be enough.
           logger.warning("stop", "Failed to stop client: " + e);
           if (debug) logger.debug("stop", e);
@@ -301,14 +301,14 @@ public class GenericConnectorServer extends JMXConnectorServer {
         if (tracing) logger.trace("Receiver.run", "waiting for connection.");
         try {
           connection = sMsgServer.accept();
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
           if (isActive()) {
             logger.error("Receiver.run", "Unexpected IOException: " + ioe);
             if (debug) logger.debug("Receiver.run", ioe);
             try {
               logger.error("Receiver.run", "stopping server");
               GenericConnectorServer.this.stop();
-            } catch (IOException ie) {
+            } catch (final IOException ie) {
               logger.warning("Receiver.run", "Failed to stop server: " + ie);
               if (debug) logger.debug("Receiver.run", ie);
             }
@@ -320,13 +320,13 @@ public class GenericConnectorServer extends JMXConnectorServer {
         if (!isActive()) return;
         if (tracing) logger.trace("Receiver.run", "received connection request.");
         // use another thread to do security issue to free the receiver thread for receiving new clients
-        ClientCreation cc = new ClientCreation(connection);
+        final ClientCreation cc = new ClientCreation(connection);
         if (connectingTimeout <= 0) {
           if (tracing) logger.trace("Receiver.run", "connectingTimeout <= 0");
           ThreadService.getShared().handoff(cc);
         } else {
           if (tracing) logger.trace("Receiver.run", "connectingTimeout > 0, using ConnectingStopper");
-          ConnectingStopper stopper = new ConnectingStopper(cc);
+          final ConnectingStopper stopper = new ConnectingStopper(cc);
           cc.setStopper(stopper);
           ThreadService.getShared().handoff(cc);
           cancelConnecting.schedule(stopper, connectingTimeout);
@@ -370,14 +370,14 @@ public class GenericConnectorServer extends JMXConnectorServer {
         connection.connect(env);
         if (tracing) logger.trace("ClientCreation.run", "opening connection.");
         subject = connection.getSubject();
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         failed = true;
         logger.warning("ClientCreation.run", "Failed to open connection: " + e, e);
         if (tracing) logger.debug("ClientCreation.run", e);
         try {
           if (tracing) logger.debug("ClientCreation.run", "cleaning up...");
           connection.close();
-        } catch (Exception ee) {
+        } catch (final Exception ee) {
           if (logger.debugOn()) logger.debug("ClientCreation.run", "Failed to cleanup: " + ee);
           if (logger.debugOn()) logger.debug("ClientCreation.run", ee);
         }
@@ -398,7 +398,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
             if (logger.debugOn()) logger.debug("ClientCreation.run", "connector already stopped.");
             if (tracing) logger.trace("ClientCreation.run", "cleaning up...");
             inter.terminate();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (logger.debugOn()) logger.debug("ClientCreation.run", "Failed to cleanup: " + e);
             if (logger.debugOn()) logger.debug("ClientCreation.run", e);
           }
@@ -436,7 +436,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
       if (logger.traceOn()) logger.trace("ConnectingStopper.run", "Connecting timeout for: " + cc.connection);
       try {
         cc.connection.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (logger.debugOn()) logger.debug("ConnectingStoper.run", e);
       }
     }

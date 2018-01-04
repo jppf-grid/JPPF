@@ -205,8 +205,8 @@ public class MBeanServerFileAccessController extends MBeanServerAccessController
    * @exception IOException if any I/O error occurs.
    */
   private static Properties propertiesFromFile(final String fname) throws IOException {
-    FileInputStream fin = new FileInputStream(fname);
-    Properties p = new Properties();
+    final FileInputStream fin = new FileInputStream(fname);
+    final Properties p = new Properties();
     p.load(fin);
     fin.close();
     return p;
@@ -226,8 +226,8 @@ public class MBeanServerFileAccessController extends MBeanServerAccessController
     });
     if (s == null) return; /* security has not been enabled */
     final Set<Principal> principals = s.getPrincipals();
-    for (Principal p : principals) {
-      String grantedAccessLevel;
+    for (final Principal p : principals) {
+      final String grantedAccessLevel;
       synchronized (props) {
         grantedAccessLevel = props.getProperty(p.getName());
       }
@@ -244,8 +244,8 @@ public class MBeanServerFileAccessController extends MBeanServerAccessController
    * @param props .
    */
   private void checkValues(final Properties props) {
-    Collection<Object> c = props.values();
-    for (Iterator<Object> i = c.iterator(); i.hasNext();) {
+    final Collection<Object> c = props.values();
+    for (final Iterator<Object> i = c.iterator(); i.hasNext();) {
       final String accessLevel = (String) i.next();
       if (!accessLevel.equals(READONLY) && !accessLevel.equals(READWRITE)) {
         throw new IllegalArgumentException("Syntax error in access level entry [" + accessLevel + "]");

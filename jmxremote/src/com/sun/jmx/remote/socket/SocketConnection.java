@@ -228,7 +228,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
           stateLock.notifyAll();
           try {
             sock.close();
-          } catch (@SuppressWarnings("unused") IOException ioe) {
+          } catch (@SuppressWarnings("unused") final IOException ioe) {
             // OK. We are closing the socket.
           }
         }
@@ -333,23 +333,23 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
       if (sock instanceof javax.net.ssl.SSLSocket) {
         try {
           Thread.sleep(1000);
-        } catch (@SuppressWarnings("unused") InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") final InterruptedException ire) {
           // OK: we are closing
         }
       }
       try {
         oin.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (logger.debugOn()) logger.debug("close", e);
       }
       try {
         oout.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (logger.debugOn()) logger.debug("close", e);
       }
       try {
         sock.close();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (logger.debugOn()) logger.debug("close", e);
       }
       stateLock.notify();
@@ -359,13 +359,13 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
   @Override
   public String getConnectionId() {
     if (sock == null) return defaultConnectionId;
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append("jmxmp://" + sock.getInetAddress().getHostName() + ":" + sock.getPort() + " ");
     if (subject != null) {
-      Set<Principal> principals = subject.getPrincipals();
+      final Set<Principal> principals = subject.getPrincipals();
       String sep = "";
-      for (Principal p: principals) {
-        String n = p.getName().replace(' ', '_').replace(';', ':');
+      for (final Principal p: principals) {
+        final String n = p.getName().replace(' ', '_').replace(';', ':');
         buf.append(sep).append(n);
         sep = ";";
       }
@@ -390,7 +390,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
       while (state != CONNECTED && state != TERMINATED && waitingTime > 0) {
         try {
           stateLock.wait(waitingTime);
-        } catch (@SuppressWarnings("unused") InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") final InterruptedException ire) {
           break;
         }
         waitingTime = endTime - System.currentTimeMillis();

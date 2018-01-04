@@ -225,20 +225,20 @@ class ServerIntermediary extends AbstractServerIntermediary {
       return getServerNotifFwd().addNotificationListener(name, (NotificationFilter) unwrapWithDefault(wrappedFilter, cl3));
     }
     if (params[0] == null || params[1] == null) throw new IllegalArgumentException("Got null arguments.");
-    ObjectName[] names = (ObjectName[]) params[0];
-    Object[] wrappedFilters = (Object[]) params[1];
+    final ObjectName[] names = (ObjectName[]) params[0];
+    final Object[] wrappedFilters = (Object[]) params[1];
     if (names.length != wrappedFilters.length) throw new IllegalArgumentException("The value lengths of 2 parameters are not same.");
     for (int i = 0; i < names.length; i++) {
       if (names[i] == null) throw new IllegalArgumentException("Null Object name.");
     }
     int i = 0;
-    Integer[] ids = new Integer[names.length];
+    final Integer[] ids = new Integer[names.length];
     final boolean debug = logger.debugOn();
     try {
       for (; i < names.length; i++) {
-        ClassLoader targetCl = getClassLoaderFor(names[i]);
+        final ClassLoader targetCl = getClassLoaderFor(names[i]);
         if (debug) logger.debug("addNotificationListener" + "(ObjectName,NotificationFilter)", "connectionId=" + clientId + " unwrapping filter with target extended ClassLoader.");
-        NotificationFilter filterValue = (NotificationFilter) unwrapWithDefault(wrappedFilters[i], targetCl);
+        final NotificationFilter filterValue = (NotificationFilter) unwrapWithDefault(wrappedFilters[i], targetCl);
         if (debug) logger.debug("addNotificationListener" + "(ObjectName,NotificationFilter)", "connectionId=" + clientId + ", name=" + names[i] + ", filter=" + filterValue);
         ids[i] = getServerNotifFwd().addNotificationListener(names[i], filterValue);
       }
@@ -247,7 +247,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
       for (int j = 0; j < i; j++) { // remove all registered listeners
         try {
           getServerNotifFwd().removeNotificationListener(names[j], ids[j]);
-        } catch (Exception eee) {
+        } catch (final Exception eee) {
           logger.warning("handleRequest-addNotificationListener", "Failed to remove a listener from the MBean " + names[j] + ". " + eee.toString());
         }
       }
@@ -280,9 +280,9 @@ class ServerIntermediary extends AbstractServerIntermediary {
         synchronized (connection) {
           connection.sendOneWay(new CloseMessage(msg));
         }
-      } catch (UnsupportedOperationException uoe) {
+      } catch (final UnsupportedOperationException uoe) {
         if (logger.traceOn()) logger.trace("terminate", "The transport level does not support " + "the method sendOneWay: " + uoe);
-      } catch (IOException ioe) {
+      } catch (final IOException ioe) {
         // We haven't been able to inform the client that we're closing.
         logger.warning("terminate", "Failed to inform the client: " + ioe);
         logger.debug("terminate", ioe);
@@ -291,7 +291,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
     if (serverNotifForwarder != null) serverNotifForwarder.terminate(); // stopping listening
     try { // close the transport protocol
       connection.close();
-    } catch (@SuppressWarnings("unused") Exception ce) { // OK. We are closing, so ignore it.
+    } catch (@SuppressWarnings("unused") final Exception ce) { // OK. We are closing, so ignore it.
     }
     if (serverCommunicatorAdmin != null) serverCommunicatorAdmin.terminate();
     myServer.clientClosing(this, clientId, "The method terminate is called.", null); // inform the server of termination
@@ -325,7 +325,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
           myServer.failedConnectionNotif(clientId, "Got unknown message: " + msg, msg);
           ServerIntermediary.this.terminate(false, "Got unknown message: " + msg);
         }
-      } catch (IOException cce) { // Do nothing here, the connection should be closed soon.
+      } catch (final IOException cce) { // Do nothing here, the connection should be closed soon.
         logger.trace("RequestHandler.execute", cce);
       } finally {
         serverCommunicatorAdmin.rspOutgoing();
@@ -350,11 +350,11 @@ class ServerIntermediary extends AbstractServerIntermediary {
      */
     private Message handleNotifReqMessage(final NotificationRequestMessage nr) throws IOException {
       if (logger.traceOn()) logger.trace("RequestHandler.handleNotifReqMessage", "Receive a NotificationRequestMessage.");
-      NotificationResult result = getServerNotifFwd().fetchNotifs(nr.getClientSequenceNumber(), nr.getTimeout(), nr.getMaxNotifications());
+      final NotificationResult result = getServerNotifFwd().fetchNotifs(nr.getClientSequenceNumber(), nr.getTimeout(), nr.getMaxNotifications());
       Object wrapped;
       try {
         wrapped = serialization.wrap(result);
-      } catch (@SuppressWarnings("unused") NotSerializableException e) {
+      } catch (@SuppressWarnings("unused") final NotSerializableException e) {
         // This presumably means that at least one of the notifications is unserializable, for example because it contains an unserializable object in its userData.
         // This should not happen often (Notification itself is serializable).
         wrapped = serialization.wrap(purgeUnserializable(result));
@@ -379,13 +379,13 @@ class ServerIntermediary extends AbstractServerIntermediary {
           if (subject == null) throw new SecurityException("Subject delegation cannot be enabled " + "unless an authenticated subject " + "is put in place");
           reqACC = subjectDelegator.delegatedContext(acc, delegationSubject);
         }
-        Object result = AccessController.doPrivileged(new PrivilegedRequestJob(req), reqACC);
+        final Object result = AccessController.doPrivileged(new PrivilegedRequestJob(req), reqACC);
         return new MBeanServerResponseMessage(req.getMessageId(), result, false);
       } catch (Exception e) {
         e = extractException(e);
         if (logger.traceOn()) logger.trace("RequestHandler.handleMBSReqMessage", "Got an exception: " + e, e);
         return new MBeanServerResponseMessage(req.getMessageId(), wrapException(e), true);
-      } catch (Error r) {
+      } catch (final Error r) {
         if (logger.traceOn()) logger.trace("RequestHandler.handleMBSReqMessage", "Got an error: " + r, r);
         final JMXServerErrorException see = new JMXServerErrorException(r.toString(), r);
         return new MBeanServerResponseMessage(req.getMessageId(), wrapException(see), true);
@@ -403,7 +403,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
     private Object wrapException(final Exception e) throws IOException {
       try {
         return serialization.wrap(e);
-      } catch (NotSerializableException nse) {
+      } catch (final NotSerializableException nse) {
         return serialization.wrap(nse);
       }
     }
@@ -452,7 +452,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
    * @return .
    */
   private NotificationResult purgeUnserializable(final NotificationResult nr) {
-    List<TargetedNotification> tnList = new ArrayList<>();
+    final List<TargetedNotification> tnList = new ArrayList<>();
     TargetedNotification[] tns = nr.getTargetedNotifications();
     // For each TargetedNotification (TN), try putting it on its own inside a NotificationResult (NR) and see if we can serialize. If so, assume the TN can also be serialized when combined with other
     // TNs. If not, replace it with a NOTIFS_LOST. We serialize a whole NR rather than just a single TN, because an arbitrary serializer might not know how to serialize a single TN (for example, it's
@@ -463,21 +463,21 @@ class ServerIntermediary extends AbstractServerIntermediary {
       try {
         serialization.wrap(trialnr);
         tnList.add(tn);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         logger.warning("purgeUnserializable", "cannot serialize notif: " + tn);
         logger.fine("purgeUnserializable", e);
         final Integer listenerID = tn.getListenerID();
         final Notification badNotif = tn.getNotification();
         final String notifType = JMXConnectionNotification.NOTIFS_LOST;
         final String notifMessage = "Not serializable: " + badNotif;
-        Notification goodNotif = new JMXConnectionNotification(notifType, badNotif.getSource(), clientId, badNotif.getSequenceNumber(), notifMessage, ONE_LONG);
+        final Notification goodNotif = new JMXConnectionNotification(notifType, badNotif.getSource(), clientId, badNotif.getSequenceNumber(), notifMessage, ONE_LONG);
         // Our implementation has the convention that a NOTIFS_LOST has a userData that says how many notifs were lost.
         tn = new TargetedNotification(goodNotif, listenerID);
         trialnr = new NotificationResult(0, 0, new TargetedNotification[] { tn });
         try {
           serialization.wrap(trialnr);
           tnList.add(tn);
-        } catch (@SuppressWarnings("unused") IOException e1) { // OK. too bad, at least we have logged it
+        } catch (@SuppressWarnings("unused") final IOException e1) { // OK. too bad, at least we have logged it
         }
       }
     }
@@ -546,7 +546,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
           return mbeanServer.getClassLoader(name);
         }
       });
-    } catch (PrivilegedActionException pe) {
+    } catch (final PrivilegedActionException pe) {
       throw (InstanceNotFoundException) extractException(pe);
     }
   }
@@ -563,7 +563,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
           return mbeanServer.getClassLoaderFor(name);
         }
       });
-    } catch (PrivilegedActionException pe) {
+    } catch (final PrivilegedActionException pe) {
       throw (InstanceNotFoundException) extractException(pe);
     }
   }

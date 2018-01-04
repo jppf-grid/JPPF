@@ -93,7 +93,7 @@ public class ClassLoaderWithRepository extends ClassLoader {
   protected Class<?> findClass(final String name) throws ClassNotFoundException {
     try {
       return repository.loadClass(name);
-    } catch (ClassNotFoundException cne) {
+    } catch (final ClassNotFoundException cne) {
       if (cl2 != null) return cl2.loadClass(name);
       else throw cne;
     }

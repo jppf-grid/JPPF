@@ -60,7 +60,7 @@ class NotifFetcher implements Runnable {
       });
     }
     while (!shouldStop()) {
-      NotificationResult nr = fetchNotifs();
+      final NotificationResult nr = fetchNotifs();
       if (nr == null) break; // nr == null means got exception
       final TargetedNotification[] notifs = nr.getTargetedNotifications();
       final int len = notifs.length;
@@ -83,8 +83,8 @@ class NotifFetcher implements Runnable {
           final Notification notif = tn.getNotification();
           final String unreg = MBeanServerNotification.UNREGISTRATION_NOTIFICATION;
           if (notif instanceof MBeanServerNotification && notif.getType().equals(unreg)) {
-            MBeanServerNotification mbsn = (MBeanServerNotification) notif;
-            ObjectName name = mbsn.getMBeanName();
+            final MBeanServerNotification mbsn = (MBeanServerNotification) notif;
+            final ObjectName name = mbsn.getMBeanName();
             forwarder.removeNotificationListener(name);
           }
         }
@@ -117,11 +117,11 @@ class NotifFetcher implements Runnable {
       logger.trace("NotifFetcher.dispatch", "Listener ID not in map");
       return;
     }
-    NotificationListener l = li.getListener();
-    Object h = li.getHandback();
+    final NotificationListener l = li.getListener();
+    final Object h = li.getHandback();
     try {
       l.handleNotification(notif, h);
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       final String msg = "Failed to forward a notification " + "to a listener";
       logger.trace("NotifFetcher-run", msg, e);
     }
@@ -132,13 +132,13 @@ class NotifFetcher implements Runnable {
    */
   private NotificationResult fetchNotifs() {
     try {
-      NotificationResult nr = forwarder.fetchNotifs(forwarder.clientSequenceNumber, forwarder.maxNotifications, forwarder.timeout);
+      final NotificationResult nr = forwarder.fetchNotifs(forwarder.clientSequenceNumber, forwarder.maxNotifications, forwarder.timeout);
       if (logger.traceOn()) logger.trace("NotifFetcher-run", "Got notifications from the server: " + nr);
       return nr;
     } catch (ClassNotFoundException|NotSerializableException e) {
       logger.trace("NotifFetcher.fetchNotifs", e);
       return fetchOneNotif();
-    } catch (IOException ioe) {
+    } catch (final IOException ioe) {
       if (!shouldStop()) logger.debug("NotifFetcher-run", ioe);
       return null; // no more fetching
     }
@@ -157,15 +157,15 @@ class NotifFetcher implements Runnable {
     int notFoundCount = 0;
     NotificationResult result = null;
     while (result == null && !shouldStop()) {
-      NotificationResult nr;
+      final NotificationResult nr;
       try {
         // 0 notifs to update startSequenceNumber
         nr = forwarder.fetchNotifs(startSequenceNumber, 0, 0L);
-      } catch (ClassNotFoundException e) {
+      } catch (final ClassNotFoundException e) {
         logger.warning("NotifFetcher.fetchOneNotif", "Impossible exception: " + e);
         logger.debug("NotifFetcher.fetchOneNotif", e);
         return null;
-      } catch (IOException e) {
+      } catch (final IOException e) {
         if (!shouldStop()) logger.trace("NotifFetcher.fetchOneNotif", e);
         return null;
       }
@@ -174,7 +174,7 @@ class NotifFetcher implements Runnable {
       try {
         // 1 notif to skip possible missing class
         result = forwarder.fetchNotifs(startSequenceNumber, 1, 0L);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (e instanceof ClassNotFoundException || e instanceof NotSerializableException) {
           logger.warning("NotifFetcher.fetchOneNotif", "Failed to deserialize a notification: " + e.toString());
           if (logger.traceOn()) logger.trace("NotifFetcher.fetchOneNotif", "Failed to deserialize a notification.", e);

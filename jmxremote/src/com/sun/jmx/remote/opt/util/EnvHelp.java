@@ -160,8 +160,8 @@ public class EnvHelp {
    */
   public static ClassLoader resolveServerClassLoader(final Map<String, ?> env, final MBeanServer mbs) throws InstanceNotFoundException {
     if (env == null) return Thread.currentThread().getContextClassLoader();
-    Object loader = env.get(DEFAULT_CLASS_LOADER);
-    Object name = env.get(DEFAULT_CLASS_LOADER_NAME);
+    final Object loader = env.get(DEFAULT_CLASS_LOADER);
+    final Object name = env.get(DEFAULT_CLASS_LOADER_NAME);
     if (loader != null && name != null) {
       final String msg = "Only one of " + DEFAULT_CLASS_LOADER + " or " + DEFAULT_CLASS_LOADER_NAME + " should be specified.";
       throw new IllegalArgumentException(msg);
@@ -174,7 +174,7 @@ public class EnvHelp {
         throw new IllegalArgumentException(msg);
       }
     }
-    ObjectName on;
+    final ObjectName on;
     if (name instanceof ObjectName) on = (ObjectName) name;
     else {
       final String msg = "ClassLoader name is not an instance of " + ObjectName.class.getName() + " : " + name.getClass().getName();
@@ -200,7 +200,7 @@ public class EnvHelp {
    */
   public static ClassLoader resolveClientClassLoader(final Map<String, ?> env) {
     if (env == null) return Thread.currentThread().getContextClassLoader();
-    Object loader = env.get(DEFAULT_CLASS_LOADER);
+    final Object loader = env.get(DEFAULT_CLASS_LOADER);
     if (loader == null) return Thread.currentThread().getContextClassLoader();
     if (loader instanceof ClassLoader) return (ClassLoader) loader;
     else {
@@ -220,9 +220,9 @@ public class EnvHelp {
     // We jump through hoops here so that we can work on platforms prior to J2SE 1.4 where the Throwable.initCause method was introduced.
     // If we change the public interface of JMRuntimeException in a future version we can add getCause() so we don't need to do this.
     try {
-      java.lang.reflect.Method initCause = t.getClass().getMethod("initCause", new Class[] { Throwable.class });
+      final java.lang.reflect.Method initCause = t.getClass().getMethod("initCause", new Class[] { Throwable.class });
       initCause.invoke(t, new Object[] { cause });
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       // OK. too bad, no debugging info
     }
     return t;
@@ -236,9 +236,9 @@ public class EnvHelp {
   public static Throwable getCause(final Throwable t) {
     Throwable ret = t;
     try {
-      java.lang.reflect.Method getCause = t.getClass().getMethod("getCause", (Class[]) null);
+      final java.lang.reflect.Method getCause = t.getClass().getMethod("getCause", (Class[]) null);
       ret = (Throwable) getCause.invoke(t, (Object[]) null);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       // OK. it must be older than 1.4.
     }
     return (ret != null) ? ret : t;
@@ -268,7 +268,7 @@ public class EnvHelp {
           defaultQueueSize = Integer.parseInt(s);
         }
       }
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       logger.warning("getNotifBufferSize", "Can't use System property " + BUFFER_SIZE_PROPERTY + ": " + e);
       logger.debug("getNotifBufferSize", e);
     }
@@ -279,7 +279,7 @@ public class EnvHelp {
       } else { // try the old one
         queueSize = (int) EnvHelp.getIntegerAttribute(env, oldP, defaultQueueSize, 0, Integer.MAX_VALUE);
       }
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       logger.warning("getNotifBufferSize", "Can't determine queuesize (using default): " + e);
       logger.debug("getNotifBufferSize", e);
     }
@@ -349,7 +349,7 @@ public class EnvHelp {
    */
   public static Map<String, Object> filterAttributes(final Map<String, ?> attributes) {
     if (logger.traceOn()) logger.trace("filterAttributes", "starts");
-    SortedMap<String, Object> map = new TreeMap<>(attributes);
+    final SortedMap<String, Object> map = new TreeMap<>(attributes);
     purgeUnserializable(map.values());
     hideAttributes(map);
     return map;
@@ -363,8 +363,8 @@ public class EnvHelp {
     logger.trace("purgeUnserializable", "starts");
     ObjectOutputStream oos = null;
     int i = 0;
-    for (Iterator<Object> it = objects.iterator(); it.hasNext(); i++) {
-      Object v = it.next();
+    for (final Iterator<Object> it = objects.iterator(); it.hasNext(); i++) {
+      final Object v = it.next();
       if (v == null || v instanceof String) {
         if (logger.traceOn()) logger.trace("purgeUnserializable", "Value trivially serializable: " + v);
         continue;
@@ -373,7 +373,7 @@ public class EnvHelp {
         if (oos == null) oos = new ObjectOutputStream(new SinkOutputStream());
         oos.writeObject(v);
         if (logger.traceOn()) logger.trace("purgeUnserializable", "Value serializable: " + v);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         if (logger.traceOn()) logger.trace("purgeUnserializable", "Value not serializable: " + v + ": " + e);
         it.remove();
         oos = null; // ObjectOutputStream invalid after exception
@@ -406,10 +406,10 @@ public class EnvHelp {
     }
     // Construct a string that is greater than any key in the map.
     // Setting a string-to-match or a prefix-to-match to this string guarantees that we will never call next() on the corresponding iterator.
-    String sentinelKey = map.lastKey() + "X";
-    Iterator<String> keyIterator = map.keySet().iterator();
-    Iterator<String> stringIterator = hiddenStrings.iterator();
-    Iterator<String> prefixIterator = hiddenPrefixes.iterator();
+    final String sentinelKey = map.lastKey() + "X";
+    final Iterator<String> keyIterator = map.keySet().iterator();
+    final Iterator<String> stringIterator = hiddenStrings.iterator();
+    final Iterator<String> prefixIterator = hiddenPrefixes.iterator();
     String nextString;
     if (stringIterator.hasNext()) nextString = stringIterator.next();
     else nextString = sentinelKey;
@@ -418,7 +418,7 @@ public class EnvHelp {
     else nextPrefix = sentinelKey;
     // Read each key in sorted order and, if it matches a string or prefix, remove it.
     keys: while (keyIterator.hasNext()) {
-      String key = keyIterator.next();
+      final String key = keyIterator.next();
       //Continue through string-match values until we find one that is either greater than the current key, or equal to it. In the latter case, remove the key.
       int cmp = +1;
       while ((cmp = nextString.compareTo(key)) < 0) {
@@ -450,7 +450,7 @@ public class EnvHelp {
   private static void parseHiddenAttributes(final String hide, final SortedSet<String> hiddenStrings, final SortedSet<String> hiddenPrefixes) {
     final StringTokenizer tok = new StringTokenizer(hide);
     while (tok.hasMoreTokens()) {
-      String s = tok.nextToken();
+      final String s = tok.nextToken();
       if (s.endsWith("*")) hiddenPrefixes.add(s.substring(0, s.length() - 1));
       else hiddenStrings.add(s);
     }
@@ -480,9 +480,9 @@ public class EnvHelp {
    * @return a hash table with no null values.
    */
   public static Hashtable<String, Object> mapToHashtable(final Map<String, ?> map) {
-    Map<String, Object> m = new HashMap<>(map);
+    final Map<String, Object> m = new HashMap<>(map);
     if (m.containsKey(null)) m.remove(null);
-    for (Iterator<Object> i = m.values().iterator(); i.hasNext();)
+    for (final Iterator<Object> i = m.values().iterator(); i.hasNext();)
       if (i.next() == null) i.remove();
     return new Hashtable<>(m);
   }

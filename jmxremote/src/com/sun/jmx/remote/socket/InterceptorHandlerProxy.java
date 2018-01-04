@@ -53,9 +53,9 @@ class InterceptorHandlerProxy {
       handlerClass = Class.forName("org.jppf.comm.interceptor.InterceptorHandler");
       invokeOnAcceptMethod = handlerClass.getMethod("invokeOnAccept", Socket.class);
       invokeOnConnectMethod = handlerClass.getMethod("invokeOnConnect", Socket.class);
-      Method hasInterceptorMethod = handlerClass.getMethod("hasInterceptor");
+      final Method hasInterceptorMethod = handlerClass.getMethod("hasInterceptor");
       hasInterceptor = (Boolean) hasInterceptorMethod.invoke(null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.debug("static init", e);
     }
   }
@@ -69,7 +69,7 @@ class InterceptorHandlerProxy {
     if (!hasInterceptor) return true;
     try {
       return (Boolean) invokeOnConnectMethod.invoke(null, connectedSocket);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.severe("invokeOnConnect", e);
     }
     return false;
@@ -84,7 +84,7 @@ class InterceptorHandlerProxy {
     if (!hasInterceptor) return true;
     try {
       return (Boolean) invokeOnAcceptMethod.invoke(null, acceptedSocket);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.severe("invokeOnAccept", e);
     }
     return false;

@@ -202,10 +202,10 @@ public abstract class ClientNotifForwarder {
   public synchronized Integer[] removeNotificationListener(final ObjectName name, final NotificationListener listener) throws ListenerNotFoundException, IOException {
     beforeRemove();
     if (logger.traceOn()) logger.trace("removeNotificationListener", "Remove the listener " + listener + " from " + name);
-    ArrayList<Integer> ids = new ArrayList<>();
-    List<ListenerInfo> values = new ArrayList<>(infoList.values());
+    final ArrayList<Integer> ids = new ArrayList<>();
+    final List<ListenerInfo> values = new ArrayList<>(infoList.values());
     for (int i = values.size() - 1; i >= 0; i--) {
-      ClientListenerInfo li = (ClientListenerInfo) values.get(i);
+      final ClientListenerInfo li = (ClientListenerInfo) values.get(i);
       if (li.sameAs(name, listener)) {
         ids.add(li.getListenerID());
         infoList.remove(li.getListenerID());
@@ -228,9 +228,9 @@ public abstract class ClientNotifForwarder {
     if (logger.traceOn()) logger.trace("removeNotificationListener", "Remove the listener " + listener + " from " + name);
     beforeRemove();
     Integer id = null;
-    List<ListenerInfo> values = new ArrayList<>(infoList.values());
+    final List<ListenerInfo> values = new ArrayList<>(infoList.values());
     for (int i = values.size() - 1; i >= 0; i--) {
-      ClientListenerInfo li = (ClientListenerInfo) values.get(i);
+      final ClientListenerInfo li = (ClientListenerInfo) values.get(i);
       if (li.sameAs(name, listener, filter, handback)) {
         id = li.getListenerID();
         infoList.remove(id);
@@ -247,10 +247,10 @@ public abstract class ClientNotifForwarder {
    */
   public synchronized Integer[] removeNotificationListener(final ObjectName name) {
     if (logger.traceOn()) logger.trace("removeNotificationListener", "Remove all listeners registered at " + name);
-    List<Integer> ids = new ArrayList<>();
-    List<ListenerInfo> values = new ArrayList<>(infoList.values());
+    final List<Integer> ids = new ArrayList<>();
+    final List<ListenerInfo> values = new ArrayList<>(infoList.values());
     for (int i = values.size() - 1; i >= 0; i--) {
-      ClientListenerInfo li = (ClientListenerInfo) values.get(i);
+      final ClientListenerInfo li = (ClientListenerInfo) values.get(i);
       if (li.sameAs(name)) {
         ids.add(li.getListenerID());
         infoList.remove(li.getListenerID());
@@ -285,8 +285,8 @@ public abstract class ClientNotifForwarder {
     while (state == STARTING) {
       try {
         wait();
-      } catch (InterruptedException ire) {
-        IOException ioe = new IOException(ire.toString());
+      } catch (final InterruptedException ire) {
+        final IOException ioe = new IOException(ire.toString());
         EnvHelp.initCause(ioe, ire);
         throw ioe;
       }
@@ -305,7 +305,7 @@ public abstract class ClientNotifForwarder {
     while (state == STOPPING) {
       try {
         wait();
-      } catch (InterruptedException ire) {
+      } catch (final InterruptedException ire) {
         throw new IOException(ire);
       }
     }
@@ -320,7 +320,7 @@ public abstract class ClientNotifForwarder {
     if (currentFetchThread == Thread.currentThread()) {
       try { // no need to init, simply get the id
         mbeanRemovedNotifID = addListenerForMBeanRemovedNotif();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         final String msg = "Failed to register a listener to the mbean " + "server: the client will not do clean when an MBean " + "is unregistered";
         if (logger.traceOn()) logger.trace("init", msg, e);
       }
@@ -362,7 +362,7 @@ public abstract class ClientNotifForwarder {
         while (state == STOPPING) { // make sure only one fetching thread.
           try {
             wait();
-          } catch (InterruptedException ire) {
+          } catch (final InterruptedException ire) {
             throw new IOException(ire);
           }
         }
@@ -373,22 +373,22 @@ public abstract class ClientNotifForwarder {
         if (logger.traceOn()) logger.trace("init", "Initializing...");
         if (!reconnected) { // init the clientSequenceNumber if not reconnected
           try {
-            NotificationResult nr = fetchNotifs(-1, 0, 0);
+            final NotificationResult nr = fetchNotifs(-1, 0, 0);
             clientSequenceNumber = nr.getNextSequenceNumber();
-          } catch (ClassNotFoundException e) {
+          } catch (final ClassNotFoundException e) {
             logger.warning("init", "Impossible exception: " + e);
             logger.debug("init", e);
           }
         }
         try { // for cleaning
           mbeanRemovedNotifID = addListenerForMBeanRemovedNotif();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           final String msg = "Failed to register a listener to the mbean " + "server: the client will not do clean when an MBean " + "is unregistered";
           if (logger.traceOn()) logger.trace("init", msg, e);
         }
         setState(STARTING); // start fetching
         notifFetcher = new NotifFetcher(this);
-        Thread t = new Thread(notifFetcher);
+        final Thread t = new Thread(notifFetcher);
         t.setDaemon(true);
         t.start();
         return;
@@ -405,7 +405,7 @@ public abstract class ClientNotifForwarder {
       if (state == TERMINATED) throw new IOException("Terminated.");
       try {
         wait();
-      } catch (InterruptedException ire) {
+      } catch (final InterruptedException ire) {
         throw new IOException(ire);
       }
     }

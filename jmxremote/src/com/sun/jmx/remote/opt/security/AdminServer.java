@@ -115,28 +115,28 @@ public class AdminServer implements ServerAdmin {
     boolean sendError = true;
     try {
       Subject subject = null; // Initialize the Subject that will be passed to all the negotiated profiles
-      String serverProfiles = (String) env.get("jmx.remote.profiles");
-      String serverVersion = "1.0";
+      final String serverProfiles = (String) env.get("jmx.remote.profiles");
+      final String serverVersion = "1.0";
       if (logger.traceOn()) logger.trace("connectionOpen", ">>>>> Handshake Begin <<<<< - Server Supported Profiles [ " + serverProfiles + " ] - Server JMXMP Version [ " + serverVersion + " ]");
-      HandshakeBeginMessage begin = new HandshakeBeginMessage(serverProfiles, serverVersion); // Begin Handshake
+      final HandshakeBeginMessage begin = new HandshakeBeginMessage(serverProfiles, serverVersion); // Begin Handshake
       mc.writeMessage(begin);
       while (true) {
-        Message msg = mc.readMessage();
+        final Message msg = mc.readMessage();
         if (msg instanceof HandshakeErrorMessage) {
           sendError = false;
           AdminClient.throwExceptionOnError((HandshakeErrorMessage) msg); // Throw exception and let GenericConnectorServer close the connection
         } else if (msg instanceof HandshakeEndMessage) {
-          HandshakeEndMessage cend = (HandshakeEndMessage) msg;
-          Object ccontext = cend.getContext();
+          final HandshakeEndMessage cend = (HandshakeEndMessage) msg;
+          final Object ccontext = cend.getContext();
           if (logger.traceOn()) logger.trace("connectionOpen", ">>>>> Handshake End <<<<< - Client Context Object [ " + ccontext + " ]");
-          Object scontext = env.get("jmx.remote.context");
+          final Object scontext = env.get("jmx.remote.context");
           // If MessageConnection is an instance of SocketConnectionIf then set the authenticated subject.
           if (mc instanceof SocketConnectionIf) ((SocketConnectionIf) mc).setSubject(subject);
           String connectionId = mc.getConnectionId();
           // If the environment includes an authenticator, check that it accepts the connection id, and replace the Subject by whatever it returns.
-          JMXAuthenticator authenticator = (JMXAuthenticator) env.get("jmx.remote.authenticator");
+          final JMXAuthenticator authenticator = (JMXAuthenticator) env.get("jmx.remote.authenticator");
           if (authenticator != null) {
-            Object[] credentials = { connectionId, subject };
+            final Object[] credentials = { connectionId, subject };
             subject = authenticator.authenticate(credentials);
             if (mc instanceof SocketConnectionIf) ((SocketConnectionIf) mc).setSubject(subject);
             connectionId = mc.getConnectionId();
@@ -144,23 +144,23 @@ public class AdminServer implements ServerAdmin {
           if (logger.traceOn()) logger.trace("connectionOpen", "Server Context Object [ " + scontext + " ] - Server Connection Id [ " + connectionId + " ]");
           // Check that the negotiated profiles are acceptable for the server's defined security policy. This method is called just before the initial handshake is completed
           // with a HandshakeEndMessage sent from the server to theclient. If the method throws an exception, then aHandshakeErrorMessage will be sent instead.
-          List<String> profileNames = getProfilesByName(mc);
-          CheckProfiles np = (CheckProfiles) env.get("com.sun.jmx.remote.profile.checker");
+          final List<String> profileNames = getProfilesByName(mc);
+          final CheckProfiles np = (CheckProfiles) env.get("com.sun.jmx.remote.profile.checker");
           if (np != null) np.checkProfiles(env, profileNames, ccontext, connectionId);
           else checkProfilesForEquality(serverProfiles, profileNames);
-          HandshakeEndMessage send = new HandshakeEndMessage(scontext, connectionId);
+          final HandshakeEndMessage send = new HandshakeEndMessage(scontext, connectionId);
           mc.writeMessage(send);
           break;
         } else if (msg instanceof VersionMessage) {
-          VersionMessage cjmxmp = (VersionMessage) msg;
-          String clientVersion = cjmxmp.getVersion();
+          final VersionMessage cjmxmp = (VersionMessage) msg;
+          final String clientVersion = cjmxmp.getVersion();
           if (clientVersion.equals(serverVersion)) {
-            VersionMessage sjmxmp = new VersionMessage(serverVersion);
+            final VersionMessage sjmxmp = new VersionMessage(serverVersion);
             mc.writeMessage(sjmxmp);
           } else throw new IOException("Protocol version " + "mismatch: Client [" + clientVersion + "] vs. Server [" + serverVersion + "]");
         } else if (msg instanceof ProfileMessage) {
           ProfileMessage pm = (ProfileMessage) msg;
-          String pn = pm.getProfileName();
+          final String pn = pm.getProfileName();
           ProfileServer p = getProfile(mc, pn);
           if (p == null) {
             p = ProfileServerFactory.createProfile(pn, env);
@@ -175,11 +175,11 @@ public class AdminServer implements ServerAdmin {
         } else throw new IOException("Unexpected message: " + msg.getClass().getName());
       }
       putSubject(mc, subject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (sendError) {
         try {
           mc.writeMessage(new HandshakeErrorMessage(e.toString()));
-        } catch (Exception hsem) {
+        } catch (final Exception hsem) {
           if (logger.debugOn()) logger.debug("connectionOpen", "Could not send HandshakeErrorMessage to the client", hsem);
         }
       }
@@ -232,7 +232,7 @@ public class AdminServer implements ServerAdmin {
    */
   private ProfileServer getProfile(final MessageConnection mc, final String pn) {
     synchronized (profilesTable) {
-      List<ProfileServer> list = profilesTable.get(mc);
+      final List<ProfileServer> list = profilesTable.get(mc);
       if (list == null) return null;
       for (ProfileServer p: list) {
         if (p.getName().equals(pn)) return p;
@@ -276,9 +276,9 @@ public class AdminServer implements ServerAdmin {
    * @return .
    */
   private List<String> getProfilesByName(final MessageConnection mc) {
-    List<ProfileServer> profiles = getProfiles(mc);
+    final List<ProfileServer> profiles = getProfiles(mc);
     if (profiles == null) return null;
-    List<String> profileNames = new ArrayList<>(profiles.size());
+    final List<String> profileNames = new ArrayList<>(profiles.size());
     for (ProfileServer p: profiles) profileNames.add(p.getName());
     return profileNames;
   }
@@ -289,12 +289,12 @@ public class AdminServer implements ServerAdmin {
    */
   private synchronized void removeProfiles(final MessageConnection mc) {
     synchronized (profilesTable) {
-      List<ProfileServer> list = profilesTable.get(mc);
+      final List<ProfileServer> list = profilesTable.get(mc);
       if (list != null) {
-        for (ProfileServer p: list) {
+        for (final ProfileServer p: list) {
           try {
             p.terminate();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (logger.debugOn()) {
               logger.debug("removeProfiles", "Got an exception to terminate a ProfileServer: " + p.getName(), e);
             }
@@ -315,16 +315,16 @@ public class AdminServer implements ServerAdmin {
   private void checkProfilesForEquality(final String serverProfiles, final List<String> clientProfilesList) throws IOException {
     // Check for null values. Both the server and the client
     // environment maps did not specified any profile.
-    boolean serverFlag = (serverProfiles == null || serverProfiles.equals(""));
-    boolean clientFlag = (clientProfilesList == null || clientProfilesList.isEmpty());
+    final boolean serverFlag = (serverProfiles == null || serverProfiles.equals(""));
+    final boolean clientFlag = (clientProfilesList == null || clientProfilesList.isEmpty());
     if (serverFlag && clientFlag) return;
     if (serverFlag) throw new IOException("The server does not support any " + "profile but the client requires one");
     if (clientFlag) throw new IOException("The client does not require any " + "profile but the server mandates one");
     // Build ArrayList<String> from server profiles string.
-    StringTokenizer sst = new StringTokenizer(serverProfiles, " ");
-    List<String> serverProfilesList = new ArrayList<>(sst.countTokens());
+    final StringTokenizer sst = new StringTokenizer(serverProfiles, " ");
+    final List<String> serverProfilesList = new ArrayList<>(sst.countTokens());
     while (sst.hasMoreTokens()) {
-      String serverToken = sst.nextToken();
+      final String serverToken = sst.nextToken();
       serverProfilesList.add(serverToken);
     }
     // Check for size equality.

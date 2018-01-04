@@ -143,14 +143,14 @@ public class ServerNotifForwarder {
     // Explicitly check MBeanPermission for addNotificationListener
     checkMBeanPermission(name, "addNotificationListener");
     try {
-      Boolean instanceOf = AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+      final Boolean instanceOf = AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
         @Override
         public Boolean run() throws InstanceNotFoundException {
           return new Boolean(mbeanServer.isInstanceOf(name, broadcasterClass));
         }
       });
       if (!instanceOf.booleanValue()) throw new IllegalArgumentException("The specified MBean [" + name + "] is not a " + "NotificationBroadcaster " + "object.");
-    } catch (PrivilegedActionException e) {
+    } catch (final PrivilegedActionException e) {
       throw (InstanceNotFoundException) extractException(e);
     }
     final Integer id = getListenerID();
@@ -175,7 +175,7 @@ public class ServerNotifForwarder {
     for (int i = 0; i < listenerIDs.length; i++) {
       try {
         removeNotificationListener(name, listenerIDs[i]);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         // Give back the first exception
         if (re != null) re = e;
       }
@@ -215,7 +215,7 @@ public class ServerNotifForwarder {
     final long t = Math.min(connectionTimeout, timeout);
     try {
       nr = notifBuffer.fetchNotifications(listenerList, startSequenceNumber, t, maxNotifications);
-    } catch (@SuppressWarnings("unused") InterruptedException ire) {
+    } catch (@SuppressWarnings("unused") final InterruptedException ire) {
       nr = new NotificationResult(0L, 0L, new TargetedNotification[0]);
     }
     if (logger.traceOn())logger.trace("fetchNotifs", "Forwarding the notifs: " + nr);
@@ -265,9 +265,9 @@ public class ServerNotifForwarder {
    * @throws SecurityException .
    */
   private void checkMBeanPermission(final ObjectName name, final String actions) throws InstanceNotFoundException, SecurityException {
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm != null) {
-      AccessControlContext acc = AccessController.getContext();
+      final AccessControlContext acc = AccessController.getContext();
       ObjectInstance oi = null;
       try {
         oi = AccessController.doPrivileged(new PrivilegedExceptionAction<ObjectInstance>() {
@@ -276,11 +276,11 @@ public class ServerNotifForwarder {
             return mbeanServer.getObjectInstance(name);
           }
         });
-      } catch (PrivilegedActionException e) {
+      } catch (final PrivilegedActionException e) {
         throw (InstanceNotFoundException) extractException(e);
       }
-      String classname = oi.getClassName();
-      MBeanPermission perm = new MBeanPermission(classname, null, name, actions);
+      final String classname = oi.getClassName();
+      final MBeanPermission perm = new MBeanPermission(classname, null, name, actions);
       sm.checkPermission(perm, acc);
     }
   }

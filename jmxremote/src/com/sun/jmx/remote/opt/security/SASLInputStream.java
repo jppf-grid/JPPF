@@ -126,11 +126,11 @@ public class SASLInputStream extends InputStream {
     this.sc = sc;
     this.ss = null;
 
-    String str = (String) sc.getNegotiatedProperty(Sasl.MAX_BUFFER);
+    final String str = (String) sc.getNegotiatedProperty(Sasl.MAX_BUFFER);
     if (str != null) {
       try {
         recvMaxBufSize = Integer.parseInt(str);
-      } catch (@SuppressWarnings("unused") NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") final NumberFormatException e) {
         throw new IOException(Sasl.MAX_BUFFER + " property must be numeric string: " + str);
       }
     }
@@ -149,11 +149,11 @@ public class SASLInputStream extends InputStream {
     this.ss = ss;
     this.sc = null;
 
-    String str = (String) ss.getNegotiatedProperty(Sasl.MAX_BUFFER);
+    final String str = (String) ss.getNegotiatedProperty(Sasl.MAX_BUFFER);
     if (str != null) {
       try {
         recvMaxBufSize = Integer.parseInt(str);
-      } catch (@SuppressWarnings("unused") NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") final NumberFormatException e) {
         throw new IOException(Sasl.MAX_BUFFER + " property must be numeric string: " + str);
       }
     }
@@ -167,8 +167,8 @@ public class SASLInputStream extends InputStream {
    */
   @Override
   public int read() throws IOException {
-    byte[] inBuf = new byte[1];
-    int count = read(inBuf, 0, 1);
+    final byte[] inBuf = new byte[1];
+    final int count = read(inBuf, 0, 1);
     return count > 0 ? inBuf[0] : -1;
   }
 
@@ -185,7 +185,7 @@ public class SASLInputStream extends InputStream {
       }
     }
 
-    int avail = buf.length - bufPos;
+    final int avail = buf.length - bufPos;
     if (count > avail) {
       // Requesting more that we have stored. Return all that we have; next invocation of read() will trigger fill()
       System.arraycopy(buf, bufPos, inBuf, start, avail);
@@ -208,7 +208,7 @@ public class SASLInputStream extends InputStream {
     // Read in length of buffer
     int actual = readFully(lenBuf, 4);
     if (actual != 4) return -1;
-    int len = networkByteOrderToInt(lenBuf, 0, 4);
+    final int len = networkByteOrderToInt(lenBuf, 0, 4);
     if (len > recvMaxBufSize) throw new IOException(len + "exceeds the negotiated receive buffer size limit:" + recvMaxBufSize);
     if (logger.traceOn()) logger.trace("fill", "reading " + len + " bytes from network");
     // Read SASL buffer

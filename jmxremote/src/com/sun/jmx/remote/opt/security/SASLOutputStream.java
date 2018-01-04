@@ -113,11 +113,11 @@ public class SASLOutputStream extends OutputStream {
     this.out = out;
     this.sc = sc;
     this.ss = null;
-    String str = (String) sc.getNegotiatedProperty(Sasl.RAW_SEND_SIZE);
+    final String str = (String) sc.getNegotiatedProperty(Sasl.RAW_SEND_SIZE);
     if (str != null) {
       try {
         rawSendSize = Integer.parseInt(str);
-      } catch (@SuppressWarnings("unused") NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") final NumberFormatException e) {
         throw new IOException(Sasl.RAW_SEND_SIZE + " property must be numeric string: " + str);
       }
     }
@@ -134,11 +134,11 @@ public class SASLOutputStream extends OutputStream {
     this.out = out;
     this.ss = ss;
     this.sc = null;
-    String str = (String) ss.getNegotiatedProperty(Sasl.RAW_SEND_SIZE);
+    final String str = (String) ss.getNegotiatedProperty(Sasl.RAW_SEND_SIZE);
     if (str != null) {
       try {
         rawSendSize = Integer.parseInt(str);
-      } catch (@SuppressWarnings("unused") NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") final NumberFormatException e) {
         throw new IOException(Sasl.RAW_SEND_SIZE + " property must be numeric string: " + str);
       }
     }
@@ -146,7 +146,7 @@ public class SASLOutputStream extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    byte[] buffer = new byte[1];
+    final byte[] buffer = new byte[1];
     buffer[0] = (byte) b;
     write(buffer, 0, 1);
   }
@@ -154,8 +154,8 @@ public class SASLOutputStream extends OutputStream {
   @Override
   public void write(final byte[] buffer, final int offset, final int total) throws IOException {
     int count;
-    byte[] wrappedToken, saslBuffer;
-
+    byte[] wrappedToken;
+    final byte[] saslBuffer;
     // "Packetize" buffer to be within rawSendSize
     if (logger.traceOn()) logger.trace("write", "Total size: " + total);
     for (int i = 0; i < total; i += rawSendSize) {

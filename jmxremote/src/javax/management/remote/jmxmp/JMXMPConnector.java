@@ -141,7 +141,7 @@ public class JMXMPConnector extends GenericConnector implements Serializable {
     // Call validateAddress again in case we've deserialized a bogus address (so we didn't call the constructor).
     validateAddress();
     // We have to be careful not to overwrite params in the constructor env with default params.
-    Map<String, Object> newEnv = new HashMap<>();
+    final Map<String, Object> newEnv = new HashMap<>();
     if (this.env != null) newEnv.putAll(this.env);
     if (env != null) {
       EnvHelp.checkAttributes(env);
@@ -150,7 +150,7 @@ public class JMXMPConnector extends GenericConnector implements Serializable {
     final ClassLoader defaultClassLoader = EnvHelp.resolveClientClassLoader(newEnv);
     newEnv.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, defaultClassLoader);
     if (!newEnv.containsKey(MESSAGE_CONNECTION)) {
-      MessageConnection conn = new SocketConnection(address.getHost(), address.getPort());
+      final MessageConnection conn = new SocketConnection(address.getHost(), address.getPort());
       newEnv.put(MESSAGE_CONNECTION, conn);
     }
     super.connect(newEnv);

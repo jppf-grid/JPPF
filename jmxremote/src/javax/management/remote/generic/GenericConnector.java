@@ -200,7 +200,7 @@ public class GenericConnector implements JMXConnector {
         EnvHelp.checkAttributes(env);
         tmpEnv.putAll(env);
       }
-      MessageConnection conn = (MessageConnection) tmpEnv.get(MESSAGE_CONNECTION);
+      final MessageConnection conn = (MessageConnection) tmpEnv.get(MESSAGE_CONNECTION);
       if (conn == null) {
         connection = DefaultConfig.getClientSynchroMessageConnection(tmpEnv);
         if (connection == null) {
@@ -254,7 +254,7 @@ public class GenericConnector implements JMXConnector {
     checkState();
     if (rmbscMap.containsKey(delegationSubject)) return rmbscMap.get(delegationSubject);
     else {
-      RemoteMBeanServerConnection rmbsc = new RemoteMBeanServerConnection(clientMBeanServer, delegationSubject);
+      final RemoteMBeanServerConnection rmbsc = new RemoteMBeanServerConnection(clientMBeanServer, delegationSubject);
       rmbscMap.put(delegationSubject, rmbsc);
       return rmbsc;
     }
@@ -275,7 +275,7 @@ public class GenericConnector implements JMXConnector {
     final boolean debug = logger.debugOn();
     final String idstr = (tracing ? "[" + this.toString() + "]" : null);
     Exception closeException;
-    boolean createdState;
+    final boolean createdState;
     synchronized (lock) {
       if (state == CLOSED) {
         if (tracing) logger.trace("close", idstr + " already closed.");
@@ -292,8 +292,8 @@ public class GenericConnector implements JMXConnector {
               connection.sendOneWay(new CloseMessage(msg));
               Thread.sleep(100);
             }
-          } catch (@SuppressWarnings("unused") InterruptedException ire) { // OK
-          } catch (Exception e1) {
+          } catch (@SuppressWarnings("unused") final InterruptedException ire) { // OK
+          } catch (final Exception e1) {
             closeException = e1; // error trace
             if (tracing) logger.trace("close", idstr + " failed to send close message: " + e1);
             if (debug) logger.debug("close", e1);
@@ -301,7 +301,7 @@ public class GenericConnector implements JMXConnector {
         }
         try { // close the transport protocol.
           connection.close();
-        } catch (Exception e1) {
+        } catch (final Exception e1) {
           closeException = e1;
           if (tracing) logger.trace("close", idstr + " failed to close MessageConnection: " + e1);
           if (debug) logger.debug("close", e1);
@@ -349,12 +349,12 @@ public class GenericConnector implements JMXConnector {
    * @param n the notification to send. This will usually be a {@link JMXConnectionNotification}, but an implementation can send other notifications as well.
    */
   protected void sendNotification(final Notification n) {
-    Runnable job = new Runnable() {
+    final Runnable job = new Runnable() {
       @Override
       public void run() {
         try {
           connectionBroadcaster.sendNotification(n);
-        } catch (@SuppressWarnings("unused") Exception e) { // OK. should never
+        } catch (@SuppressWarnings("unused") final Exception e) { // OK. should never
         }
       }
     };
@@ -368,21 +368,21 @@ public class GenericConnector implements JMXConnector {
       if (msg instanceof CloseMessage) {
         if (logger.traceOn()) logger.trace("RequestHandler.execute", "got Message REMOTE_TERMINATION");
         try { // try to re-connect anyway
-          com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
+          final com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
           admin.gotIOException(new IOException(""));
           return null;
-        } catch (@SuppressWarnings("unused") IOException ioe) { // OK. the server has been closed.
+        } catch (@SuppressWarnings("unused") final IOException ioe) { // OK. the server has been closed.
         }
         try {
           GenericConnector.this.close(true, null);
-        } catch (@SuppressWarnings("unused") IOException ie) { // OK never
+        } catch (@SuppressWarnings("unused") final IOException ie) { // OK never
         }
       } else {
         logger.warning("RequestHandler.execute", ((msg == null) ? "null" : msg.getClass().getName()) + ": Bad message type.");
         try {
           logger.warning("RequestHandler.execute", "Closing connector");
           GenericConnector.this.close(false, null);
-        } catch (IOException ie) {
+        } catch (final IOException ie) {
           logger.info("RequestHandler.execute", ie);
         }
       }
@@ -397,10 +397,10 @@ public class GenericConnector implements JMXConnector {
       logger.warning("RequestHandler-connectionException", e);
       if (e instanceof IOException) {
         try {
-          com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
+          final com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
           admin.gotIOException((IOException) e);
           return;
-        } catch (@SuppressWarnings("unused") IOException ioe) { // OK. closing at the following steps
+        } catch (@SuppressWarnings("unused") final IOException ioe) { // OK. closing at the following steps
         }
       }
       synchronized (lock) {
@@ -409,7 +409,7 @@ public class GenericConnector implements JMXConnector {
           logger.debug("RequestHandler-connectionException", "Got connection exception: " + e.toString(), e);
           try {
             GenericConnector.this.close(true, null);
-          } catch (IOException ie) {
+          } catch (final IOException ie) {
             logger.info("RequestHandler-execute", ie);
           }
         }

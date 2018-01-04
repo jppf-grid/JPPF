@@ -55,18 +55,18 @@ public class EnvManager {
   private Object createEnvProviderHandler(final String inf) {
     Object handler = null;
     try {
-      Class<?> infClass = Class.forName(inf);
-      Class<?> handlerClass = Class.forName("org.jppf.jmx.EnvironmentProviderHandler");
-      Constructor<?> c = handlerClass.getConstructor(Class.class);
-      Method getProvidersMethod = handlerClass.getDeclaredMethod("getProviders");
+      final Class<?> infClass = Class.forName(inf);
+      final Class<?> handlerClass = Class.forName("org.jppf.jmx.EnvironmentProviderHandler");
+      final Constructor<?> c = handlerClass.getConstructor(Class.class);
+      final Method getProvidersMethod = handlerClass.getDeclaredMethod("getProviders");
       handler = c.newInstance(infClass);
-      List<?> list = (List<?>) getProvidersMethod.invoke(handler);
-      for (Object o: list) {
+      final List<?> list = (List<?>) getProvidersMethod.invoke(handler);
+      for (final Object o: list) {
         if (o != null) {
           providerMap.put(o.getClass().getDeclaredMethod("getEnvironment"), o);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.error("createEnvProviderHandler", "Error creating EnvironmentProviderHandler for '%s'", e, inf);
     }
     return handler;
@@ -80,10 +80,10 @@ public class EnvManager {
     try {
       for (Map.Entry<Method, Object> entry: providerMap.entrySet()) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> map = (Map<String, Object>) entry.getKey().invoke(entry.getValue());
+        final Map<String, Object> map = (Map<String, Object>) entry.getKey().invoke(entry.getValue());
         if ((map != null) && !map.isEmpty()) env.putAll(map);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       logger.error("augmentEnvironment", "Error augmenting environment %s", e, env);
     }
   }

@@ -159,7 +159,7 @@ public class DefaultConfig {
     long l;
     try {
       l = EnvHelp.getIntegerAttribute(env, SERVER_SIDE_CONNECTING_TIMEOUT, 0, 0, Long.MAX_VALUE);
-    } catch (@SuppressWarnings("unused") IllegalArgumentException iae) {
+    } catch (@SuppressWarnings("unused") final IllegalArgumentException iae) {
       l = 0;
     }
     return l;
@@ -171,9 +171,8 @@ public class DefaultConfig {
    * @return .
    */
   public static ServerAdmin getServerAdmin(final Map<String, ?> env) {
-    ServerAdmin admin;
+    final ServerAdmin admin;
     final Object o = env.get(SERVER_ADMIN);
-
     if (o == null) {
       admin = new com.sun.jmx.remote.opt.security.AdminServer(env);
     } else if (o instanceof ServerAdmin) {
@@ -192,9 +191,8 @@ public class DefaultConfig {
    * @return .
    */
   public static ClientAdmin getClientAdmin(final Map<String, Object> env) {
-    ClientAdmin admin;
+    final ClientAdmin admin;
     final Object o = env.get(CLIENT_ADMIN);
-
     if (o == null) {
       admin = new com.sun.jmx.remote.opt.security.AdminClient(env);
     } else if (o instanceof ClientAdmin) {

@@ -98,12 +98,12 @@ public class GenericClientCommunicatorAdmin extends ClientCommunicatorAdmin {
   protected void checkConnection() throws IOException {
     try {
       intermediary.mBeanServerRequest(MBeanServerRequestMessage.GET_DEFAULT_DOMAIN, null, null, false);
-    } catch (InterruptedIOException irie) { // see  6496038
+    } catch (final InterruptedIOException irie) { // see  6496038
       logger.trace("GenericClientCommunicatorAdmin-" + "checkConnection", "Timeout?", irie);
       if (intermediary.requestTimeoutReconn) throw (IOException) EnvHelp.initCause(new IOException(irie.getMessage()), irie); // force the heartbeat to do reconnection
       // no exception. not sure that the connection is lost, let the heartbeat to try again
       return;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw ClientIntermediary.appropriateException(e);
     }
   }
@@ -117,15 +117,15 @@ public class GenericClientCommunicatorAdmin extends ClientCommunicatorAdmin {
     int j = 0;
     for (int i = 0; i < old.length; i++) { // reconnect listeners one by one...
       try {
-        Integer id = intermediary.addListenerWithSubject(old[i].getObjectName(), intermediary.serialization.wrap(old[i].getNotificationFilter()), old[i].getDelegationSubject(), false);
+        final Integer id = intermediary.addListenerWithSubject(old[i].getObjectName(), intermediary.serialization.wrap(old[i].getNotificationFilter()), old[i].getDelegationSubject(), false);
         clis[j++] = new ClientListenerInfo(id, old[i].getObjectName(), old[i].getListener(), old[i].getNotificationFilter(), old[j].getHandback(), old[i].getDelegationSubject());
-      } catch (InstanceNotFoundException infe) {
+      } catch (final InstanceNotFoundException infe) {
         logger.warning("reconnectNotificationListeners", "Can't reconnect a listener for " + old[i].getObjectName(), infe);
       }
     }
     // we should call postReconnection even j == 0, because we have to inform the notif forwarder of end of reconnection.
     if (j != old.length) {
-      ClientListenerInfo[] tmp = clis;
+      final ClientListenerInfo[] tmp = clis;
       clis = new ClientListenerInfo[j];
       System.arraycopy(tmp, 0, clis, 0, j);
     }
@@ -143,7 +143,7 @@ public class GenericClientCommunicatorAdmin extends ClientCommunicatorAdmin {
   protected void doStop() {
     try {
       intermediary.client.close();
-    } catch (IOException ioe) {
+    } catch (final IOException ioe) {
       logger.info("close", ioe);
     }
   }

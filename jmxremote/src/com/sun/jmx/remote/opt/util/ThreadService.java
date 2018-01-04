@@ -114,7 +114,7 @@ public class ThreadService {
     if (max < min) throw new IllegalArgumentException("Maximum number less than minimal number.");
     defaultPriority = Thread.currentThread().getPriority();
     defaultLoader = getContextClassLoader();
-    BlockingQueue<Runnable> queue = new SynchronousQueue<>();
+    final BlockingQueue<Runnable> queue = new SynchronousQueue<>();
     executor = new ThreadPoolExecutor(min, max, waitingTime, TimeUnit.MILLISECONDS, queue, new CustomThreadFactory("JobExecutor"));
   }
 
@@ -238,7 +238,7 @@ public class ThreadService {
 
     @Override
     public synchronized Thread newThread(final Runnable r) {
-      Thread thread;
+      final Thread thread;
       final String threadName = name + '_' + String.format("%04d", + count.incrementAndGet());
       if(doPrivileged) {
         thread = AccessController.doPrivileged(new PrivilegedAction<Thread>() {

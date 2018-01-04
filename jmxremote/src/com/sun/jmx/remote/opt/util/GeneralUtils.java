@@ -36,7 +36,7 @@ public class GeneralUtils {
    * @return a mapping of method ids to readable names.
    */
   private static Map<Integer, String> initRequestMethodNames() {
-    Map<Integer, String> map = new HashMap<>();
+    final Map<Integer, String> map = new HashMap<>();
     map.put(MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENERS, "ADD_NOTIFICATION_LISTENERS");
     map.put(MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENER_OBJECTNAME, "ADD_NOTIFICATION_LISTENER_OBJECTNAME");
     map.put(MBeanServerRequestMessage.CREATE_MBEAN, "CREATE_MBEAN");

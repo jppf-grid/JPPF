@@ -107,7 +107,7 @@ public abstract class ServerCommunicatorAdmin {
     this.timeout = timeout;
     timestamp = 0;
     if (timeout < Long.MAX_VALUE) {
-      Runnable timeoutTask = new Timeout();
+      final Runnable timeoutTask = new Timeout();
       final Thread t = new Thread(timeoutTask);
       t.setName("JMX server connection timeout " + t.getName());
       // If you change this name you will need to change a unit test (NoServerTimeoutTest)
@@ -204,7 +204,7 @@ public abstract class ServerCommunicatorAdmin {
               stopping = true;
               break;
             }
-          } catch (InterruptedException ire) {
+          } catch (final InterruptedException ire) {
             logger.warning("Timeout-run", "Unexpected Exception: " + ire);
             logger.debug("Timeout-run", ire);
             return;

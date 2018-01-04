@@ -125,9 +125,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("createMBean", "called");
     try {
       return (ObjectInstance) mBeanServerRequest(MBeanServerRequestMessage.CREATE_MBEAN, new Object[] { className, name }, delegationSubject);
-    } catch (ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException e) {
+    } catch (final ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -151,9 +151,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("createMBean", "called");
     try {
       return (ObjectInstance) mBeanServerRequest(MBeanServerRequestMessage.CREATE_MBEAN_PARAMS, new Object[] { className, name, serialization.wrap(params), signature }, delegationSubject);
-    } catch (ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException e) {
+    } catch (final ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -178,9 +178,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("createMBean", "called");
     try {
       return (ObjectInstance) mBeanServerRequest(MBeanServerRequestMessage.CREATE_MBEAN_LOADER, new Object[] { className, name, loaderName }, delegationSubject);
-    } catch (ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException|InstanceNotFoundException e) {
+    } catch (final ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException|InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -206,9 +206,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("createMBean", "called");
     try {
       return (ObjectInstance) mBeanServerRequest(MBeanServerRequestMessage.CREATE_MBEAN_LOADER_PARAMS, new Object[] { className, name, loaderName, serialization.wrap(params), signature }, delegationSubject);
-    } catch (ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException|InstanceNotFoundException e) {
+    } catch (final ReflectionException|InstanceAlreadyExistsException|MBeanException|NotCompliantMBeanException|InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -224,9 +224,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("unregisterMBean", "called");
     try {
       mBeanServerRequest(MBeanServerRequestMessage.UNREGISTER_MBEAN, new Object[] { name }, delegationSubject);
-    } catch (InstanceNotFoundException|MBeanRegistrationException e) {
+    } catch (final InstanceNotFoundException|MBeanRegistrationException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -242,9 +242,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getObjectInstance", "called");
     try {
       return (ObjectInstance) mBeanServerRequest(MBeanServerRequestMessage.GET_OBJECT_INSTANCE, new Object[] { name }, delegationSubject);
-    } catch (InstanceNotFoundException e) {
+    } catch (final InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -261,7 +261,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("queryMBeans", "called");
     try {
       return (Set<ObjectInstance>) mBeanServerRequest(MBeanServerRequestMessage.QUERY_MBEANS, new Object[] { name, serialization.wrap(query) }, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -278,7 +278,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("queryNames", "called");
     try {
       return (Set<ObjectName>) mBeanServerRequest(MBeanServerRequestMessage.QUERY_NAMES, new Object[] { name, serialization.wrap(query) }, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -293,7 +293,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("isRegistered", "called");
     try {
       return (Boolean) mBeanServerRequest(MBeanServerRequestMessage.IS_REGISTERED, new Object[] { name }, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -307,7 +307,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getMBeanCount", "called");
     try {
       return (Integer) mBeanServerRequest(MBeanServerRequestMessage.GET_MBEAN_COUNT, null, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -328,9 +328,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getAttribute", "called");
     try {
       return mBeanServerRequest(MBeanServerRequestMessage.GET_ATTRIBUTE, new Object[] { name, attribute }, delegationSubject);
-    } catch (MBeanException|AttributeNotFoundException|InstanceNotFoundException|ReflectionException e) {
+    } catch (final MBeanException|AttributeNotFoundException|InstanceNotFoundException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -348,9 +348,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getAttributes", "called");
     try {
       return (AttributeList) mBeanServerRequest(MBeanServerRequestMessage.GET_ATTRIBUTES, new Object[] { name, attributes }, delegationSubject);
-    } catch (InstanceNotFoundException|ReflectionException e) {
+    } catch (final InstanceNotFoundException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -371,9 +371,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("setAttribute", "called");
     try {
       mBeanServerRequest(MBeanServerRequestMessage.SET_ATTRIBUTE, new Object[] { name, serialization.wrap(attribute) }, delegationSubject);
-    } catch (InstanceNotFoundException|AttributeNotFoundException|InvalidAttributeValueException|MBeanException|ReflectionException e) {
+    } catch (final InstanceNotFoundException|AttributeNotFoundException|InvalidAttributeValueException|MBeanException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -391,9 +391,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("setAttributes", "called");
     try {
       return (AttributeList) mBeanServerRequest(MBeanServerRequestMessage.SET_ATTRIBUTES, new Object[] { name, serialization.wrap(attributes) }, delegationSubject);
-    } catch (InstanceNotFoundException|ReflectionException e) {
+    } catch (final InstanceNotFoundException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -418,7 +418,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
       return mBeanServerRequest(MBeanServerRequestMessage.INVOKE, new Object[] { name, operationName, serialization.wrap(params), signature }, delegationSubject);
     } catch (InstanceNotFoundException|MBeanException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -432,7 +432,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getDefaultDomain", "called");
     try {
       return (String) mBeanServerRequest(MBeanServerRequestMessage.GET_DEFAULT_DOMAIN, null, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -446,7 +446,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("getDomains", "called");
     try {
       return (String[]) mBeanServerRequest(MBeanServerRequestMessage.GET_DOMAINS, null, delegationSubject);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -466,7 +466,7 @@ class ClientIntermediary extends AbstractClientIntermediary {
       return (MBeanInfo) mBeanServerRequest(MBeanServerRequestMessage.GET_MBEAN_INFO, new Object[] { name }, delegationSubject);
     } catch (InstanceNotFoundException|IntrospectionException|ReflectionException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }
@@ -483,9 +483,9 @@ class ClientIntermediary extends AbstractClientIntermediary {
     logger.trace("isInstanceOf", "called");
     try {
       return (Boolean) mBeanServerRequest(MBeanServerRequestMessage.IS_INSTANCE_OF, new Object[] { name, className }, delegationSubject);
-    } catch (InstanceNotFoundException e) {
+    } catch (final InstanceNotFoundException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw appropriateException(e);
     }
   }

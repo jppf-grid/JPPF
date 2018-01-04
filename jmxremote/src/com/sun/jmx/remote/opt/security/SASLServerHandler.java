@@ -155,7 +155,7 @@ public class SASLServerHandler implements ProfileServer {
     mechanism = profile.substring(profile.indexOf("SASL/") + 5);
     String server = (String) env.get("jmx.remote.x.sasl.server.name");
     if (server == null) server = socket.getLocalAddress().getHostName();
-    CallbackHandler cbh = (CallbackHandler) env.get("jmx.remote.sasl.callback.handler");
+    final CallbackHandler cbh = (CallbackHandler) env.get("jmx.remote.sasl.callback.handler");
 
     // Create SASL server to use using SASL package
     //
@@ -168,13 +168,13 @@ public class SASLServerHandler implements ProfileServer {
 
   @Override
   public ProfileMessage produceMessage() throws IOException {
-    int status;
+    final int status;
     if (saslServer.isComplete()) {
       status = SASLMessage.COMPLETE;
     } else {
       status = SASLMessage.CONTINUE;
     }
-    SASLMessage challenge = new SASLMessage(mechanism, status, blob);
+    final SASLMessage challenge = new SASLMessage(mechanism, status, blob);
     if (logger.traceOn()) {
       logger.trace("produceMessage", ">>>>> SASL server message <<<<<");
       logger.trace("produceMessage", "Profile Name : " + challenge.getProfileName());
@@ -188,7 +188,7 @@ public class SASLServerHandler implements ProfileServer {
     if (!(pm instanceof SASLMessage)) {
       throw new IOException("Unexpected profile message type: " + pm.getClass().getName());
     }
-    SASLMessage response = (SASLMessage) pm;
+    final SASLMessage response = (SASLMessage) pm;
     if (logger.traceOn()) {
       logger.trace("consumeMessage", ">>>>> SASL client message <<<<<");
       logger.trace("consumeMessage", "Profile Name : " + response.getProfileName());
@@ -213,13 +213,13 @@ public class SASLServerHandler implements ProfileServer {
   public Subject activate() throws IOException {
     // If negotiated integrity or privacy
     //
-    String qop = (String) saslServer.getNegotiatedProperty(Sasl.QOP);
+    final String qop = (String) saslServer.getNegotiatedProperty(Sasl.QOP);
     if (qop != null && (qop.equalsIgnoreCase("auth-int") || qop.equalsIgnoreCase("auth-conf"))) {
       // Replace the current input/output streams in
       // MessageConnection by the SASL input/output streams
       //
-      SASLInputStream saslis = new SASLInputStream(saslServer, socket.getInputStream());
-      SASLOutputStream saslos = new SASLOutputStream(saslServer, socket.getOutputStream());
+      final SASLInputStream saslis = new SASLInputStream(saslServer, socket.getInputStream());
+      final SASLOutputStream saslos = new SASLOutputStream(saslServer, socket.getOutputStream());
       ((SocketConnectionIf) mc).replaceStreams(saslis, saslos);
     }
     // Retrieve authorization id

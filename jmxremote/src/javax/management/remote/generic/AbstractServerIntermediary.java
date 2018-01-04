@@ -201,8 +201,8 @@ abstract class AbstractServerIntermediary {
           return serialization.unwrap(obj, new OrderClassLoaders(cl, defaultClassLoader));
         }
       });
-    } catch (PrivilegedActionException pe) {
-      Exception e = extractException(pe);
+    } catch (final PrivilegedActionException pe) {
+      final Exception e = extractException(pe);
       if (e instanceof IOException) throw (IOException) e;
       if (e instanceof ClassNotFoundException) throw (ClassNotFoundException) e;
     }

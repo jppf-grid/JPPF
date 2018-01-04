@@ -124,7 +124,7 @@ public class TLSServerHandler implements ProfileServer {
       setEnabledProtocols = SSLSocket.class.getMethod("setEnabledProtocols", new Class[] { String[].class });
       getWantClientAuth = SSLSocket.class.getMethod("getWantClientAuth", new Class[0]);
       setWantClientAuth = SSLSocket.class.getMethod("setWantClientAuth", new Class[] { Boolean.TYPE });
-    } catch (@SuppressWarnings("unused") Throwable t) {
+    } catch (@SuppressWarnings("unused") final Throwable t) {
       // Running with a J2SE prior to J2SE 1.4
       error = true;
     }
@@ -172,9 +172,9 @@ public class TLSServerHandler implements ProfileServer {
   static String getProtocol(final SSLSession s) throws IOException {
     try {
       return (String) getProtocol.invoke(s, new Object[0]);
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw (RuntimeException) e.getTargetException();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       // Should never happen as this code is only executed when
       // running with the bundled JSSE, i.e. J2SE 1.4 or later.
       throw (IOException) EnvHelp.initCause(new IOException(t.getMessage()), t);
@@ -190,9 +190,9 @@ public class TLSServerHandler implements ProfileServer {
   static String[] getEnabledProtocols(final SSLSocket s) throws IOException {
     try {
       return (String[]) getEnabledProtocols.invoke(s, new Object[0]);
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw (RuntimeException) e.getTargetException();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       // Should never happen as this code is only executed when
       // running with the bundled JSSE, i.e. J2SE 1.4 or later.
       throw (IOException) EnvHelp.initCause(new IOException(t.getMessage()), t);
@@ -208,9 +208,9 @@ public class TLSServerHandler implements ProfileServer {
   static void setEnabledProtocols(final SSLSocket s, final String[] p) throws IOException {
     try {
       setEnabledProtocols.invoke(s, new Object[] { p });
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw (RuntimeException) e.getTargetException();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       // Should never happen as this code is only executed when
       // running with the bundled JSSE, i.e. J2SE 1.4 or later.
       throw (IOException) EnvHelp.initCause(new IOException(t.getMessage()), t);
@@ -226,9 +226,9 @@ public class TLSServerHandler implements ProfileServer {
   static Boolean getWantClientAuth(final SSLSocket s) throws IOException {
     try {
       return (Boolean) getWantClientAuth.invoke(s, new Object[0]);
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw (RuntimeException) e.getTargetException();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       // Should never happen as this code is only executed when
       // running with the bundled JSSE, i.e. J2SE 1.4 or later.
       throw (IOException) EnvHelp.initCause(new IOException(t.getMessage()), t);
@@ -244,9 +244,9 @@ public class TLSServerHandler implements ProfileServer {
   static void setWantClientAuth(final SSLSocket s, final Boolean b) throws IOException {
     try {
       setWantClientAuth.invoke(s, new Object[] { b });
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw (RuntimeException) e.getTargetException();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       // Should never happen as this code is only executed when
       // running with the bundled JSSE, i.e. J2SE 1.4 or later.
       throw (IOException) EnvHelp.initCause(new IOException(t.getMessage()), t);
@@ -278,8 +278,8 @@ public class TLSServerHandler implements ProfileServer {
     // Get SSLSocketFactory
     SSLSocketFactory ssf = (SSLSocketFactory) env.get("jmx.remote.tls.socket.factory");
     if (ssf == null) ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-    String hostname = socket.getInetAddress().getHostName();
-    int port = socket.getPort();
+    final String hostname = socket.getInetAddress().getHostName();
+    final int port = socket.getPort();
     if (logger.traceOn()) {
       logger.trace("initialize", "TLS: Hostname = " + hostname);
       logger.trace("initialize", "TLS: Port = " + port);
@@ -290,19 +290,19 @@ public class TLSServerHandler implements ProfileServer {
     if (logger.traceOn()) logger.trace("initialize", "TLS: Socket Client Mode = " + ts.getUseClientMode());
     // Set the SSLSocket Enabled Protocols
     if (bundledJSSE) {
-      String enabledProtocols = (String) env.get("jmx.remote.tls.enabled.protocols");
+      final String enabledProtocols = (String) env.get("jmx.remote.tls.enabled.protocols");
       if (enabledProtocols != null) {
-        StringTokenizer st = new StringTokenizer(enabledProtocols, " ");
-        int tokens = st.countTokens();
-        String enabledProtocolsList[] = new String[tokens];
+        final StringTokenizer st = new StringTokenizer(enabledProtocols, " ");
+        final int tokens = st.countTokens();
+        final String enabledProtocolsList[] = new String[tokens];
         for (int i = 0; i < tokens; i++) enabledProtocolsList[i] = st.nextToken();
         setEnabledProtocols(ts, enabledProtocolsList);
       }
       if (logger.traceOn()) {
         logger.trace("initialize", "TLS: Enabled Protocols");
-        String[] enabled_p = getEnabledProtocols(ts);
+        final String[] enabled_p = getEnabledProtocols(ts);
         if (enabled_p != null) {
-          StringBuffer str_buffer = new StringBuffer();
+          final StringBuffer str_buffer = new StringBuffer();
           for (int i = 0; i < enabled_p.length; i++) {
             str_buffer.append(enabled_p[i]);
             if (i + 1 < enabled_p.length) str_buffer.append(", ");
@@ -312,19 +312,19 @@ public class TLSServerHandler implements ProfileServer {
       }
     }
     // Set the SSLSocket Enabled Cipher Suites
-    String enabledCipherSuites = (String) env.get("jmx.remote.tls.enabled.cipher.suites");
+    final String enabledCipherSuites = (String) env.get("jmx.remote.tls.enabled.cipher.suites");
     if (enabledCipherSuites != null) {
-      StringTokenizer st = new StringTokenizer(enabledCipherSuites, " ");
-      int tokens = st.countTokens();
-      String enabledCipherSuitesList[] = new String[tokens];
+      final StringTokenizer st = new StringTokenizer(enabledCipherSuites, " ");
+      final int tokens = st.countTokens();
+      final String enabledCipherSuitesList[] = new String[tokens];
       for (int i = 0; i < tokens; i++) enabledCipherSuitesList[i] = st.nextToken();
       ts.setEnabledCipherSuites(enabledCipherSuitesList);
     }
     if (logger.traceOn()) {
       logger.trace("initialize", "TLS: Enabled Cipher Suites");
-      String[] enabled_cs = ts.getEnabledCipherSuites();
+      final String[] enabled_cs = ts.getEnabledCipherSuites();
       if (enabled_cs != null) {
-        StringBuffer str_buffer = new StringBuffer();
+        final StringBuffer str_buffer = new StringBuffer();
         for (int i = 0; i < enabled_cs.length; i++) {
           str_buffer.append(enabled_cs[i]);
           if (i + 1 < enabled_cs.length) str_buffer.append(", ");
@@ -334,12 +334,12 @@ public class TLSServerHandler implements ProfileServer {
     }
 
     // Configures the socket to require client authentication
-    String needClientAuth = (String) env.get("jmx.remote.tls.need.client.authentication");
+    final String needClientAuth = (String) env.get("jmx.remote.tls.need.client.authentication");
     if (needClientAuth != null) ts.setNeedClientAuth(Boolean.valueOf(needClientAuth).booleanValue());
     if (logger.traceOn()) logger.trace("initialize", "TLS: Socket Need Client Authentication = " + ts.getNeedClientAuth());
     // Configures the socket to request client authentication
     if (bundledJSSE) {
-      String wantClientAuth = (String) env.get("jmx.remote.tls.want.client.authentication");
+      final String wantClientAuth = (String) env.get("jmx.remote.tls.want.client.authentication");
       if (wantClientAuth != null) setWantClientAuth(ts, Boolean.valueOf(wantClientAuth));
       if (logger.traceOn()) logger.trace("initialize", "TLS: Socket Want Client Authentication = " + getWantClientAuth(ts));
     }
@@ -347,7 +347,7 @@ public class TLSServerHandler implements ProfileServer {
 
   @Override
   public ProfileMessage produceMessage() throws IOException {
-    TLSMessage tlspm = new TLSMessage(TLSMessage.PROCEED);
+    final TLSMessage tlspm = new TLSMessage(TLSMessage.PROCEED);
     if (logger.traceOn()) {
       logger.trace("produceMessage", ">>>>> TLS server message <<<<<");
       logger.trace("produceMessage", "Profile Name : " + tlspm.getProfileName());
@@ -362,7 +362,7 @@ public class TLSServerHandler implements ProfileServer {
     if (!(pm instanceof TLSMessage)) {
       throw new IOException("Unexpected profile message type: " + pm.getClass().getName());
     }
-    TLSMessage tlspm = (TLSMessage) pm;
+    final TLSMessage tlspm = (TLSMessage) pm;
     if (logger.traceOn()) {
       logger.trace("consumeMessage", ">>>>> TLS client message <<<<<");
       logger.trace("consumeMessage", "Profile Name : " + tlspm.getProfileName());
@@ -385,7 +385,7 @@ public class TLSServerHandler implements ProfileServer {
       logger.trace("activate", "TLS: Start TLS Handshake");
     }
     ts.startHandshake();
-    SSLSession session = ts.getSession();
+    final SSLSession session = ts.getSession();
     if (session != null) {
       if (logger.traceOn()) {
         logger.trace("activate", "TLS: getCipherSuite = " + session.getCipherSuite());
@@ -400,10 +400,10 @@ public class TLSServerHandler implements ProfileServer {
           final String pn = p.getName();
           if (bundledJSSE) {
             try {
-              Class<?> cl = Class.forName(X500_PRINCIPAL);
-              Constructor<?> co = cl.getConstructor(new Class[] { String.class });
+              final Class<?> cl = Class.forName(X500_PRINCIPAL);
+              final Constructor<?> co = cl.getConstructor(new Class[] { String.class });
               p = (Principal) co.newInstance(new Object[] { pn });
-            } catch (Exception e) {
+            } catch (final Exception e) {
               final String mh = "TLS: Client Authentication: ";
               logger.trace("activate", mh + e.getMessage());
               logger.debug("activate", e);
@@ -424,7 +424,7 @@ public class TLSServerHandler implements ProfileServer {
           });
           logger.trace("activate", "TLS: Client Authentication OK!" + " SubjectDN = " + principal);
         } else logger.trace("activate", "TLS: No Client Authentication");
-      } catch (SSLPeerUnverifiedException e) {
+      } catch (final SSLPeerUnverifiedException e) {
         logger.trace("activate", "TLS: No Client Authentication: " + e.getMessage());
       }
       logger.trace("activate", "TLS: Finish TLS Handshake");

@@ -101,8 +101,8 @@ class GenericClientNotifForwarder extends ClientNotifForwarder {
     logger.trace("GenericClientNotifForwarder-fetchNotifs", "fetching notifs...");
     final NotificationRequestMessage nreq = new NotificationRequestMessage(clientSequenceNumber, maxNotifications, timeout);
     final NotificationResponseMessage nresp = (NotificationResponseMessage) intermediary.connection.sendWithReturn(nreq);
-    Object wrapped = nresp.getWrappedNotificationResult();
-    Object unwrapped = intermediary.serialization.unwrap(wrapped, intermediary.myloader);
+    final Object wrapped = nresp.getWrappedNotificationResult();
+    final Object unwrapped = intermediary.serialization.unwrap(wrapped, intermediary.myloader);
     if (!(unwrapped instanceof NotificationResult)) {
       // This is a protocol error, so we close the client.
       final String msg = "Not a NotificationResult: " + unwrapped.getClass();
@@ -117,18 +117,18 @@ class GenericClientNotifForwarder extends ClientNotifForwarder {
   @Override
   protected Integer addListenerForMBeanRemovedNotif() throws IOException, InstanceNotFoundException {
     logger.trace("GenericClientNotifForwarder-" + "addListenerForMBeanRemovedNotif", "Add a listener to receive UNREGISTRATION_NOTIFICATION");
-    NotificationFilterSupport clientFilter = new NotificationFilterSupport();
+    final NotificationFilterSupport clientFilter = new NotificationFilterSupport();
     clientFilter.enableType(MBeanServerNotification.UNREGISTRATION_NOTIFICATION);
     final ObjectName[] names = { ClientIntermediary.delegateName };
     final Object wrappedFilter = intermediary.serialization.wrap(clientFilter);
     final Object[] filters = { wrappedFilter };
     final Object[] params = { names, filters };
     try {
-      int code = MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENERS;
+      final int code = MBeanServerRequestMessage.ADD_NOTIFICATION_LISTENERS;
       return (Integer) intermediary.mBeanServerRequest(code, params, null);
-    } catch (InstanceNotFoundException n) {
+    } catch (final InstanceNotFoundException n) {
       throw n;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw ClientIntermediary.appropriateException(e);
     }
   }
@@ -137,9 +137,9 @@ class GenericClientNotifForwarder extends ClientNotifForwarder {
   protected void removeListenerForMBeanRemovedNotif(final Integer id) throws IOException {
     logger.trace("GenericClientNotifForwarder-" + "removeListenerForMBeanRemovedNotif", "Remove the listener used to receive " + "UNREGISTRATION_NOTIFICATION.");
     try {
-      int code = MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK;
+      final int code = MBeanServerRequestMessage.REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK;
       intermediary.mBeanServerRequest(code, new Object[] { intermediary.delegateName, id }, null, false);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw ClientIntermediary.appropriateException(e);
     }
   }

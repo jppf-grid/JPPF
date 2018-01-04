@@ -110,13 +110,13 @@ public class ArrayQueue<E> extends AbstractList<E> {
    * @param newcapacity .
    */
   public void resize(final int newcapacity) {
-    int size = size();
+    final int size = size();
     if (newcapacity < size) throw new IndexOutOfBoundsException("Resizing would lose data");
     int nc = newcapacity;
     nc++;
     if (nc == this.capacity) return;
     //Object[] newqueue = new Object[newcapacity];
-    E[] newqueue = createArray(nc);
+    final E[] newqueue = createArray(nc);
     for (int i = 0; i < size; i++) newqueue[i] = get(i);
     this.capacity = nc;
     this.queue = newqueue;
@@ -127,7 +127,7 @@ public class ArrayQueue<E> extends AbstractList<E> {
   @Override
   public boolean add(final E o) {
     queue[tail] = o;
-    int newtail = (tail + 1) % capacity;
+    final int newtail = (tail + 1) % capacity;
     if (newtail == head) throw new IndexOutOfBoundsException("Queue full");
     tail = newtail;
     return true; // we did add something
@@ -137,14 +137,14 @@ public class ArrayQueue<E> extends AbstractList<E> {
   public E remove(final int i) {
     //if (i != 0) throw new IllegalArgumentException("Can only remove head of queue");
     if (head == tail) throw new IndexOutOfBoundsException("Queue empty");
-    E removed = queue[head];
+    final E removed = queue[head];
     if (i != 0) {
       if (i > tail) throw new IndexOutOfBoundsException(String.format("Queue empty, index=%d, queue size=%d", i, tail));
       if (i == tail) {
         tail--;
         queue[i] = null;
       } else {
-        int n = size();
+        final int n = size();
         queue[i] = null;
         System.arraycopy(queue, i+1, queue, i, n - (i + 1));
       }
@@ -157,9 +157,9 @@ public class ArrayQueue<E> extends AbstractList<E> {
 
   @Override
   public E get(final int i) {
-    int size = size();
+    final int size = size();
     if ((i < 0) || (i >= size)) throw new IndexOutOfBoundsException(String.format("Index %d, queue size %d", i, size));
-    int index = (head + i) % capacity;
+    final int index = (head + i) % capacity;
     return queue[index];
   }
 

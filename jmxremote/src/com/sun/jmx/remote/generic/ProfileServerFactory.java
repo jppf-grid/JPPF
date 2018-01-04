@@ -180,24 +180,24 @@ public final class ProfileServerFactory {
    */
   private static ProfileServerProvider getProvider(final String profile, final String pkgs, final ClassLoader loader) throws ProfileProviderException {
     Class<?> providerClass = null;
-    ProfileServerProvider provider = null;
+    final ProfileServerProvider provider = null;
     Object obj = null;
-    StringTokenizer tokenizer = new StringTokenizer(pkgs, "|");
+    final StringTokenizer tokenizer = new StringTokenizer(pkgs, "|");
     String p = profile.toLowerCase();
     if (p.indexOf("/") != -1) {
       p = p.substring(0, p.indexOf("/"));
     }
     while (tokenizer.hasMoreTokens()) {
-      String pkg = tokenizer.nextToken();
-      String className = (pkg + "." + p + ".ServerProvider");
+      final String pkg = tokenizer.nextToken();
+      final String className = (pkg + "." + p + ".ServerProvider");
       try {
         providerClass = loader.loadClass(className);
-      } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
+      } catch (@SuppressWarnings("unused") final ClassNotFoundException e) {
         continue;
       }
       try {
         obj = providerClass.newInstance();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         final String msg = "Exception when instantiating provider [" + className + "]";
         throw new ProfileProviderException(msg, e);
       }
@@ -220,7 +220,7 @@ public final class ProfileServerFactory {
     if (environment != null) {
       try {
         loader = (ClassLoader) environment.get(PROFILE_PROVIDER_CLASS_LOADER);
-      } catch (@SuppressWarnings("unused") ClassCastException e) {
+      } catch (@SuppressWarnings("unused") final ClassCastException e) {
         final String msg = "ClassLoader not an instance of java.lang.ClassLoader : " + loader.getClass().getName();
         throw new IllegalArgumentException(msg);
       }

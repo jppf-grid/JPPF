@@ -84,18 +84,16 @@ public class ObjectWrappingImpl implements ObjectWrapping {
 
   @Override
   public Object wrap(final Object obj) throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(baos);
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ObjectOutputStream oos = new ObjectOutputStream(baos);
     oos.writeObject(obj);
-
     return baos.toByteArray();
   }
 
   @Override
   public Object unwrap(final Object wrapped, final ClassLoader cloader) throws IOException, ClassNotFoundException {
-
-    ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) wrapped);
-    ObjectInputStreamWithLoader ois = new ObjectInputStreamWithLoader(bais);
+    final ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) wrapped);
+    final ObjectInputStreamWithLoader ois = new ObjectInputStreamWithLoader(bais);
     return ois.readObject(cloader);
   }
 

@@ -100,7 +100,7 @@ public class JMXSubjectDomainCombiner extends SubjectDomainCombiner {
   public ProtectionDomain[] combine(final ProtectionDomain[] current, final ProtectionDomain[] assigned) {
     // Add a new ProtectionDomain with the null codesource/signers, and the empty permission set, to the end of the array containing the
     // 'current' protections domains, i.e. the ones that will be augmented with the permissions granted to the set of principals present inthe supplied subject.
-    ProtectionDomain[] newCurrent;
+    final ProtectionDomain[] newCurrent;
     if (current == null || current.length == 0) {
       newCurrent = new ProtectionDomain[1];
       newCurrent[0] = pd;

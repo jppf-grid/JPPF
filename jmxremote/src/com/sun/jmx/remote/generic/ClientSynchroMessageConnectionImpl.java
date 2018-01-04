@@ -151,7 +151,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       if (state == UNCONNECTED) {
         if (logger.traceOn()) logger.trace("connect", "Establishing the connection.");
         // first time to connect, need to merge env parameters with the one passed to the constructor.
-        Map<String, Object> newEnv = new HashMap<>();
+        final Map<String, Object> newEnv = new HashMap<>();
         if (this.env != null) newEnv.putAll(this.env);
         if (env != null) newEnv.putAll(env);
         wtimeout = DefaultConfig.getRequestTimeout(newEnv);
@@ -186,8 +186,8 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         final ConnectionClosedException ce = new ConnectionClosedException("The connection has been closed by the server.");
         // Attention: lock order: stateLock before waitingList before ResponseMsgWrapper
         synchronized (waitingList) {
-          for (Long id: waitingList.keySet()) {
-            ResponseMsgWrapper rm = waitingList.get(id);
+          for (final Long id: waitingList.keySet()) {
+            final ResponseMsgWrapper rm = waitingList.get(id);
             synchronized (rm) {
               if (!rm.got) { // see whether the response has arrived.
                 rm.got = true;
@@ -233,8 +233,8 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           checkState();
           try {
             notifLock.wait();
-          } catch (InterruptedException ire) {   
-            InterruptedIOException iioe = new InterruptedIOException(ire.toString());
+          } catch (final InterruptedException ire) {   
+            final InterruptedIOException iioe = new InterruptedIOException(ire.toString());
             EnvHelp.initCause(iioe, ire);
             throw iioe;
           }
@@ -243,7 +243,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         notifResp = null;
       }
     } else if (msg instanceof MBeanServerRequestMessage) {
-      MBeanServerRequestMessage reqMsg = (MBeanServerRequestMessage) msg;
+      final MBeanServerRequestMessage reqMsg = (MBeanServerRequestMessage) msg;
       if (logger.traceOn()) logger.trace("sendWithReturn", String.format("Send a MBeanServerRequestMessage with messageId=%d, methodId=%s",
         reqMsg.getMessageId(), GeneralUtils.getMethodName(reqMsg.getMethodId())));
       // When receiving CloseMessage, it is possible that the server closes itself by timeout, so we will do reconnection and then wakeup all
@@ -251,7 +251,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       // Note: if a ConnectionClosedException is thrown by the server, that exception will be received by ClientIntermediary and it will inform the ClientCommunicationAdmin before doing retry.
       boolean retried = false;
       while (true) {
-        ResponseMsgWrapper mwrapper = new ResponseMsgWrapper();
+        final ResponseMsgWrapper mwrapper = new ResponseMsgWrapper();
         synchronized (waitingList) {
           waitingList.put(reqMsg.getMessageId(), mwrapper);
         }
@@ -266,7 +266,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
             try {
               checkState();
               synchronized(mwrapper) { mwrapper.wait(1000L); }
-            } catch (InterruptedException ie) {
+            } catch (final InterruptedException ie) {
               if (logger.traceOn()) logger.trace("sendWithReturn", "InterruptedException: ", ie);
               break; // OK. This is a user thread, so it is possible that the user wants to stop waiting.
             }
@@ -368,12 +368,12 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           try {
             msg = connection.readMessage();
             if (logger.traceOn()) logger.trace("MessageReader-run", "got incoming message " + msg);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (logger.traceOn()) logger.trace("MessageReader-run", e);
             if (stopped()) break;
             try {
               callback.connectionException(e);
-            } catch (@SuppressWarnings("unused") Exception ee) { // OK. We have already informed the admin.
+            } catch (@SuppressWarnings("unused") final Exception ee) { // OK. We have already informed the admin.
             }
             // if reconnected, a new reader should be created.
             break;
@@ -385,7 +385,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
               notifLock.notify();
             }
           } else if (msg instanceof MBeanServerResponseMessage) {
-            ResponseMsgWrapper mwrapper;
+            final ResponseMsgWrapper mwrapper;
             synchronized (waitingList) {
               mwrapper = (ResponseMsgWrapper) waitingList.get(new Long(((MBeanServerResponseMessage) msg).getMessageId()));
             }
@@ -402,7 +402,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           } else ThreadService.getShared().handoff(new RemoteJob(msg)); // unknown message, protocol error
           if (msg instanceof CloseMessage) break;
         }
-      } catch (@SuppressWarnings("unused") Exception eee) {
+      } catch (@SuppressWarnings("unused") final Exception eee) {
         // need to stop
         if (logger.traceOn()) logger.trace("MessageReader-run", "stops.");
       }
@@ -470,13 +470,13 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     public void run() {
       if (logger.traceOn()) logger.trace("RemoteJob-run", "Receive a new request.");
       try {
-        Message resp = callback.execute(msg);
+        final Message resp = callback.execute(msg);
         if (resp != null) {
           synchronized (connectionLock) {
             connection.writeMessage(resp);
           }
         }
-      } catch (Exception ie) {
+      } catch (final Exception ie) {
         synchronized (stateLock) {
           if (state != CONNECTED && callback != null) {
             // inform the callback
@@ -500,7 +500,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       while (state != CONNECTED && state != TERMINATED && remainingTime > 0) {
         try {
           stateLock.wait(remainingTime);
-        } catch (@SuppressWarnings("unused") InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") final InterruptedException ire) {
           break;
         }
         remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);

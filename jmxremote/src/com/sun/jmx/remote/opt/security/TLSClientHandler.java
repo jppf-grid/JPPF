@@ -132,8 +132,8 @@ public class TLSClientHandler implements ProfileClient {
     // Get SSLSocketFactory
     SSLSocketFactory ssf = (SSLSocketFactory) env.get("jmx.remote.tls.socket.factory");
     if (ssf == null) ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-    String hostname = socket.getInetAddress().getHostName();
-    int port = socket.getPort();
+    final String hostname = socket.getInetAddress().getHostName();
+    final int port = socket.getPort();
     if (logger.traceOn()) {
       logger.trace("initialize", "TLS: Hostname = " + hostname);
       logger.trace("initialize", "TLS: Port = " + port);
@@ -144,19 +144,19 @@ public class TLSClientHandler implements ProfileClient {
     if (logger.traceOn()) logger.trace("initialize", "TLS: Socket Client Mode = " + ts.getUseClientMode());
     // Set the SSLSocket Enabled Protocols
     if (TLSServerHandler.bundledJSSE) {
-      String enabledProtocols = (String) env.get("jmx.remote.tls.enabled.protocols");
+      final String enabledProtocols = (String) env.get("jmx.remote.tls.enabled.protocols");
       if (enabledProtocols != null) {
-        StringTokenizer st = new StringTokenizer(enabledProtocols, " ");
-        int tokens = st.countTokens();
-        String enabledProtocolsList[] = new String[tokens];
+        final StringTokenizer st = new StringTokenizer(enabledProtocols, " ");
+        final int tokens = st.countTokens();
+        final String enabledProtocolsList[] = new String[tokens];
         for (int i = 0; i < tokens; i++) enabledProtocolsList[i] = st.nextToken();
         TLSServerHandler.setEnabledProtocols(ts, enabledProtocolsList);
       }
       if (logger.traceOn()) {
         logger.trace("initialize", "TLS: Enabled Protocols");
-        String[] enabled_p = TLSServerHandler.getEnabledProtocols(ts);
+        final String[] enabled_p = TLSServerHandler.getEnabledProtocols(ts);
         if (enabled_p != null) {
-          StringBuffer str_buffer = new StringBuffer();
+          final StringBuffer str_buffer = new StringBuffer();
           for (int i = 0; i < enabled_p.length; i++) {
             str_buffer.append(enabled_p[i]);
             if (i + 1 < enabled_p.length) str_buffer.append(", ");
@@ -167,19 +167,19 @@ public class TLSClientHandler implements ProfileClient {
     }
 
     // Set the SSLSocket Enabled Cipher Suites
-    String enabledCipherSuites = (String) env.get("jmx.remote.tls.enabled.cipher.suites");
+    final String enabledCipherSuites = (String) env.get("jmx.remote.tls.enabled.cipher.suites");
     if (enabledCipherSuites != null) {
-      StringTokenizer st = new StringTokenizer(enabledCipherSuites, " ");
-      int tokens = st.countTokens();
-      String enabledCipherSuitesList[] = new String[tokens];
+      final StringTokenizer st = new StringTokenizer(enabledCipherSuites, " ");
+      final int tokens = st.countTokens();
+      final String enabledCipherSuitesList[] = new String[tokens];
       for (int i = 0; i < tokens; i++) enabledCipherSuitesList[i] = st.nextToken();
       ts.setEnabledCipherSuites(enabledCipherSuitesList);
     }
     if (logger.traceOn()) {
       logger.trace("initialize", "TLS: Enabled Cipher Suites");
-      String[] enabled_cs = ts.getEnabledCipherSuites();
+      final String[] enabled_cs = ts.getEnabledCipherSuites();
       if (enabled_cs != null) {
-        StringBuffer str_buffer = new StringBuffer();
+        final StringBuffer str_buffer = new StringBuffer();
         for (int i = 0; i < enabled_cs.length; i++) {
           str_buffer.append(enabled_cs[i]);
           if (i + 1 < enabled_cs.length) str_buffer.append(", ");
@@ -191,7 +191,7 @@ public class TLSClientHandler implements ProfileClient {
 
   @Override
   public ProfileMessage produceMessage() throws IOException {
-    TLSMessage tlspm = new TLSMessage(TLSMessage.READY);
+    final TLSMessage tlspm = new TLSMessage(TLSMessage.READY);
     if (logger.traceOn()) {
       logger.trace("produceMessage", ">>>>> TLS client message <<<<<");
       logger.trace("produceMessage", "Profile Name : " + tlspm.getProfileName());
@@ -205,7 +205,7 @@ public class TLSClientHandler implements ProfileClient {
     if (!(pm instanceof TLSMessage)) {
       throw new IOException("Unexpected profile message type: " + pm.getClass().getName());
     }
-    TLSMessage tlspm = (TLSMessage) pm;
+    final TLSMessage tlspm = (TLSMessage) pm;
     if (logger.traceOn()) {
       logger.trace("consumeMessage", ">>>>> TLS server message <<<<<");
       logger.trace("consumeMessage", "Profile Name : " + tlspm.getProfileName());
@@ -230,7 +230,7 @@ public class TLSClientHandler implements ProfileClient {
     }
     ts.startHandshake();
     if (logger.traceOn()) {
-      SSLSession session = ts.getSession();
+      final SSLSession session = ts.getSession();
       if (session != null) {
         logger.trace("activate", "TLS: getCipherSuite = " + session.getCipherSuite());
         logger.trace("activate", "TLS: getPeerHost = " + session.getPeerHost());

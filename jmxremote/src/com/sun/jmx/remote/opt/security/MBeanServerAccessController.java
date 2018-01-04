@@ -143,9 +143,9 @@ public abstract class MBeanServerAccessController implements MBeanServerForwarde
   public ObjectInstance createMBean(final String className, final ObjectName name) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
   NotCompliantMBeanException {
     checkWrite();
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm == null) {
-      Object object = getMBeanServer().instantiate(className);
+      final Object object = getMBeanServer().instantiate(className);
       checkClassLoader(object);
       return getMBeanServer().registerMBean(object, name);
     } else {
@@ -160,9 +160,9 @@ public abstract class MBeanServerAccessController implements MBeanServerForwarde
   public ObjectInstance createMBean(final String className, final ObjectName name, final Object params[], final String signature[]) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException,
   MBeanException, NotCompliantMBeanException {
     checkWrite();
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm == null) {
-      Object object = getMBeanServer().instantiate(className, params, signature);
+      final Object object = getMBeanServer().instantiate(className, params, signature);
       checkClassLoader(object);
       return getMBeanServer().registerMBean(object, name);
     } else {
@@ -177,9 +177,9 @@ public abstract class MBeanServerAccessController implements MBeanServerForwarde
   public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
   NotCompliantMBeanException, InstanceNotFoundException {
     checkWrite();
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm == null) {
-      Object object = getMBeanServer().instantiate(className, loaderName);
+      final Object object = getMBeanServer().instantiate(className, loaderName);
       checkClassLoader(object);
       return getMBeanServer().registerMBean(object, name);
     } else {
@@ -194,9 +194,9 @@ public abstract class MBeanServerAccessController implements MBeanServerForwarde
   public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName, final Object params[], final String signature[]) throws ReflectionException, InstanceAlreadyExistsException,
   MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException {
     checkWrite();
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm == null) {
-      Object object = getMBeanServer().instantiate(className, loaderName, params, signature);
+      final Object object = getMBeanServer().instantiate(className, loaderName, params, signature);
       checkClassLoader(object);
       return getMBeanServer().registerMBean(object, name);
     } else {
@@ -493,7 +493,7 @@ public abstract class MBeanServerAccessController implements MBeanServerForwarde
    * @throws InstanceNotFoundException .
    */
   private void checkMLetAddURL(final ObjectName name, final String operationName) throws InstanceNotFoundException {
-    SecurityManager sm = System.getSecurityManager();
+    final SecurityManager sm = System.getSecurityManager();
     if (sm == null) {
       if (operationName.equals("addURL") && getMBeanServer().isInstanceOf(name, "javax.management.loading.MLet")) throw new SecurityException("Access denied! MLet method "
           + "addURL cannot be invoked " + "unless a security manager " + "is installed.");

@@ -121,12 +121,12 @@ public class SubjectDelegator {
     }
     // Check if the subject delegation permission allows the authenticated subject to assume the identity of each principal in the delegated subject
     final Principal[] dp = delegatedPrincipals;
-    PrivilegedAction<Object> action = new PrivilegedAction<Object>() {
+    final PrivilegedAction<Object> action = new PrivilegedAction<Object>() {
       @Override
       public Object run() {
         for (int i = 0; i < dp.length; i++) {
           final String pname = dp[i].getClass().getName() + "." + dp[i].getName();
-          Permission sdp = new SubjectDelegationPermission(pname);
+          final Permission sdp = new SubjectDelegationPermission(pname);
           AccessController.checkPermission(sdp);
         }
         return null;

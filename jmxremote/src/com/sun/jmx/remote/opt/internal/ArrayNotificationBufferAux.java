@@ -90,15 +90,15 @@ public class ArrayNotificationBufferAux {
   /** */
   private static final HashMap<MBeanServer,ArrayNotificationBuffer> mbsToBuffer = new HashMap<>(1);
   static {
-    NotificationFilterSupport nfs = new NotificationFilterSupport();
+    final NotificationFilterSupport nfs = new NotificationFilterSupport();
     nfs.enableType(MBeanServerNotification.REGISTRATION_NOTIFICATION);
     creationFilter = nfs;
   }
   static {
     try {
       delegateName = ObjectName.getInstance("JMImplementation:" + "type=MBeanServerDelegate");
-    } catch (MalformedObjectNameException e) {
-      RuntimeException re = new RuntimeException("Can't create delegate name: " + e);
+    } catch (final MalformedObjectNameException e) {
+      final RuntimeException re = new RuntimeException("Can't create delegate name: " + e);
       EnvHelp.initCause(re, e);
       logger.error("<init>", "Can't create delegate name: " + e);
       logger.debug("<init>", e);
@@ -127,7 +127,7 @@ public class ArrayNotificationBufferAux {
   
     @Override
     public NotificationResult fetchNotifications(final Set<ListenerInfo> listeners, final long startSequenceNumber, final long timeout, final int maxNotifications) throws InterruptedException {
-      NotificationBuffer buf = buffer;
+      final NotificationBuffer buf = buffer;
       return buf.fetchNotifications(listeners, startSequenceNumber, timeout, maxNotifications);
     }
   
@@ -201,7 +201,7 @@ public class ArrayNotificationBufferAux {
     @Override
     public void handleNotification(final Notification notif, final Object handback) {
       if (logger.debugOn()) logger.debug("BufferListener.handleNotification", "notif=" + notif + "; handback=" + handback);
-      ObjectName name = (ObjectName) handback;
+      final ObjectName name = (ObjectName) handback;
       buffer.addNotification(new NamedNotification(name, notif));
     }
   }
@@ -223,7 +223,7 @@ public class ArrayNotificationBufferAux {
    * @return .
    */
   public static synchronized NotificationBuffer getNotificationBuffer(final MBeanServer mbs, final Map<String, ?> env) {
-    int queueSize = EnvHelp.getNotifBufferSize(env); //Find out queue size
+    final int queueSize = EnvHelp.getNotifBufferSize(env); //Find out queue size
     ArrayNotificationBuffer buf = mbsToBuffer.get(mbs);
     if (buf == null) {
       buf = new ArrayNotificationBuffer(mbs, queueSize, env);

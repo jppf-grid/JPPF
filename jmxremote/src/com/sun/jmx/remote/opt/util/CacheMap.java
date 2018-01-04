@@ -117,10 +117,10 @@ public class CacheMap<K, V> extends WeakHashMap<K, V> {
    * @param key the key to cache.
    */
   private void cache(final K key) {
-    Iterator<SoftReference<K>> it = cache.iterator();
+    final Iterator<SoftReference<K>> it = cache.iterator();
     while (it.hasNext()) {
-      SoftReference<K> sref = it.next();
-      K key1 = sref.get();
+      final SoftReference<K> sref = it.next();
+      final K key1 = sref.get();
       if (key1 == null) it.remove();
       else if (key.equals(key1)) {
         // Move this element to the head of the LRU list
@@ -129,7 +129,7 @@ public class CacheMap<K, V> extends WeakHashMap<K, V> {
         return;
       }
     }
-    int size = cache.size();
+    final int size = cache.size();
     if (size == nSoftReferences) {
       if (size == 0) return; // degenerate case, equivalent to WeakHashMap
       it.remove();

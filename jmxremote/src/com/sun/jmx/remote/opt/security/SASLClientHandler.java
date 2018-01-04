@@ -153,9 +153,9 @@ public class SASLClientHandler implements ProfileClient {
     else throw new IOException("Not an instance of SocketConnectionIf");
 
     // Prepare parameters for creating SASL client
-    String mech = profile.substring(profile.indexOf("SASL/") + 5);
-    String[] mechs = getSaslMechanismNames(mech);
-    String authzId = (String) env.get("jmx.remote.sasl.authorization.id");
+    final String mech = profile.substring(profile.indexOf("SASL/") + 5);
+    final String[] mechs = getSaslMechanismNames(mech);
+    final String authzId = (String) env.get("jmx.remote.sasl.authorization.id");
     String server = (String) env.get("jmx.remote.x.sasl.server.name");
     if (server == null) server = socket.getInetAddress().getHostName();
     if (logger.traceOn()) logger.trace("initialize", "mech=" + mech + "; mechs=" + Arrays.asList(mechs) + "; authzId=" + authzId + "; server=" + server);
@@ -166,11 +166,11 @@ public class SASLClientHandler implements ProfileClient {
     } else {
       if (env.containsKey("jmx.remote.credentials")) {
         logger.trace("initialize", "found jmx.remote.credentials property");
-        Object credso = env.get("jmx.remote.credentials");
+        final Object credso = env.get("jmx.remote.credentials");
         if (!(credso instanceof String[])) {
           if (logger.traceOn()) logger.trace("initialize", "...but it is not a String[]: " + credso);
         } else {
-          String[] creds = (String[]) credso;
+          final String[] creds = (String[]) credso;
           if (creds.length != 2) {
             if (logger.traceOn()) logger.trace("initialize", "...but it does not have 2 " + "elements: " + Arrays.asList(creds));
           } else cbh = new UserPasswordCallbackHandler(creds[0], creds[1]);
@@ -190,7 +190,7 @@ public class SASLClientHandler implements ProfileClient {
       blob = saslClnt.hasInitialResponse() ? saslClnt.evaluateChallenge(EMPTY) : EMPTY;
       initialResponse = false;
     }
-    SASLMessage response = new SASLMessage(mechanism, SASLMessage.CONTINUE, blob);
+    final SASLMessage response = new SASLMessage(mechanism, SASLMessage.CONTINUE, blob);
     if (logger.traceOn()) {
       logger.trace("produceMessage", ">>>>> SASL client message <<<<<");
       logger.trace("produceMessage", "Profile Name : " + response.getProfileName());
@@ -202,7 +202,7 @@ public class SASLClientHandler implements ProfileClient {
   @Override
   public void consumeMessage(final ProfileMessage pm) throws IOException {
     if (!(pm instanceof SASLMessage)) throw new IOException("Unexpected profile message type: " + pm.getClass().getName());
-    SASLMessage challenge = (SASLMessage) pm;
+    final SASLMessage challenge = (SASLMessage) pm;
     if (logger.traceOn()) {
       logger.trace("consumeMessage", ">>>>> SASL server message <<<<<");
       logger.trace("consumeMessage", "Profile Name : " + challenge.getProfileName());
@@ -235,13 +235,13 @@ public class SASLClientHandler implements ProfileClient {
   public void activate() throws IOException {
     // If negotiated integrity or privacy
     //
-    String qop = (String) saslClnt.getNegotiatedProperty(Sasl.QOP);
+    final String qop = (String) saslClnt.getNegotiatedProperty(Sasl.QOP);
     if (qop != null && (qop.equalsIgnoreCase("auth-int") || qop.equalsIgnoreCase("auth-conf"))) {
       // Replace the current input/output streams in
       // MessageConnection by the SASL input/output streams
       //
-      SASLInputStream saslis = new SASLInputStream(saslClnt, socket.getInputStream());
-      SASLOutputStream saslos = new SASLOutputStream(saslClnt, socket.getOutputStream());
+      final SASLInputStream saslis = new SASLInputStream(saslClnt, socket.getInputStream());
+      final SASLOutputStream saslos = new SASLOutputStream(saslClnt, socket.getOutputStream());
       ((SocketConnectionIf) mc).replaceStreams(saslis, saslos);
     }
   }
@@ -262,8 +262,8 @@ public class SASLClientHandler implements ProfileClient {
    * @return A non-null array of String; each element of the array contains a single mechanism name.
    */
   private static String[] getSaslMechanismNames(final String str) {
-    StringTokenizer parser = new StringTokenizer(str);
-    Vector<String> mechanisms = new Vector<>(10);
+    final StringTokenizer parser = new StringTokenizer(str);
+    final Vector<String> mechanisms = new Vector<>(10);
     while (parser.hasMoreTokens()) {
       mechanisms.addElement(parser.nextToken());
     }
@@ -299,10 +299,10 @@ public class SASLClientHandler implements ProfileClient {
     public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
       for (int i = 0; i < callbacks.length; i++) {
         if (callbacks[i] instanceof NameCallback) {
-          NameCallback ncb = (NameCallback) callbacks[i];
+          final NameCallback ncb = (NameCallback) callbacks[i];
           ncb.setName(user);
         } else if (callbacks[i] instanceof PasswordCallback) {
-          PasswordCallback pcb = (PasswordCallback) callbacks[i];
+          final PasswordCallback pcb = (PasswordCallback) callbacks[i];
           pcb.setPassword(pwchars);
         } else {
           throw new UnsupportedCallbackException(callbacks[i]);

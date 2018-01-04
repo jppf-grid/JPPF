@@ -147,7 +147,7 @@ public class JMXPasswordAuthenticator implements JMXAuthenticator {
     final String username = aCredentials[0];
     final String password = aCredentials[1];
     if (username == null || password == null) authenticationFailure("authenticate", "Username or password is null");
-    String localPasswd;
+    final String localPasswd;
     synchronized (props) {
       localPasswd = props.getProperty(username); // can be null
     }
@@ -179,8 +179,8 @@ public class JMXPasswordAuthenticator implements JMXAuthenticator {
    * @throws IOException .
    */
   private static Properties propertiesFromFile(final String fname) throws IOException {
-    FileInputStream fin = new FileInputStream(fname);
-    Properties p = new Properties();
+    final FileInputStream fin = new FileInputStream(fname);
+    final Properties p = new Properties();
     p.load(fin);
     fin.close();
     return p;

@@ -174,7 +174,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
         // closed by another thread
         try {
           connection.close();
-        } catch (@SuppressWarnings("unused") Exception e) {
+        } catch (@SuppressWarnings("unused") final Exception e) {
           // OK Already closed.
         }
         throw new IOException("The connecting is stooped by another thread.");
@@ -266,7 +266,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
           msg = null;
           try {
             msg = connection.readMessage();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (stopped()) break;
             callback.connectionException(e);
             // if reconnected, a new reader should be created.
@@ -277,7 +277,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
           ThreadService.getShared().handoff(new RemoteJob(msg));
           if (msg instanceof CloseMessage) break;
         }
-      } catch (@SuppressWarnings("unused") Exception eee) {
+      } catch (@SuppressWarnings("unused") final Exception eee) {
         // need to stop
         if (logger.traceOn()) logger.trace("MessageReader.run", "stops.");
       }
@@ -333,13 +333,13 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
     public void run() {
       if (logger.traceOn()) logger.trace("RemoteJob.run", "Receive a new request.");
       try {
-        Message resp = callback.execute(msg);
+        final Message resp = callback.execute(msg);
         if (resp != null) {
           synchronized (connectionLock) {
             connection.writeMessage(resp);
           }
         }
-      } catch (Exception ie) {
+      } catch (final Exception ie) {
         synchronized (stateLock) {
           if (state != CONNECTED && callback != null) {
             // inform the callback
@@ -368,7 +368,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
       while (state == CONNECTING && waitConnectedState > 0) {
         try {
           stateLock.wait(remainingTime);
-        } catch (@SuppressWarnings("unused") InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") final InterruptedException ire) {
           break;
         }
         remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);
