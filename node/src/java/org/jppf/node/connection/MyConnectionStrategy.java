@@ -64,7 +64,7 @@ public class MyConnectionStrategy implements DriverConnectionStrategy {
         (context.getReason() == ConnectionReason.MANAGEMENT_REQUEST)) {
       return currentInfo;
     }
-    DriverConnectionInfo info = queue.poll();
+    final DriverConnectionInfo info = queue.poll();
     queue.offer(info);
     return info;
   }

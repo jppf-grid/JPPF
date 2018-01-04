@@ -40,17 +40,17 @@ public class DelegatingNodeListener extends NodeLifeCycleListenerAdapter {
    */
   public DelegatingNodeListener() {
     try {
-      ScreenSaverMain ssm = ScreenSaverMain.getInstance();
+      final ScreenSaverMain ssm = ScreenSaverMain.getInstance();
       if (ssm != null) {
-        TypedProperties config = ssm.getConfig();
-        String name = config.get(JPPFProperties.SCREENSAVER_NODE_LISTENER);
+        final TypedProperties config = ssm.getConfig();
+        final String name = config.get(JPPFProperties.SCREENSAVER_NODE_LISTENER);
         if (name != null) {
-          Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
+          final Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
           delegate = (NodeIntegration) clazz.newInstance();
           delegate.setUiComponent(ssm.getScreenSaver());
         }
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
   }
 

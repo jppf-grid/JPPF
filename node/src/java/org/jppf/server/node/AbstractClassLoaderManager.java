@@ -62,7 +62,7 @@ public abstract class AbstractClassLoaderManager {
    * Default constructor for class loader manager.
    */
   protected AbstractClassLoaderManager() {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     this.maxContainers = config.get(JPPFProperties.CLASSLOADER_CACHE_SIZE);
   }
 
@@ -99,7 +99,7 @@ public abstract class AbstractClassLoaderManager {
     if (classLoader != null) {
       try {
         classLoader.close();
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         log.error(t.getMessage(), t);
       } finally {
         classLoader = null;
@@ -127,14 +127,14 @@ public abstract class AbstractClassLoaderManager {
    * @throws Exception if an error occurs while getting the container.
    */
   public synchronized JPPFContainer getContainer(final List<String> uuidPath, final boolean clientAccess, final Object...params) throws Exception {
-    String uuid = uuidPath.get(0);
+    final String uuid = uuidPath.get(0);
     JPPFContainer container = containerMap.get(uuid);
     if (container == null) {
       if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-      AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath, params);
+      final AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath, params);
       container = newJPPFContainer(uuidPath, cl, clientAccess);
       if (containerList.size() >= maxContainers) {
-        JPPFContainer toRemove = containerList.removeFirst();
+        final JPPFContainer toRemove = containerList.removeFirst();
         try {
           clearContainer(toRemove);
         } finally {
@@ -161,7 +161,7 @@ public abstract class AbstractClassLoaderManager {
       public AbstractJPPFClassLoader run() {
         try {
           return newClassLoaderCreator(uuidPath, params).call();
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
         return null;
@@ -187,10 +187,8 @@ public abstract class AbstractClassLoaderManager {
    * @param container th container to clean up.
    */
   protected void clearContainer(final JPPFContainer container) {
-    AbstractJPPFClassLoader loader = container.getClassLoader();
-    if (loader != null) {
-      loader.close();
-    }
+    final AbstractJPPFClassLoader loader = container.getClassLoader();
+    if (loader != null) loader.close();
   }
 
   /**
@@ -215,8 +213,8 @@ public abstract class AbstractClassLoaderManager {
    * Clear the resource caches of all class loaders managed by this object.
    */
   public void clearResourceCaches() {
-    for (JPPFContainer cont: containerList) {
-      AbstractJPPFClassLoader cl = cont.getClassLoader();
+    for (final JPPFContainer cont: containerList) {
+      final AbstractJPPFClassLoader cl = cont.getClassLoader();
       if (cl != null) cl.resetResourceCache();
     }
     if (classLoader != null) classLoader.resetResourceCache();
@@ -230,10 +228,10 @@ public abstract class AbstractClassLoaderManager {
    * @throws Exception if any error occurs.
    */
   public AbstractJPPFClassLoader resetClassLoader(final List<String> uuidPath, final Object...params) throws Exception {
-    JPPFContainer cont = getContainer(uuidPath);
-    AbstractJPPFClassLoader oldCL = cont.getClassLoader();
-    String requestUuid = oldCL.getRequestUuid();
-    AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath, params);
+    final JPPFContainer cont = getContainer(uuidPath);
+    final AbstractJPPFClassLoader oldCL = cont.getClassLoader();
+    final String requestUuid = oldCL.getRequestUuid();
+    final AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath, params);
     newCL.setRequestUuid(requestUuid);
     cont.setClassLoader(newCL);
     oldCL.close();

@@ -108,7 +108,7 @@ class X11IdleTimeDetector implements IdleTimeDetector {
       info = new XScreenSaverInfo();
       Xss.INSTANCE.XScreenSaverQueryInfo(display, window, info);
       idleMillis = info.idle.longValue();
-    } catch(UnsatisfiedLinkError e) {
+    } catch(final UnsatisfiedLinkError e) {
       throw new JPPFError(e.getMessage(), e);
     } finally {
       info = null;

@@ -30,6 +30,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class NodeConfigNotifier extends NotificationBroadcasterSupport implements NodeConfigNotifierMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Singleton instance of this class.
    */
   private static final NodeConfigNotifier instance = new NodeConfigNotifier();
@@ -52,7 +56,7 @@ public class NodeConfigNotifier extends NotificationBroadcasterSupport implement
    * @param configuration the changed configuration.
    */
   public void sendNotification(final String nodeUuid, final TypedProperties configuration) {
-    Notification notif = new Notification("config.notifier", nodeUuid, sequence.incrementAndGet(), System.currentTimeMillis());
+    final Notification notif = new Notification("config.notifier", nodeUuid, sequence.incrementAndGet(), System.currentTimeMillis());
     notif.setUserData(configuration);
     sendNotification(notif);
   }

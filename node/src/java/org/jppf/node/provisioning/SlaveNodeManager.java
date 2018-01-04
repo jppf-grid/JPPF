@@ -137,7 +137,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   private void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
     if (debugEnabled) log.debug(String.format("provisioning request for %d slaves, interruptIfRunning=%b, configOverrides=%s", requestedSlaves, interruptIfRunning, configOverrides));
-    int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
+    final int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       if (debugEnabled) log.debug("stopping all processes");
@@ -154,8 +154,8 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
         }
       }
     }
-    int size = nbSlaves();
-    int diff = size - requestedSlaves;
+    final int size = nbSlaves();
+    final int diff = size - requestedSlaves;
     // if running slaves > requested ones, stop those not needed
     int id = -1;
     if (diff > 0) {
@@ -180,7 +180,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       if (debugEnabled) log.debug("starting " + -diff + " processes");
       for (int i=size; i<requestedSlaves; i++) {
         id = reserveNextAvailableId();
-        String slaveDirPath = SLAVE_PATH_PREFIX + id;
+        final String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
           log.debug("starting slave at {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
@@ -194,13 +194,13 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       }
     }
     if (REQUEST_CHECK_TIMEOUT > 0) {
-      long start = System.nanoTime();
-      boolean check = ConcurrentUtils.awaitCondition(new Condition() {
+      final long start = System.nanoTime();
+      final boolean check = ConcurrentUtils.awaitCondition(new Condition() {
         @Override public boolean evaluate() {
           return nbSlaves() == requestedSlaves;
         }
       }, REQUEST_CHECK_TIMEOUT);
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) log.debug(String.format("fullfilment check for provisioning request for %d slaves %s after %,d ms", requestedSlaves, (check ? "succeeded" : "timed out"), elapsed));
     }
   }
@@ -223,11 +223,11 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param id the id assigned to the slave node.
    * @throws Exception if any error occurs.
    */
-  private void setupSlaveNodeFiles(final String slaveDirPath, final TypedProperties configOverrides, final int id) throws Exception {
-    File slaveDir = new File(slaveDirPath);
+  private static void setupSlaveNodeFiles(final String slaveDirPath, final TypedProperties configOverrides, final int id) throws Exception {
+    final File slaveDir = new File(slaveDirPath);
     if (!slaveDir.exists()) slaveDir.mkdirs();
-    File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
-    File slaveConfigDest = new File(slaveDir, SLAVE_LOCAL_CONFIG_DIR);
+    final File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
+    final File slaveConfigDest = new File(slaveDir, SLAVE_LOCAL_CONFIG_DIR);
     if (!slaveConfigDest.exists()) slaveConfigDest.mkdirs();
     if (slaveConfigSrc.exists()) {
       FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
@@ -236,8 +236,8 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       if (debugEnabled) log.debug("config source dir '{}' does not exist", slaveConfigSrc);
     }
     // get the JPPF config, apply the overrides, then save it to the slave's folder
-    TypedProperties config = JPPFConfiguration.getProperties();
-    TypedProperties props = new TypedProperties(config);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties props = new TypedProperties(config);
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.set(JPPFProperties.PROVISIONING_MASTER, false);
     props.set(JPPFProperties.PROVISIONING_SLAVE, true);
@@ -250,7 +250,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
 
   @Override
   public void processStarted(final ProcessLauncherEvent event) {
-    SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
+    final SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     synchronized(slaves) {
       slaves.put(slave.getId(), slave);
     }
@@ -260,7 +260,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
 
   @Override
   public void processStopped(final ProcessLauncherEvent event) {
-    SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
+    final SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     if (debugEnabled) log.debug("received processStopped() for slave id = {}, exitCode = {}", slave.getId(), slave.exitCode);
     if (slave.exitCode != 2) removeSlave(slave);
     else new Thread(slave, slave.getName()).start();
@@ -270,10 +270,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Compute the classpath for the slave nodes.
    */
   private void computeSlaveClasspath() {
-    String separator = System.getProperty("path.separator");
-    String cp = System.getProperty("java.class.path");
-    String[] paths = cp.split(separator);
-    for (String path: paths) {
+    final String separator = System.getProperty("path.separator");
+    final String cp = System.getProperty("java.class.path");
+    final String[] paths = cp.split(separator);
+    for (final String path: paths) {
       if (path != null) slaveClasspath.add(new File(path).getAbsolutePath());
     }
     slaveClasspath.add(".");
@@ -284,30 +284,30 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Automatically start slaves if specified in the configuration.
    */
   public static void handleStartup() {
-    int n = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_SLAVES);
+    final int n = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_SLAVES);
     if (n > 0) {
       String msg = "starting " + n + " slave nodes";
       TypedProperties props = null;
-      File file = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_FILE);
+      final File file = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_FILE);
       if ((file != null) && file.exists()) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
           props = new TypedProperties().loadAndResolve(reader);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error("slave startup config overrides file {} could not be loaded: {}", file, ExceptionUtils.getStackTrace(e));
         }
       } else {
-        String source = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_SOURCE);
+        final String source = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_SOURCE);
         if ((source != null) && !source.trim().isEmpty()) {
           try {
-            Class<?> c = Class.forName(source);
+            final Class<?> c = Class.forName(source);
             if (JPPFConfiguration.ConfigurationSource.class.isAssignableFrom(c)) {
-              JPPFConfiguration.ConfigurationSource configReader = (JPPFConfiguration.ConfigurationSource) c.newInstance();
+              final JPPFConfiguration.ConfigurationSource configReader = (JPPFConfiguration.ConfigurationSource) c.newInstance();
               props = new TypedProperties().loadAndResolve(new InputStreamReader(configReader.getPropertyStream()));
             } else {
-              JPPFConfiguration.ConfigurationSourceReader configReader = (JPPFConfiguration.ConfigurationSourceReader) c.newInstance();
+              final JPPFConfiguration.ConfigurationSourceReader configReader = (JPPFConfiguration.ConfigurationSourceReader) c.newInstance();
               props = new TypedProperties().loadAndResolve(configReader.getPropertyReader());
             }
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error("slave startup config overrides source {} could not be instantiated: {}", source, ExceptionUtils.getStackTrace(e));
           }
         }
@@ -338,7 +338,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @since 4.2.2
    */
   private int reserveNextAvailableId() {
-    int count = nextAvailableId();
+    final int count = nextAvailableId();
     synchronized(reservedIds) {
       reservedIds.add(count);
     }

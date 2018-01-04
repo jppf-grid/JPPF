@@ -47,9 +47,9 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-    Node node = event.getNode();
+    final Node node = event.getNode();
     if (!node.isOffline()) return;
-    ClassPath classpath = event.getJob().getSLA().getClassPath();
+    final ClassPath classpath = event.getJob().getSLA().getClassPath();
     if (node.isAndroid()) {
       //node.resetTaskClassLoader(classpath);
     } else {
@@ -57,30 +57,30 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
       AbstractJPPFClassLoader cl = event.getTaskClassLoader();
       if ((classpath != null) && (classpath.isForceClassLoaderReset() || !classpath.isEmpty())) cl = (AbstractJPPFClassLoader) node.resetTaskClassLoader();
       if ((classpath != null) && !classpath.isEmpty()) {
-        for (ClassPathElement elt: classpath) {
+        for (final ClassPathElement elt: classpath) {
           boolean validated = false;
           try {
             validated = elt.validate();
-          } catch (Throwable t) {
-            String format = "exception occurred during validation of classpath element '{}' : {}";
+          } catch (final Throwable t) {
+            final String format = "exception occurred during validation of classpath element '{}' : {}";
             if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(t));
             else log.warn(format, elt, ExceptionUtils.getMessage(t));
           }
           if (!validated) continue;
           URL url = null;
-          Location<?> local = elt.getLocalLocation();
-          Location<?> remote = elt.getRemoteLocation();
+          final Location<?> local = elt.getLocalLocation();
+          final Location<?> remote = elt.getRemoteLocation();
           try {
             if (remote != local) local.copyTo(remote);
             if (remote instanceof MemoryLocation) {
               cl.getResourceCache().registerResource(elt.getName(), remote);
               url = cl.getResourceCache().getResourceURL(elt.getName());
             } else if (remote instanceof FileLocation) {
-              File file = new File(((FileLocation) remote).getPath());
+              final File file = new File(((FileLocation) remote).getPath());
               if (file.exists()) url = file.toURI().toURL();
             } else if (remote instanceof URLLocation) url = ((URLLocation) remote).getPath();
-          } catch (Exception e) {
-            String format = "exception occurred during processing of classpath element '{}' : {}";
+          } catch (final Exception e) {
+            final String format = "exception occurred during processing of classpath element '{}' : {}";
             if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));
             else log.warn(format, elt, ExceptionUtils.getMessage(e));
           }

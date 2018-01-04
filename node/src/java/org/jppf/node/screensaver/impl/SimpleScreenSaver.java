@@ -35,6 +35,10 @@ import org.jppf.utils.TypedProperties;
  */
 public class SimpleScreenSaver extends JPanel implements JPPFScreenSaver {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The pseudo-random number generator.
    */
   private Random rand = new Random(System.nanoTime());
@@ -88,17 +92,17 @@ public class SimpleScreenSaver extends JPanel implements JPPFScreenSaver {
   public void paintComponent(final Graphics g) {
     // we do not call super.paintComponent(g) because we do not want to have
     // the backrground repainted each time, which would erase the shapes we draw.
-    int w = getWidth();
-    int h = getHeight();
+    final int w = getWidth();
+    final int h = getHeight();
     if (reset) {
       reset = false;
       g.setColor(Color.BLACK);
       g.fillRect(0, 0, w, h);
     } else {
-      int n = 5;
+      final int n = 5;
       for (int i=0; i<500; i++) {
-        int x = rand.nextInt(w-(n-1));
-        int y = rand.nextInt(h-(n-1));
+        final int x = rand.nextInt(w-(n-1));
+        final int y = rand.nextInt(h-(n-1));
         g.setColor(new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)));
         g.fillOval(x, y, n, n);
       }

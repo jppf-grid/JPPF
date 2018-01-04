@@ -115,7 +115,7 @@ public class NodeRunner {
   public static void main(final String...args) {
     node = null;
     try {
-      TypedProperties overrides = new ConfigurationOverridesHandler().load(true);
+      final TypedProperties overrides = new ConfigurationOverridesHandler().load(true);
       if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
       if (!ANDROID) new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
@@ -126,10 +126,10 @@ public class NodeRunner {
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
-        int port = Integer.parseInt(args[0]);
+        final int port = Integer.parseInt(args[0]);
         (launcherListener = new LauncherListener(port)).start();
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       System.exit(1);
     }
@@ -142,7 +142,7 @@ public class NodeRunner {
           node = createNode(context);
           if (launcherListener != null) launcherListener.setActionHandler(new ShutdownRestartNodeProtocolHandler(node));
           node.run();
-        } catch(JPPFNodeReconnectionNotification e) {
+        } catch(final JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));
           context = new ConnectionContext(e.getMessage(), e.getCause(), e.getReason());
           if (classLoader != null) classLoader.close();
@@ -151,7 +151,7 @@ public class NodeRunner {
           unsetSecurity();
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -189,10 +189,10 @@ public class NodeRunner {
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
-    String className = JPPFConfiguration.get(JPPFProperties.NODE_CLASS);
-    Class<?> clazz = getJPPFClassLoader().loadClass(className);
-    Constructor<?> c = clazz.getConstructor(DriverConnectionInfo.class);
-    JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);
+    final String className = JPPFConfiguration.get(JPPFProperties.NODE_CLASS);
+    final Class<?> clazz = getJPPFClassLoader().loadClass(className);
+    final Constructor<?> c = clazz.getConstructor(DriverConnectionInfo.class);
+    final JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);
     if (debugEnabled) log.debug("Created new node instance: " + node);
     return node;
   }
@@ -201,8 +201,8 @@ public class NodeRunner {
    * Restore the configuration from the snapshot taken at startup time.
    */
   public static void restoreInitialConfig() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    for (Map.Entry<Object, Object> entry: initialConfig.entrySet()) {
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    for (final Map.Entry<Object, Object> entry: initialConfig.entrySet()) {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         config.setProperty((String) entry.getKey(), (String) entry.getValue());
       }
@@ -215,7 +215,7 @@ public class NodeRunner {
    */
   private static void setSecurity() throws Exception {
     if (!securityManagerSet) {
-      String s = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
+      final String s = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
       if (s != null) {
         if (debugEnabled) log.debug("setting security");
         Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));
@@ -231,7 +231,7 @@ public class NodeRunner {
   private static void unsetSecurity() {
     if (securityManagerSet) {
       if (debugEnabled) log.debug("un-setting security");
-      PrivilegedAction<Object> pa = new PrivilegedAction<Object>() {
+      final PrivilegedAction<Object> pa = new PrivilegedAction<Object>() {
         @Override
         public Object run() {
           System.setSecurityManager(null);
@@ -251,7 +251,7 @@ public class NodeRunner {
   public static AbstractJPPFClassLoader getJPPFClassLoader() {
     synchronized(JPPFClassLoader.class) {
       if (classLoader == null) {
-        PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
+        final PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
           @Override
           public JPPFClassLoader run() {
             return new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(currentConnectionInfo), NodeRunner.class.getClassLoader());
@@ -317,22 +317,22 @@ public class NodeRunner {
   private static void stopJmxServer() {
     try {
       node.stopJmxServer();
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
           try {
             node.stopJmxServer();
-          } catch (@SuppressWarnings("unused") Exception ignore) {
+          } catch (@SuppressWarnings("unused") final Exception ignore) {
           }
         }
       };
-      Future<?> f = executor.submit(r);
+      final Future<?> f = executor.submit(r);
       // we don't want to wait forever for the connection to close
       try {
         f.get(1000L, TimeUnit.MILLISECONDS);
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
-    } catch (@SuppressWarnings("unused") Exception ignore) {
+    } catch (@SuppressWarnings("unused") final Exception ignore) {
     }
   }
 
@@ -348,7 +348,7 @@ public class NodeRunner {
     /**
      * True if the node is to be restarted, false to only shut it down.
      */
-    private final NodeInternal node;
+    private final NodeInternal nodeInternal;
 
     /**
      * Initialize this task.
@@ -357,7 +357,7 @@ public class NodeRunner {
      */
     public ShutdownOrRestart(final boolean restart, final NodeInternal node) {
       this.restart = restart;
-      this.node = node;
+      this.nodeInternal = node;
     }
 
     @Override
@@ -366,15 +366,15 @@ public class NodeRunner {
         @Override
         public Object run() {
           if (debugEnabled) log.debug("stopping the node");
-          node.stopNode();
+          nodeInternal.stopNode();
           // close the JMX server connection to avoid request being sent again by the client.
           if (debugEnabled) log.debug("stopping the JMX server");
           stopJmxServer();
           try {
             Thread.sleep(500L);
-          } catch(@SuppressWarnings("unused") Exception ignore) {
+          } catch(@SuppressWarnings("unused") final Exception ignore) {
           }
-          int exitCode = restart ? 2 : 0;
+          final int exitCode = restart ? 2 : 0;
           log.info("exiting the node with exit code {}", exitCode);
           System.exit(exitCode);
           return null;

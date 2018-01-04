@@ -94,11 +94,11 @@ public class LifeCycleEventHandler {
    * Notify all listeners that the node is starting.
    */
   public void fireNodeStarting() {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_STARTING);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_STARTING);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.nodeStarting(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -108,11 +108,11 @@ public class LifeCycleEventHandler {
    * Notify all listeners that the node is terminating.
    */
   public void fireNodeEnding() {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_ENDING);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_ENDING);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.nodeEnding(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -124,11 +124,11 @@ public class LifeCycleEventHandler {
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    */
   public void fireJobHeaderLoaded(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl) {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_HEADER_LOADED, job, cl);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_HEADER_LOADED, job, cl);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.jobHeaderLoaded(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -142,11 +142,11 @@ public class LifeCycleEventHandler {
    * @param dataProvider the data provider for the current job.
    */
   public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider) {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_STARTING, job, cl, tasks, dataProvider);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_STARTING, job, cl, tasks, dataProvider);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.jobStarting(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -160,11 +160,11 @@ public class LifeCycleEventHandler {
    * @param dataProvider the data provider for the current job.
    */
   public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider) {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_ENDING, job, cl, tasks, dataProvider);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_ENDING, job, cl, tasks, dataProvider);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.jobEnding(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -174,11 +174,11 @@ public class LifeCycleEventHandler {
    * Notify all listeners that the node is between jobs.
    */
   public void fireBeforeNextJob() {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, BEFORE_NEXT_JOB, null, null, null, null);
-    for (NodeLifeCycleListener listener : listeners) {
+    final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, BEFORE_NEXT_JOB, null, null, null, null);
+    for (final NodeLifeCycleListener listener : listeners) {
       try {
         listener.beforeNextJob(event);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         handleError(listener, event, t);
       }
     }
@@ -188,13 +188,13 @@ public class LifeCycleEventHandler {
    * Load all listener instances found in the class path via a service definition.
    */
   public void loadListeners() {
-    Iterator<NodeLifeCycleListener> it = ServiceFinder.lookupProviders(NodeLifeCycleListener.class);
+    final Iterator<NodeLifeCycleListener> it = ServiceFinder.lookupProviders(NodeLifeCycleListener.class);
     while (it.hasNext()) {
       try {
-        NodeLifeCycleListener listener = it.next();
+        final NodeLifeCycleListener listener = it.next();
         addNodeLifeCycleListener(listener);
         if (debugEnabled) log.debug("successfully added node life cycle listener " + listener.getClass().getName());
-      } catch(Error e) {
+      } catch(final Error e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -206,12 +206,12 @@ public class LifeCycleEventHandler {
    * @param event the event notification for which an error was raised.
    * @param t the uncaught throwable that was raised during the notification. 
    */
-  private void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
-    NodeLifeCycleErrorHandler handler = (listener instanceof NodeLifeCycleErrorHandler) ? (NodeLifeCycleErrorHandler) listener : DEFAULT_ERROR_HANDLER;
+  private static void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
+    final NodeLifeCycleErrorHandler handler = (listener instanceof NodeLifeCycleErrorHandler) ? (NodeLifeCycleErrorHandler) listener : DEFAULT_ERROR_HANDLER;
     try {
       handler.handleError(listener, event, t);
-    } catch (Exception e) {
-      String msg = "exception occurred while invoking error handler "  + handler + " :\n" + ExceptionUtils.getStackTrace(e);
+    } catch (final Exception e) {
+      final String msg = "exception occurred while invoking error handler "  + handler + " :\n" + ExceptionUtils.getStackTrace(e);
       log.error(msg);
     }
   }

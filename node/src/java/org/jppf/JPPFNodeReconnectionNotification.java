@@ -26,6 +26,10 @@ import org.jppf.node.connection.ConnectionReason;
  */
 public class JPPFNodeReconnectionNotification extends JPPFReconnectionNotification {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * An enum value indicating the reson for the reconnection.
    */
   private final ConnectionReason reason;

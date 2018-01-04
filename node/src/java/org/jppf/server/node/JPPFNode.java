@@ -136,14 +136,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) reset(true);
         throw new JPPFError(e);
-      } catch(IOException e) {
+      } catch(final IOException e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) {
           reset(true);
           throw new JPPFNodeReconnectionNotification("I/O exception occurred during node processing", e, ConnectionReason.JOB_CHANNEL_PROCESSING_ERROR);
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) reset(true);
@@ -188,7 +188,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processNextJob() throws Exception {
-    Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
+    final Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
     TaskBundle bundle = pair.first();
     List<Task<?>> taskList = pair.second();
     if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
@@ -239,7 +239,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
     }
     if (isJmxEnabled()) setupBundleParameters(bundle);
-    Map<String, TypedProperties> defMap = bundle.getParameter(BundleParameter.DATASOURCE_DEFINITIONS, null);
+    final Map<String, TypedProperties> defMap = bundle.getParameter(BundleParameter.DATASOURCE_DEFINITIONS, null);
     if (defMap != null) {
       if (debugEnabled) log.debug("got datasource definitions from server: {}", defMap.keySet());
       JPPFDatasourceFactory.getInstance().configure(defMap, this.getSystemInformation());
@@ -259,7 +259,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged() || bundle.isHandshake() || isOffline()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
-      TypedProperties jppf = systemInformation.getJppf();
+      final TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
       jppf.putAll(JPPFConfiguration.getProperties());
       bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
@@ -282,23 +282,23 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     initHelper();
     try {
       if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) {
-        ClassLoader cl = getClass().getClassLoader();
+        final ClassLoader cl = getClass().getClassLoader();
         if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Error registering the MBeans", e);
     }
     if (isJmxEnabled()) {
       JMXServer jmxServer = null;
       try {
         jmxServer = getJmxServer();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         jmxEnabled = false;
         System.out.println("JMX initialization failure - management is disabled for this node");
         System.out.println("see the log file for details");
         try {
           if (jmxServer != null) jmxServer.stop();
-        } catch(Exception e2) {
+        } catch(final Exception e2) {
           log.error("Error stopping the JMX server", e2);
         }
         jmxServer = null;
@@ -415,7 +415,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       try {
         if (providerManager != null) providerManager.unregisterProviderMBeans();
         if (jmxServer != null) jmxServer.stop();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -425,7 +425,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         closeDataChannel();
       }
       classLoaderManager.clearContainers();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -440,7 +440,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     synchronized(this) {
       if ((jmxServer == null) || jmxServer.isStopped()) {
         if (debugEnabled) log.debug("starting JMX server");
-        boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
+        final boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
         jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, ssl ? JPPFProperties.MANAGEMENT_SSL_PORT_NODE : JPPFProperties.MANAGEMENT_PORT_NODE);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
@@ -486,15 +486,15 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
-    TaskBundle bundle = executionManager.getBundle();
+    final TaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
-      List<String> uuidPath = bundle.getUuidPath().getList();
-      boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
-      AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);
+      final List<String> uuidPath = bundle.getUuidPath().getList();
+      final boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
+      final AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);
       newCL.setRemoteClassLoadingDisabled(remoteClassLoadingDisabled);
       return newCL;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return null;

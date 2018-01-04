@@ -69,8 +69,8 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
     if (log.isDebugEnabled()) {
       if (queue.isEmpty()) log.debug("no valid driver definition found, falling back to default strategy");
       else {
-        StringBuilder sb = new StringBuilder("driver definitions:");
-        for (DriverConnectionInfo info: queue) sb.append('\n').append(info);
+        final StringBuilder sb = new StringBuilder("driver definitions:");
+        for (final DriverConnectionInfo info: queue) sb.append('\n').append(info);
         log.debug(sb.toString());
       }
     }
@@ -83,7 +83,7 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
     if ((currentInfo != null) && (context.getReason() == ConnectionReason.MANAGEMENT_REQUEST)) {
       return currentInfo;
     }
-    DriverConnectionInfo info = queue.poll();
+    final DriverConnectionInfo info = queue.poll();
     queue.offer(info);
     return info;
   }
@@ -96,16 +96,16 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
     try {
       String path = JPPFConfiguration.getProperties().getString("jppf.server.connection.strategy.file");
       if ((path != null) && !(path = path.trim()).isEmpty()) {
-        Reader reader = FileUtils.getFileReader(path);
+        final Reader reader = FileUtils.getFileReader(path);
         if (reader != null) {
-          List<String> lines = FileUtils.textFileAsLines(reader);
-          for (String line: lines) {
-            DriverConnectionInfo info = parseLine(line.trim());
+          final List<String> lines = FileUtils.textFileAsLines(reader);
+          for (final String line: lines) {
+            final DriverConnectionInfo info = parseLine(line.trim());
             if (info != null) queue.offer(info);
           }
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -115,23 +115,23 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
    * @param csv the csv line to parse.
    * @return a {@link DriverConnectionInfo} instance, or {@code null} if the CSV is not valid or a comment.
    */
-  private DriverConnectionInfo parseLine(final String csv) {
+  private static DriverConnectionInfo parseLine(final String csv) {
     if (csv.startsWith("#")) return null;
-    String[] tokens = RegexUtils.COMMA_PATTERN.split(csv);
+    final String[] tokens = RegexUtils.COMMA_PATTERN.split(csv);
     if ((tokens != null) && (tokens.length == 4)) {
       for (int i=0; i<tokens.length; i++) tokens[i] = tokens[i].trim();
-      boolean secure = "true".equalsIgnoreCase(tokens[0]);
-      String host = tokens[1];
-      int port;
+      final boolean secure = "true".equalsIgnoreCase(tokens[0]);
+      final String host = tokens[1];
+      final int port;
       try {
         port = Integer.valueOf(tokens[2]);
-      } catch(@SuppressWarnings("unused") Exception e) {
+      } catch(@SuppressWarnings("unused") final Exception e) {
         return null;
       }
       int recoveryPort;
       try {
         recoveryPort = Integer.valueOf(tokens[3]);
-      } catch(@SuppressWarnings("unused") Exception e) {
+      } catch(@SuppressWarnings("unused") final Exception e) {
         recoveryPort = -1;
       }
       return new JPPFDriverConnectionInfo(secure, host, port, recoveryPort);

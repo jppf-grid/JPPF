@@ -51,21 +51,21 @@ public class OutputRedirectHook implements InitializationHook {
    * @param config the un-modified configuration properties of the node at startup time.
    * @param isOut whetehr to handle the output console (System.out) or the error console (System.err).
    */
-  private void handleStream(final UnmodifiableTypedProperties config, final boolean isOut) {
+  private static void handleStream(final UnmodifiableTypedProperties config, final boolean isOut) {
     try {
-      JPPFProperty<File> pathProp = isOut ? JPPFProperties.REDIRECT_OUT : JPPFProperties.REDIRECT_ERR;
-      File outFile = config.get(pathProp);
+      final JPPFProperty<File> pathProp = isOut ? JPPFProperties.REDIRECT_OUT : JPPFProperties.REDIRECT_ERR;
+      final File outFile = config.get(pathProp);
       if (outFile == null) return;
       if (debugEnabled) log.debug("redirecting System.{} to file {}", (isOut ? "out" : "err"), outFile);
-      JPPFProperty<Boolean> appendProp = isOut ? JPPFProperties.REDIRECT_OUT_APPEND : JPPFProperties.REDIRECT_ERR_APPEND;
-      boolean append = config.get(appendProp);
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
-      PrintStream pos = new PrintStream(os, true);
+      final JPPFProperty<Boolean> appendProp = isOut ? JPPFProperties.REDIRECT_OUT_APPEND : JPPFProperties.REDIRECT_ERR_APPEND;
+      final boolean append = config.get(appendProp);
+      final OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
+      final PrintStream pos = new PrintStream(os, true);
       pos.println("********** " + new Date() + " **********");
       if (isOut) System.setOut(pos);
       else System.setErr(pos);
-    } catch (Exception e) {
-      String message = "error occurred while trying to redirect System." + (isOut ? "out" :  "err") + " : {}";
+    } catch (final Exception e) {
+      final String message = "error occurred while trying to redirect System." + (isOut ? "out" :  "err") + " : {}";
       if (debugEnabled) log.debug(message, ExceptionUtils.getStackTrace(e));
       else log.warn(message, ExceptionUtils.getMessage(e));
     }

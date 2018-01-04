@@ -24,8 +24,11 @@ import java.util.EventObject;
  * Event emitted by an {@link AbstractJPPFClassLoader} when a class is loaded or not found for the first time.
  * @author Laurent Cohen
  */
-public class ClassLoaderEvent extends EventObject
-{
+public class ClassLoaderEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The class that was successfully loaded.
    */
@@ -46,8 +49,7 @@ public class ClassLoaderEvent extends EventObject
    * @param foundInURLClassPath <code>true</code> if the class was loaded from the class loader's URL classpath,
    * <code>false</code> if it was loaded from a remote JPPF driver or client.
    */
-  public ClassLoaderEvent(final AbstractJPPFClassLoader classLoader, final Class<?> loadedClass, final boolean foundInURLClassPath)
-  {
+  public ClassLoaderEvent(final AbstractJPPFClassLoader classLoader, final Class<?> loadedClass, final boolean foundInURLClassPath) {
     super(classLoader);
     this.loadedClass = loadedClass;
     this.className = loadedClass.getName();
@@ -59,8 +61,7 @@ public class ClassLoaderEvent extends EventObject
    * @param classLoader the source of this event.
    * @param className the name of a class that could not be found by this class loader.
    */
-  public ClassLoaderEvent(final AbstractJPPFClassLoader classLoader, final String className)
-  {
+  public ClassLoaderEvent(final AbstractJPPFClassLoader classLoader, final String className) {
     super(classLoader);
     this.loadedClass = null;
     this.className = className;
@@ -69,10 +70,9 @@ public class ClassLoaderEvent extends EventObject
 
   /**
    * Get the class that was successfully loaded.
-   * @return  a <code>Class</code> object, or null if the class was not found.
+   * @return a <code>Class</code> object, or null if the class was not found.
    */
-  public Class<?> getLoadedClass()
-  {
+  public Class<?> getLoadedClass() {
     return loadedClass;
   }
 
@@ -80,8 +80,7 @@ public class ClassLoaderEvent extends EventObject
    * Get the name of a class that was loaded or could not be found by this class loader.
    * @return the class name as a string.
    */
-  public String getClassName()
-  {
+  public String getClassName() {
     return className;
   }
 
@@ -90,8 +89,7 @@ public class ClassLoaderEvent extends EventObject
    * @return <code>true</code> if the class was loaded from the class loader's URL classpath,
    * <code>false</code> if it was loaded from a remote JPPF driver or client.
    */
-  public boolean isFoundInURLClassPath()
-  {
+  public boolean isFoundInURLClassPath() {
     return foundInURLClassPath;
   }
 
@@ -99,8 +97,7 @@ public class ClassLoaderEvent extends EventObject
    * Get the class laoder which emitted this event.
    * @return a {@link AbstractJPPFClassLoader} instance.
    */
-  public AbstractJPPFClassLoader getClassLoader()
-  {
+  public AbstractJPPFClassLoader getClassLoader() {
     return (AbstractJPPFClassLoader) getSource();
   }
 }

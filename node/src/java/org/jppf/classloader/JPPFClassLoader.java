@@ -60,7 +60,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
     if (!isOffline()) {
       try {
         connection.reset();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -74,7 +74,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
   public void close() {
     try {
       if (!dynamic && !isOffline()) connection.close();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     super.close();

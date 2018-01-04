@@ -55,17 +55,17 @@ public class JPPFResourceConnection extends URLConnection {
   @Override
   public void connect() throws IOException {
     try {
-      ResourceCache rc = ResourceCache.getCacheInstance(url.getHost());
-      StringBuilder path = new StringBuilder(url.getPath());
+      final ResourceCache rc = ResourceCache.getCacheInstance(url.getHost());
+      final StringBuilder path = new StringBuilder(url.getPath());
       char c;
       while (((c = path.charAt(0)) == '/') || (c == '\\')) path.deleteCharAt(0);
-      String[] keyvalue = URL_QUERY_SEPARATOR_PATTERN.split(url.getQuery());
-      int id = Integer.valueOf(keyvalue[1]);
-      List<Location<?>> list = rc.getResourcesLocations(path.toString());
+      final String[] keyvalue = URL_QUERY_SEPARATOR_PATTERN.split(url.getQuery());
+      final int id = Integer.valueOf(keyvalue[1]);
+      final List<Location<?>> list = rc.getResourcesLocations(path.toString());
       if (list != null) resource = list.get(id);
       else throw new IOException("URL '" + url + "' does not point to an existing or valid resource");
       this.connected = true;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       connectionFailed = true;
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
@@ -91,7 +91,7 @@ public class JPPFResourceConnection extends URLConnection {
     checkValid();
     try {
       return isInputStream ? resource.getInputStream() : resource.getOutputStream();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
   }

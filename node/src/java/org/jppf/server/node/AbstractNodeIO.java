@@ -79,13 +79,13 @@ public abstract class AbstractNodeIO implements NodeIO {
    */
   @Override
   public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
-    Object[] result = readObjects();
+    final Object[] result = readObjects();
     currentBundle = (TaskBundle) result[0];
-    List<Task<?>> taskList = new ArrayList<>(result.length - 2);
+    final List<Task<?>> taskList = new ArrayList<>(result.length - 2);
     if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
-      DataProvider dataProvider = (DataProvider) result[1];
+      final DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++) {
-        Task<?> task = (Task<?>) result[2 + i];
+        final Task<?> task = (Task<?>) result[2 + i];
         task.setDataProvider(dataProvider).setInNode(true).setNode(node);
         taskList.add(task);
       }
@@ -105,10 +105,10 @@ public abstract class AbstractNodeIO implements NodeIO {
     boolean reload = false;
     try {
       result = deserializeObjects();
-    } catch(IncompatibleClassChangeError err) {
+    } catch(final IncompatibleClassChangeError err) {
       reload = true;
       if (debugEnabled) log.debug(err.getMessage() + "; reloading classes", err);
-    } catch(InvalidClassException e) {
+    } catch(final InvalidClassException e) {
       reload = true;
       if (debugEnabled) log.debug(e.getMessage() + "; reloading classes", e);
     }
@@ -176,7 +176,7 @@ public abstract class AbstractNodeIO implements NodeIO {
   protected void postSendResults(final TaskBundle bundle) throws Exception {
     if (!node.isOffline()) {
       if (debugEnabled) log.debug("resetting remoteClassLoadingDisabled to false");
-      JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+      final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
       cont.getClassLoader().setRemoteClassLoadingDisabled(false);
     }
   }
@@ -195,15 +195,15 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @param tasks the list of tasks after they have been executed.
    */
   protected void finalizeBundleData(final TaskBundle bundle, final List<Task<?>> tasks) {
-    long elapsed = System.nanoTime() - bundle.getNodeExecutionTime();
+    final long elapsed = System.nanoTime() - bundle.getNodeExecutionTime();
     bundle.setNodeExecutionTime(elapsed);
-    Set<Integer> resubmitSet = new HashSet<>();
-    for (Task<?> task: tasks) {
+    final Set<Integer> resubmitSet = new HashSet<>();
+    for (final Task<?> task: tasks) {
       if ((task instanceof AbstractTask) && ((AbstractTask<?>) task).isResubmit()) resubmitSet.add(task.getPosition());
     }
     if (!resubmitSet.isEmpty()) {
       if (debugEnabled) log.debug("positions of task resubmit requests: {}", resubmitSet);
-      int[] resubmitPos = new int[resubmitSet.size()];
+      final int[] resubmitPos = new int[resubmitSet.size()];
       int count = 0;
       for (int n: resubmitSet) resubmitPos[count++] = n;
       bundle.setParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, resubmitPos);
@@ -215,6 +215,11 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @exclude
    */
   protected static class BufferList extends Pair<List<JPPFBuffer>, Integer> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initialize this pairing with the specified list of buffers and length.
      * @param first the list of buffers.
@@ -237,7 +242,7 @@ public abstract class AbstractNodeIO implements NodeIO {
     /**
      * Used to serialize the object.
      */
-    private final ObjectSerializer serializer;
+    private final ObjectSerializer ser;
     /**
      * The context class loader to use.
      */
@@ -251,27 +256,27 @@ public abstract class AbstractNodeIO implements NodeIO {
      */
     public ObjectSerializationTask(final Object object, final ObjectSerializer serializer, final ClassLoader contextCL) {
       this.object = object;
-      this.serializer = serializer;
+      this.ser = serializer;
       this.contextCL = contextCL;
     }
 
     @Override
     public DataLocation call() {
       DataLocation dl = null;
-      int p = (object instanceof Task) ? ((Task<?>) object).getPosition() : -1;
+      final int p = (object instanceof Task) ? ((Task<?>) object).getPosition() : -1;
       try {
         Thread.currentThread().setContextClassLoader(contextCL);
         if (traceEnabled) log.trace("before serialization of object at position " + p);
-        dl = IOHelper.serializeData(object, serializer);
-        int size = dl.getSize();
+        dl = IOHelper.serializeData(object, ser);
+        final int size = dl.getSize();
         if (traceEnabled) log.trace("serialized object at position " + p + ", size = " + size);
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         log.error(t.getMessage(), t);
         try {
-          JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
+          final JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
           result.setPosition(p);
-          dl = IOHelper.serializeData(result, serializer);
-        } catch(Exception e2) {
+          dl = IOHelper.serializeData(result, ser);
+        } catch(final Exception e2) {
           log.error(e2.getMessage(), e2);
         }
       } finally {

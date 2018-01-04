@@ -25,61 +25,44 @@ import static org.jppf.utils.StringUtils.build;
  * @author Laurent Cohen
  * @exclude
  */
-public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<LocalClassLoaderChannel>
-{
+public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<LocalClassLoaderChannel> {
   /**
    * Initialize this connection with the specified channel.
    * @param channel the local channel to use.
    */
-  public LocalClassLoaderConnection(final LocalClassLoaderChannel channel)
-  {
+  public LocalClassLoaderConnection(final LocalClassLoaderChannel channel) {
     this.channel = channel;
   }
 
   @Override
-  public void init() throws Exception
-  {
+  public void init() throws Exception {
     lock.lock();
-    try
-    {
-      if (initializing.compareAndSet(false, true))
-      {
-        try
-        {
-          ResourceRequestRunner rr = new LocalResourceRequest(channel);
+    try {
+      if (initializing.compareAndSet(false, true)) {
+        try {
+          final ResourceRequestRunner rr = new LocalResourceRequest(channel);
           performCommonHandshake(rr);
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
-        }
-        catch (Exception e)
-        {
+        } catch (final Exception e) {
           throw new RuntimeException(e);
-        }
-        finally
-        {
+        } finally {
           initializing.set(false);
         }
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     lock.lock();
-    try
-    {
-      if (requestHandler != null)
-      {
+    try {
+      if (requestHandler != null) {
         requestHandler.close();
         requestHandler = null;
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }

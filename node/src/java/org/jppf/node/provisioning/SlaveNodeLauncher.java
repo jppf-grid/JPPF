@@ -62,10 +62,6 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    */
   private boolean started = false;
   /**
-   *
-   */
-  private boolean stopped = false;
-  /**
    * Captures the exit code of the slave node process.
    */
   int exitCode = -1;
@@ -103,14 +99,14 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
       end = onProcessExit(exitCode);
       fireProcessStopped(false);
       tearDown();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       fireProcessStopped(false);
     } finally {
       setStarted(false);
       try {
         if (hookThread != null) Runtime.getRuntime().removeShutdownHook(hookThread);
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }
   }
@@ -121,14 +117,14 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    * @throws Exception if the process failed to start.
    */
   private Process startProcess() throws Exception {
-    File configFile = new File(slaveDir, SLAVE_LOCAL_CONFIG_PATH);
+    final File configFile = new File(slaveDir, SLAVE_LOCAL_CONFIG_PATH);
     TypedProperties config = null;
     try (Reader reader = new BufferedReader(new FileReader(configFile))) {
       config = new TypedProperties().loadAndResolve(reader);
     }
     if (log.isDebugEnabled()) log.debug("{} read config {} : {}", new Object[] {name, configFile, config});
-    List<String> jvmOptions = new ArrayList<>();
-    List<String> cpElements = new ArrayList<>(classpath);
+    final List<String> jvmOptions = new ArrayList<>();
+    final List<String> cpElements = new ArrayList<>(classpath);
     String s = config.get(JPPFProperties.JVM_OPTIONS);
     Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
     jvmOptions.addAll(parsed.first());
@@ -138,7 +134,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     jvmOptions.addAll(parsed.first());
     cpElements.addAll(parsed.second());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
-    List<String> command = new ArrayList<>();
+    final List<String> command = new ArrayList<>();
     command.add(computeJavaExecPath(config));
     command.add("-cp");
     command.add(buildClasspath(cpElements));
@@ -147,7 +143,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     command.add(MAIN_CLASS);
     command.add("" + processPort);
     if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, command);
-    ProcessBuilder builder = new ProcessBuilder(command);
+    final ProcessBuilder builder = new ProcessBuilder(command);
     builder.directory(slaveDir);
     builder.redirectOutput(new File(slaveDir, "system_out.log"));
     builder.redirectError(new File(slaveDir, "system_err.log"));

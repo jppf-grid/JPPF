@@ -100,8 +100,8 @@ class ImageData {
    * @return true if the two logos are colliding, false otherwise.
    */
   private boolean checkColliding(final ImageData d) {
-    int x1 = x + stepx;
-    int y1 = y + stepy;
+    final int x1 = x + stepx;
+    final int y1 = y + stepy;
     if (isIn(x1, y1, d)) {
       if (x >= d.x + d.imgw) reverseX(d);
       if (y >= d.y + d.imgh) reverseY(d);
@@ -159,7 +159,7 @@ class ImageData {
     y += stepy;
 
     // change speed vector at random intervals
-    int r = rand.nextInt(100);
+    final int r = rand.nextInt(100);
     if (r == 0) {
       int s = stepx < 0 ? -1 : 1;
       stepx = s * randomValueInRange(1, 2);
@@ -175,9 +175,9 @@ class ImageData {
    * @param d the other logo.
    * @return true if the corner of the first is logo is inside the second, false otherwise.
    */
-  private boolean isIn(final int x1, final int y1, final ImageData d) {
-    int x2 = d.x + d.stepx;
-    int y2 = d.y + d.stepy;
+  private static boolean isIn(final int x1, final int y1, final ImageData d) {
+    final int x2 = d.x + d.stepx;
+    final int y2 = d.y + d.stepy;
     return (x1 >= x2) && (x1 <= x2 + d.imgw) && (y1 >= y2) && (y1 <= y2 + d.imgh);
   }
 
@@ -190,7 +190,7 @@ class ImageData {
   private int randomValueInRange(final int min, final int max) {
     int result = 0;
     while (result == 0) {
-      int diff = max - min;
+      final int diff = max - min;
       result = min + rand.nextInt(diff + 1);
     }
     return result;

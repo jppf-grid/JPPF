@@ -101,7 +101,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   private void createSSLConnection() {
     try {
       channel = SSLHelper.createSSLClientConnection(channel);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -119,11 +119,11 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       channel.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       channel.flush();
       if (sslEnabled) createSSLConnection();
-      ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
+      final ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -144,7 +144,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
     lock.lock();
     try {
       if (requestHandler != null) {
-        ResourceRequestRunner requestRunner = requestHandler.close();
+        final ResourceRequestRunner requestRunner = requestHandler.close();
         requestHandler = null;
         sendCloseChannelCommand(requestRunner);
       }
@@ -152,7 +152,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       if (channel != null) {
         try {
           channel.close();
-        } catch(Exception e) {
+        } catch(final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
         channel = null;

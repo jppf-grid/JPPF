@@ -57,7 +57,7 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
    */
   @Override
   public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
-    String s = StringUtils.build("error executing ", methodsNamesMap.get(event.getType()), " on an instance of ", listener.getClass(), ", event=", event, ", listener=", listener, " : ");
+    final String s = StringUtils.build("error executing ", methodsNamesMap.get(event.getType()), " on an instance of ", listener.getClass(), ", event=", event, ", listener=", listener, " : ");
     if (debugEnabled) log.debug(s, t);
     else log.error(s + ExceptionUtils.getMessage(t));
     if (propagateErrors && (t instanceof Error)) throw (Error) t;
@@ -68,7 +68,7 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
    * @return a map of {@link NodeLifeCycleEventType} to associated strings.
    */
   private static Map<NodeLifeCycleEventType, String> generateMethodsNamesMap() {
-    Map<NodeLifeCycleEventType, String> map = new HashMap<>();
+    final Map<NodeLifeCycleEventType, String> map = new HashMap<>();
     map.put(NODE_STARTING, "nodeStarting()");
     map.put(NODE_ENDING, "nodeEnding()");
     map.put(JOB_HEADER_LOADED, "jobHeaderLoaded()");

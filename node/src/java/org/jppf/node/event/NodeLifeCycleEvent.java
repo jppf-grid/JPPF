@@ -30,6 +30,10 @@ import org.jppf.node.protocol.*;
  */
 public class NodeLifeCycleEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The class loader used to load the tasks and the classes they need from the client.
    */
   private AbstractJPPFClassLoader cl = null;
@@ -148,7 +152,7 @@ public class NodeLifeCycleEvent extends EventObject {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("type=").append(getType());
     sb.append(", node=").append(getNode());

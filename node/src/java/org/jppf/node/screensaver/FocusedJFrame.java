@@ -29,6 +29,10 @@ import javax.swing.JFrame;
  */
 public class FocusedJFrame extends JFrame {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Use to avoid inifinite recursion in {@code toFront()}.
    */
   private boolean alreadyCalled = false;

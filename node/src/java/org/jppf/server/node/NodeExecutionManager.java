@@ -87,13 +87,13 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     try {
       taskClassLoader = node instanceof ClassLoaderProvider ? ((ClassLoaderProvider) node).getClassLoader(uuidList) : getTaskClassLoader(taskList.get(0));
       usedClassLoader = threadManager.useClassLoader(taskClassLoader);
-    } catch (Exception e) {
-      String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
+    } catch (final Exception e) {
+      final String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
       if (debugEnabled) log.debug(msg, e);
       else log.warn(msg);
     }
     accumulatedElapsed.set(0L);
-    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
+    final LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
     if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
       taskList, dataProvider);
   }
@@ -104,8 +104,8 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   @Override
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
-    ClassLoader cl = usedClassLoader.getClassLoader();
-    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
+    final ClassLoader cl = usedClassLoader.getClassLoader();
+    final LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
     if (handler != null) handler.fireJobEnding(bundle, cl instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) cl : null, taskList, dataProvider);
     this.dataProvider = null;
     usedClassLoader.dispose();
@@ -124,7 +124,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param task the task from which to get the class laoder.
    * @return an instance of {@link ClassLoader}.
    */
-  private ClassLoader getTaskClassLoader(final Task<?> task) {
+  private static ClassLoader getTaskClassLoader(final Task<?> task) {
     return task.getTaskClassLoader();
   }
 
@@ -137,8 +137,8 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   @Override
   protected void taskEnded(final NodeTaskWrapper taskWrapper) {
     // Workaoround for the Android issue https://code.google.com/p/android/issues/detail?id=211596
-    Task<?> task = taskWrapper.getTask();
-    Throwable t = task.getThrowable();
+    final Task<?> task = taskWrapper.getTask();
+    final Throwable t = task.getThrowable();
     if (node.isAndroid() && (t instanceof ReflectiveOperationException)) {
       task.setThrowable(new JPPFTaskSerializationException(t));
     }

@@ -89,12 +89,12 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   protected void setupBundleParameters(final TaskBundle bundle) {
     try {
-      JMXServer jmxServer = getJmxServer();
+      final JMXServer jmxServer = getJmxServer();
       bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER, isMasterNode());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_SLAVE, isSlaveNode());
       bundle.setParameter(BundleParameter.NODE_DOTNET_CAPABLE, isDotnetCapable());
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }

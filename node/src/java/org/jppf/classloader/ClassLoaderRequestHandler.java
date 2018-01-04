@@ -90,9 +90,8 @@ public class ClassLoaderRequestHandler {
    */
   public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource) {
     if (resource == null) throw new IllegalArgumentException("resource is null");
-
     resource.preProcess();
-    Future<JPPFResourceWrapper> f;
+    final Future<JPPFResourceWrapper> f;
     synchronized (periodicTask) {
       f = nextRequest.addResource(resource);
     }
@@ -108,9 +107,8 @@ public class ClassLoaderRequestHandler {
     if (debugEnabled) log.debug("closing request handler");
     periodicTask.setStopped(true);
     periodicThread.interrupt();
-    ResourceRequestRunner tmp = requestRunner;
+    final ResourceRequestRunner tmp = requestRunner;
     requestRunner = null;
-    //nextRequest = null;
     periodicThread = null;
     periodicTask = null;
     return tmp;
@@ -136,8 +134,8 @@ public class ClassLoaderRequestHandler {
             request = nextRequest;
             nextRequest = new CompositeResourceWrapper();
           }
-          Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
-          int n = futureMap.size();
+          final Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
+          final int n = futureMap.size();
           if (n > maxBatchSize) {
             maxBatchSize = n;
             log.info(build("maxBatchSize = ", maxBatchSize));
@@ -146,17 +144,17 @@ public class ClassLoaderRequestHandler {
           if (isStopped()) return;
           requestRunner.setRequest(request);
           requestRunner.run();
-          Throwable t = requestRunner.getThrowable();
-          CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
+          final Throwable t = requestRunner.getThrowable();
+          final CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
           if (debugEnabled) log.debug(build("got response ", response));
           if (response != null) {
-            for (JPPFResourceWrapper rw : response.getResources()) {
-              ResourceFuture<JPPFResourceWrapper> f = (ResourceFuture<JPPFResourceWrapper>) futureMap.remove(rw);
+            for (final JPPFResourceWrapper rw : response.getResources()) {
+              final ResourceFuture<JPPFResourceWrapper> f = (ResourceFuture<JPPFResourceWrapper>) futureMap.remove(rw);
               if (f != null) f.setDone(rw);
             }
           }
-          for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry : futureMap.entrySet()) {
-            ResourceFuture<JPPFResourceWrapper> future = (ResourceFuture<JPPFResourceWrapper>) entry.getValue();
+          for (final Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry : futureMap.entrySet()) {
+            final ResourceFuture<JPPFResourceWrapper> future = (ResourceFuture<JPPFResourceWrapper>) entry.getValue();
             if (t != null) future.setThrowable(t);
             else future.setDone(null);
           }
@@ -165,7 +163,7 @@ public class ClassLoaderRequestHandler {
           start = System.nanoTime();
           elapsed = 0L;
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }

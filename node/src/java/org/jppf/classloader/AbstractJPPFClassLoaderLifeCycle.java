@@ -126,7 +126,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
     if (!isOffline()) {
       try {
         connection.init();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
       }
     } else {
@@ -156,12 +156,12 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
         map.put(ResourceIdentifier.FILE_LOOKUP_ALLOWED, FILE_LOOKUP);
         resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
         if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
-      } catch(IOException e) {
+      } catch(final IOException e) {
         if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
         throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e, ConnectionReason.CLASSLOADER_PROCESSING_ERROR);
-      } catch(ClassNotFoundException e) {
+      } catch(final ClassNotFoundException e) {
         throw e;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
     }
@@ -192,11 +192,11 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append("[id=").append(instanceNumber).append(", type=").append(dynamic ? "client" : "server");
     sb.append(", uuidPath=").append(uuidPath);
     sb.append(", offline=").append(offline);
-    URL[] urls = getURLs();
+    final URL[] urls = getURLs();
     sb.append(", classpath=");
     if ((urls != null) && (urls.length > 0)) {
       for (int i=0; i<urls.length; i++) {
@@ -219,23 +219,23 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   @SuppressWarnings("unchecked")
   protected URL[] findMultipleResources(final String...names) {
     if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
-    URL[] results = new URL[names.length];
-    boolean[] alreadyNotFound = new boolean[names.length];
+    final URL[] results = new URL[names.length];
+    final boolean[] alreadyNotFound = new boolean[names.length];
     for (int i=0; i<names.length; i++) {
       results[i] = null;
       alreadyNotFound[i] = notFoundCache.has(names[i]);
     }
     try {
-      List<Integer> indices = new ArrayList<>();
+      final List<Integer> indices = new ArrayList<>();
       for (int i=0; i<names.length; i++) {
         if (alreadyNotFound[i]) continue;
-        String name = names[i];
-        List<URL> locationsList = resourceCache.isEnabled() ? resourceCache.getResourcesURLs(name) : null;
+        final String name = names[i];
+        final List<URL> locationsList = resourceCache.isEnabled() ? resourceCache.getResourcesURLs(name) : null;
         if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = locationsList.get(0);
           if (debugEnabled) log.debug(build(this, " resource ", name, " found in local cache as ", results[i]));
         } else {
-          URL url = super.findResource(names[i]);
+          final URL url = super.findResource(names[i]);
           if (url != null) {
             results[i] = url;
             if (debugEnabled) log.debug(build(this, " resource ", name, " found in URL classpath as ", results[i]));
@@ -252,27 +252,27 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
         }
         return results;
       }
-      Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
-      String[] namesToLookup = new String[indices.size()];
+      final Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
+      final String[] namesToLookup = new String[indices.size()];
       for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
       map.put(ResourceIdentifier.NAME, StringUtils.arrayToString(", ", null, null, namesToLookup));
       map.put(ResourceIdentifier.MULTIPLE_NAMES, namesToLookup);
-      JPPFResourceWrapper resource = loadResource(map);
-      Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData(ResourceIdentifier.RESOURCE_MAP);
-      for (Integer index : indices) {
-        String name = names[index];
-        List<byte[]> dataList = dataMap.get(name);
-        boolean found = (dataList != null) && !dataList.isEmpty();
+      final JPPFResourceWrapper resource = loadResource(map);
+      final Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData(ResourceIdentifier.RESOURCE_MAP);
+      for (final Integer index : indices) {
+        final String name = names[index];
+        final List<byte[]> dataList = dataMap.get(name);
+        final boolean found = (dataList != null) && !dataList.isEmpty();
         if (debugEnabled && !found) log.debug(build(this, " resource [", name, "] not found remotely"));
         if (found) {
           resourceCache.registerResources(name, dataList);
-          URL url = resourceCache.getResourceURL(name);
+          final URL url = resourceCache.getResourceURL(name);
           results[index] = url;
           if (debugEnabled) log.debug(build(this, " resource [", name, "] found remotely as ", url));
         }
         else if (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR) notFoundCache.add(name);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -288,15 +288,15 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    */
   public URL[] getMultipleResources(final String...names) {
     if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
-    int length = names.length;
+    final int length = names.length;
     URL[] results = new URL[length];
-    boolean[] alreadyNotFound = new boolean[length];
+    final boolean[] alreadyNotFound = new boolean[length];
     for (int i=0; i<length; i++) {
       results[i] = null;
       alreadyNotFound[i] = notFoundCache.has(names[i]);
     }
     try {
-      ClassLoader parent = getParent();
+      final ClassLoader parent = getParent();
       if (parent == null) {
         for (int i=0; i<length; i++) if (!alreadyNotFound[i]) results[i] = getSystemResource(names[i]);
       } else if (!(parent instanceof AbstractJPPFClassLoader)) {
@@ -305,15 +305,15 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
         results = ((AbstractJPPFClassLoader) parent).getMultipleResources(names);
       }
       for (int i=0; i<length; i++) if (results[i] == null) results[i] = super.getResource(names[i]);
-      List<Integer> indices = new ArrayList<>();
+      final List<Integer> indices = new ArrayList<>();
       for (int i=0; i<length; i++) if (results[i] == null) indices.add(i);
       if (!indices.isEmpty()) {
-        String[] namesToFind = new String[indices.size()];
+        final String[] namesToFind = new String[indices.size()];
         for (int i=0; i<namesToFind.length; i++) namesToFind[i] = names[indices.get(i)];
-        URL[] foundURLs = findMultipleResources(namesToFind);
+        final URL[] foundURLs = findMultipleResources(namesToFind);
         for (int i=0; i<namesToFind.length; i++) results[indices.get(i)] = foundURLs[i];
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return results;
@@ -402,8 +402,8 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * Create a new resource cache instance.
    * @return a {@code ResourceCache} object.
    */
-  private ResourceCache createResourceCache() {
-    boolean enabled = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_ENABLED);
+  private static ResourceCache createResourceCache() {
+    final boolean enabled = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_ENABLED);
     return new ResourceCache(enabled);
   }
 }

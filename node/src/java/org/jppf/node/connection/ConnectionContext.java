@@ -76,7 +76,7 @@ public class ConnectionContext {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("message=").append(message);
     sb.append(", throwable=").append(throwable);
     sb.append(", reason=").append(reason);

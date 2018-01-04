@@ -35,6 +35,10 @@ import org.jppf.utils.configuration.JPPFProperties;
  */
 public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * 
    */
   private static final int MAX_SPEED = 100;
@@ -93,24 +97,23 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     configure();
     data = new ImageData[nbLogos];
     for (int i=0; i<nbLogos; i++) data[i] = new ImageData(logos[i % logos.length]);
-    Dimension dim = this.getSize();
-    for (ImageData d: data) d.init(dim);
-
+    final Dimension dim = this.getSize();
+    for (final ImageData d: data) d.init(dim);
     if (nodePanel == null) nodePanel = createNodePanel();
-    SpringLayout layout = new SpringLayout();
+    final SpringLayout layout = new SpringLayout();
     setLayout(layout);
     this.add(nodePanel);
     setBackground(Color.BLACK);
-    Dimension dim2 = nodePanel.getPreferredSize();
-    int hmargin = (getWidth() - dim2.width) / 2;
-    int vmargin = (getHeight() - dim2.height) / 2;
+    final Dimension dim2 = nodePanel.getPreferredSize();
+    final int hmargin = (getWidth() - dim2.width) / 2;
+    final int vmargin = (getHeight() - dim2.height) / 2;
     layout.putConstraint(SpringLayout.WEST, nodePanel, alignment * hmargin, SpringLayout.WEST, this);
     layout.putConstraint(SpringLayout.NORTH, nodePanel, vmargin, SpringLayout.NORTH, this);
     if (timer == null) {
       timer = new Timer("JPPFScreenSaverTimer");
       timer.schedule(new LogoUpdateTask(), 100L, 1000L / speed);
       timer.schedule(new LogoPaintTask(), 100L, 20L);
-      TimerTask task = new TimerTask() {
+      final TimerTask task = new TimerTask() {
         @Override
         public void run() {
           if (nodePanel != null) nodePanel.updateTimeLabel();
@@ -129,23 +132,23 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     speed = config.get(JPPFProperties.SCREENSAVER_SPEED);
     if (speed < 1) speed = 1;
     if (speed > MAX_SPEED) speed = MAX_SPEED;
-    String paths = config.get(JPPFProperties.SCREENSAVER_LOGO_PATH);
-    String[] tokens = RegexUtils.PIPE_PATTERN.split(paths);
-    java.util.List<ImageIcon> list = new LinkedList<>();
-    for (String s: tokens) {
-      ImageIcon icon = ScreenSaverMain.loadImage(s.trim());
+    final String paths = config.get(JPPFProperties.SCREENSAVER_LOGO_PATH);
+    final String[] tokens = RegexUtils.PIPE_PATTERN.split(paths);
+    final java.util.List<ImageIcon> list = new LinkedList<>();
+    for (final String s: tokens) {
+      final ImageIcon icon = ScreenSaverMain.loadImage(s.trim());
       if (icon != null) list.add(icon);
     }
     if (list.isEmpty()) list.add(ScreenSaverMain.loadImage(JPPFProperties.SCREENSAVER_LOGO_PATH.getDefaultValue()));
     logos = new ImageIcon[list.size()];
-    Random rnd = new Random(System.nanoTime());
+    final Random rnd = new Random(System.nanoTime());
     int count = 0;
     while (!list.isEmpty()) {
-      int n = rnd.nextInt(list.size());
+      final int n = rnd.nextInt(list.size());
       logos[count++] = list.remove(n);
     }
     //logos = list.toArray(new ImageIcon[list.size()]);
-    String s = config.get(JPPFProperties.SCREENSAVER_STATUS_PANEL_ALIGNMENT).trim().toLowerCase();
+    final String s = config.get(JPPFProperties.SCREENSAVER_STATUS_PANEL_ALIGNMENT).trim().toLowerCase();
     if (s.startsWith("l")) alignment = 0;
     else if (s.startsWith("r")) alignment = 2;
     else alignment = 1;
@@ -184,12 +187,12 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     public void run() {
       if (data == null) return;
       try {
-        Dimension dim = JPPFScreenSaverImpl.this.getSize();
+        final Dimension dim = JPPFScreenSaverImpl.this.getSize();
         for (int i=0; i<data.length; i++) {
-          ImageData d = data[i];
+          final ImageData d = data[i];
           d.update(dim, collisions ? data : null, i+1);
         }
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         t.printStackTrace();
       }
     }
@@ -202,23 +205,17 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    */
   private void paintLogos(final Graphics g) {
     if (data == null) return;
-    Rectangle r = g.getClipBounds();
+    final Rectangle r = g.getClipBounds();
     try {
       for (ImageData d: data) {
         synchronized(d) {
-          /*
-          g.setClip(d.prevx, d.prevy, d.imgw, d.imgh);
-          g.setColor(Color.BLACK);
-          g.fillRect(d.prevx, d.prevy, d.imgw, d.imgh);
-          */
-
           g.setClip(d.x, d.y, d.imgw, d.imgh);
           g.drawImage(d.img, d.x, d.y, null);
           d.prevx = d.x;
           d.prevy = d.y;
         }
       }
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       t.printStackTrace();
     } finally {
       g.setClip(r);

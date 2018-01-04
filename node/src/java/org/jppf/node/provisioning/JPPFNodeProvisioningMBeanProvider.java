@@ -56,10 +56,10 @@ public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider 
    * @param node the node in which to register.
    * @return true if the node is a master node, false otherwise.
    */
-  private boolean mustRegister(final Node node) {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    boolean slave = !node.isOffline() && config.get(JPPFProperties.PROVISIONING_SLAVE);
-    boolean master = !node.isOffline() && config.get(JPPFProperties.PROVISIONING_MASTER);
+  private static boolean mustRegister(final Node node) {
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final boolean slave = !node.isOffline() && config.get(JPPFProperties.PROVISIONING_SLAVE);
+    final boolean master = !node.isOffline() && config.get(JPPFProperties.PROVISIONING_MASTER);
     config.set(JPPFProperties.PROVISIONING_MASTER, master);
     config.set(JPPFProperties.PROVISIONING_SLAVE, slave);
     return master;

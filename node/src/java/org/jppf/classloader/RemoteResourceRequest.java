@@ -68,7 +68,7 @@ class RemoteResourceRequest extends AbstractResourceRequest {
       throwable = null;
       IOHelper.sendData(socketClient, request, serializer);
       response = (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, serializer);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throwable = t;
     }
   }

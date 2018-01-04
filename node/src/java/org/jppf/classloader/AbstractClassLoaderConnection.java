@@ -59,12 +59,12 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   protected void performCommonHandshake(final ResourceRequestRunner requestRunner) {
     try {
       if (debugEnabled) log.debug("sending node initiation message");
-      JPPFResourceWrapper request = new JPPFResourceWrapper();
+      final JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
       request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
       requestRunner.setRequest(request);
       requestRunner.run();
-      Throwable t = requestRunner.getThrowable();
+      final Throwable t = requestRunner.getThrowable();
       if (t != null) {
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
@@ -72,10 +72,10 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       if (debugEnabled) log.debug("received node initiation response");
       requestRunner.reset();
       requestHandler = new ClassLoaderRequestHandler(requestRunner);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.debug(e.getMessage(), e);
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -87,20 +87,20 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   protected void sendCloseChannelCommand(final ResourceRequestRunner requestRunner) {
     try {
       if (debugEnabled) log.debug("sending close channel command");
-      JPPFResourceWrapper request = new JPPFResourceWrapper();
+      final JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.CLOSE_CHANNEL);
       request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
       requestRunner.setRequest(request);
       requestRunner.run();
-      Throwable t = requestRunner.getThrowable();
+      final Throwable t = requestRunner.getThrowable();
       if (t != null) {
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
       }
       if (debugEnabled) log.debug("received node response");
       requestRunner.reset();
-    } catch (Exception e) {
-      String format = "error sending close channel command : {}";
+    } catch (final Exception e) {
+      final String format = "error sending close channel command : {}";
       if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
       else log.warn(format, ExceptionUtils.getMessage(e));
     }
@@ -111,15 +111,14 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
     resource.setDynamic(dynamic);
-    TraversalList<String> list = new TraversalList<>(uuidPath);
+    final TraversalList<String> list = new TraversalList<>(uuidPath);
     resource.setUuidPath(list);
     if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-    for (Map.Entry<ResourceIdentifier, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+    for (final Map.Entry<ResourceIdentifier, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
     resource.setRequestUuid(requestUuid);
-
-    Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+    final Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
     resource = f.get();
-    Throwable t = ((ResourceFuture<?>) f).getThrowable();
+    final Throwable t = ((ResourceFuture<?>) f).getThrowable();
     if (t != null) {
       if (t instanceof Exception) throw (Exception) t;
       else if (t instanceof Error) throw (Error) t;
@@ -141,7 +140,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     lock.lock();
     try {
       init();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the server after connection reset", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } finally {
       lock.unlock();

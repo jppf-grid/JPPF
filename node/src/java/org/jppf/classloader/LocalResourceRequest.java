@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Encapsulates a remote resource request submitted asynchronously
  * via the single-thread executor.
  */
-class LocalResourceRequest extends AbstractResourceRequest
-{
+class LocalResourceRequest extends AbstractResourceRequest {
   /**
    * Logger for this class.
    */
@@ -48,36 +47,28 @@ class LocalResourceRequest extends AbstractResourceRequest
    * Initialize.
    * @param channel the channel used by the local node's class loader.
    */
-  public LocalResourceRequest(final LocalClassLoaderChannel channel)
-  {
+  public LocalResourceRequest(final LocalClassLoaderChannel channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
-    
     this.channel = channel;
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       throwable = null;
       if (debugEnabled) log.debug(build("channel ", channel, " sending request ", request));
-      synchronized(channel.getServerLock())
-      {
+      synchronized (channel.getServerLock()) {
         channel.setServerResource(request);
         channel.setReadyOps(SelectionKey.OP_READ);
         while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
       }
-      synchronized(channel.getNodeLock())
-      {
+      synchronized (channel.getNodeLock()) {
         channel.setReadyOps(SelectionKey.OP_WRITE);
         while ((response = channel.getNodeResource()) == null) channel.getNodeLock().goToSleep();
         channel.setNodeResource(null);
       }
       if (debugEnabled) log.debug(build("channel ", channel, " got response ", response));
-    }
-    catch (Throwable t)
-    {
+    } catch (final Throwable t) {
       throwable = t;
     }
   }

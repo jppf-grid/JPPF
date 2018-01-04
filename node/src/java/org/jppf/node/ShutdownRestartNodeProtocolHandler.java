@@ -54,7 +54,7 @@ public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProto
   @Override
   public void performAction(final int actionCode) {
     if (node == null) return;
-    JPPFNodeAdminMBean mbean = node.getNodeAdmin();
+    final JPPFNodeAdminMBean mbean = node.getNodeAdmin();
     if (mbean == null) return;
     try {
       if (debugEnabled) log.debug("processing {} command code", ProcessCommands.getCommandName(actionCode));
@@ -72,7 +72,7 @@ public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProto
           mbean.shutdown(false);
           break;
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

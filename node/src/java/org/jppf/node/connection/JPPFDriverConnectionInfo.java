@@ -76,8 +76,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    * Specify whether SSL/TLS should be used.
    * @param secure {@code true} for a secure connection, {@code false} otherwise.
    */
-  public void setSecure(final boolean secure)
-  {
+  public void setSecure(final boolean secure) {
     this.secure = secure;
   }
 
@@ -136,11 +135,10 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    JPPFDriverConnectionInfo other = (JPPFDriverConnectionInfo) obj;
+    final JPPFDriverConnectionInfo other = (JPPFDriverConnectionInfo) obj;
     if (host == null) {
       if (other.host != null) return false;
-    }
-    else if (!host.equals(other.host)) return false;
+    } else if (!host.equals(other.host)) return false;
     if (port != other.port) return false;
     if (recoveryPort != other.recoveryPort) return false;
     if (secure != other.secure) return false;
@@ -149,7 +147,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("secure=").append(secure);
     sb.append(", host=").append(host);
     sb.append(", port=").append(port);
@@ -166,8 +164,8 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    * @return a {@link DriverConnectionInfo} instance.
    */
   public static DriverConnectionInfo fromJPPFConnectionInformation(final JPPFConnectionInformation ci, final boolean ssl, final boolean recovery) {
-    int port = ssl ? ci.sslServerPorts[0] : ci.serverPorts[0];
-    boolean recoveryEnabled = recovery && (ci.recoveryPort >= 0);
-    return new JPPFDriverConnectionInfo(ssl, ci.host, port, recoveryEnabled ? ci.recoveryPort: -1);
+    final int port = ssl ? ci.sslServerPorts[0] : ci.serverPorts[0];
+    final boolean recoveryEnabled = recovery && (ci.recoveryPort >= 0);
+    return new JPPFDriverConnectionInfo(ssl, ci.host, port, recoveryEnabled ? ci.recoveryPort : -1);
   }
 }

@@ -59,7 +59,7 @@ public class ScreenSaverMain implements InitializationHook
     try {
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       new ScreenSaverMain().startScreenSaver(JPPFConfiguration.getProperties());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -69,7 +69,7 @@ public class ScreenSaverMain implements InitializationHook
     try {
       if (instance != null) return;
       if (initialConfiguration.get(SCREENSAVER_ENABLED)) startScreenSaver(initialConfiguration);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -94,11 +94,11 @@ public class ScreenSaverMain implements InitializationHook
       System.err.println("This is a headless graphics environment - cannot run in full screen");
       return;
     }
-    boolean fullscreenRequested = config.get(SCREENSAVER_FULLSCREEN);
+    final boolean fullscreenRequested = config.get(SCREENSAVER_FULLSCREEN);
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice[] devices = env.getScreenDevices();
     boolean fullscreenSupported = true;
-    Rectangle2D result = new Rectangle2D.Double();
+    final Rectangle2D result = new Rectangle2D.Double();
     for (GraphicsDevice gd : devices) {
       fullscreenSupported &= gd.isFullScreenSupported();
       for (GraphicsConfiguration graphicsConfiguration : gd.getConfigurations()) {
@@ -107,7 +107,7 @@ public class ScreenSaverMain implements InitializationHook
     }
 
     if (fullscreenRequested && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
-    String title = config.get(SCREENSAVER_TITLE);
+    final String title = config.get(SCREENSAVER_TITLE);
     final JFrame frame = new FocusedJFrame(title);
     ImageIcon icon = loadImage(config.get(SCREENSAVER_ICON));
     if (icon == null) icon = loadImage(SCREENSAVER_ICON.getDefaultValue());
@@ -117,11 +117,11 @@ public class ScreenSaverMain implements InitializationHook
       frame.setSize((int) result.getWidth(), (int) result.getHeight());
       frame.setResizable(false);
       // hide the mouse cursor over the JFrame
-      BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB); // Transparent 16 x 16 pixel cursor image.
-      Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor"); // Create a new blank cursor.
+      final BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB); // Transparent 16 x 16 pixel cursor image.
+      final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor"); // Create a new blank cursor.
       frame.getContentPane().setCursor(blankCursor); // Set the blank cursor to the JFrame.
     } else {
-      Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+      final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
       int w = JPPFConfiguration.get(SCREENSAVER_WIDTH);
       int h = JPPFConfiguration.get(SCREENSAVER_HEIGHT);
       if ((w <= 0) || (w > d.width)) w = 1000;
@@ -134,8 +134,8 @@ public class ScreenSaverMain implements InitializationHook
     createScreenSaver();
     frame.add(screensaver.getComponent());
     screensaver.getComponent().setSize(frame.getSize());
-    int screenX = config.get(SCREENSAVER_LOCATION_X);
-    int screenY = config.get(SCREENSAVER_LOCATION_Y);
+    final int screenX = config.get(SCREENSAVER_LOCATION_X);
+    final int screenY = config.get(SCREENSAVER_LOCATION_Y);
     frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
@@ -153,10 +153,10 @@ public class ScreenSaverMain implements InitializationHook
    */
   private JPPFScreenSaver createScreenSaver() throws Exception {
     try {
-      String name = JPPFConfiguration.get(SCREENSAVER_CLASS);
-      Class<?> clazz = Class.forName(name);
+      final String name = JPPFConfiguration.get(SCREENSAVER_CLASS);
+      final Class<?> clazz = Class.forName(name);
       screensaver = (JPPFScreenSaver) clazz.newInstance();
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       screensaver = new JPPFScreenSaverImpl();
     }
     return screensaver;
@@ -239,7 +239,7 @@ public class ScreenSaverMain implements InitializationHook
     byte[] buf = null;
     try {
       buf = FileUtils.getPathAsByte(file);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.err.println("Could not load image '" + file + "' : " + ExceptionUtils.getStackTrace(e));
     }
     return (buf == null) ? null : new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));

@@ -128,7 +128,7 @@ public abstract class JPPFContainer {
     this.classLoader = classLoader;
     try {
       initHelper();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("error setting new class loader", e);
     }
   }
@@ -140,9 +140,9 @@ public abstract class JPPFContainer {
   protected void initHelper() throws Exception {
     AbstractJPPFClassLoader cl = getClassLoader();
     if (!clientAccess) cl = (AbstractJPPFClassLoader) cl.getParent();
-    String name = "org.jppf.utils.SerializationHelperImpl";
+    final String name = "org.jppf.utils.SerializationHelperImpl";
     if (debugEnabled) log.debug("loading class {} with classloader {}", name, cl);
-    Class<?> c = cl.loadJPPFClass(name);
+    final Class<?> c = cl.loadJPPFClass(name);
     helper = (SerializationHelper) c.newInstance();
     serializer = helper.getSerializer();
   }
@@ -197,7 +197,7 @@ public abstract class JPPFContainer {
      */
     @Override
     public ObjectDeserializationTask call() {
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
         if (traceEnabled) log.debug("deserializing object index = " + index);
@@ -207,8 +207,8 @@ public abstract class JPPFContainer {
         } finally {
           if (sequentialDeserialization) lock.unlock();
         }
-      } catch (Throwable t) {
-        String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
+      } catch (final Throwable t) {
+        final String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
         if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
         else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
         if (index > 0) object = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);

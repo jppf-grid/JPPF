@@ -27,7 +27,7 @@ import com.sun.jna.platform.win32.*;
 class WindowsIdleTimeDetector implements IdleTimeDetector {
   @Override
   public long getIdleTimeMillis() {
-    WinUser.LASTINPUTINFO lastInputInfo = new WinUser.LASTINPUTINFO();
+    final WinUser.LASTINPUTINFO lastInputInfo = new WinUser.LASTINPUTINFO();
     User32.INSTANCE.GetLastInputInfo(lastInputInfo);
     return Kernel32.INSTANCE.GetTickCount() - lastInputInfo.dwTime;
   }

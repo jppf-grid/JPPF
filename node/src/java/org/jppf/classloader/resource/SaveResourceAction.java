@@ -29,8 +29,7 @@ import org.jppf.utils.configuration.JPPFProperties;
  * Privileged action wrapper for saving a resource definition to a temporary file.
  * @exclude
  */
-public class SaveResourceAction implements PrivilegedAction<Location<?>>
-{
+public class SaveResourceAction implements PrivilegedAction<Location<?>> {
   /**
    * Determines whether resources should be stored in memory.
    */
@@ -58,16 +57,14 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
    * @param name the original name of the resource to find.
    * @param definition the resource definition to save.
    */
-  public SaveResourceAction(final List<String> tmpDirs, final String name, final byte[] definition)
-  {
+  public SaveResourceAction(final List<String> tmpDirs, final String name, final byte[] definition) {
     this.tmpDirs = tmpDirs;
     this.name = name;
     this.definition = definition;
   }
 
   @Override
-  public Location<?> run()
-  {
+  public Location<?> run() {
     Location<?> resource = null;
     if (!IS_MEMORY_STORAGE) resource = saveToFileResource();
     if (resource == null) resource = saveToMemoryResource();
@@ -78,25 +75,20 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
    * Save the resource to a temporary file.
    * @return an instance of {@link FileResource}.
    */
-  private Location<?> saveToFileResource()
-  {
+  private Location<?> saveToFileResource() {
     Location<?> resource = null;
     File tmp = null;
-    try
-    {
-      for (String s: tmpDirs)
-      {
-        File f = new File(s, name);
-        if (!f.exists())
-        {
+    try {
+      for (final String s: tmpDirs) {
+        final File f = new File(s, name);
+        if (!f.exists()) {
           tmp = f;
           break;
         }
       }
-      if (tmp == null)
-      {
-        String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
-        File f = new File(dir + File.separator);
+      if (tmp == null) {
+        final String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
+        final File f = new File(dir + File.separator);
         FileUtils.mkdirs(f);
         f.deleteOnExit();
         tmp = new File(f, name);
@@ -107,12 +99,9 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
       FileUtils.writeBytesToFile(definition, tmp);
       resource = new FileLocation(tmp);
       exception = null;
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       exception = e;
-      if ((tmp != null) && tmp.exists())
-      {
+      if ((tmp != null) && tmp.exists()) {
         tmp.delete();
         tmp = null;
       }
@@ -124,16 +113,12 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
    * Save the resource to memory.
    * @return an instance of {@link MemoryResource}.
    */
-  private Location<?> saveToMemoryResource()
-  {
+  private Location<?> saveToMemoryResource() {
     Location<?> resource = null;
-    try
-    {
+    try {
       resource = new MemoryLocation(definition);
       exception = null;
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       exception = e;
     }
     return resource;
@@ -143,8 +128,7 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
    * Get the resulting exception.
    * @return an <code>Exception</code> or null if no exception was raised.
    */
-  public Exception getException()
-  {
+  public Exception getException() {
     return exception;
   }
 
@@ -152,9 +136,8 @@ public class SaveResourceAction implements PrivilegedAction<Location<?>>
    * Determine if resources should be stored in memory.
    * @return <code>true</code> if resources should be stored in memory, <code>false</code> otherwise.
    */
-  private static boolean isMemoryStorageType()
-  {
-    String s = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_STORAGE);
+  private static boolean isMemoryStorageType() {
+    final String s = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_STORAGE);
     return "memory".equalsIgnoreCase(s);
   }
 }

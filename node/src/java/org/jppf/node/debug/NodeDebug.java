@@ -29,6 +29,10 @@ import org.slf4j.*;
  */
 public class NodeDebug implements NodeDebugMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(NodeDebug.class);
@@ -42,14 +46,14 @@ public class NodeDebug implements NodeDebugMBean {
 
   @Override
   public void cancel() {
-    JPPFNode node = (JPPFNode) NodeRunner.getNode();
+    final JPPFNode node = (JPPFNode) NodeRunner.getNode();
     node.getExecutionManager().cancelAllTasks(true, false);
   }
 
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
     if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
-    ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
+    final ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
     if (runner == null) throw new IllegalStateException("Could not instantiate a script runner for language = " + language);
     try {
       return runner.evaluate(script, null);

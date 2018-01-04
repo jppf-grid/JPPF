@@ -102,7 +102,7 @@ public class ResourceCache {
    * @return a file path, or null if the resource is not found in the cache.
    */
   private synchronized Location<?> getResourceLocation(final String name) {
-    Collection<Location<?>> locations = cache.getValues(name);
+    final Collection<Location<?>> locations = cache.getValues(name);
     if ((locations == null) || locations.isEmpty()) return null;
     return locations.iterator().next();
   }
@@ -123,12 +123,12 @@ public class ResourceCache {
    */
   public synchronized List<URL> getResourcesURLs(final String name) {
     if (!enabled) return null;
-    Collection<Location<?>> resources = getResourcesLocations(name);
+    final Collection<Location<?>> resources = getResourcesLocations(name);
     if (resources == null) return null;
-    List<URL> urls = new ArrayList<>(resources.size());
+    final List<URL> urls = new ArrayList<>(resources.size());
     int count = 0;
-    for (Location<?> res : resources) {
-      URL url = getResourceURL(name, res, count++);
+    for (final Location<?> res : resources) {
+      final URL url = getResourceURL(name, res, count++);
       if (url != null) urls.add(url);
     }
     return urls;
@@ -152,14 +152,14 @@ public class ResourceCache {
    */
   private synchronized URL getResourceURL(final String name, final Location<?> res, final int id) {
     if (res instanceof FileLocation) {
-      String path = ((FileLocation) res).getPath();
+      final String path = ((FileLocation) res).getPath();
       if (path == null) return null;
       return FileUtils.getURLFromFilePath(path);
     } else if (res instanceof MemoryLocation) {
-      String s = "jppfres://" + uuid + '/' + name + "?id=" + id;
+      final String s = "jppfres://" + uuid + '/' + name + "?id=" + id;
       try {
         return new URL(s);
-      } catch (@SuppressWarnings("unused") Exception e) {
+      } catch (@SuppressWarnings("unused") final Exception e) {
         return null;
       }
     } else if (res instanceof URLLocation) return ((URLLocation) res).getPath();
@@ -174,12 +174,12 @@ public class ResourceCache {
   public synchronized void registerResources(final String name, final List<byte[]> definitions) {
     if (!enabled) return;
     if (isAbsolutePath(name)) return;
-    List<Location<?>> locations = new LinkedList<>();
-    for (byte[] def : definitions) {
+    final List<Location<?>> locations = new LinkedList<>();
+    for (final byte[] def : definitions) {
       try {
         locations.add(saveToTempFile(name, def));
-      } catch (Exception e) {
-        String s = "Exception caught while saving resource named '" + name + "' : ";
+      } catch (final Exception e) {
+        final String s = "Exception caught while saving resource named '" + name + "' : ";
         if (debugEnabled) log.debug(s, e);
         else log.warn(s + ExceptionUtils.getMessage(e));
       }
@@ -204,8 +204,8 @@ public class ResourceCache {
    * @throws Exception if any I/O error occurs.
    */
   private Location<?> saveToTempFile(final String name, final byte[] definition) throws Exception {
-    SaveResourceAction action = new SaveResourceAction(tempFolders, name, definition);
-    Location<?> file = AccessController.doPrivileged(action);
+    final SaveResourceAction action = new SaveResourceAction(tempFolders, name, definition);
+    final Location<?> file = AccessController.doPrivileged(action);
     if (action.getException() != null) throw action.getException();
     if (traceEnabled) log.trace("saved resource [" + name + "] to file " + file);
     return file;
@@ -216,12 +216,12 @@ public class ResourceCache {
    */
   private void initTempFolders() {
     try {
-      File tmpDir = FileUtils.getJPPFTempDir();
-      File baseDir = new File(tmpDir, uuid + File.separator);
+      final File tmpDir = FileUtils.getJPPFTempDir();
+      final File baseDir = new File(tmpDir, uuid + File.separator);
       FileUtils.mkdirs(baseDir);
       tempFolders.add(baseDir.getPath());
       if (traceEnabled) log.trace("added temp folder {}", baseDir);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -231,10 +231,10 @@ public class ResourceCache {
    * @param path the path to verify.
    * @return true if the path is absolute, false otherwise
    */
-  private boolean isAbsolutePath(final String path) {
+  private static boolean isAbsolutePath(final String path) {
     if (path.startsWith("/") || path.startsWith("\\")) return true;
     if (path.length() < 3) return false;
-    char c = path.charAt(0);
+    final char c = path.charAt(0);
     if ((((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))) && (path.charAt(1) == ':')) return true;
     return false;
   }
@@ -282,7 +282,7 @@ public class ResourceCache {
     if (enabled) {
       try {
         if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug("could not deregister shutdown hook", e);
       }
       new ShutdownHook(tempFolders, uuid).run();

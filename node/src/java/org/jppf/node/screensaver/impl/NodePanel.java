@@ -32,6 +32,10 @@ import org.jppf.utils.configuration.JPPFProperties;
  */
 public class NodePanel extends JPanel {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Path to the images to display in the UI.
    */
   public static final String IMAGE_PATH = "org/jppf/node";
@@ -86,9 +90,9 @@ public class NodePanel extends JPanel {
    */
   private void createUI() {
     initNodeState();
-    GridBagLayout g = new GridBagLayout();
+    final GridBagLayout g = new GridBagLayout();
     setLayout(g);
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     setBackground(Color.BLACK);
     addLayoutComp(this, g, c, createTopPanel());
@@ -102,7 +106,7 @@ public class NodePanel extends JPanel {
    * @return the panel as a {@link JComponent}.
    */
   protected JComponent createTopPanel() {
-    String path = JPPFConfiguration.get(JPPFProperties.SCREENSAVER_CENTERIMAGE);
+    final String path = JPPFConfiguration.get(JPPFProperties.SCREENSAVER_CENTERIMAGE);
     ImageIcon logo = ScreenSaverMain.loadImage(path);
     if (logo == null) logo = ScreenSaverMain.loadImage(DEFAULT_IMG);
     return new JLabel(logo);
@@ -141,9 +145,9 @@ public class NodePanel extends JPanel {
    * @return a panel with some node information about is activity.
    */
   private JPanel createNodePanel() {
-    JPanel panel = new JPanel();
-    GridBagLayout g = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
+    final JPanel panel = new JPanel();
+    final GridBagLayout g = new GridBagLayout();
+    final GridBagConstraints c = new GridBagConstraints();
     c.gridy = 0;
     panel.setLayout(g);
     panel.setBackground(Color.BLACK);
@@ -190,19 +194,19 @@ public class NodePanel extends JPanel {
    * @return a <code>JPanel</code> instance.
    */
   private JPanel makeStatusPanel(final int statusIdx, final String text) {
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
     panel.setBackground(Color.BLACK);
 
-    JLabel label = new JLabel(text);
+    final JLabel label = new JLabel(text);
     label.setBackground(Color.BLACK);
     label.setForeground(Color.WHITE);
-    JPanel labelPanel = new JPanel();
+    final JPanel labelPanel = new JPanel();
     labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
     labelPanel.add(label);
     labelPanel.setBackground(Color.BLACK);
 
-    JPanel statusPanel = new JPanel();
+    final JPanel statusPanel = new JPanel();
     statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
     statusPanel.setBackground(Color.BLACK);
     statusPanel.add(statusLabels[statusIdx]);
@@ -236,7 +240,7 @@ public class NodePanel extends JPanel {
    * Update the text of the label indicating how long the screensaver has been active.
    */
   public synchronized void updateTimeLabel() {
-    String s = toStringDuration(DateTimeUtils.elapsedFrom(startedAt));
+    final String s = toStringDuration(DateTimeUtils.elapsedFrom(startedAt));
     timeLabel.setText("Active for: " + s);
   }
 
@@ -268,7 +272,7 @@ public class NodePanel extends JPanel {
       integerFormatter.setMinimumIntegerDigits(2);
     }
     long elapsed = duration;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(integerFormatter.format(elapsed / 3_600_000L)).append(" hrs ");
     sb.append(integerFormatter.format((elapsed %= 3_600_000L) / 60_000L)).append(" mn ");
     sb.append(integerFormatter.format((elapsed %= 60_000L) / 1_000L)).append(" sec");
