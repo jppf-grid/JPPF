@@ -65,12 +65,12 @@ public class UserSettings {
    */
   public UserSettings load() {
     try  {
-      TypedProperties props = persistence.loadProperties(userHash);
+      final TypedProperties props = persistence.loadProperties(userHash);
       if (!props.isEmpty()) {
         properties.clear();
         properties.putAll(props);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error loading settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
     return this;
@@ -82,7 +82,7 @@ public class UserSettings {
   public void save() {
     try  {
       persistence.saveProperties(userHash, properties);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error saving settings for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
   }

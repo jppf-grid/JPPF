@@ -133,7 +133,7 @@ public abstract class TableTreeData implements SelectionListener {
    * @return the selected tree nodes.
    */
   public List<DefaultMutableTreeNode> getSelectedTreeNodes() {
-    List<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
+    final List<DefaultMutableTreeNode> treeNodes = new ArrayList<>();
     exploreTreeSelection(getSelectionHandler(), (DefaultMutableTreeNode) getModel().getRoot(), treeNodes);
     return treeNodes;
   }
@@ -146,7 +146,7 @@ public abstract class TableTreeData implements SelectionListener {
    */
   void exploreTreeSelection(final SelectionHandler handler, final DefaultMutableTreeNode currentNode, final List<DefaultMutableTreeNode> treeNodes) {
     if (!currentNode.isRoot()) {
-      AbstractComponent<?> data = (AbstractComponent<?>) currentNode.getUserObject();
+      final AbstractComponent<?> data = (AbstractComponent<?>) currentNode.getUserObject();
       if (handler.isSelected(data.getUuid())) treeNodes.add(currentNode);
     }
     for (int i=0; i<currentNode.getChildCount(); i++) exploreTreeSelection(handler, (DefaultMutableTreeNode) currentNode.getChildAt(i), treeNodes);

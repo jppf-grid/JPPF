@@ -39,7 +39,7 @@ public abstract class AbstractFilePersistence extends AbstractPersistence {
 
   @Override
   public String loadString(final String name) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
+    final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
     if (debugEnabled) log.debug("loading settings from file {}", file);
     return file.exists() ? FileUtils.readTextFile(file) : null;
   }

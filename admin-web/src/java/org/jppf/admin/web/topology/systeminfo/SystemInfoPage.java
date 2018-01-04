@@ -31,7 +31,7 @@ public class SystemInfoPage extends WebPage {
    * @param info .
    */
   public SystemInfoPage(final String info) {
-    Label label = new Label("system.info", info);
+    final Label label = new Label("system.info", info);
     label.setEscapeModelStrings(false);
     add(label);
   }

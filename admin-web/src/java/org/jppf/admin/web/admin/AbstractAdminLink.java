@@ -19,22 +19,12 @@
 package org.jppf.admin.web.admin;
 
 import org.jppf.admin.web.utils.AjaxButtonWithIcon;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * This class represents the save configuration button in the config panel of the admin page.
  * @author Laurent Cohen
  */
 public abstract class AbstractAdminLink extends AjaxButtonWithIcon {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(AbstractAdminLink.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The type of config panel to add this button to.
    */

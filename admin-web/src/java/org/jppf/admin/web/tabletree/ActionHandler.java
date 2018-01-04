@@ -63,11 +63,11 @@ public class ActionHandler {
    */
   public void selectionChanged(final List<DefaultMutableTreeNode> treeNodes) {
     if (debugEnabled) log.debug("selected nodes: {}", treeNodes);
-    for (String id: actionLinks.keySet()) {
-      AbstractActionLink link = actionLinks.get(id);
-      UpdatableAction action = actions.get(id);
+    for (final String id: actionLinks.keySet()) {
+      final AbstractActionLink link = actionLinks.get(id);
+      final UpdatableAction action = actions.get(id);
       if (action != null) {
-        JPPFWebSession session = (JPPFWebSession) Session.get();
+        final JPPFWebSession session = (JPPFWebSession) Session.get();
         action.setAuthorized(session.getRoles());
         action.setEnabled(treeNodes);
         if (link != null) link.setEnabled(action.isAuthorized() && action.isEnabled());
@@ -92,7 +92,7 @@ public class ActionHandler {
    * @param link the action link to add.
    */
   public void addActionLink(final Form<String> toolbar, final AbstractActionLink link) {
-    UpdatableAction action = actions.get(link.getId());
+    final UpdatableAction action = actions.get(link.getId());
     if (debugEnabled) log.debug(String.format("adding link %s, id=%s, action=%s", link, link.getId(), action));
     link.setAction(action);
     toolbar.add(link);

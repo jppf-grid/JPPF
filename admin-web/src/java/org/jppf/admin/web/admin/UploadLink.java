@@ -52,16 +52,16 @@ public class UploadLink extends AbstractAdminLink {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on {}.upload", type.getPrefix());
-    AbstractConfigPanel panel = ((AdminPage) target.getPage()).getConfigPanel(type);
-    FileUploadField fileUploadField = panel.getFileUploadField();
-    FileUpload fileUpload = fileUploadField.getFileUpload();
+    final AbstractConfigPanel panel = ((AdminPage) target.getPage()).getConfigPanel(type);
+    final FileUploadField fileUploadField = panel.getFileUploadField();
+    final FileUpload fileUpload = fileUploadField.getFileUpload();
     try {
-      byte[] bytes = fileUpload.getBytes();
-      String s = new String(bytes, "UTF-8");
-      TypedProperties props = new TypedProperties().fromString(s);
-      TextArea<String> area = panel.getConfig();
+      final byte[] bytes = fileUpload.getBytes();
+      final String s = new String(bytes, "UTF-8");
+      final TypedProperties props = new TypedProperties().fromString(s);
+      final TextArea<String> area = panel.getConfig();
       area.setModel(Model.of(props.asString()));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     target.add(form);
@@ -70,7 +70,7 @@ public class UploadLink extends AbstractAdminLink {
   @Override
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
-    String style = tag.getAttributes().getString("style");
+    final String style = tag.getAttributes().getString("style");
     tag.getAttributes().put("style", (style == null) ? "display: none" : style + "; display: none");
   }
 }

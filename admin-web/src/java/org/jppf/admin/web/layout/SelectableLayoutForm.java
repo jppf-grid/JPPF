@@ -55,7 +55,7 @@ public class SelectableLayoutForm extends AbstractModalForm {
 
   @Override
   protected void createFields() {
-    List<LocalizedListItem> all = layout.getAllItems();
+    final List<LocalizedListItem> all = layout.getAllItems();
     paletteField = new Palette<>(prefix + ".palette.field", Model.ofList(layout.getVisibleItems()), Model.ofList(all), new LocalizedListItemRenderer(), all.size(), true);
     paletteField.add(new DefaultTheme());
     add(paletteField);

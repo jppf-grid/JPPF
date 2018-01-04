@@ -87,8 +87,8 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
 
   @Override
   protected Component newContentComponent(final String id, final IModel<DefaultMutableTreeNode> model) {
-    DefaultMutableTreeNode node = model.getObject();
-    WebMarkupContainer panel = new NodeContent(id, node, nodeRenderer, JPPFWebSession.get().isShowIP());
+    final DefaultMutableTreeNode node = model.getObject();
+    final WebMarkupContainer panel = new NodeContent(id, node, nodeRenderer, JPPFWebSession.get().isShowIP());
     return panel;
   }
 
@@ -173,18 +173,18 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
 
     @Override
     protected void onEvent(final AjaxRequestTarget target) {
-      JPPFWebSession session = (JPPFWebSession) target.getPage().getSession();
-      TableTreeData data = session.getTableTreeData(type);
-      SelectionHandler selectionHandler = data.getSelectionHandler();
-      DefaultMutableTreeNode node = TreeTableUtils.findTreeNode((DefaultMutableTreeNode) data.getModel().getRoot(), uuid, selectionHandler.getFilter());
+      final JPPFWebSession session = (JPPFWebSession) target.getPage().getSession();
+      final TableTreeData data = session.getTableTreeData(type);
+      final SelectionHandler selectionHandler = data.getSelectionHandler();
+      final DefaultMutableTreeNode node = TreeTableUtils.findTreeNode((DefaultMutableTreeNode) data.getModel().getRoot(), uuid, selectionHandler.getFilter());
       if (node != null) {
-        IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
-        TypedProperties props = new TypedProperties()
+        final IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
+        final TypedProperties props = new TypedProperties()
           .setBoolean("ctrl", params.getParameterValue("ctrl").toBoolean(false))
           .setBoolean("shift", params.getParameterValue("shift").toBoolean(false));
-        Page page = target.getPage();
+        final Page page = target.getPage();
         if (selectionHandler.handle(target, node, props) && (page instanceof TableTreeHolder)) {
-          TableTreeHolder holder = (TableTreeHolder) page;
+          final TableTreeHolder holder = (TableTreeHolder) page;
           target.add(holder.getTableTree());
           target.add(holder.getToolbar());
         }

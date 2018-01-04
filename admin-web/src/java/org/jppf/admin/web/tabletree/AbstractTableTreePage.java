@@ -88,12 +88,12 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
     this.viewType = viewType;
     this.namePrefix = namePrefix;
     add(getOrCreateToolbar());
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    final TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     treeModel = data.getModel();
     selectionHandler = data.getSelectionHandler();
     tableTree = createTableTree("jppf." + namePrefix + ".visible.columns");
     tableTree.add(new WindowsTheme()); // adds windows-style handles on nodes with children
-    int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
+    final int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
     refreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(interval));
     tableTree.add(refreshTimer);
     tableTree.addUpdateTarget(toolbar);
@@ -106,7 +106,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   @Override
   protected void onInitialize() {
     super.onInitialize();
-    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    final ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new SelectableLayoutLink(selectableLayout, toolbar));
   }
 
@@ -133,14 +133,14 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
   protected JPPFTableTree createTableTree(final String layoutProperty) {
     if (debugEnabled) log.debug("getting tree model for {}", viewType);
     //createTreeTableModel();
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    final TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     createSelectableLayout(layoutProperty);
-    JPPFTableTree tree = new JPPFTableTree(
+    final JPPFTableTree tree = new JPPFTableTree(
       viewType, namePrefix + ".table.tree", createColumns(), treeModel, Integer.MAX_VALUE, selectionHandler, TableTreeHelper.newTreeNodeRenderer(viewType), data.getExpansionModel());
-    DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
-    HeadersToolbar<String> header = new HeadersToolbar<>(table, null);
+    final DataTable<DefaultMutableTreeNode, String> table = tree.getTable();
+    final HeadersToolbar<String> header = new HeadersToolbar<>(table, null);
     table.addTopToolbar(header);
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
     if (data.isFirstExpansion()) {
       data.setFirstExpansion(false);
       TableTreeHelper.expand(tree, root);
@@ -154,7 +154,7 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    * @return the toolbar.
    */
   private Form<String> getOrCreateToolbar() {
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    final TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     ActionHandler actionHandler = data.getActionHandler();
     if (actionHandler == null) {
       actionHandler = new ActionHandler();
@@ -172,10 +172,10 @@ public abstract class AbstractTableTreePage extends TemplatePage implements Tabl
    * @param propertyName name of the property used when saving to / loading from the user settings.
    */
   protected void createSelectableLayout(final String propertyName) {
-    Locale locale = JPPFWebSession.get().getLocale();
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
-    AbstractJPPFTreeTableModel model = data.getModel();
-    List<LocalizedListItem> allItems = new ArrayList<>();
+    final Locale locale = JPPFWebSession.get().getLocale();
+    final TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    final AbstractJPPFTreeTableModel model = data.getModel();
+    final List<LocalizedListItem> allItems = new ArrayList<>();
     for (int i=1; i<treeModel.getColumnCount(); i++) allItems.add(new LocalizedListItem(model.getBaseColumnName(i), i, model.getI18nBase(), locale));
     selectableLayout = new SelectableLayoutImpl(allItems, propertyName);
   }

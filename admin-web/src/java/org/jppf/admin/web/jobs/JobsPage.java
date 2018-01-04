@@ -68,8 +68,8 @@ public class JobsPage extends AbstractTableTreePage {
    */
   public JobsPage() {
     super(TreeViewType.JOBS, "jobs");
-    JobsTreeData data = JPPFWebSession.get().getJobsData();
-    JobsTreeListener listener = (JobsTreeListener) data.getListener();
+    final JobsTreeData data = JPPFWebSession.get().getJobsData();
+    final JobsTreeListener listener = (JobsTreeListener) data.getListener();
     listener.setTableTree(tableTree);
   }
 
@@ -78,15 +78,15 @@ public class JobsPage extends AbstractTableTreePage {
    */
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
-    List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
+    final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new JobTreeColumn(Model.of("Tree")));
-    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new JobColumn(item.index));
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new JobColumn(item.index));
     return columns;
   }
 
   @Override
   protected void createActions() {
-    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    final ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new CancelJobLink());
     actionHandler.addActionLink(toolbar, new SuspendJobLink(false));
     actionHandler.addActionLink(toolbar, new SuspendJobLink(true));
@@ -116,18 +116,18 @@ public class JobsPage extends AbstractTableTreePage {
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
       super.populateItem(cellItem, componentId, rowModel);
-      DefaultMutableTreeNode node = rowModel.getObject();
-      AbstractJobComponent comp = (AbstractJobComponent) node.getUserObject();
+      final DefaultMutableTreeNode node = rowModel.getObject();
+      final AbstractJobComponent comp = (AbstractJobComponent) node.getUserObject();
       String cssClass = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
       if (comp instanceof Job) {
-        Job data = (Job) comp;
+        final Job data = (Job) comp;
         inactive = data.getJobInformation().isSuspended();
         if (inactive) cssClass += (selected) ? "tree_inactive_selected " : "tree_inactive ";
         else cssClass = (selected) ? "tree_selected " : "node_up ";
       } else if (comp instanceof JobDriver) {
-        TopologyDriver driver = ((JobDriver) comp).getTopologyDriver();
+        final TopologyDriver driver = ((JobDriver) comp).getTopologyDriver();
         if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
         else cssClass = (selected) ? "tree_inactive_selected " : "driver_down ";
       } else if (comp instanceof JobDispatch) {
@@ -160,14 +160,14 @@ public class JobsPage extends AbstractTableTreePage {
 
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
-      NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
-      DefaultMutableTreeNode treeNode = nodeModel.getObject();
-      AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
-      String value = (String) treeModel.getValueAt(treeNode, index);
+      final NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
+      final DefaultMutableTreeNode treeNode = nodeModel.getObject();
+      final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+      final String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
       String cssClass = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       if ((comp instanceof Job) || (comp instanceof JobDispatch)) cssClass += "node_up " + getCssClass();
       else if (!selected) cssClass += "empty";
       if (selected) cssClass += "tree_selected";

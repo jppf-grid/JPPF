@@ -41,14 +41,14 @@ public class SelectJobsLink extends AbstractViewTypeLink {
 
   @Override
   protected void onClick(final AjaxRequestTarget target, final TableTreeData data) {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
-    SelectionHandler handler = data.getSelectionHandler();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
+    final SelectionHandler handler = data.getSelectionHandler();
     handler.clearSelection();
     for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode dmtnDriver = (DefaultMutableTreeNode) root.getChildAt(i);
+      final DefaultMutableTreeNode dmtnDriver = (DefaultMutableTreeNode) root.getChildAt(i);
       for (int j=0; j<dmtnDriver.getChildCount(); j++) {
-        DefaultMutableTreeNode dmtnNode = (DefaultMutableTreeNode) dmtnDriver.getChildAt(j);
-        AbstractJobComponent job = (AbstractJobComponent) dmtnNode.getUserObject();
+        final DefaultMutableTreeNode dmtnNode = (DefaultMutableTreeNode) dmtnDriver.getChildAt(j);
+        final AbstractJobComponent job = (AbstractJobComponent) dmtnNode.getUserObject();
         handler.select(job.getUuid());
       }
     }

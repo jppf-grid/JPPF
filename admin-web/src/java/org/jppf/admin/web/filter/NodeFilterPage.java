@@ -78,19 +78,19 @@ public class NodeFilterPage extends TemplatePage {
    */
   public NodeFilterPage() {
     add(form = new Form<>("node.filter.form"));
-    String validTitle = LocalizationUtils.getLocalized(BASE, "node.filter.valid.title", JPPFWebSession.get().getLocale());
+    final String validTitle = LocalizationUtils.getLocalized(BASE, "node.filter.valid.title", JPPFWebSession.get().getLocale());
     add(validDialog = new MessageDialog("node.filter.valid.dialog", Model.of(validTitle), Model.of(""), DialogButtons.OK, DialogIcon.INFO) {
       @Override
       public void onClose(final IPartialPageRequestHandler handler, final DialogButton button) {
       }
     });
-    String errorTitle = LocalizationUtils.getLocalized(BASE, "node.filter.invalid.title", JPPFWebSession.get().getLocale());
+    final String errorTitle = LocalizationUtils.getLocalized(BASE, "node.filter.invalid.title", JPPFWebSession.get().getLocale());
     add(errorDialog = new MessageDialog("node.filter.error.dialog", Model.of(errorTitle), Model.of(""), DialogButtons.OK, DialogIcon.ERROR) {
       @Override
       public void onClose(final IPartialPageRequestHandler handler, final DialogButton button) {
       }
     });
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
     form.add(new CheckBox("node.filter.active", Model.of(active)) {
       @Override
@@ -109,7 +109,7 @@ public class NodeFilterPage extends TemplatePage {
     form.add(new DownloadLink());
     form.add(new UploadLink());
     form.add(fileUploadField = new FileUploadField("node.filter.upload.browse"));
-    ContextImage cimg = new ContextImage("node.filter.upload.img", "images/toolbar/upload.png");
+    final ContextImage cimg = new ContextImage("node.filter.upload.img", "images/toolbar/upload.png");
     form.add(cimg);
     setTooltip(cimg);
     form.add(policyField = new TextArea<>("node.filter.policy.field", Model.of(JPPFWebSession.get().getNodeFilter().getXmlPolicy())));
@@ -147,9 +147,9 @@ public class NodeFilterPage extends TemplatePage {
    * Called when the filter's active state is changed in the UI.
    * @param active the new active state.
    */
-  private void onActiveStateChanged(final boolean active) {
+  private static void onActiveStateChanged(final boolean active) {
     if (debugEnabled) log.debug("changing active state to {}", active);
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     JPPFWebSession.get().getNodeFilter().setActive(active);
     settings.getProperties().setBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, active);
     settings.save();
@@ -158,7 +158,7 @@ public class NodeFilterPage extends TemplatePage {
   @Override
   protected void onConfigure() {
     super.onConfigure();
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
     JPPFWebSession.get().getNodeFilter().setActive(active);
     nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));

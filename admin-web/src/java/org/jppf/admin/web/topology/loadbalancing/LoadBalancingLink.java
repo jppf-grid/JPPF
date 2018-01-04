@@ -61,15 +61,15 @@ public class LoadBalancingLink extends AbstractModalLink<LoadBalancingForm> {
    * Called when the ok button is closed.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TopologyTreeData data = session.getTopologyData();
-    List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
+    final List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
     if (!selectedDrivers.isEmpty()) {
       try {
-        TopologyDriver driver = selectedDrivers.get(0);
-        TypedProperties props = new TypedProperties().fromString(modalForm.getProperties());
+        final TopologyDriver driver = selectedDrivers.get(0);
+        final TypedProperties props = new TypedProperties().fromString(modalForm.getProperties());
         driver.getJmx().changeLoadBalancerSettings(modalForm.getAlgorithm(), props);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -77,18 +77,18 @@ public class LoadBalancingLink extends AbstractModalLink<LoadBalancingForm> {
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TopologyTreeData data = session.getTopologyData();
-    List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
+    final List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
     if (!selectedDrivers.isEmpty()) {
       try {
-        TopologyDriver driver = selectedDrivers.get(0);
-        LoadBalancingInformation lbi = driver.getJmx().loadBalancerInformation();
+        final TopologyDriver driver = selectedDrivers.get(0);
+        final LoadBalancingInformation lbi = driver.getJmx().loadBalancerInformation();
         modalForm.setAlgorithm(lbi.getAlgorithm());
         modalForm.setAlgorithmChoices(lbi.getAlgorithmNames());
         modalForm.setProperties(lbi.getParameters().asString());
         modalForm.setDriverName(driver.getDisplayName());
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

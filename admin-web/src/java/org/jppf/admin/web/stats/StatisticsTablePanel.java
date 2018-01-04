@@ -54,13 +54,13 @@ public class StatisticsTablePanel extends Panel {
    */
   public StatisticsTablePanel(final String id, final String name, final Fields[] fields) {
     super(id);
-    Locale locale = JPPFWebSession.get().getLocale();
-    String caption = LocalizationUtils.getLocalized(STATS_BASE, name + ".label", locale);
+    final Locale locale = JPPFWebSession.get().getLocale();
+    final String caption = LocalizationUtils.getLocalized(STATS_BASE, name + ".label", locale);
     add(new Label("caption", (caption != null) ? caption : ""));
-    List<IColumn<Fields, String>> columns = new ArrayList<>();
+    final List<IColumn<Fields, String>> columns = new ArrayList<>();
     columns.add(new StatsColumn(0));
     columns.add(new StatsColumn(1));
-    DataTable<Fields, String> table = new DataTable<>("table", columns, new ListDataProvider<>(Arrays.asList(fields)), Long.MAX_VALUE);
+    final DataTable<Fields, String> table = new DataTable<>("table", columns, new ListDataProvider<>(Arrays.asList(fields)), Long.MAX_VALUE);
     add(table);
   }
 
@@ -84,13 +84,13 @@ public class StatisticsTablePanel extends Panel {
 
     @Override
     public void populateItem(final Item<ICellPopulator<Fields>> cellItem, final String componentId, final IModel<Fields> rowModel) {
-      Fields field = rowModel.getObject();
-      Locale locale = JPPFWebSession.get().getLocale();
+      final Fields field = rowModel.getObject();
+      final Locale locale = JPPFWebSession.get().getLocale();
       String value = null;
       if (index == 0) {
         value = LocalizationUtils.getLocalized(FIELDS_BASE, field.name(), locale);
       } else {
-        StatsUpdater updater = JPPFWebConsoleApplication.get().getStatsUpdater();
+        final StatsUpdater updater = JPPFWebConsoleApplication.get().getStatsUpdater();
         value = updater.formatLatestValue(locale, JPPFWebSession.get().getCurrentDriver(), field);
       }
       cellItem.add(new Label(componentId, value));

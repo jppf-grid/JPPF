@@ -58,12 +58,12 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
     if ((params != null) && (params.length > 0)) {
       if (params[0] instanceof TypedProperties) props = (TypedProperties) params[0];
     }
-    boolean ctrl = (props == null) ? false : props.getBoolean("ctrl", false);
-    boolean shift = (props == null) ? false : props.getBoolean("shift", false);
-    AbstractComponent<?> data = (AbstractComponent<?>) node.getUserObject();
-    String uuid = data.getUuid();
-    boolean sel = isSelected(uuid);
-    int size = selected.size();
+    final boolean ctrl = (props == null) ? false : props.getBoolean("ctrl", false);
+    final boolean shift = (props == null) ? false : props.getBoolean("shift", false);
+    final AbstractComponent<?> data = (AbstractComponent<?>) node.getUserObject();
+    final String uuid = data.getUuid();
+    final boolean sel = isSelected(uuid);
+    final int size = selected.size();
     boolean selectionChanged = true;
     if (debugEnabled) log.debug(String.format("ctrl=%b, shift=%b, sel=%b, size=%d", ctrl, shift, sel, size));
     if (shift && (lastSelected != null)) {
@@ -96,25 +96,25 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
    * @param target ajax target for the selection request.
    */
   private void blockSelect(final AjaxRequestTarget target, final DefaultMutableTreeNode treeNode, final String uuid) {
-    Map<String, Integer> uuidToPos = new HashMap<>();
-    SortedMap<Integer, String> posToUuid = new TreeMap<>();
+    final Map<String, Integer> uuidToPos = new HashMap<>();
+    final SortedMap<Integer, String> posToUuid = new TreeMap<>();
     int pos = 0;
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeNode.getRoot();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeNode.getRoot();
     for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
-      AbstractComponent<?> driverData = (AbstractComponent<?>) driver.getUserObject();
-      String driverUuid = driverData.getUuid();
+      final DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
+      final AbstractComponent<?> driverData = (AbstractComponent<?>) driver.getUserObject();
+      final String driverUuid = driverData.getUuid();
       posToUuid.put(pos, driverUuid);
       uuidToPos.put(driverUuid, pos);
       pos++;
       //JPPFTableTree tableTree = (JPPFTableTree) target.getPage().get("table.tree");
-      JPPFTableTree tableTree = ((AbstractTableTreePage) target.getPage()).getTableTree();
+      final JPPFTableTree tableTree = ((AbstractTableTreePage) target.getPage()).getTableTree();
       if (tableTree.getState(driver) == State.EXPANDED) {
         for (int j=0; j<driver.getChildCount(); j++) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
+          final DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
           if ((filter != null) && !filter.accepts(node)) continue;
-          AbstractComponent<?> nodeData = (AbstractComponent<?>) node.getUserObject();
-          String nodeUuid = nodeData.getUuid();
+          final AbstractComponent<?> nodeData = (AbstractComponent<?>) node.getUserObject();
+          final String nodeUuid = nodeData.getUuid();
           posToUuid.put(pos, nodeUuid);
           uuidToPos.put(nodeUuid, pos);
           pos++;
@@ -122,9 +122,9 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
       }
     }
     if (lastSelected != null) {
-      int lastIndex = uuidToPos.get(lastSelected);
-      int nodeIndex = uuidToPos.get(uuid);
-      SortedMap<Integer, String> sub = (lastIndex <= nodeIndex) ? posToUuid.subMap(lastIndex, nodeIndex + 1) : posToUuid.subMap(nodeIndex, lastIndex + 1);
+      final int lastIndex = uuidToPos.get(lastSelected);
+      final int nodeIndex = uuidToPos.get(uuid);
+      final SortedMap<Integer, String> sub = (lastIndex <= nodeIndex) ? posToUuid.subMap(lastIndex, nodeIndex + 1) : posToUuid.subMap(nodeIndex, lastIndex + 1);
       selected.clear();
       selected.addAll(sub.values());
     }

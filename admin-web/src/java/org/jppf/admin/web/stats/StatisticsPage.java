@@ -60,10 +60,10 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
    *
    */
   public StatisticsPage() {
-    Form<String> form = new Form<>("stats.toolbar");
+    final Form<String> form = new Form<>("stats.toolbar");
     add(form);
-    List<TopologyDriver> drivers = JPPFWebConsoleApplication.get().getTopologyManager().getDrivers();
-    DropDownChoice<TopologyDriver> combo = new DropDownChoice<TopologyDriver>("stats.driver_selector.field", drivers, new TopologyDriverRenderer()) {
+    final List<TopologyDriver> drivers = JPPFWebConsoleApplication.get().getTopologyManager().getDrivers();
+    final DropDownChoice<TopologyDriver> combo = new DropDownChoice<TopologyDriver>("stats.driver_selector.field", drivers, new TopologyDriverRenderer()) {
       @Override
       protected void onSelectionChanged(final TopologyDriver newSelection) {
         JPPFWebSession.get().setCurrentDriver(newSelection);
@@ -75,7 +75,7 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
         return true;
       }
     };
-    TopologyDriver driver = JPPFWebSession.get().getCurrentDriver();
+    final TopologyDriver driver = JPPFWebSession.get().getCurrentDriver();
     if (driver != null) combo.setModel(Model.of(driver));
     form.add(combo);
     form.add(new ServerResetStatsLink());
@@ -89,16 +89,16 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
       }
     });
     tablesContainer = new WebMarkupContainer("stats.tables.container");
-    List<StatsTableData> tables = new ArrayList<>();
-    for (LocalizedListItem item: selectableLayout.getVisibleItems()) tables.add(new StatsTableData(item.name, StatsConstants.ALL_TABLES_MAP.get(item.name)));
+    final List<StatsTableData> tables = new ArrayList<>();
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) tables.add(new StatsTableData(item.name, StatsConstants.ALL_TABLES_MAP.get(item.name)));
     //for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) tables.add(new StatsTableData(entry.getKey(), entry.getValue()));
-    ListView<StatsTableData> listView = new ListView<StatsTableData>("stats.visible.tables", tables) {
+    final ListView<StatsTableData> listView = new ListView<StatsTableData>("stats.visible.tables", tables) {
       @Override
       protected void populateItem(final ListItem<StatsTableData> item) {
         item.add(new StatisticsTablePanel("stats.table", item.getModelObject().name, item.getModelObject().fields));
       }
     };
-    int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
+    final int interval = JPPFWebConsoleApplication.get().getRefreshInterval();
     tablesContainer.add(statsRefreshTimer = new AjaxSelfUpdatingTimerBehavior(Duration.seconds(interval)));
     tablesContainer.add(listView);
     add(tablesContainer);

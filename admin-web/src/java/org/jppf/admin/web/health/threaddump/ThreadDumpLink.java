@@ -69,20 +69,20 @@ public class ThreadDumpLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on thread dump");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getHealthData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
-      DefaultMutableTreeNode treeNode = selectedNodes.get(0);
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
-      Locale locale = Session.get().getLocale();
-      String title = HealthUtils.getThreadDumpTitle(comp, locale);
+      final DefaultMutableTreeNode treeNode = selectedNodes.get(0);
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+      final Locale locale = Session.get().getLocale();
+      final String title = HealthUtils.getThreadDumpTitle(comp, locale);
       final StringBuilder html = new StringBuilder();
       try {
-        ThreadDump info = HealthUtils.retrieveThreadDump(comp);
+        final ThreadDump info = HealthUtils.retrieveThreadDump(comp);
         if (info == null) html.append(HealthUtils.localizeThreadDumpInfo("threaddump.info_not_found", locale));
         else html.append(HTMLThreadDumpWriter.printToString(info, title, false, 10));
-      } catch(Exception e) {
+      } catch(final Exception e) {
         html.append(ExceptionUtils.getStackTrace(e).replace("\n", "<br>"));
       }
       //if (debugEnabled) log.debug("html = {}", html);

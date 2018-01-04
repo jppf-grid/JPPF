@@ -81,12 +81,12 @@ public class AbstractJPPFPage extends WebPage {
    * @return the component itself.
    */
   public <T extends Component> T setTooltip(final T comp, final String base) {
-    String id = comp.getId();
+    final String id = comp.getId();
     String key = null;
-    String[] possibleEndings = { ".field", ".label" };
+    final String[] possibleEndings = { ".field", ".label" };
     for (String ending: possibleEndings) {
       if (id.endsWith(ending)) {
-        int idx = id.lastIndexOf(ending);
+        final int idx = id.lastIndexOf(ending);
         key = id.substring(0, idx) + ".tooltip";
         break;
       }

@@ -52,12 +52,12 @@ public class ValidateLink extends AjaxButtonWithIcon {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on node.filter.validate");
-    NodeFilterPage page = (NodeFilterPage) target.getPage();
-    TextArea<String> area = page.getPolicyField();
-    String xml = area.getModelObject();
-    Pair<Boolean, String> result = NodeFilterUtils.validatePolicy(xml);
-    boolean valid = result.first();
-    MessageDialog dialog = valid ? page.getValidDialog() : page.getErrorDialog();
+    final NodeFilterPage page = (NodeFilterPage) target.getPage();
+    final TextArea<String> area = page.getPolicyField();
+    final String xml = area.getModelObject();
+    final Pair<Boolean, String> result = NodeFilterUtils.validatePolicy(xml);
+    final boolean valid = result.first();
+    final MessageDialog dialog = valid ? page.getValidDialog() : page.getErrorDialog();
     String message = LocalizationUtils.getLocalized("org.jppf.ui.i18n.FilterPanel", "node.filter." + (valid ? "valid" : "invalid") + ".message", JPPFWebSession.get().getLocale());
     if (!valid) message += "\n" + result.second();
     if (debugEnabled) log.debug("message = {}", message);

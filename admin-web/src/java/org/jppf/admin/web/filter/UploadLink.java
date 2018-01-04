@@ -52,15 +52,15 @@ public class UploadLink extends AjaxButtonWithIcon {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on node.filter.upload");
-    NodeFilterPage page = (NodeFilterPage) target.getPage();
-    FileUploadField fileUploadField = page.getFileUploadField();
-    FileUpload fileUpload = fileUploadField.getFileUpload();
+    final NodeFilterPage page = (NodeFilterPage) target.getPage();
+    final FileUploadField fileUploadField = page.getFileUploadField();
+    final FileUpload fileUpload = fileUploadField.getFileUpload();
     try {
-      byte[] bytes = fileUpload.getBytes();
-      String s = new String(bytes, "UTF-8");
-      TextArea<String> area = page.getPolicyField();
+      final byte[] bytes = fileUpload.getBytes();
+      final String s = new String(bytes, "UTF-8");
+      final TextArea<String> area = page.getPolicyField();
       area.setModel(Model.of(s));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     target.add(form);
@@ -69,7 +69,7 @@ public class UploadLink extends AjaxButtonWithIcon {
   @Override
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
-    String style = tag.getAttributes().getString("style");
+    final String style = tag.getAttributes().getString("style");
     tag.getAttributes().put("style", (style == null) ? "display: none" : style + "; display: none");
   }
 }

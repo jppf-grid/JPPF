@@ -34,10 +34,10 @@ public class ProvisioningAction extends AbstractManagerRoleAction {
   @Override
   public void setEnabled(final List<DefaultMutableTreeNode> selected) {
     enabled = false;
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isNode()) {
-        JPPFManagementInfo info = ((TopologyNode) comp).getManagementInfo();
+        final JPPFManagementInfo info = ((TopologyNode) comp).getManagementInfo();
         if ((info != null) && info.isMasterNode()) {
           enabled = true;
           break;

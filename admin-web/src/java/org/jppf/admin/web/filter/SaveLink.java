@@ -49,8 +49,8 @@ public class SaveLink extends AjaxButtonWithIcon {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on node.filter.save");
-    TextArea<String> area = ((NodeFilterPage) getPage()).getPolicyField();
-    String xmlPolicy = area.getModelObject();
+    final TextArea<String> area = ((NodeFilterPage) getPage()).getPolicyField();
+    final String xmlPolicy = area.getModelObject();
     JPPFWebSession.get().getNodeFilter().setXmlPolicy(xmlPolicy);
   }
 }

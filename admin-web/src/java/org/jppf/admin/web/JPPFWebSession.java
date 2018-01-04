@@ -89,8 +89,8 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
   @Override
   public void onInvalidate() {
     super.onInvalidate();
-    for (TreeViewType type: TreeViewType.values()) {
-      TableTreeData ttd = dataMap.get(type);
+    for (final TreeViewType type: TreeViewType.values()) {
+      final TableTreeData ttd = dataMap.get(type);
       if (ttd != null) ttd.cleanup();
     }
     dataMap.clear();
@@ -156,17 +156,17 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
 
   @Override
   public boolean authenticate(final String user, final String pwd) {
-    boolean ret = super.authenticate(user, pwd);
+    final boolean ret = super.authenticate(user, pwd);
     if (ret) {
-      List<String> roles = getUserRoles();
+      final List<String> roles = getUserRoles();
       if (debugEnabled) log.debug("successful authentication for user {}, roles = {}", user, roles);
       userSettings = new UserSettings(user).load();
       nodeFilter = new TopologyFilter(getUserName());
-      boolean active = userSettings.getProperties().getBoolean(NODE_FILTER_ACTIVE_PROP, false);
+      final boolean active = userSettings.getProperties().getBoolean(NODE_FILTER_ACTIVE_PROP, false);
       if (debugEnabled) log.debug("node filter is {}", active ? "active" : "inactive");
       nodeFilter.setActive(active);
       if (roles.contains(JPPFRoles.MANAGER) || roles.contains(JPPFRoles.MONITOR)) {
-        for (TreeViewType type: TreeViewType.values()) getTableTreeData(type);
+        for (final TreeViewType type: TreeViewType.values()) getTableTreeData(type);
       }
       getHealthData().initThresholds(userSettings.getProperties());
     } else if (debugEnabled) log.debug("failed authentication for user {}", user);
@@ -201,8 +201,8 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    * @return the name of the authenticated user, or {@code null} if the user is not authenticated.
    */
   public static String getSignedInUser() {
-    HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
-    Principal p = req.getUserPrincipal();
+    final HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
+    final Principal p = req.getUserPrincipal();
     return p == null ? null : p.getName();
   }
 
@@ -210,11 +210,11 @@ public class JPPFWebSession extends ServletContainerAuthenticatedWebSession {
    *
    * @return the roles of the current signed-in user, if any.
    */
-  private List<String> getUserRoles() {
-    List<String> result = new ArrayList<>();
-    HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
-    for (JPPFRole r: JPPFRole.values()) {
-      String role = r.getRoleName();
+  private static List<String> getUserRoles() {
+    final List<String> result = new ArrayList<>();
+    final HttpServletRequest req = (HttpServletRequest) RequestCycle.get().getRequest().getContainerRequest();
+    for (final JPPFRole r: JPPFRole.values()) {
+      final String role = r.getRoleName();
       if (req.isUserInRole(role)) result.add(role);
     }
     return result;

@@ -57,7 +57,7 @@ public class ThresholdsLink extends AbstractModalLink<ThresholdsForm> {
   /**
    * Called when the ok button is clicked.
    */
-  private void doOK() {
+  private static void doOK() {
     JPPFWebSession.get().getHealthData().updateThresholds();
   }
 }

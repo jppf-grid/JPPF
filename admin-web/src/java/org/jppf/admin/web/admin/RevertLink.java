@@ -50,7 +50,7 @@ public class RevertLink extends AbstractAdminLink {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on {}.revert", type.getPrefix());
-    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
+    final TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
     area.setModel(Model.of(JPPFWebConsoleApplication.get().getConfig(type).getProperties().asString()));
     target.add(form);
   }

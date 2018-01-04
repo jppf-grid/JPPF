@@ -73,8 +73,8 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   @Override
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
-    Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
-    String format = "<img src='" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s'/>";
+    final Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
+    final String format = "<img src='" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s'/>";
     if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
       if (pair != null) setBody(Model.of(String.format(format, pair.first() + "-disabled", pair.second())));
@@ -105,7 +105,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   protected void stopRefreshTimer(final AjaxRequestTarget target) {
     //if (debugEnabled) log.debug("stopping timer for page {}", target.getPage());
     if (target.getPage() instanceof RefreshTimerHolder) {
-      AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
+      final AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
       //if (debugEnabled) log.debug("stopping timer {} for page {}", timer, target.getPage());
       if (timer != null) timer.stop(null);
     }
@@ -118,7 +118,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
   protected void restartRefreshTimer(final AjaxRequestTarget target) {
     //if (debugEnabled) log.debug("restarting timer for page {}", target.getPage());
     if (target.getPage() instanceof RefreshTimerHolder) {
-      AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
+      final AjaxSelfUpdatingTimerBehavior timer = ((RefreshTimerHolder) target.getPage()).getRefreshTimer();
       //if (debugEnabled) log.debug("restarting timer {} for page {}", timer, target.getPage());
       if (timer != null) timer.restart(null);
     }
@@ -130,7 +130,7 @@ public abstract class AbstractActionLink extends AjaxLink<String> {
    */
   protected void addTableTreeToTarget(final AjaxRequestTarget target) {
     if (target.getPage() instanceof TableTreeHolder) {
-      JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
+      final JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       if (tableTree != null) target.add(tableTree);
     }
   }

@@ -100,9 +100,9 @@ public class AjaxButtonWithIcon extends AjaxButton {
   @Override
   protected void onComponentTag(final ComponentTag tag) {
     super.onComponentTag(tag);
-    Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
-    StringBuilder style = new StringBuilder();
-    String format = "background-image: url(" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s)";
+    final Pair<String, String> pair = FileUtils.getFileNameAndExtension(imageName);
+    final StringBuilder style = new StringBuilder();
+    final String format = "background-image: url(" + RequestCycle.get().getRequest().getContextPath() + "/images/toolbar/%s.%s)";
     if ((action != null) && (!action.isEnabled() || !action.isAuthorized())) {
       tag.getAttributes().put("class", "button_link_disabled");
       if (pair != null) style.append(String.format(format, pair.first() + "-disabled", pair.second()));

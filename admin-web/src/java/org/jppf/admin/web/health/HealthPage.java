@@ -68,14 +68,14 @@ public class HealthPage extends AbstractTableTreePage {
    */
   public HealthPage() {
     super(TreeViewType.HEALTH, "health");
-    HealthTreeData data = JPPFWebSession.get().getHealthData();
-    HealthTreeListener listener = (HealthTreeListener) data.getListener();
+    final HealthTreeData data = JPPFWebSession.get().getHealthData();
+    final HealthTreeListener listener = (HealthTreeListener) data.getListener();
     listener.setTableTree(tableTree);
   }
 
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
-    List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
+    final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new HealthTreeColumn(Model.of("Tree")));
     for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new HealthColumn(item.index));
     return columns;
@@ -83,7 +83,7 @@ public class HealthPage extends AbstractTableTreePage {
 
   @Override
   protected void createActions() {
-    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    final ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new GCLink());
     actionHandler.addActionLink(toolbar, new ThreadDumpLink(toolbar));
     actionHandler.addActionLink(toolbar, new HeapDumpLink());
@@ -113,14 +113,14 @@ public class HealthPage extends AbstractTableTreePage {
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
       super.populateItem(cellItem, componentId, rowModel);
-      DefaultMutableTreeNode node = rowModel.getObject();
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
+      final DefaultMutableTreeNode node = rowModel.getObject();
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
       String cssClass = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
       if (comp.isPeer()) cssClass += "peer ";
       else if (comp.isNode()) {
-        TopologyNode data = (TopologyNode) node.getUserObject();
+        final TopologyNode data = (TopologyNode) node.getUserObject();
         //if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
@@ -129,7 +129,7 @@ public class HealthPage extends AbstractTableTreePage {
         }
         else cssClass += selected ? "tree_inactive_selected " : "node_tree_down ";
       } else if (comp.isDriver()) {
-        TopologyDriver driver = (TopologyDriver) node.getUserObject();
+        final TopologyDriver driver = (TopologyDriver) node.getUserObject();
         if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
         else cssClass = (selected) ? "tree_inactive_selected" : "driver_down";
       }
@@ -160,13 +160,13 @@ public class HealthPage extends AbstractTableTreePage {
 
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
-      NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
-      DefaultMutableTreeNode treeNode = nodeModel.getObject();
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
-      String value = (String) treeModel.getValueAt(treeNode, index);
+      final NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
+      final DefaultMutableTreeNode treeNode = nodeModel.getObject();
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+      final String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       String css = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       if (!comp.isPeer()) css += (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
       cellItem.add(new AttributeModifier("class", css));
       if (traceEnabled && (index == 1)) log.trace(String.format("index=%d, value=%s, css=%s, comp=%s", index, value, css, comp));
@@ -194,8 +194,8 @@ public class HealthPage extends AbstractTableTreePage {
      * @return the css class that specifies the cell's background color.
      */
     private String getThresholdCssClass(final AbstractTopologyComponent comp) {
-      HealthTreeData data = JPPFWebSession.get().getHealthData();
-      HealthSnapshot snapshot = comp.getHealthSnapshot();
+      final HealthTreeData data = JPPFWebSession.get().getHealthData();
+      final HealthSnapshot snapshot = comp.getHealthSnapshot();
       double value = -1d;
       String css = "health_tree";
       AlertThresholds thresholds = null;

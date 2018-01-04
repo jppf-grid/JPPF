@@ -46,7 +46,7 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    TopologyDriver driver = event.getDriver();
+    final TopologyDriver driver = event.getDriver();
     selectionHandler.unselect(driver.getUuid());
     for (TopologyNode node: driver.getNodesAndPeers()) selectionHandler.unselect(node.getUuid());
     TopologyUtils.removeDriver(treeModel, driver);
@@ -59,7 +59,7 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
   @Override
   public void nodeAdded(final TopologyEvent event) {
     if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
-    TopologyNode nodeComp = event.getNodeOrPeer();
+    final TopologyNode nodeComp = event.getNodeOrPeer();
     if (!nodeComp.isPeer()) {
       addNode(event.getDriver(), nodeComp);
     }
@@ -67,7 +67,7 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    TopologyNode nodeComp = event.getNodeOrPeer();
+    final TopologyNode nodeComp = event.getNodeOrPeer();
     if (!nodeComp.isPeer()) {
       TopologyUtils.removeNode(treeModel, event.getDriver(), nodeComp);
       selectionHandler.unselect(event.getNodeOrPeer().getUuid());
@@ -77,7 +77,7 @@ public class HealthTreeListener extends AbstractMonitoringListener implements To
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
     if (!isAccepted(nodeFilter, event.getNodeOrPeer())) return;
-    TopologyNode nodeComp = event.getNodeOrPeer();
+    final TopologyNode nodeComp = event.getNodeOrPeer();
     if (!nodeComp.isPeer()) {
       if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {
         TopologyUtils.updateNode(treeModel, event.getDriver(), nodeComp);

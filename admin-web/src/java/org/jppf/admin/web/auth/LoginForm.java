@@ -78,7 +78,7 @@ public class LoginForm extends Form<String> {
         if (hasError) tag.append("style", "margin-top: 15px", ";");
       }
     });
-    AjaxButton button = new AjaxButton(PREFIX + ".ok") {
+    final AjaxButton button = new AjaxButton(PREFIX + ".ok") {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         if (debugEnabled) log.debug("clicked on login.ok");
@@ -123,13 +123,13 @@ public class LoginForm extends Form<String> {
    * @param target .
    */
   private void doOK(final AjaxRequestTarget target) {
-    AuthenticatedWebSession session = AuthenticatedWebSession.get();
+    final AuthenticatedWebSession session = AuthenticatedWebSession.get();
     if (session.signIn(getUsername(), getPassword())) {
       //continueToOriginalDestination();
       setResponsePage(session.getRoles().hasRole(JPPFRoles.ADMIN) ? AdminPage.class  : getApplication().getHomePage());
       hasError = false;
     } else {
-      String message = LocalizationUtils.getLocalized(LoginPage.class.getName(), "login.error", Session.get().getLocale());
+      final String message = LocalizationUtils.getLocalized(LoginPage.class.getName(), "login.error", Session.get().getLocale());
       this.error.setDefaultModel(Model.of(message));
       target.add(this.getParent());
       hasError = true;

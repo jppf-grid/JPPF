@@ -91,7 +91,7 @@ public abstract class AbstractModalForm extends Form<String> {
     beforeCreateFields(args);
     createFields();
     if (addDefaultButtons) {
-      AjaxButton okButton = new AjaxButton(prefix + ".ok") {
+      final AjaxButton okButton = new AjaxButton(prefix + ".ok") {
         @Override
         protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
           if (debugEnabled) log.debug("clicked on {}.ok", AbstractModalForm.this.prefix);
@@ -129,7 +129,7 @@ public abstract class AbstractModalForm extends Form<String> {
    */
   protected final void loadSettings() {
     if (JPPFWebSession.get() != null) {
-      UserSettings settings = JPPFWebSession.get().getUserSettings();
+      final UserSettings settings = JPPFWebSession.get().getUserSettings();
       if (settings != null) loadSettings(settings.getProperties());
     }
   }
@@ -144,7 +144,7 @@ public abstract class AbstractModalForm extends Form<String> {
    * Save the fields values.
    */
   protected final void saveSettings() {
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     if (saveSettings(settings.getProperties())) settings.save();
   }
 
@@ -165,7 +165,7 @@ public abstract class AbstractModalForm extends Form<String> {
    * @return the newly created text field.
    */
   protected TextField<Long> createLongField(final String id, final long value, final long min, final long max, final long step) {
-    Spinner<Long> spinner = new Spinner<>(id, Model.of(value), Long.class);
+    final Spinner<Long> spinner = new Spinner<>(id, Model.of(value), Long.class);
     spinner.setMin(min);
     spinner.setMax(max);
     spinner.setStep(step);
@@ -183,7 +183,7 @@ public abstract class AbstractModalForm extends Form<String> {
    * @return the newly created text field.
    */
   protected TextField<Integer> createIntField(final String id, final int value, final int min, final int max, final int step) {
-    Spinner<Integer> spinner = new Spinner<>(id, Model.of(value), Integer.class);
+    final Spinner<Integer> spinner = new Spinner<>(id, Model.of(value), Integer.class);
     spinner.setMin(min);
     spinner.setMax(max);
     spinner.setStep(step);
@@ -201,7 +201,7 @@ public abstract class AbstractModalForm extends Form<String> {
    * @return the newly created text field.
    */
   protected TextField<Double> createDecField(final String id, final double value, final double min, final double max, final double step) {
-    Spinner<Double> spinner = new Spinner<>(id, Model.of(value), Double.class);
+    final Spinner<Double> spinner = new Spinner<>(id, Model.of(value), Double.class);
     spinner.setMin(min);
     spinner.setMax(max);
     spinner.setStep(step);
@@ -217,10 +217,10 @@ public abstract class AbstractModalForm extends Form<String> {
    * @return the component itself.
    */
   protected <T extends Component> T setTooltip(final T comp, final String base) {
-    String id = comp.getId();
+    final String id = comp.getId();
     String key = null;
     if (id.endsWith(".field")) {
-      int idx = id.lastIndexOf(".field");
+      final int idx = id.lastIndexOf(".field");
       key = id.substring(0, idx) + ".tooltip";
     } else key = id + ".tooltip";
     comp.add(new AttributeModifier("title", LocalizationUtils.getLocalized(base, key, locale)));

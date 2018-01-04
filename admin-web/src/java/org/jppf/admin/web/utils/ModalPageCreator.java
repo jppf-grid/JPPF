@@ -54,9 +54,9 @@ public class ModalPageCreator<F extends Form<String>, P extends Page> implements
   @Override
   public Page createPage() {
     try {
-      Constructor<P> c = pageClass.getConstructor(form.getClass());
+      final Constructor<P> c = pageClass.getConstructor(form.getClass());
       return c.newInstance(form);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
     }
   }

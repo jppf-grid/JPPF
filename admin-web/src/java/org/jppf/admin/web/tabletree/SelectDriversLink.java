@@ -41,11 +41,11 @@ public class SelectDriversLink extends AbstractViewTypeLink {
 
   @Override
   protected void onClick(final AjaxRequestTarget target, final TableTreeData data) {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
-    SelectionHandler handler = data.getSelectionHandler();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
+    final SelectionHandler handler = data.getSelectionHandler();
     handler.clearSelection();
     for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) root.getChildAt(i);
+      final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) root.getChildAt(i);
       handler.select(((AbstractComponent<?>) dmtn.getUserObject()).getUuid());
     }
   }

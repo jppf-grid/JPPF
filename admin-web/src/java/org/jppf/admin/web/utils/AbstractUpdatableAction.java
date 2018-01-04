@@ -65,8 +65,8 @@ public abstract class AbstractUpdatableAction implements UpdatableAction {
    * @return {@code true} if at least one node is selected, {@code false} otherwise.
    */
   protected boolean isNodeSelected(final List<DefaultMutableTreeNode> selected) {
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isNode()) return true;
     }
     return false;
@@ -78,8 +78,8 @@ public abstract class AbstractUpdatableAction implements UpdatableAction {
    * @return {@code true} if at least one node is selected, {@code false} otherwise.
    */
   protected boolean isDriverSelected(final List<DefaultMutableTreeNode> selected) {
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isDriver()) return true;
     }
     return false;
@@ -91,8 +91,8 @@ public abstract class AbstractUpdatableAction implements UpdatableAction {
    * @return {@code true} if at least one node is selected, {@code false} otherwise.
    */
   protected boolean isJobSelected(final List<DefaultMutableTreeNode> selected) {
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractComponent<?> comp = (AbstractComponent<?>) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractComponent<?> comp = (AbstractComponent<?>) treeNode.getUserObject();
       if (comp instanceof Job) return true;
     }
     return false;

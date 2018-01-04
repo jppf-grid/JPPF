@@ -35,11 +35,11 @@ public class FooterPanel extends Panel {
   public FooterPanel() {
     super("jppf.footer");
     int nbServers = 0, nbNodes = 0;
-    String user = JPPFWebSession.getSignedInUser();
-    WebMarkupContainer gridInfo = new WebMarkupContainer("jppf.footer.grid.info");
+    final String user = JPPFWebSession.getSignedInUser();
+    final WebMarkupContainer gridInfo = new WebMarkupContainer("jppf.footer.grid.info");
     add(gridInfo);
     if (user != null) {
-      TopologyManager mgr =JPPFWebConsoleApplication.get().getTopologyManager();
+      final TopologyManager mgr =JPPFWebConsoleApplication.get().getTopologyManager();
       nbServers = mgr.getDriverCount();
       nbNodes = mgr.getNodeCount();
     }

@@ -33,11 +33,11 @@ public class DownloadLink extends AbstractAdminLink {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(DownloadLink.class);
+  private static Logger log = LoggerFactory.getLogger(DownloadLink.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * 
    */
@@ -69,8 +69,8 @@ public class DownloadLink extends AbstractAdminLink {
 
     @Override
     protected IResourceStream getResourceStream() {
-      TextArea<String> area = ((AdminPage) getPage()).getConfigPanel(type).getConfig();
-      String configString = area.getModelObject();
+      final TextArea<String> area = ((AdminPage) getPage()).getConfigPanel(type).getConfig();
+      final String configString = area.getModelObject();
       return new StringResourceStream(configString, "text/plain");
     }
   }

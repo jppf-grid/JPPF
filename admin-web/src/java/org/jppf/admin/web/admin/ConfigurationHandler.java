@@ -79,14 +79,14 @@ public class ConfigurationHandler {
    */
   public synchronized ConfigurationHandler load() {
     try {
-      TypedProperties props = persistence.loadProperties(type.getHash());
+      final TypedProperties props = persistence.loadProperties(type.getHash());
       if (props.isEmpty()) {
-        try (Reader reader = FileUtils.getFileReader(type.getDefaultPath())) {
+        try (final Reader reader = FileUtils.getFileReader(type.getDefaultPath())) {
           props.load(reader);
         }
       }
       config = props;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return this;
@@ -99,7 +99,7 @@ public class ConfigurationHandler {
   public synchronized ConfigurationHandler save() {
     try {
       persistence.saveProperties(type.getHash(), config);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return this;

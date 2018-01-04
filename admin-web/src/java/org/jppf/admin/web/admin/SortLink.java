@@ -58,17 +58,17 @@ public class SortLink extends AbstractAdminLink {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on {}.sort[{}]", type.getPrefix(), ((ascending ? "a" : "de") + "scending"));
-    TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
-    String configString = area.getModelObject();
+    final TextArea<String> area = ((AdminPage) target.getPage()).getConfigPanel(type).getConfig();
+    final String configString = area.getModelObject();
     try {
-      List<String> list = FileUtils.textFileAsLines(new StringReader(configString));
+      final List<String> list = FileUtils.textFileAsLines(new StringReader(configString));
       Collections.sort(list);
       if (!ascending) Collections.reverse(list);
-      StringBuilder sb = new StringBuilder();
-      for (String s: list) sb.append(s).append('\n');
+      final StringBuilder sb = new StringBuilder();
+      for (final String s: list) sb.append(s).append('\n');
       area.setModel(Model.of(sb.toString()));
       target.add(form);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error(e.getMessage(), e);
     }
   }

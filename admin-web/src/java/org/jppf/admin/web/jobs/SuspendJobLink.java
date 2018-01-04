@@ -65,27 +65,27 @@ public class SuspendJobLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on " + (requeue ? "suspend requeue" : "suspend") + " counter");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getJobsData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
       final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-      for (DefaultMutableTreeNode treeNode: selectedNodes) {
-        AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+      for (final DefaultMutableTreeNode treeNode: selectedNodes) {
+        final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
         if ((comp instanceof Job) && (comp.getParent() != null)) {
-          Job job = (Job) comp;
+          final Job job = (Job) comp;
           if (!job.getJobInformation().isSuspended()) {
-            List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
-            for (JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
+            final List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
+            for (final JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
           }
         }
       }
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
-        TopologyDriver driver = entry.getKey();
-        JobSelector selector = new JobUuidSelector(entry.getValue());
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        final TopologyDriver driver = entry.getKey();
+        final JobSelector selector = new JobUuidSelector(entry.getValue());
         try {
           driver.getJobManager().suspendJobs(selector, requeue);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -99,9 +99,9 @@ public class SuspendJobLink extends AbstractActionLink {
     @Override
     public void setEnabled(final List<DefaultMutableTreeNode> selected) {
       enabled = false;
-      for (DefaultMutableTreeNode treeNode: selected) {
+      for (final DefaultMutableTreeNode treeNode: selected) {
         if (treeNode.getUserObject() instanceof Job) {
-          Job job = (Job) treeNode.getUserObject();
+          final Job job = (Job) treeNode.getUserObject();
           if (!job.getJobInformation().isSuspended()) {
             enabled = true;
             break;

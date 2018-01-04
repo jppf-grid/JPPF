@@ -31,7 +31,7 @@ import org.jppf.ui.utils.TopologyUtils;
 public class JobNodeRenderer implements TreeNodeRenderer {
   @Override
   public String getText(final DefaultMutableTreeNode treeNode, final boolean showIP) {
-    AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+    final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
     if (comp instanceof JobDriver) return TopologyUtils.getDisplayName(((JobDriver) comp).getTopologyDriver(), showIP);
     else if (comp instanceof JobDispatch) return TopologyUtils.getDisplayName(((JobDispatch) comp).getNode(), showIP);
     return comp.getDisplayName();
@@ -39,11 +39,11 @@ public class JobNodeRenderer implements TreeNodeRenderer {
 
   @Override
   public String getIconPath(final DefaultMutableTreeNode treeNode) {
-    AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+    final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
     String path = "driver.gif";
     if (comp instanceof Job) path = "job.png";
     else if (comp instanceof JobDispatch) {
-      JobDispatch dispatch = (JobDispatch) comp;
+      final JobDispatch dispatch = (JobDispatch) comp;
       path = dispatch.getNode().getManagementInfo().isMasterNode() ? "node-master.png" : "node-slave.png";
     }
     return "images/tree/" + path;

@@ -61,7 +61,7 @@ public class TopologyTreeData extends TableTreeData {
     });
     listener = new TopologyTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
     JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
-    ActionHandler ah = getActionHandler();
+    final ActionHandler ah = getActionHandler();
     ah.addAction(TopologyConstants.SYSTEM_INFO_ACTION, new SystemInfoAction());
     ah.addAction(TopologyConstants.PROVISIONING_ACTION, new ProvisioningAction());
     ah.addAction(TopologyConstants.SERVER_STOP_RESTART_ACTION, new DriverStopRestartAction());
@@ -71,7 +71,7 @@ public class TopologyTreeData extends TableTreeData {
     ah.addAction(TopologyConstants.NODE_THREADS_ACTION, new NodeThreadsAction());
     ah.addAction(TopologyConstants.CANCEL_PENDING_ACTION, new CancelPendingActionLink.Action());
     ah.addAction(TopologyConstants.NODE_RESET_TASKS_ACTION, new ResetTaskCounterLink.Action());
-    UpdatableAction action = new StopRestartNodeLink.Action();
+    final UpdatableAction action = new StopRestartNodeLink.Action();
     ah.addAction(TopologyConstants.NODE_STOP_ACTION, action);
     ah.addAction(TopologyConstants.NODE_RESTART_ACTION, action);
     ah.addAction(TopologyConstants.NODE_STOP_DEFERRED_ACTION, action);
@@ -85,9 +85,9 @@ public class TopologyTreeData extends TableTreeData {
    * @return a list of the selected nodes.
    */
   public static List<TopologyNode> getSelectedNodes(final List<DefaultMutableTreeNode> selected) {
-    List<TopologyNode> result = new ArrayList<>();
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    final List<TopologyNode> result = new ArrayList<>();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isNode()) result.add((TopologyNode) comp);
     }
     return result;
@@ -99,9 +99,9 @@ public class TopologyTreeData extends TableTreeData {
    * @return a list of the selected drivers.
    */
   public static List<TopologyDriver> getSelectedDrivers(final List<DefaultMutableTreeNode> selected) {
-    List<TopologyDriver> result = new ArrayList<>();
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    final List<TopologyDriver> result = new ArrayList<>();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isDriver()) result.add((TopologyDriver) comp);
     }
     return result;
@@ -113,9 +113,9 @@ public class TopologyTreeData extends TableTreeData {
    * @return mapping of driver to nodes uuids.
    */
   public static CollectionMap<TopologyDriver, String> getNodesMultimap(final List<DefaultMutableTreeNode> selected) {
-    CollectionMap<TopologyDriver, String> map = new SetHashMap<>();
-    for (DefaultMutableTreeNode treeNode: selected) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    final CollectionMap<TopologyDriver, String> map = new SetHashMap<>();
+    for (final DefaultMutableTreeNode treeNode: selected) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if (comp.isNode() && (comp.getParent() != null)) map.putValue((TopologyDriver) comp.getParent(), comp.getUuid());
     }
     return map;
@@ -144,12 +144,12 @@ public class TopologyTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     model = new NodeTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale());
-    TopologyFilter filter = session.getNodeFilter();
-    for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
+    final TopologyFilter filter = session.getNodeFilter();
+    for (final TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
       TopologyUtils.addDriver(model, driver);
-      for (TopologyNode node : driver.getNodesAndPeers()) {
+      for (final TopologyNode node : driver.getNodesAndPeers()) {
         if (node.isPeer() || AbstractMonitoringListener.isAccepted(filter, node)) TopologyUtils.addNode(model, driver, node);
       }
     }

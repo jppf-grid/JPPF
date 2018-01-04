@@ -64,24 +64,24 @@ public class DriverStopRestartLink extends AbstractModalLink<DriverStopRestartFo
    * Called when the ok button is closed.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TopologyTreeData data = session.getTopologyData();
-    List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
+    final List<TopologyDriver> selectedDrivers = TopologyTreeData.getSelectedDrivers(data.getSelectedTreeNodes());
     if (!selectedDrivers.isEmpty()) {
-      long shutdownDelay = modalForm.getShutdownDelay();
-      long restartDelay = modalForm.isRestart() ? modalForm.getRestartDelay() : -1L;
-      Set<String> uuids = new HashSet<>();
-      List<JMXDriverConnectionWrapper> list = new ArrayList<>();
-      for (TopologyDriver driver: selectedDrivers) {
+      final long shutdownDelay = modalForm.getShutdownDelay();
+      final long restartDelay = modalForm.isRestart() ? modalForm.getRestartDelay() : -1L;
+      final Set<String> uuids = new HashSet<>();
+      final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
+      for (final TopologyDriver driver: selectedDrivers) {
         if (!uuids.contains(driver.getUuid())) {
           uuids.add(driver.getUuid());
           list.add(driver.getJmx());
         }
       }
-      for (JMXDriverConnectionWrapper jmx: list) {
+      for (final JMXDriverConnectionWrapper jmx: list) {
         try {
           jmx.restartShutdown(shutdownDelay, restartDelay);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

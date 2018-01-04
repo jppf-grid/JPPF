@@ -50,15 +50,15 @@ public class JobsTreeData extends TableTreeData {
     getSelectionHandler().setFilter(new TreeNodeFilter() {
       @Override
       public boolean accepts(final DefaultMutableTreeNode node) {
-        AbstractJobComponent comp = (AbstractJobComponent) node.getUserObject();
+        final AbstractJobComponent comp = (AbstractJobComponent) node.getUserObject();
         return (comp instanceof Job);
       }
     });
     listener = new JobsTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
     JPPFWebConsoleApplication.get().getJobMonitor().addJobMonitoringListener(listener);
-    ActionHandler ah = getActionHandler();
+    final ActionHandler ah = getActionHandler();
     ah.addAction(JobsConstants.CANCEL_ACTION, new CancelJobLink.Action());
-    UpdatableAction suspendAction = new SuspendJobLink.Action();
+    final UpdatableAction suspendAction = new SuspendJobLink.Action();
     ah.addAction(JobsConstants.SUSPEND_ACTION, suspendAction);
     ah.addAction(JobsConstants.SUSPEND_REQUEUE_ACTION, suspendAction);
     ah.addAction(JobsConstants.RESUME_ACTION, new ResumeJobLink.Action());
@@ -89,15 +89,15 @@ public class JobsTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    JPPFWebSession session = JPPFWebSession.get();
-    TopologyFilter filter = session.getNodeFilter();
+    final JPPFWebSession session = JPPFWebSession.get();
+    final TopologyFilter filter = session.getNodeFilter();
     model = new JobTreeTableModel(new DefaultMutableTreeNode("tree.root.name"), session.getLocale());
-    for (JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
+    for (final JobDriver driver: JPPFWebConsoleApplication.get().getJobMonitor().getJobDrivers()) {
       JobsUtils.addDriver(model, driver);
-      for (Job job: driver.getJobs()) {
+      for (final Job job: driver.getJobs()) {
         JobsUtils.addJob(model, driver, job);
-        for (JobDispatch dispatch: job.getJobDispatches()) {
-          TopologyNode node = dispatch.getNode();
+        for (final JobDispatch dispatch: job.getJobDispatches()) {
+          final TopologyNode node = dispatch.getNode();
           if (AbstractMonitoringListener.isAccepted(filter, node)) JobsUtils.addJobDispatch(model, job, dispatch);
         }
       }

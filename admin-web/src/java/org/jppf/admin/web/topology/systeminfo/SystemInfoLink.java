@@ -69,15 +69,15 @@ public class SystemInfoLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on System info");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
-      DefaultMutableTreeNode treeNode = selectedNodes.get(0);
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
-      Locale locale = Session.get().getLocale();
-      String title = TopologyUtils.getSystemInfoTitle(comp, locale, false);
-      JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
+      final DefaultMutableTreeNode treeNode = selectedNodes.get(0);
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+      final Locale locale = Session.get().getLocale();
+      final String title = TopologyUtils.getSystemInfoTitle(comp, locale, false);
+      final JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
       final StringBuilder html = new StringBuilder();
       html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title, false), locale));
       if (debugEnabled) log.debug("html = {}", html);

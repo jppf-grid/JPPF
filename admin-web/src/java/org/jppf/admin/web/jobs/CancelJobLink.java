@@ -59,25 +59,25 @@ public class CancelJobLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on cancel");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getJobsData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
       final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-      for (DefaultMutableTreeNode treeNode: selectedNodes) {
-        AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+      for (final DefaultMutableTreeNode treeNode: selectedNodes) {
+        final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
         if ((comp instanceof Job) && (comp.getParent() != null)) {
-          Job job = (Job) comp;
-          List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
-          for (JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
+          final Job job = (Job) comp;
+          final List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
+          for (final JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
         }
       }
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
-        TopologyDriver driver = entry.getKey();
-        JobSelector selector = new JobUuidSelector(entry.getValue());
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        final TopologyDriver driver = entry.getKey();
+        final JobSelector selector = new JobUuidSelector(entry.getValue());
         try {
           driver.getJobManager().cancelJobs(selector);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

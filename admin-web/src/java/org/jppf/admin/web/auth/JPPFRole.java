@@ -85,7 +85,7 @@ public enum JPPFRole {
    */
   public JPPFRole[] getImpliedRoles() {
     if (impliedRoles.length <= 0) return impliedRoles;
-    JPPFRole[] tmp = new JPPFRole[impliedRoles.length];
+    final JPPFRole[] tmp = new JPPFRole[impliedRoles.length];
     System.arraycopy(impliedRoles, 0, tmp, 0, impliedRoles.length);
     return tmp;
   }
@@ -110,9 +110,9 @@ public enum JPPFRole {
    * @return a set of roles, possibly empty.
    */
   public static Set<String> getRoles(final Roles roles) {
-    Set<String> set = new HashSet<>();
+    final Set<String> set = new HashSet<>();
     if (roles != null) {
-      for (JPPFRole role: JPPFRole.values()) {
+      for (final JPPFRole role: JPPFRole.values()) {
         if (roles.hasRole(role.getRoleName())) set.add(role.getRoleName());
       }
     }

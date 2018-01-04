@@ -59,19 +59,19 @@ public class CancelPendingActionLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on System info");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
-      CollectionMap<TopologyDriver, String> map = TopologyTreeData.getNodesMultimap(selectedNodes);
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+      final CollectionMap<TopologyDriver, String> map = TopologyTreeData.getNodesMultimap(selectedNodes);
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
         try {
-          JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+          final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
-          NodeSelector selector = new UuidSelector(entry.getValue());
+          final NodeSelector selector = new UuidSelector(entry.getValue());
           if (debugEnabled) log.debug("invoking cancelPendingAction() for the nodes: " + entry.getValue());
           forwarder.forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelPendingAction");
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

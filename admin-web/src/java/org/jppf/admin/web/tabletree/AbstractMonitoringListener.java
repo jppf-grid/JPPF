@@ -98,9 +98,9 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
    */
   public static boolean isAccepted(final TopologyFilter nodeFilter, final TopologyNode node) {
     if ((nodeFilter == null) || !nodeFilter.isActive()) return true;
-    ExecutionPolicy policy = nodeFilter.getPolicy();
+    final ExecutionPolicy policy = nodeFilter.getPolicy();
     if (policy == null) return true;
-    JPPFSystemInformation info = node.getManagementInfo().getSystemInfo();
+    final JPPFSystemInformation info = node.getManagementInfo().getSystemInfo();
     if (info == null) return true;
     return policy.evaluate(info);
   }
@@ -110,18 +110,18 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
    * @param event the event encapsulating a change in the topology filter.
    */
   protected void updateTopology(final TopologyFilterEvent event) {
-    TopologyManager mgr = JPPFWebConsoleApplication.get().getTopologyManager();
-    List<TopologyDriver> allDrivers= mgr.getDrivers();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
-    CollectionMap<TopologyDriver, TopologyNode> toRemove = new ArrayListHashMap<>();
-    CollectionMap<TopologyDriver, TopologyNode> toAdd = new ArrayListHashMap<>();
-    for (TopologyDriver driver: allDrivers) {
-      DefaultMutableTreeNode driverDmtn = TreeTableUtils.findComponent(root, driver.getUuid());
+    final TopologyManager mgr = JPPFWebConsoleApplication.get().getTopologyManager();
+    final List<TopologyDriver> allDrivers= mgr.getDrivers();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
+    final CollectionMap<TopologyDriver, TopologyNode> toRemove = new ArrayListHashMap<>();
+    final CollectionMap<TopologyDriver, TopologyNode> toAdd = new ArrayListHashMap<>();
+    for (final TopologyDriver driver: allDrivers) {
+      final DefaultMutableTreeNode driverDmtn = TreeTableUtils.findComponent(root, driver.getUuid());
       if (driverDmtn == null) continue;
-      for (TopologyNode node: driver.getNodes()) {
-        boolean accepted = isAccepted(nodeFilter, node);
-        DefaultMutableTreeNode nodeDmtn = TreeTableUtils.findComponent(driverDmtn, node.getUuid());
-        boolean present = nodeDmtn!= null;
+      for (final TopologyNode node: driver.getNodes()) {
+        final boolean accepted = isAccepted(nodeFilter, node);
+        final DefaultMutableTreeNode nodeDmtn = TreeTableUtils.findComponent(driverDmtn, node.getUuid());
+        final boolean present = nodeDmtn!= null;
         if (accepted && !present) toAdd.putValue(driver, node);
         else if (!accepted && present) toRemove.putValue(driver, node);
       }
@@ -143,13 +143,13 @@ public abstract class AbstractMonitoringListener implements TopologyFilterListen
    * @param node the node to add.
    */
   protected void addNode(final TopologyDriver driver, final TopologyNode node) {
-    DefaultMutableTreeNode nodeDmtn = TopologyUtils.addNode(treeModel, driver, node);
+    final DefaultMutableTreeNode nodeDmtn = TopologyUtils.addNode(treeModel, driver, node);
     if ((nodeDmtn != null) && (getTableTree() != null)) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) nodeDmtn.getParent();
+      final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) nodeDmtn.getParent();
       try {
-        JPPFTableTree tree = getTableTree();
+        final JPPFTableTree tree = getTableTree();
         if ((parent.getChildCount() == 1) && (tree.getRequestCycle() != null)) tree.expand(parent);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
     }

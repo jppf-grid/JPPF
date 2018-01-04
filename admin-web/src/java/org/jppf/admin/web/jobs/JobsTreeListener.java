@@ -53,17 +53,17 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
 
   @Override
   public void driverRemoved(final JobMonitoringEvent event) {
-    JobDriver driver = event.getJobDriver();
+    final JobDriver driver = event.getJobDriver();
     selectionHandler.unselect(driver.getUuid());
-    for (Job job: driver.getJobs()) selectionHandler.unselect(job.getUuid());
+    for (final Job job: driver.getJobs()) selectionHandler.unselect(job.getUuid());
     JobsUtils.removeDriver(treeModel, driver);
   }
 
   @Override
   public void jobAdded(final JobMonitoringEvent event) {
-    DefaultMutableTreeNode jobNode = JobsUtils.addJob(treeModel, event.getJobDriver(), event.getJob());
+    final DefaultMutableTreeNode jobNode = JobsUtils.addJob(treeModel, event.getJobDriver(), event.getJob());
     if ((jobNode != null) && (getTableTree() != null)) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) jobNode.getParent();
+      final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) jobNode.getParent();
       if (parent.getChildCount() == 1) getTableTree().expand(parent);
     }
   }
@@ -81,7 +81,7 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
 
   @Override
   public void jobDispatchAdded(final JobMonitoringEvent event) {
-    TopologyNode node = event.getJobDispatch().getNode();
+    final TopologyNode node = event.getJobDispatch().getNode();
     if ((node == null) || !isAccepted(nodeFilter, node)) return;
     addDispatch(event.getJob(), event.getJobDispatch());
   }
@@ -94,34 +94,34 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
 
   @Override
   public void onFilterChange(final TopologyFilterEvent event) {
-    JobMonitor monitor = JPPFWebConsoleApplication.get().getJobMonitor();
-    CollectionMap<Job, JobDispatch> toRemove = new ArrayListHashMap<>();
-    CollectionMap<Job, JobDispatch> toAdd = new ArrayListHashMap<>();
-    List<JobDriver> allDrivers = monitor.getJobDrivers();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
-    for (JobDriver driver: allDrivers) {
-      DefaultMutableTreeNode driverDmtn = TreeTableUtils.findComponent(root, driver.getUuid());
+    final JobMonitor monitor = JPPFWebConsoleApplication.get().getJobMonitor();
+    final CollectionMap<Job, JobDispatch> toRemove = new ArrayListHashMap<>();
+    final CollectionMap<Job, JobDispatch> toAdd = new ArrayListHashMap<>();
+    final List<JobDriver> allDrivers = monitor.getJobDrivers();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
+    for (final JobDriver driver: allDrivers) {
+      final DefaultMutableTreeNode driverDmtn = TreeTableUtils.findComponent(root, driver.getUuid());
       if (driverDmtn == null) continue;
-      for (Job job: driver.getJobs()) {
-        DefaultMutableTreeNode jobDmtn = TreeTableUtils.findComponent(driverDmtn, job.getUuid());
+      for (final Job job: driver.getJobs()) {
+        final DefaultMutableTreeNode jobDmtn = TreeTableUtils.findComponent(driverDmtn, job.getUuid());
         if (jobDmtn == null) continue;
-        for (JobDispatch dispatch: job.getJobDispatches()) {
-          boolean accepted = isAccepted(nodeFilter, dispatch.getNode());
-          DefaultMutableTreeNode dispatchDmtn = TreeTableUtils.findComponent(jobDmtn, dispatch.getUuid());
-          boolean present = dispatchDmtn!= null;
+        for (final JobDispatch dispatch: job.getJobDispatches()) {
+          final boolean accepted = isAccepted(nodeFilter, dispatch.getNode());
+          final DefaultMutableTreeNode dispatchDmtn = TreeTableUtils.findComponent(jobDmtn, dispatch.getUuid());
+          final boolean present = dispatchDmtn!= null;
           if (accepted && !present) toAdd.putValue(job, dispatch);
           else if (!accepted && present) toRemove.putValue(job, dispatch);
         }
       }
     }
-    for (Map.Entry<Job, Collection<JobDispatch>> entry: toRemove.entrySet()) {
-      for (JobDispatch dispatch: entry.getValue()) {
+    for (final Map.Entry<Job, Collection<JobDispatch>> entry: toRemove.entrySet()) {
+      for (final JobDispatch dispatch: entry.getValue()) {
         JobsUtils.removeJobDispatch(treeModel, entry.getKey(), dispatch);
         selectionHandler.unselect(dispatch.getUuid());
       }
     }
-    for (Map.Entry<Job, Collection<JobDispatch>> entry: toAdd.entrySet()) {
-      for (JobDispatch dispatch: entry.getValue()) addDispatch(entry.getKey(), dispatch);
+    for (final Map.Entry<Job, Collection<JobDispatch>> entry: toAdd.entrySet()) {
+      for (final JobDispatch dispatch: entry.getValue()) addDispatch(entry.getKey(), dispatch);
     }
   }
 
@@ -131,9 +131,9 @@ public class JobsTreeListener extends AbstractMonitoringListener implements JobM
    * @param dispatch the dispatch to add.
    */
   private void addDispatch(final Job job, final JobDispatch dispatch) {
-    DefaultMutableTreeNode dispatchDmtn = JobsUtils.addJobDispatch(treeModel, job, dispatch);
+    final DefaultMutableTreeNode dispatchDmtn = JobsUtils.addJobDispatch(treeModel, job, dispatch);
     if ((dispatchDmtn != null) && (getTableTree() != null)) {
-      DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dispatchDmtn.getParent();
+      final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dispatchDmtn.getParent();
       if (parent.getChildCount() == 1) getTableTree().expand(parent);
     }
   }

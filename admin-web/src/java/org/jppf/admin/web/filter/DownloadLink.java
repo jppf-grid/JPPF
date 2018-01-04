@@ -68,7 +68,7 @@ public class DownloadLink extends AjaxButtonWithIcon {
 
     @Override
     protected IResourceStream getResourceStream() {
-      TextArea<String> area = ((NodeFilterPage) getPage()).getPolicyField();
+      final TextArea<String> area = ((NodeFilterPage) getPage()).getPolicyField();
       String configString = area.getModelObject();
       if (configString == null) configString = "";
       return new StringResourceStream(configString, "text/xml");

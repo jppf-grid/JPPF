@@ -45,15 +45,15 @@ public class HeaderPanel extends Panel {
    */
   public HeaderPanel() {
     super("jppf.header");
-    String user = JPPFWebSession.getSignedInUser();
+    final String user = JPPFWebSession.getSignedInUser();
     //String user = JPPFWebSession.get().getUserName();
-    Locale locale = Session.get().getLocale();
-    String s = (user != null)
+    final Locale locale = Session.get().getLocale();
+    final String s = (user != null)
       ? LocalizationUtils.getLocalized(getClass().getName(), "jppf.header.user.label", locale) + " " + user
       : LocalizationUtils.getLocalized(getClass().getName(), "jppf.header.not.signed_in.label", locale);
     add(new Label("jppf.header.user", Model.of(s)));
-    Form<String> form = new Form<>("login.signout.form");
-    AjaxButton link = new AjaxButton("login.signout.link", Model.of("Sign out")) {
+    final Form<String> form = new Form<>("login.signout.form");
+    final AjaxButton link = new AjaxButton("login.signout.link", Model.of("Sign out")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
         AuthenticatedWebSession.get().signOut();

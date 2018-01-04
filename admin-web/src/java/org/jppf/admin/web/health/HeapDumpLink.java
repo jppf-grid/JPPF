@@ -59,25 +59,25 @@ public class HeapDumpLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on heap dump");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selected= data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selected= data.getSelectedTreeNodes();
     if (!selected.isEmpty()) {
-      List<TopologyDriver> drivers = TopologyTreeData.getSelectedDrivers(selected);
-      for (TopologyDriver driver: drivers) {
+      final List<TopologyDriver> drivers = TopologyTreeData.getSelectedDrivers(selected);
+      for (final TopologyDriver driver: drivers) {
         try {
-          JMXDriverConnectionWrapper jmx = driver.getJmx();
+          final JMXDriverConnectionWrapper jmx = driver.getJmx();
           if ((jmx != null) && jmx.isConnected()) jmx.getDiagnosticsProxy().heapDump();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
-      CollectionMap<TopologyDriver, String> nodesMap = TopologyTreeData.getNodesMultimap(selected);
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: nodesMap.entrySet()) {
+      final CollectionMap<TopologyDriver, String> nodesMap = TopologyTreeData.getNodesMultimap(selected);
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry: nodesMap.entrySet()) {
         try {
-          JMXDriverConnectionWrapper jmx = entry.getKey().getJmx();
+          final JMXDriverConnectionWrapper jmx = entry.getKey().getJmx();
           if ((jmx != null) && jmx.isConnected()) jmx.getNodeForwarder().heapDump(new UuidSelector(entry.getValue()));
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

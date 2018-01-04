@@ -58,10 +58,10 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
     EXECUTOR.execute(new Runnable() {
       @Override
       public void run() {
-        File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
+        final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
         try {
           FileUtils.writeTextFile(file, settings);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug("error writing to file '{}' : {}", file, settings);
           else log.error("error writing settings to file", e);
         }

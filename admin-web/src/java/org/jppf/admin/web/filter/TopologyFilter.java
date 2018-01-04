@@ -83,7 +83,7 @@ public class TopologyFilter {
   public synchronized TopologyFilter load() {
     try  {
       setXmlPolicy(persistence.loadString(nameHash));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error loading topology filter for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
     return this;
@@ -95,7 +95,7 @@ public class TopologyFilter {
   public synchronized void save() {
     try  {
       persistence.saveString(nameHash, xmlPolicy);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error saving topology filter for user {} : {}", user, ExceptionUtils.getStackTrace(e));
     }
   }
@@ -115,7 +115,7 @@ public class TopologyFilter {
     this.xmlPolicy = xmlPolicy;
     try  {
       if ((xmlPolicy != null) && !xmlPolicy.isEmpty()) policy = PolicyParser.parsePolicy(xmlPolicy);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error parsing topology filter for user {} : {}", user, ExceptionUtils.getStackTrace(e));
       policy = null;
     }
@@ -166,7 +166,7 @@ public class TopologyFilter {
    * Notify all listeners that a change occurred.
    */
   private void fireChangeEvent() {
-    TopologyFilterEvent event = new TopologyFilterEvent(this);
-    for (TopologyFilterListener listener: listeners) listener.onFilterChange(event);;
+    final TopologyFilterEvent event = new TopologyFilterEvent(this);
+    for (final TopologyFilterListener listener: listeners) listener.onFilterChange(event);;
   }
 }

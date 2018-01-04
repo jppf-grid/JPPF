@@ -98,7 +98,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     configMap.put(ConfigType.CLIENT, new ConfigurationHandler(ConfigType.CLIENT) {
       @Override
       public synchronized ConfigurationHandler load() {
-        ConfigurationHandler handler = super.load();
+        final ConfigurationHandler handler = super.load();
         getProperties().set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName()).remove(JPPFProperties.SSL_CONFIGURATION_FILE);
         return handler;
       }
@@ -113,7 +113,7 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
 
     getPageSettings().setVersionPagesByDefault(false);
     this.setPageManagerProvider(new MyPageManagerProvider(this));
-    TypedProperties config = getConfig(ConfigType.CLIENT).getProperties();
+    final TypedProperties config = getConfig(ConfigType.CLIENT).getProperties();
     JPPFConfiguration.reset(config);
     this.topologyManager = new TopologyManager(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), null, true);
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);

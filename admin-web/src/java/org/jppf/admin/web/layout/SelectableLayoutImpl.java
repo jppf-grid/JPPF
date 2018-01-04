@@ -55,14 +55,14 @@ public class SelectableLayoutImpl implements SelectableLayout {
   @Override
   public List<LocalizedListItem> getVisibleItems() {
     if (visibleItems == null) {
-      UserSettings settings = JPPFWebSession.get().getUserSettings();
+      final UserSettings settings = JPPFWebSession.get().getUserSettings();
       if (settings != null) { 
-        String s = settings.getProperties().getString(propertyName);
+        final String s = settings.getProperties().getString(propertyName);
         if ((s != null) && !s.trim().isEmpty()) {
-          int[] indices = StringUtils.parseIntValues(s);
+          final int[] indices = StringUtils.parseIntValues(s);
           visibleItems = new ArrayList<>(indices.length);
           for (int i=0; i<indices.length; i++) {
-            for (LocalizedListItem item: getAllItems()) {
+            for (final LocalizedListItem item: getAllItems()) {
               if (item.index == indices[i]) {
                 visibleItems.add(item);
                 break;
@@ -84,9 +84,9 @@ public class SelectableLayoutImpl implements SelectableLayout {
   @Override
   public void setVisibleItems(final List<LocalizedListItem> items) {
     if (items == null) return;
-    int[] indices = new int[items.size()];
+    final int[] indices = new int[items.size()];
     for (int i=0; i<indices.length; i++) indices[i] = items.get(i).index;
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     settings.getProperties().setString(propertyName, StringUtils.buildString(indices));
     settings.save();
   }

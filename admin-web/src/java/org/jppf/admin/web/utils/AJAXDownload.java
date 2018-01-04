@@ -65,7 +65,7 @@ public abstract class AJAXDownload extends AbstractAjaxBehavior {
 
   @Override
   public void onRequest() {
-    ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(getResourceStream(), getFileName());
+    final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(getResourceStream(), getFileName());
     handler.setContentDisposition(ContentDisposition.ATTACHMENT);
     getComponent().getRequestCycle().scheduleRequestHandlerAfterCurrent(handler);
   }

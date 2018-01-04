@@ -58,7 +58,7 @@ public class HealthTreeData extends TableTreeData {
     });
     listener = new HealthTreeListener(model, getSelectionHandler(), JPPFWebSession.get().getNodeFilter());
     JPPFWebConsoleApplication.get().getTopologyManager().addTopologyListener(listener);
-    ActionHandler ah = getActionHandler();
+    final ActionHandler ah = getActionHandler();
     ah.addAction(HealthConstants.GC_ACTION, new GCLink.Action());
     ah.addAction(HealthConstants.THREAD_DUMP_ACTION, new ThreadDumpAction());
     ah.addAction(HealthConstants.HEAP_DUMP_ACTION, new HeapDumpLink.Action());
@@ -108,7 +108,7 @@ public class HealthTreeData extends TableTreeData {
    * Update the threshold values from the current user settings.
    */
   public void updateThresholds() {
-    UserSettings settings = JPPFWebSession.get().getUserSettings();
+    final UserSettings settings = JPPFWebSession.get().getUserSettings();
     initThresholds(settings.getProperties());
   }
 
@@ -120,12 +120,12 @@ public class HealthTreeData extends TableTreeData {
 
   @Override
   protected void createTreeTableModel() {
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale());
-    TopologyFilter filter = session.getNodeFilter();
-    for (TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
+    final TopologyFilter filter = session.getNodeFilter();
+    for (final TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
       TopologyUtils.addDriver(model, driver);
-      for (TopologyNode node : driver.getNodes()) {
+      for (final TopologyNode node : driver.getNodes()) {
         if (AbstractMonitoringListener.isAccepted(filter, node)) TopologyUtils.addNode(model, driver, node);
       }
     }

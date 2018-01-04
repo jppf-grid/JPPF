@@ -67,25 +67,25 @@ public class PriorityLink extends AbstractModalLink<PriorityForm> {
    * Called when the ok button is clicked.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TableTreeData data = session.getJobsData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (DefaultMutableTreeNode treeNode: selectedNodes) {
-      AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selectedNodes) {
+      final AbstractJobComponent comp = (AbstractJobComponent) treeNode.getUserObject();
       if ((comp instanceof Job) && (comp.getParent() != null)) {
-        Job job = (Job) comp;
-        List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
-        for (JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
+        final Job job = (Job) comp;
+        final List<JobDriver> drivers = JPPFWebConsoleApplication.get().getJobMonitor().getDriversForJob(job.getUuid());
+        for (final JobDriver driver: drivers) map.putValue(driver.getTopologyDriver(), job.getUuid());
       }
     }
-    int priority = modalForm.getPriority();
-    for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
-      TopologyDriver driver = entry.getKey();
-      JobSelector selector = new JobUuidSelector(entry.getValue());
+    final int priority = modalForm.getPriority();
+    for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+      final TopologyDriver driver = entry.getKey();
+      final JobSelector selector = new JobUuidSelector(entry.getValue());
       try {
         driver.getJobManager().updatePriority(selector, priority);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

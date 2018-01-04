@@ -43,9 +43,9 @@ public class PersistenceFactory {
    */
   public static Persistence newPersistence(final String persistenceClassName) {
     try {
-      ClassLoader cl = PersistenceFactory.class.getClassLoader();
+      final ClassLoader cl = PersistenceFactory.class.getClassLoader();
       return (Persistence) Class.forName(persistenceClassName, true, cl).newInstance();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug("error creating persistence for className = {}:\n{}", persistenceClassName, ExceptionUtils.getStackTrace(e));
       throw new JPPFRuntimeException(e);
     }

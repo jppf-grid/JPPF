@@ -40,9 +40,9 @@ public class CollapseAllLink extends AbstractViewTypeLink {
 
   @Override
   public void onClick(final AjaxRequestTarget target, final TableTreeData data) {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) data.getModel().getRoot();
     if (target.getPage() instanceof TableTreeHolder) {
-      JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
+      final JPPFTableTree tableTree = ((TableTreeHolder) target.getPage()).getTableTree();
       for (int i=0; i<root.getChildCount(); i++) tableTree.collapse((DefaultMutableTreeNode) root.getChildAt(i));
       target.add(tableTree);
     }

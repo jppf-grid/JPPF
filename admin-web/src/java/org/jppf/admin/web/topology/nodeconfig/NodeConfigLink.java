@@ -65,17 +65,17 @@ public class NodeConfigLink extends AbstractModalLink<NodeConfigForm> {
    * Called when the ok button is closed.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TopologyTreeData data = session.getTopologyData();
-    List<TopologyNode> selectedNodes = TopologyTreeData.getSelectedNodes(data.getSelectedTreeNodes());
+    final List<TopologyNode> selectedNodes = TopologyTreeData.getSelectedNodes(data.getSelectedTreeNodes());
     if (!selectedNodes.isEmpty()) {
       try {
-        TopologyNode node = selectedNodes.get(0);
-        TopologyDriver parent = (TopologyDriver) node.getParent();
+        final TopologyNode node = selectedNodes.get(0);
+        final TopologyDriver parent = (TopologyDriver) node.getParent();
         if (parent == null) return;
-        Map<Object, Object> config = NodeConfigurationAction.getPropertiesAsMap(modalForm.getConfig());
+        final Map<Object, Object> config = NodeConfigurationAction.getPropertiesAsMap(modalForm.getConfig());
         parent.getForwarder().updateConfiguration(new UuidSelector(node.getUuid()), config, modalForm.isForceRestart(), modalForm.isInterrupt());
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -83,10 +83,10 @@ public class NodeConfigLink extends AbstractModalLink<NodeConfigForm> {
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TopologyTreeData data = session.getTopologyData();
-    List<TopologyNode> selectedNodes = TopologyTreeData.getSelectedNodes(data.getSelectedTreeNodes());
-    String config = NodeConfigurationAction.getPropertiesAsString(selectedNodes.get(0));
+    final List<TopologyNode> selectedNodes = TopologyTreeData.getSelectedNodes(data.getSelectedTreeNodes());
+    final String config = NodeConfigurationAction.getPropertiesAsString(selectedNodes.get(0));
     modalForm.setConfig(config);
     super.onClick(target);
   }

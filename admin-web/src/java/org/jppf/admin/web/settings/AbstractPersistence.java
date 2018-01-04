@@ -29,8 +29,8 @@ import org.jppf.utils.*;
 public abstract class AbstractPersistence implements Persistence {
   @Override
   public TypedProperties loadProperties(final String name) throws Exception {
-    TypedProperties settings = new TypedProperties();
-    String s = loadString(name);
+    final TypedProperties settings = new TypedProperties();
+    final String s = loadString(name);
     if (s != null) {
       try (Reader reader = new StringReader(s)) {
         settings.loadAndResolve(reader);

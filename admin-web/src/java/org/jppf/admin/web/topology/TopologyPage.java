@@ -71,22 +71,22 @@ public class TopologyPage extends AbstractTableTreePage {
    */
   public TopologyPage() {
     super(TreeViewType.TOPOLOGY, "topology");
-    TopologyTreeData data = JPPFWebSession.get().getTopologyData();
-    TopologyTreeListener listener = (TopologyTreeListener) data.getListener();
+    final TopologyTreeData data = JPPFWebSession.get().getTopologyData();
+    final TopologyTreeListener listener = (TopologyTreeListener) data.getListener();
     listener.setTableTree(tableTree);
   }
 
   @Override
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
-    List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
+    final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new TopologyTreeColumn(Model.of("Tree")));
-    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new TopologyColumn(item.index));
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new TopologyColumn(item.index));
     return columns;
   }
 
   @Override
   protected void createActions() {
-    ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
+    final ActionHandler actionHandler = JPPFWebSession.get().getTableTreeData(viewType).getActionHandler();
     actionHandler.addActionLink(toolbar, new DriverStopRestartLink(toolbar));
     actionHandler.addActionLink(toolbar, new ServerResetStatsLink());
     actionHandler.addActionLink(toolbar, new LoadBalancingLink(toolbar));
@@ -126,14 +126,14 @@ public class TopologyPage extends AbstractTableTreePage {
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
       super.populateItem(cellItem, componentId, rowModel);
-      DefaultMutableTreeNode node = rowModel.getObject();
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
+      final DefaultMutableTreeNode node = rowModel.getObject();
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) node.getUserObject();
       String cssClass = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       boolean inactive = false;
       if (comp.isPeer()) cssClass += "peer ";
       else if (comp.isNode()) {
-        TopologyNode data = (TopologyNode) node.getUserObject();
+        final TopologyNode data = (TopologyNode) node.getUserObject();
         if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
@@ -142,7 +142,7 @@ public class TopologyPage extends AbstractTableTreePage {
         }
         else cssClass += (selected) ? "tree_inactive_selected " : "node_tree_down ";
       } else if (comp.isDriver()) {
-        TopologyDriver driver = (TopologyDriver) node.getUserObject();
+        final TopologyDriver driver = (TopologyDriver) node.getUserObject();
         if (driver.getConnection().getStatus().isWorkingStatus()) cssClass += (selected) ? "tree_selected " : "driver_up ";
         else cssClass += (selected) ? "tree_inactive_selected " : "driver_down ";
       }
@@ -173,16 +173,16 @@ public class TopologyPage extends AbstractTableTreePage {
 
     @Override
     public void populateItem(final Item<ICellPopulator<DefaultMutableTreeNode>> cellItem, final String componentId, final IModel<DefaultMutableTreeNode> rowModel) {
-      NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
-      DefaultMutableTreeNode treeNode = nodeModel.getObject();
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
-      String value = (String) treeModel.getValueAt(treeNode, index);
+      final NodeModel<DefaultMutableTreeNode> nodeModel = (NodeModel<DefaultMutableTreeNode>) rowModel;
+      final DefaultMutableTreeNode treeNode = nodeModel.getObject();
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+      final String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       if (traceEnabled) log.trace(String.format("index %d populating value=%s, treeNode=%s", index, value, treeNode));
       String cssClass = "default_cursor ";
-      boolean selected = selectionHandler.isSelected(comp.getUuid());
+      final boolean selected = selectionHandler.isSelected(comp.getUuid());
       if (comp.isNode()) {
-        TopologyNode data = (TopologyNode) treeNode.getUserObject();
+        final TopologyNode data = (TopologyNode) treeNode.getUserObject();
         if (data.isNode()) cssClass += ((data.getStatus() == TopologyNodeStatus.UP) ? "node_up " : "node_down ") + getCssClass();
       } else if (!selected) cssClass += "empty ";
       if (selected && !comp.isPeer()) cssClass += "tree_selected ";

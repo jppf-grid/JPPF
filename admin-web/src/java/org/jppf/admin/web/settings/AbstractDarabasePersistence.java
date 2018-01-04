@@ -42,7 +42,7 @@ public abstract class AbstractDarabasePersistence extends AbstractPersistence {
 
   @Override
   public String loadString(final String name) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
+    final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
     if (debugEnabled) log.debug("loading settings from file {}", file);
     return file.exists() ? FileUtils.readTextFile(file) : null;
   }
@@ -59,7 +59,7 @@ public abstract class AbstractDarabasePersistence extends AbstractPersistence {
    * @throws Exception if any error occurs.
    */
   protected DataSource getDataSource() throws Exception {
-    InitialContext ctx = new InitialContext();
+    final InitialContext ctx = new InitialContext();
     return (DataSource) ctx.lookup(getDSName());
   }
 }

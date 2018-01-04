@@ -67,32 +67,32 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
    * Called when the ok button is closed.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TableTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (DefaultMutableTreeNode treeNode: selectedNodes) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selectedNodes) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if ((comp.getParent() != null) && comp.isNode()) {
-        JPPFManagementInfo info = comp.getManagementInfo();
+        final JPPFManagementInfo info = comp.getManagementInfo();
         if ((info != null) && info.isMasterNode()) map.putValue((TopologyDriver) comp.getParent(), comp.getUuid());
       }
     }
     TypedProperties props = null;
     if (modalForm.isUseOverrides()) {
-      try (Reader reader = new StringReader(modalForm.getOverrides())) {
+      try (final Reader reader = new StringReader(modalForm.getOverrides())) {
         props = new TypedProperties().loadAndResolve(reader);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
-    for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
-      TopologyDriver parent = entry.getKey();
-      NodeSelector selector = new UuidSelector(entry.getValue());
+    for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+      final TopologyDriver parent = entry.getKey();
+      final NodeSelector selector = new UuidSelector(entry.getValue());
       try {
-        Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, modalForm.getNbSlaves(), modalForm.isInterrupt(), props);
+        final Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, modalForm.getNbSlaves(), modalForm.isInterrupt(), props);
         printForwardingRequestErrors(result);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -102,11 +102,11 @@ public class ProvisioningLink extends AbstractModalLink<ProvisioningForm> {
    * Prints the eventual errors resulting from a node forwarding request.
    * @param result the map containing the results for the request.
    */
-  private void printForwardingRequestErrors(final Map<String, Object> result) {
+  private static void printForwardingRequestErrors(final Map<String, Object> result) {
     if (debugEnabled) {
-      for (Map.Entry<String, Object> entry: result.entrySet()) {
+      for (final Map.Entry<String, Object> entry: result.entrySet()) {
         if (entry.getValue() instanceof Throwable) {
-          Throwable t = (Throwable) entry.getValue();
+          final Throwable t = (Throwable) entry.getValue();
           if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}", entry.getKey(), ExceptionUtils.getStackTrace(t));
         }
       }

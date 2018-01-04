@@ -68,7 +68,7 @@ public class StatsUpdater extends BaseStatsHandler {
    * @param driver the driver to add.
    */
   private synchronized void addDriver(final TopologyDriver driver) {
-    ConnectionDataHolder holder = new ConnectionDataHolder(getRolloverPosition(), driver);
+    final ConnectionDataHolder holder = new ConnectionDataHolder(getRolloverPosition(), driver);
     dataHolderMap.put(driver.getUuid(), holder);
     if (currentDriver == null) currentDriver = driver;
   }
@@ -112,16 +112,7 @@ public class StatsUpdater extends BaseStatsHandler {
     @Override
     public void run() {
       synchronized(StatsUpdater.this) {
-        /*
-        for (Map.Entry<String, ConnectionDataHolder> entry: dataHolderMap.entrySet()) {
-          String uuid = entry.getKey();
-          if (topologyManager.getDriver(uuid) == null) removeDriver(entry.getValue().getDriver());
-        }
-        for (TopologyDriver driver: topologyManager.getDrivers()) {
-          if (!dataHolderMap.containsKey(driver.getUuid())) addDriver(driver);
-        }
-        */
-        for (ConnectionDataHolder holder: dataHolderMap.values()) requestUpdate(holder.getDriver());
+        for (final ConnectionDataHolder holder: dataHolderMap.values()) requestUpdate(holder.getDriver());
       }
     }
   }

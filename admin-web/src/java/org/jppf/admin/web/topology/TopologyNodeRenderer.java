@@ -31,17 +31,16 @@ import org.jppf.ui.utils.TopologyUtils;
 public class TopologyNodeRenderer implements TreeNodeRenderer {
   @Override
   public String getText(final DefaultMutableTreeNode treeNode, final boolean showIP) {
-    AbstractTopologyComponent topologyComp = (AbstractTopologyComponent) treeNode.getUserObject();
-    //return topologyComp.getDisplayName();
+    final AbstractTopologyComponent topologyComp = (AbstractTopologyComponent) treeNode.getUserObject();
     return TopologyUtils.getDisplayName(topologyComp, showIP);
   }
 
   @Override
   public String getIconPath(final DefaultMutableTreeNode treeNode) {
-    AbstractTopologyComponent topologyComp = (AbstractTopologyComponent) treeNode.getUserObject();
+    final AbstractTopologyComponent topologyComp = (AbstractTopologyComponent) treeNode.getUserObject();
     String path = "driver.gif";
     if (topologyComp.isNode()) {
-      TopologyNode topologyNode = (TopologyNode) topologyComp;
+      final TopologyNode topologyNode = (TopologyNode) topologyComp;
       path = topologyNode.getManagementInfo().isMasterNode() ? "node-master.png" : "node-slave.png";
     }
     return "images/tree/" + path;

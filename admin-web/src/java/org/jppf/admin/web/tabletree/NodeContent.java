@@ -38,9 +38,9 @@ public class NodeContent extends Panel {
    */
   public NodeContent(final String id, final DefaultMutableTreeNode treeNode, final TreeNodeRenderer renderer, final boolean showIP) {
     super(id);
-    String iconPath = renderer.getIconPath(treeNode);
+    final String iconPath = renderer.getIconPath(treeNode);
     add(new ContextImage("icon", (iconPath != null) ? iconPath : ""));
-    String text = renderer.getText(treeNode, showIP);
+    final String text = renderer.getText(treeNode, showIP);
     add(new Label("text", (text != null) ? text : ""));
   }
 }

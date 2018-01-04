@@ -85,10 +85,10 @@ public class ExportLink extends AjaxButtonWithIcon {
 
     @Override
     protected IResourceStream getResourceStream() {
-      JPPFWebSession session = JPPFWebSession.get();
-      TopologyDriver driver = session.getCurrentDriver();
-      BaseStatsHandler handler = JPPFWebConsoleApplication.get().getStatsUpdater();
-      StatsExporter exporter = (format == TEXT) ? new TextStatsExporter(handler, driver, session.getLocale()) : new CsvStatsExporter(handler, driver);
+      final JPPFWebSession session = JPPFWebSession.get();
+      final TopologyDriver driver = session.getCurrentDriver();
+      final BaseStatsHandler handler = JPPFWebConsoleApplication.get().getStatsUpdater();
+      final StatsExporter exporter = (format == TEXT) ? new TextStatsExporter(handler, driver, session.getLocale()) : new CsvStatsExporter(handler, driver);
       return new StringResourceStream(exporter.formatAll(), "text/plain");
     }
   }

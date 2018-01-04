@@ -57,18 +57,18 @@ public class SuspendNodeLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on suspend node");
-    JPPFWebSession session = JPPFWebSession.get();
+    final JPPFWebSession session = JPPFWebSession.get();
     final TopologyTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     if (!selectedNodes.isEmpty()) {
-      CollectionMap<TopologyDriver, String> map = TopologyTreeData.getNodesMultimap(selectedNodes);
-      for (Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
+      final CollectionMap<TopologyDriver, String> map = TopologyTreeData.getNodesMultimap(selectedNodes);
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
         try {
-          JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
+          final JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
           if (driverJmx == null) continue;
-          NodeSelector selector = new UuidSelector(entry.getValue());
+          final NodeSelector selector = new UuidSelector(entry.getValue());
           driverJmx.toggleActiveState(selector);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

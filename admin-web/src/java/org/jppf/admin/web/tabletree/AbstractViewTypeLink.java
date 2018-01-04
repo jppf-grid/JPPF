@@ -66,10 +66,10 @@ public abstract class AbstractViewTypeLink extends AbstractActionLink {
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
+    final TableTreeData data = JPPFWebSession.get().getTableTreeData(viewType);
     onClick(target, data);
     if (selection) data.selectionChanged(data.getSelectionHandler());
-    Page page = target.getPage();
+    final Page page = target.getPage();
     if (page instanceof TableTreeHolder) target.add(((TableTreeHolder) page).getTableTree());
     if (getParent() != null) target.add(getParent());
   }

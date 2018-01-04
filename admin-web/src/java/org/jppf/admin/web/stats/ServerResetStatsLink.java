@@ -60,15 +60,15 @@ public class ServerResetStatsLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     if (debugEnabled) log.debug("clicked on server reset stats");
-    JPPFWebSession session = JPPFWebSession.get();
-    TopologyDriver driver = session.getCurrentDriver();
+    final JPPFWebSession session = JPPFWebSession.get();
+    final TopologyDriver driver = session.getCurrentDriver();
     try {
-      JMXDriverConnectionWrapper jmx =  driver.getJmx();
+      final JMXDriverConnectionWrapper jmx =  driver.getJmx();
       if ((jmx != null) && jmx.isConnected()) jmx.resetStatistics();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.warn(e.getMessage(), e);
     }
-    StatisticsPage page = (StatisticsPage) target.getPage();
+    final StatisticsPage page = (StatisticsPage) target.getPage();
     target.add(page.getTablesContainer());
   }
 }

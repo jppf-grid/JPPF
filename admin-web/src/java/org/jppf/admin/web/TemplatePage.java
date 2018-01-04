@@ -50,22 +50,22 @@ public class TemplatePage extends AbstractJPPFPage {
    */
   public TemplatePage() {
     setVersioned(false);
-    HeaderPanel hp = new HeaderPanel();
+    final HeaderPanel hp = new HeaderPanel();
     add(hp);
     setTooltip(hp.getShowIPCheckBox(), HeaderPanel.class.getName());
     add(new FooterPanel());
-    JPPFWebSession session = JPPFWebSession.get();
-    Roles roles = session.getRoles();
-    Set<String> set = JPPFRole.getRoles(roles);
+    final JPPFWebSession session = JPPFWebSession.get();
+    final Roles roles = session.getRoles();
+    final Set<String> set = JPPFRole.getRoles(roles);
     addWithRoles("jppf.admin.link", AdminPage.class, set, JPPFRoles.ADMIN);
     addWithRoles("jppf.topology.link", TopologyPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     addWithRoles("jppf.health.link", HealthPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     addWithRoles("jppf.jobs.link", JobsPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     addWithRoles("jppf.stats.link", StatisticsPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     nodeFilterLink =  addWithRoles("jppf.filter.link", NodeFilterPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
-    UserSettings settings = session.getUserSettings();
+    final UserSettings settings = session.getUserSettings();
     if (getClass() != NodeFilterPage.class) {
-      boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
+      final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
       nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
     }
   }
@@ -73,14 +73,14 @@ public class TemplatePage extends AbstractJPPFPage {
   @Override
   public void renderHead(final IHeaderResponse response) {
     super.renderHead(response);
-    String name = getClass().getSimpleName();
-    String base = getClass().getName();
+    final String name = getClass().getSimpleName();
+    final String base = getClass().getName();
     String localized = LocalizationUtils.getLocalized(base, name, null, JPPFWebSession.get().getLocale());
     if (localized == null) {
-      int idx = name.lastIndexOf("Page");
+      final int idx = name.lastIndexOf("Page");
       localized = (idx >= 0) ? name.substring(0, idx) : name;
     }
-    StringHeaderItem item = StringHeaderItem.forString("<title>" + localized + "</title>");
+    final StringHeaderItem item = StringHeaderItem.forString("<title>" + localized + "</title>");
     response.render(item);
   }
 
@@ -93,9 +93,9 @@ public class TemplatePage extends AbstractJPPFPage {
    * @return the component, for method chaining.
    */
   private BookmarkablePageLink<String> addWithRoles(final String id, final Class<? extends TemplatePage> clazz, final Set<String> userRoles, final String...visibleRoles) {
-    BookmarkablePageLink<String> link = new BookmarkablePageLink<>(id, clazz);
+    final BookmarkablePageLink<String> link = new BookmarkablePageLink<>(id, clazz);
     boolean show = false;
-    for (String role: visibleRoles) {
+    for (final String role: visibleRoles) {
       if (userRoles.contains(role)) {
         show = true;
         break;

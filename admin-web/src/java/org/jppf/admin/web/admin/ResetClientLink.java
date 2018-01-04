@@ -49,8 +49,8 @@ public class ResetClientLink extends AbstractAdminLink {
   @Override
   public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
     if (debugEnabled) log.debug("clicked on {}.reset_client", type.getPrefix());
-    JPPFWebConsoleApplication app = JPPFWebConsoleApplication.get();
-    TypedProperties config = app.getConfig(ConfigType.CLIENT).getProperties();
+    final JPPFWebConsoleApplication app = JPPFWebConsoleApplication.get();
+    final TypedProperties config = app.getConfig(ConfigType.CLIENT).getProperties();
     app.getTopologyManager().getJPPFClient().reset(config);
   }
 }

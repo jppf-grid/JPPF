@@ -66,24 +66,24 @@ public class NodeThreadsLink extends AbstractModalLink<NodeThreadsForm> {
    * Called when the ok button is clicked.
    */
   private void doOK() {
-    JPPFWebSession session = (JPPFWebSession) getPage().getSession();
+    final JPPFWebSession session = (JPPFWebSession) getPage().getSession();
     final TableTreeData data = session.getTopologyData();
-    List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
+    final List<DefaultMutableTreeNode> selectedNodes = data.getSelectedTreeNodes();
     final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (DefaultMutableTreeNode treeNode: selectedNodes) {
-      AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
+    for (final DefaultMutableTreeNode treeNode: selectedNodes) {
+      final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       if ((comp.getParent() != null) && comp.isNode()) {
-        JPPFManagementInfo info = comp.getManagementInfo();
+        final JPPFManagementInfo info = comp.getManagementInfo();
         if (info != null) map.putValue((TopologyDriver) comp.getParent(), comp.getUuid());
       }
     }
-    for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
-      TopologyDriver parent = entry.getKey();
-      NodeSelector selector = new UuidSelector(entry.getValue());
+    for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+      final TopologyDriver parent = entry.getKey();
+      final NodeSelector selector = new UuidSelector(entry.getValue());
       try {
         parent.getForwarder().updateThreadPoolSize(selector, modalForm.getNbThreads());
         parent.getForwarder().updateThreadsPriority(selector, modalForm.getPriority());
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

@@ -31,7 +31,7 @@ public class ThreadDumpPage extends WebPage {
    * @param info .
    */
   public ThreadDumpPage(final String info) {
-    Label label = new Label("threaddump.info", info);
+    final Label label = new Label("threaddump.info", info);
     label.setEscapeModelStrings(false);
     add(label);
   }

@@ -65,8 +65,8 @@ public class LoadBalancingForm extends AbstractModalForm {
    * @param driverName the driver name.
    */
   public void setDriverName(final String driverName) {
-    String key = driverNameLabel.getId() + ".label";
-    String caption = LocalizationUtils.getLocalized(LoadBalancingPage.class.getName(), key, key, JPPFWebSession.get().getLocale(), driverName);
+    final String key = driverNameLabel.getId() + ".label";
+    final String caption = LocalizationUtils.getLocalized(LoadBalancingPage.class.getName(), key, key, JPPFWebSession.get().getLocale(), driverName);
     driverNameLabel.setDefaultModel(Model.of(caption));
   }
 

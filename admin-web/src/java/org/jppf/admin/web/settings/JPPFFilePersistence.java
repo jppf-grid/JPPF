@@ -35,7 +35,7 @@ public class JPPFFilePersistence extends AbstractFilePersistence {
 
   @Override
   public void saveString(final String name, final String settings) throws Exception {
-    File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
+    final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
     FileUtils.writeTextFile(file, settings);
   }
 }
