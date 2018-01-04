@@ -45,11 +45,10 @@ final class JMXNioServerFactory extends NioServerFactory<JMXState, JMXTransition
    */
   @Override
   public Map<JMXState, NioState<JMXTransition>> createStateMap() {
-    JMXNioServer server = (JMXNioServer) this.server;
-    Map<JMXState, NioState<JMXTransition>> map = new EnumMap<>(JMXState.class);
+    final JMXNioServer server = (JMXNioServer) this.server;
+    final Map<JMXState, NioState<JMXTransition>> map = new EnumMap<>(JMXState.class);
     map.put(SENDING_MESSAGE, new SendingMessageState(server));
     map.put(RECEIVING_MESSAGE, new ReceivingMessageState(server));
-    map.put(IDLE, new IdleState(server));
     return map;
   }
 
@@ -59,10 +58,9 @@ final class JMXNioServerFactory extends NioServerFactory<JMXState, JMXTransition
    */
   @Override
   public Map<JMXTransition, NioTransition<JMXState>> createTransitionMap() {
-    Map<JMXTransition, NioTransition<JMXState>> map = new EnumMap<>(JMXTransition.class);
-    map.put(TO_SENDING_MESSAGE, transition(SENDING_MESSAGE, RW));
-    map.put(TO_RECEIVING_MESSAGE, transition(RECEIVING_MESSAGE, RW));
-    map.put(TO_IDLE, transition(IDLE, R));
+    final Map<JMXTransition, NioTransition<JMXState>> map = new EnumMap<>(JMXTransition.class);
+    map.put(TO_SENDING_MESSAGE, transition(SENDING_MESSAGE, W));
+    map.put(TO_RECEIVING_MESSAGE, transition(RECEIVING_MESSAGE, R));
     return map;
   }
 }

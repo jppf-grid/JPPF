@@ -33,7 +33,7 @@ enum ConnectionEventType {
   OPENED {
     @Override
     void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
-      for (JMXConnectionStatusListener listener: listeners) listener.connectionOpened(event);
+      for (final JMXConnectionStatusListener listener: listeners) listener.connectionOpened(event);
     }
   },
   /**
@@ -42,7 +42,7 @@ enum ConnectionEventType {
   CLOSED {
     @Override
     void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
-      for (JMXConnectionStatusListener listener: listeners) listener.connectionClosed(event);
+      for (final JMXConnectionStatusListener listener: listeners) listener.connectionClosed(event);
     }
   },
   /**
@@ -51,7 +51,7 @@ enum ConnectionEventType {
   FAILED {
     @Override
     void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event) {
-      for (JMXConnectionStatusListener listener: listeners) listener.connectionFailed(event);
+      for (final JMXConnectionStatusListener listener: listeners) listener.connectionFailed(event);
     }
   };
 
@@ -60,5 +60,5 @@ enum ConnectionEventType {
    * @param listeners the listeners to notify.
    * @param event the event to notify of.
    */
-  abstract void fireNotification(List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event);
+  abstract void fireNotification(final List<JMXConnectionStatusListener> listeners, final JMXConnectionStatusEvent event);
 }

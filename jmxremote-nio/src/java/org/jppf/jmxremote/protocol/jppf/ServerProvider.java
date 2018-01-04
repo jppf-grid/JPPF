@@ -41,10 +41,10 @@ public class ServerProvider implements JMXConnectorServerProvider {
   @Override
   public JMXConnectorServer newJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, final MBeanServer mbeanServer) throws IOException {
     if (!JMXHelper.JPPF_JMX_PROTOCOL.equals(serviceURL.getProtocol())) throw new MalformedURLException("Protocol not " + JMXHelper.JPPF_JMX_PROTOCOL + ": " + serviceURL.getProtocol());
-    Map<String, Object> env = new HashMap<>(environment);
-    for (ServerEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
+    final Map<String, Object> env = new HashMap<>(environment);
+    for (final ServerEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {
-        Map<String, ?> map = provider.getEnvironment();
+        final Map<String, ?> map = provider.getEnvironment();
         if ((map != null) && !map.isEmpty()) env.putAll(map);
       }
     }

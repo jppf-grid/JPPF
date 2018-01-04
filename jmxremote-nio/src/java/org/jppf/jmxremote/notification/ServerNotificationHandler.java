@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
 
+import org.jppf.jmxremote.nio.JMXNioServer;
+
 /**
  *
  * @author Laurent Cohen
@@ -36,6 +38,18 @@ public class ServerNotificationHandler {
    * Association of dispatchers to each mbean server.
    */
   private final Map<MBeanServer, MBeanServerNotificationDispatcher> mbeanServerMap = new HashMap<>();
+  /**
+   * The nio server.
+   */
+  private final JMXNioServer server;
+
+  /**
+   * Initialize with the specified nio server.
+   * @param server the nio server.
+   */
+  public ServerNotificationHandler(final JMXNioServer server) {
+    this.server = server;
+  }
 
   /**
    * Add a notification listener.
@@ -51,11 +65,11 @@ public class ServerNotificationHandler {
     synchronized(mbeanServerMap) {
       dispatcher = mbeanServerMap.get(mbeanServer);
       if (dispatcher == null) {
-        dispatcher = new MBeanServerNotificationDispatcher(mbeanServer);
+        dispatcher = new MBeanServerNotificationDispatcher(mbeanServer, server);
         mbeanServerMap.put(mbeanServer, dispatcher);
       }
     }
-    int listenerID = listenerSequence.incrementAndGet();
+    final int listenerID = listenerSequence.incrementAndGet();
     dispatcher.addNotificationListener(mbeanName, filter, listenerID, connectionID);
     return listenerID;
   }

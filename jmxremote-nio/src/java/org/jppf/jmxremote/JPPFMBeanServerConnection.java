@@ -55,13 +55,19 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
    * Mapping of notification listener ids to actual listeners.
    */
   private final Map<Integer, ClientListenerInfo> listenerMap = new HashMap<>();
+  /**
+   * The nio server.
+   */
+  private final JMXNioServer server;
 
   /**
    * Initialize with the specified message handler.
    * @param messageHandler performs the communication with the server.
+   * @param server the nio server.
    */
-  public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler) {
+  public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler, final JMXNioServer server) {
     this.messageHandler = messageHandler;
+    this.server = server;
   }
 
   @Override
@@ -69,11 +75,11 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
     try {
       return (ObjectInstance) messageHandler.sendRequestWithResponse(CREATE_MBEAN, className, name);
-    } catch (MBeanRegistrationException e) {
+    } catch (final MBeanRegistrationException e) {
       throw e;
-    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
+    } catch (final ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -83,11 +89,11 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
     try {
       return (ObjectInstance) messageHandler.sendRequestWithResponse(CREATE_MBEAN_LOADER, className, name, loaderName);
-    } catch (MBeanRegistrationException e) {
+    } catch (final MBeanRegistrationException e) {
       throw e;
-    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
+    } catch (final ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -97,11 +103,11 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, IOException {
     try {
       return (ObjectInstance) messageHandler.sendRequestWithResponse(CREATE_MBEAN_PARAMS, className, name, params, signature);
-    } catch (MBeanRegistrationException e) {
+    } catch (final MBeanRegistrationException e) {
       throw e;
-    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
+    } catch (final ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -111,11 +117,11 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
     try {
       return (ObjectInstance) messageHandler.sendRequestWithResponse(CREATE_MBEAN_LOADER_PARAMS, className, name, loaderName);
-    } catch (MBeanRegistrationException e) {
+    } catch (final MBeanRegistrationException e) {
       throw e;
-    } catch (ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
+    } catch (final ReflectionException | InstanceAlreadyExistsException | MBeanException | NotCompliantMBeanException | InstanceNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -124,9 +130,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public void unregisterMBean(final ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException, IOException {
     try {
       messageHandler.sendRequestWithResponse(UNREGISTER_MBEAN, name);
-    } catch (InstanceNotFoundException | MBeanRegistrationException | IOException e) {
+    } catch (final InstanceNotFoundException | MBeanRegistrationException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -135,9 +141,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public ObjectInstance getObjectInstance(final ObjectName name) throws InstanceNotFoundException, IOException {
     try {
       return (ObjectInstance) messageHandler.sendRequestWithResponse(GET_OBJECT_INSTANCE, name);
-    } catch (InstanceNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -147,9 +153,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public Set<ObjectInstance> queryMBeans(final ObjectName name, final QueryExp query) throws IOException {
     try {
       return (Set<ObjectInstance>) messageHandler.sendRequestWithResponse(QUERY_MBEANS, name, query);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -159,9 +165,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public Set<ObjectName> queryNames(final ObjectName name, final QueryExp query) throws IOException {
     try {
       return (Set<ObjectName>) messageHandler.sendRequestWithResponse(QUERY_NAMES, name, query);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -170,9 +176,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public boolean isRegistered(final ObjectName name) throws IOException {
     try {
       return (Boolean) messageHandler.sendRequestWithResponse(IS_REGISTERED, name);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -181,9 +187,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public Integer getMBeanCount() throws IOException {
     try {
       return (Integer) messageHandler.sendRequestWithResponse(GET_MBEAN_COUNT);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -192,9 +198,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public Object getAttribute(final ObjectName name, final String attribute) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException {
     try {
       return messageHandler.sendRequestWithResponse(GET_ATTRIBUTE, name, attribute);
-    } catch (MBeanException | AttributeNotFoundException | InstanceNotFoundException | ReflectionException | IOException e) {
+    } catch (final MBeanException | AttributeNotFoundException | InstanceNotFoundException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -203,9 +209,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public AttributeList getAttributes(final ObjectName name, final String[] attributes) throws InstanceNotFoundException, ReflectionException, IOException {
     try {
       return (AttributeList) messageHandler.sendRequestWithResponse(GET_ATTRIBUTES, name, attributes);
-    } catch (InstanceNotFoundException | ReflectionException | IOException e) {
+    } catch (final InstanceNotFoundException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -215,9 +221,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException, IOException {
     try {
       messageHandler.sendRequestWithResponse(SET_ATTRIBUTE, name, attribute);
-    } catch (InstanceNotFoundException | AttributeNotFoundException | InvalidAttributeValueException | MBeanException | ReflectionException | IOException e) {
+    } catch (final InstanceNotFoundException | AttributeNotFoundException | InvalidAttributeValueException | MBeanException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -226,9 +232,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public AttributeList setAttributes(final ObjectName name, final AttributeList attributes) throws InstanceNotFoundException, ReflectionException, IOException {
     try {
       return (AttributeList) messageHandler.sendRequestWithResponse(SET_ATTRIBUTES, name, attributes);
-    } catch (InstanceNotFoundException | ReflectionException | IOException e) {
+    } catch (final InstanceNotFoundException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -238,9 +244,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
     try {
       return messageHandler.sendRequestWithResponse(INVOKE, name, operationName, params, signature);
-    } catch (InstanceNotFoundException | MBeanException | ReflectionException | IOException e) {
+    } catch (final InstanceNotFoundException | MBeanException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -249,9 +255,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public String getDefaultDomain() throws IOException {
     try {
       return (String) messageHandler.sendRequestWithResponse(GET_DEFAULT_DOMAIN);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -260,9 +266,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public String[] getDomains() throws IOException {
     try {
       return (String[]) messageHandler.sendRequestWithResponse(GET_DOMAINS);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -271,13 +277,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback)
     throws InstanceNotFoundException, IOException {
     try {
-      int listenerID = (Integer) messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER, name, filter);
+      final int listenerID = (Integer) messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER, name, filter);
       synchronized(listenerMap) {
         listenerMap.put(listenerID, new ClientListenerInfo(listenerID, name, listener, filter, handback));
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -286,9 +292,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public void addNotificationListener(final ObjectName name, final ObjectName listener, final NotificationFilter filter, final Object handback) throws InstanceNotFoundException, IOException {
     try {
       messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER_OBJECTNAME, name, listener, filter, handback);
-    } catch (InstanceNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -296,23 +302,23 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   @Override
   public void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
     try {
-      List<ClientListenerInfo> toRemove = new ArrayList<>();
+      final List<ClientListenerInfo> toRemove = new ArrayList<>();
       synchronized(listenerMap) {
-        for (Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
-          ClientListenerInfo info = entry.getValue();
+        for (final Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
+          final ClientListenerInfo info = entry.getValue();
           if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
         }
       }
       if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
-      int[] ids = new int[toRemove.size()];
+      final int[] ids = new int[toRemove.size()];
       for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
       messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
       synchronized(listenerMap) {
-        for (int id: ids) listenerMap.remove(id);
+        for (final int id: ids) listenerMap.remove(id);
       }
-    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -324,7 +330,7 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
       ClientListenerInfo toRemove = null;
       synchronized(listenerMap) {
         for (Map.Entry<Integer, ClientListenerInfo> entry: listenerMap.entrySet()) {
-          ClientListenerInfo info = entry.getValue();
+          final ClientListenerInfo info = entry.getValue();
           if (info.getMbeanName().equals(name) && (info.getListener() == listener) && (info.getFilter() == filter) && (info.getHandback() == handback)) {
             toRemove = info;
             break;
@@ -336,9 +342,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
       synchronized(listenerMap) {
         listenerMap.remove(toRemove.getListenerID());
       }
-    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -347,9 +353,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public void removeNotificationListener(final ObjectName name, final ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
     try {
       messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME, name, listener);
-    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -359,9 +365,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     throws InstanceNotFoundException, ListenerNotFoundException, IOException {
     try {
       messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK, name, listener, filter, handback);
-    } catch (InstanceNotFoundException | ListenerNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -370,9 +376,9 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public MBeanInfo getMBeanInfo(final ObjectName name) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
     try {
       return (MBeanInfo) messageHandler.sendRequestWithResponse(GET_MBEAN_INFO, name);
-    } catch (InstanceNotFoundException | IntrospectionException | ReflectionException | IOException e) {
+    } catch (final InstanceNotFoundException | IntrospectionException | ReflectionException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -381,41 +387,41 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   public boolean isInstanceOf(final ObjectName name, final String className) throws InstanceNotFoundException, IOException {
     try {
       return (Boolean) messageHandler.sendRequestWithResponse(IS_INSTANCE_OF, name, className);
-    } catch (InstanceNotFoundException | IOException e) {
+    } catch (final InstanceNotFoundException | IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
 
   @Override
   public void close() throws IOException {
-    ChannelsPair channels = messageHandler.getChannels();
+    final ChannelsPair channels = messageHandler.getChannels();
     if (channels.isClosing() || channels.isClosed()) return;
     try {
       if (debugEnabled) log.debug("closing {}", channels);
       channels.requestClose();
       channels.disableRead();
       messageHandler.sendRequestNoResponse(CLOSE);
-      JMXNioServer.getInstance().closeConnection(connectionID, null, true);
-    } catch (IOException e) {
+      server.closeConnection(connectionID, null, true);
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
 
   /**
-   * COnnect ot the remote server.
-   * @return the connection ID.
+   * Obtain the connection ID from the remote server. This method should opnly be called once, after the JPPF identifier has been sent.
+   * @return the connection ID string.
    * @throws IOException if any error occurs.
    */
-  public String connect() throws IOException {
+  String receiveConnectionID() throws IOException {
     try {
       return connectionID = messageHandler.receiveConnectionID();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
@@ -459,8 +465,8 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
    * @throws Exception if any error occurs.
    */
   public void handleNotification(final JMXNotification jmxNotification) throws Exception {
-    for (Integer listenerID: jmxNotification.getListenerIDs()) {
-      ClientListenerInfo info = getListenerInfo(listenerID);
+    for (final Integer listenerID: jmxNotification.getListenerIDs()) {
+      final ClientListenerInfo info = getListenerInfo(listenerID);
       if (info != null) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
     }
   }

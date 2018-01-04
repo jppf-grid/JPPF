@@ -33,6 +33,10 @@ import org.slf4j.Logger;
  */
 public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggingUtils.getLogger(ChannelsPair.class, JMXEnvHelper.isAsyncLoggingEnabled());
@@ -71,11 +75,23 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
    * The tasks that perform the state transitions for the reading and writing channels.
    */
-  private final JMXTransitionTask readingTask, writingTask;
+  private final JMXTransitionTask writingTask;
   /**
-   * 
+   * The tasks that perform the state transitions for the reading and writing channels.
+   */
+  private final JMXTransitionTask nonSelectingWritingTask;
+  /**
+   * The associated nio server.
    */
   private final JMXNioServer server;
+  /**
+   * The socket channel's interest ops.
+   */
+  private int interestOps;
+  /**
+   * Selection key for the associated socket channel and nio server selector.
+   */
+  private SelectionKey selectionKey;
 
   /**
    * @param first the reading channel.
@@ -85,8 +101,8 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   public ChannelsPair(final JMXChannelWrapper first, final JMXChannelWrapper second, final JMXNioServer server) {
     super(first, second);
     this.server = server;
-    readingTask = new JMXTransitionTask(first, JMXState.RECEIVING_MESSAGE, server.getFactory());
-    writingTask = new JMXTransitionTask(second, JMXState.SENDING_MESSAGE, server.getFactory());
+    writingTask = new JMXTransitionTask(second, server);
+    nonSelectingWritingTask = new JMXTransitionTask(second, server, false);
   }
 
   /**
@@ -108,12 +124,10 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * @throws Exception if any error occurs.
    */
   public void close() throws Exception {
-    if (closed.compareAndSet(false, true)) {
-      try {
-        first().close();
-      } finally {
-        second().close();
-      }
+    if (closed.compareAndSet(false, true)) try {
+      first().close();
+    } finally {
+      second().close();
     }
   }
 
@@ -230,11 +244,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   public void disableRead() throws Exception {
     if (closed.get()) return;
     if (debugEnabled) log.debug("disabling read on {}", this);
-    JMXChannelWrapper readingChannel = readingChannel();
-    server.getTransitionManager().updateInterestOps(readingChannel.getContext().getSelectionKey(), SelectionKey.OP_READ, false);
-    synchronized(readingChannel) {
-      readingChannel.context.setState(null);
-    }
+    final JMXChannelWrapper readingChannel = readingChannel();
+    readingChannel.context.setState(null);
+    server.updateInterestOps(readingChannel.getContext().getSelectionKey(), SelectionKey.OP_READ, false);
   }
 
   /**
@@ -244,11 +256,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   public void disableWrite() throws Exception {
     if (closed.get()) return;
     if (debugEnabled) log.debug("disabling write on {}", this);
-    JMXChannelWrapper writingChannel = writingChannel();
-    server.getTransitionManager().updateInterestOps(writingChannel.getContext().getSelectionKey(), SelectionKey.OP_WRITE, false);
-    synchronized(writingChannel) {
-      writingChannel.context.setState(null);
-    }
+    final JMXChannelWrapper writingChannel = writingChannel();
+    writingChannel.context.setState(null);
+    server.updateInterestOps(writingChannel.getContext().getSelectionKey(), SelectionKey.OP_WRITE, false);
   }
 
   /**
@@ -258,13 +268,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   public void disableReadWrite() throws Exception {
     if (closed.get()) return;
     if (debugEnabled) log.debug("disabling read and write on {}", this);
-    server.getTransitionManager().updateInterestOps(writingChannel().getContext().getSelectionKey(), SelectionKey.OP_READ | SelectionKey.OP_WRITE, false);
-    synchronized(writingChannel()) {
-      writingChannel().context.setState(null);
-    }
-    synchronized(readingChannel()) {
-      readingChannel().context.setState(null);
-    }
+    writingChannel().context.setState(null);
+    readingChannel().context.setState(null);
+    server.updateInterestOps(writingChannel().getContext().getSelectionKey(), SelectionKey.OP_READ | SelectionKey.OP_WRITE, false);
   }
 
   @Override
@@ -280,16 +286,46 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   }
 
   /**
-   * @return the reading task. 
-   */
-  JMXTransitionTask getReadingTask() {
-    return readingTask;
-  }
-
-  /**
-   * @return the writing task. 
+   * @return the writing task.
    */
   public JMXTransitionTask getWritingTask() {
     return writingTask;
+  }
+
+  /**
+   * @return the writing task while the selector is not selecting.
+   */
+  public JMXTransitionTask getNonSelectingWritingTask() {
+    return nonSelectingWritingTask;
+  }
+
+  /**
+   * @return the socket channel's interest ops.
+   */
+  public int getInterestOps() {
+    return interestOps;
+  }
+
+  /**
+   * Set the socket channel's interest ops.
+   * @param interestOps the interest ops to set.
+   */
+  public void setInterestOps(final int interestOps) {
+    this.interestOps = interestOps;
+  }
+
+  /**
+   * @return the associated selection key.
+   */
+  public SelectionKey getSelectionKey() {
+    return selectionKey;
+  }
+
+  /**
+   * Set the associated selection key.
+   * @param selectionKey the ley to set.
+   */
+  public void setSelectionKey(final SelectionKey selectionKey) {
+    this.selectionKey = selectionKey;
   }
 }

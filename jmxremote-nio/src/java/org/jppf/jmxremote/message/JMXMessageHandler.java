@@ -37,11 +37,11 @@ public class JMXMessageHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggingUtils.getLogger(JMXMessageHandler.class, JMXEnvHelper.isAsyncLoggingEnabled());
+  private static final Logger log = LoggingUtils.getLogger(JMXMessageHandler.class, JMXEnvHelper.isAsyncLoggingEnabled());
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Message ID for receiving a connection ID from the server.
    */
@@ -69,6 +69,10 @@ public class JMXMessageHandler {
   /**
    * The transition manager.
    */
+  private final JMXNioServer server;
+  /**
+   * The transition manager.
+   */
   private final StateTransitionManager<JMXState, JMXTransition> mgr;
   /**
    * 
@@ -82,7 +86,8 @@ public class JMXMessageHandler {
    */
   public JMXMessageHandler(final ChannelsPair channels, final Map<String, ?> env) {
     this.channels = channels;
-    this.mgr = channels.readingChannel().getContext().getServer().getTransitionManager();
+    this.server = channels.readingChannel().getContext().getServer();
+    this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
     connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
     if (connectionRequest != null) putRequest(connectionRequest);
@@ -114,8 +119,9 @@ public class JMXMessageHandler {
   public String receiveConnectionID() throws Exception {
     synchronized(connectionRequest) {
       if (connectionRequest.getResponse() != null) {
-        Object o = connectionRequest.getResponse().getResult();
-        if (o != null) return (String) o;
+        final JMXResponse response = connectionRequest.getResponse();
+        if (response.getException() != null) throw response.getException();
+        return (String) response.getResult();
       }
       return (String) receiveResponse(connectionRequest, false);
     }
@@ -136,7 +142,7 @@ public class JMXMessageHandler {
       if (doSendMessage) sendMessage(request);
       waitForMessage(request);
     }
-    JMXResponse response = request.getResponse();
+    final JMXResponse response = request.getResponse();
     if (response != null) {
       if (debugEnabled) log.debug("got response {}", response);
       if (response.getException() != null) throw response.getException();
@@ -171,14 +177,14 @@ public class JMXMessageHandler {
   public void sendRequestNoResponse(final byte type, final Object...params) throws Exception {
     if (closed.get()) return;
     try {
-      JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
+      final JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
       if (debugEnabled) log.debug("sending request {}, channels={}", request, channels);
       putRequest(request);
       synchronized(request) {
         sendMessage(request);
         waitForMessage(request);
       }
-    } catch(JPPFTimeoutException e) {
+    } catch(final JPPFTimeoutException e) {
       log.error(e.getMessage(), e);
       throw e;
     }
@@ -190,12 +196,9 @@ public class JMXMessageHandler {
    */
   public void messageSent(final JMXMessage message) {
     if (debugEnabled) log.debug("sent request {}, channels={}", message, channels);
-    JMXRequest request = removeRequest(message.getMessageID());
-    if (request == null) {
-      log.warn("no matching request for {}", message);
-    } else if (request != message) {
-      log.warn("message and request do not match, request = {}, message = {}", request, message);
-    }
+    final JMXRequest request = removeRequest(message.getMessageID());
+    if (request == null) log.warn("no matching request for {}", message);
+    else if (request != message) log.warn("message and request do not match, request = {}, message = {}", request, message);
     synchronized(message) {
       message.notifyAll();
     }
@@ -210,7 +213,9 @@ public class JMXMessageHandler {
     if (closed.get()) return;
     if (debugEnabled) log.debug("sending message {}", message);
     channels.writingChannel().getContext().offerJmxMessage(message);
-    mgr.submit(channels.getWritingTask());
+    final JMXTransitionTask task = channels.getWritingTask();
+    if (!task.incrementCountIfNeeded()) mgr.submit(task);
+    //server.updateInterestOps(channels.getSelectionKey(), SelectionKey.OP_WRITE, true);
   }
 
   /**
@@ -220,7 +225,7 @@ public class JMXMessageHandler {
     if (closed.compareAndSet(false, true)) {
       synchronized(requestMap) {
         for (Map.Entry<Long, JMXRequest> entry: requestMap.entrySet()) {
-          JMXRequest request = entry.getValue();
+          final JMXRequest request = entry.getValue();
           synchronized(request) {
             request.notifyAll();
           }
@@ -238,10 +243,10 @@ public class JMXMessageHandler {
    * @throws Exception if any other error occurs.
    */
   private void waitForMessage(final JMXRequest request) throws JPPFTimeoutException, Exception {
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     request.wait(requestTimeout);
     if ((System.nanoTime() - start) / 1_000_000L >= requestTimeout) {
-      String text = "exceeded timeout of " + requestTimeout + " ms waiting for " + request + " on " + channels;
+      final String text = "exceeded timeout of " + requestTimeout + " ms waiting for " + request + " on " + channels;
       log.warn(text + ", requests map = {}");
       throw new JPPFTimeoutException(text);
     }

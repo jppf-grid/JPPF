@@ -37,15 +37,15 @@ public class JMXEnvHelper {
    */
   public static long getLong(final JPPFProperty<Long> prop, final Map<String, ?> env, final TypedProperties config) {
     long value = prop.getDefaultValue();
-    String name = prop.getName();
+    final String name = prop.getName();
     if (env.containsKey(name)) value = (Long) env.get(name);
     else if (config.containsProperty(prop)) value = config.get(prop);
     else { 
-      String s = System.getProperty(name);
+      final String s = System.getProperty(name);
       if (s != null) value = Long.valueOf(s);
     }
     if (prop instanceof LongProperty) {
-      LongProperty p = (LongProperty) prop;
+      final LongProperty p = (LongProperty) prop;
       if ((value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
     }
     return value;
@@ -60,15 +60,15 @@ public class JMXEnvHelper {
    */
   public static int getInt(final JPPFProperty<Integer> prop, final Map<String, ?> env, final TypedProperties config) {
     int value = 0;
-    String name = prop.getName();
+    final String name = prop.getName();
     if (env.containsKey(name)) value = (Integer) env.get(name);
     else if (config.containsProperty(prop)) value = config.get(prop);
     else { 
-      String s = System.getProperty(name);
+      final String s = System.getProperty(name);
       if (s != null) value = Integer.valueOf(s);
     }
     if (prop instanceof IntProperty) {
-      IntProperty p = (IntProperty) prop;
+      final IntProperty p = (IntProperty) prop;
       if ((value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
     }
     return value;
@@ -82,10 +82,10 @@ public class JMXEnvHelper {
    * @return the value of the proerty if the property is found, or the property's default value if it is not found.
    */
   public static boolean getBoolean(final JPPFProperty<Boolean> prop, final Map<String, ?> env, final TypedProperties config) {
-    String name = prop.getName();
+    final String name = prop.getName();
     if (env.containsKey(name)) return (Boolean) env.get(name);
     if (config.containsProperty(prop)) return config.get(prop);
-    String value = System.getProperty(name);
+    final String value = System.getProperty(name);
     if (value != null) return Boolean.valueOf(value);
     return prop.getDefaultValue();
   }

@@ -49,14 +49,20 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * Association of server-side listeners to each mbean for which a listener is registered.
    */
   private final CollectionMap<ObjectName, ServerListenerInfo> listenerMap = new ArrayListHashMap<>();
+  /**
+   * The nio server.
+   */
+  private final JMXNioServer server;
 
   /**
-   * Initiamize with the specified MBean server.
+   * Initialize with the specified MBean server.
    * @param mbeanServer the MBean server whose notifications to dispatch.
+   * @param server the nio server.
    */
-  public MBeanServerNotificationDispatcher(final MBeanServer mbeanServer) {
+  public MBeanServerNotificationDispatcher(final MBeanServer mbeanServer, final JMXNioServer server) {
     if (mbeanServer == null) throw new IllegalArgumentException("MBeanServer cannot be null");
     this.mbeanServer = mbeanServer;
+    this.server = server;
   }
 
   /**
@@ -68,7 +74,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public void addNotificationListener(final ObjectName mbeanName, final NotificationFilter filter, final int listenerID, final String connectionID) throws Exception {
-    ServerListenerInfo info = new ServerListenerInfo(listenerID, filter, connectionID);
+    final ServerListenerInfo info = new ServerListenerInfo(listenerID, filter, connectionID);
     if (debugEnabled) log.debug("adding {} to {}", info, mbeanServer);
     synchronized(listenerMap) {
       if (!listenerMap.containsKey(mbeanName)) mbeanServer.addNotificationListener(mbeanName, this, null, mbeanName);
@@ -83,12 +89,12 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public void removeNotificationListeners(final ObjectName mbeanName, final int[] listenerIDs) throws Exception {
-    Set<Integer> idSet = new HashSet<>();
-    for (int n: listenerIDs) idSet.add(n);
-    List<ServerListenerInfo> toRemove = new ArrayList<>();
+    final Set<Integer> idSet = new HashSet<>();
+    for (final int n: listenerIDs) idSet.add(n);
+    final List<ServerListenerInfo> toRemove = new ArrayList<>();
     synchronized(listenerMap) {
       if (listenerMap.containsKey(mbeanName)) {
-        for (ServerListenerInfo info: listenerMap.getValues(mbeanName)) {
+        for (final ServerListenerInfo info: listenerMap.getValues(mbeanName)) {
           if (idSet.contains(info.getListenerID())) toRemove.add(info);
         }
       }
@@ -100,23 +106,23 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    ObjectName mbeanName = (ObjectName) handback;
+    final ObjectName mbeanName = (ObjectName) handback;
     List<ServerListenerInfo> infos = null;
     synchronized(listenerMap) {
-      Collection<ServerListenerInfo> coll = listenerMap.getValues(mbeanName);
+      final Collection<ServerListenerInfo> coll = listenerMap.getValues(mbeanName);
       if (coll != null) infos = new ArrayList<>(coll);
     }
     if (infos != null) {
-      CollectionMap<String, Integer> listenersPerConnection = new ArrayListHashMap<>();
-      for (ServerListenerInfo info: infos) {
+      final CollectionMap<String, Integer> listenersPerConnection = new ArrayListHashMap<>();
+      for (final ServerListenerInfo info: infos) {
         if (info.getFilter().isNotificationEnabled(notification)) listenersPerConnection.putValue(info.getConnectionID(), info.getListenerID());
       }
-      Map<String, JMXMessageHandler> handlersMap = JMXNioServer.getInstance().getMessageHandlers(listenersPerConnection.keySet());
-      for (Map.Entry<String, JMXMessageHandler> entry: handlersMap.entrySet()) {
-        Collection<Integer> listenerIDs = listenersPerConnection.getValues(entry.getKey());
+      final Map<String, JMXMessageHandler> handlersMap = server.getMessageHandlers(listenersPerConnection.keySet());
+      for (final Map.Entry<String, JMXMessageHandler> entry: handlersMap.entrySet()) {
+        final Collection<Integer> listenerIDs = listenersPerConnection.getValues(entry.getKey());
         try {
           entry.getValue().sendMessage(new JMXNotification(-1L, notification, listenerIDs.toArray(new Integer[listenerIDs.size()])));
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

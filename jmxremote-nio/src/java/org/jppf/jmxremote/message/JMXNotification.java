@@ -59,6 +59,13 @@ public class JMXNotification extends AbstractJMXMessage {
     return notification;
   }
 
+  /**
+   * @return the ids of the listeners to dispatch to.
+   */
+  public Integer[] getListenerIDs() {
+    return listenerIDs;
+  }
+
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
@@ -67,12 +74,5 @@ public class JMXNotification extends AbstractJMXMessage {
       .append(", listenerIDs=").append(Arrays.asList(listenerIDs))
       .append(", notification=").append(Arrays.asList(notification))
       .append(']').toString();
-  }
-
-  /**
-   * @return the ids of the listeners to dispatch to.
-   */
-  public Integer[] getListenerIDs() {
-    return listenerIDs;
   }
 }

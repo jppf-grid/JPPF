@@ -24,7 +24,7 @@ import java.util.*;
 import javax.management.MBeanServer;
 import javax.management.remote.*;
 
-import org.jppf.jmxremote.nio.JMXNioServer;
+import org.jppf.jmxremote.nio.*;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -76,31 +76,37 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public void start() throws IOException {
     if (debugEnabled) log.debug("starting server @{}, env={}", address, environment);
     try {
-      JMXNioServer server = JMXNioServer.getInstance();
-      if (debugEnabled) log.debug("Got JMXNioServer instance {}", server);
-      int port = address.getPort();
-      Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
-      boolean secure = (tls == null) ? false : tls;
+      //JMXNioServer server = JMXNioServer.getInstance();
+      //if (debugEnabled) log.debug("Got JMXNioServer instance {}", server);
+      final int port = address.getPort();
+      final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
+      final boolean secure = (tls == null) ? false : tls;
       NioHelper.getAcceptorServer().addServer(port, secure, environment);
-      server.addConnectionStatusListener(this);
+      if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
+      for (JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;
       if (debugEnabled) log.debug("successfully started server @{}", address);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IOException(e);
     }
   }
 
   @Override
   public void stop() throws IOException {
-    if (!started) return;
-    started = false;
-    JMXNioServer server = JMXNioServer.getInstance();
     try {
-      server.removeAllConnections(address.getPort());
-    } finally {
-      server.removeConnectionStatusListener(this);
+      if (!started) return;
+      started = false;
+      try {
+        for (JMXNioServer server: JMXNioServerPool.getServers()) server.removeAllConnections(address.getPort());
+      } finally {
+        for (JMXNioServer server: JMXNioServerPool.getServers()) server.removeConnectionStatusListener(this);
+      }
+    } catch (final IOException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new IOException(e);
     }
   }
 
@@ -116,7 +122,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
 
   @Override
   public Map<String, ?> getAttributes() {
-    Map<String, Object> map = new HashMap<>();
+    final Map<String, Object> map = new HashMap<>();
     synchronized(environment) {
       for (Map.Entry<String, ?> entry: environment.entrySet())
         if (entry.getValue() instanceof Serializable) map.put(entry.getKey(), entry.getValue());

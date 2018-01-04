@@ -40,10 +40,10 @@ public class ClientProvider implements JMXConnectorProvider {
   @Override
   public JMXConnector newJMXConnector(final JMXServiceURL serviceURL, final Map<String, ?> environment) throws IOException {
     if (!JMXHelper.JPPF_JMX_PROTOCOL.equals(serviceURL.getProtocol())) throw new MalformedURLException("Protocol not " + JMXHelper.JPPF_JMX_PROTOCOL + ": " + serviceURL.getProtocol());
-    Map<String, Object> env = new HashMap<>(environment);
-    for (ClientEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
+    final Map<String, Object> env = new HashMap<>(environment);
+    for (final ClientEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {
-        Map<String, ?> map = provider.getEnvironment();
+        final Map<String, ?> map = provider.getEnvironment();
         if ((map != null) && !map.isEmpty()) env.putAll(map);
       }
     }

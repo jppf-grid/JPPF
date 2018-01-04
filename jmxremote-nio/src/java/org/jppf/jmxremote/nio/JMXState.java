@@ -30,9 +30,5 @@ public enum JMXState {
   /**
    * Sending a message.
    */
-  SENDING_MESSAGE,
-  /**
-   * Idle state for a JMX channel.
-   */
-  IDLE
+  SENDING_MESSAGE
 }

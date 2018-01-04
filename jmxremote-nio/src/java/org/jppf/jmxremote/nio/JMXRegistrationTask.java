@@ -29,11 +29,11 @@ import org.slf4j.*;
  * They extend the Runnable interface so they can be executed concurrently by a pool of threads.
  * @author Laurent Cohen
  */
-public class JMXTransitionTask implements Runnable {
+public class JMXRegistrationTask implements Runnable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXTransitionTask.class);
+  private static Logger log = LoggerFactory.getLogger(JMXRegistrationTask.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -72,7 +72,7 @@ public class JMXTransitionTask implements Runnable {
    * @param channel the channel whose state is changing.
    * @param server the NIO server.
    */
-  public JMXTransitionTask(final JMXChannelWrapper channel, final JMXNioServer server) {
+  public JMXRegistrationTask(final JMXChannelWrapper channel, final JMXNioServer server) {
     this(channel, server, true);
   }
 
@@ -82,7 +82,7 @@ public class JMXTransitionTask implements Runnable {
    * @param server the NIO server.
    * @param selecting whether the selector is selecting.
    */
-  public JMXTransitionTask(final JMXChannelWrapper channel, final JMXNioServer server, final boolean selecting) {
+  public JMXRegistrationTask(final JMXChannelWrapper channel, final JMXNioServer server, final boolean selecting) {
     this.channel = channel;
     final NioServerFactory<JMXState, JMXTransition>factory = server.getFactory();
     this.nioState = factory.getState(JMXState.SENDING_MESSAGE);

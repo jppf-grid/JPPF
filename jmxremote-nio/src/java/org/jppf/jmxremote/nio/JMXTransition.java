@@ -30,9 +30,5 @@ public enum JMXTransition {
   /**
    * Transition from a state to SENDING_MESSAGE.
    */
-  TO_SENDING_MESSAGE,
-  /**
-   * Transition from a state to IDLE.
-   */
-  TO_IDLE
+  TO_SENDING_MESSAGE
 }

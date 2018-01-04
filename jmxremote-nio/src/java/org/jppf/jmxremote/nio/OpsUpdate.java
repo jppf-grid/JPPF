@@ -18,21 +18,29 @@
 
 package org.jppf.jmxremote.nio;
 
-import java.io.Serializable;
+import java.nio.channels.SelectionKey;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
-public interface JMXNioServerMBean extends Serializable {
+public class OpsUpdate {
   /**
-   * Name of the node's admin MBean.
+   *
    */
-  String MBEAN_NAME = "org.jppf:name=JMXNioServer,type=debug,instance=";
+  public final SelectionKey key;
+  /**
+   *
+   */
+  public final int ops;
 
   /**
-   * Provide some statistics about this sserver, for debug purposes.
-   * @return a map of statistics entries.
+   *
+   * @param key .
+   * @param ops .
    */
-  String stats();
+  public OpsUpdate(final SelectionKey key, final int ops) {
+    this.key = key;
+    this.ops = ops;
+  }
 }

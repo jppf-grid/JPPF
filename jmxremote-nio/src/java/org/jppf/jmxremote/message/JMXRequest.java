@@ -31,7 +31,7 @@ public class JMXRequest extends AbstractJMXMessage {
    */
   private static final long serialVersionUID = 1L;
   /**
-   * 
+   * Constant for no parameters in the request.
    */
   private static final Object[] NO_PARAMS = {};
   /**
@@ -91,7 +91,7 @@ public class JMXRequest extends AbstractJMXMessage {
    * @throws IOException if any I/O error occurs.
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
-    int n = params.length;
+    final int n = params.length;
     out.writeByte(n);
     if (n > 0) {
       for (Object o: params) out.writeObject(o);
@@ -105,7 +105,7 @@ public class JMXRequest extends AbstractJMXMessage {
    * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    int n = in.readByte();
+    final int n = in.readByte();
     if (n <= 0) params = NO_PARAMS;
     else {
       params  = new Object[n];

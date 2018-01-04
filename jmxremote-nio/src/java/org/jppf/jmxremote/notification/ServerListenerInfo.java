@@ -29,6 +29,11 @@ public class ServerListenerInfo {
    * A notification filter which accepts all notifications.
    */
   private static final NotificationFilter ACCEPT_ALL = new NotificationFilter() {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean isNotificationEnabled(final Notification notification) {
       return true;

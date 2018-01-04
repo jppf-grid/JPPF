@@ -24,7 +24,11 @@ import java.io.*;
  * Abstract superclass for all JMX messages.
  * @author Laurent Cohen
  */
-public abstract class AbstractJMXMessage implements JMXMessage {
+abstract class AbstractJMXMessage implements JMXMessage {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The message identifier.
    */
@@ -39,7 +43,7 @@ public abstract class AbstractJMXMessage implements JMXMessage {
    * @param messageID the message ID.
    * @param messageType the type of request.
    */
-  public AbstractJMXMessage(final long messageID, final byte messageType) {
+  AbstractJMXMessage(final long messageID, final byte messageType) {
     this.messageID = messageID;
     this.messageType = messageType;
   }
@@ -61,12 +65,7 @@ public abstract class AbstractJMXMessage implements JMXMessage {
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.writeByte(messageType);
-    if (messageType != JMXMessageType.CONNECT) {
-      boolean isInt = (messageID <= Integer.MAX_VALUE) && (messageID >= Integer.MIN_VALUE);
-      out.writeBoolean(isInt);
-      if (isInt) out.writeInt((int) messageID);
-      else out.writeLong(messageID);
-    }
+    if (messageType != JMXMessageType.CONNECT) out.writeLong(messageID);
   }
 
   /**
@@ -77,7 +76,6 @@ public abstract class AbstractJMXMessage implements JMXMessage {
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     messageType = in.readByte();
-    if (messageType == JMXMessageType.CONNECT) messageID = JMXMessageHandler.CONNECTION_MESSAGE_ID;
-    else messageID = in.readBoolean() ? in.readInt() : in.readLong();
+    messageID = (messageType == JMXMessageType.CONNECT) ? JMXMessageHandler.CONNECTION_MESSAGE_ID : in.readLong();
   }
 }

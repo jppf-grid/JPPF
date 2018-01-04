@@ -18,7 +18,6 @@
 
 package org.jppf.jmxremote.message;
 
-import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -32,13 +31,13 @@ public class JMXResponse extends AbstractJMXMessage {
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Whether the result is an exception or a normal result.
+   */
+  private final boolean isException;
+  /**
    * The result of the request.
    */
-  private Object result;
-  /**
-   * An exception eventually raised when performing the request.
-   */
-  private Exception exception;
+  private final Object result;
 
   /**
    * Initialize this request with the specified ID, request type and parameters.
@@ -47,7 +46,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param result the request's result.
    */
   public JMXResponse(final long messageID, final byte requestType, final Object result) {
-    this(messageID, requestType, result, null);
+    this(messageID, requestType, result, false);
   }
 
   /**
@@ -57,7 +56,7 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param exception an exception eventually raised when performing the request.
    */
   public JMXResponse(final long messageID, final byte requestType, final Exception exception) {
-    this(messageID, requestType, null, exception);
+    this(messageID, requestType, exception, true);
   }
 
   /**
@@ -65,26 +64,26 @@ public class JMXResponse extends AbstractJMXMessage {
    * @param messageID the message id.
    * @param requestType the type of request.
    * @param result the request's result.
-   * @param exception an exception eventually raised when performing the request.
+   * @param isException whether the result is an exception or a normal result.
    */
-  public JMXResponse(final long messageID, final byte requestType, final Object result, final Exception exception) {
+  public JMXResponse(final long messageID, final byte requestType, final Object result, final boolean isException) {
     super(messageID, requestType);
     this.result = result;
-    this.exception = exception;
+    this.isException = isException;
   }
 
   /**
    * @return the request's parameters.
    */
   public Object getResult() {
-    return result;
+    return isException ? null : result;
   }
 
   /**
    * @return an exception eventually raised when performing the request.
    */
   public Exception getException() {
-    return exception;
+    return isException ? (Exception) result : null;
   }
 
   @Override
@@ -93,31 +92,7 @@ public class JMXResponse extends AbstractJMXMessage {
       .append("messageID=").append(getMessageID())
       .append(", messageType=").append(getMessageType())
       .append(", result=").append(Arrays.asList(result))
-      .append(", exception=").append(exception)
+      .append(", isException=").append(isException)
       .append(']').toString();
-  }
-
-  /**
-   * Save the state of this object to a stream (i.e.,serialize it).
-   * @param out the output stream to which to write this object. 
-   * @throws IOException if any I/O error occurs.
-   */
-  private void writeObject(final ObjectOutputStream out) throws IOException {
-    boolean hasException = exception != null;
-    out.writeBoolean(hasException);
-    out.writeObject(hasException ? exception : result);
-  }
-
-  /**
-   * Reconstitute this object from a stream (i.e., deserialize it).
-   * @param in the input stream from which to read the object. 
-   * @throws IOException if any I/O error occurs.
-   * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
-   */
-  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    boolean hasException = in.readBoolean();
-    Object o = in.readObject();
-    if (hasException) exception = (Exception) o;
-    else result = o;
   }
 }

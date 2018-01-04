@@ -18,24 +18,30 @@
 
 package org.jppf.jmxremote.nio;
 
-import org.jppf.nio.ChannelWrapper;
+import org.jppf.jmxremote.message.JMXMessage;
+import org.jppf.nio.NioMessage;
 
 /**
- * Idle state for a channel.
+ *
  * @author Laurent Cohen
  */
-public class IdleState extends JMXNioState {
+class MessageWrapper {
   /**
    *
-   * @param server the server which handles the channels states and transitions.
    */
-  public IdleState(final JMXNioServer server) {
-    super(server);
+  final JMXMessage jmxMessage;
+  /**
+   *
+   */
+  final NioMessage nioMessage;
 
-  }
-
-  @Override
-  public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    return null;
+  /**
+   *
+   * @param jmxMessage .
+   * @param nioMessage .
+   */
+  MessageWrapper(final JMXMessage jmxMessage, final NioMessage nioMessage) {
+    this.jmxMessage = jmxMessage;
+    this.nioMessage = nioMessage;
   }
 }

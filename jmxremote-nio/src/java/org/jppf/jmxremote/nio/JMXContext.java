@@ -23,7 +23,7 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jppf.io.*;
+import org.jppf.io.IOHelper;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
 import org.slf4j.*;
@@ -38,13 +38,13 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private static Logger log = LoggerFactory.getLogger(JMXContext.class);
   /**
-   * The last read or written non-serialized JMX message.
+   * The last read or written JMX message.
    */
-  private JMXMessage currentJmxMessage;
+  private MessageWrapper currentMessageWrapper;
   /**
    * The queue of pending messages to send.
    */
-  private final Queue<JMXMessage> pendingJmxMessages;
+  private final Queue<MessageWrapper> pendingJmxMessages;
   /**
    * The JMX nio server to use.
    */
@@ -56,28 +56,28 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   /**
    *
    */
-  private AtomicReference<JMXState> stateRef = new AtomicReference<>();
+  private final AtomicReference<JMXState> stateRef = new AtomicReference<>();
   /**
-   * 
+   *
    */
   private SelectionKey selectionKey;
 
   /**
-   * Initializewitht he specified server.
+   * Initialize with the specified server.
    * @param server the JMX nio server to use.
    * @param reading whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
    */
   public JMXContext(final JMXNioServer server, final boolean reading) {
     this.server = server;
-    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<JMXMessage>();
+    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<MessageWrapper>();
     this.peer = false;
   }
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
     try {
-      server.closeConnection(getConnectionID(), exception);
-    } catch (Exception e) {
+      server.closeConnection(getConnectionID(), exception, false);
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -95,56 +95,35 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @throws Exception if any error occurs.
    */
   public JMXMessage deserializeMessage() throws Exception {
-    currentJmxMessage = null;
-    if (message != null) {
-      BaseNioMessage msg = (BaseNioMessage) message;
-      DataLocation dl = msg.getLocations().get(0);
-      currentJmxMessage = (JMXMessage) IOHelper.unwrappedData(dl);
-    }
-    return currentJmxMessage;
+    return deserializeMessage((SimpleNioMessage) message);
   }
 
   /**
-   * Serialize the current message message.
-   * @param channel the channel to which the serialized message is written.
+   * Deserialize the specified message.
+   * @param message the message to deserialize.
+   * @return a deserialzed message.
    * @throws Exception if any error occurs.
    */
-  public void serializeMessage(final ChannelWrapper<?> channel) throws Exception {
-    BaseNioMessage msg = (BaseNioMessage) (message = new BaseNioMessage(channel));
-    byteCount = 0;
-    DataLocation dl = IOHelper.serializeData(currentJmxMessage);
-    msg.addLocation(dl);
-  }
-
-  /**
-   * @return the last read or written non-serialized JMX message.
-   */
-  public JMXMessage getCurrentJmxMessage() {
-    return currentJmxMessage;
-  }
-
-  /**
-   * Set the next to read or write non-serialized JMX message.
-   * @param jmxMessage the next to read or write non-serialized JMX message.
-   */
-  public void setCurrentJmxMessage(final JMXMessage jmxMessage) {
-    this.currentJmxMessage = jmxMessage;
+  public JMXMessage deserializeMessage(final SimpleNioMessage message) throws Exception {
+    return (message != null) ? (JMXMessage) IOHelper.unwrappedData(message.getLocation()) : null;
   }
 
   /**
    * Add a JMX message to the pending queue.
-   * @param msg the JMX message to offer.
+   * @param message the JMX message to offer.
    * @throws Exception if any error occurs.
    */
-  public void offerJmxMessage(final JMXMessage msg) throws Exception {
-    pendingJmxMessages.offer(msg);
+  public void offerJmxMessage(final JMXMessage message) throws Exception {
+    final SimpleNioMessage msg = new SimpleNioMessage(channel);
+    msg.setLocation(IOHelper.serializeData(message));
+    pendingJmxMessages.offer(new MessageWrapper(message, msg));
   }
 
   /**
    * Get the next JMX message from the pending queue.
    * @return a {@link JMXMessage} instance.
    */
-  public JMXMessage pollJmxMessage() {
+  public MessageWrapper pollJmxMessage() {
     return pendingJmxMessages.poll();
   }
 
@@ -181,7 +160,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", connectionID=").append(messageHandler == null ? "null" : getConnectionID());
@@ -222,7 +201,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   JMXTransition transitionChannel(final JMXState state, final int updateOps, final boolean add) throws Exception {
     setState(state);
-    server.getTransitionManager().updateInterestOps(getSelectionKey(), updateOps, add);
+    server.updateInterestOps(getSelectionKey(), updateOps, add);
     return null;
   }
 
@@ -239,5 +218,49 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   public SelectionKey getSelectionKey() {
     if (selectionKey == null) selectionKey = getChannel().getSocketChannel().keyFor(server.getSelector());
     return selectionKey;
+  }
+
+  /**
+   * Read data from a channel.
+   * @param wrapper the channel to read the data from.
+   * @return true if all the data has been read, false otherwise.
+   * @throws Exception if an error occurs while reading the data.
+   */
+  @Override
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
+    if (message == null) message = new SimpleNioMessage(channel);
+    byteCount = ((SimpleNioMessage) message).channelCount;
+    final boolean b = message.read();
+    byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    return b;
+  }
+
+  /**
+   * Write data to a channel.
+   * @param wrapper the channel to write the data to.
+   * @return true if all the data has been written, false otherwise.
+   * @throws Exception if an error occurs while writing the data.
+   */
+  @Override
+  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
+    byteCount = ((SimpleNioMessage) message).channelCount;
+    final boolean b = message.write();
+    byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    return b;
+  }
+
+  /**
+   * @return the last read or written JMX message.
+   */
+  MessageWrapper getCurrentMessageWrapper() {
+    return currentMessageWrapper;
+  }
+
+  /**
+   * Set the last read or written JMX message.
+   * @param currentMessageWrapper the last read or written JMX message to set.
+   */
+  void setCurrentMessageWrapper(final MessageWrapper currentMessageWrapper) {
+    this.currentMessageWrapper = currentMessageWrapper;
   }
 }

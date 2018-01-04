@@ -26,6 +26,10 @@ import java.util.EventObject;
  */
 public class JMXConnectionStatusEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * A {@link Throwable} that caused the connection failure, may be {@code null}.
    */
   private final Throwable throwable;
