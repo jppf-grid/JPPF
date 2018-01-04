@@ -55,10 +55,10 @@ public class JavaDemoTask extends AbstractTask<String> {
     try {
       System.out.printf("starting %s, duration = %d ms%n", getClass().getSimpleName(), duration);
       if (duration > 0L) Thread.sleep(duration);
-      String message = "execution successful";
+      final String message = "execution successful";
       setResult(message);
       System.out.println(message);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       setThrowable(e);
       System.out.printf("exception during execution: %s%n", ExceptionUtils.getStackTrace(e));
     }

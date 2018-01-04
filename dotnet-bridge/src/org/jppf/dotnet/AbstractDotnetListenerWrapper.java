@@ -66,12 +66,12 @@ public class AbstractDotnetListenerWrapper {
     this.debugEnabled = debugEnabled;
     namePrefix = dotnetDispatcher.getClass().getSimpleName();
     try {
-      Class<?> c = dotnetDispatcher.getClass();
-      for (String name: methodNames) {
-        Method method = c.getMethod(name, Object.class);
+      final Class<?> c = dotnetDispatcher.getClass();
+      for (final String name: methodNames) {
+        final Method method = c.getMethod(name, Object.class);
         methodMap.put(name, method);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       if (e instanceof RuntimeException) throw (RuntimeException) e;
       throw new JPPFRuntimeException("Error initializing " + getClass().getName(), e);
@@ -87,9 +87,9 @@ public class AbstractDotnetListenerWrapper {
     if (dotnetDispatcher == null) return;
     if (debugEnabled) log.debug(String.format("delegating to method %s.%s() event=%s", namePrefix, methodName, event));
     try {
-      Method m = methodMap.get(methodName);
+      final Method m = methodMap.get(methodName);
       m.invoke(dotnetDispatcher, event);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(String.format("error invoking %s.%s() with event=%s :%n%s", namePrefix, methodName, event, ExceptionUtils.getStackTrace(e)));
     }
   }

@@ -37,7 +37,7 @@ public class DotnetBridgeHook implements InitializationHook {
       //Bridge.setDebug(true);
       //Bridge.setVerbose(true);
       Bridge.init();
-      BridgeSetup setup = Bridge.getSetup();
+      final BridgeSetup setup = Bridge.getSetup();
       System.out.println("BridgeSetup : " + setup);
       //setup.setVeryVerbose(true);
       for (String key: config.stringPropertyNames()) {
@@ -45,17 +45,17 @@ public class DotnetBridgeHook implements InitializationHook {
           Bridge.LoadAndRegisterAssemblyFrom(new File (config.getString(key)));
           System.out.println("loaded assembly " + config.getString(key));
         } else if (key.startsWith("AssemblyPaths.")) {
-          String[] split = RegexUtils.PIPE_PATTERN.split(config.getString(key));
+          final String[] split = RegexUtils.PIPE_PATTERN.split(config.getString(key));
           if ((split == null) || (split.length < 2)) continue;
-          String[] paths = RegexUtils.SEMICOLUMN_PATTERN.split(split[1]);
-          for (String path: paths) {
+          final String[] paths = RegexUtils.SEMICOLUMN_PATTERN.split(split[1]);
+          for (final String path: paths) {
             Bridge.LoadAndRegisterAssemblyFrom(new File(split[0], path));
             System.out.printf("loaded assembly %s/%s%n", split[0], path);
           }
         }
       }
       JPPFConfiguration.getProperties().setBoolean("jppf.dotnet.bridge.initialized", true);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       JPPFConfiguration.getProperties().setBoolean("jppf.dotnet.bridge.initialized", false);
       System.err.printf(".Net bridge initialization failure: %s%n", ExceptionUtils.getStackTrace(t));
     }

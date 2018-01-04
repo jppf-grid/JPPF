@@ -30,6 +30,10 @@ import org.jppf.node.protocol.*;
  */
 public class DotnetTaskWrapper extends AbstractTask<Object> implements CancellationHandler, TimeoutHandler {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The serialized dotnet task.
    */
   private byte[] bytes = null;
@@ -63,12 +67,12 @@ public class DotnetTaskWrapper extends AbstractTask<Object> implements Cancellat
       // deserialize the .Net task, execute it and serialize its new state
       if (loggingEnabled) System.out.println("[Java] executing the dotnet task");
       doExecute();
-      String s = "execution successful for " + this;
+      final String s = "execution successful for " + this;
       if (loggingEnabled) System.out.println("[Java]  " + s);
       setResult(s);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
-      Throwable cause = t.getCause();
+      final Throwable cause = t.getCause();
       setThrowable(cause == null ? t : cause);
       //setResult("execution failure: " + ExceptionUtils.getStackTrace(t));
     }
@@ -89,7 +93,7 @@ public class DotnetTaskWrapper extends AbstractTask<Object> implements Cancellat
    */
   private void doExecute() throws Throwable {
     if (serializer != null) {
-      Method m = serializerClass.getDeclaredMethod("Execute", byte[].class);
+      final Method m = serializerClass.getDeclaredMethod("Execute", byte[].class);
       bytes = (byte[]) m.invoke(serializer, bytes);
     }
   }
@@ -115,7 +119,7 @@ public class DotnetTaskWrapper extends AbstractTask<Object> implements Cancellat
   public void doCancelAction() throws Exception {
     if (loggingEnabled) System.out.println("cancelling dot net task");
     if (serializer != null) {
-      Method m = serializerClass.getDeclaredMethod("Cancel");
+      final Method m = serializerClass.getDeclaredMethod("Cancel");
       m.invoke(serializer);
     }
   }
@@ -128,7 +132,7 @@ public class DotnetTaskWrapper extends AbstractTask<Object> implements Cancellat
   public void doTimeoutAction() throws Exception {
     if (loggingEnabled) System.out.println("dotnet task has timed out");
     if (serializer != null) {
-      Method m = serializerClass.getDeclaredMethod("Timeout");
+      final Method m = serializerClass.getDeclaredMethod("Timeout");
       m.invoke(serializer);
     }
   }
