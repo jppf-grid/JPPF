@@ -198,11 +198,13 @@ public class BaseSetup {
 
   /**
    * Reset the client configuration to the defaults.
+   * @return the new JPPF configuration.
    * @throws Exception if any error occurs.
    */
-  public static void resetClientConfig() throws Exception {
+  public static TypedProperties resetClientConfig() throws Exception {
     TestConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
     JPPFConfiguration.reset();
+    return JPPFConfiguration.getProperties();
   }
 
   /**

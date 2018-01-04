@@ -18,7 +18,7 @@
 
 package test.org.jppf.test.setup;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.junit.*;
 
 
@@ -31,13 +31,12 @@ public class Setup1D1N extends BaseTest {
    * Launches a driver and node.
    * @throws Exception if a process could not be started.
    */
+  @SuppressWarnings("resource")
   @BeforeClass
   public static void setup() throws Exception {
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
-    try (JPPFClient client = new JPPFClient()) {
-      client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    }
+    Assert.assertTrue(new JMXDriverConnectionWrapper("localhost", 11201).connectAndWait(5000L));
   }
 
   /**

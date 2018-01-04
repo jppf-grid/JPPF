@@ -122,14 +122,21 @@ public final class SystemUtils {
       final Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
         @Override
         public Properties run() {
-          return System.getProperties();
+          final Properties props = new Properties();
+          synchronized(System.getProperties()) {
+            props.putAll(System.getProperties());
+          }
+          return props;
         }
       });
       final Enumeration<?> en = sysProps.propertyNames();
       while (en.hasMoreElements()) {
         final String name = (String) en.nextElement();
         try {
-          if (!props.contains(name)) props.setProperty(name, System.getProperty(name));
+          if (!props.containsKey(name)) {
+            final String value = sysProps.getProperty(name);
+            if (value != null) props.setProperty(name, value);
+          }
         } catch(final SecurityException e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.info(e.getMessage());
