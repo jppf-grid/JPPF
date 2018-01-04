@@ -36,10 +36,10 @@ public class RestartableNodeProcessLauncher extends RestartableProcessLauncher {
     super(n, "  node", scenarioConfig);
     setJppfConfig(doConfigOverride("node.template.properties", "node-" + n + ".properties"));
     setJVMOptions();
-    String s = doConfigOverride("log4j-node.template.properties", "log4j-node-" + n + ".properties");
+    final String s = doConfigOverride("log4j-node.template.properties", "log4j-node-" + n + ".properties");
     try {
       setLog4j(new File(s).toURI().toURL().toString());
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw new RuntimeException(e);
     }
     setLogging(doConfigOverride("logging-node.template.properties", "logging-node-" + n + ".properties"));

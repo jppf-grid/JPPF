@@ -30,7 +30,7 @@ public class OfflineNodeRunner extends AbstractScenarioRunner {
   public void run() {
     try {
       StreamUtils.waitKeyPressed();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

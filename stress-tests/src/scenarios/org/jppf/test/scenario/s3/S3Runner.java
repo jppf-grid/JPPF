@@ -38,10 +38,10 @@ public class S3Runner extends AbstractScenarioRunner {
   @Override
   public void run() {
     try {
-      TypedProperties props = getConfiguration().getProperties();
-      int nbJobs = props.getInt("nbJobs", 1);
-      int nbTasks = props.getInt("nbTasks", 1);
-      long count = props.getInt("count", 1);
+      final TypedProperties props = getConfiguration().getProperties();
+      final int nbJobs = props.getInt("nbJobs", 1);
+      final int nbTasks = props.getInt("nbTasks", 1);
+      final long count = props.getInt("count", 1);
       output("submitting " + nbJobs + " jobs with " + nbTasks + " each, count=" + count);
       //StreamUtils.waitKeyPressed("press any key to continue ...");
 
@@ -50,11 +50,11 @@ public class S3Runner extends AbstractScenarioRunner {
       long max = 0L;
 
       for (int i = 1; i <= nbJobs; i++) {
-        long start = System.nanoTime();
-        JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
+        final long start = System.nanoTime();
+        final JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
         job.getMetadata().setParameter("job.name", "job-" + i);
         getSetup().getClient().submitJob(job);
-        long elapsed = (System.nanoTime() - start) / 1000000L;
+        final long elapsed = (System.nanoTime() - start) / 1000000L;
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
         totalIterationTime += elapsed;
@@ -62,7 +62,7 @@ public class S3Runner extends AbstractScenarioRunner {
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / nbJobs) + ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max)
           + ", total time: " + StringUtils.toStringDuration(totalIterationTime));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

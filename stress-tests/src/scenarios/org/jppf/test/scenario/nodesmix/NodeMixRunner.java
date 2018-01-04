@@ -30,7 +30,7 @@ public class NodeMixRunner extends AbstractScenarioRunner {
   public void run() {
     try {
       StreamUtils.waitKeyPressed("Press [Enter] to terminate ...");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
     }

@@ -32,8 +32,7 @@ import test.org.jppf.test.setup.common.*;
  * Testing the resubmission of a job when the driver is disconnected.
  * @author Laurent Cohen
  */
-public class ResubmitRunner extends AbstractScenarioRunner
-{
+public class ResubmitRunner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
@@ -44,22 +43,18 @@ public class ResubmitRunner extends AbstractScenarioRunner
   private final AtomicBoolean dispatched = new AtomicBoolean(false);
 
   @Override
-  public void run()
-  {
-    try
-    {
-      long start = System.nanoTime();
-      JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
+  public void run() {
+    try {
+      final long start = System.nanoTime();
+      final JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
       job.addJobListener(new MyJobListener());
       getSetup().getClient().submitJob(job);
       while (!dispatched.get()) Thread.sleep(1000L);
       getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
       job.awaitResults();
-      long elapsed = System.nanoTime() - start;
-      output("total time: " + StringUtils.toStringDuration(elapsed/1000000L));
-    }
-    catch (Exception e)
-    {
+      final long elapsed = System.nanoTime() - start;
+      output("total time: " + StringUtils.toStringDuration(elapsed / 1000000L));
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -68,8 +63,7 @@ public class ResubmitRunner extends AbstractScenarioRunner
    * Print a message to the console and/or log file.
    * @param message - the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
@@ -77,11 +71,9 @@ public class ResubmitRunner extends AbstractScenarioRunner
   /**
    * Set the "dispatched" flag when at least one dispatch has occurred.
    */
-  public class MyJobListener extends JobListenerAdapter
-  {
+  public class MyJobListener extends JobListenerAdapter {
     @Override
-    public void jobDispatched(final JobEvent event)
-    {
+    public void jobDispatched(final JobEvent event) {
       dispatched.set(true);
     }
   }

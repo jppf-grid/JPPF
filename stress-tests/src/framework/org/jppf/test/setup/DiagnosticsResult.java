@@ -25,15 +25,18 @@ import org.jppf.utils.Pair;
  * Result generated when querying nodes and drivers for diagnostics via JMX.
  * @author Laurent Cohen
  */
-public class DiagnosticsResult extends Pair<HealthSnapshot, HealthSnapshot>
-{
+public class DiagnosticsResult extends Pair<HealthSnapshot, HealthSnapshot> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Intiialize this result with the specified jmx id and diagnostics information.
    * @param beforeGC the diagnostics before GC.
    * @param afterGC the diagnostics after GC.
    */
-  public DiagnosticsResult(final HealthSnapshot beforeGC, final HealthSnapshot afterGC)
-  {
+  public DiagnosticsResult(final HealthSnapshot beforeGC, final HealthSnapshot afterGC) {
     super(beforeGC, afterGC);
   }
 
@@ -41,8 +44,7 @@ public class DiagnosticsResult extends Pair<HealthSnapshot, HealthSnapshot>
    * Get the diagnostics information.
    * @return a {@link HealthSnapshot} instance.
    */
-  public HealthSnapshot getDiagnosticsInfo()
-  {
+  public HealthSnapshot getDiagnosticsInfo() {
     return first();
   }
 
@@ -50,8 +52,7 @@ public class DiagnosticsResult extends Pair<HealthSnapshot, HealthSnapshot>
    * Get the diagnostics information after at least one GC has been performed.
    * @return an instance of {@link HealthSnapshot}.
    */
-  public HealthSnapshot getDiagnosticsInfoAfterGC()
-  {
+  public HealthSnapshot getDiagnosticsInfoAfterGC() {
     return second();
   }
 }

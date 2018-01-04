@@ -94,7 +94,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
       while (!end) {
         if (debugEnabled) log.debug(name + "starting process");
         startProcess();
-        int exitCode = process.waitFor();
+        final int exitCode = process.waitFor();
         if (debugEnabled) log.debug(name + "exited with code " + exitCode);
         end = onProcessExit(exitCode);
         //if (process != null) process.destroy();
@@ -112,7 +112,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    * @param exitCode the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
-  private boolean onProcessExit(final int exitCode) {
+  private static boolean onProcessExit(final int exitCode) {
     return exitCode != 2;
   }
 
@@ -125,10 +125,10 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
   protected String doConfigOverride(final String template, final String override) {
     File templateFile = new File(config.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
-    File overrideFile = new File(config.getConfigDir(), override);
-    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
+    final File overrideFile = new File(config.getConfigDir(), override);
+    final TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
     if (overrideFile.exists()) ConfigurationHelper.overrideConfig(config, overrideFile);
-    String path = ConfigurationHelper.createTempConfigFile(config);
+    final String path = ConfigurationHelper.createTempConfigFile(config);
     tempFileCache.add(path);
     return path;
   }
@@ -136,8 +136,8 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
   @Override
   public void stopProcess() {
     super.stopProcess();
-    for (String path: tempFileCache) {
-      File file = new File(path);
+    for (final String path: tempFileCache) {
+      final File file = new File(path);
       if (file.exists()) {
         if (!file.delete() && debugEnabled) log.debug("could not delete file '" + file + '\'');
       }
@@ -149,10 +149,10 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    * 
    */
   protected void setJVMOptions() {
-    TypedProperties props = ConfigurationHelper.loadProperties(new File(jppfConfig));
-    String opts = props.get(JPPFProperties.JVM_OPTIONS);
+    final TypedProperties props = ConfigurationHelper.loadProperties(new File(jppfConfig));
+    final String opts = props.get(JPPFProperties.JVM_OPTIONS);
     if ((opts != null) && !"".equals(opts.trim())) {
-      String[] options = RegexUtils.SPACES_PATTERN.split(opts);
+      final String[] options = RegexUtils.SPACES_PATTERN.split(opts);
       for (int i=0; i<options.length; i++) {
         if ("-cp".equals(options[i]) || "-classpath".equals(options[i])) addClasspathElement(options[++i]);
         else jvmOptions.add(options[i]);
@@ -165,16 +165,16 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    * @param outputName the path to create the stream from.
    * @return a <code>PrintStream</code> instance.
    */
-  private PrintStream configureOutput(final String outputName) {
+  private static PrintStream configureOutput(final String outputName) {
     PrintStream result = null;
     try {
       if ((outputName == null) || "out".equalsIgnoreCase(outputName)) result = System.out;
       else if ("err".equalsIgnoreCase(outputName)) result = System.err;
       else {
-        File file = new File(outputName);
+        final File file = new File(outputName);
         result = new PrintStream(new FileOutputStream(file));
       }
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return result;
   }

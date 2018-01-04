@@ -32,32 +32,27 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * Testing the resubmission of a job when the driver is disconnected.
  * @author Laurent Cohen
  */
-public class Runner extends AbstractScenarioRunner
-{
+public class Runner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
   static Logger log = LoggerFactory.getLogger(Runner.class);
 
   @Override
-  public void run()
-  {
-    try
-    {
-      TypedProperties config = getConfiguration().getProperties();
-      String file = config.getString("class.names.file");
-      List<String> list = FileUtils.getFilePathList(file);
-      long start = System.nanoTime();
-      JPPFJob job = BaseTestHelper.createJob("classloading", true, true, 1, MyTask.class);
-      DataProvider dp = new MemoryMapDataProvider();
+  public void run() {
+    try {
+      final TypedProperties config = getConfiguration().getProperties();
+      final String file = config.getString("class.names.file");
+      final List<String> list = FileUtils.getFilePathList(file);
+      final long start = System.nanoTime();
+      final JPPFJob job = BaseTestHelper.createJob("classloading", true, true, 1, MyTask.class);
+      final DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("list", list);
       job.setDataProvider(dp);
       getSetup().getClient().submitJob(job);
-      long elapsed = System.nanoTime() - start;
-      output(job.getName() + " done in " + StringUtils.toStringDuration(elapsed/1000000L));
-    }
-    catch (Exception e)
-    {
+      final long elapsed = System.nanoTime() - start;
+      output(job.getName() + " done in " + StringUtils.toStringDuration(elapsed / 1000000L));
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -66,8 +61,7 @@ public class Runner extends AbstractScenarioRunner
    * Print a message to the console and/or log file.
    * @param message - the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
@@ -75,39 +69,34 @@ public class Runner extends AbstractScenarioRunner
   /**
    * 
    */
-  public static class MyTask extends AbstractTask<String>
-  {
+  public static class MyTask extends AbstractTask<String> {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     @SuppressWarnings("unchecked")
-    public void run()
-    {
+    public void run() {
       int nbSuccess = 0;
       List<String> list = null;
-      try
-      {
+      try {
         list = (List<String>) getDataProvider().getParameter("list");
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         setThrowable(e);
         e.printStackTrace();
         return;
       }
       boolean first = true;
       int nbClasses = 0;
-      ClassLoader cl = getClass().getClassLoader();
-      for (String s: list)
-      {
+      final ClassLoader cl = getClass().getClassLoader();
+      for (String s: list) {
         nbClasses++;
-        try
-        {
+        try {
           Class.forName(s, true, cl);
           nbSuccess++;
-        }
-        catch (Throwable t)
-        {
-          if (!first)
-          {
+        } catch (final Throwable t) {
+          if (!first) {
             first = true;
             System.out.println("throwable for '" + s + "' : " + ExceptionUtils.getStackTrace(t));
           }

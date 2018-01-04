@@ -32,8 +32,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class JMXThreadsRunner extends AbstractScenarioRunner
-{
+public class JMXThreadsRunner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
@@ -44,41 +43,33 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
   private ExecutorService executor = null;
 
   @Override
-  public void run()
-  {
-    try
-    {
-      TypedProperties config = getConfiguration().getProperties();
-      int nbNodes = getConfiguration().getNbNodes();
+  public void run() {
+    try {
+      final TypedProperties config = getConfiguration().getProperties();
+      final int nbNodes = getConfiguration().getNbNodes();
       executor = Executors.newFixedThreadPool(nbNodes, new JPPFThreadFactory("NodeRestart"));
-      int iterations = config.getInt("iterations", 10);
+      final int iterations = config.getInt("iterations", 10);
       output("performing test with " + nbNodes + " nodes, for " + iterations + " iterations");
-      JMXDriverConnectionWrapper jmxDriver = getSetup().getClient().getConnectionPool().getJmxConnection();
-      for (int i=1; i<=iterations; i++)
-      {
-        long start = System.nanoTime();
+      final JMXDriverConnectionWrapper jmxDriver = getSetup().getClient().getConnectionPool().getJmxConnection();
+      for (int i = 1; i <= iterations; i++) {
+        final long start = System.nanoTime();
         getSetup().getJmxHandler().checkDriverAndNodesInitialized(1, nbNodes);
         restartNodes(jmxDriver.nodesInformation());
-        long elapsed = System.nanoTime() - start;
-        output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
+        final long elapsed = System.nanoTime() - start;
+        output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed / 1000000L));
       }
       Thread.sleep(3000L);
-      DiagnosticsMBean proxy = jmxDriver.getDiagnosticsProxy();
-      String[] threadNames = proxy.threadNames();
+      final DiagnosticsMBean proxy = jmxDriver.getDiagnosticsProxy();
+      final String[] threadNames = proxy.threadNames();
       int count = 0;
-      for (String name: threadNames)
-      {
+      for (final String name: threadNames) {
         if (name.startsWith("JMX connection ")) count++;
       }
       output("*** found " + count + " 'JMX connection ...' threads ***");
       //StreamUtils.waitKeyPressed("press [Enter]");
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (executor != null) executor.shutdownNow();
     }
   }
@@ -88,18 +79,15 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
    * @param nodesInfo a collection of information used to connect tothe nodes.
    * @throws Exception if any error occurs.
    */
-  private void restartNodes(final Collection<JPPFManagementInfo> nodesInfo) throws Exception
-  {
-    List<Future<RestartNode>> futures = new ArrayList<>(nodesInfo.size());
-    for (JPPFManagementInfo info: nodesInfo)
-    {
-      RestartNode task = new RestartNode(info);
+  private void restartNodes(final Collection<JPPFManagementInfo> nodesInfo) throws Exception {
+    final List<Future<RestartNode>> futures = new ArrayList<>(nodesInfo.size());
+    for (final JPPFManagementInfo info: nodesInfo) {
+      final RestartNode task = new RestartNode(info);
       futures.add(executor.submit(task, task));
     }
-    for (Future<RestartNode> f: futures)
-    {
-      RestartNode task = f.get();
-      Exception e = task.getException();
+    for (final Future<RestartNode> f: futures) {
+      final RestartNode task = f.get();
+      final Exception e = task.getException();
       if (e != null) output("got exception: " + ExceptionUtils.getMessage(e));
     }
   }
@@ -108,8 +96,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
@@ -117,8 +104,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
   /**
    * 
    */
-  private class RestartNode implements Runnable
-  {
+  private class RestartNode implements Runnable {
     /**
      * The node information
      */
@@ -132,34 +118,25 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
      * Initialize this task.
      * @param info the node information.
      */
-    public RestartNode(final JPPFManagementInfo info)
-    {
+    public RestartNode(final JPPFManagementInfo info) {
       this.info = info;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       JMXNodeConnectionWrapper node = null;
-      try
-      {
+      try {
         node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), false);
         node.connect();
-        while (!node.isConnected()) Thread.sleep(10L);
+        while (!node.isConnected())
+          Thread.sleep(10L);
         node.restart();
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         exception = e;
-      }
-      finally
-      {
-        try
-        {
+      } finally {
+        try {
           if (node != null) node.close();
-        }
-        catch (Exception e)
-        {
+        } catch (final Exception e) {
           if (exception != null) exception = e;
         }
       }
@@ -167,10 +144,9 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
 
     /**
      * Get the eventual exception resulting from this task's execution.
-     * @return  an <code>Exception</code> or <code>null</code>.
+     * @return an <code>Exception</code> or <code>null</code>.
      */
-    public Exception getException()
-    {
+    public Exception getException() {
       return exception;
     }
   }

@@ -44,18 +44,18 @@ public class S1Runner extends AbstractScenarioRunner {
   @Override
   public void run() {
     try {
-      TypedProperties props = getConfiguration().getProperties();
-      int size = props.getInt("matrix.size", 300);
-      int iterations = props.getInt("matrix.iterations", 10);
+      final TypedProperties props = getConfiguration().getProperties();
+      final int size = props.getInt("matrix.size", 300);
+      final int iterations = props.getInt("matrix.iterations", 10);
       int nbChannels = props.getInt("matrix.nbChannels", 1);
       if (nbChannels < 1) nbChannels = 1;
       JPPFConfiguration.getProperties().set(JPPFProperties.POOL_SIZE, nbChannels);
-      int nbRows = props.getInt("task.nbRows", 1);
+      final int nbRows = props.getInt("task.nbRows", 1);
       output("performing " + size + 'x' + size + " matrix multiplication for " + iterations + " iterations, using " + nbChannels + " channels");
   
-      Matrix a = new Matrix(size);
+      final Matrix a = new Matrix(size);
       a.assignRandomValues();
-      Matrix b = new Matrix(size);
+      final Matrix b = new Matrix(size);
       b.assignRandomValues();
       long totalIterationTime = 0L;
       long min = Long.MAX_VALUE;
@@ -63,7 +63,7 @@ public class S1Runner extends AbstractScenarioRunner {
   
       // perform "iteration" times
       for (int iter=0; iter<iterations; iter++) {
-        long elapsed = performParallelMultiplication(a, b, nbRows, nbChannels);
+        final long elapsed = performParallelMultiplication(a, b, nbRows, nbChannels);
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
         totalIterationTime += elapsed;
@@ -72,7 +72,7 @@ public class S1Runner extends AbstractScenarioRunner {
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max) + 
           ", total time: " + StringUtils.toStringDuration(totalIterationTime));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -87,9 +87,9 @@ public class S1Runner extends AbstractScenarioRunner {
    * @throws Exception if an error is raised during the execution.
    */
   private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final int nbChannels) throws Exception {
-    long start = System.nanoTime();
-    int size = a.getSize();
-    JPPFJob job = new JPPFJob();
+    final long start = System.nanoTime();
+    final int size = a.getSize();
+    final JPPFJob job = new JPPFJob();
     job.setName("matrix sample " + (iterationsCount++));
     job.getClientSLA().setMaxChannels(nbChannels);
     int remaining = size;
@@ -106,18 +106,18 @@ public class S1Runner extends AbstractScenarioRunner {
     // create a data provider to share matrix b among all tasks
     job.setDataProvider(new MemoryMapDataProvider());
     job.getDataProvider().setParameter(ExtMatrixTask.DATA_KEY, b);
-    List<Task<?>> results = getSetup().getClient().submitJob(job);
-    Matrix c = new Matrix(size);
+    final List<Task<?>> results = getSetup().getClient().submitJob(job);
+    final Matrix c = new Matrix(size);
     int rowIdx = 0;
-    for (Task<?> matrixTask : results) {
+    for (final Task<?> matrixTask : results) {
       if (matrixTask.getThrowable() != null) throw new Exception(matrixTask.getThrowable());
-      double[][] rows = (double[][]) matrixTask.getResult();
+      final double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);
       }
       rowIdx += rows.length;
     }
-    long elapsed = System.nanoTime() - start;
+    final long elapsed = System.nanoTime() - start;
     return elapsed/1_000_000L;
   }
 

@@ -28,6 +28,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class MyTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The time it takes to perform the count.
    */
   private long elapsed = 0L;
@@ -50,7 +54,7 @@ public class MyTask extends AbstractTask<String> {
 
   @Override
   public void run() {
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     rand = new Random(start);
     getBusy(busyTime);
     elapsed = System.nanoTime() - start;
@@ -61,8 +65,8 @@ public class MyTask extends AbstractTask<String> {
    * @param millis the duration in milliseconds.
    */
   private void getBusy(final long millis) {
-    long nanos = millis * 1000000L;
-    long start = System.nanoTime();
+    final long nanos = millis * 1000000L;
+    final long start = System.nanoTime();
     while (System.nanoTime() - start < nanos) {
       Math.log(rand.nextLong());
     }

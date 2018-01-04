@@ -33,8 +33,7 @@ import test.org.jppf.test.setup.ConfigurationHelper;
  * Helper object for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
  */
-public class Setup
-{
+public class Setup {
   /**
    * The jppf client to use.
    */
@@ -68,8 +67,7 @@ public class Setup
    * Initialize this tests etup with the psecified scenario configuration.
    * @param config the configuration of the scenario to run.
    */
-  public Setup(final ScenarioConfiguration config)
-  {
+  public Setup(final ScenarioConfiguration config) {
     this.config = config;
   }
 
@@ -78,9 +76,8 @@ public class Setup
    * @return an instance of <code>DriverJobManagementMBean</code>.
    * @throws Exception if the proxy could not be obtained.
    */
-  public DriverJobManagementMBean getJobManagementProxy() throws Exception
-  {
-    JMXDriverConnectionWrapper driver = getDriverManagementProxy();
+  public DriverJobManagementMBean getJobManagementProxy() throws Exception {
+    final JMXDriverConnectionWrapper driver = getDriverManagementProxy();
     return driver.getJobManager();
   }
 
@@ -89,8 +86,7 @@ public class Setup
    * @return an instance of <code>DriverJobManagementMBean</code>.
    * @throws Exception if the proxy could not be obtained.
    */
-  public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
-  {
+  public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception {
     return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
@@ -101,27 +97,22 @@ public class Setup
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public JPPFClient setup(final int nbDrivers, final int nbNodes) throws Exception
-  {
+  public JPPFClient setup(final int nbDrivers, final int nbNodes) throws Exception {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes and 1 client");
     createShutdownHook();
     drivers = new RestartableDriverProcessLauncher[nbDrivers];
-    for (int i=0; i<nbDrivers; i++)
-    {
-      drivers[i] = new RestartableDriverProcessLauncher(i+1, config);
+    for (int i = 0; i < nbDrivers; i++) {
+      drivers[i] = new RestartableDriverProcessLauncher(i + 1, config);
       new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new RestartableNodeProcessLauncher[nbNodes];
-    for (int i=0; i<nbNodes; i++)
-    {
-      nodes[i] = new RestartableNodeProcessLauncher(i+1, config);
+    for (int i = 0; i < nbNodes; i++) {
+      nodes[i] = new RestartableNodeProcessLauncher(i + 1, config);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
-    if (config.isStartClient())
-    {
+    if (config.isStartClient()) {
       client = createClient("c" + clientCount.incrementAndGet(), true);
-      if (config.getProperties().getBoolean("jppf.scenario.jmx.checks.enabled", true))
-        jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+      if (config.getProperties().getBoolean("jppf.scenario.jmx.checks.enabled", true)) jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
     return client;
   }
@@ -137,7 +128,8 @@ public class Setup
   public JPPFClient createClient(final String uuid, final boolean reset, final ConnectionPoolListener listener) throws Exception {
     if (reset) JPPFConfiguration.reset();
     client = (uuid == null) ? new JPPFClient(listener) : new JPPFClient(uuid, listener);
-    while (!client.hasAvailableConnection()) Thread.sleep(10L);
+    while (!client.hasAvailableConnection())
+      Thread.sleep(10L);
     jmxHandler = new JMXHandler(client);
     return client;
   }
@@ -157,10 +149,8 @@ public class Setup
    * Stops the driver and node and close the client.
    * @throws Exception if a process could not be stopped.
    */
-  public void cleanup() throws Exception
-  {
-    if (client != null)
-    {
+  public void cleanup() throws Exception {
+    if (client != null) {
       client.close();
       client = null;
       jmxHandler = null;
@@ -175,19 +165,15 @@ public class Setup
   /**
    * Stop driver and node processes.
    */
-  protected void stopProcesses()
-  {
-    try
-    {
-      if (nodes != null) for (RestartableNodeProcessLauncher n: nodes) if (n != null) n.stopProcess();
-      if (drivers != null) for (RestartableDriverProcessLauncher d: drivers) if (d != null) d.stopProcess();
-    }
-    catch(Throwable t)
-    {
+  protected void stopProcesses() {
+    try {
+      if (nodes != null) for (RestartableNodeProcessLauncher n: nodes)
+        if (n != null) n.stopProcess();
+      if (drivers != null) for (RestartableDriverProcessLauncher d: drivers)
+        if (d != null) d.stopProcess();
+    } catch (final Throwable t) {
       t.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       nodes = null;
       drivers = null;
     }
@@ -196,8 +182,7 @@ public class Setup
   /**
    * Create the shutdown hook.
    */
-  protected void createShutdownHook()
-  {
+  protected void createShutdownHook() {
     shutdownHook = new Thread() {
       @Override
       public void run() {
@@ -212,8 +197,7 @@ public class Setup
    * Get the jppf client to use.
    * @return a {@link JPPFClient} instance.
    */
-  public JPPFClient getClient()
-  {
+  public JPPFClient getClient() {
     return client;
   }
 
@@ -221,8 +205,7 @@ public class Setup
    * Set the jppf client to use.
    * @param client a {@link JPPFClient} instance.
    */
-  public void setClient(final JPPFClient client)
-  {
+  public void setClient(final JPPFClient client) {
     this.client = client;
   }
 
@@ -230,8 +213,7 @@ public class Setup
    * Get the nodes to launch for the test.
    * @return an array of <code>NodeProcessLauncher</code> instances.
    */
-  public RestartableNodeProcessLauncher[] getNodes()
-  {
+  public RestartableNodeProcessLauncher[] getNodes() {
     return nodes;
   }
 
@@ -239,8 +221,7 @@ public class Setup
    * Get the drivers to launch for the test.
    * @return an array of <code>DriverProcessLauncher</code> instances.
    */
-  public RestartableDriverProcessLauncher[] getDrivers()
-  {
+  public RestartableDriverProcessLauncher[] getDrivers() {
     return drivers;
   }
 
@@ -248,8 +229,7 @@ public class Setup
    * Get the object which manages the JMX connections to ddrivers and nodes.
    * @return a {@link JMXHandler} instance.
    */
-  public JMXHandler getJmxHandler()
-  {
+  public JMXHandler getJmxHandler() {
     return jmxHandler;
   }
 }

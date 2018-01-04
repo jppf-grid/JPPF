@@ -53,12 +53,12 @@ public class JMXHandler {
    */
   public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
+    final Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected) {
-      List<JPPFConnectionPool> list = client.getConnectionPools();
+      final List<JPPFConnectionPool> list = client.getConnectionPools();
       if (list != null) {
-        for (JPPFConnectionPool c: list) {
+        for (final JPPFConnectionPool c: list) {
           // since all the drivers are local to the same host, we can differentiate them with their port number
           if (!connectionMap.containsKey(c.getDriverPort())) connectionMap.put(c.getDriverPort(), c);
         }
@@ -66,9 +66,9 @@ public class JMXHandler {
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
-    for (Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
-      String url = wrapper.getURL().toString();
+    for (final Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
+      final JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
+      final String url = wrapper.getURL().toString();
       if (!wrapperMap.containsKey(url)) {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(url, wrapper);
@@ -77,8 +77,8 @@ public class JMXHandler {
     int sum = 0;
     while (sum < nbNodes) {
       sum = 0;
-      for (Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
-        Integer n = entry.getValue().nbNodes();
+      for (final Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
+        final Integer n = entry.getValue().nbNodes();
         if (n != null) sum += n;
         else break;
       }
@@ -89,12 +89,11 @@ public class JMXHandler {
    * Close the JMX connections to all the drivers and clear the map.
    */
   public void clearWrapperMap() {
-    for (Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
-    {
-      JMXDriverConnectionWrapper wrapper = entry.getValue();
+    for (Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
+      final JMXDriverConnectionWrapper wrapper = entry.getValue();
       try {
         if (wrapper.isConnected()) wrapper.close();
-      } catch (@SuppressWarnings("unused") Exception ingore) {
+      } catch (@SuppressWarnings("unused") final Exception ingore) {
       }
     }
     wrapperMap.clear();
@@ -110,13 +109,13 @@ public class JMXHandler {
    * @throws Exception if any error occurs.
    */
   public <D, N> Map<JMXResult<D>, List<JMXResult<N>>> performJmxOperations(final JmxAwareCallable<D> driverOp, final JmxAwareCallable<N> nodeOp) throws Exception {
-    Map<JMXResult<D>, List<JMXResult<N>>> map = new HashMap<>();
-    for (Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
-      List<JMXResult<N>> list = new ArrayList<>();
+    final Map<JMXResult<D>, List<JMXResult<N>>> map = new HashMap<>();
+    for (final Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
+      final List<JMXResult<N>> list = new ArrayList<>();
       driverOp.setJmx(entry.getValue());
-      JMXResult<D> t = driverOp.call();
+      final JMXResult<D> t = driverOp.call();
       map.put(t, list);
-      Collection<JPPFManagementInfo> coll = entry.getValue().nodesInformation();
+      final Collection<JPPFManagementInfo> coll = entry.getValue().nodesInformation();
       for (JPPFManagementInfo info: coll) {
         if (info.isPeer()) continue; // skip peer driver
         JMXNodeConnectionWrapper node = null;

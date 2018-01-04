@@ -26,6 +26,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class ExtMatrixTask extends AbstractTask<double[][]> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Data provider key mapping to the second matrix operand in the multiplication.
    */
   public static final String DATA_KEY = "matrix";
@@ -64,7 +68,7 @@ public class ExtMatrixTask extends AbstractTask<double[][]> {
         }
       }
       setResult(computeResult);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

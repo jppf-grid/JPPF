@@ -42,31 +42,31 @@ public class JPPF_130_Runner extends AbstractScenarioRunner {
   public void run() {
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     final MyConnectionListener listener = new MyConnectionListener();
-    ConnectionPoolListener poolListener = new ConnectionPoolListenerAdapter() {
+    final ConnectionPoolListener poolListener = new ConnectionPoolListenerAdapter() {
       @Override
       public void connectionAdded(final ConnectionPoolEvent event) {
         event.getConnection().addClientConnectionStatusListener(listener);
       }
     };
     try {
-      JPPFClient client = getSetup().createClient(null, true, poolListener);
-      TypedProperties config = getConfiguration().getProperties();
-      int nbTasks = config.getInt("nbTasks", 1);
-      int nbIter = config.getInt("nbJobs", 1);
-      int nbLookups = config.getInt("nbLookups", 1);
+      final JPPFClient client = getSetup().createClient(null, true, poolListener);
+      final TypedProperties config = getConfiguration().getProperties();
+      final int nbTasks = config.getInt("nbTasks", 1);
+      final int nbIter = config.getInt("nbJobs", 1);
+      final int nbLookups = config.getInt("nbLookups", 1);
       print("running demo with " + nbIter + " iterations, " + nbTasks + " tasks per iteration");
       for (int n=0; n<nbIter; n++) {
-        long start = System.nanoTime();
+        final long start = System.nanoTime();
         try {
-          JPPFJob job = new JPPFJob("job_" + n);
+          final JPPFJob job = new JPPFJob("job_" + n);
           job.getClientSLA().setMaxChannels(10);
           job.setName("ruleset job_" + n);
           for (int i=0; i<nbTasks; i++) job.add(new JPPF_130_Task(nbLookups));
           job.setBlocking(false);
           client.submitJob(job);
-          List<Task<?>> results = job.awaitResults();
-          for (Task<?> task: results) {
-            Throwable t = task.getThrowable();
+          final List<Task<?>> results = job.awaitResults();
+          for (final Task<?> task: results) {
+            final Throwable t = task.getThrowable();
             if (t != null) {
               if (t instanceof Exception) throw (Exception) t;
               else if (t instanceof Error) throw (Error) t;
@@ -74,11 +74,11 @@ public class JPPF_130_Runner extends AbstractScenarioRunner {
             }
           }
         } finally {
-          long elapsed = System.nanoTime() - start;
+          final long elapsed = System.nanoTime() - start;
           print("Iteration #" + (n+1) + " performed in " + StringUtils.toStringDuration(elapsed/1_000_000L));
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       //e.printStackTrace();
       if (e instanceof RuntimeException) throw (RuntimeException) e;
       throw new RuntimeException(e);
@@ -92,14 +92,14 @@ public class JPPF_130_Runner extends AbstractScenarioRunner {
   private class MyConnectionListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+      final JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
       if ((status != JPPFClientConnectionStatus.ACTIVE) && (status != JPPFClientConnectionStatus.EXECUTING)) {
         try {
           getSetup().cleanup();
-        } catch(Exception e) {
+        } catch(final Exception e) {
           e.printStackTrace();
         } finally {
-          String msg = "\n***** Detected client disconnection - Exiting immediately *****";
+          final String msg = "\n***** Detected client disconnection - Exiting immediately *****";
           log.error(msg);
           System.err.println(msg);
           // exit immediately to ensure the next cenario iteratrion is not exedcuted,

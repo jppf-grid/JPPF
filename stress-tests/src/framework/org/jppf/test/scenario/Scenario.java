@@ -54,9 +54,9 @@ public class Scenario {
    */
   public static void main(final String[] args) {
     try {
-      Scenario scenario = new Scenario(args[0]);
+      final Scenario scenario = new Scenario(args[0]);
       scenario.execute();
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       e.printStackTrace();
     }
   }
@@ -67,7 +67,7 @@ public class Scenario {
    */
   public Scenario(final String configDir) {
     if (configDir == null) throw new IllegalArgumentException("config directory cannot be null");
-    File file = new File(configDir);
+    final File file = new File(configDir);
     if (!file.exists()) throw new IllegalArgumentException("config directory '" + configDir + "' does not exist");
     if (!file.isDirectory()) throw new IllegalArgumentException("'" + configDir + "' is not a directory");
     this.configDir = file;
@@ -79,10 +79,10 @@ public class Scenario {
    * @throws Exception if any error occurs.
    */
   public void execute() throws Exception {
-    int iterations = configuration.getNbIterations();
+    final int iterations = configuration.getNbIterations();
     for (int i=1; i<=iterations; i++) {
       if (iterations > 1) {
-        String hr = StringUtils.padRight("", '-', 15);
+        final String hr = StringUtils.padRight("", '-', 15);
         System.out.println(hr);
         System.out.println("Iteration #" + i);
         System.out.println(hr);
@@ -97,27 +97,27 @@ public class Scenario {
    */
   public void executeIteration() throws Exception {
     try {
-      Map<String, Object> variables = new HashMap<>();
+      final Map<String, Object> variables = new HashMap<>();
       variables.put("$n", 1);
       variables.put("$scenario_dir", configDir.getAbsolutePath().replace("\\", "/"));
       variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
-      String jppf = doConfigOverride("client.template.properties", "client.properties", variables);
+      final String jppf = doConfigOverride("client.template.properties", "client.properties", variables);
       System.setProperty("jppf.config", jppf);
-      String log4j = doConfigOverride("log4j-client.template.properties", "log4j-client.properties", variables);
-      URL url = new File(log4j).toURI().toURL();
+      final String log4j = doConfigOverride("log4j-client.template.properties", "log4j-client.properties", variables);
+      final URL url = new File(log4j).toURI().toURL();
       System.out.println("Log4j url = " + url);
       // use reflection to avoid compile-time dependency on log4j lib.
-      Class<?> configuratorClass = Class.forName("org.apache.log4j.PropertyConfigurator");
-      Method method = configuratorClass.getMethod("configure", URL.class);
+      final Class<?> configuratorClass = Class.forName("org.apache.log4j.PropertyConfigurator");
+      final Method method = configuratorClass.getMethod("configure", URL.class);
       method.invoke(null, url);
       //PropertyConfigurator.configure(url);
       System.setProperty("log4j.configuration", url.toString());
-      String logging = doConfigOverride("logging-client.template.properties", "logging-client.properties", variables);
+      final String logging = doConfigOverride("logging-client.template.properties", "logging-client.properties", variables);
       System.setProperty("java.util.logging.config.file", logging);
       setup = new Setup(configuration);
-      String className = configuration.getRunnerClassName();
-      Class<?> clazz = Class.forName(className);
-      ScenarioRunner runner = (ScenarioRunner) clazz.newInstance();
+      final String className = configuration.getRunnerClassName();
+      final Class<?> clazz = Class.forName(className);
+      final ScenarioRunner runner = (ScenarioRunner) clazz.newInstance();
       setup.setup(configuration.getNbDrivers(), configuration.getNbNodes());
       runner.setSetup(setup);
       runner.setConfiguration(configuration);
@@ -137,23 +137,23 @@ public class Scenario {
    */
   private void printDiagnostics() throws Exception {
     if (!configuration.isStartClient()) return;
-    String fileName = configuration.getDiagnosticsOutputFilename();
+    final String fileName = configuration.getDiagnosticsOutputFilename();
     if ("none".equals(fileName)) return;
     PrintStream out = null;
     if ("out".equals(fileName)) out = System.out;
     else if ("err".equals(fileName)) out = System.err;
     else out = new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName)));
     try {
-      Map<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> map =
+      final Map<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> map =
         setup.getJmxHandler().performJmxOperations(new DiagnosticsGrabber(true), new DiagnosticsGrabber(false));
-      String rule = "---------------------------------------------------------";
-      for (Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet()) {
+      final String rule = "---------------------------------------------------------";
+      for (final Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet()) {
         out.println(rule);
         out.println("results for driver " + entry.getKey().getJmxId());
         out.println(rule);
         out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo().toFormattedString(null));
         out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
-        for (JMXResult<DiagnosticsResult> dr: entry.getValue()) {
+        for (final JMXResult<DiagnosticsResult> dr: entry.getValue()) {
           out.println(rule);
           out.println("results for node " + dr.getJmxId());
           out.println("before GC: " + dr.getResult().getDiagnosticsInfo().toFormattedString(null));
@@ -183,10 +183,10 @@ public class Scenario {
   protected String doConfigOverride(final String template, final String override, final Map<String, Object> variables) {
     File templateFile = new File(configuration.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
-    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
-    File overrideFile = new File(configuration.getConfigDir(), override);
+    final TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
+    final File overrideFile = new File(configuration.getConfigDir(), override);
     if (overrideFile.exists()) ConfigurationHelper.overrideConfig(config, overrideFile);
-    String path = ConfigurationHelper.createTempConfigFile(config);
+    final String path = ConfigurationHelper.createTempConfigFile(config);
     return path;
   }
 
@@ -209,10 +209,10 @@ public class Scenario {
 
     @Override
     public JMXResult<DiagnosticsResult> call() throws Exception {
-      String name = driver ? DiagnosticsMBean.MBEAN_NAME_DRIVER : DiagnosticsMBean.MBEAN_NAME_NODE;
-      HealthSnapshot info = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
+      final String name = driver ? DiagnosticsMBean.MBEAN_NAME_DRIVER : DiagnosticsMBean.MBEAN_NAME_NODE;
+      final HealthSnapshot info = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       getJmx().invoke(name, "gc", (Object[]) null, (String[]) null);
-      HealthSnapshot info2 = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
+      final HealthSnapshot info2 = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       return new JMXResult<>(getJmx().getURL().toString(), new DiagnosticsResult(info, info2));
     }
   }

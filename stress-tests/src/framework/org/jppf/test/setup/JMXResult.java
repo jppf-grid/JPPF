@@ -25,15 +25,18 @@ import org.jppf.utils.Pair;
  * @param <V> the type of results.
  * @author Laurent Cohen
  */
-public class JMXResult<V> extends Pair<String, V>
-{
+public class JMXResult<V> extends Pair<String, V> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Intiialize this result with the specified jmx id and diagnostics information.
    * @param jmxId the id of the jmx connection wrapper.
    * @param result the diagnostics information.
    */
-  public JMXResult(final String jmxId, final V result)
-  {
+  public JMXResult(final String jmxId, final V result) {
     super(jmxId, result);
   }
 
@@ -41,8 +44,7 @@ public class JMXResult<V> extends Pair<String, V>
    * Get the id of the jmx connection wrapper.
    * @return the id as a string.
    */
-  public String getJmxId()
-  {
+  public String getJmxId() {
     return first();
   }
 
@@ -50,8 +52,7 @@ public class JMXResult<V> extends Pair<String, V>
    * Get the diagnostics information.
    * @return a {@link org.jppf.management.diagnostics.MemoryInformation MemoryInformation} instance.
    */
-  public V getResult()
-  {
+  public V getResult() {
     return second();
   }
 }

@@ -26,6 +26,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class JPPF_130_Task extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Number of class loader lookups to perform.
    */
   private final int nbLookups;
@@ -41,16 +45,16 @@ public class JPPF_130_Task extends AbstractTask<String> {
   @Override
   public void run() {
     try {
-      ClassLoader cl = getClass().getClassLoader();
+      final ClassLoader cl = getClass().getClassLoader();
       for (int i = 0; i < nbLookups; i++) {
         try {
           cl.getResource("test.SomeResource" + i);
           //Class<?> clazz = cl.loadClass("test.SomeResource" + i);
-        } catch (@SuppressWarnings("unused") Exception e) {
+        } catch (@SuppressWarnings("unused") final Exception e) {
         }
       }
       setResult("success");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

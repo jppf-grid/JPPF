@@ -36,10 +36,10 @@ public class RestartableDriverProcessLauncher extends RestartableProcessLauncher
     super(n, "driver", scenarioConfig);
     setJppfConfig(doConfigOverride("driver.template.properties", "driver-" + n + ".properties"));
     setJVMOptions();
-    String s = doConfigOverride("log4j-driver.template.properties", "log4j-driver-" + n + ".properties");
+    final String s = doConfigOverride("log4j-driver.template.properties", "log4j-driver-" + n + ".properties");
     try {
       setLog4j(new File(s).toURI().toURL().toString());
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw new RuntimeException(e);
     }
     setLogging(doConfigOverride("logging-driver.template.properties", "logging-driver-" + n + ".properties"));

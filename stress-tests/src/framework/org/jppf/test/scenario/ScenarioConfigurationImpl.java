@@ -29,8 +29,11 @@ import test.org.jppf.test.setup.ConfigurationHelper;
  * 
  * @author Laurent Cohen
  */
-public class ScenarioConfigurationImpl extends TypedProperties implements ScenarioConfiguration
-{
+public class ScenarioConfigurationImpl extends TypedProperties implements ScenarioConfiguration {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The configuration directory.
    */
@@ -40,76 +43,64 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
    * Initialize this confiugration from the specified diretory.
    * @param configDir the configuration directory.
    */
-  public ScenarioConfigurationImpl(final File configDir)
-  {
+  public ScenarioConfigurationImpl(final File configDir) {
     super(ConfigurationHelper.createConfigFromTemplate(new File(configDir, SCENARIO_FILE).getPath(), createVariables(configDir.getPath())));
     this.configDir = configDir;
     //ConfigurationHelper.loadProperties(this, new File(configDir, SCENARIO_FILE));
   }
 
   @Override
-  public File getConfigDir()
-  {
+  public File getConfigDir() {
     return configDir;
   }
 
   @Override
-  public String getName()
-  {
+  public String getName() {
     return getString("jppf.scenario.name");
   }
 
   @Override
-  public String getDescription()
-  {
+  public String getDescription() {
     return getString("jppf.scenario.description");
   }
 
   @Override
-  public int getNbDrivers()
-  {
+  public int getNbDrivers() {
     return getInt("jppf.scenario.nbDrivers", 1);
   }
 
   @Override
-  public int getNbNodes()
-  {
+  public int getNbNodes() {
     return getInt("jppf.scenario.nbNodes", 1);
   }
 
   @Override
-  public TypedProperties getProperties()
-  {
+  public TypedProperties getProperties() {
     return this;
   }
 
   @Override
-  public String getRunnerClassName()
-  {
+  public String getRunnerClassName() {
     return getString("jppf.scenario.runner.class");
   }
 
   @Override
-  public String getDiagnosticsOutputFilename()
-  {
+  public String getDiagnosticsOutputFilename() {
     return getString("jppf.scenario.diagnostics.file", "out");
   }
 
   @Override
-  public int getNbIterations()
-  {
+  public int getNbIterations() {
     return getInt("jppf.scenario.iterations", 1);
   }
 
   @Override
-  public String getStdoutFilename()
-  {
+  public String getStdoutFilename() {
     return getString("jppf.scenario.process.stdout.file", "out");
   }
 
   @Override
-  public String getStderrFilename()
-  {
+  public String getStderrFilename() {
     return getString("jppf.scenario.process.stderr.file", "out");
   }
 
@@ -118,16 +109,14 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
    * @param dir the root directory for the scenario.
    * @return a map of string names to object values.
    */
-  private static Map<String, Object> createVariables(final String dir)
-  {
-    Map<String, Object> vars = new HashMap<>();
+  private static Map<String, Object> createVariables(final String dir) {
+    final Map<String, Object> vars = new HashMap<>();
     vars.put("$scenario_dir", dir);
     return vars;
   }
 
   @Override
-  public boolean isStartClient()
-  {
+  public boolean isStartClient() {
     return getBoolean("jppf.scenario.start.client", true);
   }
 }

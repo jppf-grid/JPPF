@@ -26,6 +26,10 @@ import org.jppf.node.protocol.AbstractTask;
  */
 public class NodeMixTask extends AbstractTask<String> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The duration of this task.
    */
   private final long duration;
@@ -43,7 +47,7 @@ public class NodeMixTask extends AbstractTask<String> {
     try {
       if (duration > 0L) Thread.sleep(duration);
       setResult("ok");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
       setResult("ko");
     }
