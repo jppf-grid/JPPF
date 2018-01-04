@@ -128,10 +128,10 @@ public class GraphTopologyHandler implements TopologyListener {
     if (debugEnabled) log.debug("start populate");
     graphOption.repaintFlag.set(false);
     try {
-      for (TopologyDriver driver: manager.getDrivers()) {
+      for (final TopologyDriver driver: manager.getDrivers()) {
         driverAdded(new TopologyEvent(manager, driver, null, TopologyEvent.UpdateType.TOPOLOGY));
-        for (AbstractTopologyComponent child: driver.getChildren()) {
-          TopologyNode node = (TopologyNode) child;
+        for (final AbstractTopologyComponent child: driver.getChildren()) {
+          final TopologyNode node = (TopologyNode) child;
           log.debug(String.format("adding %s %s to driver %s", (node.isNode() ? "node" : "peer"), node, driver));
           nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
         }
@@ -145,15 +145,15 @@ public class GraphTopologyHandler implements TopologyListener {
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriver();
+        final TopologyDriver driver = event.getDriver();
         synchronized(drivers) {
           if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
-          List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
+          final List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
           if (list != null) {
-            for (TopologyDriver tmpDriver: list) insertPeerVertex(driver, tmpDriver);
+            for (final TopologyDriver tmpDriver: list) insertPeerVertex(driver, tmpDriver);
             driversAsNodes.remove(driver.getUuid());
           }
         }
@@ -170,10 +170,10 @@ public class GraphTopologyHandler implements TopologyListener {
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriver();
+        final TopologyDriver driver = event.getDriver();
         synchronized(drivers) {
           drivers.remove(driver.getUuid());
           driversAsNodes.remove(driver.getUuid());
@@ -204,11 +204,11 @@ public class GraphTopologyHandler implements TopologyListener {
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriver();
-        TopologyNode node = event.getNodeOrPeer();
+        final TopologyDriver driver = event.getDriver();
+        final TopologyNode node = event.getNodeOrPeer();
         removeVertex(node);
         synchronized(collapsedMap) {
           collapsedMap.remove(node.getUuid());
@@ -226,11 +226,11 @@ public class GraphTopologyHandler implements TopologyListener {
    */
   @Override
   public void nodeUpdated(final TopologyEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriver();
-        TopologyNode node = event.getNodeOrPeer();
+        final TopologyDriver driver = event.getDriver();
+        final TopologyNode node = event.getNodeOrPeer();
         if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
         graphOption.repaintGraph(false);
       }
@@ -305,8 +305,8 @@ public class GraphTopologyHandler implements TopologyListener {
       synchronized(collapsedMap) {
         collapsedMap.put(driver.getUuid(),  CollapsedState.COLLAPSED);
       }
-      Collection<AbstractTopologyComponent> neighbors = displayGraph.getNeighbors(driver);
-      for (AbstractTopologyComponent data: neighbors) {
+      final Collection<AbstractTopologyComponent> neighbors = displayGraph.getNeighbors(driver);
+      for (final AbstractTopologyComponent data: neighbors) {
         if (data.isNode()) displayGraph.removeVertex(data);
       }
     }
@@ -322,11 +322,11 @@ public class GraphTopologyHandler implements TopologyListener {
       synchronized(collapsedMap) {
         collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
       }
-      Collection<AbstractTopologyComponent> neighbors = fullGraph.getNeighbors(driver);
-      for (AbstractTopologyComponent data: neighbors) {
+      final Collection<AbstractTopologyComponent> neighbors = fullGraph.getNeighbors(driver);
+      for (final AbstractTopologyComponent data: neighbors) {
         if (data.isNode()) {
           displayGraph.addVertex(data);
-          Number edge = fullGraph.findEdge(driver, data);
+          final Number edge = fullGraph.findEdge(driver, data);
           if (edge != null) displayGraph.addEdge(edge, driver, data);
         }
       }
@@ -374,12 +374,12 @@ public class GraphTopologyHandler implements TopologyListener {
 
     @Override
     public void run() {
-      TopologyDriver driver = event.getDriver();
-      TopologyNode node = event.getNodeOrPeer();
+      final TopologyDriver driver = event.getDriver();
+      final TopologyNode node = event.getNodeOrPeer();
       synchronized(drivers) {
         if (node.isPeer()) {
-          TopologyPeer peer = node.isPeer() ? (TopologyPeer) node : null;
-          TopologyDriver actualDriver = drivers.get(peer.getUuid());
+          final TopologyPeer peer = node.isPeer() ? (TopologyPeer) node : null;
+          final TopologyDriver actualDriver = drivers.get(peer.getUuid());
           if (actualDriver != null) insertPeerVertex(driver, actualDriver);
           else {
             List<TopologyDriver> list = driversAsNodes.get(peer.getUuid());

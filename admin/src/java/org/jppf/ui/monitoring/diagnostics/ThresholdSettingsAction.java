@@ -69,21 +69,21 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     try {
       panel = loadWithPreferences("org/jppf/ui/options/xml/JVMHealthThresholdsPanel.xml");
-      Map<Name, Double> values = healthPanel.getThresholds().getValues();
-      for (Map.Entry<Name, Double> entry: values.entrySet()) {
-        AbstractOption option = (AbstractOption) panel.findFirstWithName(entry.getKey().getName());
+      final Map<Name, Double> values = healthPanel.getThresholds().getValues();
+      for (final Map.Entry<Name, Double> entry: values.entrySet()) {
+        final AbstractOption option = (AbstractOption) panel.findFirstWithName(entry.getKey().getName());
         option.setValue(entry.getValue()*100d);
       }
 
-      JButton okBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.ok").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.cancel").getUIComponent();
+      final JButton okBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.ok").getUIComponent();
+      final JButton cancelBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.cancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Alert Threshold Settings", false);
       dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      AbstractAction okAction = new AbstractAction() {
+      final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -92,7 +92,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
         }
       };
       okBtn.addActionListener(okAction);
-      AbstractAction cancelAction = new AbstractAction() {
+      final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -107,7 +107,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
       dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -116,8 +116,8 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
    * Set the color of the labels of the spinners.
    */
   private void setAllLabelsColors() {
-    Map<Name, Double> values = healthPanel.getThresholds().getValues();
-    for (Map.Entry<Name, Double> entry: values.entrySet()) setLabelColors(entry.getKey());
+    final Map<Name, Double> values = healthPanel.getThresholds().getValues();
+    for (final Map.Entry<Name, Double> entry: values.entrySet()) setLabelColors(entry.getKey());
   }
 
   /**
@@ -137,8 +137,8 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
         break;
     }
     if (c == null) return;
-    SpinnerNumberOption option = (SpinnerNumberOption) panel.findFirstWithName(name.getName());
-    JLabel label = option.getSpinnerLabel();
+    final SpinnerNumberOption option = (SpinnerNumberOption) panel.findFirstWithName(name.getName());
+    final JLabel label = option.getSpinnerLabel();
     if (label != null) {
       label.setOpaque(true);
       label.setBackground(c);
@@ -152,16 +152,16 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
     savePreferences(panel);
     final Map<Thresholds.Name, Double> values = healthPanel.getThresholds().getValues();
     final List<Thresholds.Name> list = new ArrayList<>(values.keySet());
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         try {
-          for (Name name: list) {
-            AbstractOption option = (AbstractOption) panel.findFirstWithName(name.getName());
+          for (final Name name: list) {
+            final AbstractOption option = (AbstractOption) panel.findFirstWithName(name.getName());
             values.put(name, (Double) option.getValue()/100d);
           }
           healthPanel.saveThresholds();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }

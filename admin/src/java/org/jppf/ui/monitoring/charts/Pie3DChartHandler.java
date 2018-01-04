@@ -29,8 +29,7 @@ import org.jppf.ui.monitoring.data.*;
  * Instances of this class are used to create and update 3D pie charts.
  * @author Laurent Cohen
  */
-public class Pie3DChartHandler implements ChartHandler
-{
+public class Pie3DChartHandler implements ChartHandler {
   /**
    * The stats formatter that provides the data.
    */
@@ -40,8 +39,7 @@ public class Pie3DChartHandler implements ChartHandler
    * Initialize this chart handler with a specified stats formatter.
    * @param statsHandler the stats formatter that provides the data.
    */
-  public Pie3DChartHandler(final StatsHandler statsHandler)
-  {
+  public Pie3DChartHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
   }
 
@@ -52,13 +50,11 @@ public class Pie3DChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration createChart(final ChartConfiguration config)
-  {
-    Object ds = createDataset(config);
-    Class<?>[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes,
-        config.name, ds, false, true, false);
-    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );
+  public ChartConfiguration createChart(final ChartConfiguration config) {
+    final Object ds = createDataset(config);
+    final Class<?>[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
+    final Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes, config.name, ds, false, true, false);
+    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE);
     config.chart = chart;
     return config;
   }
@@ -68,10 +64,9 @@ public class Pie3DChartHandler implements ChartHandler
    * @param config the names of the fields whose values populate the dataset.
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
-  protected Object createDataset(final ChartConfiguration config)
-  {
+  protected Object createDataset(final ChartConfiguration config) {
     //PieDataset ds = new DefaultPieDataset();
-    Object ds = newInstance("org.jfree.data.general.DefaultPieDataset");
+    final Object ds = newInstance("org.jfree.data.general.DefaultPieDataset");
     config.dataset = ds;
     populateDataset(config);
     return ds;
@@ -84,8 +79,7 @@ public class Pie3DChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration populateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration populateDataset(final ChartConfiguration config) {
     return updateDataset(config);
   }
 
@@ -96,16 +90,13 @@ public class Pie3DChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration updateDataset(final ChartConfiguration config)
-  {
-    Object ds = config.dataset;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-    if (valueMap != null)
-    {
-      for (Fields key: config.fields)
-      {
+  public ChartConfiguration updateDataset(final ChartConfiguration config) {
+    final Object ds = config.dataset;
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    if (valueMap != null) {
+      for (final Fields key: config.fields) {
         //ds.setValue(key, valueMap.get(key));
-        invokeMethod(ds.getClass(), ds, "setValue", new Class[] {Comparable.class, Number.class}, key, valueMap.get(key));
+        invokeMethod(ds.getClass(), ds, "setValue", new Class[] { Comparable.class, Number.class }, key, valueMap.get(key));
       }
     }
     return config;

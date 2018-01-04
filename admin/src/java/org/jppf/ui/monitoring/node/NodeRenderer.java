@@ -53,20 +53,20 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
    */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-    DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     if (value instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+      final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
-        AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
+        final AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
-        Font f = renderer.getFont();
+        final Font f = renderer.getFont();
         Font font = getPlainFont(f);
         renderer.setText(TopologyUtils.getDisplayName(data, isShowIP()));
         if (data.isDriver()) {
-          TopologyDriver driver = (TopologyDriver) data;
+          final TopologyDriver driver = (TopologyDriver) data;
           if (driver.getConnection().getStatus().isWorkingStatus()) {
             path = DRIVER_ICON;
             background = ACTIVE_COLOR;
@@ -82,7 +82,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
           font = getBoldItalicFont(f);
           foreground = DIMMED_FOREGROUND;
         } else if (data.isNode()) {
-          TopologyNode nodeData = (TopologyNode) data;
+          final TopologyNode nodeData = (TopologyNode) data;
           path = GuiUtils.computeNodeIconKey(nodeData);
           if (!TopologyNodeStatus.UP.equals(nodeData.getStatus())) {
             background = INACTIVE_COLOR;
@@ -94,7 +94,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
           }
         }
         if (font != null) setFont(font);
-        ImageIcon icon = GuiUtils.loadIcon(path);
+        final ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);
         renderer.setBackgroundNonSelectionColor(background);
         renderer.setBackgroundSelectionColor(backgroundSelected);

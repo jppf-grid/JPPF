@@ -105,7 +105,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     if (graphHandler == null) {
       if (debugEnabled) log.debug("creating UI");
       graphHandler = new GraphTopologyHandler(this);
-      SparseMultigraph<AbstractTopologyComponent, Number> graph = graphHandler.getDisplayGraph();
+      final SparseMultigraph<AbstractTopologyComponent, Number> graph = graphHandler.getDisplayGraph();
       layoutFactory = new LayoutFactory(graph);
       layout = "Radial";
       viewer = new VisualizationViewer<>(layoutFactory.createLayout(layout));
@@ -113,11 +113,11 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.setBackground(Color.white);
       viewer.setPickedVertexState(new MultiPickedState<AbstractTopologyComponent>());
       viewer.setPickSupport(new ShapePickSupport<>(viewer));
-      VertexLabelAsShapeRenderer<AbstractTopologyComponent, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
+      final VertexLabelAsShapeRenderer<AbstractTopologyComponent, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
       viewer.getRenderer().setVertexLabelRenderer(vlasr);
       viewer.getRenderContext().setVertexShapeTransformer(vlasr);
-      JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
-      Dimension d = renderer.getPreferredSize();
+      final JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
+      final Dimension d = renderer.getPreferredSize();
       d.width = LayoutFactory.VERTEX_SIZE.width;
       if (d.height < LayoutFactory.VERTEX_SIZE.height) {
         d.height = LayoutFactory.VERTEX_SIZE.height;
@@ -140,9 +140,9 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       graphComponent.getVerticalScrollBar().setPreferredSize(new Dimension(GuiUtils.DEFAULT_SCROLLBAR_THICKNESS, 0));
       graphComponent.getHorizontalScrollBar().setPreferredSize(new Dimension(0, GuiUtils.DEFAULT_SCROLLBAR_THICKNESS));
       actionHandler = new GraphActionHandler(viewer);
-      EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
+      final EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
       graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
-      PopupMenuMousePlugin<AbstractTopologyComponent, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
+      final PopupMenuMousePlugin<AbstractTopologyComponent, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
       graphMouse.remove(graphMouse.getPopupEditingPlugin());
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);
@@ -229,8 +229,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.putAction("graph.toggle.layout", new ToggleLayoutAction(this));
       actionHandler.updateActions();
     }
-    Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
-    Runnable r2 = new ActionsInitializer(this, "/graph.topology.toolbar.bottom");
+    final Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
+    final Runnable r2 = new ActionsInitializer(this, "/graph.topology.toolbar.bottom");
     new Thread(r).start();
     new Thread(r2).start();
   }
@@ -268,8 +268,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
-  private String computeNodeTooltip(final TopologyNode node) {
-    StringBuilder sb = new StringBuilder();
+  private static String computeNodeTooltip(final TopologyNode node) {
+    final StringBuilder sb = new StringBuilder();
     sb.append("<html>uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
@@ -285,8 +285,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * @param driver contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
-  private String computeDriverTooltip(final TopologyDriver driver) {
-    StringBuilder sb = new StringBuilder();
+  private static String computeDriverTooltip(final TopologyDriver driver) {
+    final StringBuilder sb = new StringBuilder();
     sb.append("<html>uuid: ").append(driver.getUuid());
     sb.append("</html>");
     return sb.toString();

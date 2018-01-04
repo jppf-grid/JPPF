@@ -108,7 +108,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   public Object getChild(final Object parent, final int index) {
     try {
       return ((TreeNode) parent).getChildAt(index);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.debug(e.getMessage(), e);
       return null;
     }
@@ -140,8 +140,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param node the node to remove from the parent.
    */
   public void removeNodeFromParent(final DefaultMutableTreeNode node) {
-    DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-    int pos = parent.getIndex(node);
+    final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+    final int pos = parent.getIndex(node);
     parent.remove(node);
     fireTreeNodesRemoved(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
   }
@@ -151,8 +151,8 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param node the node to update.
    */
   public void changeNode(final DefaultMutableTreeNode node) {
-    DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-    int pos = parent.getIndex(node);
+    final DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+    final int pos = parent.getIndex(node);
     fireTreeNodesChanged(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
   }
 
@@ -203,7 +203,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a {@code NumberFormat} instance.
    */
   protected NumberFormat createNumberFormat() {
-    NumberFormat nf = NumberFormat.getIntegerInstance(locale);
+    final NumberFormat nf = NumberFormat.getIntegerInstance(locale);
     nf.setGroupingUsed(true);
     nf.setMaximumFractionDigits(0);
     return nf;
@@ -214,7 +214,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a {@code NumberFormat} instance.
    */
   protected NumberFormat createDecimalNumberFormat() {
-    NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
+    final NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
     nf.setGroupingUsed(true);
     nf.setMinimumFractionDigits(1);
     nf.setMaximumFractionDigits(1);
@@ -226,7 +226,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a {@code NumberFormat} instance.
    */
   protected NumberFormat createMBFormat() {
-    NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
+    final NumberFormat nf = DecimalFormat.getIntegerInstance(locale);
     nf.setGroupingUsed(true);
     nf.setMinimumFractionDigits(1);
     nf.setMaximumFractionDigits(1);

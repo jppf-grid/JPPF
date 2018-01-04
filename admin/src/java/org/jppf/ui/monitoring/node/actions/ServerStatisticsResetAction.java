@@ -49,9 +49,9 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    for (Object o: selectedElements) {
+    for (final Object o: selectedElements) {
       if (!(o instanceof AbstractTopologyComponent)) continue;
-      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (!data.isNode()) {
         setEnabled(true);
         return;
@@ -68,25 +68,25 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     try {
       final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<>();
-      for (Object o: selectedElements) {
+      for (final Object o: selectedElements) {
         if (!(o instanceof AbstractTopologyComponent)) continue;
-        AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+        final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
         if (data.isDriver()) driverConnections.add(((TopologyDriver) data).getJmx());
       }
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
           for (JMXDriverConnectionWrapper jmx: driverConnections) {
             try {
               jmx.resetStatistics();
-            } catch(Exception e) {
+            } catch(final Exception e) {
               log.error(e.getMessage(), e);
             }
           }
         }
       };
       runAction(r);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }

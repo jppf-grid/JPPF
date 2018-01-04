@@ -60,23 +60,23 @@ public class PreferencesStorage {
    * Load all chart configurations from the preferences tree, and create the corresponding charts.
    */
   public void loadChartConfigurations() {
-    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+    final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
     String[] tabChildrenNames = null;
     try {
       tabChildrenNames = pref.childrenNames();
-    } catch(BackingStoreException e) {
+    } catch(final BackingStoreException e) {
       log.error(e.getMessage(), e);
       return;
     }
     if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return;
-    TabConfiguration[] tabs = new TabConfiguration[tabChildrenNames.length];
+    final TabConfiguration[] tabs = new TabConfiguration[tabChildrenNames.length];
     int cnt = 0;
-    for (String s: tabChildrenNames) {
-      Preferences child = pref.node(s);
-      TabConfiguration tab = new TabConfiguration();
+    for (final String s: tabChildrenNames) {
+      final Preferences child = pref.node(s);
+      final TabConfiguration tab = new TabConfiguration();
       tab.name = child.get("name", "Tab" + cnt);
       tab.position = child.getInt("position", -1);
-      ChartConfiguration[] configs = loadTabCharts(child);
+      final ChartConfiguration[] configs = loadTabCharts(child);
       tab.configs.addAll(Arrays.asList(configs));
       tabs[cnt] = tab;
       cnt++;
@@ -90,9 +90,9 @@ public class PreferencesStorage {
         return Integer.valueOf(o1.position).compareTo(o2.position);
       }
     });
-    for (TabConfiguration tab: tabs) {
+    for (final TabConfiguration tab: tabs) {
       chartBuilder.addTab(tab);
-      for (ChartConfiguration config : tab.configs) {
+      for (final ChartConfiguration config : tab.configs) {
         chartBuilder.createChart(config, false);
         tab.panel.add(config.chartPanel);
       }
@@ -103,11 +103,11 @@ public class PreferencesStorage {
    * Load all chart configurations from the preferences tree, and create the corresponding charts.
    */
   public void loadDefaultChartConfigurations() {
-    try (InputStream is =  FileUtils.getFileInputStream("ui-default-charts-settings.xml")) {
-      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+    try (final InputStream is =  FileUtils.getFileInputStream("ui-default-charts-settings.xml")) {
+      final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
       pref.importPreferences(is);
       loadChartConfigurations();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -122,16 +122,16 @@ public class PreferencesStorage {
     String[] tabChildrenNames = null;
     try {
       tabChildrenNames = tabNode.childrenNames();
-    } catch(BackingStoreException e) {
+    } catch(final BackingStoreException e) {
       log.error(e.getMessage(), e);
       return result;
     }
     if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return result;
     result = new ChartConfiguration[tabChildrenNames.length];
     int cnt = 0;
-    for (String s: tabChildrenNames) {
-      Preferences child = tabNode.node(s);
-      ChartConfiguration config = loadChartConfiguration(child);
+    for (final String s: tabChildrenNames) {
+      final Preferences child = tabNode.node(s);
+      final ChartConfiguration config = loadChartConfiguration(child);
       result[cnt] = config;
       cnt++;
     }
@@ -153,22 +153,22 @@ public class PreferencesStorage {
    * @return a <code>ChartConfiguration</code> instance.
    */
   public ChartConfiguration loadChartConfiguration(final Preferences child) {
-    ChartConfiguration config = new ChartConfiguration();
+    final ChartConfiguration config = new ChartConfiguration();
     config.name = child.get("name", "");
     config.precision = child.getInt("precision", 0);
     config.unit = child.get("unit", null);
-    String fields = child.get("fields", "");
-    String[] sFields = RegexUtils.PIPE_PATTERN.split(fields);
-    List<Fields> list = new ArrayList<>();
-    for (String sField : sFields) {
-      Fields f = lookupEnum(sField);
+    final String fields = child.get("fields", "");
+    final String[] sFields = RegexUtils.PIPE_PATTERN.split(fields);
+    final List<Fields> list = new ArrayList<>();
+    for (final String sField : sFields) {
+      final Fields f = lookupEnum(sField);
       if (f != null) list.add(f);
     }
     config.fields = list.toArray(new Fields[list.size()]);
-    String type = child.get("type", CHART_PLOTXY.name());
+    final String type = child.get("type", CHART_PLOTXY.name());
     try {
       config.type = ChartType.valueOf(type);
-    } catch(IllegalArgumentException e) {
+    } catch(final IllegalArgumentException e) {
       log.error(e.getMessage(), e);
     }
     if (config.type == null) config.type = CHART_PLOTXY;
@@ -184,9 +184,9 @@ public class PreferencesStorage {
     Fields field = null;
     try {
       field = Fields.valueOf(name);
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       log.error(e.getMessage(), e);
-      for (Fields f: Fields.values()) {
+      for (final Fields f: Fields.values()) {
         if (name.equals(f.toString())) {
           field = f;
           break;
@@ -212,9 +212,9 @@ public class PreferencesStorage {
       }
     }
     try {
-      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+      final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
       pref.flush();
-    } catch(BackingStoreException e) {
+    } catch(final BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -224,8 +224,8 @@ public class PreferencesStorage {
    * @param tab the tab to save.
    */
   public void saveTabConfiguration(final TabConfiguration tab) {
-    String tabNodeName = "TabConfiguration" + tab.position;
-    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName);
+    final String tabNodeName = "TabConfiguration" + tab.position;
+    final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName);
     pref.put("name", tab.name);
     pref.putInt("position", tab.position);
   }
@@ -236,14 +236,14 @@ public class PreferencesStorage {
    * @param config the configuration to save.
    */
   public void saveChartConfiguration(final TabConfiguration tab, final ChartConfiguration config) {
-    String tabNodeName = "TabConfiguration" + tab.position;
-    String nodeName = "ChartConfiguration" + config.position;
-    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName + '/' + nodeName);
+    final String tabNodeName = "TabConfiguration" + tab.position;
+    final String nodeName = "ChartConfiguration" + config.position;
+    final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName + '/' + nodeName);
     pref.put("name", config.name);
     pref.putInt("precision", config.precision);
     if (config.unit != null ) pref.put("unit", config.unit);
     pref.put("type", config.type.name());
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     for (int i=0; i<config.fields.length; i++) {
       if (i > 0) sb.append('|');
       sb.append(config.fields[i].name());
@@ -257,10 +257,10 @@ public class PreferencesStorage {
    */
   public void removeAllSaved() {
     try {
-      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
-      String[] names = pref.childrenNames();
-      for (String name: names) pref.node(name).removeNode();
-    } catch(BackingStoreException e) {
+      final Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+      final String[] names = pref.childrenNames();
+      for (final String name: names) pref.node(name).removeNode();
+    } catch(final BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
   }

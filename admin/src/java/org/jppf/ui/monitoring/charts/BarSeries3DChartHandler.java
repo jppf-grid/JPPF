@@ -73,14 +73,14 @@ public class BarSeries3DChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration createChart(final ChartConfiguration config) {
-    Object ds = createDataset(config);
+    final Object ds = createDataset(config);
     String s = config.name;
     if (config.unit != null) s += " (" + config.unit+ ')';
     //JFreeChart chart = ChartFactory.createBarChart3D(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, chartMethodName, s, null, null, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
-    Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
+    final Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, chartMethodName, s, null, null, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
+    final Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
     //CategoryAxis axis = plot.getDomainAxis();
-    Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
+    final Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
     //axis.setTickLabelsVisible(false);
     invokeMethod(axis.getClass(), axis, "setTickLabelsVisible", false);
     config.chart = chart;
@@ -93,7 +93,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   private Object createDataset(final ChartConfiguration config) {
-    Object ds = newDataset(config);
+    final Object ds = newDataset(config);
     populateDataset(config);
     return ds;
   }
@@ -103,9 +103,9 @@ public class BarSeries3DChartHandler implements ChartHandler {
    * @param config the configuration holding the new dataset.
    * @return the dataset.
    */
-  private Object newDataset(final ChartConfiguration config) {
+  private static Object newDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
-    Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
+    final Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
     return ds;
   }
@@ -118,16 +118,16 @@ public class BarSeries3DChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
     if (config.dataset == null) newDataset(config);
-    Object ds = config.dataset;
+    final Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
-    ConnectionDataHolder cdh = statsHandler.getCurrentDataHolder();
+    final ConnectionDataHolder cdh = statsHandler.getCurrentDataHolder();
     if (cdh == null) return config;
-    int statsCount = cdh.getSize();
+    final int statsCount = cdh.getSize();
     if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentDriver(), statsCount);
-    int start = Math.max(0, statsHandler.getTickCount() - statsCount);
+    final int start = Math.max(0, statsHandler.getTickCount() - statsCount);
     int count = 0;
-    for (Map<Fields, Double> valueMap: cdh.getDoubleValuesMaps()) {
+    for (final Map<Fields, Double> valueMap: cdh.getDoubleValuesMaps()) {
       count++;
       for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
@@ -146,10 +146,10 @@ public class BarSeries3DChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
     if (config.dataset == null) newDataset(config);
-    Object ds = config.dataset;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    final Object ds = config.dataset;
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
-      for (Fields key: config.fields) {
+      for (final Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
       }

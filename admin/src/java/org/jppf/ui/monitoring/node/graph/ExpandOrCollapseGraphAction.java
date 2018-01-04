@@ -53,20 +53,20 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction {
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    GraphTopologyHandler handler = panel.getGraphHandler();
+    final GraphTopologyHandler handler = panel.getGraphHandler();
     synchronized(panel) {
-      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-      Set<AbstractTopologyComponent> selection = viewer.getPickedVertexState().getPicked();
+      final VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      final Set<AbstractTopologyComponent> selection = viewer.getPickedVertexState().getPicked();
       int count = 0;
       if (collapse) {
-        for (AbstractTopologyComponent comp: selection) {
+        for (final AbstractTopologyComponent comp: selection) {
           if (comp.isDriver() && !handler.isCollapsed(comp)) {
             handler.collapse((TopologyDriver) comp);
             count++;
           }
         }
       } else {
-        for (AbstractTopologyComponent comp: selection) {
+        for (final AbstractTopologyComponent comp: selection) {
           if (comp.isDriver() && !handler.isExpanded(comp)) {
             handler.expand((TopologyDriver) comp);
             count++;

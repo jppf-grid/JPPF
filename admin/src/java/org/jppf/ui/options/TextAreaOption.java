@@ -75,7 +75,6 @@ public class TextAreaOption extends AbstractOption {
     this.label = label;
     setToolTipText(tooltip);
     this.value = value;
-    //this.bordered = true;
     createUI();
   }
 
@@ -89,16 +88,14 @@ public class TextAreaOption extends AbstractOption {
     if (toolTipText != null) textArea.setToolTipText(toolTipText);
     textArea.setEditable(editable);
     textArea.addMouseListener(new EditorMouseListener());
-    //if (!bordered) textArea.setBorder(BorderFactory.createEmptyBorder());
-    //textArea.setOpaque(false);
     if (scrollable) {
-      JScrollPane scrollPane = new JScrollPane(textArea);
+      final JScrollPane scrollPane = new JScrollPane(textArea);
       scrollPane.setOpaque(false);
       GuiUtils.adjustScrollbarsThickness(scrollPane);
       if (!bordered) scrollPane.setBorder(BorderFactory.createEmptyBorder());
       UIComponent = scrollPane;
     } else {
-      JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
+      final JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
       mainPanel.setBorder(BorderFactory.createTitledBorder(label));
       mainPanel.add(textArea);
       if (!bordered) mainPanel.setBorder(BorderFactory.createEmptyBorder());
@@ -126,7 +123,7 @@ public class TextAreaOption extends AbstractOption {
     this.value = value;
     if ((value == null) || "".equals(value)) textArea.setText((String) value);
     else {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       if (dateFormat != null) sb.append(dateFormat.format(new Date())).append(' ');
       sb.append(this.value);
       textArea.setText(sb.toString());
@@ -166,7 +163,7 @@ public class TextAreaOption extends AbstractOption {
    */
   @Override
   protected void setupValueChangeNotifications() {
-    Document doc = textArea.getDocument();
+    final Document doc = textArea.getDocument();
     doc.addDocumentListener(new DocumentListener() {
       @Override
       public void changedUpdate(final DocumentEvent e) {
@@ -245,24 +242,24 @@ public class TextAreaOption extends AbstractOption {
      */
     @Override
     public void mousePressed(final MouseEvent event) {
-      int x = event.getX();
-      int y = event.getY();
-      int button = event.getButton();
+      final int x = event.getX();
+      final int y = event.getY();
+      final int button = event.getButton();
       if (button == MouseEvent.BUTTON3) {
-        JPopupMenu menu = new JPopupMenu();
-        AbstractAction clipboardAction = new AbstractAction() {
+        final JPopupMenu menu = new JPopupMenu();
+        final AbstractAction clipboardAction = new AbstractAction() {
           @Override
           public void actionPerformed(final ActionEvent e) {
             try {
-              Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+              final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
               clip.setContents(new StringSelection(textArea.getText()), null);
-            } catch (Exception e2) {
+            } catch (final Exception e2) {
               log.debug(e2.getMessage(), e2);
             }
           }
         };
         clipboardAction.putValue(ThreadDumpAction.NAME, "Copy to clipboard");
-        AbstractAction clearAction = new AbstractAction() {
+        final AbstractAction clearAction = new AbstractAction() {
           @Override
           public void actionPerformed(final ActionEvent e) {
             clear();

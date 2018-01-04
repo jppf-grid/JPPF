@@ -51,14 +51,14 @@ public class JobTreeTableMouseListener extends MouseAdapter {
    */
   @Override
   public void mousePressed(final MouseEvent event) {
-    Component comp = event.getComponent();
+    final Component comp = event.getComponent();
     if (!(comp instanceof JPPFTreeTable)) return;
-    JPPFTreeTable treeTable = (JPPFTreeTable) comp;
-    int x = event.getX();
-    int y = event.getY();
-    int button = event.getButton();
+    final JPPFTreeTable treeTable = (JPPFTreeTable) comp;
+    final int x = event.getX();
+    final int y = event.getY();
+    final int button = event.getButton();
     if (button == MouseEvent.BUTTON3) {
-      JPopupMenu menu = createPopupMenu(event);
+      final JPopupMenu menu = createPopupMenu(event);
       menu.show(treeTable, x, y);
     }
   }
@@ -69,9 +69,9 @@ public class JobTreeTableMouseListener extends MouseAdapter {
    * @return a <code>JPopupMenu</code> instance.
    */
   private JPopupMenu createPopupMenu(final MouseEvent event) {
-    Component comp = event.getComponent();
-    Point p = comp.getLocationOnScreen();
-    JPopupMenu menu = new JPopupMenu();
+    final Component comp = event.getComponent();
+    final Point p = comp.getLocationOnScreen();
+    final JPopupMenu menu = new JPopupMenu();
     menu.add(createMenuItem(actionHandler.getAction("cancel.job"), p));
     menu.add(createMenuItem(actionHandler.getAction("suspend.job"), p));
     menu.add(createMenuItem(actionHandler.getAction("suspend_requeue.job"), p));

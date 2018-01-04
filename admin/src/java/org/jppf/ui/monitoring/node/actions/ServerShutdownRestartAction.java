@@ -72,9 +72,9 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    for (Object o: selectedElements) {
+    for (final Object o: selectedElements) {
       if (!(o instanceof AbstractTopologyComponent)) continue;
-      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (!data.isNode()) {
         setEnabled(true);
         return;
@@ -91,24 +91,24 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
-    for (Object o: selectedElements) {
+    for (final Object o: selectedElements) {
       if (!(o instanceof AbstractTopologyComponent)) continue;
-      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (data.isDriver()) list.add(((TopologyDriver) data).getJmx());
     }
 
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
       panel = loadWithPreferences("org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml");
-      OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
+      final OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
       OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
-      JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
+      final JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
+      final JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("shutdown.restart.driver.label"), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
-      Action okAction = new AbstractAction() {
+      final Action okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -117,7 +117,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
         }
       };
       okBtn.addActionListener(okAction);
-      Action cancelAction = new AbstractAction() {
+      final Action cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -131,7 +131,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
       dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -145,25 +145,21 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
     AbstractOption option = (AbstractOption) panel.findFirstWithName("Shutdown_delay");
     shutdownDelay = ((Number) option.getValue()).longValue();
     option = (AbstractOption) panel.findFirstWithName("Restart");
-    boolean restart = (Boolean) option.getValue();
+    final boolean restart = (Boolean) option.getValue();
     if (restart) {
       option = (AbstractOption) panel.findFirstWithName("Restart_delay");
       restartDelay = ((Number) option.getValue()).longValue();
     } else restartDelay = -1L;
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JMXDriverConnectionWrapper jmx: driverConnections) {
           try {
             jmx.restartShutdown(shutdownDelay, restartDelay);
-          } catch(Exception e) {
+          } catch(final Exception e) {
             log.error(e.getMessage(), e);
           }
         }
-        /*
-        OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
-        OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
-        */
       }
     };
     runAction(r);

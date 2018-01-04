@@ -42,8 +42,8 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction {
   @Override
   public void actionPerformed(final ActionEvent e) {
     synchronized(panel) {
-      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-      for (AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, data.isNode());
+      final VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      for (final AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, data.isNode());
     }
   }
 }

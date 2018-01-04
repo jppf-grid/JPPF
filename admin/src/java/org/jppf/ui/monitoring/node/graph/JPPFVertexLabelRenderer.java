@@ -61,8 +61,8 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
 
   @Override
   public <V> Component getVertexLabelRendererComponent(final JComponent vv, final Object value, final Font fnt, final boolean sel, final V vertex) {
-    DefaultVertexLabelRenderer renderer = (DefaultVertexLabelRenderer) super.getVertexLabelRendererComponent(vv, value, fnt, sel, vertex);
-    AbstractTopologyComponent data = (AbstractTopologyComponent) vertex;
+    final DefaultVertexLabelRenderer renderer = (DefaultVertexLabelRenderer) super.getVertexLabelRendererComponent(vv, value, fnt, sel, vertex);
+    final AbstractTopologyComponent data = (AbstractTopologyComponent) vertex;
     renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
     renderer.setText(TopologyUtils.getDisplayName(data, StatsHandler.getInstance().getShowIPHandler().isShowIP()));
@@ -70,9 +70,9 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     String path = null;
     Color background = Color.white;
     Color backgroundSelected = Color.blue;
-    Color foreground = sel ? AbstractTreeCellRenderer.DEFAULT_SELECTION_FOREGROUND : AbstractTreeCellRenderer.DEFAULT_FOREGROUND;
+    final Color foreground = sel ? AbstractTreeCellRenderer.DEFAULT_SELECTION_FOREGROUND : AbstractTreeCellRenderer.DEFAULT_FOREGROUND;
     if (baseFont == null) {
-      Font f2 = renderer.getFont();
+      final Font f2 = renderer.getFont();
       baseFont = new Font(f2.getFontName(), f2.getStyle(), 10);
       boldFont = new Font(baseFont.getName(), Font.BOLD, baseFont.getSize());
       italicFont = new Font(baseFont.getName(), Font.ITALIC, baseFont.getSize());
@@ -81,7 +81,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     Font font = baseFont;
 
     if (data.isDriver()) {
-      JPPFClientConnection c = ((TopologyDriver) data).getConnection();
+      final JPPFClientConnection c = ((TopologyDriver) data).getConnection();
       if (c == null) {
         path = AbstractTreeCellRenderer.DRIVER_ICON;
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
@@ -105,7 +105,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     }
 
     if (font != null) renderer.setFont(font);
-    ImageIcon icon = GuiUtils.loadIcon(path);
+    final ImageIcon icon = GuiUtils.loadIcon(path);
     renderer.setIcon(icon);
     renderer.setBackground(sel ? backgroundSelected : background);
     renderer.setForeground(foreground);

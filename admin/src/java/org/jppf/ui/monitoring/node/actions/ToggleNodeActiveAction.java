@@ -58,17 +58,17 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyDriver, String> map = getDriverMap();
-        for (Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
+        final CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (final Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
           try {
-            JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
+            final JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
             if (driverJmx == null) continue;
-            NodeSelector selector = new UuidSelector(entry.getValue());
+            final NodeSelector selector = new UuidSelector(entry.getValue());
             driverJmx.toggleActiveState(selector);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

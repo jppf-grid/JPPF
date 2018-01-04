@@ -95,7 +95,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     treeTable.getTree().setCellRenderer(new JobRenderer());
     treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer(this));
-    JScrollPane sp = new JScrollPane(treeTable);
+    final JScrollPane sp = new JScrollPane(treeTable);
     GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
@@ -113,11 +113,11 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
   private synchronized void populateTreeTableModel() {
     if (debugEnabled) log.debug("populating the tree table");
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
-    for (JobDriver driver: jobMonitor.getJobDrivers()) {
+    for (final JobDriver driver: jobMonitor.getJobDrivers()) {
       addDriver(driver);
       for (Job job: driver.getJobs()) {
         addJob(driver, job);
-        for (JobDispatch dispatch: job.getJobDispatches()) addJobDispatch(job, dispatch);
+        for (final JobDispatch dispatch: job.getJobDispatches()) addJobDispatch(job, dispatch);
       }
     }
   }
@@ -126,9 +126,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * Remove all driver nodes from the tree table.
    */
   private void clearDrivers() {
-    DefaultMutableTreeNode root = getTreeTableRoot();
+    final DefaultMutableTreeNode root = getTreeTableRoot();
     if (debugEnabled) log.debug("removing all drivers");
-    int n = root.getChildCount();
+    final int n = root.getChildCount();
     if (n <= 0) return;
     for (int i=n-1; i>=0; i--) getModel().removeNodeFromParent((DefaultMutableTreeNode) root.getChildAt(i));
   }
@@ -151,14 +151,14 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     if (!firstDriverAdded) {
       firstDriverAdded = true;
       if (debugEnabled) log.debug("adding first driver: {}", driver.getDisplayName());
-      Runnable r =  new Runnable() {
+      final Runnable r =  new Runnable() {
         @Override public synchronized void run() {
           try {
             JPPFTreeTable treeTable = null;
             while ((treeTable = getTreeTable()) == null) wait(10L);
             treeTable.expand(getTreeTableRoot());
             treeTable.expand(driverNode);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.debug(e.getMessage(), e);
           }
         }
@@ -166,7 +166,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
       new Thread(r, "Job tree expansion").start();
     } else {
       if (debugEnabled) log.debug("additional driver: {}", driver.getDisplayName());
-      JPPFTreeTable treeTable = getTreeTable();
+      final JPPFTreeTable treeTable = getTreeTable();
       if (treeTable != null) {
         treeTable.expand(getTreeTableRoot());
         treeTable.expand(driverNode);
@@ -253,7 +253,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
       actionHandler.updateActions();
     }
     treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));
-    Runnable r = new ActionsInitializer(this, "/job.toolbar");
+    final Runnable r = new ActionsInitializer(this, "/job.toolbar");
     new Thread(r).start();
   }
 

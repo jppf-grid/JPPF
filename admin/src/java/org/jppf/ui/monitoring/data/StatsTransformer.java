@@ -48,7 +48,7 @@ public class StatsTransformer {
    * @return a map of field names to their corresponding double values.
    */
   public Map<Fields, Double> formatDoubleValues(final JPPFStatistics stats, final HealthSnapshot snapshot) {
-    Map<Fields, Double> map = new HashMap<>();
+    final Map<Fields, Double> map = new HashMap<>();
     formatDoubleStatsValues(map, stats);
     formatDoubleStatsValues(map, snapshot);
     return map;
@@ -60,7 +60,7 @@ public class StatsTransformer {
    * @param stats the data snapshot to map.
    * @return a map of field names to their corresponding double values.
    */
-  private Map<Fields, Double> formatDoubleStatsValues(final Map<Fields, Double> map, final JPPFStatistics stats) {
+  private static Map<Fields, Double> formatDoubleStatsValues(final Map<Fields, Double> map, final JPPFStatistics stats) {
     map.put(TOTAL_TASKS_EXECUTED, stats.getSnapshot(TASK_DISPATCH).getTotal());
     JPPFSnapshot snapshot = stats.getSnapshot(EXECUTION);
     map.put(TOTAL_EXECUTION_TIME, snapshot.getTotal());
@@ -91,10 +91,10 @@ public class StatsTransformer {
     map.put(QUEUE_SIZE, snapshot.getLatest());
     map.put(MAX_QUEUE_SIZE, snapshot.getMax());
     snapshot = stats.getSnapshot(NODES);
-    double d = snapshot.getLatest();
+    final double d = snapshot.getLatest();
     map.put(NB_NODES, d);
     map.put(MAX_NODES, snapshot.getMax());
-    double idle = stats.getSnapshot(IDLE_NODES).getLatest();
+    final double idle = stats.getSnapshot(IDLE_NODES).getLatest();
     map.put(NB_IDLE_NODES, idle);
     map.put(NB_BUSY_NODES, d - idle);
     snapshot = stats.getSnapshot(CLIENTS);
@@ -134,7 +134,7 @@ public class StatsTransformer {
    * @param map the map to fill.
    * @param stats the data snapshot to map.
    */
-  private void formatDoubleStatsValues2(final Map<Fields, Double> map, final JPPFStatistics stats) {
+  private static void formatDoubleStatsValues2(final Map<Fields, Double> map, final JPPFStatistics stats) {
     double d = 0d;
     double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
     map.put(CLIENT_INBOUND_MB, d);
@@ -161,7 +161,7 @@ public class StatsTransformer {
    * @param map the map to fill.
    * @param snapshot the data snapshot to map.
    */
-  private void formatDoubleStatsValues(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
+  private static void formatDoubleStatsValues(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
     map.put(HEALTH_HEAP, (double) snapshot.getHeapUsed() / MB);
     double d = snapshot.getHeapUsedRatio();
     if (d < 0d) d = 0d;

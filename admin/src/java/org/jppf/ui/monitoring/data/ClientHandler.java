@@ -147,11 +147,11 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
       if (driver != null) {
         synchronized(statsHandler) {
           currentDriver = driver;
-          JPPFClientConnectionStatus status = currentDriver.getConnection().getStatus();
+          final JPPFClientConnectionStatus status = currentDriver.getConnection().getStatus();
           if (status.isWorkingStatus()) {
             statsHandler.fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
             if (currentDriverNull) {
-              Runnable r = new Runnable() {
+              final Runnable r = new Runnable() {
                 @Override public void run() {
                   log.debug("first refreshLoadBalancer()");
                   // to cancel the task
@@ -171,37 +171,37 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * @return {@code true} to indicate success, {@code false} otherwise.
    */
   public boolean refreshLoadBalancer() {
-    OptionElement option = OptionsHandler.getPage("JPPFAdminTool");
+    final OptionElement option = OptionsHandler.getPage("JPPFAdminTool");
     if (option == null) {
       log.debug("JPPFAdminTool element is null");
       return false;
     }
-    OptionElement lbOption = OptionsHandler.findOptionWithName(option, "LoadBalancingPanel");
+    final OptionElement lbOption = OptionsHandler.findOptionWithName(option, "LoadBalancingPanel");
     if (lbOption == null) {
       log.debug("LoadBalancingPanel element is null");
       return false;
     }
     log.debug("LoadBalancingPanel = " + lbOption);
-    JMXDriverConnectionWrapper jmx = currentJmxConnection();
-    AbstractOption messageArea = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingMessages");
+    final JMXDriverConnectionWrapper jmx = currentJmxConnection();
+    final AbstractOption messageArea = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingMessages");
     if ((jmx == null) || !jmx.isConnected()) {
       messageArea.setValue("Not connected to a server, please click on 'Refresh' to try again");
       return false;
     }
     messageArea.setValue("");
     try {
-      LoadBalancingInformation info = jmx.loadBalancerInformation();
+      final LoadBalancingInformation info = jmx.loadBalancerInformation();
       log.debug("info = {}", info);
       if (info != null) {
-        ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
-        List<? extends Object> items = combo.getItems();
+        final ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
+        final List<? extends Object> items = combo.getItems();
         if ((items == null) || items.isEmpty()) combo.setItems(info.getAlgorithmNames());
         combo.setValue(info.getAlgorithm());
-        AbstractOption params = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingParameters");
+        final AbstractOption params = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingParameters");
         params.setValue(info.getParameters().asString());
         return true;
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return false;
@@ -212,7 +212,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
   public JMXDriverConnectionWrapper currentJmxConnection() {
-    TopologyDriver driver = getCurrentDriver();
+    final TopologyDriver driver = getCurrentDriver();
     return (driver == null) ? null : driver.getJmx();
   }
 
@@ -221,7 +221,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * @return an <code>OptionElement</code> instance.
    */
   public synchronized OptionElement getServerListOption() {
-    OptionElement page =  OptionsHandler.getPage("JPPFAdminTool");
+    final OptionElement page =  OptionsHandler.getPage("JPPFAdminTool");
     return (page == null) ? null : page.findFirstWithName("ServerChooser");
   }
 
@@ -231,21 +231,21 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   public synchronized void setServerListOption(final OptionElement serverListOption) {
     this.serverListOption = serverListOption;
-    JComboBox<?> box = ((ComboBoxOption) serverListOption).getComboBox();
+    final JComboBox<?> box = ((ComboBoxOption) serverListOption).getComboBox();
     box.setRenderer(new DefaultListCellRenderer() {
       @Override
       public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
-        DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        TopologyDriver driver = (TopologyDriver) value;
+        final DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        final TopologyDriver driver = (TopologyDriver) value;
         if (driver != null) {
-          JPPFManagementInfo info = driver.getManagementInfo();
+          final JPPFManagementInfo info = driver.getManagementInfo();
           if (info != null) renderer.setText((statsHandler.getShowIPHandler().isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
           else renderer.setText(driver.getDisplayName());
         }
         return renderer;
       }
     });
-    List<TopologyDriver> list = manager.getDrivers();
+    final List<TopologyDriver> list = manager.getDrivers();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
     for (TopologyDriver driver: list) scheduler.submit(new NewConnectionTask(statsHandler.getRolloverPosition(), statsHandler, driver));
     notifyAll();
@@ -257,7 +257,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   @Override
   public void close() {
     scheduler.shutdownNow();
-    JPPFClient client = manager.getJPPFClient();
+    final JPPFClient client = manager.getJPPFClient();
     if (client != null) client.close();
   }
 
@@ -296,8 +296,8 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   private Object[] getMeterIntervals(final Thresholds.Name...names) {
     if ((names != null) && (names.length > 0)) {
       try {
-        int len = names.length + 2;
-        double[] values = new double[len];
+        final int len = names.length + 2;
+        final double[] values = new double[len];
         // convert from [name1, ..., nameN] to [0, value1, ..., valueN, 100]
         values[0] = 0d;
         for (int i=0; i<names.length; i++) {
@@ -305,15 +305,15 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
           if (traceEnabled) log.trace("value for '{}' = {}", names[i], values[i+1]);
         }
         values[len-1] = 100d;
-        Object[] intervals = new Object[len - 1];
-        Class<?> intervalClass = ReflectionHelper.getClass0("org.jfree.chart.plot.MeterInterval");
-        Class<?> rangeClass = ReflectionHelper.getClass0("org.jfree.data.Range");
+        final Object[] intervals = new Object[len - 1];
+        final Class<?> intervalClass = ReflectionHelper.getClass0("org.jfree.chart.plot.MeterInterval");
+        final Class<?> rangeClass = ReflectionHelper.getClass0("org.jfree.data.Range");
         for (int  i=0; i<len-1; i++) {
           // Range range = new Range(values[i], values[i+1]);
-          Object range = ReflectionHelper.invokeConstructor(rangeClass, new Class<?>[] {double.class, double.class}, values[i], values[i+1]);
-          String label = (i == 0) ? "Normal" : LocalizationUtils.getLocalized("org.jppf.ui.i18n.NodeDataPage", names[i-1].getDisplayName());
-          Class<?>[] paramTypes = {String.class, rangeClass, Paint.class, Stroke.class, Paint.class};
-          Color outline = Color.WHITE;
+          final Object range = ReflectionHelper.invokeConstructor(rangeClass, new Class<?>[] {double.class, double.class}, values[i], values[i+1]);
+          final String label = (i == 0) ? "Normal" : LocalizationUtils.getLocalized("org.jppf.ui.i18n.NodeDataPage", names[i-1].getDisplayName());
+          final Class<?>[] paramTypes = {String.class, rangeClass, Paint.class, Stroke.class, Paint.class};
+          final Color outline = Color.WHITE;
           Color background = Color.GRAY;
           switch(label) {
             case "Warning":
@@ -323,12 +323,12 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
               background = AbstractTreeCellRenderer.INACTIVE_COLOR;
               break;
           }
-          Stroke stroke = new BasicStroke(2f);
+          final Stroke stroke = new BasicStroke(2f);
           // MeterInterval interval = new MeterInterval(label, range); intervals[i] = interval;
           intervals[i] = ReflectionHelper.invokeConstructor(intervalClass, paramTypes, label, range, outline, stroke, background );
         }
         return intervals;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

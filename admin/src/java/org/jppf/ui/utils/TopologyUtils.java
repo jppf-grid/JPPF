@@ -56,11 +56,11 @@ public class TopologyUtils {
   public static synchronized DefaultMutableTreeNode addDriver(final AbstractJPPFTreeTableModel model, final TopologyDriver driver) {
     DefaultMutableTreeNode driverNode = null;
     if (!driver.getConnection().getStatus().isWorkingStatus()) return null;
-    String uuid = driver.getUuid();
-    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final String uuid = driver.getUuid();
+    final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
     if (driverNode == null) {
-      int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
+      final int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
       if (index >= 0) {
         driverNode = new DefaultMutableTreeNode(driver);
         if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("adding driver: " + driver + " at index " + index);
@@ -77,9 +77,9 @@ public class TopologyUtils {
    */
   public static synchronized void removeDriver(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData) {
     if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("removing driver: " + driverData);
-    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
-    String uuid = driverData.getUuid();
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
+    final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final String uuid = driverData.getUuid();
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, uuid);
     if (driverNode == null) return;
     model.removeNodeFromParent(driverNode);
   }
@@ -93,16 +93,16 @@ public class TopologyUtils {
    */
   public static synchronized DefaultMutableTreeNode addNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return null;
-    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
-    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
+    final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
     if (driverNode == null) return null;
-    String nodeUuid = nodeData.getUuid();
+    final String nodeUuid = nodeData.getUuid();
     if (TreeTableUtils.findComponent(driverNode, nodeUuid) != null) return null;
     if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("attempting to add node={} to driver={}", nodeData, driverData);
-    int index = TreeTableUtils.insertIndex(driverNode, nodeData);
+    final int index = TreeTableUtils.insertIndex(driverNode, nodeData);
     if (index < 0) return null;
     if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("adding node: " + nodeUuid + " at index " + index);
-    DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
+    final DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
     model.insertNodeInto(nodeNode, driverNode, index);
     return nodeNode;
   }
@@ -116,10 +116,10 @@ public class TopologyUtils {
   public static synchronized void removeNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return;
     if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("attempting to remove node=" + nodeData + " from driver=" + driverData);
-    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
-    DefaultMutableTreeNode driver = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
+    final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final DefaultMutableTreeNode driver = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
     if (driver == null) return;
-    String nodeUuid = nodeData.getUuid();
+    final String nodeUuid = nodeData.getUuid();
     final DefaultMutableTreeNode node = TreeTableUtils.findComponent(driver, nodeUuid);
     if (node != null) {
       if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug("removing node: " + nodeData);
@@ -134,7 +134,7 @@ public class TopologyUtils {
    * @param nodeData the node to add.
    */
   public static synchronized void updateNode(final AbstractJPPFTreeTableModel model, final TopologyDriver driverData, final TopologyNode nodeData) {
-    DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
+    final DefaultMutableTreeNode treeTableRoot = (DefaultMutableTreeNode) model.getRoot();
     final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driverData.getUuid());
     if ((driverNode != null) && (nodeData != null)) {
       final DefaultMutableTreeNode node = TreeTableUtils.findComponent(driverNode, nodeData.getUuid());
@@ -149,7 +149,7 @@ public class TopologyUtils {
    * @return the display name as a string.
    */
   public static String getDisplayName(final AbstractTopologyComponent comp, final boolean showIP) {
-    JPPFManagementInfo info = comp.getManagementInfo();
+    final JPPFManagementInfo info = comp.getManagementInfo();
     if (info != null) return (showIP ? info.getIpAddress() : info.getHost()) + ":" + info.getPort();
     return comp.getDisplayName();
   }
@@ -163,21 +163,21 @@ public class TopologyUtils {
     JPPFSystemInformation info = null;
     try {
       if (data.isNode()) {
-        TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
-        Object o = result.get(data.getUuid());
+        final TopologyDriver parent = (TopologyDriver) data.getParent();
+        final Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
+        final Object o = result.get(data.getUuid());
         if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
       } else {
         if (data.isPeer()) {
-          String uuid = ((TopologyPeer) data).getUuid();
+          final String uuid = ((TopologyPeer) data).getUuid();
           if (uuid != null) {
-            TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
+            final TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
             if (driver != null) info = driver.getJmx().systemInformation();
           }
         }
         else info = ((TopologyDriver) data).getJmx().systemInformation();
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (TreeTableUtils.debugEnabled) TreeTableUtils.log.debug(e.getMessage(), e);
     }
     return info;

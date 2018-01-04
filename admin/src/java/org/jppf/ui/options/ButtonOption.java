@@ -42,10 +42,10 @@ public class ButtonOption extends AbstractOption {
 
   @Override
   public void createUI() {
-    AbstractButton button = toggle ? new JToggleButton() : new JButton();
+    final AbstractButton button = toggle ? new JToggleButton() : new JButton();
     if (label != null) button.setText(label);
     if (iconPath != null) {
-      ImageIcon icon = GuiUtils.loadIcon(iconPath);
+      final ImageIcon icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) button.setIcon(icon);
     }
     if (toolTipText != null) button.setToolTipText(toolTipText);
@@ -55,7 +55,7 @@ public class ButtonOption extends AbstractOption {
 
   @Override
   protected void setupValueChangeNotifications() {
-    AbstractButton button = (AbstractButton) UIComponent;
+    final AbstractButton button = (AbstractButton) UIComponent;
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -102,12 +102,11 @@ public class ButtonOption extends AbstractOption {
   @Override
   public void setValue(final Object value) {
     if (!toggle || (value == null)) return;
-    boolean b = (value instanceof Boolean) ? (Boolean) value : Boolean.valueOf(value.toString());
-    JToggleButton toggleBtn = ((JToggleButton) UIComponent);
+    final boolean b = (value instanceof Boolean) ? (Boolean) value : Boolean.valueOf(value.toString());
+    final JToggleButton toggleBtn = ((JToggleButton) UIComponent);
     if (b != toggleBtn.isSelected()) {
       super.setValue(b);
       toggleBtn.doClick();
-      //toggleBtn.setSelected(b);
     }
   }
 }

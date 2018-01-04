@@ -31,11 +31,11 @@ public class LabelOption extends AbstractOption {
    */
   @Override
   public void createUI() {
-    JLabel lab = new JLabel();
+    final JLabel lab = new JLabel();
     lab.setHorizontalAlignment(SwingConstants.RIGHT);
     if (label != null) lab.setText(label);
     if (iconPath != null) {
-      ImageIcon icon = GuiUtils.loadIcon(iconPath);
+      final ImageIcon icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) lab.setIcon(icon);
     }
     if (toolTipText != null) lab.setToolTipText(toolTipText);

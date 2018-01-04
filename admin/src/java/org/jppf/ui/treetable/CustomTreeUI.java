@@ -47,11 +47,9 @@ class CustomTreeUI extends BasicTreeUI {
     return new NodeDimensionsHandler() {
       @Override
       public Rectangle getNodeDimensions(final Object value, final int row, final int depth, final boolean expanded, final Rectangle size) {
-        JViewport port = (JViewport) treeTable.getParent();
-        Rectangle dimensions = super.getNodeDimensions(value, row, depth, expanded, size);
-        if (port != null) {
-          dimensions.width = port.getWidth();
-        }
+        final JViewport port = (JViewport) treeTable.getParent();
+        final Rectangle dimensions = super.getNodeDimensions(value, row, depth, expanded, size);
+        if (port != null) dimensions.width = port.getWidth();
         return dimensions;
       }
     };

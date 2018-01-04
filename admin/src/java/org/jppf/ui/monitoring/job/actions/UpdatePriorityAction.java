@@ -76,23 +76,23 @@ public class UpdatePriorityAction extends AbstractJobAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
       panel = loadWithPreferences("org/jppf/ui/options/xml/JobPriorityPanel.xml");
       priority = Integer.MAX_VALUE;
-      for (Job joba: jobDataArray) {
-        int n = joba.getJobInformation().getPriority();
+      for (final Job joba: jobDataArray) {
+        final int n = joba.getJobInformation().getPriority();
         if (n < priority) priority = n;
       }
       ((AbstractOption) panel.findFirstWithName("job.priority")).setValue(priority);
 
-      JButton okBtn = (JButton) panel.findFirstWithName("/job.priority.OK").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("/job.priority.Cancel").getUIComponent();
+      final JButton okBtn = (JButton) panel.findFirstWithName("/job.priority.OK").getUIComponent();
+      final JButton cancelBtn = (JButton) panel.findFirstWithName("/job.priority.Cancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the new job priority", false);
       dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      AbstractAction okAction = new AbstractAction() {
+      final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -100,7 +100,7 @@ public class UpdatePriorityAction extends AbstractJobAction {
           doOK();
         }
       };
-      AbstractAction cancelAction = new AbstractAction() {
+      final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -115,7 +115,7 @@ public class UpdatePriorityAction extends AbstractJobAction {
       dialog.setLocationRelativeTo(null);
       dialog.setLocation(location);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -125,18 +125,18 @@ public class UpdatePriorityAction extends AbstractJobAction {
    */
   private void doOK() {
     savePreferences(panel);
-    AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
+    final AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
     priority = ((Number) priorityOption.getValue()).intValue();
     final CollectionMap<JobDriver, String> map = new SetHashMap<>();
     for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobDriver driver: map.keySet()) {
           try {
-            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            final DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
             if (jmx != null) jmx.updatePriority(new JobUuidSelector(map.getValues(driver)), priority);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

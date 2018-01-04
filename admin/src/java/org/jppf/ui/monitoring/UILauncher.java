@@ -61,17 +61,17 @@ public class UILauncher {
   public static void main(final String...args) {
     try {
       if ((args  == null) || (args.length < 2)) throw new IllegalArgumentException("Usage: UILauncher page_location location_source");
-      String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+      final String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
           "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
       //if (args.length > 2) adminConsole = false;
-      int n = 3;
+      final int n = 3;
       boolean success = false;
-      String s = System.getProperty("swing.defaultlaf");
+      final String s = System.getProperty("swing.defaultlaf");
       if (!success && (s != null)) {
         try {
           UIManager.setLookAndFeel(s);
           success = true;
-        } catch(Throwable t) {
+        } catch(final Throwable t) {
           log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
           System.getProperties().remove("swing.defaultlaf");
         }
@@ -79,16 +79,16 @@ public class UILauncher {
       if (!success) {
         try {
           UIManager.setLookAndFeel(laf[n]);
-        } catch(Throwable t) {
+        } catch(final Throwable t) {
           log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
       }
-      boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
+      final boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
       if (showSplash) (splash = new JPPFSplash(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE))).start();
       loadUI(args[0], args[1]);
       if (showSplash) splash.stop();
-      Frame[] frames = Frame.getFrames();
+      final Frame[] frames = Frame.getFrames();
       for (final Frame f: frames) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
@@ -97,7 +97,7 @@ public class UILauncher {
           }
         });
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
@@ -115,7 +115,7 @@ public class UILauncher {
     if (consoleComponent == null) {
       OptionElement elt = null;
       try {
-        Frame frame = new JFrame();
+        final Frame frame = new JFrame();
         OptionsHandler.setMainWindow(frame);
         frame.addWindowListener(new WindowClosingListener());
         if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
@@ -123,11 +123,11 @@ public class UILauncher {
         frame.add(elt.getUIComponent());
         OptionsHandler.loadPreferences();
         frame.setTitle(elt.getLabel());
-        String iconPath = elt.getIconPath();
+        final String iconPath = elt.getIconPath();
         frame.setIconImage(GuiUtils.loadIcon(iconPath != null ? iconPath : GuiUtils.JPPF_ICON).getImage());
         OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node(elt.getName()));
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
         log.error(e.getMessage(), e);
       }

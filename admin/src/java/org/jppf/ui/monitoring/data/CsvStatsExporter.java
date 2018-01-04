@@ -54,10 +54,10 @@ public class CsvStatsExporter implements StatsExporter {
 
   @Override
   public String formatAll() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("\"JPPF driver statistics\",\n\n");
-    Map<Fields, Double> m = statsHandler.getLatestDoubleValues(driver);
-    Map<Fields, Double> map = (m == null) ? new HashMap<Fields, Double>() : new HashMap<>(m);
+    final Map<Fields, Double> m = statsHandler.getLatestDoubleValues(driver);
+    final Map<Fields, Double> map = (m == null) ? new HashMap<Fields, Double>() : new HashMap<>(m);
     sb.append(format(map, EXECUTION_FIELDS, "ExecutionTable.label"));
     sb.append(format(map, NODE_EXECUTION_FIELDS, "NodeExecutionTable.label"));
     sb.append(format(map, TRANSPORT_FIELDS, "NetworkOverheadTable.label"));
@@ -78,14 +78,14 @@ public class CsvStatsExporter implements StatsExporter {
    * @param label the title given to the set of values.
    * @return the values formatted as plain text.
    */
-  private String format(final Map<Fields, Double> map, final Fields[] fields, final String label) {
-    StringBuilder sb = new StringBuilder();
-    String title = LocalizationUtils.getLocalized(BASE, label);
+  private static String format(final Map<Fields, Double> map, final Fields[] fields, final String label) {
+    final StringBuilder sb = new StringBuilder();
+    final String title = LocalizationUtils.getLocalized(BASE, label);
     sb.append('\"').append(title).append("\",\n\n");
-    for (Fields field: fields) {
+    for (final Fields field: fields) {
       Double value = map.get(field);
       if (value == null) value = 0d;
-      String name = field.toString();
+      final String name = field.toString();
       sb.append('\"').append(name).append("\", ").append(value).append('\n');
     }
     sb.append('\n');

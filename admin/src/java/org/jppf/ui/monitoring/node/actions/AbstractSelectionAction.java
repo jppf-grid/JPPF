@@ -28,8 +28,7 @@ import org.jppf.ui.treetable.*;
  * Abstract superclass for actions that select nodes in the tree table.
  * @author Laurent Cohen
  */
-public abstract class AbstractSelectionAction extends AbstractTopologyAction
-{
+public abstract class AbstractSelectionAction extends AbstractTopologyAction {
   /**
    * Constant for an empty <code>TreePath</code>.
    */
@@ -43,8 +42,7 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public AbstractSelectionAction(final AbstractTreeTableOption panel)
-  {
+  public AbstractSelectionAction(final AbstractTreeTableOption panel) {
     this.panel = panel;
     setEnabled(true);
   }
@@ -53,14 +51,12 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
    * Get the list of all tree nodes representing a driver.
    * @return a list of {@link DefaultMutableTreeNode} instances.
    */
-  protected List<DefaultMutableTreeNode> getDriverNodes()
-  {
-    List<DefaultMutableTreeNode> list = new ArrayList<>();
-    JPPFTreeTable treeTable = panel.getTreeTable();
-    TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getTreeTableModel().getRoot();
-    for (int i=0; i<root.getChildCount(); i++)
-    {
+  protected List<DefaultMutableTreeNode> getDriverNodes() {
+    final List<DefaultMutableTreeNode> list = new ArrayList<>();
+    final JPPFTreeTable treeTable = panel.getTreeTable();
+    final TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getTreeTableModel().getRoot();
+    for (int i = 0; i < root.getChildCount(); i++) {
       list.add((DefaultMutableTreeNode) root.getChildAt(i));
     }
     return list;

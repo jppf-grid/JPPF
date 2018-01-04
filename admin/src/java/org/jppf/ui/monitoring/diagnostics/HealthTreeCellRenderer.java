@@ -54,21 +54,21 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
    */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-    DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+    final DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
     if (value instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+      final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
-        AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
+        final AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
         renderer.setText(TopologyUtils.getDisplayName(data, isShowIP()));
         String path = null;
-        Color background = defaultNonSelectionBackground;
-        Color backgroundSelected = defaultSelectionBackground;
+        final Color background = defaultNonSelectionBackground;
+        final Color backgroundSelected = defaultSelectionBackground;
         if (data.isDriver()) {
           path = ((TopologyDriver) data).getConnection().getStatus().isWorkingStatus() ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
         } else if (data.isNode()) {
           path = GuiUtils.computeNodeIconKey((TopologyNode) data);
         }
-        ImageIcon icon = GuiUtils.loadIcon(path);
+        final ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);
         renderer.setBackgroundNonSelectionColor(background);
         renderer.setBackgroundSelectionColor(backgroundSelected);

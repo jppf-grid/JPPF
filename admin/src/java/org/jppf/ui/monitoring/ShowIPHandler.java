@@ -68,10 +68,10 @@ public class ShowIPHandler {
    */
   public void setShowIP(final boolean showIP) {
     if (showIP != this.showIP.get()) {
-      boolean oldState = this.showIP.get();
+      final boolean oldState = this.showIP.get();
       this.showIP.set(showIP);
-      ShowIPEvent event = new ShowIPEvent(this, oldState);
-      for (ShowIPListener listener: showIPListeners) listener.stateChanged(event);
+      final ShowIPEvent event = new ShowIPEvent(this, oldState);
+      for (final ShowIPListener listener: showIPListeners) listener.stateChanged(event);
     }
   }
 }

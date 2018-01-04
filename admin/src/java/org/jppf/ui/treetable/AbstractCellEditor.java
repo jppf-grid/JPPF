@@ -57,8 +57,7 @@ import javax.swing.event.*;
  * @author Philip Milne
  * @author Scott Violet
  */
-public abstract class AbstractCellEditor implements CellEditor
-{
+public abstract class AbstractCellEditor implements CellEditor {
   /**
    * The list of listeners for this cell editor.
    */
@@ -70,64 +69,41 @@ public abstract class AbstractCellEditor implements CellEditor
    * @see javax.swing.CellEditor#getCellEditorValue()
    */
   @Override
-  public Object getCellEditorValue()
-  {
+  public Object getCellEditorValue() {
     return null;
   }
 
   /**
    * Asks the editor if it can start editing using <code>anEvent</code>. This method always returns true.
-   * @param	event	the event the editor should use to consider whether to begin editing or not.
+   * @param event the event the editor should use to consider whether to begin editing or not.
    * @return <code>true</code>.
-   * @see javax.swing.CellEditor#isCellEditable(java.util.EventObject)
    */
   @Override
-  public boolean isCellEditable(final EventObject event)
-  {
+  public boolean isCellEditable(final EventObject event) {
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public boolean shouldSelectCell(final EventObject anEvent)
-  {
+  public boolean shouldSelectCell(final EventObject anEvent) {
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public boolean stopCellEditing()
-  {
+  public boolean stopCellEditing() {
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void cancelCellEditing()
-  {
+  public void cancelCellEditing() {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void addCellEditorListener(final CellEditorListener l)
-  {
+  public void addCellEditorListener(final CellEditorListener l) {
     listenerList.add(CellEditorListener.class, l);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void removeCellEditorListener(final CellEditorListener l)
-  {
+  public void removeCellEditorListener(final CellEditorListener l) {
     listenerList.remove(CellEditorListener.class, l);
   }
 
@@ -135,16 +111,13 @@ public abstract class AbstractCellEditor implements CellEditor
    * Notify all listeners that have registered interest for notification on this event type.
    * @see EventListenerList
    */
-  protected void fireEditingStopped()
-  {
+  protected void fireEditingStopped() {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == CellEditorListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == CellEditorListener.class) {
         ((CellEditorListener) listeners[i + 1]).editingStopped(new ChangeEvent(this));
       }
     }
@@ -154,16 +127,13 @@ public abstract class AbstractCellEditor implements CellEditor
    * Notify all listeners that have registered interest for notification on this event type.
    * @see EventListenerList
    */
-  protected void fireEditingCanceled()
-  {
+  protected void fireEditingCanceled() {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == CellEditorListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == CellEditorListener.class) {
         ((CellEditorListener) listeners[i + 1]).editingCanceled(new ChangeEvent(this));
       }
     }

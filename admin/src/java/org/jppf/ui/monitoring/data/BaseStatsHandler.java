@@ -97,12 +97,12 @@ public class BaseStatsHandler {
   public JPPFStatistics requestUpdate(final TopologyDriver driver) {
     JPPFStatistics stats = null;
     try {
-      JMXDriverConnectionWrapper jmx = driver.getJmx();
+      final JMXDriverConnectionWrapper jmx = driver.getJmx();
       if ((jmx != null) && jmx.isConnected()) {
         stats = jmx.statistics();
         if (stats != null) update(driver, stats);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return stats;
@@ -115,11 +115,11 @@ public class BaseStatsHandler {
    */
   public synchronized void update(final TopologyDriver driver, final JPPFStatistics stats) {
     if (stats == null) return;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     tickCount++;
     if (dataHolder == null) return;
-    TopologyDriver data = dataHolder.getDriver();
-    HealthSnapshot snapshot = (data == null) ? new HealthSnapshot() : data.getHealthSnapshot();
+    final TopologyDriver data = dataHolder.getDriver();
+    final HealthSnapshot snapshot = (data == null) ? new HealthSnapshot() : data.getHealthSnapshot();
     dataHolder.update(stats, snapshot);
   }
 
@@ -149,7 +149,7 @@ public class BaseStatsHandler {
    */
   public int getStatsCount(final TopologyDriver driver) {
     if (driver == null) return 0;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     return (dataHolder == null) ? -1 : dataHolder.getSize();
   }
 
@@ -162,9 +162,9 @@ public class BaseStatsHandler {
    */
   public synchronized Map<Fields, String> getStringValues(final Locale locale, final TopologyDriver driver, final int position) {
     if (driver == null) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     if (dataHolder == null) return StatsConstants.NO_STRING_VALUES;
-    StatsFormatter formatter = getFormatter(locale);
+    final StatsFormatter formatter = getFormatter(locale);
     synchronized(formatter) {
       return formatter.formatValues(dataHolder.getDoubleValuesAt(position));
     }
@@ -178,9 +178,9 @@ public class BaseStatsHandler {
    */
   public synchronized Map<Fields, String> getLatestStringValues(final Locale locale, final TopologyDriver driver) {
     if (driver == null) return StatsConstants.NO_STRING_VALUES;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     if (dataHolder == null) return StatsConstants.NO_STRING_VALUES;
-    StatsFormatter formatter = getFormatter(locale);
+    final StatsFormatter formatter = getFormatter(locale);
     synchronized(formatter) {
       return formatter.formatValues(dataHolder.getLatestDoubleValues());
     }
@@ -194,8 +194,8 @@ public class BaseStatsHandler {
    * @return value formatted accoridng to the locale.
    */
   public String formatLatestValue(final Locale locale, final TopologyDriver driver, final Fields field) {
-    Map<Fields, Double> map = getLatestDoubleValues(driver);
-    StatsFormatter formatter = getFormatter(locale);
+    final Map<Fields, Double> map = getLatestDoubleValues(driver);
+    final StatsFormatter formatter = getFormatter(locale);
     synchronized(formatter) {
       return formatter.formatValue(field, map.get(field));
     }
@@ -209,7 +209,7 @@ public class BaseStatsHandler {
    */
   public synchronized Map<Fields, Double> getDoubleValues(final TopologyDriver driver, final int position) {
     if (driver == null) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     return (dataHolder == null) ? null : dataHolder.getDoubleValuesAt(position);
   }
 
@@ -220,7 +220,7 @@ public class BaseStatsHandler {
    */
   public Map<Fields, Double> getLatestDoubleValues(final TopologyDriver driver) {
     if (driver == null) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
+    final ConnectionDataHolder dataHolder = dataHolderMap.get(driver.getUuid());
     return (dataHolder == null) ? null : dataHolder.getLatestDoubleValues();
   }
 
@@ -248,7 +248,7 @@ public class BaseStatsHandler {
    */
   public void fireStatsHandlerEvent(final StatsHandlerEvent.Type type) {
     if (log.isTraceEnabled()) log.trace("firing stats handler event of type {}", type);
-    StatsHandlerEvent event = new StatsHandlerEvent(this, type);
+    final StatsHandlerEvent event = new StatsHandlerEvent(this, type);
     for (StatsHandlerListener listener: listeners) listener.dataUpdated(event);
   }
 

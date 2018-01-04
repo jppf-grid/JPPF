@@ -74,9 +74,9 @@ class MonitorTableModel extends AbstractTableModel {
    */
   @Override
   public Object getValueAt(final int row, final int column) {
-    Fields field = fields[row];
+    final Fields field = fields[row];
     if (column == 0) return GuiUtils.shortenLabel(field.toString());
-    StatsHandler handler = StatsHandler.getInstance();
+    final StatsHandler handler = StatsHandler.getInstance();
     if (handler.getStatsCount() <= 0) return EMPTY_VALUES;
     return handler.formatLatestValue(Locale.getDefault(), handler.getCurrentDataHolder().getDriver(), field);
   }
@@ -86,8 +86,8 @@ class MonitorTableModel extends AbstractTableModel {
    * @return .
    */
   private static Map<Fields, String> initEmptyValues() {
-    StatsTransformer t = new StatsTransformer();
-    Map<Fields, Double> values = t.formatDoubleValues(createServerStatistics(), new HealthSnapshot());
+    final StatsTransformer t = new StatsTransformer();
+    final Map<Fields, Double> values = t.formatDoubleValues(createServerStatistics(), new HealthSnapshot());
     return new StatsFormatter(Locale.getDefault()).formatValues(values);
   }
 }

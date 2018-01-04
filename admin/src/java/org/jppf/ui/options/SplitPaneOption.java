@@ -25,8 +25,7 @@ import org.slf4j.*;
  * This option class encapsulates a split pane, as the one present in the Swing api.
  * @author Laurent Cohen
  */
-public class SplitPaneOption extends AbstractOptionContainer
-{
+public class SplitPaneOption extends AbstractOptionContainer {
   /**
    * Logger for this class.
    */
@@ -61,9 +60,8 @@ public class SplitPaneOption extends AbstractOptionContainer
   protected int orientation = 0;
 
   @Override
-  public void createUI()
-  {
-    JSplitPane pane = new JSplitPane();
+  public void createUI() {
+    final JSplitPane pane = new JSplitPane();
     pane.setOrientation(orientation == HORIZONTAL ? JSplitPane.HORIZONTAL_SPLIT : JSplitPane.VERTICAL_SPLIT);
     UIComponent = pane;
     children.add(FILLER1);
@@ -76,24 +74,18 @@ public class SplitPaneOption extends AbstractOptionContainer
   }
 
   @Override
-  public void add(final OptionElement element)
-  {
-    JSplitPane pane = (JSplitPane) UIComponent;
-    if (FILLER1 == children.get(0))
-    {
+  public void add(final OptionElement element) {
+    final JSplitPane pane = (JSplitPane) UIComponent;
+    if (FILLER1 == children.get(0)) {
       children.remove(0);
       children.add(0, element);
       pane.setLeftComponent(element.getUIComponent());
-    }
-    else if (FILLER2 == children.get(1))
-    {
+    } else if (FILLER2 == children.get(1)) {
       children.remove(1);
       children.add(1, element);
       pane.setRightComponent(element.getUIComponent());
-    }
-    else
-    {
-      String msg = '['+ this.toString() + "] This split pane can't contain more than 2 elements";
+    } else {
+      final String msg = '[' + this.toString() + "] This split pane can't contain more than 2 elements";
       System.err.println(msg);
       log.error(msg);
       return;
@@ -102,19 +94,15 @@ public class SplitPaneOption extends AbstractOptionContainer
   }
 
   @Override
-  public void remove(final OptionElement element)
-  {
-    int idx = children.indexOf(element);
+  public void remove(final OptionElement element) {
+    final int idx = children.indexOf(element);
     if (idx < 0) return;
-    JSplitPane pane = (JSplitPane) UIComponent;
-    if (idx == 0)
-    {
+    final JSplitPane pane = (JSplitPane) UIComponent;
+    if (idx == 0) {
       children.remove(0);
       children.add(0, FILLER1);
       pane.setLeftComponent(FILLER1.getUIComponent());
-    }
-    else
-    {
+    } else {
       children.remove(1);
       children.add(1, FILLER2);
       pane.setRightComponent(FILLER2.getUIComponent());
@@ -126,8 +114,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Get the split pane's divider width.
    * @return the divider width as an int value.
    */
-  public int getDividerWidth()
-  {
+  public int getDividerWidth() {
     return dividerWidth;
   }
 
@@ -135,8 +122,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Set the split pane's divider width.
    * @param dividerWidth the divider width as an int value.
    */
-  public void setDividerWidth(final int dividerWidth)
-  {
+  public void setDividerWidth(final int dividerWidth) {
     this.dividerWidth = dividerWidth;
   }
 
@@ -144,8 +130,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Get the split pane's resize weight.
    * @return the resize weight as a double value.
    */
-  public double getResizeWeight()
-  {
+  public double getResizeWeight() {
     return resizeWeight;
   }
 
@@ -153,8 +138,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Set the split pane's resize weight.
    * @param resizeWeight the resize weight as a double value.
    */
-  public void setResizeWeight(final double resizeWeight)
-  {
+  public void setResizeWeight(final double resizeWeight) {
     this.resizeWeight = resizeWeight;
   }
 
@@ -162,8 +146,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Get the orientation of the split.
    * @return one of {@link #VERTICAL} or {@link #HORIZONTAL}.
    */
-  public int getOrientation()
-  {
+  public int getOrientation() {
     return orientation;
   }
 
@@ -171,8 +154,7 @@ public class SplitPaneOption extends AbstractOptionContainer
    * Set the orientation of the split.
    * @param orientation - one of {@link #VERTICAL} or {@link #HORIZONTAL}.
    */
-  public void setOrientation(final int orientation)
-  {
+  public void setOrientation(final int orientation) {
     this.orientation = orientation;
   }
 }

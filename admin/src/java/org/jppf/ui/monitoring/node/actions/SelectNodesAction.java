@@ -30,14 +30,12 @@ import org.jppf.ui.treetable.*;
  * Action performed to select all drivers in the topology view.
  * @author Laurent Cohen
  */
-public class SelectNodesAction extends AbstractSelectionAction
-{
+public class SelectNodesAction extends AbstractSelectionAction {
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectNodesAction(final AbstractTreeTableOption panel)
-  {
+  public SelectNodesAction(final AbstractTreeTableOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_nodes.gif");
     setupNameAndTooltip("select.nodes");
@@ -45,14 +43,14 @@ public class SelectNodesAction extends AbstractSelectionAction
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    synchronized(panel) {
-      JPPFTreeTable treeTable = panel.getTreeTable();
-      TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-      List<TreePath> selectionPath = new ArrayList<>();
-      for (DefaultMutableTreeNode driverNode: getDriverNodes()) {
-        for (int i=0; i<driverNode.getChildCount(); i++) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-          AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
+    synchronized (panel) {
+      final JPPFTreeTable treeTable = panel.getTreeTable();
+      final TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+      final List<TreePath> selectionPath = new ArrayList<>();
+      for (final DefaultMutableTreeNode driverNode: getDriverNodes()) {
+        for (int i = 0; i < driverNode.getChildCount(); i++) {
+          final DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
+          final AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
           if ((data == null) || !data.isNode()) continue;
           selectionPath.add(treeTable.getPathForNode(node));
         }

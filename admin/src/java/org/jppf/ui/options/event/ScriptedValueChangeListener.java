@@ -31,8 +31,7 @@ import org.slf4j.*;
  * Implementation of ValueChangeListener for script-based event listeners.
  * @author Laurent Cohen
  */
-public class ScriptedValueChangeListener implements ValueChangeListener
-{
+public class ScriptedValueChangeListener implements ValueChangeListener {
   /**
    * Logger for this class.
    */
@@ -63,8 +62,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
    * @param language the name of the scripting language to use.
    * @param content the actual source of the script to execute.
    */
-  public ScriptedValueChangeListener(final String language, final String content)
-  {
+  public ScriptedValueChangeListener(final String language, final String content) {
     this.language = language;
     this.script = content;
   }
@@ -78,34 +76,36 @@ public class ScriptedValueChangeListener implements ValueChangeListener
    */
   @Override
   public void valueChanged(final ValueChangeEvent event) {
-    OptionElement option = event.getOption();
+    final OptionElement option = event.getOption();
     if (scriptText == null) {
-      TreePath path = option.getPath();
-      StringBuilder sb = new StringBuilder();
+      final TreePath path = option.getPath();
+      final StringBuilder sb = new StringBuilder();
       // add the scripts defined in the option and all its ancestors to the one in the listener.
       // only scripts written in the same scripting language are added.
-      for (Object o: path.getPath()) {
-        OptionElement elt = (OptionElement) o;
-        for (ScriptDescriptor desc: elt.getScripts()) {
+      for (final Object o: path.getPath()) {
+        final OptionElement elt = (OptionElement) o;
+        for (final ScriptDescriptor desc: elt.getScripts()) {
           if (language.equals(desc.language)) sb.append(desc.content).append('\n');
         }
       }
       sb.append(script);
       scriptText = sb.toString();
     }
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("root", option.getRoot());
     variables.put("option", option);
     ScriptRunner runner = null;
     try {
       runner = ScriptRunnerFactory.getScriptRunner(this.language);
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       runner.evaluate(uuid, scriptText, variables);
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
-      StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
-      if (debugEnabled) log.debug(sb.toString());
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      if (debugEnabled) {
+        final StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
+        log.debug(sb.toString());
+      }
       //System.out.println(sb.toString());
-    } catch(JPPFScriptingException e) {
+    } catch (final JPPFScriptingException e) {
       //e.printStackTrace();
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
     } finally {

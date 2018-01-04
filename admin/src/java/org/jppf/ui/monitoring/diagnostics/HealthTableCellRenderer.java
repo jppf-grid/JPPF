@@ -69,8 +69,8 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean selected, final boolean hasFocus, final int row, final int column) {
-    DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
-    int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
+    final DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
+    final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
     if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return renderer;
     int alignment = SwingConstants.LEFT;
     switch(actualCol) {
@@ -85,28 +85,24 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
       case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
         alignment = SwingConstants.RIGHT;
         break;
-        /*
-        alignment = SwingConstants.CENTER;
-        break;
-        */
     }
-    JPPFTreeTable treeTable = (JPPFTreeTable) table;
-    TreePath path = treeTable.getPathForRow(row);
+    final JPPFTreeTable treeTable = (JPPFTreeTable) table;
+    final TreePath path = treeTable.getPathForRow(row);
     String iconPath = null;
     if (path != null) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+      final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
       renderer.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
-      Object o = node.getUserObject();
+      final Object o = node.getUserObject();
       if (o instanceof AbstractTopologyComponent) {
-        AbstractTopologyComponent data = (AbstractTopologyComponent) o;
-        HealthSnapshot health = data.getHealthSnapshot();
+        final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+        final HealthSnapshot health = data.getHealthSnapshot();
         switch(actualCol) {
           case JVMHealthTreeTableModel.THREADS:
             if (health.isDeadlocked()) {
               renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
               iconPath = CRITICAL_ICON;
-              Rectangle r = table.getCellRect(row, column, false);
-              int n = r == null ? 4 : r.width - 36;
+              final Rectangle r = table.getCellRect(row, column, false);
+              final int n = r == null ? 4 : r.width - 36;
               renderer.setIconTextGap(n < 4 ? 4 : n);
             } else {
               renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
@@ -136,7 +132,7 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
         }
       }
     }
-    ImageIcon icon = iconPath != null ? GuiUtils.loadIcon(iconPath) : null;
+    final ImageIcon icon = iconPath != null ? GuiUtils.loadIcon(iconPath) : null;
     renderer.setIcon(icon);
     renderer.setHorizontalAlignment(alignment);
     renderer.setBorder(border);
@@ -152,9 +148,8 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    * @param warning name of the threshold for warning level of the value.
    * @param critical name of the threshold for critical level of the value.
    */
-  private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final double value, final boolean selected, final Name warning, final Name critical)
-  {
-    Thresholds thr = healthPanel.getThresholds();
+  private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final double value, final boolean selected, final Name warning, final Name critical) {
+    final Thresholds thr = healthPanel.getThresholds();
     if (value < thr.getValue(warning)) renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
     else if (value < thr.getValue(critical)) renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
     else renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);

@@ -135,10 +135,10 @@ public class FileChooserOption extends AbstractOption {
   public void doChooseFile() {
     String val = (String) value;
     if ((val == null) || "".equals(val.trim())) val = System.getProperty("user.dir");
-    JFileChooser chooser = new JFileChooser(new File(val).getParent()) {
+    final JFileChooser chooser = new JFileChooser(new File(val).getParent()) {
       @Override
       protected JDialog createDialog(final java.awt.Component parent) throws HeadlessException {
-        JDialog dialog = super.createDialog(parent);
+        final JDialog dialog = super.createDialog(parent);
         if (icon != null) dialog.setIconImage(icon.getImage());
         return dialog;
       }
@@ -191,12 +191,8 @@ public class FileChooserOption extends AbstractOption {
     filters.clear();
     if ((extensions == null) || "".equals(extensions.trim())) this.extensions = DEFAULT_EXTENSIONS;
     else this.extensions = extensions;
-    /*else*/ {
-      String[] rawExt = RegexUtils.PIPE_PATTERN.split(extensions);
-      for (String s: rawExt) {
-        filters.add(parseFilter(s));
-      }
-    }
+    final String[] rawExt = RegexUtils.PIPE_PATTERN.split(extensions);
+    for (final String s: rawExt) filters.add(parseFilter(s));
   }
 
   /**
@@ -204,10 +200,10 @@ public class FileChooserOption extends AbstractOption {
    * @param source the descriptor string.
    * @return a {@link Filter} instance.
    */
-  private Filter parseFilter(final String source) {
+  private static Filter parseFilter(final String source) {
     String ext = "";
     String desc = "";
-    int idx = source.indexOf(';');
+    final int idx = source.indexOf(';');
     if (idx < 0) ext = source.trim();
     else {
       ext = source.substring(0, idx).trim();
@@ -249,8 +245,8 @@ public class FileChooserOption extends AbstractOption {
       if (f == null) return false;
       if (f.isDirectory()) return true;
       if ("*".equals(ext)) return true;
-      String s = f.getAbsolutePath();
-      int idx = s.lastIndexOf('.');
+      final String s = f.getAbsolutePath();
+      final int idx = s.lastIndexOf('.');
       if ((idx < 0) && "".equals(ext)) return true;
       return ext.equals(s.substring(idx + 1));
     }

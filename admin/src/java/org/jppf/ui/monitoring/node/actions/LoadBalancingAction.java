@@ -67,7 +67,7 @@ public class LoadBalancingAction extends AbstractTopologyAction {
     super.updateState(selectedElements);
     for (Object o: selectedElements) {
       if (o instanceof AbstractTopologyComponent) {
-        AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+        final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
         if (data.isDriver()) {
           setEnabled(true);
           return;
@@ -84,27 +84,27 @@ public class LoadBalancingAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
       final TopologyDriver driver = (TopologyDriver) selectedElements.get(0);
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/LoadBalancingSettings.xml");
-      JButton applyBtn = (JButton) panel.findFirstWithName("Apply").getUIComponent();
-      JButton refreshBtn = (JButton) panel.findFirstWithName("Refresh").getUIComponent();
+      final JButton applyBtn = (JButton) panel.findFirstWithName("Apply").getUIComponent();
+      final JButton refreshBtn = (JButton) panel.findFirstWithName("Refresh").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("load.balancing.caption", driver.getDisplayName()), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/balance.png").getImage());
-      Action applyAction = new AbstractAction() {
+      final Action applyAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) { doApply(driver); }
       };
       applyBtn.addActionListener(applyAction);
-      Action refreshAction = new AbstractAction() {
+      final Action refreshAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) { doRefresh(driver); }
       };
       refreshBtn.addActionListener(refreshAction);
-      Action closeAction = new AbstractAction() {
+      final Action closeAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -119,7 +119,7 @@ public class LoadBalancingAction extends AbstractTopologyAction {
       dialog.setLocation(location);
       dialog.setSize(500, 500);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -131,12 +131,12 @@ public class LoadBalancingAction extends AbstractTopologyAction {
   private void doApply(final TopologyDriver driver) {
     final String params = (String) ((AbstractOption) panel.findFirstWithName("LoadBalancingParameters")).getValue();
     final String algo = (String) ((AbstractOption) panel.findFirstWithName("Algorithm")).getValue();
-    JMXDriverConnectionWrapper jmx = driver.getJmx();
+    final JMXDriverConnectionWrapper jmx = driver.getJmx();
     try {
-      TextAreaOption option = (TextAreaOption) panel.findFirstWithName("/LoadBalancingMessages");
-      String msg = jmx.changeLoadBalancerSettings(algo, new TypedProperties().fromString(params));
+      final TextAreaOption option = (TextAreaOption) panel.findFirstWithName("/LoadBalancingMessages");
+      final String msg = jmx.changeLoadBalancerSettings(algo, new TypedProperties().fromString(params));
       if (msg != null) option.append(LocalizationUtils.getLocalized("org.jppf.server.i18n.server_messages", msg) + " (" + algo + ")");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -146,15 +146,15 @@ public class LoadBalancingAction extends AbstractTopologyAction {
    * @param driver the driver to refresh the settings from.
    */
   private void doRefresh(final TopologyDriver driver) {
-    AbstractOption paramsOption = (AbstractOption) panel.findFirstWithName("LoadBalancingParameters");
-    ComboBoxOption algoOption = (ComboBoxOption) panel.findFirstWithName("Algorithm");
-    JMXDriverConnectionWrapper jmx = driver.getJmx();
+    final AbstractOption paramsOption = (AbstractOption) panel.findFirstWithName("LoadBalancingParameters");
+    final ComboBoxOption algoOption = (ComboBoxOption) panel.findFirstWithName("Algorithm");
+    final JMXDriverConnectionWrapper jmx = driver.getJmx();
     try {
-      LoadBalancingInformation lbi = jmx.loadBalancerInformation();
+      final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
       algoOption.setItems(lbi.getAlgorithmNames());
       algoOption.setValue(lbi.getAlgorithm());
       paramsOption.setValue(lbi.getParameters().asString());
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }

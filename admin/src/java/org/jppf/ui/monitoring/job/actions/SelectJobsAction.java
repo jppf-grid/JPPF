@@ -59,17 +59,17 @@ public class SelectJobsAction extends AbstractJobAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     synchronized(panel) {
-      JPPFTreeTable treeTable = panel.getTreeTable();
-      List<TreePath> selectionPath = new ArrayList<>();
-      DefaultMutableTreeNode root = panel.getTreeTableRoot();
+      final JPPFTreeTable treeTable = panel.getTreeTable();
+      final List<TreePath> selectionPath = new ArrayList<>();
+      final DefaultMutableTreeNode root = panel.getTreeTableRoot();
       for (int i=0; i<root.getChildCount(); i++) {
-        DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
+        final DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
         for (int j=0; j<driver.getChildCount(); j++) {
-          DefaultMutableTreeNode job = (DefaultMutableTreeNode) driver.getChildAt(j);
+          final DefaultMutableTreeNode job = (DefaultMutableTreeNode) driver.getChildAt(j);
           selectionPath.add(treeTable.getPathForNode(job));
         }
       }
-      TreeTableModelAdapter m = (TreeTableModelAdapter) treeTable.getModel();
+      final TreeTableModelAdapter m = (TreeTableModelAdapter) treeTable.getModel();
       m.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
     }
   }

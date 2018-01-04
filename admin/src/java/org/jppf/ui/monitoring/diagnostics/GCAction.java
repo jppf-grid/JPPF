@@ -67,25 +67,25 @@ public class GCAction extends AbstractTopologyAction {
       // do the gc() in the drivers
       for (AbstractTopologyComponent data: dataArray) {
         if (data.isDriver() && (((TopologyDriver) data).getJmx() != null)) {
-          TopologyDriver driver = (TopologyDriver) data;
+          final TopologyDriver driver = (TopologyDriver) data;
           try {
-            DiagnosticsMBean diagnostics = driver.getDiagnostics();
+            final DiagnosticsMBean diagnostics = driver.getDiagnostics();
             if (diagnostics == null) continue;
             diagnostics.gc();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }
       }
       // do the gc() in the nodes grouped by server attachment
-      CollectionMap<TopologyDriver, String> map = getDriverMap();
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+      final CollectionMap<TopologyDriver, String> map = getDriverMap();
+      for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
         try {
-          JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+          final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
-          NodeSelector selector = new UuidSelector(entry.getValue());
+          final NodeSelector selector = new UuidSelector(entry.getValue());
           forwarder.gc(selector);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

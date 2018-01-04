@@ -53,13 +53,13 @@ public class HealthUtils {
     ThreadDump info = null;
     try {
       if (data.isNode()) {
-        TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
-        Object o = result.get(data.getUuid());
+        final TopologyDriver parent = (TopologyDriver) data.getParent();
+        final Map<String, Object> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
+        final Object o = result.get(data.getUuid());
         if (o instanceof ThreadDump) info = (ThreadDump) o;
       }
       else info = ((TopologyDriver) data).getDiagnostics().threadDump();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return info;

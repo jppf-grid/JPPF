@@ -31,23 +31,20 @@ import org.jppf.ui.monitoring.node.AbstractTopologyMouseListener;
  * Processes right-click events to display popup menus.
  * @author Laurent Cohen
  */
-public class JVMHealthTreeTableMouseListener extends AbstractTopologyMouseListener
-{
+public class JVMHealthTreeTableMouseListener extends AbstractTopologyMouseListener {
   /**
    * Initialize this mouse listener.
    * @param actionHandler the object that handles toolbar and menu actions.
    */
-  public JVMHealthTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
-  {
+  public JVMHealthTreeTableMouseListener(final JTreeTableActionHandler actionHandler) {
     super(actionHandler);
   }
 
   @Override
-  protected JPopupMenu createPopupMenu(final MouseEvent event)
-  {
-    Component comp = event.getComponent();
-    Point p = comp.getLocationOnScreen();
-    JPopupMenu menu = new JPopupMenu();
+  protected JPopupMenu createPopupMenu(final MouseEvent event) {
+    final Component comp = event.getComponent();
+    final Point p = comp.getLocationOnScreen();
+    final JPopupMenu menu = new JPopupMenu();
     addItem(menu, "health.gc", p);
     addItem(menu, "health.thread.dump", p);
     addItem(menu, "health.heap.dump", p);

@@ -39,7 +39,7 @@ public class JPPFTreeTable extends JTreeTable {
   public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel) {
     super(treeTableModel);
     for (int i = 0; i < treeTableModel.getColumnCount(); i++) {
-      TableColumn column = getColumnModel().getColumn(i);
+      final TableColumn column = getColumnModel().getColumn(i);
       column.setIdentifier(Integer.valueOf(i));
     }
   }
@@ -53,7 +53,7 @@ public class JPPFTreeTable extends JTreeTable {
     if (getTree().getRowCount() <= n) return null;
     try {
       return getTree().getPathForRow(n);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.debug(e.getMessage(), e);
       return null;
     }
@@ -72,7 +72,7 @@ public class JPPFTreeTable extends JTreeTable {
    * Expand all paths in the tree.
    */
   public void expandAll() {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
     expand(root, true);
   }
 
@@ -100,7 +100,7 @@ public class JPPFTreeTable extends JTreeTable {
    * Collapse all paths in the tree.
    */
   public void collapseAll() {
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
+    final DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
     for (int i = 0; i < root.getChildCount(); i++) getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
   }
 

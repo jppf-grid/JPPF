@@ -73,10 +73,10 @@ public class ProvisioningAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    List<AbstractTopologyComponent> list = new ArrayList<>();
-    for (Object o: selectedElements) {
-      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
-      JPPFManagementInfo info = data.getManagementInfo();
+    final List<AbstractTopologyComponent> list = new ArrayList<>();
+    for (final Object o: selectedElements) {
+      final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      final JPPFManagementInfo info = data.getManagementInfo();
       if ((info != null) && info.isMasterNode()) list.add(data);
     }
     dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new AbstractTopologyComponent[list.size()]);
@@ -89,23 +89,23 @@ public class ProvisioningAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     panel = loadWithPreferences("org/jppf/ui/options/xml/ProvisioningPanel.xml");
-    JButton okBtn = (JButton) panel.findFirstWithName("/provisioningOK").getUIComponent();
-    JButton cancelBtn = (JButton) panel.findFirstWithName("/provisioningCancel").getUIComponent();
+    final JButton okBtn = (JButton) panel.findFirstWithName("/provisioningOK").getUIComponent();
+    final JButton cancelBtn = (JButton) panel.findFirstWithName("/provisioningCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("provisioning.frame.caption"), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
-    AbstractAction okAction = new AbstractAction() {
+    final AbstractAction okAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
         doOK();
       }
     };
-    AbstractAction cancelAction = new AbstractAction() {
+    final AbstractAction cancelAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
+        final CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
         overrides = (String) textArea.getValue();
         dialog.setVisible(false);
         dialog.dispose();
@@ -126,26 +126,26 @@ public class ProvisioningAction extends AbstractTopologyAction {
    */
   private void doOK() {
     savePreferences(panel);
-    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
+    final CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
     final Boolean b = (Boolean) ((BooleanOption) panel.findFirstWithName("useOverrides")).getValue();
     overrides = (String) textArea.getValue();
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;
     nbSlaves = ((Number) ((SpinnerNumberOption) panel.findFirstWithName("nbSlaves")).getValue()).intValue();
     final Boolean interruptIfRunning = (Boolean) ((BooleanOption) panel.findFirstWithName("interruptIfRunning")).getValue();
     final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (AbstractTopologyComponent data: dataArray) {
+    for (final AbstractTopologyComponent data: dataArray) {
       if (data.getParent() == null) continue;
       map.putValue((TopologyDriver) data.getParent(), data.getUuid());
     }
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override public void run() {
-        for (Map.Entry<TopologyDriver, Collection<String>> en: map.entrySet()) {
-          TopologyDriver parent = en.getKey();
-          NodeSelector selector = new UuidSelector(en.getValue());
+        for (final Map.Entry<TopologyDriver, Collection<String>> en: map.entrySet()) {
+          final TopologyDriver parent = en.getKey();
+          final NodeSelector selector = new UuidSelector(en.getValue());
           try {
-            Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, nbSlaves, interruptIfRunning, props);
+            final Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, nbSlaves, interruptIfRunning, props);
             printForwardingRequestErrors(result);
-          } catch(Exception e) {
+          } catch(final Exception e) {
             log.error(e.getMessage(), e);
           }
         }
@@ -160,10 +160,10 @@ public class ProvisioningAction extends AbstractTopologyAction {
    * @return a map of string keys to string values.
    */
   private static TypedProperties getPropertiesFromString(final String source) {
-    TypedProperties props = new TypedProperties();
-    try (Reader reader = new StringReader(source)) {
+    final TypedProperties props = new TypedProperties();
+    try (final Reader reader = new StringReader(source)) {
       props.load(reader);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return props;
@@ -173,11 +173,11 @@ public class ProvisioningAction extends AbstractTopologyAction {
    * Prints the eventual errors resulting from a node forwarding request.
    * @param result the map containing the results for the request.
    */
-  private void printForwardingRequestErrors(final Map<String, Object> result) {
+  private static void printForwardingRequestErrors(final Map<String, Object> result) {
     if (debugEnabled) {
       for (Map.Entry<String, Object> en2: result.entrySet()) {
         if (en2.getValue() instanceof Throwable) {
-          Throwable t = (Throwable) en2.getValue();
+          final Throwable t = (Throwable) en2.getValue();
           if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}", en2.getKey(), ExceptionUtils.getStackTrace(t));
         }
       }

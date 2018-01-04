@@ -96,8 +96,8 @@ public final class StatsHandler extends BaseStatsHandler {
     if (debugEnabled) log.debug("initializing TopologyManager");
     topologyManager = new TopologyManager();
     if (debugEnabled) log.debug("initializing JobMonitor");
-    String modeStr = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_MODE);
-    long period = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_PERIOD);
+    final String modeStr = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_MODE);
+    final long period = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_PERIOD);
     JobMonitorUpdateMode mode = JobMonitorUpdateMode.IMMEDIATE_NOTIFICATIONS;
     if ("deferred_notifications".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.DEFERRED_NOTIFICATIONS;
     else if ("polling".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.POLLING;
@@ -122,14 +122,14 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public void requestUpdate() {
     if (debugEnabled) log.debug("stats update requested");
-    ConnectionDataHolder cdh = getCurrentDataHolder();
+    final ConnectionDataHolder cdh = getCurrentDataHolder();
     if (cdh != null) requestUpdate(cdh.getDriver());
   }
 
   @Override
   public synchronized void update(final TopologyDriver driver, final JPPFStatistics stats) {
     super.update(driver, stats);
-    TopologyDriver current = clientHandler.getCurrentDriver();
+    final TopologyDriver current = clientHandler.getCurrentDriver();
     if ((current != null) && driver.getUuid().equals(current.getUuid())) fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
   }
 
@@ -138,7 +138,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return the number of snapshots as an int.
    */
   public int getStatsCount() {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? 0 : super.getStatsCount(driver);
   }
 
@@ -147,7 +147,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return a {@link ConnectionDataHolder} instance.
    */
   public synchronized ConnectionDataHolder getCurrentDataHolder() {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? null : dataHolderMap.get(driver.getUuid());
   }
 
@@ -157,7 +157,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return a map of field names to their values represented as strings.
    */
   public synchronized Map<Fields, String> getStringValues(final int position) {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? null : getStringValues(Locale.getDefault(), driver, position);
   }
 
@@ -166,7 +166,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return a map of field names to their values represented as strings.
    */
   public Map<Fields, String> getLatestStringValues() {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? StatsConstants.NO_STRING_VALUES : getLatestStringValues(Locale.getDefault(), driver);
   }
 
@@ -176,7 +176,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return a map of field names to their values represented as double values.
    */
   public synchronized Map<Fields, Double> getDoubleValues(final int position) {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? null : getDoubleValues(driver, position);
   }
 
@@ -185,7 +185,7 @@ public final class StatsHandler extends BaseStatsHandler {
    * @return a map of field names to their values represented as double values.
    */
   public Map<Fields, Double> getLatestDoubleValues() {
-    TopologyDriver driver = clientHandler.getCurrentDriver();
+    final TopologyDriver driver = clientHandler.getCurrentDriver();
     return (driver == null) ? null : getLatestDoubleValues(driver);
   }
 
@@ -195,12 +195,12 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public void copyStatsToClipboard(final int format) {
     try {
-      TopologyDriver driver = getCurrentDataHolder().getDriver();
-      StatsExporter exporter = (format == StatsExporter.CSV) ? new CsvStatsExporter(this, driver) : new TextStatsExporter(this, driver, Locale.getDefault());
-      String text = exporter.formatAll();
-      Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+      final TopologyDriver driver = getCurrentDataHolder().getDriver();
+      final StatsExporter exporter = (format == StatsExporter.CSV) ? new CsvStatsExporter(this, driver) : new TextStatsExporter(this, driver, Locale.getDefault());
+      final String text = exporter.formatAll();
+      final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
       clip.setContents(new StringSelection(text), null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -210,16 +210,16 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   public void resetCurrentStats() {
     if (debugEnabled) log.debug("resetting current stats");
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = clientHandler.getCurrentDriver();
+        final TopologyDriver driver = clientHandler.getCurrentDriver();
         if (driver == null) return;
-        JMXDriverConnectionWrapper jmx = driver.getJmx();
+        final JMXDriverConnectionWrapper jmx = driver.getJmx();
         if ((jmx != null) && jmx.isConnected()) {
           try {
             jmx.resetStatistics();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (debugEnabled) log.debug("couldn't reset statistics on {} : {}", driver, ExceptionUtils.getStackTrace(e));
             else log.error("couldn't reset statistics on {} : {}", driver, ExceptionUtils.getMessage(e));
           }

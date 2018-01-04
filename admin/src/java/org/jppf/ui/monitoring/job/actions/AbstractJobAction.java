@@ -60,9 +60,9 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    List<Job> jobList = new ArrayList<>();
-    List<JobDispatch> subjobList = new ArrayList<>();
-    for (Object o : selectedElements) {
+    final List<Job> jobList = new ArrayList<>();
+    final List<JobDispatch> subjobList = new ArrayList<>();
+    for (final Object o : selectedElements) {
       if (o instanceof Job) jobList.add((Job) o);
       else if (o instanceof JobDispatch) subjobList.add((JobDispatch) o);
     }

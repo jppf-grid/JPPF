@@ -67,7 +67,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Initialize the mapping of chart types to the chart handler used to create and update them.
    */
   private void initHandlerMap() {
-    StatsHandler statsHandler = StatsHandler.getInstance();
+    final StatsHandler statsHandler = StatsHandler.getInstance();
     handlerMap.put(CHART_PLOTXY, new PlotXYChartHandler(statsHandler));
     handlerMap.put(CHART_3DBAR, new Bar3DChartHandler(statsHandler));
     handlerMap.put(CHART_AREA, new AreaChartHandler(statsHandler));
@@ -88,20 +88,20 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @return the configuration with its created chart set.
    */
   public ChartConfiguration createChart(final ChartConfiguration config, final boolean preview) {
-    ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
-    ChartHandler handler = handlerMap.get(cfg.type);
+    final ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
+    final ChartHandler handler = handlerMap.get(cfg.type);
     if (handler == null) return null;
     handler.createChart(cfg);
-    Class<?> jfChartClass = getClass0("org.jfree.chart.JFreeChart");
-    Class<?> chartPanelClass = getClass0("org.jfree.chart.ChartPanel");
+    final Class<?> jfChartClass = getClass0("org.jfree.chart.JFreeChart");
+    final Class<?> chartPanelClass = getClass0("org.jfree.chart.ChartPanel");
     if (cfg.chart instanceof Object[]) {
-      JPanel panel = new JPanel();
+      final JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-      Object[] charts = (Object[]) cfg.chart;
+      final Object[] charts = (Object[]) cfg.chart;
       for (int i=0; i<charts.length; i++) {
-        Object chart = charts[i];
+        final Object chart = charts[i];
         //chartPanel = new ChartPanel(chart, true);
-        JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass, boolean.class}, chart, true);
+        final JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass, boolean.class}, chart, true);
         //chartPanel.setMinimumDrawWidth(0);
         invokeMethod(chartPanelClass, chartPanel, "setMinimumDrawWidth", new Class[] {int.class}, 0);
         //chartPanel.setMaximumDrawWidth(Integer.MAX_VALUE);
@@ -179,7 +179,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    */
   public void removeChart(final TabConfiguration tab, final ChartConfiguration config) {
     tab.configs.remove(config);
-    JPanel panel = tab.panel;
+    final JPanel panel = tab.panel;
     panel.remove(config.chartPanel);
     panel.updateUI();
   }
@@ -254,10 +254,10 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   public void reset() {
     try {
       StatsHandler.getInstance().removeStatsHandlerListener(this);
-      List<TabConfiguration> tmpTabs = new ArrayList<>(tabList);
-      for (TabConfiguration tabConfig: tmpTabs) {
-        List<ChartConfiguration> tmpCharts = new ArrayList<>(tabConfig.configs);
-        for (ChartConfiguration chartConfig: tmpCharts) removeChart(tabConfig, chartConfig);
+      final List<TabConfiguration> tmpTabs = new ArrayList<>(tabList);
+      for (final TabConfiguration tabConfig: tmpTabs) {
+        final List<ChartConfiguration> tmpCharts = new ArrayList<>(tabConfig.configs);
+        for (final ChartConfiguration chartConfig: tmpCharts) removeChart(tabConfig, chartConfig);
         removeTab(tabConfig);
       }
       createInitialCharts();

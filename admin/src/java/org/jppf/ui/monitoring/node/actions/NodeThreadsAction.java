@@ -83,7 +83,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
@@ -95,11 +95,11 @@ public class NodeThreadsAction extends AbstractTopologyAction {
       ((AbstractOption) panel.findFirstWithName("nbThreads")).setValue(nbThreads);
       ((AbstractOption) panel.findFirstWithName("threadPriority")).setValue(priority);
 
-      JButton okBtn = (JButton) panel.findFirstWithName("/nodeThreadsOK").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
+      final JButton okBtn = (JButton) panel.findFirstWithName("/nodeThreadsOK").getUIComponent();
+      final JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("NodeThreadPoolPanel.label"), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
-      AbstractAction okAction = new AbstractAction() {
+      final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -108,7 +108,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
         }
       };
       okBtn.addActionListener(okAction);
-      AbstractAction cancelAction = new AbstractAction() {
+      final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -116,14 +116,14 @@ public class NodeThreadsAction extends AbstractTopologyAction {
         }
       };
       cancelBtn.addActionListener(cancelAction);
-      JComponent comp = panel.getUIComponent();
+      final JComponent comp = panel.getUIComponent();
       dialog.getContentPane().add(comp);
       dialog.pack();
       dialog.setLocationRelativeTo(null);
       dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -133,22 +133,22 @@ public class NodeThreadsAction extends AbstractTopologyAction {
    */
   private void doOK() {
     savePreferences(panel);
-    AbstractOption nbThreadsOption = (AbstractOption) panel.findFirstWithName("nbThreads");
-    AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
+    final AbstractOption nbThreadsOption = (AbstractOption) panel.findFirstWithName("nbThreads");
+    final AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
     nbThreads = ((Number) nbThreadsOption.getValue()).intValue();
     priority = ((Number) priorityOption.getValue()).intValue();
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyDriver, String> map = getDriverMap();
-        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        final CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+            final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
-            NodeSelector selector = new UuidSelector(entry.getValue());
+            final NodeSelector selector = new UuidSelector(entry.getValue());
             forwarder.updateThreadPoolSize(selector, nbThreads);
             forwarder.updateThreadsPriority(selector, priority);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

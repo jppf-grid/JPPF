@@ -93,7 +93,7 @@ public final class StatsFormatter {
    * @return a {@code NumberFormat} instance.
    */
   private NumberFormat initDoubleFormatter() {
-    NumberFormat doubleFormatter = NumberFormat.getInstance(locale);
+    final NumberFormat doubleFormatter = NumberFormat.getInstance(locale);
     doubleFormatter.setGroupingUsed(true);
     doubleFormatter.setMinimumFractionDigits(2);
     doubleFormatter.setMaximumFractionDigits(2);
@@ -107,7 +107,7 @@ public final class StatsFormatter {
    * @since 5.0
    */
   private NumberFormat initIntegerFormatter() {
-    NumberFormat intFormatter = NumberFormat.getInstance(locale);
+    final NumberFormat intFormatter = NumberFormat.getInstance(locale);
     intFormatter.setGroupingUsed(true);
     intFormatter.setMinimumFractionDigits(0);
     intFormatter.setMaximumFractionDigits(0);
@@ -121,9 +121,9 @@ public final class StatsFormatter {
    * @return a map of field names to their corresponding string values.
    */
   public Map<Fields, String> formatValues(final Map<Fields, Double> values) {
-    Map<Fields, String> map = new HashMap<>();
-    for (Map.Entry<Fields, Double> entry: values.entrySet()) {
-      Fields field = entry.getKey();
+    final Map<Fields, String> map = new HashMap<>();
+    for (final Map.Entry<Fields, Double> entry: values.entrySet()) {
+      final Fields field = entry.getKey();
       map.put(field, formatValue(field, entry.getValue()));
     }
     return map;
@@ -180,7 +180,7 @@ public final class StatsFormatter {
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private String formatTime(final double value) {
+  private static String formatTime(final double value) {
     return StringUtils.toStringDuration((long) value);
   }
 }

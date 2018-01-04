@@ -41,9 +41,9 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener {
 
   @Override
   protected JPopupMenu createPopupMenu(final MouseEvent event) {
-    Component comp = event.getComponent();
-    Point p = comp.getLocationOnScreen();
-    JPopupMenu menu = new JPopupMenu();
+    final Component comp = event.getComponent();
+    final Point p = comp.getLocationOnScreen();
+    final JPopupMenu menu = new JPopupMenu();
     addItem(menu, "show.information", p);
     menu.addSeparator();
     addItem(menu, "shutdown.restart.driver", p);

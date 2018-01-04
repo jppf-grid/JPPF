@@ -51,7 +51,7 @@ public class PluggableViewHandler {
    * @return {@code true} if the view was added successfully, {@code false} otherwise.
    */
   public boolean addView(final String name, final OptionElement elt) {
-    PluggableViewDescriptor desc = new PluggableViewDescriptor(name, elt, null, -1);
+    final PluggableViewDescriptor desc = new PluggableViewDescriptor(name, elt, null, -1);
     viewMap.put(name, desc);
     return true;
   }
@@ -62,16 +62,16 @@ public class PluggableViewHandler {
    * @return {@code true} if the view was added successfully, {@code false} otherwise.
    */
   private boolean addViewFromConfig(final String name) {
-    List<String> errors = new ArrayList<>();
-    TypedProperties config = JPPFConfiguration.getProperties();
-    boolean active = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ENABLED, name);
+    final List<String> errors = new ArrayList<>();
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final boolean active = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ENABLED, name);
     if (!active) return false;
-    String className = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_CLASS, name);
+    final String className = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_CLASS, name);
     if ((className == null) || "".equals(className)) errors.add(String.format("no class name defined for pluggable view '%s'", name));
-    String containerName = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ADD_TO, name);
+    final String containerName = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ADD_TO, name);
     if ((containerName == null) || "".equals(containerName)) errors.add(String.format("no 'addto' property defined for pluggable view '%s'", name));
     TabbedPaneOption container = null;
-    PluggableViewDescriptor containerDesc = viewMap.get(containerName);
+    final PluggableViewDescriptor containerDesc = viewMap.get(containerName);
     if (containerDesc == null) errors.add(String.format("container '%s' for pluggable view '%s' could not be found", containerName, name));
     else container = (TabbedPaneOption) containerDesc.getOption();
 
@@ -80,14 +80,14 @@ public class PluggableViewHandler {
       Class<?> clazz = null;
       try {
         clazz = Class.forName(className);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         errors.add(String.format("the class '%s' for pluggable view '%s' could not be found%n%s", className, name, ExceptionUtils.getStackTrace(e)));
       }
       if (clazz != null) {
         PluggableView view = null;
         try {
           view = (PluggableView) clazz.newInstance();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           errors.add(String.format("the class '%s' for pluggable view '%s' could not be instantiated%n%s", className, name, ExceptionUtils.getStackTrace(e)));
         }
         if (view != null) {
@@ -98,7 +98,7 @@ public class PluggableViewHandler {
           String title = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_TITLE, name);
           if ((title == null) || "".equals(title.trim())) title = name;
           option.setLabel(title);
-          String iconPath = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ICON, name);
+          final String iconPath = config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ICON, name);
           if (iconPath != null) option.setIconPath(iconPath);
           option.setDetachable(true);
           option.createUI();
@@ -106,11 +106,11 @@ public class PluggableViewHandler {
           try {
             if (pos < 0) pos = container.getChildren().size();
             container.add(option, pos);
-            JTabbedPane pane = (JTabbedPane) container.getUIComponent();
+            final JTabbedPane pane = (JTabbedPane) container.getUIComponent();
             if (config.get(JPPFProperties.ADMIN_CONSOLE_VIEW_AUTOSELECT, name)) pane.setSelectedIndex(pos);
             if (log.isDebugEnabled()) log.debug("successfully added pluggable view '{}'", name);
             return true;
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (pos >= 0) errors.add(String.format("the pluggable view '%s' could not be added to the container '%s' at position %d%n%s", className, name, pos, ExceptionUtils.getStackTrace(e)));
             else errors.add(String.format("the pluggable view '%s' could not be added to the container '%s'%n%s", className, name, ExceptionUtils.getStackTrace(e)));
           }
@@ -125,15 +125,15 @@ public class PluggableViewHandler {
    * Discover and install the pluggable views from the configuration.
    */
   public void installViews() {
-    TypedProperties fullConfig = JPPFConfiguration.getProperties();
+    final TypedProperties fullConfig = JPPFConfiguration.getProperties();
     final Pattern pattern = Pattern.compile("jppf\\.admin\\.console\\.view\\.(.+)\\..+");
     final Set<String> names = new HashSet<>();
     fullConfig.filter(new TypedProperties.Filter() {
       @Override
       public boolean accepts(final String name, final String value) {
-        Matcher matcher = pattern.matcher(name);
+        final Matcher matcher = pattern.matcher(name);
         if (matcher.matches()) {
-          String s = matcher.group(1);
+          final String s = matcher.group(1);
           if ((s != null) && !names.contains(s)) {
             names.add(s);
             return true;
@@ -150,10 +150,10 @@ public class PluggableViewHandler {
    * @param viewName the name of the vies.
    * @param errors the list of reported errors.
    */
-  private void logErrors(final String viewName, final List<String> errors) {
-    String s = errors.size() > 1 ? "s" : "";
-    StringBuilder sb = new StringBuilder("Error").append(s).append(" reported while creating the pluggable view '").append(viewName).append("':");
-    for (String error: errors) sb.append("\n").append(error);
+  private static void logErrors(final String viewName, final List<String> errors) {
+    final String s = errors.size() > 1 ? "s" : "";
+    final StringBuilder sb = new StringBuilder("Error").append(s).append(" reported while creating the pluggable view '").append(viewName).append("':");
+    for (final String error: errors) sb.append("\n").append(error);
     log.warn(sb.toString());
   }
 }

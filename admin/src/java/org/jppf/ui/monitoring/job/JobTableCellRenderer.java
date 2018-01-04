@@ -55,8 +55,8 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
    */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-    DefaultTableCellRenderer renderer =  (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
+    final DefaultTableCellRenderer renderer =  (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
     if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return renderer;
       int alignment = SwingConstants.LEFT;
     switch(actualCol) {

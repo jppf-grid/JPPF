@@ -77,7 +77,7 @@ public final class GuiUtils {
    * @return a <code>JPanel</code> instance.
    */
   public static JPanel createBoxPanel(final int orientation) {
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, orientation));
     return panel;
   }
@@ -106,13 +106,13 @@ public final class GuiUtils {
     }
     URL url = null;
     try {
-      File file = new File(path);
+      final File file = new File(path);
       if (file.exists()) url = file.toURI().toURL();
       else url = GuiUtils.class.getResource(path);
       if (url == null) return null;
       icon = new ImageIcon(url);
       if (useCache) iconMap.put(path, icon);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.warn(e.getMessage(), e);
     }
     return icon;
@@ -137,9 +137,9 @@ public final class GuiUtils {
   public static Cursor createCursor(final String name, final String imagePath, final Point hotspot) {
     Cursor cursor = cursorMap.get(name);
     if (cursor == null) {
-      ImageIcon icon = loadIcon(imagePath);
+      final ImageIcon icon = loadIcon(imagePath);
       if (icon == null) return null;
-      Image image = icon.getImage();
+      final Image image = icon.getImage();
       if (image == null) return null;
       cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, hotspot, name);
       if (cursor != null) cursorMap.put(name, cursor);
@@ -162,7 +162,7 @@ public final class GuiUtils {
    * @return the copy of the image as a {@link BufferedImage} object.
    */
   private static Image imageCopy(final Image source) {
-    BufferedImage copy = new BufferedImage(source.getWidth(null), source.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR);
+    final BufferedImage copy = new BufferedImage(source.getWidth(null), source.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR);
     copy.getGraphics().drawImage(source, 0, 0, null);
     return copy;
   }
@@ -174,11 +174,11 @@ public final class GuiUtils {
    * @return a new ImageIcon whose image is the result of merging all specified images.
    */
   public static ImageIcon mergeIcons(final String source, final String...toMerge) {
-    ImageIcon sourceIco = loadIcon(source);
-    Image resImg = imageCopy(sourceIco.getImage());
-    for (String s: toMerge) {
-      Graphics g = resImg.getGraphics();
-      ImageIcon ico = loadIcon(s);
+    final ImageIcon sourceIco = loadIcon(source);
+    final Image resImg = imageCopy(sourceIco.getImage());
+    for (final String s: toMerge) {
+      final Graphics g = resImg.getGraphics();
+      final ImageIcon ico = loadIcon(s);
       g.drawImage(ico.getImage(), 0, 0, null);
       g.dispose();
     }
@@ -190,10 +190,10 @@ public final class GuiUtils {
    */
   public static void initNodeIcons() {
     for (boolean master: AbstractTreeCellRenderer.BOOL_VALUES) {
-      for (boolean dotnet: AbstractTreeCellRenderer.BOOL_VALUES) {
-        for (NodePendingAction action: NodePendingAction.class.getEnumConstants()) {
-          StringBuilder sb = new StringBuilder("node");
-          java.util.List<String> iconsToMerge = new ArrayList<>();
+      for (final boolean dotnet: AbstractTreeCellRenderer.BOOL_VALUES) {
+        for (final NodePendingAction action: NodePendingAction.class.getEnumConstants()) {
+          final StringBuilder sb = new StringBuilder("node");
+          final java.util.List<String> iconsToMerge = new ArrayList<>();
           if (master) {
             sb.append("-master");
             iconsToMerge.add(AbstractTreeCellRenderer.MARKER_MASTER_ICON);
@@ -212,7 +212,7 @@ public final class GuiUtils {
               sb.append("-pending-restart");
               break;
           }
-          ImageIcon img = mergeIcons(AbstractTreeCellRenderer.NODE_ICON, iconsToMerge.toArray(new String[iconsToMerge.size()]));
+          final ImageIcon img = mergeIcons(AbstractTreeCellRenderer.NODE_ICON, iconsToMerge.toArray(new String[iconsToMerge.size()]));
           cacheIcon(sb.toString(), img);
         }
       }
@@ -225,8 +225,8 @@ public final class GuiUtils {
    * @return the icon cache key as a string.
    */
   public static String computeNodeIconKey(final TopologyNode node) {
-    StringBuilder sb = new StringBuilder("node");
-    JPPFManagementInfo info = node.getManagementInfo();
+    final StringBuilder sb = new StringBuilder("node");
+    final JPPFManagementInfo info = node.getManagementInfo();
     if (info != null) {
       if (info.isMasterNode()) sb.append("-master");
       if (info.isDotnetCapable()) sb.append("-dotnet");
@@ -250,8 +250,8 @@ public final class GuiUtils {
    * @return a <code>JComponent</code> instance.
    */
   public static JComponent createFiller(final int width, final int height) {
-    JPanel filler = new JPanel();
-    Dimension d = new Dimension(width, height);
+    final JPanel filler = new JPanel();
+    final Dimension d = new Dimension(width, height);
     filler.setMinimumSize(d);
     filler.setMaximumSize(d);
     filler.setPreferredSize(d);
@@ -266,7 +266,7 @@ public final class GuiUtils {
    */
   public static String formatToolTipText(final String tooltip) {
     if (tooltip == null) return null;
-    String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
+    final String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
     return "<html>" + s + "</html>";
   }
 
@@ -276,7 +276,7 @@ public final class GuiUtils {
    * @return a {@link Frame} instance if it can be found, null otherwise.
    */
   public static Frame getTopFrame(final Component comp) {
-    Component tmp = SwingUtilities.getRoot(comp);
+    final Component tmp = SwingUtilities.getRoot(comp);
     return (tmp instanceof Frame) ? (Frame) tmp : null;
   }
 
@@ -286,10 +286,10 @@ public final class GuiUtils {
    * @return the string with its keywords replaced.
    */
   public static String shortenLabel(final String key) {
-    String[] words = RegexUtils.SPACES_PATTERN.split(key);
-    StringBuilder sb = new StringBuilder();
+    final String[] words = RegexUtils.SPACES_PATTERN.split(key);
+    final StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (String word : words) {
+    for (final String word : words) {
       String result = shortenerMap.get(word);
       if (result == null) result = word;
       sb.append(result);
@@ -304,7 +304,7 @@ public final class GuiUtils {
    * @return a map of keyword to shorter replacements.
    */
   private static Map<String, String> createShortener() {
-    Map<String, String> map = new HashMap<>();
+    final Map<String, String> map = new HashMap<>();
     map.put("Execution", "Exec");
     map.put("execution", "exec");
     map.put("Maximum", "Max");
@@ -339,11 +339,11 @@ public final class GuiUtils {
   public static Component getTabComponent(final OptionElement option) {
     Component comp = option.getUIComponent();
     while ((comp != null) && (comp.getParent() != null)) {
-      Component parent = comp.getParent();
+      final Component parent = comp.getParent();
       if (parent instanceof JTabbedPane) {
-        JTabbedPane tabbedPane = (JTabbedPane) parent;
-        int index = tabbedPane.indexOfComponent(comp);
-        Component tabComp = tabbedPane.getTabComponentAt(index);
+        final JTabbedPane tabbedPane = (JTabbedPane) parent;
+        final int index = tabbedPane.indexOfComponent(comp);
+        final Component tabComp = tabbedPane.getTabComponentAt(index);
         if (tabComp instanceof JLabel) return tabComp;
         break;
       }

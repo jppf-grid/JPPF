@@ -56,12 +56,12 @@ public class EditorMouseListener extends MouseAdapter {
    */
   @Override
   public void mousePressed(final MouseEvent event) {
-    int x = event.getX();
-    int y = event.getY();
-    int button = event.getButton();
+    final int x = event.getX();
+    final int y = event.getY();
+    final int button = event.getButton();
     if (button == MouseEvent.BUTTON3) {
-      JPopupMenu menu = new JPopupMenu();
-      ClipboardAction action = new ClipboardAction();
+      final JPopupMenu menu = new JPopupMenu();
+      final ClipboardAction action = new ClipboardAction();
       action.putValue(ThreadDumpAction.NAME, "Copy to clipboard");
       menu.add(new JMenuItem(action));
       menu.show(event.getComponent(), x, y);
@@ -75,9 +75,9 @@ public class EditorMouseListener extends MouseAdapter {
     @Override
     public void actionPerformed(final ActionEvent event) {
       try {
-        Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
         clip.setContents(new StringSelection(text), null);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

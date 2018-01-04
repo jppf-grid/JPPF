@@ -67,7 +67,7 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    * Update the number of active servers and nodes in the status bar.
    */
   void updateStatusBar() {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         if (debugEnabled) log.debug("updating status bar with nbDrivers={}, nbNodes={}", manager.getDriverCount(), manager.getNodeCount());

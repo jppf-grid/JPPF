@@ -68,9 +68,9 @@ public class DebugMouseListener extends MouseAdapter {
   @Override
   public void mousePressed(final MouseEvent event) {
     if (event.getButton() != MouseEvent.BUTTON3) return;
-    Component comp = event.getComponent();
-    JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = new JMenuItem("Reload");
+    final Component comp = event.getComponent();
+    final JPopupMenu menu = new JPopupMenu();
+    final JMenuItem item = new JMenuItem("Reload");
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event) {
@@ -86,7 +86,7 @@ public class DebugMouseListener extends MouseAdapter {
    */
   private void doReloadPage() {
     try {
-      OptionContainer parent = (OptionContainer) option.getParent();
+      final OptionContainer parent = (OptionContainer) option.getParent();
       TabbedPaneOption tpo = null;
       int idx = -1;
       if (parent instanceof TabbedPaneOption){
@@ -94,7 +94,7 @@ public class DebugMouseListener extends MouseAdapter {
         idx = ((JTabbedPane) tpo.getUIComponent()).getSelectedIndex();
       }
       parent.remove(option);
-      OptionsPageBuilder builder = new OptionsPageBuilder(true);
+      final OptionsPageBuilder builder = new OptionsPageBuilder(true);
       OptionElement elt;
       if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
       else elt = builder.buildPage(location, null);
@@ -113,7 +113,7 @@ public class DebugMouseListener extends MouseAdapter {
       else parent.add(elt);
       builder.triggerInitialEvents(elt);
       parent.getUIComponent().repaint();
-    } catch(Exception  e) {
+    } catch(final Exception  e) {
       log.error(e.getMessage(), e);
     }
   }

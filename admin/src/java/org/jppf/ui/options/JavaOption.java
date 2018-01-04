@@ -51,14 +51,14 @@ public class JavaOption extends AbstractOption {
   @Override
   public void createUI() {
     try {
-      JComponent comp = instance = (JComponent) Class.forName(getClassName()).newInstance();
-      JScrollPane scrollPane = scrollable ? createScrollPane(comp) : null;
+      final JComponent comp = instance = (JComponent) Class.forName(getClassName()).newInstance();
+      final JScrollPane scrollPane = scrollable ? createScrollPane(comp) : null;
       if (comp instanceof JPanel) {
-        JPanel panel = (JPanel) comp;
+        final JPanel panel = (JPanel) comp;
         if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints)) panel.setLayout(new MigLayout(layoutConstraints));
       }
       if (mouseListenerClassName != null) {
-        JavaOptionMouseListener ml = (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
+        final JavaOptionMouseListener ml = (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
         ml.setOption(this);
         comp.addMouseListener(ml);
       }
@@ -66,7 +66,7 @@ public class JavaOption extends AbstractOption {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         UIComponent = scrollPane;
       } else UIComponent = comp;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

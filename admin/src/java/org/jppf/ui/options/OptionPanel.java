@@ -77,14 +77,14 @@ public class OptionPanel extends AbstractOptionContainer {
   public void createUI() {
     panel = new JPanel();
     if (bordered) {
-      Border border = (label != null) ? BorderFactory.createTitledBorder(label) : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+      final Border border = (label != null) ? BorderFactory.createTitledBorder(label) : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
       panel.setBorder(border);
     } else panel.setBorder(BorderFactory.createEmptyBorder());
     if (toolTipText != null) panel.setToolTipText(toolTipText);
-    MigLayout mig = new MigLayout(layoutConstraints);
+    final MigLayout mig = new MigLayout(layoutConstraints);
     panel.setLayout(mig);
     if (scrollable) {
-      JScrollPane sp = new JScrollPane(panel);
+      final JScrollPane sp = new JScrollPane(panel);
       sp.setBorder(BorderFactory.createEmptyBorder());
       GuiUtils.adjustScrollbarsThickness(sp);
       UIComponent = sp;

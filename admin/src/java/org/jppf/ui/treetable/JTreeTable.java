@@ -90,7 +90,7 @@ public class JTreeTable extends JTable {
     // Install a tableModel representing the visible rows in the tree.
     super.setModel(new TreeTableModelAdapter(treeTableModel, tree));
     // Force the JTable and JTree to share their row selection models.
-    ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper();
+    final ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper();
     tree.setSelectionModel(selectionWrapper);
     selectionWrapper.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
     setSelectionModel(selectionWrapper.getListSelectionModel());
@@ -190,9 +190,9 @@ public class JTreeTable extends JTable {
     public void updateUI() {
       super.updateUI();
       // Make the tree's cell renderer use the table's cell selection colors.
-      TreeCellRenderer tcr = getCellRenderer();
+      final TreeCellRenderer tcr = getCellRenderer();
       if (tcr instanceof DefaultTreeCellRenderer) {
-        DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
+        final DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
         // For 1.1 uncomment this, 1.2 has a bug that will cause an exception to be thrown if the border selection color is null.
         // dtcr.setBorderSelectionColor(null);
         dtcr.setTextSelectionColor(UIManager.getColor("Table.selectionForeground"));
@@ -230,7 +230,7 @@ public class JTreeTable extends JTable {
       g.translate(0, -visibleRow * getRowHeight());
       try {
         super.paint(g);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.debug(e.getMessage(), e);
       }
     }
@@ -273,12 +273,12 @@ public class JTreeTable extends JTable {
       if (e instanceof MouseEvent) {
         for (int counter = getColumnCount() - 1; counter >= 0; counter--) {
           if (getColumnClass(counter) == TreeTableModel.class) {
-            MouseEvent me = (MouseEvent) e;
+            final MouseEvent me = (MouseEvent) e;
             if (me.isControlDown()) return false;
-            int x = me.getX() - getCellRect(0, counter, true).x;
-            int row = JTreeTable.this.rowAtPoint(me.getPoint());
-            int y = me.getY() - (row * JTreeTable.this.getIntercellSpacing().height);
-            MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiers(), x, y, me.getClickCount(), me.isPopupTrigger());
+            final int x = me.getX() - getCellRect(0, counter, true).x;
+            final int row = JTreeTable.this.rowAtPoint(me.getPoint());
+            final int y = me.getY() - (row * JTreeTable.this.getIntercellSpacing().height);
+            final MouseEvent newME = new MouseEvent(tree, me.getID(), me.getWhen(), me.getModifiers(), x, y, me.getClickCount(), me.isPopupTrigger());
             tree.dispatchEvent(newME);
             break;
           }
@@ -354,13 +354,13 @@ public class JTreeTable extends JTable {
         updatingListSelectionModel = true;
         try {
           // This is way expensive, ListSelectionModel needs an enumerator for iterating.
-          int min = listSelectionModel.getMinSelectionIndex();
-          int max = listSelectionModel.getMaxSelectionIndex();
+          final int min = listSelectionModel.getMinSelectionIndex();
+          final int max = listSelectionModel.getMaxSelectionIndex();
           clearSelection();
           if (min != -1 && max != -1) {
             for (int counter = min; counter <= max; counter++) {
               if (listSelectionModel.isSelectedIndex(counter)) {
-                TreePath selPath = tree.getPathForRow(counter);
+                final TreePath selPath = tree.getPathForRow(counter);
                 if (selPath != null) addSelectionPath(selPath);
               }
             }
@@ -380,14 +380,14 @@ public class JTreeTable extends JTable {
         System.out.println("in updateSelectedTableRows()");
         updatingTreeSelectionModel = true;
         try {
-          TreeSelectionModel treeSelectionModel = getTree().getSelectionModel();
-          int[] rows = treeSelectionModel.getSelectionRows();
+          final TreeSelectionModel treeSelectionModel = getTree().getSelectionModel();
+          final int[] rows = treeSelectionModel.getSelectionRows();
           if ((rows == null) || (rows.length == 0)) listSelectionModel.clearSelection();
           else {
-            Set<Integer> selectionSet = new HashSet<>();
-            for (int r: rows) selectionSet.add(r);
+            final Set<Integer> selectionSet = new HashSet<>();
+            for (final int r: rows) selectionSet.add(r);
             for (int i=0; i<JTreeTable.this.getRowCount(); i++) {
-              boolean sel = listSelectionModel.isSelectedIndex(i);
+              final boolean sel = listSelectionModel.isSelectedIndex(i);
               if (selectionSet.contains(i)) {
                 if (!sel) listSelectionModel.addSelectionInterval(i, i);
               } else {
@@ -436,10 +436,10 @@ public class JTreeTable extends JTable {
 
     @Override
     public String getToolTipText(final MouseEvent event) {
-      Point p = event.getPoint();
-      int index = getColumnModel().getColumnIndexAtX(p.x);
-      int realIndex = getColumnModel().getColumn(index).getModelIndex();
-      TreeTableModelAdapter model = (TreeTableModelAdapter) getModel();
+      final Point p = event.getPoint();
+      final int index = getColumnModel().getColumnIndexAtX(p.x);
+      final int realIndex = getColumnModel().getColumn(index).getModelIndex();
+      final TreeTableModelAdapter model = (TreeTableModelAdapter) getModel();
       return model.treeTableModel.getColumnTooltip(realIndex);
     }
   }

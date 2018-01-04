@@ -107,10 +107,10 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   public Object getValueAt(final Object node, final int column) {
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
+      final DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
       if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
-        AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
-        HealthSnapshot health = info.getHealthSnapshot();
+        final AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
+        final HealthSnapshot health = info.getHealthSnapshot();
         double d = -1d;
         if (health == null) return res;
         switch (column) {
@@ -142,7 +142,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
             res = d < 0d ? NA : nfInt.format(d / MB);
             break;
           case THREADS:
-            int n = health.getLiveThreads();
+            final int n = health.getLiveThreads();
             res = n < 0 ? NA : nfInt.format(n);
             break;
           case CPU_LOAD:

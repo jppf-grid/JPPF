@@ -37,9 +37,9 @@ public class WindowClosingListener extends WindowAdapter {
   @Override
   public void windowClosing(final WindowEvent event) {
     if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
-    OptionElement elt = OptionsHandler.getTopPage();
+    final OptionElement elt = OptionsHandler.getTopPage();
     if (elt != null) {
-      OptionsPageBuilder builder = new OptionsPageBuilder();
+      final OptionsPageBuilder builder = new OptionsPageBuilder();
       builder.triggerFinalEvents(elt);
     }
     OptionsHandler.savePreferences();

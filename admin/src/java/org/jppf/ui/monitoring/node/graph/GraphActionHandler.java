@@ -30,8 +30,7 @@ import edu.uci.ics.jung.visualization.picking.MultiPickedState;
  * Abstract implementation of the <code>ActionManager</code> interface for <code>mxGraph</code> components.
  * @author Laurent Cohen
  */
-public class GraphActionHandler extends AbstractActionHandler
-{
+public class GraphActionHandler extends AbstractActionHandler {
   /**
    * The JTreeTable whose actions are managed.
    */
@@ -41,15 +40,12 @@ public class GraphActionHandler extends AbstractActionHandler
    * Initialize this action manager with the specified JTreeTable component.
    * @param graph the graph whose actions are managed.
    */
-  public GraphActionHandler(final VisualizationViewer<AbstractTopologyComponent, Number> graph)
-  {
+  public GraphActionHandler(final VisualizationViewer<AbstractTopologyComponent, Number> graph) {
     this.graph = graph;
-    MultiPickedState<?> mps = (MultiPickedState<?>) graph.getPickedVertexState();
-    mps.addItemListener(new ItemListener()
-    {
+    final MultiPickedState<?> mps = (MultiPickedState<?>) graph.getPickedVertexState();
+    mps.addItemListener(new ItemListener() {
       @Override
-      public void itemStateChanged(final ItemEvent e)
-      {
+      public void itemStateChanged(final ItemEvent e) {
         computeSelectedElements();
         updateActions();
       }
@@ -59,11 +55,10 @@ public class GraphActionHandler extends AbstractActionHandler
   /**
    * Compute the list of elements selected in the component.
    */
-  protected synchronized void computeSelectedElements()
-  {
+  protected synchronized void computeSelectedElements() {
     selectedElements.clear();
-    Object[] sel = ((MultiPickedState<AbstractTopologyComponent>) graph.getPickedVertexState()).getSelectedObjects();
+    final Object[] sel = ((MultiPickedState<AbstractTopologyComponent>) graph.getPickedVertexState()).getSelectedObjects();
     if ((sel == null) || (sel.length <= 0)) return;
-    for (Object data: sel) selectedElements.add(data);
+    for (final Object data: sel) selectedElements.add(data);
   }
 }

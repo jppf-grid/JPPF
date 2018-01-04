@@ -71,15 +71,15 @@ public abstract class AbstractSuspendJobAction extends AbstractJobAction {
   public void actionPerformed(final ActionEvent event) {
     final CollectionMap<JobDriver, String> map = new SetHashMap<>();
     for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobDriver driver: map.keySet()) {
           try {
             log.info("attempting to suspend jobs {} via driver {}", map.getValues(driver), driver.getDisplayName());
-            DriverJobManagementMBean jmx = driver.getJobManager();
+            final DriverJobManagementMBean jmx = driver.getJobManager();
             if (jmx != null) jmx.suspendJobs(new JobUuidSelector(map.getValues(driver)), requeue);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

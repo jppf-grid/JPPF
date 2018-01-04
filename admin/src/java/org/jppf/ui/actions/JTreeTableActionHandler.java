@@ -73,12 +73,12 @@ public class JTreeTableActionHandler extends AbstractActionHandler {
    */
   protected synchronized void computeSelectedElements() {
     selectedElements.clear();
-    int[] rows = treeTable.getSelectedRows();
+    final int[] rows = treeTable.getSelectedRows();
     if ((rows == null) || (rows.length <= 0)) return;
-    for (int n: rows) {
-      TreePath path = treeTable.getTree().getPathForRow(n);
+    for (final int n: rows) {
+      final TreePath path = treeTable.getTree().getPathForRow(n);
       if (path == null) continue;
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+      final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
       selectedElements.add(node.getUserObject());
     }
   }

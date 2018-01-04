@@ -149,7 +149,7 @@ public class StatsConstants {
    * @return a map of names to {@code Field[]}.
    */
   private static Map<String, Fields[]> createFieldsMap() {
-    Map<String, Fields[]> map = new LinkedHashMap<>();
+    final Map<String, Fields[]> map = new LinkedHashMap<>();
     map.put(EXECUTION, EXECUTION_FIELDS);
     map.put(NODE_EXECUTION, NODE_EXECUTION_FIELDS);
     map.put(TRANSPORT, TRANSPORT_FIELDS);
@@ -169,9 +169,9 @@ public class StatsConstants {
    * @return a mapping of non-localized names to {@link LocalizedListItem} objects.
    */
   public static Map<String, LocalizedListItem> createLocalizedItems(final Locale locale) {
-    Map<String, LocalizedListItem> map = new LinkedHashMap<>();
+    final Map<String, LocalizedListItem> map = new LinkedHashMap<>();
     int i = 0;
-    for (String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
+    for (final String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
     return Collections.unmodifiableMap(map);
   }
 }

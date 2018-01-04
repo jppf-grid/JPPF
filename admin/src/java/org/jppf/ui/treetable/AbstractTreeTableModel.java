@@ -149,7 +149,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
    */
   protected void fireTreeNodesChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     TreeModelEvent event = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
@@ -159,7 +159,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
         if (event == null) event = new TreeModelEvent(source, path, childIndices, children);
         try {
           ((TreeModelListener) listeners[i + 1]).treeNodesChanged(event);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }
@@ -177,7 +177,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
    */
   protected void fireTreeNodesInserted(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
@@ -201,7 +201,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
    */
   protected void fireTreeNodesRemoved(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
@@ -211,7 +211,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
         try {
           if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
           ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-        } catch(Exception ex) {
+        } catch(final Exception ex) {
           log.error(ex.getMessage(), ex);
         }
       }
@@ -229,7 +229,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel, Serializ
    */
   protected void fireTreeStructureChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
-    Object[] listeners = listenerList.getListenerList();
+    final Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event

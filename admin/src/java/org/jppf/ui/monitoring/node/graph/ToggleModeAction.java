@@ -63,18 +63,10 @@ public class ToggleModeAction extends AbstractGraphSelectionAction {
   @SuppressWarnings("unchecked")
   public void actionPerformed(final ActionEvent e) {
     synchronized(panel) {
-      AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.mode").getUIComponent();
-      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-      EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = (EditingModalGraphMouse<AbstractTopologyComponent, Number>) viewer.getGraphMouse();
+      final AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.mode").getUIComponent();
+      final VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      final EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = (EditingModalGraphMouse<AbstractTopologyComponent, Number>) viewer.getGraphMouse();
       graphMouse.setMode(button.isSelected() ? ModalGraphMouse.Mode.TRANSFORMING : ModalGraphMouse.Mode.PICKING);
-      /*
-      if (e != null)
-      {
-        button.removeItemListener(itemListener);
-        button.setSelected(!button.isSelected());
-        button.addItemListener(itemListener);
-      }
-      */
     }
   }
 }

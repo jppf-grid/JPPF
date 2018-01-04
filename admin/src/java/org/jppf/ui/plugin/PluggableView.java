@@ -85,7 +85,7 @@ public abstract class PluggableView {
    * @return {@code true} if IP adresses are displayed, {@code false} otherwise.
    * @since 5.1
    */
-  public final boolean isShowIP() {
+  public static final boolean isShowIP() {
     return StatsHandler.getInstance().getShowIPHandler().isShowIP();
   }
 }

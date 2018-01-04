@@ -52,15 +52,15 @@ public class StackedAreaChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration createChart(final ChartConfiguration config) {
-    Object ds = createDataset(config);
+    final Object ds = createDataset(config);
     String s = config.name;
     if (config.unit != null) s += " (" + config.unit+ ')';
     //JFreeChart chart = ChartFactory.createStackedAreaChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createStackedAreaChart",
-        s, null, null, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
-    Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
+    final Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createStackedAreaChart",
+      s, null, null, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
+    final Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
     //CategoryAxis axis = plot.getDomainAxis();
-    Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
+    final Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
     //axis.setTickLabelsVisible(false);
     invokeMethod(axis.getClass(), axis, "setTickLabelsVisible", false);
     config.chart = chart;
@@ -73,7 +73,7 @@ public class StackedAreaChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   private Object createDataset(final ChartConfiguration config) {
-    Object ds = newDataset(config);
+    final Object ds = newDataset(config);
     populateDataset(config);
     return ds;
   }
@@ -83,9 +83,9 @@ public class StackedAreaChartHandler implements ChartHandler {
    * @param config the configuration holding the new dataset.
    * @return the dataset.
    */
-  private Object newDataset(final ChartConfiguration config) {
+  private static Object newDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
-    Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
+    final Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
     return ds;
   }
@@ -98,13 +98,13 @@ public class StackedAreaChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
     if (config.dataset == null) newDataset(config);
-    Object ds = config.dataset;
+    final Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
-    int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
+    final int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
     for (int j=0; j<statsHandler.getStatsCount(); j++) {
-      Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
-      for (Fields key: config.fields) {
+      final Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
+      for (final Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(j + start));
       }
@@ -119,10 +119,10 @@ public class StackedAreaChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
-    Object ds = config.dataset;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    final Object ds = config.dataset;
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
-      for (Fields key: config.fields) {
+      for (final Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
       }
@@ -178,10 +178,10 @@ public class StackedAreaChartHandler implements ChartHandler {
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
       if ("".equals(method.getName())) {
         //double val = dataset.getValue(row, col).doubleValue();
-        double val = (Double) invokeMethod(args[0].getClass(), args[0], "getValue", args[1], args[2]);
+        final double val = (Double) invokeMethod(args[0].getClass(), args[0], "getValue", args[1], args[2]);
         //Object key = dataset.getColumnKey(col);
-        Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
-        StringBuilder sb = new StringBuilder(String.valueOf(key)).append(" : ").append(nf.format(val));
+        final Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
+        final StringBuilder sb = new StringBuilder(String.valueOf(key)).append(" : ").append(nf.format(val));
         if (unit != null) sb.append(' ').append(unit);
         return sb.toString();
       } else {

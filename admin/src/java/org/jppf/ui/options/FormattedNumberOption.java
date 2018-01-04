@@ -29,8 +29,7 @@ import org.slf4j.*;
  * {@link java.text.DecimalFormat}.
  * @author Laurent Cohen
  */
-public class FormattedNumberOption extends AbstractOption
-{
+public class FormattedNumberOption extends AbstractOption {
   /**
    * Logger for this class.
    */
@@ -56,8 +55,7 @@ public class FormattedNumberOption extends AbstractOption
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  public FormattedNumberOption()
-  {
+  public FormattedNumberOption() {
   }
 
   /**
@@ -69,8 +67,7 @@ public class FormattedNumberOption extends AbstractOption
    * @param pattern the pattern defining the format of the number used as value.
    * @see java.text.DecimalFormat
    */
-  public FormattedNumberOption(final String name, final String label, final String tooltip, final Number value, final String pattern)
-  {
+  public FormattedNumberOption(final String name, final String label, final String tooltip, final Number value, final String pattern) {
     this.name = name;
     this.label = label;
     setToolTipText(tooltip);
@@ -85,12 +82,10 @@ public class FormattedNumberOption extends AbstractOption
    * Create the UI components for this option.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     fieldLabel = new JLabel(label);
     field = createField();
-    if (toolTipText != null)
-    {
+    if (toolTipText != null) {
       field.setToolTipText(toolTipText);
       fieldLabel.setToolTipText(toolTipText);
     }
@@ -103,8 +98,7 @@ public class FormattedNumberOption extends AbstractOption
    * @return a <code>JPasswordField</code> instance.
    * @see org.jppf.ui.options.TextOption#createField()
    */
-  protected JFormattedTextField createField()
-  {
+  protected JFormattedTextField createField() {
     field = new JFormattedTextField(format);
     field.setValue(value);
     if (pattern != null) field.setColumns(pattern.length());
@@ -119,9 +113,8 @@ public class FormattedNumberOption extends AbstractOption
    * @see org.jppf.ui.options.TextOption#getValue()
    */
   @Override
-  public Object getValue()
-  {
-    JFormattedTextField tmp = field;
+  public Object getValue() {
+    final JFormattedTextField tmp = field;
     return tmp.getValue();
   }
 
@@ -131,17 +124,12 @@ public class FormattedNumberOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
   @Override
-  public void setValue(final Object value)
-  {
+  public void setValue(final Object value) {
     Object val = value;
-    if (val instanceof String)
-    {
-      try
-      {
+    if (val instanceof String) {
+      try {
         val = Double.parseDouble((String) value);
-      }
-      catch(NumberFormatException e)
-      {
+      } catch (final NumberFormatException e) {
         log.debug(e.getMessage(), e);
         val = 0;
       }
@@ -155,8 +143,7 @@ public class FormattedNumberOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
 
   /**
@@ -165,8 +152,7 @@ public class FormattedNumberOption extends AbstractOption
    * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     field.setEnabled(enabled);
     fieldLabel.setEnabled(enabled);
   }
@@ -175,8 +161,7 @@ public class FormattedNumberOption extends AbstractOption
    * Get the pattern that defines the field format.
    * @return the pattern as a string.
    */
-  public String getPattern()
-  {
+  public String getPattern() {
     return pattern;
   }
 
@@ -184,8 +169,7 @@ public class FormattedNumberOption extends AbstractOption
    * Set the pattern that defines the field format.
    * @param pattern the pattern as a string.
    */
-  public void setPattern(final String pattern)
-  {
+  public void setPattern(final String pattern) {
     this.pattern = pattern;
     format = new DecimalFormat(pattern);
   }
@@ -194,8 +178,7 @@ public class FormattedNumberOption extends AbstractOption
    * {@inheritDoc}
    */
   @Override
-  public void setEditable(final boolean editable)
-  {
+  public void setEditable(final boolean editable) {
     if (field != null) field.setEditable(editable);
   }
 }

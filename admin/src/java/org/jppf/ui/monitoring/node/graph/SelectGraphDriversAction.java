@@ -28,14 +28,12 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * Action performed to select all drivers in the topology view.
  * @author Laurent Cohen
  */
-public class SelectGraphDriversAction extends AbstractGraphSelectionAction
-{
+public class SelectGraphDriversAction extends AbstractGraphSelectionAction {
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectGraphDriversAction(final GraphOption panel)
-  {
+  public SelectGraphDriversAction(final GraphOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_drivers.gif");
     setupNameAndTooltip("select.drivers");
@@ -45,12 +43,10 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
    * {@inheritDoc}
    */
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
-      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-      for (AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, !data.isNode());
+  public void actionPerformed(final ActionEvent e) {
+    synchronized (panel) {
+      final VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      for (final AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, !data.isNode());
     }
   }
 }

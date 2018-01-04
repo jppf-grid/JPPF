@@ -66,20 +66,20 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   public void run() {
     synchronized(statsHandler) {
       if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) {
-        ConnectionDataHolder cdh = statsHandler.dataHolderMap.remove(driver.getUuid());
+        final ConnectionDataHolder cdh = statsHandler.dataHolderMap.remove(driver.getUuid());
         if (cdh != null) cdh.close();
       }
     }
     JComboBox<?> box = null;
     while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
-    JPPFClientConnection c = driver.getConnection();
+    final JPPFClientConnection c = driver.getConnection();
     synchronized(statsHandler) {
       if (debugEnabled) log.debug("removing client connection " + c.getName() + " from driver combo box");
       box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
-      int count = box.getItemCount();
+      final int count = box.getItemCount();
       int idx = -1;
       for (int i=0; i<count; i++) {
-        Object o = box.getItemAt(i);
+        final Object o = box.getItemAt(i);
         if (c.equals(o)) {
           box.removeItemAt(i);
           idx = i;
@@ -87,9 +87,9 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
         }
       }
       if ((idx >= 0) && (box.getItemCount() > 0)) {
-        if ((statsHandler.getClientHandler().currentDriver == null) || c.equals(statsHandler.getClientHandler().currentDriver)) {
-          int n = Math.min(idx, box.getItemCount()-1);
-          TopologyDriver item = (TopologyDriver) box.getItemAt(n);
+        if ((statsHandler.getClientHandler().currentDriver == null) || c.equals(statsHandler.getClientHandler().currentDriver.getConnection())) {
+          final int n = Math.min(idx, box.getItemCount()-1);
+          final TopologyDriver item = (TopologyDriver) box.getItemAt(n);
           statsHandler.getClientHandler().currentDriver = item;
           box.setSelectedItem(item);
         }

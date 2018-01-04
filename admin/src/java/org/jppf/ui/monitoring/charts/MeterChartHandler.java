@@ -52,16 +52,16 @@ public class MeterChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration createChart(final ChartConfiguration config) {
     if ((config.fields == null) || (config.fields.length <= 0)) return config;
-    Object[] charts = new Object[config.fields.length];
+    final Object[] charts = new Object[config.fields.length];
     config.chart = charts;
-    Object[] plots = new Object[config.fields.length];
-    Class<?> plotClass = getClass0("org.jfree.chart.plot.MeterPlot");
+    final Object[] plots = new Object[config.fields.length];
+    final Class<?> plotClass = getClass0("org.jfree.chart.plot.MeterPlot");
     for (int i=0; i<config.fields.length; i++) {
       // plots[i] = new MeterPlot();
       plots[i] = newInstance(plotClass);
     }
     config.params.put("plot", plots);
-    Object[] ds = (Object[]) createDataset(config);
+    final Object[] ds = (Object[]) createDataset(config);
 
     for (int i=0; i<config.fields.length; i++) {
       // plots[i].setDataset(ds);
@@ -73,7 +73,7 @@ public class MeterChartHandler implements ChartHandler {
       // plots[i].setNeedlePaint(COLOR.GREEN);
       invokeMethod(plotClass, plots[i], "setNeedlePaint", new Color(0, 255, 0, 128));
       // charts[i] = new JFreeChart(config.name, plots[i]);
-      Class<?>[] paramTypes = {String.class, getClass0("org.jfree.chart.plot.Plot")};
+      final Class<?>[] paramTypes = {String.class, getClass0("org.jfree.chart.plot.Plot")};
       charts[i] = invokeConstructor(getClass0("org.jfree.chart.JFreeChart"), paramTypes, config.fields[i].toString(), plots[i]);
       // charts[i].setBackgroundPaint(Color.WHITE);
       invokeMethod(getClass0("org.jfree.chart.JFreeChart"), charts[i], "setBackgroundPaint", Color.WHITE );
@@ -87,7 +87,7 @@ public class MeterChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   protected Object createDataset(final ChartConfiguration config) {
-    Object[] datasets = new Object[config.fields.length];
+    final Object[] datasets = new Object[config.fields.length];
     for (int i=0; i<config.fields.length; i++) {
       // datasets[i] = new DefaultValueDataset();
       datasets[i] = newInstance("org.jfree.data.general.DefaultValueDataset");
@@ -114,11 +114,11 @@ public class MeterChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
-    Object[] ds = (Object[]) config.dataset;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    final Object[] ds = (Object[]) config.dataset;
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
       for (int i=0; i<config.fields.length; i++) {
-        Fields field = config.fields[i];
+        final Fields field = config.fields[i];
         //ds[i].setValue(valueMap.get(field));
         if (ds != null) invokeMethod(ds[i].getClass(), ds[i], "setValue", new Class[] {Number.class}, valueMap.get(field));
         setIntervals(config, i);
@@ -133,12 +133,12 @@ public class MeterChartHandler implements ChartHandler {
    * @param i the index of the dataset to update
    */
   private void setIntervals(final ChartConfiguration config, final int i) {
-    Object[] intervals = statsHandler.getClientHandler().getMeterIntervals(config.fields[i]);
+    final Object[] intervals = statsHandler.getClientHandler().getMeterIntervals(config.fields[i]);
     if ((intervals == null) || (intervals.length <= 0)) return;
-    Object plot = ((Object[]) config.params.get("plot"))[i];
+    final Object plot = ((Object[]) config.params.get("plot"))[i];
     // plot.clearIntervals();
     invokeMethod(plot.getClass(), plot, "clearIntervals");
-    for (Object interval: intervals) {
+    for (final Object interval: intervals) {
       // plot.addInterval(interval);
       invokeMethod(plot.getClass(), plot, "addInterval", interval);
     }

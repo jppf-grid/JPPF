@@ -49,8 +49,8 @@ public class DockToExistingViewAction extends AbstractDockingAction {
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    DockingManager dmgr = DockingManager.getInstance();
-    DetachableComponentDescriptor desc = dmgr.getComponent(comp);
+    final DockingManager dmgr = DockingManager.getInstance();
+    final DetachableComponentDescriptor desc = dmgr.getComponent(comp);
     dmgr.attach(desc.getComponent(), viewId);
   }
 }

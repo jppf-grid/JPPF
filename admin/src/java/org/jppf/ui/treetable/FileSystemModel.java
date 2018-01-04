@@ -104,7 +104,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
    * @return a <code>File</code> instance.
    */
   protected File getFile(final Object node) {
-    FileNode fileNode = ((FileNode) node);
+    final FileNode fileNode = ((FileNode) node);
     return fileNode.getFile();
   }
 
@@ -114,7 +114,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
    * @return the children as an array of objects
    */
   protected Object[] getChildren(final Object node) {
-    FileNode fileNode = ((FileNode) node);
+    final FileNode fileNode = ((FileNode) node);
     return fileNode.getChildren();
   }
 
@@ -127,7 +127,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
    */
   @Override
   public int getChildCount(final Object node) {
-    Object[] children = getChildren(node);
+    final Object[] children = getChildren(node);
     return (children == null) ? 0 : children.length;
   }
 
@@ -181,7 +181,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
    */
   @Override
   public Object getValueAt(final Object node, final int column) {
-    File file = getFile(node);
+    final File file = getFile(node);
     try {
       switch (column) {
         case 0:
@@ -193,7 +193,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
         case 3:
           return new Date(file.lastModified());
       }
-    } catch (SecurityException se) {
+    } catch (final SecurityException se) {
       log.debug(se.getMessage(), se);
     }
 
@@ -253,18 +253,18 @@ class FileNode {
       return children;
     }
     try {
-      String[] files = file.list();
+      final String[] files = file.list();
       if (files != null) {
         Arrays.sort(files);
         // fileMS.sort(files);
         children = new FileNode[files.length];
-        String path = file.getPath();
+        final String path = file.getPath();
         for (int i = 0; i < files.length; i++) {
-          File childFile = new File(path, files[i]);
+          final File childFile = new File(path, files[i]);
           children[i] = new FileNode(childFile);
         }
       }
-    } catch (SecurityException se) {
+    } catch (final SecurityException se) {
       log.debug(se.getMessage(), se);
     }
     return children;

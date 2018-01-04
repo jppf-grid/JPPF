@@ -78,7 +78,7 @@ public class JPPFAdminConsole {
    * @return a {@link JPPFClient} instance used by the admin console.
    */
   public static JPPFClient getJPPFClient() {
-    TopologyManager manager = getTopologyManager();
+    final TopologyManager manager = getTopologyManager();
     return (manager == null) ? null : manager.getJPPFClient();
   }
 
@@ -88,7 +88,7 @@ public class JPPFAdminConsole {
    * @return a {@link TopologyManager} instance used by the admin console.
    */
   public static TopologyManager getTopologyManager() {
-    StatsHandler handler = StatsHandler.getInstance();
+    final StatsHandler handler = StatsHandler.getInstance();
     return (handler == null) ? null : handler.getTopologyManager();
   }
 
@@ -98,7 +98,7 @@ public class JPPFAdminConsole {
    * @return a {@link JobMonitor} instance used by the admin console.
    */
   public static JobMonitor getJobMonitor() {
-    StatsHandler handler = StatsHandler.getInstance();
+    final StatsHandler handler = StatsHandler.getInstance();
     return (handler == null) ? null : handler.getJobMonitor();
   }
 

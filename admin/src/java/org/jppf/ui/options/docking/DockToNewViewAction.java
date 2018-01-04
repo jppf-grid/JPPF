@@ -27,8 +27,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
  * Action to dock a tab to a new view.
  * @author Laurent Cohen
  */
-public class DockToNewViewAction extends AbstractDockingAction
-{
+public class DockToNewViewAction extends AbstractDockingAction {
   /**
    * Initialize this action.
    * @param comp the id of the view to which the component will be attached.
@@ -50,10 +49,10 @@ public class DockToNewViewAction extends AbstractDockingAction
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    DockingManager dmgr = DockingManager.getInstance();
-    String id = dmgr.createView();
-    ViewDescriptor view = dmgr.getView(id);
-    DetachableComponentDescriptor desc = dmgr.getComponent(comp);
+    final DockingManager dmgr = DockingManager.getInstance();
+    final String id = dmgr.createView();
+    final ViewDescriptor view = dmgr.getView(id);
+    final DetachableComponentDescriptor desc = dmgr.getComponent(comp);
     dmgr.attach(desc.getComponent(), id);
     //view.getFrame().pack();
     view.getFrame().setSize(OptionsHandler.getMainWindow().getSize());

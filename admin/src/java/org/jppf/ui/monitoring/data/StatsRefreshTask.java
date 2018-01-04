@@ -47,7 +47,7 @@ public class StatsRefreshTask extends TimerTask {
    */
   @Override
   public void run() {
-    JPPFClientConnectionStatus status = driver.getConnection().getStatus();
+    final JPPFClientConnectionStatus status = driver.getConnection().getStatus();
     if (status.isWorkingStatus()) StatsHandler.getInstance().requestUpdate(driver);
   }
 }

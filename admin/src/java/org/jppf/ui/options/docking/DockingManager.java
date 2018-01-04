@@ -115,7 +115,7 @@ public final class DockingManager {
    */
   public void setMainView(final Frame frame, final OptionContainer container) {
     if (viewMap.get(INITIAL_VIEW) != null) throw new IllegalStateException("the main view is already set");
-    ViewDescriptor view = new ViewDescriptor(frame, container);
+    final ViewDescriptor view = new ViewDescriptor(frame, container);
     viewMap.put(INITIAL_VIEW, view);
     while (!pendingQueue.isEmpty()) view.addComponent(pendingQueue.poll());
   }
@@ -126,12 +126,12 @@ public final class DockingManager {
    * @param listenerComponent the UI component which has the mouse listener.
    */
   public void register(final OptionElement element, final Component listenerComponent) {
-    TabbedPaneOption parent = (TabbedPaneOption) element.getParent();
-    Component tabComponent = parent.getTabComponent(element);
-    DetachableComponentDescriptor desc = new DetachableComponentDescriptor(element, listenerComponent, tabComponent);
+    final TabbedPaneOption parent = (TabbedPaneOption) element.getParent();
+    final Component tabComponent = parent.getTabComponent(element);
+    final DetachableComponentDescriptor desc = new DetachableComponentDescriptor(element, listenerComponent, tabComponent);
     componentMap.put(element.getUIComponent(), desc);
     listenerToComponentMap.put(listenerComponent, element.getUIComponent());
-    ViewDescriptor view = viewMap.get(INITIAL_VIEW);
+    final ViewDescriptor view = viewMap.get(INITIAL_VIEW);
     if (view != null) view.addComponent(desc);
     else pendingQueue.offer(desc);
   }
@@ -142,7 +142,7 @@ public final class DockingManager {
    * @param listenerComponent the UI component which has the mouse listener.
    */
   public void update(final OptionElement element, final Component listenerComponent) {
-    DetachableComponentDescriptor desc = getComponent(element.getUIComponent());
+    final DetachableComponentDescriptor desc = getComponent(element.getUIComponent());
     listenerToComponentMap.remove(desc.getListenerComponent());
     desc.setListenerComponent(listenerComponent);
     listenerToComponentMap.put(listenerComponent, element.getUIComponent());
@@ -163,12 +163,12 @@ public final class DockingManager {
    * @param viewId the id of the viez to zhcih to attach the co;ponent.
    */
   public void attach(final OptionElement element, final String viewId) {
-    ViewDescriptor newView = viewMap.get(viewId);
+    final ViewDescriptor newView = viewMap.get(viewId);
     if (newView == null) throw new IllegalArgumentException("the view '" + viewId + "' does not exist");
-    DetachableComponentDescriptor desc = componentMap.get(element.getUIComponent());
+    final DetachableComponentDescriptor desc = componentMap.get(element.getUIComponent());
     if (desc == null) throw new IllegalArgumentException("the component '" + element + "' could not be found");
-    TabbedPaneOption targetContainer = (TabbedPaneOption) (INITIAL_VIEW.equals(viewId) ? desc.getInitialContainer() : newView.getContainer());
-    ViewDescriptor oldView = viewMap.get(desc.getViewId());
+    final TabbedPaneOption targetContainer = (TabbedPaneOption) (INITIAL_VIEW.equals(viewId) ? desc.getInitialContainer() : newView.getContainer());
+    final ViewDescriptor oldView = viewMap.get(desc.getViewId());
     desc.getCurrentContainer().remove(element);
     targetContainer.add(element, desc.getTabComponent());
     desc.setCurrentContainer(targetContainer);
@@ -182,16 +182,16 @@ public final class DockingManager {
    * @return the id of the view.
    */
   public String createView() {
-    String id = VIEW_PREFIX + VIEW_SEQ.incrementAndGet();
-    JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), id, false);
+    final String id = VIEW_PREFIX + VIEW_SEQ.incrementAndGet();
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), id, false);
     dialog.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     dialog.addWindowListener(windowAdapter);
-    TabbedPaneOption container = new TabbedPaneOption();
+    final TabbedPaneOption container = new TabbedPaneOption();
     container.setName(id);
     container.createUI();
     dialog.getContentPane().add(container.getUIComponent(), BorderLayout.CENTER);
-    ViewDescriptor view = new ViewDescriptor(dialog, container);
+    final ViewDescriptor view = new ViewDescriptor(dialog, container);
     viewMap.put(id, view);
     return id;
   }
@@ -220,7 +220,7 @@ public final class DockingManager {
    * @return a {@link DetachableComponentDescriptor} object.
    */
   public DetachableComponentDescriptor getComponentFromListenerComp(final Component comp) {
-    Component temp = listenerToComponentMap.get(comp);
+    final Component temp = listenerToComponentMap.get(comp);
     return temp == null ? null : componentMap.get(temp);
   }
 
@@ -249,8 +249,8 @@ public final class DockingManager {
    * @param viewId the id of the view to remove.
    */
   private void removeView(final String viewId) {
-    ViewDescriptor view = viewMap.get(viewId);
-    Set<DetachableComponentDescriptor> set = new HashSet<>(view.getComponents());
+    final ViewDescriptor view = viewMap.get(viewId);
+    final Set<DetachableComponentDescriptor> set = new HashSet<>(view.getComponents());
     for (DetachableComponentDescriptor desc: set) dockToInitialContainer(desc.getComponent().getUIComponent());
     view.getFrame().setVisible(false);
     view.getFrame().dispose();
@@ -262,14 +262,14 @@ public final class DockingManager {
    * @param comp the component to move.
    */
   public void dockToInitialContainer(final Component comp) {
-    DetachableComponentDescriptor desc = componentMap.get(comp);
-    OptionElement element = desc.getComponent();
+    final DetachableComponentDescriptor desc = componentMap.get(comp);
+    final OptionElement element = desc.getComponent();
     desc.getCurrentContainer().remove(element);
     ((TabbedPaneOption) desc.getInitialContainer()).add(element, desc.getTabComponent());
     desc.setCurrentContainer(desc.getInitialContainer());
-    ViewDescriptor oldView = viewMap.get(desc.getViewId());
+    final ViewDescriptor oldView = viewMap.get(desc.getViewId());
     oldView.removeComponent(desc);
-    String id = getViewIdForContainer(desc.getInitialContainer());
+    final String id = getViewIdForContainer(desc.getInitialContainer());
     desc.setViewId(id);
     viewMap.get(id).addComponent(desc);
   }
@@ -298,10 +298,10 @@ public final class DockingManager {
    * @return an {@link OptionElement} instance representing the element.
    */
   public OptionElement findFirstElementWithName(final String name) {
-    for (ViewDescriptor view: viewMap.values()) {
-      OptionContainer cont = view.getContainer();
+    for (final ViewDescriptor view: viewMap.values()) {
+      final OptionContainer cont = view.getContainer();
       if (cont == null) continue;
-      OptionElement elt = cont.findFirstWithName(name);
+      final OptionElement elt = cont.findFirstWithName(name);
       if (elt != null) return elt;
     }
     return null;

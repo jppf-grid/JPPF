@@ -49,14 +49,14 @@ public class SelectAllAction extends AbstractSelectionAction
   @Override
   public void actionPerformed(final ActionEvent e) {
     synchronized(panel) {
-      JPPFTreeTable treeTable = panel.getTreeTable();
-      TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-      List<TreePath> selectionPath = new ArrayList<>();
-      for (DefaultMutableTreeNode driver: getDriverNodes()) {
+      final JPPFTreeTable treeTable = panel.getTreeTable();
+      final TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+      final List<TreePath> selectionPath = new ArrayList<>();
+      for (final DefaultMutableTreeNode driver: getDriverNodes()) {
         selectionPath.add(treeTable.getPathForNode(driver));
         for (int i=0; i<driver.getChildCount(); i++) {
-          DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
-          AbstractTopologyComponent nodeData = (AbstractTopologyComponent) node.getUserObject();
+          final DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
+          final AbstractTopologyComponent nodeData = (AbstractTopologyComponent) node.getUserObject();
           if ((nodeData == null) || !nodeData.isNode()) continue;
           selectionPath.add(treeTable.getPathForNode(node));
         }

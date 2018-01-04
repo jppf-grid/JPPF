@@ -46,10 +46,10 @@ public final class TreeTableUtils {
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
   public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent<?> comp) {
-    int n = parent.getChildCount();
+    final int n = parent.getChildCount();
     for (int i=0; i<n; i++) {
-      DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
-      AbstractComponent<?> childData = (AbstractComponent<?>) child.getUserObject();
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+      final AbstractComponent<?> childData = (AbstractComponent<?>) child.getUserObject();
       if (childData == null) return -1;
       if (childData.getUuid().equals(comp.getUuid())) return -1;
       else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return i;
@@ -66,8 +66,8 @@ public final class TreeTableUtils {
   public static DefaultMutableTreeNode findComponent(final DefaultMutableTreeNode parent, final String uuid) {
     if (uuid == null) return null;
     for (int i=0; i<parent.getChildCount(); i++) {
-      DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
-      AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
+      final AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
       if (data == null) continue;
       if (data.getUuid().equals(uuid)) return child;
     }
@@ -94,11 +94,11 @@ public final class TreeTableUtils {
   public static DefaultMutableTreeNode findTreeNode(final DefaultMutableTreeNode root, final String uuid, final TreeNodeFilter filter) {
     if (uuid == null) return null;
     for (int i=0; i<root.getChildCount(); i++) {
-      DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
-      AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
+      final DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+      final AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
       if (data == null) continue;
       if (data.getUuid().equals(uuid) && ((filter == null) || filter.accepts(child))) return child;
-      DefaultMutableTreeNode result = findTreeNode(child, uuid, filter);
+      final DefaultMutableTreeNode result = findTreeNode(child, uuid, filter);
       if (result != null) return result;
     }
     return null;

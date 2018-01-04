@@ -52,58 +52,54 @@ public class Bar3DChartHandler implements ChartHandler {
    * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration createChart(final ChartConfiguration config)
-  {
-    Object ds = createDataset(config);
+  public ChartConfiguration createChart(final ChartConfiguration config) {
+    final Object ds = createDataset(config);
     if (ds == null) return null;
     //JFreeChart chart = ChartFactory.createBarChart3D(null, null, config.name, ds, PlotOrientation.HORIZONTAL, false, true, false);
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createBarChart3D",
-        config.name, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "HORIZONTAL"), false, true, false);
+    final Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createBarChart3D", config.name, null, null, ds,
+      getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "HORIZONTAL"), false, true, false);
     //CategoryPlot plot = chart.getCategoryPlot();
-    Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
+    final Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
     //plot.setForegroundAlpha(1.0f);
     invokeMethod(plot.getClass(), plot, "setForegroundAlpha", 1.0f);
     //CategoryAxis axis = plot.getDomainAxis();
-    Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
+    final Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
     //axis.setTickLabelsVisible(false);
     invokeMethod(axis.getClass(), axis, "setTickLabelsVisible", false);
-    Color c1 = new Color(255, 255, 0, 224);
+    final Color c1 = new Color(255, 255, 0, 224);
     //Color c2 = new Color(128, 128, 255, 26);
-    Color c2 = new Color(160, 160, 255);
+    final Color c2 = new Color(160, 160, 255);
     //plot.setBackgroundPaint(c2);
     invokeMethod(plot.getClass(), plot, "setBackgroundPaint", c2);
     //plot.setBackgroundAlpha(0.1f);
     invokeMethod(plot.getClass(), plot, "setBackgroundAlpha", 0.1f);
     //BarRenderer3D rend = (BarRenderer3D) plot.getRenderer();
-    Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
-    Color c3 = new Color(255, 255, 192, 255);
+    final Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
+    final Color c3 = new Color(255, 255, 192, 255);
     //rend.setWallPaint(c3);
     invokeMethod(rend.getClass(), rend, "setWallPaint", c3);
     //rend.setSeriesPaint(0, c1);
-    invokeMethod(rend.getClass(), rend, "setSeriesPaint", new Class[] {Integer.TYPE, Paint.class}, 0, c1);
+    invokeMethod(rend.getClass(), rend, "setSeriesPaint", new Class[] { Integer.TYPE, Paint.class }, 0, c1);
     //rend.setBaseItemLabelGenerator(new LabelGenerator(config.unit, config.precision));
-    Object labelGenerator = Proxy.newProxyInstance(
-        getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
-        new CategoryItemLabelGeneratorInvocationHandler(config.unit, config.precision));
+    final Object labelGenerator = Proxy.newProxyInstance(getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
+      new CategoryItemLabelGeneratorInvocationHandler(config.unit, config.precision));
     invokeMethod(rend.getClass(), rend, "setBaseItemLabelGenerator", labelGenerator);
 
     //ItemLabelPosition labelPos = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_CENTER);
-    Class<?> itemLabelAnchorClass = getClass0("org.jfree.chart.labels.ItemLabelAnchor");
-    Class<?> textAnchorClass = getClass0("org.jfree.ui.TextAnchor");
-    Object labelPos = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
-        new Class[] {itemLabelAnchorClass, textAnchorClass},
-        getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_CENTER"));
+    final Class<?> itemLabelAnchorClass = getClass0("org.jfree.chart.labels.ItemLabelAnchor");
+    final Class<?> textAnchorClass = getClass0("org.jfree.ui.TextAnchor");
+    final Object labelPos = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"), new Class[] { itemLabelAnchorClass, textAnchorClass }, getField(itemLabelAnchorClass, null, "CENTER"),
+      getField(textAnchorClass, null, "BOTTOM_CENTER"));
     //rend.setBasePositiveItemLabelPosition(labelPos);
-    Class<?> labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
-    invokeMethod(rend.getClass(), rend, "setBasePositiveItemLabelPosition", new Class[] {labelPositionClass}, labelPos);
+    final Class<?> labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
+    invokeMethod(rend.getClass(), rend, "setBasePositiveItemLabelPosition", new Class[] { labelPositionClass }, labelPos);
     //ItemLabelPosition labelPos2 = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_LEFT);
-    Object labelPos2 = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
-        new Class[] {itemLabelAnchorClass, textAnchorClass},
-        getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_LEFT"));
+    final Object labelPos2 = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"), new Class[] { itemLabelAnchorClass, textAnchorClass }, getField(itemLabelAnchorClass, null, "CENTER"),
+      getField(textAnchorClass, null, "BOTTOM_LEFT"));
     //rend.setPositiveItemLabelPositionFallback(labelPos2);
-    invokeMethod(rend.getClass(), rend, "setPositiveItemLabelPositionFallback", new Class[] {labelPositionClass}, labelPos2);
+    invokeMethod(rend.getClass(), rend, "setPositiveItemLabelPositionFallback", new Class[] { labelPositionClass }, labelPos2);
     //rend.setBaseItemLabelsVisible(true);
-    invokeMethod(rend.getClass(), rend, "setBaseItemLabelsVisible", new Class[] {Boolean.class}, true);
+    invokeMethod(rend.getClass(), rend, "setBaseItemLabelsVisible", new Class[] { Boolean.class }, true);
     config.chart = chart;
     return config;
   }
@@ -115,7 +111,7 @@ public class Bar3DChartHandler implements ChartHandler {
    */
   private Object createDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
-    Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
+    final Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
     populateDataset(config);
     return ds;
@@ -143,9 +139,9 @@ public class Bar3DChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
-    Object ds = config.dataset;
+    final Object ds = config.dataset;
     if (ds == null) return config;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
       for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), "0", key);

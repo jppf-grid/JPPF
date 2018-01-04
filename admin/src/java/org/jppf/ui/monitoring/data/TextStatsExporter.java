@@ -76,9 +76,9 @@ public class TextStatsExporter implements StatsExporter {
 
   @Override
   public String formatAll() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("JPPF driver statistics\n\n");
-    Map<Fields, String> map = new HashMap<>(statsHandler.getLatestStringValues(locale, driver));
+    final Map<Fields, String> map = new HashMap<>(statsHandler.getLatestStringValues(locale, driver));
     maxNameLength = 0;
     maxValueLength = 0;
     updateMaxLengths(map, StatsConstants.ALL_FIELDS);
@@ -103,13 +103,13 @@ public class TextStatsExporter implements StatsExporter {
    * @return the values formatted as plain text.
    */
   private String format(final Map<Fields, String> map, final Fields[] fields, final String label) {
-    StringBuilder sb = new StringBuilder();
-    String title = LocalizationUtils.getLocalized(BASE, label, locale);
+    final StringBuilder sb = new StringBuilder();
+    final String title = LocalizationUtils.getLocalized(BASE, label, locale);
     sb.append(title).append('\n');
     sb.append(StringUtils.padRight("", '-', title.length())).append("\n\n");
-    for (Fields field : fields) {
-      String value = map.get(field);
-      String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
+    for (final Fields field : fields) {
+      final String value = map.get(field);
+      final String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
       sb.append(StringUtils.padRight(name, ' ', maxNameLength));
       sb.append(" = ");
       sb.append(StringUtils.padLeft(value, ' ', maxValueLength));
@@ -126,9 +126,9 @@ public class TextStatsExporter implements StatsExporter {
    */
   private void updateMaxLengths(final Map<Fields, String> map, final Fields[]... fieldsArrays) {
     maxNameLength = getMaxLength(locale);
-    for (Fields[] fields : fieldsArrays) {
-      for (Fields field : fields) {
-        String value = map.get(field);
+    for (final Fields[] fields : fieldsArrays) {
+      for (final Fields field : fields) {
+        final String value = map.get(field);
         if (value != null ) maxValueLength = Math.max(maxValueLength, value.length());
       }
     }
@@ -143,8 +143,8 @@ public class TextStatsExporter implements StatsExporter {
     synchronized(maxNameLengthMap) {
       if (maxNameLengthMap.containsKey(locale)) return maxNameLengthMap.get(locale);
       int max = 0;
-      for (Fields field: Fields.values()) {
-        String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
+      for (final Fields field: Fields.values()) {
+        final String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
         if (name != null) max = Math.max(max, name.length());
       }
       maxNameLengthMap.put(locale, max);

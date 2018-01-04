@@ -80,9 +80,9 @@ public class OptionsPageBuilder {
    */
   public OptionElement buildPageFromContent(final String content, final String baseName) throws Exception {
     this.baseName = baseName;
-    OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
+    final OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
     if (desc == null) return null;
-    OptionElement page = build(desc).get(0);
+    final OptionElement page = build(desc).get(0);
     if (eventEnabled) triggerInitialEvents(page);
     return page;
   }
@@ -99,15 +99,12 @@ public class OptionsPageBuilder {
     URL url = null;
     try {
       url = new URL(urlString);
-    } catch(MalformedURLException e) {
+    } catch(final MalformedURLException e) {
       log.error(e.getMessage(), e);
       return null;
     }
-    Reader reader = new InputStreamReader(url.openStream());
-    try {
+    try (final Reader reader = new InputStreamReader(url.openStream())) {
       return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
-    } finally {
-      reader.close();
     }
   }
 
@@ -120,17 +117,15 @@ public class OptionsPageBuilder {
    */
   public OptionElement buildPage(final String xmlPath, final String baseName) throws Exception {
     if (baseName == null) {
-      String path = xmlPath.replace("\\", "/");
+      final String path = xmlPath.replace("\\", "/");
       int idx = path.lastIndexOf('/');
       this.baseName = BASE_NAME + ((idx < 0) ? path : path.substring(idx + 1));
       idx = this.baseName.lastIndexOf('.');
       if (idx >= 0) this.baseName = this.baseName.substring(0, idx);
     }
     else this.baseName = baseName;
-    OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
+    final OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
     if (desc == null) return null;
-
-    //if (eventEnabled) triggerInitialEvents(page);
     return build(desc).get(0);
   }
 
@@ -161,9 +156,9 @@ public class OptionsPageBuilder {
   private static void triggerLifeCycleEvents(final OptionElement elt, final boolean initial) {
     if (elt == null) return;
     if (initial) {
-      JComponent comp = elt.getUIComponent();
+      final JComponent comp = elt.getUIComponent();
       if (comp != null) {
-        MouseListener listener = elt.getMouseListener();
+        final MouseListener listener = elt.getMouseListener();
         if (listener != null) comp.addMouseListener(listener);
       }
     }
@@ -175,7 +170,7 @@ public class OptionsPageBuilder {
       }
     }
     if ((elt instanceof AbstractOptionElement) && initial) {
-      JComponent comp = elt.getUIComponent();
+      final JComponent comp = elt.getUIComponent();
       if (comp != null) comp.setName(elt.getStringPath());
     }
   }
@@ -212,13 +207,13 @@ public class OptionsPageBuilder {
   public void initCommonOptionAttributes(final AbstractOption option, final OptionDescriptor desc) throws Exception {
     initCommonAttributes(option, desc);
     if (desc.mouseListener != null) {
-      MouseListener listener = createMouseListener(option, desc.mouseListener);
+      final MouseListener listener = createMouseListener(option, desc.mouseListener);
       option.setMouseListener(listener);
     }
     //option.setEditable(desc.getBoolean("editable", false));
     option.setPersistent(desc.getBoolean("persistent", false));
-    for (ListenerDescriptor listenerDesc: desc.listeners) {
-      ValueChangeListener listener = createListener(listenerDesc);
+    for (final ListenerDescriptor listenerDesc: desc.listeners) {
+      final ValueChangeListener listener = createListener(listenerDesc);
       if (listener != null) option.addValueChangeListener(listener);
     }
   }
@@ -233,10 +228,10 @@ public class OptionsPageBuilder {
     ValueChangeListener listener = null;
     if (listenerDesc != null) {
       if ("java".equals(listenerDesc.type)) {
-        Class<?> clazz = Class.forName(listenerDesc.className);
+        final Class<?> clazz = Class.forName(listenerDesc.className);
         listener = (ValueChangeListener) clazz.newInstance();
       } else {
-        ScriptDescriptor script = listenerDesc.script;
+        final ScriptDescriptor script = listenerDesc.script;
         listener = new ScriptedValueChangeListener(script.language, script.content);
       }
     }
@@ -254,10 +249,10 @@ public class OptionsPageBuilder {
     MouseListener listener = null;
     if (listenerDesc != null) {
       if ("java".equals(listenerDesc.type)) {
-        Class<?> clazz = Class.forName(listenerDesc.className);
+        final Class<?> clazz = Class.forName(listenerDesc.className);
         listener = (MouseListener) clazz.newInstance();
       } else {
-        ScriptDescriptor script = listenerDesc.script;
+        final ScriptDescriptor script = listenerDesc.script;
         listener = new ScriptedMouseListener(option, script.language, script.content);
       }
     }
@@ -271,10 +266,10 @@ public class OptionsPageBuilder {
    * @throws Exception if an error was raised while building the page.
    */
   public List<OptionElement> build(final OptionDescriptor desc) throws Exception {
-    List<OptionElement> list = new ArrayList<>();
+    final List<OptionElement> list = new ArrayList<>();
     if (desc.debug && !JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED)) return list;
-    OptionElementFactory f = getFactory();
-    String type = desc.type;
+    final OptionElementFactory f = getFactory();
+    final String type = desc.type;
     if ("page".equalsIgnoreCase(type)) list.add(f.buildPage(desc));
     else if ("SplitPane".equalsIgnoreCase(desc.type)) list.add(f.buildSplitPane(desc));
     else if ("TabbedPane".equalsIgnoreCase(desc.type)) list.add(f.buildTabbedPane(desc));

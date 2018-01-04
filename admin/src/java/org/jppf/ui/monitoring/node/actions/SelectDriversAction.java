@@ -29,28 +29,24 @@ import org.jppf.ui.treetable.*;
  * Action performed to select all drivers in the topology view.
  * @author Laurent Cohen
  */
-public class SelectDriversAction extends AbstractSelectionAction
-{
+public class SelectDriversAction extends AbstractSelectionAction {
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectDriversAction(final AbstractTreeTableOption panel)
-  {
+  public SelectDriversAction(final AbstractTreeTableOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_drivers.gif");
     setupNameAndTooltip("select.drivers");
   }
 
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
-      JPPFTreeTable treeTable = panel.getTreeTable();
-      TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-      List<TreePath> selectionPath = new ArrayList<>();
-      for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
+  public void actionPerformed(final ActionEvent e) {
+    synchronized (panel) {
+      final JPPFTreeTable treeTable = panel.getTreeTable();
+      final TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+      final List<TreePath> selectionPath = new ArrayList<>();
+      for (final DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
       model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
     }
   }

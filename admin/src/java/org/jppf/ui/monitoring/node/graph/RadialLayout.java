@@ -79,34 +79,34 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
 
   @Override
   public void initialize() {
-    Dimension d = getSize();
+    final Dimension d = getSize();
     if (d != null) {
-      Collection<TopologyDriver> drivers = getDrivers();
-      int dSize = drivers.size();
-      double height = d.getHeight();
-      double width = d.getWidth();
+      final Collection<TopologyDriver> drivers = getDrivers();
+      final int dSize = drivers.size();
+      final double height = d.getHeight();
+      final double width = d.getWidth();
       double radius = radiusFactor * (height < width ? height : width);
       radius *= (dSize > 1) ? 1d : 2d;
 
-      int vertextWidth = LayoutFactory.VERTEX_SIZE.width;
+      final int vertextWidth = LayoutFactory.VERTEX_SIZE.width;
       int i = 0;
-      for (TopologyDriver driver : drivers) {
-        Point2D coord = transform(driver);
+      for (final TopologyDriver driver : drivers) {
+        final Point2D coord = transform(driver);
         //double angle = dSize > 1 ? (2d * Math.PI * i) / dSize : 0d;
-        double angle = dSize > 1 ? -Math.PI/2d + (2d * Math.PI * i) / dSize : 0d;
+        final double angle = dSize > 1 ? -Math.PI/2d + (2d * Math.PI * i) / dSize : 0d;
         if (dSize == 1) coord.setLocation(width / 2d, height / 2d);
         else coord.setLocation(Math.cos(angle) * radius + width / 2d, Math.sin(angle) * radius + height / 2d);
-        Collection<TopologyNode> nodes = getNodes(driver);
-        double firstAngle = dSize > 1 ? angle - Math.PI/2d : 0d;
+        final Collection<TopologyNode> nodes = getNodes(driver);
+        final double firstAngle = dSize > 1 ? angle - Math.PI/2d : 0d;
         int j = 0;
-        double factor = dSize > 1 ? 1d : 2d;
-        for (TopologyNode node : nodes) {
-          Point2D nodeCoord = transform(node);
-          double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
+        final double factor = dSize > 1 ? 1d : 2d;
+        for (final TopologyNode node : nodes) {
+          final Point2D nodeCoord = transform(node);
+          final double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
           double nodeX = Math.cos(nodeAngle) * radius + coord.getX();
           // make sure the vertex fits fully in the view
           if (nodeX < vertextWidth/2) nodeX = vertextWidth/2;
-          double offset = nodeX + vertextWidth/2 - width;
+          final double offset = nodeX + vertextWidth/2 - width;
           if (offset > 0) nodeX -= offset;
           nodeCoord.setLocation(nodeX, Math.sin(nodeAngle) * radius + coord.getY());
           j++;
@@ -127,13 +127,13 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
    */
   private Collection<TopologyDriver> getDrivers() {
     try {
-      Set<TopologyDriver> drivers = new HashSet<>();
-      Collection<AbstractTopologyComponent> coll = graph.getVertices();
+      final Set<TopologyDriver> drivers = new HashSet<>();
+      final Collection<AbstractTopologyComponent> coll = graph.getVertices();
       if (coll != null) {
-        for (AbstractTopologyComponent data: coll) if (data.isDriver()) drivers.add((TopologyDriver) data);
+        for (final AbstractTopologyComponent data: coll) if (data.isDriver()) drivers.add((TopologyDriver) data);
       }
       return drivers;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.debug(e.getMessage(), e);
       return Collections.<TopologyDriver>emptyList();
     }
@@ -146,13 +146,13 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
    */
   private Collection<TopologyNode> getNodes(final TopologyDriver driver) {
     try {
-      Set<TopologyNode> nodes = new HashSet<>();
-      Collection<AbstractTopologyComponent> coll = graph.getNeighbors(driver);
+      final Set<TopologyNode> nodes = new HashSet<>();
+      final Collection<AbstractTopologyComponent> coll = graph.getNeighbors(driver);
       if (coll != null) {
-        for (AbstractTopologyComponent data: coll) if (data.isNode()) nodes.add((TopologyNode) data);
+        for (final AbstractTopologyComponent data: coll) if (data.isNode()) nodes.add((TopologyNode) data);
       }
       return nodes;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.debug(e.getMessage(), e);
       return Collections.<TopologyNode>emptyList();
     }

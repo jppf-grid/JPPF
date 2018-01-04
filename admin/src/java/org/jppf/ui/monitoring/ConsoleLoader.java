@@ -66,11 +66,11 @@ public class ConsoleLoader {
   public static void main(final String...args) {
     try {
       System.out.println("Default charset: " + Charset.defaultCharset());
-      boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.console.download.charts", false);
+      final boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.console.download.charts", false);
       if (!b) startWithCheckNoDownload();
       else startWithCheckAndDownload();
       log.info("terminating");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
@@ -85,7 +85,7 @@ public class ConsoleLoader {
     try {
       Class.forName("org.jfree.chart.ChartFactory");
       return true;
-    } catch(ClassNotFoundException e) {
+    } catch(final ClassNotFoundException e) {
       log.error(e.getMessage(), e);
       return false;
     }
@@ -98,8 +98,8 @@ public class ConsoleLoader {
    * @throws Exception if any error occurs.
    */
   private static void startWithCheckNoDownload() throws Exception {
-    boolean present = checkChartClassesAvailable();
-    String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
+    final boolean present = checkChartClassesAvailable();
+    final String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
     ConsoleLauncher.main(xmlPath, "file");
   }
 
@@ -110,14 +110,14 @@ public class ConsoleLoader {
    * @throws Exception if any error occurs.
    */
   private static void startWithCheckAndDownload() throws Exception {
-    String[] names = { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
-    File folder = new File("lib");
-    File[] files = FileUtils.toFiles(folder, names);
-    Downloader downloader = new Downloader();
-    boolean available = checkChartClassesAvailable();
+    final String[] names = { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
+    final File folder = new File("lib");
+    final File[] files = FileUtils.toFiles(folder, names);
+    final Downloader downloader = new Downloader();
+    final boolean available = checkChartClassesAvailable();
     boolean present = downloader.checkFilesPresent(folder, names);
     if (!present && !available) {
-      File dontAskAgain = new File(".dontAskAgain");
+      final File dontAskAgain = new File(".dontAskAgain");
       if (!dontAskAgain.exists()) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         frame = new JFrame(TITLE);
@@ -133,13 +133,13 @@ public class ConsoleLoader {
       }
     }
     if (present && !available) {
-      ClassLoader cl = ConsoleLoader.class.getClassLoader();
-      URL[] urls = FileUtils.toURLs(files);
-      ConsoleClassLoader consoleClassLoader = new ConsoleClassLoader(null, cl);
-      for (URL url: urls) consoleClassLoader.addURL(url);
+      final ClassLoader cl = ConsoleLoader.class.getClassLoader();
+      final URL[] urls = FileUtils.toURLs(files);
+      final ConsoleClassLoader consoleClassLoader = new ConsoleClassLoader(null, cl);
+      for (final URL url: urls) consoleClassLoader.addURL(url);
       Thread.currentThread().setContextClassLoader(consoleClassLoader);
     }
-    String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present || available ? "" : "NoCharts") + ".xml";
+    final String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present || available ? "" : "NoCharts") + ".xml";
     ConsoleLauncher.main(xmlPath, "file");
   }
 
@@ -150,8 +150,8 @@ public class ConsoleLoader {
    */
   private static boolean showDownloadDialog() throws Exception {
     final OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ChartsCheckPanel.xml");
-    JButton yesBtn = (JButton) panel.findFirstWithName("/YesBtn").getUIComponent();
-    JButton noBtn = (JButton) panel.findFirstWithName("/NoBtn").getUIComponent();
+    final JButton yesBtn = (JButton) panel.findFirstWithName("/YesBtn").getUIComponent();
+    final JButton noBtn = (JButton) panel.findFirstWithName("/NoBtn").getUIComponent();
     final JDialog dialog = new JDialog(frame, TITLE, true);
     doDownload = false;
     yesBtn.addActionListener(new ActionListener() {
@@ -167,8 +167,8 @@ public class ConsoleLoader {
         closeDialog(dialog, panel);
       }
     });
-    TextAreaOption textArea = (TextAreaOption) panel.findFirstWithName("/msgText");
-    StringBuilder sb = new StringBuilder();
+    final TextAreaOption textArea = (TextAreaOption) panel.findFirstWithName("/msgText");
+    final StringBuilder sb = new StringBuilder();
     sb.append("\nJPPF Admin console has detected the JFreeChart charting libraries are missing");
     sb.append("\nIf you choose not to download them, charts will not be available in the console");
     sb.append("\nDo you want do download the JFreeChart libraries?\n");
@@ -192,12 +192,12 @@ public class ConsoleLoader {
    * @param panel the panel managed by the dialog.
    */
   private static void closeDialog(final JDialog d, final OptionElement panel) {
-    BooleanOption opt = (BooleanOption) panel.findFirstWithName("/dontAskAgain");
+    final BooleanOption opt = (BooleanOption) panel.findFirstWithName("/dontAskAgain");
     Boolean dontAskAgain = (Boolean) opt.getValue();
     if (dontAskAgain == null) dontAskAgain = Boolean.TRUE;
     if (dontAskAgain) {
-      try (FileWriter writer = new FileWriter(".dontAskAgain")) {
-      } catch(Exception e) {
+      try (final FileWriter writer = new FileWriter(".dontAskAgain")) {
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -237,14 +237,14 @@ public class ConsoleLoader {
       nf.setMinimumFractionDigits(1);
       nf.setMaximumFractionDigits(1);
       nf.setGroupingUsed(true);
-      Font font = new Font("Arial", Font.BOLD, 24);
+      final Font font = new Font("Arial", Font.BOLD, 24);
       label = new JLabel("");
       label.setFont(font);
       label.setHorizontalAlignment(SwingConstants.RIGHT);
       label.setPreferredSize(new Dimension(80, 20));
       window = new Window(frame);
       window.setLayout(new MigLayout("fill"));
-      JLabel l = new JLabel("Download in progress, please wait ...");
+      final JLabel l = new JLabel("Download in progress, please wait ...");
       l.setFont(font);
       window.add(l);
       //window.add(label, "grow, push, gap rel");
@@ -261,14 +261,6 @@ public class ConsoleLoader {
     @Override
     public void dataTransferred(final LocationEvent event) {
       event.getTransferredBytes();
-      /*
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          label.setText(nf.format(count / max));
-        }
-      });
-      */
     }
   }
 

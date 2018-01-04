@@ -84,15 +84,15 @@ public class SystemInformationAction extends AbstractTopologyAction {
       }
     });
     final JEditorPane editor = new JEditorPane("text/html", localize("system.retrieving"));
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     editor.setEditable(false);
     editor.setOpaque(true);
     editor.setBackground(Color.WHITE);
     editor.setCaretPosition(0);
-    JScrollPane panel = new JScrollPane(editor);
+    final JScrollPane panel = new JScrollPane(editor);
     dialog.getContentPane().add(panel);
-    AbstractAction escAction = new AbstractAction() {
+    final AbstractAction escAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
@@ -134,13 +134,13 @@ public class SystemInformationAction extends AbstractTopologyAction {
     public void run() {
       final StringBuilder html = new StringBuilder();
       final StringBuilder toClipboard = new StringBuilder();
-      AbstractTopologyComponent comp = dataArray[0];
+      final AbstractTopologyComponent comp = dataArray[0];
       final String title = TopologyUtils.getSystemInfoTitle(comp, Locale.getDefault(), StatsHandler.getInstance().getShowIPHandler().isShowIP());
       try {
-        JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
+        final JPPFSystemInformation info = TopologyUtils.retrieveSystemInfo(comp);
         html.append(TopologyUtils.formatProperties(info, new HTMLPropertiesTableFormat(title), Locale.getDefault()));
         toClipboard.append(TopologyUtils.formatProperties(info, new TextPropertiesTableFormat(title.toString()), Locale.getDefault()));
-      } catch(Exception e) {
+      } catch(final Exception e) {
         toClipboard.append(ExceptionUtils.getStackTrace(e));
         html.append(toClipboard.toString().replace("\n", "<br>"));
       }
@@ -152,7 +152,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
           editor.setText(html.toString());
           editor.setCaretPosition(0);
           editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (debugEnabled) log.debug("exception while setting system information dialog data: ", e);
           }
         }

@@ -109,7 +109,7 @@ public final class OptionsHandler {
       try {
         pageMap.put(page.getName(), page);
         if (log.isDebugEnabled()) log.debug("adding page '{}' = {}", page.getName(), page);
-      } catch(RuntimeException e) {
+      } catch(final RuntimeException e) {
         log.error("Exception for page = {} : {}", page, ExceptionUtils.getMessage(e));
         throw e;
       }
@@ -136,7 +136,7 @@ public final class OptionsHandler {
     try {
       if (log.isDebugEnabled()) log.debug("loading page '{}'", xmlPath);
       return builder.buildPage(xmlPath, null);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error loading page '{}'", xmlPath, e);
     }
     return null;
@@ -161,7 +161,7 @@ public final class OptionsHandler {
     try {
       if (log.isDebugEnabled()) log.debug("loading page '{}', baseName={}", xmlPath, baseName);
       return builder.buildPageFromURL(xmlPath, baseName);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error("error loading page '{}'", xmlPath, e);
     }
     return null;
@@ -183,12 +183,12 @@ public final class OptionsHandler {
   public static void savePreferences() {
     log.trace("saving preferences");
     try {
-      for (OptionElement elt: pageList) {
-        OptionNode node = buildPersistenceGraph(elt);
+      for (final OptionElement elt: pageList) {
+        final OptionNode node = buildPersistenceGraph(elt);
         savePreferences(node, JPPF_PREFERENCES);
       }
       getPreferences().flush();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -201,14 +201,14 @@ public final class OptionsHandler {
   public static void savePreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
       log.trace("persisting node {}", node.elt.getName());
-      Preferences p = prefs.node(node.elt.getName());
-      for (OptionNode child: node.children) savePreferences(child, p);
+      final Preferences p = prefs.node(node.elt.getName());
+      for (final OptionNode child: node.children) savePreferences(child, p);
     } else if (node.elt instanceof Option) {
-      Option option = (Option) node.elt;
+      final Option option = (Option) node.elt;
       if (option.isPersistent()) {
-        Object value = option.getValue();
+        final Object value = option.getValue();
         log.trace("persisting option {} = {}", option.getStringPath(), value);
-        String s = String.valueOf(value);
+        final String s = String.valueOf(value);
         prefs.put(option.getName(), s);
       }
     } else log.trace("persisting node {}", node.elt.getName());
@@ -218,8 +218,8 @@ public final class OptionsHandler {
    * Load the value of all persistent options in the preferences store.
    */
   public static void loadPreferences() {
-    for (OptionElement elt: pageList) {
-      OptionNode node = buildPersistenceGraph(elt);
+    for (final OptionElement elt: pageList) {
+      final OptionNode node = buildPersistenceGraph(elt);
       loadPreferences(node, JPPF_PREFERENCES);
     }
   }
@@ -232,13 +232,13 @@ public final class OptionsHandler {
   public static void loadPreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
       log.trace("loading node {}", node.elt.getName());
-      Preferences p = prefs.node(node.elt.getName());
-      for (OptionNode child: node.children) loadPreferences(child, p);
+      final Preferences p = prefs.node(node.elt.getName());
+      for (final OptionNode child: node.children) loadPreferences(child, p);
     } else if (node.elt instanceof AbstractOption) {
-      AbstractOption option = (AbstractOption) node.elt;
-      Object def = option.getValue();
+      final AbstractOption option = (AbstractOption) node.elt;
+      final Object def = option.getValue();
       log.trace("loading option {} = {}", option.getStringPath(), def);
-      String val = prefs.get(option.getName(), def == null ? null : def.toString());
+      final String val = prefs.get(option.getName(), def == null ? null : def.toString());
       option.setValue(val);
     }
   }
@@ -261,9 +261,9 @@ public final class OptionsHandler {
     if (elt instanceof OptionContainer) {
       log.trace("processing container {}", elt.getStringPath());
       node = new OptionNode(elt);
-      OptionContainer page = (OptionContainer) elt;
-      for (OptionElement child: page.getChildren()) {
-        OptionNode childNode = buildPersistenceGraph(child);
+      final OptionContainer page = (OptionContainer) elt;
+      for (final OptionElement child: page.getChildren()) {
+        final OptionNode childNode = buildPersistenceGraph(child);
         if (childNode != null) node.children.add(childNode);
       }
     } else if (elt instanceof AbstractOption) {
@@ -311,13 +311,13 @@ public final class OptionsHandler {
    * @param pref the preferences node from where the attributes are loaded.
    */
   public static void loadFrameAttributes(final Frame frame, final Preferences pref) {
-    int x = pref.getInt("locationx", 0);
-    int y = pref.getInt("locationy", 0);
-    int width = pref.getInt("width", 600);
-    int height = pref.getInt("height", 768);
+    final int x = pref.getInt("locationx", 0);
+    final int y = pref.getInt("locationy", 0);
+    final int width = pref.getInt("width", 600);
+    final int height = pref.getInt("height", 768);
     frame.setSize(width, height);
     frame.setLocation(x, y);
-    boolean maximized = pref.getBoolean("maximized", false);
+    final boolean maximized = pref.getBoolean("maximized", false);
     if (maximized) frame.setExtendedState(Frame.MAXIMIZED_BOTH);
   }
 
@@ -327,19 +327,19 @@ public final class OptionsHandler {
    * @param pref the preferences node where the attributes are saved.
    */
   public static void saveFrameAttributes(final Frame frame, final Preferences pref) {
-    int state = frame.getExtendedState();
-    boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
+    final int state = frame.getExtendedState();
+    final boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
     if (maximized) frame.setExtendedState(Frame.NORMAL);
-    java.awt.Point p = frame.getLocation();
+    final java.awt.Point p = frame.getLocation();
     pref.putInt("locationx", p.x);
     pref.putInt("locationy", p.y);
-    java.awt.Dimension d = frame.getSize();
+    final java.awt.Dimension d = frame.getSize();
     pref.putInt("width", d.width);
     pref.putInt("height", d.height);
     pref.putBoolean("maximized", maximized);
     try {
       pref.flush();
-    } catch(BackingStoreException e) {
+    } catch(final BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -413,26 +413,26 @@ public final class OptionsHandler {
     try {
       savePreferences();
       if (ConsoleLauncher.isEmbedded()) saveMainWindowAttributes(getPreferences());
-      OptionElement root = pageList.get(0);
-      OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
+      final OptionElement root = pageList.get(0);
+      final OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
-        JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
+        final JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
         if (chartBuilder != null) chartBuilder.getStorage().saveAll();
       }
-      String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
+      final String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
       JVMHealthPanel panel = null;
-      for (String name: names) {
-        AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
+      for (final String name: names) {
+        final AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
         if (option != null) option.saveTableColumnsWidth();
         if ("/health.treetable".equals(name)) panel = (JVMHealthPanel) option;
       }
       if (panel != null) panel.saveThresholds();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
-    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
+    try (final OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
       getPreferences().exportSubtree(os); 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -444,29 +444,29 @@ public final class OptionsHandler {
   public static void importSettings(final String path) {
     try (InputStream is = new BufferedInputStream(new FileInputStream(path))) {
       getPreferences().importPreferences(is); 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     try {
       loadPreferences();
       if (!ConsoleLauncher.isEmbedded()) loadMainWindowAttributes(getPreferences());
-      OptionElement root = pageList.get(0);
-      OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
+      final OptionElement root = pageList.get(0);
+      final OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
-        JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
+        final JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
         if (chartBuilder != null) chartBuilder.reset();
-        OptionElement chartConfigPage = findOptionWithName(root, "/ChartsConfiguration");
+        final OptionElement chartConfigPage = findOptionWithName(root, "/ChartsConfiguration");
         chartConfigPage.getInitializer().valueChanged(new ValueChangeEvent(chartConfigPage));
       }
-      String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
+      final String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
       JVMHealthPanel panel = null;
-      for (String name: names) {
-        AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
+      for (final String name: names) {
+        final AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
         if (option != null) option.setupTableColumns();
         if ("/health.treetable".equals(name)) panel = (JVMHealthPanel) option;
       }
       if (panel != null) panel.loadThresholds();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }

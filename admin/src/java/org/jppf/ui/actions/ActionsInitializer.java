@@ -80,13 +80,13 @@ public class ActionsInitializer implements Runnable {
         log.error(e.getMessage(), e);
       }
       if (page != null) {
-        for (OptionElement elt: page.getChildren()) {
+        for (final OptionElement elt: page.getChildren()) {
           if (!(elt.getUIComponent() instanceof AbstractButton)) continue;
           final AbstractButton button = (AbstractButton) elt.getUIComponent();
           final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
           if (action == null) continue;
           if (elt instanceof ButtonOption) {
-            ButtonOption btnOption = (ButtonOption) elt;
+            final ButtonOption btnOption = (ButtonOption) elt;
             if (btnOption.getIconPath() != null) action.putValue(Action.SMALL_ICON, GuiUtils.loadIcon(btnOption.getIconPath()));
           }
           button.setAction(action);

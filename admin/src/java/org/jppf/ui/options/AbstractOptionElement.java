@@ -25,8 +25,7 @@ import javax.swing.tree.TreePath;
  * Default abstract implementation of the <code>OptionElement</code> interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractOptionElement extends AbstractOptionProperties implements OptionElement
-{
+public abstract class AbstractOptionElement extends AbstractOptionProperties implements OptionElement {
   /**
    * Constant for an empty <code>OptionElement</code> array.
    */
@@ -44,8 +43,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  protected AbstractOptionElement()
-  {
+  protected AbstractOptionElement() {
   }
 
   /**
@@ -54,8 +52,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#getParent()
    */
   @Override
-  public OptionElement getParent()
-  {
+  public OptionElement getParent() {
     return parent;
   }
 
@@ -63,8 +60,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * Set the parent panel for this option.
    * @param parent an <code>ElementOption</code> instance.
    */
-  public void setParent(final OptionElement parent)
-  {
+  public void setParent(final OptionElement parent) {
     this.parent = parent;
     if (parent == null) root = null;
   }
@@ -75,10 +71,10 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#getRoot()
    */
   @Override
-  public OptionElement getRoot()
-  {
+  public OptionElement getRoot() {
     OptionElement elt = this;
-    while (elt.getParent() != null) elt = elt.getParent();
+    while (elt.getParent() != null)
+      elt = elt.getParent();
     root = elt;
     return root;
   }
@@ -89,12 +85,10 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#getPath()
    */
   @Override
-  public TreePath getPath()
-  {
-    List<OptionElement> list = new ArrayList<>();
+  public TreePath getPath() {
+    final List<OptionElement> list = new ArrayList<>();
     OptionElement elt = this;
-    while (elt != null)
-    {
+    while (elt != null) {
       list.add(0, elt);
       elt = elt.getParent();
     }
@@ -107,17 +101,15 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#getPath()
    */
   @Override
-  public String getStringPath()
-  {
-    List<String> list = new ArrayList<>();
+  public String getStringPath() {
+    final List<String> list = new ArrayList<>();
     OptionElement elt = this;
-    while (elt != null)
-    {
+    while (elt != null) {
       list.add(0, elt.getName());
       elt = elt.getParent();
     }
-    StringBuilder sb = new StringBuilder("/");
-    for (String aList : list) sb.append('/').append(aList);
+    final StringBuilder sb = new StringBuilder("/");
+    for (String aList: list) sb.append('/').append(aList);
     return sb.toString();
   }
 
@@ -129,20 +121,18 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#findElement(java.lang.String)
    */
   @Override
-  public OptionElement findElement(final String path)
-  {
+  public OptionElement findElement(final String path) {
     if (path == null) return null;
     else if ("".equals(path)) return this;
     if (path.startsWith("/")) return getRoot().findElement(path.substring(1));
-    if (path.startsWith(".."))
-    {
-      int idx = path.indexOf('/');
+    if (path.startsWith("..")) {
+      final int idx = path.indexOf('/');
       return (idx < 0) ? getParent() : getParent().findElement(path.substring(idx + 1));
     }
-    int idx = path.indexOf('/');
+    final int idx = path.indexOf('/');
     if (idx < 0) return getChildForName(path);
-    String s = path.substring(0, idx);
-    OptionElement child = getChildForName(s);
+    final String s = path.substring(0, idx);
+    final OptionElement child = getChildForName(s);
     return (child == null) ? null : child.findElement(path.substring(idx + 1));
   }
 
@@ -152,12 +142,10 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @return the child with the specified name, or null if this element is not an option page, or if no child
    * was found with the given name.
    */
-  protected OptionElement getChildForName(final String childName)
-  {
+  protected OptionElement getChildForName(final String childName) {
     if (!(this instanceof OptionContainer)) return null;
-    OptionContainer page = 	(OptionContainer) this;
-    for (OptionElement elt: page.getChildren())
-    {
+    final OptionContainer page = (OptionContainer) this;
+    for (final OptionElement elt: page.getChildren()) {
       if (childName.equals(elt.getName())) return elt;
     }
     return null;
@@ -169,9 +157,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append('[').append((this instanceof OptionContainer) ? "Page" : "Option").append(" : ");
     sb.append(getClass().getName()).append("] ");
     sb.append("name=").append(name);
@@ -188,10 +175,9 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#findAllWithName(java.lang.String)
    */
   @Override
-  public List<OptionElement> findAllWithName(final String name)
-  {
+  public List<OptionElement> findAllWithName(final String name) {
     if (name.startsWith("/")) return getRoot().findAllWithName(name.substring(1));
-    List<OptionElement> list = new ArrayList<>();
+    final List<OptionElement> list = new ArrayList<>();
     findAll(name, list);
     return list;
   }
@@ -203,9 +189,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
    */
   @Override
-  public OptionElement findFirstWithName(final String name)
-  {
-    List<OptionElement> list = findAllWithName(name);
+  public OptionElement findFirstWithName(final String name) {
+    final List<OptionElement> list = findAllWithName(name);
     return list.isEmpty() ? null : list.get(0);
   }
 
@@ -217,9 +202,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
    */
   @Override
-  public OptionElement findLastWithName(final String name)
-  {
-    List<OptionElement> list = findAllWithName(name);
+  public OptionElement findLastWithName(final String name) {
+    final List<OptionElement> list = findAllWithName(name);
     return list.isEmpty() ? null : list.get(list.size() - 1);
   }
 
@@ -230,13 +214,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    * @param list a list of <code>OptionElement</code> instances, to fill with the elements found.
    * could be found with the specified name. The resulting list can be empty, but never null.
    */
-  protected void findAll(final String name, final List<OptionElement> list)
-  {
+  protected void findAll(final String name, final List<OptionElement> list) {
     if (name.equals(getName())) list.add(this);
-    if (this instanceof OptionContainer)
-    {
-      OptionContainer page = (OptionContainer) this;
-      for (OptionElement elt: page.getChildren()) ((AbstractOptionElement) elt).findAll(name, list);
+    if (this instanceof OptionContainer) {
+      final OptionContainer page = (OptionContainer) this;
+      for (final OptionElement elt: page.getChildren()) ((AbstractOptionElement) elt).findAll(name, list);
     }
   }
 }

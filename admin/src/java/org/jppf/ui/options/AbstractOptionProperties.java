@@ -398,7 +398,7 @@ public abstract class AbstractOptionProperties implements OptionProperties {
    * @return {@link JScrollPane} instance.
    */
   protected JScrollPane createScrollPane(final JComponent comp) {
-    JScrollPane jsc = new JScrollPane(comp);
+    final JScrollPane jsc = new JScrollPane(comp);
     GuiUtils.adjustScrollbarsThickness(jsc);
     jsc.setHorizontalScrollBarPolicy(isHorizontalScrollbar() ? ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     jsc.setVerticalScrollBarPolicy(isVerticalScrollbar() ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);

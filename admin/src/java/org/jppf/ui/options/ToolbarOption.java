@@ -23,37 +23,32 @@ import javax.swing.*;
  * This option class encapsulates a JToolBar.
  * @author Laurent Cohen
  */
-public class ToolbarOption extends AbstractOptionContainer
-{
+public class ToolbarOption extends AbstractOptionContainer {
   /**
    * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
    */
-  public ToolbarOption()
-  {
+  public ToolbarOption() {
   }
 
   @Override
-  public void createUI()
-  {
-    JToolBar toolbar = new JToolBar(SwingConstants.HORIZONTAL);
+  public void createUI() {
+    final JToolBar toolbar = new JToolBar(SwingConstants.HORIZONTAL);
     toolbar.setFloatable(false);
     UIComponent = toolbar;
     toolbar.setOpaque(false);
   }
 
   @Override
-  public void add(final OptionElement element)
-  {
+  public void add(final OptionElement element) {
     super.add(element);
-    JToolBar toolbar = (JToolBar) UIComponent;
+    final JToolBar toolbar = (JToolBar) UIComponent;
     toolbar.add(element.getUIComponent());
   }
 
   @Override
-  public void remove(final OptionElement element)
-  {
+  public void remove(final OptionElement element) {
     super.remove(element);
-    JToolBar toolbar = (JToolBar) UIComponent;
+    final JToolBar toolbar = (JToolBar) UIComponent;
     toolbar.remove(element.getUIComponent());
   }
 }

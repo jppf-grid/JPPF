@@ -77,24 +77,24 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
     try {
       panel = loadWithPreferences("org/jppf/ui/options/xml/JobMaxNodesPanel.xml");
       maxNodes = Integer.MAX_VALUE;
       for (Job data: jobDataArray) {
-        int n = data.getJobInformation().getMaxNodes();
+        final int n = data.getJobInformation().getMaxNodes();
         if (n < maxNodes) maxNodes = n;
       }
       ((AbstractOption) panel.findFirstWithName("job.max.nodes")).setValue(maxNodes);
       ((AbstractOption) panel.findFirstWithName("job.nolimit.toggle")).setValue(maxNodes == Integer.MAX_VALUE);
 
-      JButton okBtn = (JButton) panel.findFirstWithName("/job.max.nodes.OK").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("/job.max.nodes.Cancel").getUIComponent();
+      final JButton okBtn = (JButton) panel.findFirstWithName("/job.max.nodes.OK").getUIComponent();
+      final JButton cancelBtn = (JButton) panel.findFirstWithName("/job.max.nodes.Cancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("JobMaxNodesPanel.label"), false);
       dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      AbstractAction okAction = new AbstractAction() {
+      final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -102,7 +102,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
           doOK();
         }
       };
-      AbstractAction cancelAction = new AbstractAction() {
+      final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -117,7 +117,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
       dialog.setLocationRelativeTo(null);
       dialog.setLocation(location);
       dialog.setVisible(true);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -127,20 +127,20 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
    */
   private void doOK() {
     savePreferences(panel);
-    AbstractOption noLimitOption = (AbstractOption) panel.findFirstWithName("job.nolimit.toggle");
-    AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
-    boolean noLimit = (Boolean) noLimitOption.getValue();
+    final AbstractOption noLimitOption = (AbstractOption) panel.findFirstWithName("job.nolimit.toggle");
+    final AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
+    final boolean noLimit = (Boolean) noLimitOption.getValue();
     maxNodes = noLimit ? Integer.MAX_VALUE : ((Number) maxNodesOption.getValue()).intValue();
     final CollectionMap<JobDriver, String> map = new SetHashMap<>();
     for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobDriver driver: map.keySet()) {
           try {
-            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            final DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
             if (jmx != null) jmx.updateMaxNodes(new JobUuidSelector(map.getValues(driver)), maxNodes);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

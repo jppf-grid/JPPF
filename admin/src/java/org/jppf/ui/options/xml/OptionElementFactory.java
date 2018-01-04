@@ -55,7 +55,7 @@ public class OptionElementFactory {
    */
   private OptionsPageBuilder getOrCreateBuilder(final String i18n) {
     if ((i18n == null) || "".equals(i18n.trim()) || i18n.equals(builder.getBaseName())) return this.builder;
-    OptionsPageBuilder newBuilder = new OptionsPageBuilder(builder.isEventEnabled());
+    final OptionsPageBuilder newBuilder = new OptionsPageBuilder(builder.isEventEnabled());
     newBuilder.setBaseName(i18n);
     return newBuilder;
   }
@@ -67,13 +67,13 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the page.
    */
   public OptionElement buildPage(final OptionDescriptor desc) throws Exception {
-    OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
-    OptionPanel page = new OptionPanel();
+    final OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+    final OptionPanel page = new OptionPanel();
     page.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(page, desc);
     page.createUI();
-    for (OptionDescriptor child: desc.children) {
-      for (OptionElement elt: tmpBuilder.build(child)) page.add(elt);
+    for (final OptionDescriptor child: desc.children) {
+      for (final OptionElement elt: tmpBuilder.build(child)) page.add(elt);
     }
     page.setEventsEnabled(true);
     return page;
@@ -86,16 +86,16 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public OptionElement buildSplitPane(final OptionDescriptor desc) throws Exception {
-    OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
-    SplitPaneOption option = new SplitPaneOption();
+    final OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+    final SplitPaneOption option = new SplitPaneOption();
     tmpBuilder.initCommonAttributes(option, desc);
     option.setDividerWidth(desc.getInt("dividerWidth", 4));
     option.setResizeWeight(desc.getDouble("resizeWeight", 0.5d));
-    String s = desc.getString("orientation", "horizontal");
+    final String s = desc.getString("orientation", "horizontal");
     option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
     option.createUI();
-    for (OptionDescriptor child: desc.children) {
-      for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+    for (final OptionDescriptor child: desc.children) {
+      for (final OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     return option;
   }
@@ -107,13 +107,13 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public OptionElement buildToolbar(final OptionDescriptor desc) throws Exception {
-    OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
-    ToolbarOption option = new ToolbarOption();
+    final OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+    final ToolbarOption option = new ToolbarOption();
     option.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(option, desc);
     option.createUI();
-    for (OptionDescriptor child: desc.children) {
-      for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+    for (final OptionDescriptor child: desc.children) {
+      for (final OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     option.setEventsEnabled(true);
     return option;
@@ -126,13 +126,13 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public OptionElement buildTabbedPane(final OptionDescriptor desc) throws Exception {
-    OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
-    TabbedPaneOption option = new TabbedPaneOption();
+    final OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
+    final TabbedPaneOption option = new TabbedPaneOption();
     option.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(option, desc);
     option.createUI();
-    for (OptionDescriptor child: desc.children) {
-      for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
+    for (final OptionDescriptor child: desc.children) {
+      for (final OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     option.setEventsEnabled(true);
     return option;
@@ -145,7 +145,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildButton(final OptionDescriptor desc) throws Exception {
-    ButtonOption option = new ButtonOption();
+    final ButtonOption option = new ButtonOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setToggle(desc.getBoolean("toggle", false));
@@ -161,7 +161,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildLabel(final OptionDescriptor desc) throws Exception {
-    LabelOption option = new LabelOption();
+    final LabelOption option = new LabelOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(desc.getProperty("value"));
@@ -177,7 +177,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildTextArea(final OptionDescriptor desc) throws Exception {
-    TextAreaOption option = new TextAreaOption();
+    final TextAreaOption option = new TextAreaOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setEditable(desc.getBoolean("editable", false));
@@ -194,7 +194,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildCodeEditor(final OptionDescriptor desc) throws Exception {
-    CodeEditorOption option = new CodeEditorOption();
+    final CodeEditorOption option = new CodeEditorOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setEditable(desc.getBoolean("editable", false));
@@ -211,7 +211,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildPassword(final OptionDescriptor desc) throws Exception {
-    PasswordOption option = new PasswordOption();
+    final PasswordOption option = new PasswordOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(desc.getProperty("value"));
@@ -227,7 +227,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildPlainText(final OptionDescriptor desc) throws Exception {
-    PlainTextOption option = new PlainTextOption();
+    final PlainTextOption option = new PlainTextOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(desc.getProperty("value"));
@@ -244,7 +244,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildFormattedNumber(final OptionDescriptor desc) throws Exception {
-    FormattedNumberOption option = new FormattedNumberOption();
+    final FormattedNumberOption option = new FormattedNumberOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(new Double(desc.getDouble("value")));
@@ -262,7 +262,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildSpinnerNumber(final OptionDescriptor desc) throws Exception {
-    SpinnerNumberOption option = new SpinnerNumberOption();
+    final SpinnerNumberOption option = new SpinnerNumberOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setStep(desc.getDouble("step", 1d));
@@ -282,7 +282,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildBoolean(final OptionDescriptor desc) throws Exception {
-    BooleanOption option = new BooleanOption();
+    final BooleanOption option = new BooleanOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(Boolean.valueOf(desc.getBoolean("value")));
@@ -298,7 +298,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildRadio(final OptionDescriptor desc) throws Exception {
-    RadioButtonOption option = new RadioButtonOption();
+    final RadioButtonOption option = new RadioButtonOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(Boolean.valueOf(desc.getBoolean("value")));
@@ -314,11 +314,11 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildComboBox(final OptionDescriptor desc) throws Exception {
-    ComboBoxOption option = new ComboBoxOption();
+    final ComboBoxOption option = new ComboBoxOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    List<Object> items = new ArrayList<>();
-    for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
+    final List<Object> items = new ArrayList<>();
+    for (final ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
     option.setItems(items);
     option.setValue(desc.getProperty("value"));
     option.createUI();
@@ -333,13 +333,13 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildList(final OptionDescriptor desc) throws Exception {
-    ListOption option = new ListOption();
+    final ListOption option = new ListOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    List<Object> items = new ArrayList<>();
-    for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
-    int selMode = "single".equals(desc.getProperty("selection"))
-    ? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+    final List<Object> items = new ArrayList<>();
+    for (final ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
+    final int selMode = "single".equals(desc.getProperty("selection"))
+      ? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
     option.setSelMode(selMode);
     option.setItems(items);
     option.setValue(new ArrayList<>());
@@ -355,8 +355,8 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildFiller(final OptionDescriptor desc) throws Exception {
-    int width = desc.getInt("width", 1);
-    int height = desc.getInt("height", 1);
+    final int width = desc.getInt("width", 1);
+    final int height = desc.getInt("height", 1);
     return new FillerOption(width, height);
   }
 
@@ -367,9 +367,9 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildToolbarSeparator(final OptionDescriptor desc) throws Exception {
-    int width = desc.getInt("width", 5);
-    int height = desc.getInt("height", 5);
-    String text = desc.getString("text", " ");
+    final int width = desc.getInt("width", 5);
+    final int height = desc.getInt("height", 5);
+    final String text = desc.getString("text", " ");
     return new ToolbarSeparatorOption(text, width, height);
   }
 
@@ -380,9 +380,9 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildFileChooser(final OptionDescriptor desc) throws Exception   {
-    FileChooserOption option = new FileChooserOption();
+    final FileChooserOption option = new FileChooserOption();
     builder.initCommonOptionAttributes(option, desc);
-    int dlgType = "open".equals(desc.getProperty("type")) ? FileChooserOption.OPEN : FileChooserOption.SAVE;
+    final int dlgType = "open".equals(desc.getProperty("type")) ? FileChooserOption.OPEN : FileChooserOption.SAVE;
     option.setDialogType(dlgType);
     option.setExtensions(desc.getProperty("extensions"));
     option.setValue(desc.getProperty("value"));
@@ -397,10 +397,10 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildPickList(final OptionDescriptor desc) throws Exception   {
-    PickListOption option = new PickListOption();
+    final PickListOption option = new PickListOption();
     builder.initCommonOptionAttributes(option, desc);
     option.createUI();
-    PickList<?> pickList = option.getPickList();
+    final PickList<?> pickList = option.getPickList();
     String s = desc.getProperty("leftTitle", null);
     if (s != null) pickList.setLeftTitle(LocalizationUtils.getLocalized(builder.getBaseName(), s));
     s = desc.getProperty("rightTitle", null);
@@ -415,27 +415,27 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public List<OptionElement> loadImport(final OptionDescriptor desc) throws Exception {
-    OptionsPageBuilder builder = new OptionsPageBuilder(true);
-    List<OptionElement> list = new ArrayList<>();
-    String source = desc.getProperty("source");
-    String location = desc.getProperty("location");
+    final OptionsPageBuilder builder = new OptionsPageBuilder(true);
+    final List<OptionElement> list = new ArrayList<>();
+    final String source = desc.getProperty("source");
+    final String location = desc.getProperty("location");
     if (StringUtils.isOneOf(source, true, "url", "file")) {
       boolean enabled = true;
-      String pluggableViewName = desc.getProperty("pluggableView");
+      final String pluggableViewName = desc.getProperty("pluggableView");
       if ((pluggableViewName != null) && !"".equals(pluggableViewName.trim())) {
         enabled = JPPFConfiguration.get(JPPFProperties.ADMIN_CONSOLE_VIEW_ENABLED, pluggableViewName);
       }
       if (enabled) {
-        OptionElement elt = "url".equalsIgnoreCase(source) ? builder.buildPageFromURL(location, builder.getBaseName()) : builder.buildPage(location, null);
+        final OptionElement elt = "url".equalsIgnoreCase(source) ? builder.buildPageFromURL(location, builder.getBaseName()) : builder.buildPage(location, null);
         list.add(elt);
         OptionsHandler.getPluggableViewHandler().addView(pluggableViewName, elt);
         if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
       }
     } else if ("plugin".equalsIgnoreCase(source)) {
-      List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
-      Set<String> names = new HashSet<>();
-      for (String def: pathList) {
-        OptionElement elt = builder.buildPage(def, null);
+      final List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
+      final Set<String> names = new HashSet<>();
+      for (final String def: pathList) {
+        final OptionElement elt = builder.buildPage(def, null);
         if (!names.contains(elt.getName())) {
           names.add(elt.getName());
           list.add(elt);
@@ -444,11 +444,11 @@ public class OptionElementFactory {
       }
     } else if ("script".equalsIgnoreCase(source)) {
       if (!desc.scripts.isEmpty()) {
-        ScriptDescriptor scriptDesc = desc.scripts.get(0);
+        final ScriptDescriptor scriptDesc = desc.scripts.get(0);
         ScriptRunner runner = null;
         try {
           runner = ScriptRunnerFactory.getScriptRunner(scriptDesc.language);
-          String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
+          final String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
           if (path != null) list.add(builder.buildPage(path, null));
         } finally {
           ScriptRunnerFactory.releaseScriptRunner(runner);
@@ -466,7 +466,7 @@ public class OptionElementFactory {
    */
   void addDebugComp(final OptionElement elt, final String source, final String location) {
     if (elt instanceof TabbedPaneOption) return;
-    JLabel label = new JLabel(" X ");
+    final JLabel label = new JLabel(" X ");
     label.setOpaque(true);
     label.setBackground(Color.RED);
     JComponent comp = elt.getUIComponent();
@@ -482,7 +482,7 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildJavaOption(final OptionDescriptor desc) throws Exception {
-    JavaOption option = new JavaOption();
+    final JavaOption option = new JavaOption();
     builder.initCommonOptionAttributes(option, desc);
     option.setClassName(desc.getProperty("class"));
     option.setMouseListenerClassName(desc.getProperty("mouseListenerClass"));
@@ -497,9 +497,9 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildCustomOption(final OptionDescriptor desc) throws Exception {
-    String className = desc.getString("impl.class");
-    Class<?> clazz = Class.forName(className);
-    AbstractOption option = (AbstractOption) clazz.newInstance();
+    final String className = desc.getString("impl.class");
+    final Class<?> clazz = Class.forName(className);
+    final AbstractOption option = (AbstractOption) clazz.newInstance();
     builder.initCommonOptionAttributes(option, desc);
     option.createUI();
     return option;

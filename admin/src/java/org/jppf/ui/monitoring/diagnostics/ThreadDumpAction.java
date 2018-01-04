@@ -76,17 +76,17 @@ public class ThreadDumpAction extends AbstractTopologyAction {
           dialog.dispose();
         }
       });
-      JEditorPane editor = new JEditorPane("text/html", "");
+      final JEditorPane editor = new JEditorPane("text/html", "");
       editor.setBackground(Color.WHITE);
       editor.setText(HealthUtils.localizeThreadDumpInfo("threaddump.retrieving", Locale.getDefault()));
       editor.setCaretPosition(0);
-      AbstractButton btn = (AbstractButton) event.getSource();
+      final AbstractButton btn = (AbstractButton) event.getSource();
       if (btn.isShowing()) location = btn.getLocationOnScreen();
       editor.setEditable(false);
       editor.setOpaque(true);
-      JScrollPane panel = new JScrollPane(editor);
+      final JScrollPane panel = new JScrollPane(editor);
       dialog.getContentPane().add(panel);
-      AbstractAction escAction = new AbstractAction() {
+      final AbstractAction escAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
@@ -99,7 +99,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       dialog.setSize(600, 600);
       dialog.setVisible(true);
       runAction(new AsyncRunnable(dialog, editor));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -133,14 +133,14 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       final StringBuilder toClipboard = new StringBuilder();
       final String title = HealthUtils.getThreadDumpTitle(dataArray[0], Locale.getDefault());
       try {
-        ThreadDump info = HealthUtils.retrieveThreadDump(dataArray[0]);
+        final ThreadDump info = HealthUtils.retrieveThreadDump(dataArray[0]);
         if (info == null) html.append("<p><b>No thread dump was generated</b>");
         if (info == null) html.append(HealthUtils.localizeThreadDumpInfo("threaddump.info_not_found", Locale.getDefault()));
         else {
           html.append(HTMLThreadDumpWriter.printToString(info, title, true, 12));
           toClipboard.append(TextThreadDumpWriter.printToString(info, title));
         }
-      } catch(Exception e) {
+      } catch(final Exception e) {
         toClipboard.append(ExceptionUtils.getStackTrace(e));
         html.append(toClipboard.toString().replace("\n", "<br>"));
       }
@@ -152,7 +152,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
           editor.setText(html.toString());
           editor.setCaretPosition(0);
           editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (debugEnabled) log.debug("exception while setting thread dump dialog data: ", e);
           }
         }

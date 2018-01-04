@@ -31,7 +31,7 @@ import org.jppf.ui.utils.GuiUtils;
 public class TabbedPaneOption extends AbstractOptionContainer {
   @Override
   public void createUI() {
-    JTabbedPane pane = new JTabbedPane();
+    final JTabbedPane pane = new JTabbedPane();
     pane.setDoubleBuffered(true);
     if (!bordered) pane.setBorder(BorderFactory.createEmptyBorder());
     UIComponent = pane;
@@ -72,10 +72,10 @@ public class TabbedPaneOption extends AbstractOptionContainer {
     if (index < 0) throw new IndexOutOfBoundsException("negative index " + index);
     //int idx = children.size();
     super.add(element, index);
-    JTabbedPane pane = (JTabbedPane) UIComponent;
+    final JTabbedPane pane = (JTabbedPane) UIComponent;
     ImageIcon icon = null;
     if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
-    DockingManager dmgr = DockingManager.getInstance();
+    final DockingManager dmgr = DockingManager.getInstance();
     try {
       //pane.addTab("", null, element.getUIComponent(), element.getToolTipText());
       pane.insertTab("", null, element.getUIComponent(), element.getToolTipText(), index);
@@ -89,7 +89,7 @@ public class TabbedPaneOption extends AbstractOptionContainer {
         if (!dmgr.isRegistered(element)) dmgr.register(element, l);
         else dmgr.update(element, l);
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
   }
@@ -106,7 +106,7 @@ public class TabbedPaneOption extends AbstractOptionContainer {
    * @return the tab component as a {@link Component}.
    */
   public Component getTabComponent(final OptionElement element) {
-    int index = ((JTabbedPane) UIComponent).indexOfComponent(element.getUIComponent());
+    final int index = ((JTabbedPane) UIComponent).indexOfComponent(element.getUIComponent());
     return ((JTabbedPane) UIComponent).getTabComponentAt(index);
   }
 }

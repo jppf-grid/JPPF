@@ -59,18 +59,18 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleColumnsPanel.xml");
     
     JComponent columnsPanel = null;
-    JComponent comp = OptionsHandler.findOptionWithName(thisPanel, "/show.hide.columns").getUIComponent();
+    final JComponent comp = OptionsHandler.findOptionWithName(thisPanel, "/show.hide.columns").getUIComponent();
     if (comp instanceof JScrollPane) columnsPanel = (JComponent) ((JScrollPane) comp).getViewport().getView();
     else columnsPanel = comp;
-    TreeTableModel model = treeTableOption.getModel();
+    final TreeTableModel model = treeTableOption.getModel();
     checkboxes.clear();
     for (int i=0; i<model.getColumnCount(); i++) {
-      JCheckBox checkbox = new JCheckBox(model.getColumnName(i));
+      final JCheckBox checkbox = new JCheckBox(model.getColumnName(i));
       if (i == 0) {
         checkbox.setSelected(true);
         checkbox.setEnabled(false);
@@ -81,15 +81,15 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
 
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("show.hide.label"), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
-    JButton applyBtn = (JButton) thisPanel.findFirstWithName("/show.hide.apply").getUIComponent();
-    AbstractAction applyAction = new AbstractAction() {
+    final JButton applyBtn = (JButton) thisPanel.findFirstWithName("/show.hide.apply").getUIComponent();
+    final AbstractAction applyAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         doApply();
       }
     };
     applyBtn.addActionListener(applyAction);
-    JButton closeBtn = (JButton) thisPanel.findFirstWithName("/show.hide.close").getUIComponent();
-    AbstractAction closeAction = new AbstractAction() {
+    final JButton closeBtn = (JButton) thisPanel.findFirstWithName("/show.hide.close").getUIComponent();
+    final AbstractAction closeAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
@@ -98,14 +98,14 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     };
     closeBtn.addActionListener(closeAction);
     setOkCancelKeys(thisPanel, applyAction, closeAction);
-    JButton selectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.select.all").getUIComponent();
+    final JButton selectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.select.all").getUIComponent();
     selectAllBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         for (JCheckBox checkbox: checkboxes) if (checkbox.isEnabled()) checkbox.setSelected(true);
       }
     });
-    JButton unselectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.unselect.all").getUIComponent();
+    final JButton unselectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.unselect.all").getUIComponent();
     unselectAllBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -124,7 +124,7 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
    */
   private void doApply() {
     for (int i=1; i<checkboxes.size(); i++) {
-      JCheckBox checkbox = checkboxes.get(i);
+      final JCheckBox checkbox = checkboxes.get(i);
       if (checkbox.isSelected()) {
         if (treeTableOption.isColumnHidden(i)) treeTableOption.restoreColumn(i);
       } else {

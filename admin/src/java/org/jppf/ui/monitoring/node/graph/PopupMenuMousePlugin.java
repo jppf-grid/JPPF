@@ -61,13 +61,12 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
   @SuppressWarnings("unchecked")
   protected void handlePopup(final MouseEvent e) {
     final VisualizationViewer<V, E> viewer = (VisualizationViewer<V, E>) e.getSource();
-    Point p = e.getPoint();
-
-    GraphElementAccessor<V, E> pickSupport = viewer.getPickSupport();
+    final Point p = e.getPoint();
+    final GraphElementAccessor<V, E> pickSupport = viewer.getPickSupport();
     if (pickSupport != null) {
       final V vertex = pickSupport.getVertex(viewer.getGraphLayout(), p.getX(), p.getY());
       if (vertex != null) {
-        JPopupMenu vertexMenu = createMenu(vertex, viewer, e.getLocationOnScreen());
+        final JPopupMenu vertexMenu = createMenu(vertex, viewer, e.getLocationOnScreen());
         vertexMenu.show(viewer, e.getX(), e.getY());
       }
     }
@@ -80,9 +79,8 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
    * @param point the location of the mouse right-click.
    * @return the created popup menu.
    */
-  private JPopupMenu createMenu(final V vertex, final VisualizationViewer<?, ?> viewer, final Point point)
-  {
-    JPopupMenu menu = new JPopupMenu();
+  private JPopupMenu createMenu(final V vertex, final VisualizationViewer<?, ?> viewer, final Point point) {
+    final JPopupMenu menu = new JPopupMenu();
     menu.add(createMenuItem(actionHandler.getAction("graph.show.information"), point));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.restart.driver"), point));
@@ -109,8 +107,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
    * @param location the location to use for any window create by the action.
    * @return a <code>JMenuItem</code> instance.
    */
-  private static JMenuItem createMenuItem(final Action action, final Point location)
-  {
+  private static JMenuItem createMenuItem(final Action action, final Point location) {
     if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
     return new JMenuItem(action);
   }

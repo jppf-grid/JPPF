@@ -31,8 +31,7 @@ import org.jppf.ui.utils.GuiUtils;
  * Instances of this class are used to create and update line charts with an horizontal orientation.
  * @author Laurent Cohen
  */
-public class PlotXYChartHandler implements ChartHandler
-{
+public class PlotXYChartHandler implements ChartHandler {
   /**
    * The stats formatter that provides the data.
    */
@@ -42,8 +41,7 @@ public class PlotXYChartHandler implements ChartHandler
    * Initialize this chart handler with a specified stats formatter.
    * @param statsHandler the stats formatter that provides the data.
    */
-  public PlotXYChartHandler(final StatsHandler statsHandler)
-  {
+  public PlotXYChartHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
   }
 
@@ -54,24 +52,22 @@ public class PlotXYChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration createChart(final ChartConfiguration config)
-  {
-    Object ds = createDataset(config);
+  public ChartConfiguration createChart(final ChartConfiguration config) {
+    final Object ds = createDataset(config);
     String s = config.name;
     if (config.unit != null) s += " (" + config.unit + ')';
     //JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
-        s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+    final Object chart = invokeMethod(
+      getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart", s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
     //XYPlot plot = chart.getXYPlot();
-    Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
+    final Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
     //XYItemRenderer rend = plot.getRenderer();
-    Object rend = invokeMethod(getClass0("org.jfree.chart.plot.XYPlot"), plot, "getRenderer");
-    Class<?> rendClass = getClass0("org.jfree.chart.renderer.xy.XYItemRenderer");
+    final Object rend = invokeMethod(getClass0("org.jfree.chart.plot.XYPlot"), plot, "getRenderer");
+    final Class<?> rendClass = getClass0("org.jfree.chart.renderer.xy.XYItemRenderer");
     //rend.setBaseSeriesVisibleInLegend(true);
-    invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
+    invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] { Boolean.TYPE }, true);
     //rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
-    Object labelGenerator = Proxy.newProxyInstance(
-        getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+    final Object labelGenerator = Proxy.newProxyInstance(getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
     invokeMethod(rendClass, rend, "setLegendItemLabelGenerator", labelGenerator);
     //rend.setBaseStroke(new BasicStroke(2f));
     invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2.0f));
@@ -84,14 +80,12 @@ public class PlotXYChartHandler implements ChartHandler
    * @param config the names of the fields whose values populate the dataset.
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
-  private Object createDataset(final ChartConfiguration config)
-  {
+  private Object createDataset(final ChartConfiguration config) {
     //XYSeriesCollection ds = new XYSeriesCollection();
-    Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
-    for (Fields key: config.fields)
-    {
+    final Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
+    for (final Fields key: config.fields) {
       //XYSeries series = new XYSeries(key);
-      Object series = invokeConstructor(getClass0("org.jfree.data.xy.XYSeries"), new Class[] {Comparable.class}, key);
+      final Object series = invokeConstructor(getClass0("org.jfree.data.xy.XYSeries"), new Class[] { Comparable.class }, key);
       //ds.addSeries(series);
       invokeMethod(ds.getClass(), ds, "addSeries", series);
       //series.setMaximumItemCount(statsHandler.getRolloverPosition());
@@ -109,30 +103,26 @@ public class PlotXYChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration populateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration populateDataset(final ChartConfiguration config) {
     //XYSeriesCollection ds= (XYSeriesCollection) config.dataset;
-    Object ds = config.dataset;
+    final Object ds = config.dataset;
     //List list = ds.getSeries();
-    List<?> list = (List<?>) invokeMethod(ds.getClass(), ds, "getSeries");
-    for (Object o: list)
-    {
+    final List<?> list = (List<?>) invokeMethod(ds.getClass(), ds, "getSeries");
+    for (final Object o: list) {
       //((XYSeries) o).clear();
       invokeMethod(o.getClass(), o, "clear");
     }
     //for (int i=0; i<ds.getSeriesCount(); i++)
-    for (int i=0; i<(Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++)
-    {
+    for (int i = 0; i < (Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++) {
       //Fields key = (Fields) ds.getSeriesKey(i);
-      Fields key = (Fields) invokeMethod(ds.getClass(), ds, "getSeriesKey", i);
+      final Fields key = (Fields) invokeMethod(ds.getClass(), ds, "getSeriesKey", i);
       //XYSeries series = ds.getSeries(i);
-      Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
-      int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
-      for (int j=0; j<statsHandler.getStatsCount(); j++)
-      {
-        Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
+      final Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] { Integer.TYPE }, i);
+      final int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
+      for (int j = 0; j < statsHandler.getStatsCount(); j++) {
+        final Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
         //series.add(start + j, valueMap.get(key));
-        invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, start + j, valueMap.get(key));
+        invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class }, start + j, valueMap.get(key));
       }
     }
     return config;
@@ -145,20 +135,18 @@ public class PlotXYChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration updateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration updateDataset(final ChartConfiguration config) {
     //XYSeriesCollection ds = (XYSeriesCollection) config.dataset;
-    Object ds = config.dataset;
-    Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
+    final Object ds = config.dataset;
+    final Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     //for (int i=0; i<ds.getSeriesCount(); i++)
-    for (int i=0; i<(Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++)
-    {
+    for (int i = 0; i < (Integer) invokeMethod(ds.getClass(), ds, "getSeriesCount"); i++) {
       //XYSeries series = ds.getSeries(i);
-      Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] {Integer.TYPE}, i);
+      final Object series = invokeMethod(ds.getClass(), ds, "getSeries", new Class[] { Integer.TYPE }, i);
       //Fields key = (Fields) series.getKey();
-      Fields key = (Fields) invokeMethod(series.getClass(), series, "getKey");
+      final Fields key = (Fields) invokeMethod(series.getClass(), series, "getKey");
       //series.add(statsHandler.getTickCount(), valueMap.get(key));
-      invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class}, statsHandler.getTickCount(), valueMap.get(key));
+      invokeMethod(series.getClass(), series, "add", new Class[] { Double.TYPE, Number.class }, statsHandler.getTickCount(), valueMap.get(key));
     }
     return config;
   }
@@ -166,8 +154,7 @@ public class PlotXYChartHandler implements ChartHandler
   /**
    * Invocation handler for a dynamic proxy to a <code>org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGenerator</code> implementation.
    */
-  public static class LegendLabelGeneratorInvocationHandler implements InvocationHandler
-  {
+  public static class LegendLabelGeneratorInvocationHandler implements InvocationHandler {
     /**
      * Invoke a specified method on the specified proxy.
      * @param proxy the dynamic proxy to invoke the method on.
@@ -178,9 +165,8 @@ public class PlotXYChartHandler implements ChartHandler
      * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
      */
     @Override
-    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-    {
-      Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getSeriesKey", args[1]);
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+      final Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getSeriesKey", args[1]);
       return GuiUtils.shortenLabel(key.toString());
     }
   }

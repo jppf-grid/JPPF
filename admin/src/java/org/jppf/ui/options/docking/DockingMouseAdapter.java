@@ -31,8 +31,8 @@ class DockingMouseAdapter extends MouseAdapter {
   @Override
   public void mousePressed(final MouseEvent event) {
     if (event.getButton() != MouseEvent.BUTTON3) return;
-    Component comp = event.getComponent();
-    JPopupMenu menu = createPopupMenu(comp);
+    final Component comp = event.getComponent();
+    final JPopupMenu menu = createPopupMenu(comp);
     menu.show(comp, event.getX(), event.getY());
   }
 
@@ -41,20 +41,20 @@ class DockingMouseAdapter extends MouseAdapter {
    * @param comp the component to move.
    * @return a popup menu.
    */
-  private JPopupMenu createPopupMenu(final Component comp) {
-    DockingManager dm = DockingManager.getInstance();
-    DetachableComponentDescriptor desc = dm.getComponentFromListenerComp(comp);
-    Component realComp = desc.getComponent().getUIComponent();
-    JPopupMenu menu = new JPopupMenu();
+  private static JPopupMenu createPopupMenu(final Component comp) {
+    final DockingManager dm = DockingManager.getInstance();
+    final DetachableComponentDescriptor desc = dm.getComponentFromListenerComp(comp);
+    final Component realComp = desc.getComponent().getUIComponent();
+    final JPopupMenu menu = new JPopupMenu();
     if (desc.getInitialContainer() != desc.getCurrentContainer())
       menu.add(new JMenuItem(new DockToInitialContainerAction(realComp, DockingManager.localize("attach.to.initial.container"))));
     menu.add(new JMenuItem(new DockToNewViewAction(realComp, DockingManager.localize("attach.to.new.view"))));
-    Map<String, ViewDescriptor> viewMap = dm.getViewMap();
+    final Map<String, ViewDescriptor> viewMap = dm.getViewMap();
     // exclude current and main view
     if (viewMap.size() > 2) {
-      JMenu subMenu = new JMenu(DockingManager.localize("attach.to.existing.view"));
+      final JMenu subMenu = new JMenu(DockingManager.localize("attach.to.existing.view"));
       menu.add(subMenu);
-      for (String id: viewMap.keySet()) {
+      for (final String id: viewMap.keySet()) {
         if (!id.equals(desc.getViewId()) && (!id.equals(DockingManager.INITIAL_VIEW))) subMenu.add(new JMenuItem(new DockToExistingViewAction(realComp, id, id)));
       }
     }
@@ -64,10 +64,10 @@ class DockingMouseAdapter extends MouseAdapter {
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (e.getButton() == MouseEvent.BUTTON1) {
-      Component comp = e.getComponent();
-      DetachableComponentDescriptor desc = DockingManager.getInstance().getComponentFromListenerComp(comp);
+      final Component comp = e.getComponent();
+      final DetachableComponentDescriptor desc = DockingManager.getInstance().getComponentFromListenerComp(comp);
       if (desc == null) return;
-      JTabbedPane pane = (JTabbedPane) desc.getCurrentContainer().getUIComponent();
+      final JTabbedPane pane = (JTabbedPane) desc.getCurrentContainer().getUIComponent();
       pane.setSelectedComponent(desc.getComponent().getUIComponent());
     }
   }

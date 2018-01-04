@@ -121,16 +121,16 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * Set the columns width based on values stored as preferences.
    */
   public void setupTableColumns() {
-    Preferences pref = OptionsHandler.getPreferences();
+    final Preferences pref = OptionsHandler.getPreferences();
     String key = getName() + "_column_widths";
     String s = pref.get(key, null);
     if (s != null) {
-      String[] wStr = RegexUtils.SPACES_PATTERN.split(s);
+      final String[] wStr = RegexUtils.SPACES_PATTERN.split(s);
       for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++) {
         int width = 60;
         try {
           width = Integer.valueOf(wStr[i]);
-        } catch(NumberFormatException e) {
+        } catch(final NumberFormatException e) {
           log.debug(e.getMessage(), e);
         }
         treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
@@ -139,12 +139,12 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
     key = getName() + "_hidden_columns";
     s = pref.get(key, null);
     if (s != null) {
-      String[] posStr = RegexUtils.SPACES_PATTERN.split(s);
+      final String[] posStr = RegexUtils.SPACES_PATTERN.split(s);
       for (String str: posStr) {
         int pos = -1;
         try {
           pos = Integer.valueOf(str);
-        } catch(NumberFormatException e) {
+        } catch(final NumberFormatException e) {
           log.debug(e.getMessage(), e);
         }
         if (pos > 0) hideColumn(pos);
@@ -156,11 +156,11 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * Set the columns width based on values stored as preferences.
    */
   public void saveTableColumnsWidth() {
-    Preferences pref = OptionsHandler.getPreferences();
+    final Preferences pref = OptionsHandler.getPreferences();
     String key = getName() + "_column_widths";
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<treeTable.getColumnCount(); i++) {
-      int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
+      final int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
       if (i > 0) sb.append(' ');
       sb.append(width);
     }
@@ -198,7 +198,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    */
   public void hideColumn(final int pos) {
     if ((pos < 0) || (pos >= model.getColumnCount()) || hiddenColumns.containsKey(pos)) return;
-    TableColumn col = treeTable.getColumn(pos);
+    final TableColumn col = treeTable.getColumn(pos);
     if (col == null) return;
     treeTable.removeColumn(col);
     hiddenColumns.put(pos, col);
@@ -217,12 +217,12 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * @param pos the column position in the tree table model (<i>not</i> the table column model).
    */
   public void restoreColumn(final int pos) {
-    TableColumn col = hiddenColumns.remove(pos);
+    final TableColumn col = hiddenColumns.remove(pos);
     if (col == null) return;
     treeTable.addColumn(col);
-    TableColumnModel tcm = treeTable.getColumnModel();
+    final TableColumnModel tcm = treeTable.getColumnModel();
     if (pos <= tcm.getColumnCount()) {
-      int idx = tcm.getColumnIndex(pos);
+      final int idx = tcm.getColumnIndex(pos);
       tcm.moveColumn(idx, pos);
     }
   }
@@ -241,8 +241,8 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * @param positions the positions of the columns position in the tree table model (<i>not</i> the table column model).
    */
   public void restoreColumns(final Collection<Integer> positions) {
-    Set<Integer> set = new TreeSet<>(positions);
-    for (int n: set) restoreColumn(n);
+    final Set<Integer> set = new TreeSet<>(positions);
+    for (final int n: set) restoreColumn(n);
   }
 
   /**

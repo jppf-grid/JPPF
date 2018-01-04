@@ -75,16 +75,16 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
     synchronized(statsHandler) {
       if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) return;
       if (debugEnabled) log.debug("adding client connection " + driver);
-      ConnectionDataHolder cdh = new ConnectionDataHolder(capacity, driver);
+      final ConnectionDataHolder cdh = new ConnectionDataHolder(capacity, driver);
       statsHandler.dataHolderMap.put(driver.getUuid(), cdh);
       if (statsHandler.timer != null) {
-        TimerTask task = new StatsRefreshTask(driver);
+        final TimerTask task = new StatsRefreshTask(driver);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
     try {
       SwingUtilities.invokeAndWait(new ComboUpdate());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -95,13 +95,13 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   private class ComboUpdate implements Runnable {
     @Override
     public void run() {
-      OptionElement serverList = clientHandler.getServerListOption();
-      JComboBox<Object> box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
+      final OptionElement serverList = clientHandler.getServerListOption();
+      final JComboBox<Object> box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
       if (box != null) {
-        int count = box.getItemCount();
+        final int count = box.getItemCount();
         boolean found = false;
         for (int i=0; i<count; i++) {
-          Object o = box.getItemAt(i);
+          final Object o = box.getItemAt(i);
           if (driver.equals(o)) {
             found = true;
             break;
@@ -112,8 +112,8 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
           int maxLen = 0;
           Object proto = null;
           for (int i=0; i<box.getItemCount(); i++) {
-            Object o = box.getItemAt(i);
-            int n = o.toString().length();
+            final Object o = box.getItemAt(i);
+            final int n = o.toString().length();
             if (n > maxLen) {
               maxLen = n;
               proto = o;

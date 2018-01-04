@@ -17,7 +17,6 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.*;
@@ -50,10 +49,6 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * Panel containing the dialog for entering the number of threads and their priority.
    */
   private OptionElement panel = null;
-  /**
-   * Location at which to display the entry dialog.
-   */
-  private Point location = null;
 
   /**
    * Initialize this action.
@@ -81,18 +76,18 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    AbstractButton btn = (AbstractButton) event.getSource();
+    final AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     panel = loadWithPreferences("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
-    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
-    AbstractTopologyComponent data = dataArray[0];
+    final CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
+    final AbstractTopologyComponent data = dataArray[0];
     textArea.setValue(getPropertiesAsString(data));
-    JButton okBtn = (JButton) panel.findFirstWithName("/updateConfigOK").getUIComponent();
-    JButton cancelBtn = (JButton) panel.findFirstWithName("/updateConfigCancel").getUIComponent();
+    final JButton okBtn = (JButton) panel.findFirstWithName("/updateConfigOK").getUIComponent();
+    final JButton cancelBtn = (JButton) panel.findFirstWithName("/updateConfigCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(),
       localize("nodeConfigurationUpdatePanel.label") + " " + TopologyUtils.getDisplayName(data, StatsHandler.getInstance().getShowIPHandler().isShowIP()), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
-    AbstractAction okAction = new AbstractAction() {
+    final AbstractAction okAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
@@ -101,7 +96,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
       }
     };
     okBtn.addActionListener(okAction);
-    AbstractAction cancelAction = new AbstractAction() {
+    final AbstractAction cancelAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
@@ -122,20 +117,20 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    */
   private void doOK() {
     savePreferences(panel);
-    CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
+    final CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
     final Boolean restart = (Boolean) ((BooleanOption) panel.findFirstWithName("forceRestart")).getValue();
     final Boolean interrupt = (Boolean) ((BooleanOption) panel.findFirstWithName("nodeConfig.interruptIfRunning")).getValue();
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         TopologyDriver parent = null;
         try {
-          AbstractTopologyComponent data = dataArray[0];
+          final AbstractTopologyComponent data = dataArray[0];
           parent = (TopologyDriver) data.getParent();
           if (parent == null) return;
           parent.getForwarder().updateConfiguration(new UuidSelector(data.getUuid()), map, restart, interrupt);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -149,21 +144,21 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * @return the properties as a string.
    */
   public static String getPropertiesAsString(final AbstractTopologyComponent data) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     try {
-      TopologyDriver parent = (TopologyDriver) data.getParent();
+      final TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
-      Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
+      final Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
       if (result == null) return "could not retrieve system information for the selected node";
-      Object o = result.get(data.getUuid());
+      final Object o = result.get(data.getUuid());
       if (o == null) return "could not retrieve system information for the selected node";
       else if (o instanceof Exception) throw (Exception) o;
-      JPPFSystemInformation info = (JPPFSystemInformation) o;
-      TypedProperties props = info.getJppf();
-      Set<String> keys = new TreeSet<>();
-      for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
-      for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
-    } catch (Exception e) {
+      final JPPFSystemInformation info = (JPPFSystemInformation) o;
+      final TypedProperties props = info.getJppf();
+      final Set<String> keys = new TreeSet<>();
+      for (final Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
+      for (final String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
+    } catch (final Exception e) {
       sb.append("an error occurred while retrieving the system information for the selected node: " + ExceptionUtils.getMessage(e));
     }
     return sb.toString();
@@ -176,24 +171,24 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    */
   public static Map<Object, Object> getPropertiesAsMap(final String source) {
     try {
-      Map<Object, Object> map = new HashMap<>();
-      BufferedReader reader = new BufferedReader(new StringReader(source));
+      final Map<Object, Object> map = new HashMap<>();
+      final BufferedReader reader = new BufferedReader(new StringReader(source));
       try {
         while (true) {
-          String s = reader.readLine();
+          final String s = reader.readLine();
           if (s == null) break;
           int idx = s.indexOf('=');
           if (idx < 0) idx = s.indexOf(' ');
           if (idx < 0) continue;
-          String key = s.substring(0, idx).trim();
-          String value = s.substring(idx+1).trim();
+          final String key = s.substring(0, idx).trim();
+          final String value = s.substring(idx+1).trim();
           map.put(key, value);
         }
       } finally {
         reader.close();
       }
       return map;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;

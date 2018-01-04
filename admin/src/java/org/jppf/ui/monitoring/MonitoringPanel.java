@@ -88,13 +88,13 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    */
   public MonitoringPanel() {
     this.statsHandler = StatsHandler.getInstance();
-    JTable tmp = new JTable();
-    FontMetrics metrics = tmp.getFontMetrics(tmp.getFont());
-    for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) {
-      int n = computeMaxWidth(entry.getValue(), metrics);
+    final JTable tmp = new JTable();
+    final FontMetrics metrics = tmp.getFontMetrics(tmp.getFont());
+    for (final Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) {
+      final int n = computeMaxWidth(entry.getValue(), metrics);
       if (n > maxLabelWidth) maxLabelWidth = n;
     }
-    WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
+    final WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
     setLayout(wl);
     statsHandler.addStatsHandlerListener(this);
@@ -128,8 +128,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * @param title the reference to the localized title of the table.
    */
   private void addTablePanel(final Fields[] fields, final String title) {
-    LocalizedListItem item = allItems.get(title);
-    JComponent comp = makeTablePanel(fields, item.label);
+    final LocalizedListItem item = allItems.get(title);
+    final JComponent comp = makeTablePanel(fields, item.label);
     comp.setToolTipText(item.tooltip);
     add(comp);
     visibleTableComps.add(comp);
@@ -158,24 +158,24 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * @return a {@code JComponent} instance.
    */
   private JComponent makeTablePanel(final Fields[] props, final String title) {
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setAlignmentY(0f);
     panel.setLayout(new MigLayout("fill"));
     panel.setBorder(BorderFactory.createTitledBorder(title));
-    JTable table = new JTable() {
+    final JTable table = new JTable() {
       @Override
       public boolean isCellEditable(final int row, final int column) {
         return false;
       }
     };
-    MonitorTableModel model = new MonitorTableModel(props);
+    final MonitorTableModel model = new MonitorTableModel(props);
     table.setModel(model);
     table.setOpaque(true);
-    DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
+    final DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
     rend1.setHorizontalAlignment(SwingConstants.RIGHT);
     rend1.setOpaque(true);
     table.getColumnModel().getColumn(1).setCellRenderer(rend1);
-    DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
+    final DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
@@ -196,18 +196,18 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
   public void selectStats(final AbstractButton btn) {
     try {
       Point location = ((btn != null) && btn.isShowing()) ? location = btn.getLocationOnScreen() : new Point(0, 0);
-      OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
+      final OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
       final PickListOption option = (PickListOption) panel.findFirstWithName("visible.stats.selection");
       option.populate(new ArrayList<Object>(allItems.values()), new ArrayList<Object>(visibleItems));
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), LocalizationUtils.getLocalized(BASE, "visible.stats.panel.label"), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
-      JButton applyBtn = (JButton) panel.findFirstWithName("/visible.stats.apply").getUIComponent();
-      AbstractAction applyAction = new AbstractAction() {
+      final JButton applyBtn = (JButton) panel.findFirstWithName("/visible.stats.apply").getUIComponent();
+      final AbstractAction applyAction = new AbstractAction() {
         @Override public void actionPerformed(final ActionEvent event) {
           visibleItems.clear();
-          List<Object> picked = option.getPickList().getPickedItems();
-          List<LocalizedListItem> value = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
-          for (Object o: picked) value.add((LocalizedListItem) o);
+          final List<Object> picked = option.getPickList().getPickedItems();
+          final List<LocalizedListItem> value = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
+          for (final Object o: picked) value.add((LocalizedListItem) o);
           visibleItems.addAll(value);
           clearTablesFromView();
           addTables();
@@ -216,8 +216,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
         }
       };
       applyBtn.addActionListener(applyAction);
-      JButton closeBtn = (JButton) panel.findFirstWithName("/visible.stats.close").getUIComponent();
-      AbstractAction closeAction = new AbstractAction() {
+      final JButton closeBtn = (JButton) panel.findFirstWithName("/visible.stats.close").getUIComponent();
+      final AbstractAction closeAction = new AbstractAction() {
         @Override public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
           dialog.dispose();
@@ -230,7 +230,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
       dialog.setLocationRelativeTo(null);
       if (location != null) dialog.setLocation(location);
       dialog.setVisible(true);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -240,12 +240,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    */
   public void loadVisibleStats() {
     visibleItems.clear();
-    Preferences pref = OptionsHandler.getPreferences();
-    String s = pref.get(VISIBLE_STATS_KEY, null);
+    final Preferences pref = OptionsHandler.getPreferences();
+    final String s = pref.get(VISIBLE_STATS_KEY, null);
     if (s != null) {
-      String[] names = RegexUtils.SPACES_PATTERN.split(s);
-      for (String name: names) {
-        LocalizedListItem item = allItems.get(name);
+      final String[] names = RegexUtils.SPACES_PATTERN.split(s);
+      for (final String name: names) {
+        final LocalizedListItem item = allItems.get(name);
         if (item != null) visibleItems.add(item);
       }
     }
@@ -257,10 +257,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * Store the ist of visible stats into the prefrences.
    */
   public void storeVisibleStats() {
-    Preferences pref = OptionsHandler.getPreferences();
-    StringBuilder sb = new StringBuilder();
+    final Preferences pref = OptionsHandler.getPreferences();
+    final StringBuilder sb = new StringBuilder();
     int count  = 0;
-    for (LocalizedListItem item: visibleItems) {
+    for (final LocalizedListItem item: visibleItems) {
       if (count > 0) sb.append(' ');
       sb.append(item.name);
       count++;
@@ -274,10 +274,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * @param metrics the font used to compute the width.
    * @return the maximum width in pixels.
    */
-  private int computeMaxWidth(final Fields[] fields, final FontMetrics metrics) {
+  private static int computeMaxWidth(final Fields[] fields, final FontMetrics metrics) {
     int max = 0;
-    for (Fields field: fields) {
-      int n = metrics.stringWidth(field.toString());
+    for (final Fields field: fields) {
+      final int n = metrics.stringWidth(field.toString());
       if (n > max) max = n;
     }
     return max;

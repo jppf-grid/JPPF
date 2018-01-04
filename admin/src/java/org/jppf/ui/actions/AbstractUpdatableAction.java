@@ -144,9 +144,9 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @param actionKey a key to use int he {@link ActionMap}.
    */
   protected static void setKeyAction(final JComponent comp, final KeyStroke vkey, final Action action, final Object actionKey) {
-    InputMap inputMap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    final InputMap inputMap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     inputMap.put(vkey, actionKey);
-    ActionMap map = comp.getActionMap();
+    final ActionMap map = comp.getActionMap();
     map.put(actionKey, action);
   }
 
@@ -186,7 +186,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @return elt, for method chaining.
    */
   protected OptionElement loadPreferences(final OptionElement elt) {
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
+    final OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
     OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
     return elt;
   }
@@ -197,7 +197,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @return elt, for method chaining.
    */
   protected OptionElement savePreferences(final OptionElement elt) {
-    OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
+    final OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(elt);
     OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
     return elt;
   }

@@ -26,8 +26,7 @@ import javax.swing.AbstractButton;
  * Action performed to toggle the auto-layout on the graph graph.
  * @author Laurent Cohen
  */
-public class ToggleLayoutAction extends AbstractGraphSelectionAction
-{
+public class ToggleLayoutAction extends AbstractGraphSelectionAction {
   /**
    * Listens to state changes for the toggle button.
    */
@@ -41,21 +40,16 @@ public class ToggleLayoutAction extends AbstractGraphSelectionAction
    * Initialize this action with the specified tree table panel.
    * @param panel the graph panel to which this action applies.
    */
-  public ToggleLayoutAction(final GraphOption panel)
-  {
+  public ToggleLayoutAction(final GraphOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/layout.gif");
     setupNameAndTooltip("graph.toggle.layout");
-    //setupNameAndTooltip("graph.toggle.layout.on");
-    //setupTooltip("graph.toggle.layout.on");
     button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
     button.setSelected(true);
     button.setToolTipText(localize("graph.toggle.layout.on.tooltip"));
-    itemListener = new ItemListener()
-    {
+    itemListener = new ItemListener() {
       @Override
-      public void itemStateChanged(final ItemEvent e)
-      {
+      public void itemStateChanged(final ItemEvent e) {
         actionPerformed(null);
       }
     };
@@ -66,15 +60,10 @@ public class ToggleLayoutAction extends AbstractGraphSelectionAction
    * {@inheritDoc}
    */
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
-      AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
-      boolean selected = button.isSelected();
-      //setupNameAndTooltip(selected ? "graph.toggle.layout.on" : "graph.toggle.layout.off");
-      //setupTooltip(selected ? "graph.toggle.layout.on" : "graph.toggle.layout.off");
-      //button.setToolTipText(localize(selected ? "graph.toggle.layout.on.tooltip" : "graph.toggle.layout.off.tooltip"));
+  public void actionPerformed(final ActionEvent e) {
+    synchronized (panel) {
+      final AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
+      final boolean selected = button.isSelected();
       panel.setAutoLayout(selected);
     }
   }

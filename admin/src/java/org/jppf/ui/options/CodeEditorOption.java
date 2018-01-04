@@ -81,7 +81,7 @@ public class CodeEditorOption extends AbstractOption {
     if (toolTipText != null) textArea.setToolTipText(toolTipText);
     textArea.setEditable(editable);
     if (scrollable) {
-      RTextScrollPane scrollPane = new RTextScrollPane(textArea);
+      final RTextScrollPane scrollPane = new RTextScrollPane(textArea);
       GuiUtils.adjustScrollbarsThickness(scrollPane);
       scrollPane.setOpaque(false);
       scrollPane.setLineNumbersEnabled(false);
@@ -89,7 +89,7 @@ public class CodeEditorOption extends AbstractOption {
       if (!bordered) scrollPane.setBorder(BorderFactory.createEmptyBorder());
       UIComponent = scrollPane;
     } else {
-      JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
+      final JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
       mainPanel.setBorder(BorderFactory.createTitledBorder(label));
       mainPanel.add(textArea);
       if (!bordered) mainPanel.setBorder(BorderFactory.createEmptyBorder());
@@ -146,7 +146,7 @@ public class CodeEditorOption extends AbstractOption {
    */
   @Override
   protected void setupValueChangeNotifications() {
-    Document doc = textArea.getDocument();
+    final Document doc = textArea.getDocument();
     doc.addDocumentListener(new DocumentListener() {
       @Override
       public void changedUpdate(final DocumentEvent e) {
@@ -221,9 +221,9 @@ public class CodeEditorOption extends AbstractOption {
   private static Theme loadTheme(final String path) {
     Theme theme = null;
     try {
-      InputStream is = CodeEditorOption.class.getClassLoader().getResourceAsStream(path);
+      final InputStream is = CodeEditorOption.class.getClassLoader().getResourceAsStream(path);
       theme = Theme.load(is);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return theme;

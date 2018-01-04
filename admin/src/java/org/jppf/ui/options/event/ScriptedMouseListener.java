@@ -83,18 +83,18 @@ public class ScriptedMouseListener implements MouseListener {
    */
   private void invokeScript(final MouseEvent event, final String eventType) {
     if (scriptText == null) {
-      TreePath path = option.getPath();
-      StringBuilder sb = new StringBuilder();
-      for (Object o : path.getPath()) {
-        OptionElement elt = (OptionElement) o;
-        for (ScriptDescriptor desc : elt.getScripts()) {
+      final TreePath path = option.getPath();
+      final StringBuilder sb = new StringBuilder();
+      for (final Object o : path.getPath()) {
+        final OptionElement elt = (OptionElement) o;
+        for (final ScriptDescriptor desc : elt.getScripts()) {
           if (language.equals(desc.language)) sb.append(desc.content).append('\n');
         }
       }
       sb.append(script);
       scriptText = sb.toString();
     }
-    Map<String, Object> variables = new HashMap<>();
+    final Map<String, Object> variables = new HashMap<>();
     variables.put("root", option.getRoot());
     variables.put("option", option);
     variables.put("event", event);
@@ -102,12 +102,14 @@ public class ScriptedMouseListener implements MouseListener {
     ScriptRunner runner = null;
     try {
       runner = ScriptRunnerFactory.getScriptRunner(this.language);
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       runner.evaluate(uuid, scriptText, variables);
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
-      StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
-      if (debugEnabled) log.debug(sb.toString());
-    } catch (JPPFScriptingException e) {
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      if (debugEnabled) {
+        final StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
+        log.debug(sb.toString());
+      }
+    } catch (final JPPFScriptingException e) {
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
     } finally {
       ScriptRunnerFactory.releaseScriptRunner(runner);

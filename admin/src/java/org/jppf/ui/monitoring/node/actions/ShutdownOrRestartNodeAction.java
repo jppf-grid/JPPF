@@ -76,19 +76,19 @@ public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyDriver, String> map = getDriverMap();
-        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        final CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+            final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
             if (debugEnabled) log.debug(String.format("invoking %s with interrupt=%b for the nodes: %s", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue()));
-            NodeSelector selector = new UuidSelector(entry.getValue());
+            final NodeSelector selector = new UuidSelector(entry.getValue());
             if (restart) forwarder.restart(selector, interruptIfRunning);
             else forwarder.shutdown(selector, interruptIfRunning);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

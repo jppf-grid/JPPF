@@ -30,8 +30,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * Abstract superclass for actions that select nodes in the tree table.
  * @author Laurent Cohen
  */
-public abstract class AbstractGraphSelectionAction extends AbstractTopologyAction
-{
+public abstract class AbstractGraphSelectionAction extends AbstractTopologyAction {
   /**
    * The tree table panel to which this action applies.
    */
@@ -41,8 +40,7 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public AbstractGraphSelectionAction(final GraphOption panel)
-  {
+  public AbstractGraphSelectionAction(final GraphOption panel) {
     super();
     this.panel = panel;
     setEnabled(true);
@@ -52,10 +50,9 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
    * Get the list of all tree nodes representing a driver.
    * @return an list of driver cells.
    */
-  protected Collection<AbstractTopologyComponent> getVertices()
-  {
-    VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
-    SparseMultigraph<AbstractTopologyComponent, Number> graph = (SparseMultigraph<AbstractTopologyComponent, Number>) viewer.getGraphLayout().getGraph();
+  protected Collection<AbstractTopologyComponent> getVertices() {
+    final VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+    final SparseMultigraph<AbstractTopologyComponent, Number> graph = (SparseMultigraph<AbstractTopologyComponent, Number>) viewer.getGraphLayout().getGraph();
     return graph.getVertices();
   }
 }

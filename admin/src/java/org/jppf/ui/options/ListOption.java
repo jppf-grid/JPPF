@@ -89,7 +89,7 @@ public class ListOption extends AbstractOption {
       @Override
       public void valueChanged(final ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
-        List<Object> sel = new ArrayList<>();
+        final List<Object> sel = new ArrayList<>();
         sel.addAll(list.getSelectedValuesList());
         value = sel;
         fireValueChanged();
@@ -105,12 +105,12 @@ public class ListOption extends AbstractOption {
   public void createUI() {
     list = new JList<>();
     if (toolTipText != null) list.setToolTipText(toolTipText);
-    DefaultListModel<Object> model = new DefaultListModel<>();
+    final DefaultListModel<Object> model = new DefaultListModel<>();
     list.setModel(model);
     list.setSelectionMode(selMode);
     JComponent comp = list;
     if (scrollable) {
-      JScrollPane scrollPane = new JScrollPane(list);
+      final JScrollPane scrollPane = new JScrollPane(list);
       scrollPane.setBorder(BorderFactory.createEmptyBorder());
       GuiUtils.adjustScrollbarsThickness(scrollPane);
       scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -134,14 +134,14 @@ public class ListOption extends AbstractOption {
     if (list == null) return;
     list.removeListSelectionListener(selectionListener);
     list.clearSelection();
-    DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
+    final DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
     if (value == null) value = new ArrayList<>();
     else if (value instanceof String) {
-      List<Object> tmpList = new ArrayList<>();
-      String[] names = RegexUtils.COMMA_PATTERN.split((String) value);
+      final List<Object> tmpList = new ArrayList<>();
+      final String[] names = RegexUtils.COMMA_PATTERN.split((String) value);
       for (String s : names) {
         s = s.trim();
-        for (Object o : items) {
+        for (final Object o : items) {
           if (s.equals(o.toString())) {
             tmpList.add(o);
             break;
@@ -150,16 +150,16 @@ public class ListOption extends AbstractOption {
       }
       value = tmpList;
     }
-    List<Object> selectedItems = (List<Object>) value;
+    final List<Object> selectedItems = (List<Object>) value;
     model.removeAllElements();
-    for (Object item : items)
+    for (final Object item : items)
       model.addElement(item);
-    List<Integer> indices = new ArrayList<>();
-    for (Object item : selectedItems) {
-      int n = items.indexOf(item);
+    final List<Integer> indices = new ArrayList<>();
+    for (final Object item : selectedItems) {
+      final int n = items.indexOf(item);
       if (n >= 0) indices.add(n);
     }
-    int[] array = new int[indices.size()];
+    final int[] array = new int[indices.size()];
     for (int i = 0; i < array.length; i++) array[i] = indices.get(i);
     list.setSelectedIndices(array);
     list.addListSelectionListener(selectionListener);

@@ -53,11 +53,11 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    List<AbstractTopologyComponent> list = new ArrayList<>();
-    for (Object o: selectedElements) {
-      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+    final List<AbstractTopologyComponent> list = new ArrayList<>();
+    for (final Object o: selectedElements) {
+      final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (data.isNode()) {
-        JPPFManagementInfo info = ((TopologyNode) data).getManagementInfo();
+        final JPPFManagementInfo info = ((TopologyNode) data).getManagementInfo();
         if (info != null) list.add(data);
       }
     }
@@ -69,10 +69,10 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction {
    * @return a mapping of driver uuids to lists of node uuid values.
    */
   protected CollectionMap<TopologyDriver, String> getDriverMap() {
-    CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (AbstractTopologyComponent data: dataArray) {
+    final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
+    for (final AbstractTopologyComponent data: dataArray) {
       if (!data.isNode()) continue;
-      TopologyDriver parent = (TopologyDriver) data.getParent();
+      final TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent != null) map.putValue(parent, data.getUuid());
     }
     return map;

@@ -66,17 +66,17 @@ public class ConsoleLauncher {
     try {
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if ((args  == null) || (args.length < 2)) throw new IllegalArgumentException("Usage: UILauncher page_location location_source");
-      String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+      final String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
           "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
       //if (args.length > 2) adminConsole = false;
-      int n = 3;
+      final int n = 3;
       boolean success = false;
-      String s = System.getProperty("swing.defaultlaf");
+      final String s = System.getProperty("swing.defaultlaf");
       if (!success && (s != null)) {
         try {
           UIManager.setLookAndFeel(s);
           success = true;
-        } catch(Throwable t) {
+        } catch(final Throwable t) {
           log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
           System.getProperties().remove("swing.defaultlaf");
         }
@@ -84,16 +84,16 @@ public class ConsoleLauncher {
       if (!success) {
         try {
           UIManager.setLookAndFeel(laf[n]);
-        } catch(Throwable t) {
+        } catch(final Throwable t) {
           log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
       }
-      boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
+      final boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
       if (showSplash) (splash = new JPPFSplash(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE))).start();
       loadUI(args[0], args[1], true, -1);
       if (showSplash) splash.stop();
-      Frame[] frames = Frame.getFrames();
+      final Frame[] frames = Frame.getFrames();
       for (final Frame f: frames) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
@@ -102,7 +102,7 @@ public class ConsoleLauncher {
           }
         });
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
@@ -127,7 +127,7 @@ public class ConsoleLauncher {
   public synchronized static JComponent reloadUI() {
     int idx = -1;
     if (consoleComponent == null) {
-      Frame frame = OptionsHandler.getMainWindow();
+      final Frame frame = OptionsHandler.getMainWindow();
       if (frame != null) {
         for (int i=0; i<frame.getComponentCount(); i++) {
           if (frame.getComponent(i) == consoleComponent) {
@@ -174,14 +174,14 @@ public class ConsoleLauncher {
           OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences());
         } else {
           if (idx < 0) {
-            JComponent comp = elt.getUIComponent();
+            final JComponent comp = elt.getUIComponent();
             comp.addHierarchyListener(new MainFrameObserver(elt));
           } else {
             frame.add(elt.getUIComponent(), idx);
           }
         }
         OptionsHandler.getPluggableViewHandler().installViews();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
         log.error(e.getMessage(), e);
       }
@@ -215,7 +215,7 @@ public class ConsoleLauncher {
     @Override
     public void hierarchyChanged(final HierarchyEvent event) {
       if (frameFound) return;
-      Frame frame = getTopFrame(event.getChanged());
+      final Frame frame = getTopFrame(event.getChanged());
       if (frame != null) {
         frameFound = true;
         OptionsHandler.setMainWindow(frame);
@@ -228,7 +228,7 @@ public class ConsoleLauncher {
      * @param comp the component for which to lookup the hierarchy.
      * @return the top {@link Frame}, or {@code null} if there is no frame in the hierarchy.
      */
-    private Frame getTopFrame(final Component comp) {
+    private static Frame getTopFrame(final Component comp) {
       if (comp instanceof Frame) return (Frame) comp;
       else if (comp != null) {
         Component tmp = comp;

@@ -90,10 +90,10 @@ public abstract class TextOption extends AbstractOption {
    */
   @Override
   public Object getValue() {
-    Document doc = field.getDocument();
+    final Document doc = field.getDocument();
     try {
       value = doc.getText(0, doc.getLength());
-    } catch (BadLocationException e) {
+    } catch (final BadLocationException e) {
       log.debug(e.getMessage(), e);
     }
     return value;

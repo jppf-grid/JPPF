@@ -78,9 +78,9 @@ public class JPPFSplash extends Window {
   public JPPFSplash(final String message) {
     super(null);
     setBackground(Color.WHITE);
-    List<String> pathList = StringUtils.parseStrings(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_IMAGES), "\\|");
-    for (String path: pathList) {
-      ImageIcon icon = GuiUtils.loadIcon(path, false);
+    final List<String> pathList = StringUtils.parseStrings(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_IMAGES), "\\|");
+    for (final String path: pathList) {
+      final ImageIcon icon = GuiUtils.loadIcon(path, false);
       if (icon != null) images.add(icon);
     }
     if (images.isEmpty()) {
@@ -92,21 +92,21 @@ public class JPPFSplash extends Window {
     label.setVerticalTextPosition(SwingConstants.CENTER);
     label.setText(message);
     Color color = DEFAULT_FOREGROUND;
-    String s = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE_COLOR);
+    final String s = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE_COLOR);
     if ((s != null) && !s.trim().isEmpty()) {
-      String[] comps = s.split(",");
+      final String[] comps = s.split(",");
       if ((comps != null) && (comps.length >= 3)) {
-        int rgb[] = new int[comps.length];
+        final int rgb[] = new int[comps.length];
         try {
           for (int i=0; i<comps.length; i++) rgb[i] = Integer.valueOf(comps[i].trim());
           color = (rgb.length == 3) ? new Color(rgb[0], rgb[1], rgb[2]) : new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.debug(e.getMessage(), e);
         }
       }
     }
     label.setForeground(color);
-    Font tmp = label.getFont();
+    final Font tmp = label.getFont();
     label.setFont(new Font(tmp.getFamily(), Font.BOLD, 24));
     setLayout(new MigLayout("fill, ins 4 4 4 4"));
     add(label, "grow, push");
@@ -118,10 +118,10 @@ public class JPPFSplash extends Window {
    * Start the animation of this splash screen.
    */
   public void start() {
-    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    Dimension d2 = label.getSize();
-    int x = (d.width - d2.width) / 2;
-    int y = (d.height - d2.height) / 2;
+    final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    final Dimension d2 = label.getSize();
+    final int x = (d.width - d2.width) / 2;
+    final int y = (d.height - d2.height) / 2;
     setLocation(x, y);
     task = new ScrollTask();
     setVisible(true);
@@ -133,7 +133,7 @@ public class JPPFSplash extends Window {
    * Stop the animation of this splash screen.
    */
   public void stop() {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         /* try { Thread.sleep(2000); }

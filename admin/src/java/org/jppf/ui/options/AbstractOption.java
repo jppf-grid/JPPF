@@ -115,9 +115,9 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
    * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
    */
   protected JPanel layoutComponents(final JComponent comp1, final JComponent comp2) {
-    JPanel panel = new JPanel();
-    String s = getLayoutConstraints().trim();
-    MigLayout mig = new MigLayout(s);
+    final JPanel panel = new JPanel();
+    final String s = getLayoutConstraints().trim();
+    final MigLayout mig = new MigLayout(s);
     panel.setLayout(mig);
     if ((comp1 == null) && (comp2 == null)) return panel;
     if ((comp1 != null) && (comp2 != null)) {
@@ -137,9 +137,9 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
    * @return a <code>JPanel</code> instance, enclosing the 2 components plus the filler.
    */
   protected JPanel layoutComponents(final JComponent comp1, final String constraint1, final JComponent comp2, final String constraint2) {
-    JPanel panel = new JPanel();
-    String s = getLayoutConstraints().trim();
-    MigLayout mig = new MigLayout(s);
+    final JPanel panel = new JPanel();
+    final String s = getLayoutConstraints().trim();
+    final MigLayout mig = new MigLayout(s);
     panel.setLayout(mig);
     if ((comp1 == null) && (comp2 == null)) return panel;
     if ((comp1 != null) && (comp2 != null)) {
@@ -169,7 +169,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append('[').append((this instanceof OptionContainer) ? "Page" : "Option").append(" : ");
     sb.append(getClass().getName()).append("] ");
     sb.append("name=").append(name);

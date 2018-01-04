@@ -98,16 +98,16 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
   public Object getValueAt(final Object node, final int column) {
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      Object userObject = defNode.getUserObject();
+      final DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
+      final Object userObject = defNode.getUserObject();
       if (userObject instanceof AbstractTopologyComponent) {
-        AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
-        JPPFManagementInfo mgtInfo = info.getManagementInfo();
-        boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
+        final AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
+        final JPPFManagementInfo mgtInfo = info.getManagementInfo();
+        final boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
         if (info.isDriver()) {
           return (column > 0) ? res : info.getDisplayName();
         }
-        JPPFNodeState state = ((TopologyNode) info).getNodeState();
+        final JPPFNodeState state = ((TopologyNode) info).getNodeState();
         if (state == null) return res;
         switch (column) {
           case NODE_URL:
@@ -115,8 +115,8 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case NODE_THREADS:
             if (isNode) {
-              int n = state.getThreadPoolSize();
-              int p = state.getThreadPriority();
+              final int n = state.getThreadPoolSize();
+              final int p = state.getThreadPriority();
               res = "" + (n <= 0 ? "?" : n) + " / " + (p <= 0 ? "?" : p);
             }
             break;
@@ -132,7 +132,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
           case NB_SLAVES:
             if (isNode) {
               if ((mgtInfo != null) && mgtInfo.isMasterNode()) {
-                int n = ((TopologyNode) info).getNbSlaveNodes();
+                final int n = ((TopologyNode) info).getNbSlaveNodes();
                 res = n >= 0 ? nfInt.format(n) : "";
               } else res = "";
             }

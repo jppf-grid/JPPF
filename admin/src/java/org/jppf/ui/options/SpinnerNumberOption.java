@@ -67,9 +67,9 @@ public class SpinnerNumberOption extends AbstractOption {
 
   @Override
   public void createUI() {
-    SpinnerNumberModel model = new SpinnerNumberModel((Number) value, (Comparable<?>) min, (Comparable<?>) max, step);
+    final SpinnerNumberModel model = new SpinnerNumberModel((Number) value, (Comparable<?>) min, (Comparable<?>) max, step);
     spinner = new JSpinner(model);
-    JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
+    final JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
     editor.getFormat().applyPattern(pattern);
     if (editor.getTextField().getColumns() < 5) editor.getTextField().setColumns(5);
     spinnerLabel = new JLabel(label);
@@ -109,7 +109,7 @@ public class SpinnerNumberOption extends AbstractOption {
    */
   @Override
   protected void setupValueChangeNotifications() {
-    SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+    final SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
     model.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(final ChangeEvent e) {
@@ -187,7 +187,7 @@ public class SpinnerNumberOption extends AbstractOption {
    * @param n .
    * @return .
    */
-  private String asString(final Number n) {
+  private static String asString(final Number n) {
     return n.getClass().getSimpleName() + '(' + n.doubleValue() + ')';
   }
 

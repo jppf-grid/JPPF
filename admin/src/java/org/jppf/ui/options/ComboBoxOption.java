@@ -156,8 +156,8 @@ public class ComboBoxOption extends AbstractOption {
       combo.removeAllItems();
       Object val = "";
       int maxLen = 0;
-      for (Object o : items) {
-        String s = o.toString();
+      for (final Object o : items) {
+        final String s = o.toString();
         if (s.length() > maxLen) {
           maxLen = s.length();
           val = s + "  ";

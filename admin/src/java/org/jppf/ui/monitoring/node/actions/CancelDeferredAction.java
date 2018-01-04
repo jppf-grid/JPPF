@@ -63,18 +63,18 @@ public class CancelDeferredAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyDriver, String> map = getDriverMap();
-        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        final CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (final Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
+            final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
-            NodeSelector selector = new UuidSelector(entry.getValue());
+            final NodeSelector selector = new UuidSelector(entry.getValue());
             if (debugEnabled) log.debug("invoking cancelPendingAction() for the nodes: " + entry.getValue());
             forwarder.forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelPendingAction");
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

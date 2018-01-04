@@ -28,14 +28,12 @@ import org.jppf.ui.monitoring.data.StatsHandler;
  * Instances of this class are used to create and update ring charts.
  * @author Laurent Cohen
  */
-public class RingChartHandler extends Pie3DChartHandler
-{
+public class RingChartHandler extends Pie3DChartHandler {
   /**
    * Initialize this chart handler with a specified stats formatter.
    * @param statsHandler the stats formatter that provides the data.
    */
-  public RingChartHandler(final StatsHandler statsHandler)
-  {
+  public RingChartHandler(final StatsHandler statsHandler) {
     super(statsHandler);
   }
 
@@ -46,14 +44,12 @@ public class RingChartHandler extends Pie3DChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration createChart(final ChartConfiguration config)
-  {
-    Object ds = createDataset(config);
+  public ChartConfiguration createChart(final ChartConfiguration config) {
+    final Object ds = createDataset(config);
     //JFreeChart chart = ChartFactory.createRingChart(config.name, ds, false, true, Locale.getDefault());
-    Class<?>[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE};
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart", classes,
-        config.name, ds, false, true, false);
-    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );
+    final Class<?>[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
+    final Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart", classes, config.name, ds, false, true, false);
+    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE);
     config.chart = chart;
     return config;
   }

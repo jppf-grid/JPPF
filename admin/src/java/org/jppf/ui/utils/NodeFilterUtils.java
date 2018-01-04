@@ -45,7 +45,7 @@ public class NodeFilterUtils {
     try {
       PolicyParser.validatePolicy(policy);
       return new Pair<>(true, null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       return new Pair<>(false, e.getMessage());
     }
   }
@@ -57,7 +57,7 @@ public class NodeFilterUtils {
   private static String loadDefaultEmptyFilter() {
     try {
       return FileUtils.readTextFile("org/jppf/ui/filtering/empty_policy.xml");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (log.isDebugEnabled()) log.debug("Could not load default empty policy", e);
       return "<ExecutionPolicy>\n  \n</ExecutionPolicy>";
     }

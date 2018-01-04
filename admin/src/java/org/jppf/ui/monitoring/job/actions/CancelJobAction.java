@@ -61,16 +61,16 @@ public class CancelJobAction extends AbstractJobAction {
   public void actionPerformed(final ActionEvent event) {
     final CollectionMap<JobDriver, String> map = new SetHashMap<>();
     for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobDriver driver: map.keySet()) {
           try {
-            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            final DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
             if (jmx != null) {
               jmx.cancelJobs(new JobUuidSelector(map.getValues(driver)));
             }
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
           }
         }

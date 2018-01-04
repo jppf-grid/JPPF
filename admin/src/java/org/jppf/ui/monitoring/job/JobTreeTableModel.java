@@ -83,15 +83,15 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
   public Object getValueAt(final Object node, final int column) {
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
-      DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
+      final DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
       if (defNode.getUserObject() instanceof AbstractJobComponent) {
-        AbstractJobComponent data = (AbstractJobComponent) defNode.getUserObject();
+        final AbstractJobComponent data = (AbstractJobComponent) defNode.getUserObject();
         switch (column) {
           case NODE_URL:
             break;
           case JOB_STATE:
             if (data instanceof Job) {
-              JobInformation jobInfo = ((Job) data).getJobInformation();
+              final JobInformation jobInfo = ((Job) data).getJobInformation();
               String s = null;
               if (jobInfo.isPending()) s = "pending";
               else s = jobInfo.isSuspended() ? "suspended" : "executing";
@@ -111,7 +111,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case MAX_NODES:
             if (data instanceof Job) {
-              int n = ((Job) data).getJobInformation().getMaxNodes();
+              final int n = ((Job) data).getJobInformation().getMaxNodes();
               // \u221E = infinity symbol
               res = (n == Integer.MAX_VALUE) ? "\u221E" : nfInt.format(n);
             }
