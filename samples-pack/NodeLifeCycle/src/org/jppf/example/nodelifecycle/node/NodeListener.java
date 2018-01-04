@@ -94,8 +94,8 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
    * @return a {@link DataSource} instance.
    */
   private static DataSource createXADataSource() {
-    AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
-    Properties props = ds.getXaProperties();
+    final AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
+    final Properties props = ds.getXaProperties();
     /*
     // PostgreSQL Properties
     // !!! on PostgreSQL, the server configuration property "maxPreparedConnections"
@@ -133,7 +133,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
    * @return a {@link DataSource} instance.
    */
   static DataSource createNonXADataSource() {
-    AtomikosNonXADataSourceBean ds = new AtomikosNonXADataSourceBean();
+    final AtomikosNonXADataSourceBean ds = new AtomikosNonXADataSourceBean();
     ds.setUser("jppf");
     ds.setPassword("jppf");
 
@@ -179,7 +179,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
    * This is used to discard logged transactions that would remain after a node crash.
    */
   public static void startTransaction(final boolean rollbackOnly) {
-    Exception e = submit(new StartTransactionTask(rollbackOnly));
+    final Exception e = submit(new StartTransactionTask(rollbackOnly));
     if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
 
@@ -190,7 +190,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
    * If false, the transaction will be committed.
    */
   public synchronized static void endTransaction(final boolean rollback) {
-    Exception e = submit(new EndTransactionTask(rollback));
+    final Exception e = submit(new EndTransactionTask(rollback));
     if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
 
@@ -203,9 +203,9 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
   public static <T> T submit(final Callable<T> callable) {
     T result = null;
     try {
-      Future<T> f = executor.submit(callable);
+      final Future<T> f = executor.submit(callable);
       result = f.get();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       output(ExceptionUtils.getStackTrace(e));
     }
     return result;
@@ -240,14 +240,14 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
         // create the datasource; it will be automatically enlisted in the transaction
         getDataSource();
         // start the atomikos transaction manager
-        UserTransactionImp utx = new UserTransactionImp();
+        final UserTransactionImp utx = new UserTransactionImp();
         utx.setTransactionTimeout(60);
         if (rollbackOnly) utx.setRollbackOnly();
         utx.begin();
-        Connection c = getConnection();
+        final Connection c = getConnection();
         c.close();
         return null;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         return e;
       }
     }
@@ -278,7 +278,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
     @Override
     public Exception call() {
       try {
-        UserTransactionImp utx = new UserTransactionImp();
+        final UserTransactionImp utx = new UserTransactionImp();
         if (utx.getStatus() == Status.STATUS_NO_TRANSACTION) output("WARNING: endTransaction() called outside a tx");
         else {
           output("INFO: transaction " + (rollback ? "rollback" : "commit"));
@@ -286,7 +286,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
           else utx.commit();
         }
         return null;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         return e;
       }
     }

@@ -50,7 +50,7 @@ public class Parameters {
    * Initialize the application parameters.
    */
   public Parameters() {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     dataFile = config.getString("wordcount.file", "data/wikipedia_en_small.xml");
     nbArticles = config.getInt("wordcount.articles.per.task", 100);
     nbTasks = config.getInt("wordcount.tasks.per.job", 100);

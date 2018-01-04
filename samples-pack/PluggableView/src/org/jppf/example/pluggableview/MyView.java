@@ -122,7 +122,7 @@ public class MyView extends PluggableView {
         getTopologyManager().addTopologyListener(new MyTopologyListener());
         // subscribe this view to job monitoring events to update the log accordingly
         getJobMonitor().addJobMonitoringListener(new MyJobMonitorListener());
-      } catch(Throwable t) {
+      } catch(final Throwable t) {
         t.printStackTrace();
       }
     }
@@ -133,16 +133,16 @@ public class MyView extends PluggableView {
    * Create the logo area.
    * @return the {@link JComponent} enclosing the text area.
    */
-  private JComponent createLogoPanel() {
-    JPanel logoPanel = new JPanel();
+  private static JComponent createLogoPanel() {
+    final JPanel logoPanel = new JPanel();
     logoPanel.setBackground(BKG);
     logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
     // add the JPPF logo
     logoPanel.add(new JLabel(GuiUtils.loadIcon("/jppf_logo.gif")));
     // add a formatted text just below the logo
-    JLabel label = new JLabel("JPPF pluggable view");
+    final JLabel label = new JLabel("JPPF pluggable view");
     label.setForeground(new Color(109, 120, 182));
-    Font font = label.getFont();
+    final Font font = label.getFont();
     label.setFont(new Font("Arial", Font.BOLD, 2*font.getSize()));
     logoPanel.add(label);
     return logoPanel;
@@ -169,7 +169,7 @@ public class MyView extends PluggableView {
    */
   private JComponent createButtonsPanel() {
     // create the button to clear the log entries
-    JButton clearButton = new JButton("Clear", GuiUtils.loadIcon("/clear.gif"));
+    final JButton clearButton = new JButton("Clear", GuiUtils.loadIcon("/clear.gif"));
     clearButton.setToolTipText("clear all log entries");
     clearButton.addActionListener(new ActionListener() {
       @Override
@@ -181,23 +181,23 @@ public class MyView extends PluggableView {
       }
     });
     // create the button to copy the log entries to the clipboard
-    JButton copyButton = new JButton("Copy", GuiUtils.loadIcon("/copy.gif"));
+    final JButton copyButton = new JButton("Copy", GuiUtils.loadIcon("/copy.gif"));
     copyButton.setToolTipText("copy all log entries to the clipboard");
     copyButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         synchronized(MyView.this) {
-          Enumeration<?> elements =  listModel.elements();
+          final Enumeration<?> elements =  listModel.elements();
           while (elements.hasMoreElements()) {
             sb.append(elements.nextElement()).append('\n');
           }
         }
-        Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
         clip.setContents(new StringSelection(sb.toString()), null);
       }
     });
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setBackground(BKG);
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
     panel.setBorder(BorderFactory.createTitledBorder("Actions"));
@@ -206,7 +206,7 @@ public class MyView extends PluggableView {
     panel.add(Box.createHorizontalStrut(10));
     panel.add(copyButton);
     panel.add(Box.createHorizontalGlue());
-    Dimension d = new Dimension(2800, 48);
+    final Dimension d = new Dimension(2800, 48);
     panel.setPreferredSize(d);
     panel.setMaximumSize(d);
     panel.setMinimumSize(new Dimension(100, 48));
@@ -219,9 +219,9 @@ public class MyView extends PluggableView {
    */
   private void newMessage(final String message) {
     // create and format a timestamp
-    String date = sdf.format(new Date());
+    final String date = sdf.format(new Date());
     // add the new, timestamped message to the log
-    String formatted = String.format("[%s] %s", date, message);
+    final String formatted = String.format("[%s] %s", date, message);
     synchronized(this) {
       logSize++;
       // if number of log entries > max, remove the oldest ones
@@ -232,7 +232,7 @@ public class MyView extends PluggableView {
       // add the log entry to the JList
       listModel.addElement(formatted);
       // scroll to the end of the log
-      JScrollBar scrollBar = listScroller.getVerticalScrollBar();
+      final JScrollBar scrollBar = listScroller.getVerticalScrollBar();
       scrollBar.setValue(scrollBar.getMaximum());
     }
   }
@@ -253,15 +253,15 @@ public class MyView extends PluggableView {
 
     @Override
     public void nodeAdded(final TopologyEvent event) {
-      TopologyNode node = event.getNodeOrPeer();
-      String message = String.format("added %s %s to driver %s", (node.isNode() ? "node" :  "peer"), node.getDisplayName(), event.getDriver().getDisplayName());
+      final TopologyNode node = event.getNodeOrPeer();
+      final String message = String.format("added %s %s to driver %s", (node.isNode() ? "node" :  "peer"), node.getDisplayName(), event.getDriver().getDisplayName());
       newMessage(message);
     }
 
     @Override
     public void nodeRemoved(final TopologyEvent event) {
-      TopologyNode node = event.getNodeOrPeer();
-      String message = String.format("removed %s %s from driver %s", (node.isNode() ? "node" :  "peer"), node.getDisplayName(), event.getDriver().getDisplayName());
+      final TopologyNode node = event.getNodeOrPeer();
+      final String message = String.format("removed %s %s from driver %s", (node.isNode() ? "node" :  "peer"), node.getDisplayName(), event.getDriver().getDisplayName());
       newMessage(message);
     }
   }
@@ -273,34 +273,34 @@ public class MyView extends PluggableView {
   private class MyJobMonitorListener extends JobMonitoringListenerAdapter {
     @Override
     public void jobAdded(final JobMonitoringEvent event) {
-      Job job = event.getJob();
-      String message = String.format("added job '%s' to driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
+      final Job job = event.getJob();
+      final String message = String.format("added job '%s' to driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }
 
     @Override
     public void jobRemoved(final JobMonitoringEvent event) {
-      Job job = event.getJob();
+      final Job job = event.getJob();
       // we can't use job.getJobDriver(), since the job is already removed from its parent driver
-      String message = String.format("removed job '%s' from driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
+      final String message = String.format("removed job '%s' from driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }
 
     @Override
     public void jobDispatchAdded(final JobMonitoringEvent event) {
-      JobDispatch dispatch = event.getJobDispatch();
-      TopologyNode node = dispatch.getNode();
-      String message = String.format("job '%s' dispatched to %s %s by driver %s",
+      final JobDispatch dispatch = event.getJobDispatch();
+      final TopologyNode node = dispatch.getNode();
+      final String message = String.format("job '%s' dispatched to %s %s by driver %s",
         event.getJob().getDisplayName(), node.isPeer() ? "peer node" : "node", dispatch.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }
 
     @Override
     public void jobDispatchRemoved(final JobMonitoringEvent event) {
-      JobDispatch dispatch = event.getJobDispatch();
-      TopologyNode node = dispatch.getNode();
+      final JobDispatch dispatch = event.getJobDispatch();
+      final TopologyNode node = dispatch.getNode();
       // we can't use dispatch.getJob(), since the job dispatch is already removed from its parent job
-      String message = String.format("job '%s' returned from %s %s to driver %s", event.getJob().getDisplayName(),
+      final String message = String.format("job '%s' returned from %s %s to driver %s", event.getJob().getDisplayName(),
         node.isPeer() ? "peer node" : "node", dispatch.getDisplayName(), event.getJobDriver().getDisplayName());
       newMessage(message);
     }

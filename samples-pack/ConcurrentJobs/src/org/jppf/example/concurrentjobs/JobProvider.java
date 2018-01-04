@@ -71,7 +71,7 @@ public class JobProvider extends AbstractJPPFJobStream {
       int count = 0;
       // read lines from the file and create a task for each line
       for (int i=0; i<tasksPerJob; i++) {
-        String message = reader.readLine();
+        final String message = reader.readLine();
         if (message == null) {
           // this is the end of stream condition
           eof = true;
@@ -81,7 +81,7 @@ public class JobProvider extends AbstractJPPFJobStream {
         // add the task to the job
         job.add(new MyTask(message, 200L)).setId(String.format("%s - task %d", job.getName(), ++count));
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       eof = true;
       e.printStackTrace();
     }

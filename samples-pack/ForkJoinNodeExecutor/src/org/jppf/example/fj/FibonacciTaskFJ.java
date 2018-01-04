@@ -50,9 +50,9 @@ public class FibonacciTaskFJ extends RecursiveTask<Long> {
   @Override
   protected Long compute() {
     if (n <= 1) return (long) n;
-    FibonacciTaskFJ f1 = new FibonacciTaskFJ(n - 1);
+    final FibonacciTaskFJ f1 = new FibonacciTaskFJ(n - 1);
     f1.fork();
-    FibonacciTaskFJ f2 = new FibonacciTaskFJ(n - 2);
+    final FibonacciTaskFJ f2 = new FibonacciTaskFJ(n - 2);
     return f2.compute() + f1.join();
   }
 }

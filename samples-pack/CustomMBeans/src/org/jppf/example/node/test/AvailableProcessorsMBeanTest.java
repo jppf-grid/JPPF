@@ -24,20 +24,19 @@ import org.jppf.management.JMXNodeConnectionWrapper;
  * A simple class to test a custom node MBean
  * @author Laurent Cohen
  */
-public class AvailableProcessorsMBeanTest
-{
+public class AvailableProcessorsMBeanTest {
   /**
    * Entry point.
    * @param args not used.
    * @throws Exception if any error occurs.
    */
-  public static void main(final String...args) throws Exception
-  {
+  public static void main(final String... args) throws Exception {
     // we assume the node is on localhost and uses the management port 12001
-    JMXNodeConnectionWrapper wrapper = new JMXNodeConnectionWrapper("localhost", 12001);
-    wrapper.connectAndWait(5000L);
-    // query the node for the available processors
-    int n = (Integer) wrapper.invoke("org.jppf.example.mbean:name=AvailableProcessors,type=node", "queryAvailableProcessors", (Object[]) null, (String[]) null);
-    System.out.println("The node has " + n + " available processors");
+    try (JMXNodeConnectionWrapper wrapper = new JMXNodeConnectionWrapper("localhost", 12001)) {
+      wrapper.connectAndWait(5000L);
+      // query the node for the available processors
+      final int n = (Integer) wrapper.invoke("org.jppf.example.mbean:name=AvailableProcessors,type=node", "queryAvailableProcessors", (Object[]) null, (String[]) null);
+      System.out.println("The node has " + n + " available processors");
+    }
   }
 }

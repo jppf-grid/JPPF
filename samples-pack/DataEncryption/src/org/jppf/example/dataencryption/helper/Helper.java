@@ -72,7 +72,7 @@ public final class Helper {
   public static void main(final String... args) {
     try {
       generateKeyStore(args[0]);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -83,9 +83,9 @@ public final class Helper {
    * @throws Exception if any error occurs.
    */
   private static void generateKeyStore(final String pwd) throws Exception {
-    byte[] passwordBytes = pwd.getBytes();
+    final byte[] passwordBytes = pwd.getBytes();
     // encode the password in Base64
-    byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
+    final byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
     // store the encoded password to a file
     FileOutputStream fos = new FileOutputStream(getPasswordFilename());
     try {
@@ -94,13 +94,13 @@ public final class Helper {
     } finally {
       fos.close();
     }
-    char[] password = pwd.toCharArray();
-    KeyStore ks = KeyStore.getInstance(getProvider());
+    final char[] password = pwd.toCharArray();
+    final KeyStore ks = KeyStore.getInstance(getProvider());
     // create an empty keystore
     ks.load(null, password);
     // generate the initial secret key
-    KeyGenerator gen = KeyGenerator.getInstance(getAlgorithm());
-    SecretKey key = gen.generateKey();
+    final KeyGenerator gen = KeyGenerator.getInstance(getAlgorithm());
+    final SecretKey key = gen.generateKey();
     // save the key in the keystore
     ks.setKeyEntry(getKeyAlias(), key, password, null);
     // save the keystore to a file
@@ -122,10 +122,10 @@ public final class Helper {
    */
   public static synchronized SecretKey retrieveSecretKey()  throws Exception {
     // get the keystore password
-    char[] password = Helper.getPassword();
-    ClassLoader cl = Helper.class.getClassLoader();
-    InputStream is = cl.getResourceAsStream(Helper.getKeystoreFolder() + Helper.getKeystoreFilename());
-    KeyStore ks = KeyStore.getInstance(Helper.getProvider());
+    final char[] password = Helper.getPassword();
+    final ClassLoader cl = Helper.class.getClassLoader();
+    final InputStream is = cl.getResourceAsStream(Helper.getKeystoreFolder() + Helper.getKeystoreFilename());
+    final KeyStore ks = KeyStore.getInstance(Helper.getProvider());
     // load the keystore
     ks.load(is, password);
     // get the secret key from the keystore
@@ -139,14 +139,14 @@ public final class Helper {
   public static char[] getPassword() {
     if (some_chars == null) {
       try {
-        String path = getKeystoreFolder() + getPasswordFilename();
-        InputStream is = Helper.class.getClassLoader().getResourceAsStream(path);
+        final String path = getKeystoreFolder() + getPasswordFilename();
+        final InputStream is = Helper.class.getClassLoader().getResourceAsStream(path);
         // read the encoded password
-        byte[] encodedBytes = StreamUtils.getInputStreamAsByte(is);
+        final byte[] encodedBytes = StreamUtils.getInputStreamAsByte(is);
         // decode the password from Base64
-        byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
+        final byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
         some_chars = new String(passwordBytes).toCharArray();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

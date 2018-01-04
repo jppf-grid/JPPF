@@ -46,10 +46,10 @@ public class FibonacciFJ {
     JPPFClient client = null;
     try {
       client = new JPPFClient();
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setBlocking(true);
 
-      TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = JPPFConfiguration.getProperties();
       COUNT = config.getInt("fib.fj.nbTasks", 10);
       if (COUNT < 1) COUNT = 1;
       N = config.getInt("fib.fj.N", 10);
@@ -63,13 +63,13 @@ public class FibonacciFJ {
       dur = System.nanoTime() - dur;
       System.out.printf("Job done in %.3f ms%n", dur / 1000000.0);
 
-      for (Task<?> task : job.getResults().getAllResults()) {
+      for (final Task<?> task : job.getResults().getAllResults()) {
         if (task.getResult() instanceof FibonacciResult) {
-          FibonacciResult result = (FibonacciResult) task.getResult();
+          final FibonacciResult result = (FibonacciResult) task.getResult();
           System.out.printf("  %2d. ForkJoin: %s, Result: %d%n", task.getPosition(), result.isForkJoinUsed(), result.getResult());
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();

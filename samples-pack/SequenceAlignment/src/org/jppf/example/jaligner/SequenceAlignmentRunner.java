@@ -79,10 +79,10 @@ public class SequenceAlignmentRunner {
   public static void main(final String[] args) {
     try {
       System.out.println("Running example...");
-      String s = FileUtils.readTextFile("data/TargetSequence.txt");
+      final String s = FileUtils.readTextFile("data/TargetSequence.txt");
       doPerform(s, "PAM120", "data/ecoli.aa");
       System.exit(0);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -99,7 +99,7 @@ public class SequenceAlignmentRunner {
     log.info(String.format("performing computation with targetSequence=%s, matrix=%s, dbPath=%s, option=%s", targetSequence, matrix, dbPath, option));
     SequenceAlignmentRunner.option = option;
     createOrDisplayWaitWindow();
-    AlignmentExecution exec = new AlignmentExecution(targetSequence, matrix, dbPath);
+    final AlignmentExecution exec = new AlignmentExecution(targetSequence, matrix, dbPath);
     executor.execute(exec);
   }
 
@@ -112,46 +112,46 @@ public class SequenceAlignmentRunner {
    * @throws Exception if the computation failed.
    */
   public static SequenceAlignmentTask doPerform(final String targetSequence, final String matrix, final String dbPath) throws Exception {
-    long start = System.nanoTime();
-    Sequence target = SequenceParser.parse(targetSequence);
-    DataProvider dp = new MemoryMapDataProvider();
+    final long start = System.nanoTime();
+    final Sequence target = SequenceParser.parse(targetSequence);
+    final DataProvider dp = new MemoryMapDataProvider();
     dp.setParameter(SequenceAlignmentTask.TARGET_SEQUENCE, target);
     dp.setParameter(SequenceAlignmentTask.SCORING_MATRIX, MatrixLoader.load(matrix));
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("Sequence alignment " + jobSequence.incrementAndGet());
     job.setDataProvider(dp);
     System.out.println("Indexing sequence database...");
-    String idx = dbPath+".idx";
-    int nb = DatabaseHandler.generateIndex(dbPath, idx, null);
+    final String idx = dbPath+".idx";
+    final int nb = DatabaseHandler.generateIndex(dbPath, idx, null);
     System.out.println("" + nb + " sequences indexed");
     int n = 0;
-    DatabaseHandler dh = new DatabaseHandler(dbPath, idx, null);
+    final DatabaseHandler dh = new DatabaseHandler(dbPath, idx, null);
     boolean end = false;
     while (!end) {
-      String s = dh.nextSequence();
+      final String s = dh.nextSequence();
       if (s == null) end = true;
       else job.add(new SequenceAlignmentTask(s, ++n));
     }
-    long start2 = System.nanoTime();
-    AlignmentJobListener listener = new AlignmentJobListener(job.getJobTasks().size());
+    final long start2 = System.nanoTime();
+    final AlignmentJobListener listener = new AlignmentJobListener(job.getJobTasks().size());
     job.addJobListener(listener);
-    List<Task<?>> results = client.submitJob(job);
-    long elapsed2 = DateTimeUtils.elapsedFrom(start2);
+    final List<Task<?>> results = client.submitJob(job);
+    final long elapsed2 = DateTimeUtils.elapsedFrom(start2);
     float maxScore = 0;
     SequenceAlignmentTask maxTask = null;
-    for (Task<?> t: results) {
-      SequenceAlignmentTask task = (SequenceAlignmentTask) t;
+    for (final Task<?> t: results) {
+      final SequenceAlignmentTask task = (SequenceAlignmentTask) t;
       if (task.getThrowable() != null) {
-        String msg = "Exception in task #"+task.getNumber()+ ", sequence:\n"+task.getSequence();
+        final String msg = "Exception in task #"+task.getNumber()+ ", sequence:\n"+task.getSequence();
         log.info(msg, task.getThrowable());
       }
-      float score = task.getResult();
+      final float score = task.getResult();
       if (score > maxScore) {
         maxScore = score;
         maxTask = task;
       }
     }
-    long elapsed = DateTimeUtils.elapsedFrom(start);
+    final long elapsed = DateTimeUtils.elapsedFrom(start);
     log.info("max score is "+maxScore+" for sequence #"+maxTask.getNumber()+" :\n" + maxTask.getSequence());
     log.info("Total time = " + StringUtils.toStringDuration(elapsed) + ", calculation time = " + StringUtils.toStringDuration(elapsed2));
     hideWaitWindow();
@@ -165,12 +165,12 @@ public class SequenceAlignmentRunner {
   public static void createOrDisplayWaitWindow() {
     if (window == null) {
       Frame frame = null;
-      for (Frame f: Frame.getFrames()) {
+      for (final Frame f: Frame.getFrames()) {
         if (f.isVisible()) frame = f;
       }
       progressBar = new JProgressBar();
-      Font font = progressBar.getFont();
-      Font f = new Font(font.getName(), Font.BOLD, 14);
+      final Font font = progressBar.getFont();
+      final Font f = new Font(font.getName(), Font.BOLD, 14);
       progressBar.setFont(f);
       progressBar.setString("Calculating, please wait ...");
       progressBar.setStringPainted(true);
@@ -181,10 +181,10 @@ public class SequenceAlignmentRunner {
     SwingUtilities.invokeLater(new Runnable()     {
       @Override
       public void run() {
-        Dimension d = window.getOwner().getSize();
-        Point p = window.getOwner().getLocationOnScreen();
-        int w = 300;
-        int h = 60;
+        final Dimension d = window.getOwner().getSize();
+        final Point p = window.getOwner().getLocationOnScreen();
+        final int w = 300;
+        final int h = 60;
         window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
         progressBar.setValue(0);
         window.setVisible(true);

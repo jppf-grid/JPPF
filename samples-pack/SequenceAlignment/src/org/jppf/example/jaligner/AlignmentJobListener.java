@@ -63,7 +63,7 @@ public class AlignmentJobListener extends JobListenerAdapter {
    */
   @Override
   public synchronized void jobReturned(final JobEvent event) {
-    List<Task<?>> tasks = event.getJobTasks();
+    final List<Task<?>> tasks = event.getJobTasks();
     if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
     pendingCount -= tasks.size();
     final int n = (100 * (initialCount-pendingCount)) / initialCount;

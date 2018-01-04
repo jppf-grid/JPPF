@@ -65,12 +65,12 @@ public class AdaptiveGridDemo implements Runnable {
     // the configuration must be done before the client is initialized
     configure();
     try (JPPFClient client = new JPPFClient()) {
-      int maxAllowedNodes = JPPFConfiguration.getProperties().getInt("maxAllowedNodes", 1);
-      int maxAllowedPoolSize = JPPFConfiguration.getProperties().getInt("maxAllowedPoolSize", 1);
+      final int maxAllowedNodes = JPPFConfiguration.getProperties().getInt("maxAllowedNodes", 1);
+      final int maxAllowedPoolSize = JPPFConfiguration.getProperties().getInt("maxAllowedPoolSize", 1);
       print("Starting the demo with maxAllowedNodes=%d and maxAllowedPoolSize=%d", maxAllowedNodes, maxAllowedPoolSize);
       manager = new DriverConnectionManager(client, maxAllowedNodes, maxAllowedPoolSize);
       // parse the number of job batches to submit and their respective sizes from the configuration
-      Integer[] batches = parseJobBatches();
+      final Integer[] batches = parseJobBatches();
       for (int i=0; i<batches.length; i++) {
         // wait a bit before the next batch
         if (i > 0) Thread.sleep(2000L);
@@ -80,7 +80,7 @@ public class AdaptiveGridDemo implements Runnable {
       // in the end, reset the number of connections to 1 and stop all slave nodes
       print("demo has completed, resetting to initial grid configuration");
       manager.updateGridSetup(0);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -88,7 +88,7 @@ public class AdaptiveGridDemo implements Runnable {
   /**
    * Programmatically configure the JPPF client to ensure the created connection pool has the desired name.
    */
-  private void configure() {
+  private static void configure() {
     // disable auto-discovery
     JPPFConfiguration.set(JPPFProperties.DISCOVERY_ENABLED, false)
     // set the pool name
@@ -110,20 +110,20 @@ public class AdaptiveGridDemo implements Runnable {
    */
   private void runJobs(final JPPFClient client, final int batchNumber, final int batchSize) throws Exception {
     print("**** submitting jobs batch #%d (%d jobs) *****", batchNumber, batchSize);
-    List<JPPFJob> jobs = new ArrayList<>(batchSize);
-    long duration = JPPFConfiguration.getProperties().getLong("taskDuration", 1000L);
+    final List<JPPFJob> jobs = new ArrayList<>(batchSize);
+    final long duration = JPPFConfiguration.getProperties().getLong("taskDuration", 1000L);
     // create the jobs
     for (int i=1; i<=batchSize; i++) {
       // give the job a meaningful and human-readable name
-      String jobName = String.format("Job %d - batch %d (%d/%d)", jobSequence.incrementAndGet(), batchNumber, i, batchSize);
+      final String jobName = String.format("Job %d - batch %d (%d/%d)", jobSequence.incrementAndGet(), batchNumber, i, batchSize);
       try {
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         job.setName(jobName);
         job.setBlocking(false);
         // add a single task
         job.add(new SimpleTask(duration));
         jobs.add(job);
-      } catch(JPPFException e) {
+      } catch(final JPPFException e) {
         print("could not create job '%s' due to %s", jobName, ExceptionUtils.getMessage(e));
       }
     }
@@ -133,12 +133,12 @@ public class AdaptiveGridDemo implements Runnable {
     manager.updateGridSetup(batchSize);
 
     // submit the jobs for execution
-    for (JPPFJob job: jobs) client.submitJob(job);
+    for (final JPPFJob job: jobs) client.submitJob(job);
     // get the results of the jobs
-    for (JPPFJob job: jobs) {
-      List<Task<?>> results = job.awaitResults();
-      SimpleTask task = (SimpleTask) results.get(0);
-      Throwable t = task.getThrowable();
+    for (final JPPFJob job: jobs) {
+      final List<Task<?>> results = job.awaitResults();
+      final SimpleTask task = (SimpleTask) results.get(0);
+      final Throwable t = task.getThrowable();
       if (t != null) print("the job '%' has an error: %s", job.getName(), ExceptionUtils.getMessage(t));
       else print("job '%s' result: %s", job.getName(), task.getResult());
     }
@@ -149,20 +149,20 @@ public class AdaptiveGridDemo implements Runnable {
    * and convert it into an array of integers.
    * @return an array of Integer values.
    */
-  private Integer[] parseJobBatches()  {
-    String s = JPPFConfiguration.getProperties().getString(JOB_BATCHES_PROPERTY, "1");
+  private static Integer[] parseJobBatches()  {
+    final String s = JPPFConfiguration.getProperties().getString(JOB_BATCHES_PROPERTY, "1");
     // assume a list of space-separated values
-    String[] tokens = s.split("\\s");
-    List<Integer> result = new ArrayList<>(tokens.length);
+    final String[] tokens = s.split("\\s");
+    final List<Integer> result = new ArrayList<>(tokens.length);
     int position = 0;
-    String errorMessage = "the property '" + JOB_BATCHES_PROPERTY + "' has an invalid value '%s' at position %d, it will be ignored";
-    for (String token: tokens) {
+    final String errorMessage = "the property '" + JOB_BATCHES_PROPERTY + "' has an invalid value '%s' at position %d, it will be ignored";
+    for (final String token: tokens) {
       try {
         position++;
-        int n = Integer.valueOf(token);
+        final int n = Integer.valueOf(token);
         if (n <= 0) System.out.printf(errorMessage, token, position);
         else result.add(n);
-      } catch (@SuppressWarnings("unused") NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") final NumberFormatException e) {
         print(errorMessage, token, position);
       }
     }

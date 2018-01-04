@@ -34,14 +34,14 @@ public class CreateDB {
   public static void main(final String[] args) {
     try {
       Class.forName("org.h2.Driver");
-      Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "sa", "");
-      String sql = FileUtils.readTextFile("./db/jppf_samples-h2.sql");
-      Statement stmt = c.createStatement();
+      final Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "sa", "");
+      final String sql = FileUtils.readTextFile("./db/jppf_samples-h2.sql");
+      final Statement stmt = c.createStatement();
       stmt.executeUpdate(sql);
       stmt.close();
       c.close();
       System.out.println("database created successfully");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

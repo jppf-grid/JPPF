@@ -43,7 +43,7 @@ public class FractalNodeIntegration extends NodeState {
 
   @Override
   public void taskNotification(final TaskExecutionEvent event) {
-    Object o = event.getUserObject();
+    final Object o = event.getUserObject();
     if ((o instanceof FractalPoint) && (nodePanel != null)) {
       ((FractalPanel) nodePanel).getFractalPreviewPanel().addPoint((FractalPoint) o);
     }
@@ -52,12 +52,12 @@ public class FractalNodeIntegration extends NodeState {
   @Override
   public void jobStarting(final NodeLifeCycleEvent event) {
     super.jobStarting(event);
-    DataProvider dp = event.getDataProvider();
-    Object o = dp.getParameter("config");
+    final DataProvider dp = event.getDataProvider();
+    final Object o = dp.getParameter("config");
     if ((o instanceof MandelbrotConfiguration) && (nodePanel != null)) {
-      FractalPreviewPanel fp = ((FractalPanel) nodePanel).getFractalPreviewPanel();
+      final FractalPreviewPanel fp = ((FractalPanel) nodePanel).getFractalPreviewPanel();
       fp.doReset();
-      MandelbrotConfiguration cfg = (MandelbrotConfiguration) o;
+      final MandelbrotConfiguration cfg = (MandelbrotConfiguration) o;
       fp.updateScaling(cfg.width, cfg.height);
       //((FractalPanel) nodePanel).getProgressPanel().updateTotalTasks(event.getTasks().size());
     }

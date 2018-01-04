@@ -95,7 +95,7 @@ public class CrawlerTask extends AbstractTask<String> {
     try {
       if (doSearch) search();
       else crawl();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     }
   }
@@ -105,7 +105,7 @@ public class CrawlerTask extends AbstractTask<String> {
    * @throws Exception if an error occurs.
    */
   private void crawl() throws Exception {
-    URL u = new URL(url);
+    final URL u = new URL(url);
     String server = u.getProtocol() + "://" + u.getHost();
     while (server.endsWith("/")) server = server.substring(0, server.length() -1);
     if (u.getPort() >= 0) server += ":" + u.getPort();
@@ -114,9 +114,9 @@ public class CrawlerTask extends AbstractTask<String> {
     start = "/" + start;
     if (u.getQuery() != null) start += "?" + u.getQuery();
 
-    int depth = 1;
+    final int depth = 1;
 
-    Crawler crawler = new Crawler();
+    final Crawler crawler = new Crawler();
     ILinkFilter filter = new ServerFilter(server);
     ILinkFilter filter2 = new FileExtensionFilter(
         new String[] {".png", ".jpg", ".gif", ".pdf", ".mpg", ".avi", ".wmv", ".swf", });
@@ -127,7 +127,7 @@ public class CrawlerTask extends AbstractTask<String> {
     crawler.addParserListener(new IParserEventListener() {
       @Override
       public void parse(final ParserEvent event) {
-        String url = event.getLink().getURI();
+        final String url = event.getLink().getURI();
         if (!toVisit.contains(url)) toVisit.add(url);
       }
     });
@@ -140,21 +140,21 @@ public class CrawlerTask extends AbstractTask<String> {
    * @throws Exception if an error occurs.
    */
   private void search() throws Exception {
-    QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
-    Query q = parser.parse(query);
+    final QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
+    final Query q = parser.parse(query);
 
-    MemoryIndex index = new MemoryIndex();
-    Link link = new Link(url);
-    PageData pageData = new SimpleHttpClientParser().load(link);
+    final MemoryIndex index = new MemoryIndex();
+    final Link link = new Link(url);
+    final PageData pageData = new SimpleHttpClientParser().load(link);
     index.addField("contents", pageData.getData().toString(), new StandardAnalyzer());
-    IndexSearcher searcher = index.createSearcher();
-    Hits hits = searcher.search(q);
+    final IndexSearcher searcher = index.createSearcher();
+    final Hits hits = searcher.search(q);
     @SuppressWarnings("rawtypes")
-    Iterator it = hits.iterator();
+    final Iterator it = hits.iterator();
     float relevance = 0f;
     if (it.hasNext()) {
       while (it.hasNext()) {
-        Hit hit = (Hit) it.next();
+        final Hit hit = (Hit) it.next();
         relevance += ((float) Math.round(hit.getScore() * 1000)) / 10;
       }
       matchedLinks.add(new LinkMatch(url, relevance));

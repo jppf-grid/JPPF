@@ -63,7 +63,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter implements  NodeL
         dictionary.add(s.trim().toLowerCase());
       }
       System.out.printf(" %d entries\n", dictionary.size());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -79,7 +79,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter implements  NodeL
   @SuppressWarnings("unchecked")
   public void jobEnding(final NodeLifeCycleEvent event) {
     if (!event.getJob().getName().startsWith("WordCount")) return;
-    List<Task<?>> tasks = event.getTasks();
+    final List<Task<?>> tasks = event.getTasks();
     Map<String, Long> reduced = null;
     int initialIndex = 0;
     // find the first task whose result is not null
@@ -91,11 +91,11 @@ public class NodeListener extends NodeLifeCycleListenerAdapter implements  NodeL
     if (reduced == null) return;
     // aggregate the word cunts of the other tasks into the first one found
     for (int i=initialIndex+1; i<tasks.size(); i++) {
-      Task<?> task = tasks.get(i);
-      Map<String, Long> map = (Map<String, Long>) task.getResult();
+      final Task<?> task = tasks.get(i);
+      final Map<String, Long> map = (Map<String, Long>) task.getResult();
       if (map != null) {
         task.setResult(null);
-        for (Map.Entry<String, Long> entry: map.entrySet()) {
+        for (final Map.Entry<String, Long> entry: map.entrySet()) {
           Long n = reduced.get(entry.getKey());
           if (n == null) n = entry.getValue();
           else n += entry.getValue();

@@ -52,10 +52,10 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
       prevTimeout = acceptedSocket.getSoTimeout();
       acceptedSocket.setSoTimeout(SOCKET_TIMEOUT);
 
-      InputStream is = acceptedSocket.getInputStream();
-      OutputStream os = acceptedSocket.getOutputStream();
-      String userName = CryptoHelper.readAndDecrypt(is);
-      String localUser = System.getProperty(USER_NAME_PROPERTY);
+      final InputStream is = acceptedSocket.getInputStream();
+      final OutputStream os = acceptedSocket.getOutputStream();
+      final String userName = CryptoHelper.readAndDecrypt(is);
+      final String localUser = System.getProperty(USER_NAME_PROPERTY);
       if (!userName.equals(localUser)) {
         print("invalid user name '%s' from client side, source is %s", userName);
         // send invalid user response
@@ -66,16 +66,16 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
         print("successful server authentication");
         return true;
       }
-    } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
+    } catch (@SuppressWarnings("unused") final SocketTimeoutException e) {
       print("unable to get a response from the client after %,d ms", SOCKET_TIMEOUT);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (prevTimeout >= 0) {
         try {
           // restore the initial SO_TIMEOUT setting
           acceptedSocket.setSoTimeout(prevTimeout);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           e.printStackTrace();
         }
       }
@@ -98,28 +98,28 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
       prevTimeout = connectedSocket.getSoTimeout();
       connectedSocket.setSoTimeout(SOCKET_TIMEOUT);
 
-      InputStream is = connectedSocket.getInputStream();
-      OutputStream os = connectedSocket.getOutputStream();
+      final InputStream is = connectedSocket.getInputStream();
+      final OutputStream os = connectedSocket.getOutputStream();
       // send the user name to the server
       CryptoHelper.encryptAndWrite(System.getProperty(USER_NAME_PROPERTY), os);
       // read the server reponse
-      String response = CryptoHelper.readAndDecrypt(is);
+      final String response = CryptoHelper.readAndDecrypt(is);
       if (!"OK".equals(response)) {
         print("bad response from server: %s", response);
       } else {
         print("successful client authentication");
         return true;
       }
-    } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
+    } catch (@SuppressWarnings("unused") final SocketTimeoutException e) {
       print("unable to get a response from the server after %,d ms", SOCKET_TIMEOUT);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (prevTimeout >= 0) {
         try {
           // restore the initial SO_TIMEOUT setting
           connectedSocket.setSoTimeout(prevTimeout);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           e.printStackTrace();
         }
       }
@@ -135,8 +135,8 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * @param format the format string.
    * @param params the parameters referenced in the format.
    */
-  private void print(final String format, final Object...params) {
-    String message = String.format(format, params);
+  private static void print(final String format, final Object...params) {
+    final String message = String.format(format, params);
     System.out.println(message);
   }
 }

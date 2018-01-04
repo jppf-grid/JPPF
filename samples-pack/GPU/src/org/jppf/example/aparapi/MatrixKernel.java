@@ -56,7 +56,7 @@ public class MatrixKernel extends Kernel {
 
   @Override
   public void run() {
-    int rowA = getGlobalId();
+    final int rowA = getGlobalId();
     // the loop performs the multiplication of each row of matrix A by the entire matrix B.
     // this is the part of the computation that is executed in parallel.
     for (int colB=0; colB<size; colB++) multiply(rowA, colB);

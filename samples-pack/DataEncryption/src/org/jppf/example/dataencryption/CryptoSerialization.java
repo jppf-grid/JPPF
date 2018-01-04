@@ -47,11 +47,11 @@ public class CryptoSerialization extends JPPFCompositeSerialization {
     // initialize the cipher with the key stored in the secured keystore
     cipher.init(Cipher.WRAP_MODE, getSecretKey(), getInitializationVector());
     // generate a new key that we will use to encrypt the data
-    SecretKey key = generateKey();
+    final SecretKey key = generateKey();
     // encrypt the new key, using the secret key found in the keystore
-    byte[] keyBytes = cipher.wrap(key);
+    final byte[] keyBytes = cipher.wrap(key);
     // now we write the encrypted key before the data
-    DataOutputStream dos = new DataOutputStream(os);
+    final DataOutputStream dos = new DataOutputStream(os);
     // write the key length
     dos.writeInt(keyBytes.length);
     // write the key content
@@ -63,7 +63,7 @@ public class CryptoSerialization extends JPPFCompositeSerialization {
     // init the cipher in encryption mode
     cipher.init(Cipher.ENCRYPT_MODE, key, getInitializationVector());
     // encrypt the plain riginal object into a sealed object
-    SealedObject sealed = new SealedObject((Serializable) o, cipher);
+    final SealedObject sealed = new SealedObject((Serializable) o, cipher);
     // serialize the sealed object
     getDelegate().serialize(sealed, os);
   }
@@ -71,28 +71,28 @@ public class CryptoSerialization extends JPPFCompositeSerialization {
   @Override
   public Object deserialize(final InputStream is) throws Exception {
     // start by reading the secret key to use to decrypt the data
-    DataInputStream dis = new DataInputStream(is);
+    final DataInputStream dis = new DataInputStream(is);
     // read the length of the key
-    int keyLength = dis.readInt();
+    final int keyLength = dis.readInt();
     // read the encrypted key
-    byte[] keyBytes = new byte[keyLength];
+    final byte[] keyBytes = new byte[keyLength];
     int count = 0;
     while (count < keyLength) {
-      int n = dis.read(keyBytes, count, keyLength - count);
+      final int n = dis.read(keyBytes, count, keyLength - count);
       if (n > 0) count += n;
       else throw new EOFException("could only read " + count + " bytes of the key, out of " + keyLength);
     }
     // decrypt the key using the initial key stored in the keystore
     Cipher cipher = Cipher.getInstance(Helper.getTransformation());
     cipher.init(Cipher.UNWRAP_MODE, getSecretKey(), getInitializationVector());
-    SecretKey key = (SecretKey) cipher.unwrap(keyBytes, Helper.getAlgorithm(), Cipher.SECRET_KEY);
+    final SecretKey key = (SecretKey) cipher.unwrap(keyBytes, Helper.getAlgorithm(), Cipher.SECRET_KEY);
 
     // get a new cipher for the actual decryption
     cipher = Cipher.getInstance(Helper.getTransformation());
     // init the cipher in decryption mode with the retireved key
     cipher.init(Cipher.DECRYPT_MODE, key, getInitializationVector());
     // deserialize a sealed (encrypted) object
-    SealedObject sealed = (SealedObject) getDelegate().deserialize(is);
+    final SealedObject sealed = (SealedObject) getDelegate().deserialize(is);
     // decrypt the sealed object into the plain riginal object
     return sealed.getObject(cipher);
   }
@@ -109,8 +109,8 @@ public class CryptoSerialization extends JPPFCompositeSerialization {
    * @return a {@link SecretKey} instance.
    * @throws Exception if any error occurs.
    */
-  private SecretKey generateKey() throws Exception {
-    KeyGenerator gen = KeyGenerator.getInstance(Helper.getAlgorithm());
+  private static SecretKey generateKey() throws Exception {
+    final KeyGenerator gen = KeyGenerator.getInstance(Helper.getAlgorithm());
     return gen.generateKey();
   }
 
@@ -134,7 +134,7 @@ public class CryptoSerialization extends JPPFCompositeSerialization {
   private static synchronized IvParameterSpec getInitializationVector() {
     if (ivSpec == null) {
       // here we simply initialize the vector with zeroes 
-      byte[] bytes = new byte[16];
+      final byte[] bytes = new byte[16];
       ivSpec = new IvParameterSpec(bytes);
     }
     return ivSpec;

@@ -44,7 +44,7 @@ public abstract class AbstractRunner {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(AbstractRunner.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractRunner.class);
   /**
    * JPPF client used to submit execution requests.
    */
@@ -172,7 +172,7 @@ public abstract class AbstractRunner {
   public Future<GeneratedImage> submitExecution(final int id, final AbstractFractalConfiguration config, final long wait) throws Exception {
     semaphore.acquire();
     if (recording) addRecord(config);
-    FractalExecution exec = new FractalExecution(id, config, wait);
+    final FractalExecution exec = new FractalExecution(id, config, wait);
     return executor.submit(exec);
   }
 
@@ -184,17 +184,17 @@ public abstract class AbstractRunner {
    * @throws Exception if an error is raised during the execution.
    */
   public BufferedImage computeFractal(final int id, final AbstractFractalConfiguration cfg) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.getSLA().setPriority(id);
     job.setName(name + " fractal " + jobCount.incrementAndGet());
-    DataProvider dp = new MemoryMapDataProvider();
+    final DataProvider dp = new MemoryMapDataProvider();
     dp.setParameter("config", cfg);
     job.setDataProvider(dp);
-    long start = System.nanoTime();
-    List<Task<?>> results = submitJob(job, cfg);
-    long elapsed = DateTimeUtils.elapsedFrom(start);
+    final long start = System.nanoTime();
+    final List<Task<?>> results = submitJob(job, cfg);
+    final long elapsed = DateTimeUtils.elapsedFrom(start);
     if (log.isDebugEnabled()) log.debug("Computation performed in " + StringUtils.toStringDuration(elapsed));
-    BufferedImage image = generateImage(results, cfg);
+    final BufferedImage image = generateImage(results, cfg);
     if (JPPFConfiguration.getProperties().getBoolean("jppf.fractals.autosave.enabled", true)) saveImage(image, "png", "data/" + name + ".png");
     return image;
   }
@@ -223,10 +223,10 @@ public abstract class AbstractRunner {
    * @param format the format, eg "jpeg", "png", etc.
    * @param filename the path to the file to save to.
    */
-  private void saveImage(final BufferedImage image, final String format, final String filename) {
+  private static void saveImage(final BufferedImage image, final String format, final String filename) {
     try {
       ImageIO.write(image, format, new File(filename));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -264,13 +264,13 @@ public abstract class AbstractRunner {
   public void createOrDisplayWaitWindow() {
     final JFrame frame = (JFrame) OptionsHandler.getMainWindow();
     if (window == null) {
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
-          JProgressBar progressBar = new JProgressBar();
+          final JProgressBar progressBar = new JProgressBar();
           progressBar.setIndeterminate(true);
-          Font font = progressBar.getFont();
-          Font f = new Font(font.getName(), Font.BOLD, 14);
+          final Font font = progressBar.getFont();
+          final Font f = new Font(font.getName(), Font.BOLD, 14);
           progressBar.setFont(f);
           progressBar.setString("Calculating, please wait ...");
           progressBar.setStringPainted(true);
@@ -281,7 +281,7 @@ public abstract class AbstractRunner {
       };
       SwingUtilities.invokeLater(r);
     }
-    Runnable r2 = new Runnable() {
+    final Runnable r2 = new Runnable() {
       @Override
       public void run() {
         focusOwner = frame.getFocusOwner();
@@ -289,10 +289,10 @@ public abstract class AbstractRunner {
           cursor = focusOwner.getCursor();
           focusOwner.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         }
-        Dimension d = frame.getSize();
-        Point p = frame.getLocationOnScreen();
-        int w = 300;
-        int h = 60;
+        final Dimension d = frame.getSize();
+        final Point p = frame.getLocationOnScreen();
+        final int w = 300;
+        final int h = 60;
         window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
         window.setVisible(true);
         window.toFront();
@@ -357,9 +357,9 @@ public abstract class AbstractRunner {
         BufferedImage image = null;
         if (uiMode) createOrDisplayWaitWindow();
         try {
-          long start = System.nanoTime();
+          final long start = System.nanoTime();
           image = computeFractal(id, config);
-          long elapsed = DateTimeUtils.elapsedFrom(start);
+          final long elapsed = DateTimeUtils.elapsedFrom(start);
           if (wait > 0L) {
             Thread.sleep(Math.max(1L, wait - elapsed));
             final ImagePanel panel = getImagePanel();
@@ -375,7 +375,7 @@ public abstract class AbstractRunner {
               });
             }
           }
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         } finally {
           if (uiMode) hideWaitWindow();
@@ -430,15 +430,15 @@ public abstract class AbstractRunner {
    * Replay all recorded events.
    */
   public void replay() {
-    boolean temp = recording;
-    Semaphore oldSemaphore = semaphore;
+    final boolean temp = recording;
+    final Semaphore oldSemaphore = semaphore;
     try {
       recording = false;
       semaphore = new Semaphore(records.size());
       for (AbstractFractalConfiguration config: records) {
         try {
           submitExecution(0, config, 2000L);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           e.printStackTrace();
         }
       }
@@ -454,7 +454,7 @@ public abstract class AbstractRunner {
    */
   public void saveRecords(final String filename) {
     try {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       int count = 0;
       for (AbstractFractalConfiguration config: records) {
         if (count > 0) sb.append('\n');
@@ -462,7 +462,7 @@ public abstract class AbstractRunner {
         count++;
       }
       FileUtils.writeTextFile(filename, sb.toString());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
 
     }

@@ -49,9 +49,9 @@ public class MatrixTask extends AbstractTask<double[]> {
   @Override
   public void run() {
     try {
-      Matrix matrix = getDataProvider().getParameter(DATA_KEY);
-      int size = matrix.getSize();
-      double[] result = new double[size];
+      final Matrix matrix = getDataProvider().getParameter(DATA_KEY);
+      final int size = matrix.getSize();
+      final double[] result = new double[size];
 
       for (int col=0; col<size; col++) {
         double sum = 0d;
@@ -59,7 +59,7 @@ public class MatrixTask extends AbstractTask<double[]> {
         result[col] = sum;
       }
       setResult(result);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     }
   }

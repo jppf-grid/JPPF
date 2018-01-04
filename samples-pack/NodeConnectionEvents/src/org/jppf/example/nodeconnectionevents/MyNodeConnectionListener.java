@@ -25,13 +25,11 @@ import org.jppf.server.event.*;
  * This is a test of a driver startup class.
  * @author Laurent Cohen
  */
-public class MyNodeConnectionListener implements NodeConnectionListener
-{
+public class MyNodeConnectionListener implements NodeConnectionListener {
   /**
    * Default no-arg constructor.
    */
-  public MyNodeConnectionListener()
-  {
+  public MyNodeConnectionListener() {
     System.out.println("*** MyNodeConnectionListener instance successfully loaded ***");
   }
 
@@ -39,8 +37,7 @@ public class MyNodeConnectionListener implements NodeConnectionListener
    * {@inheritDoc}
    */
   @Override
-  public void nodeConnected(final NodeConnectionEvent event)
-  {
+  public void nodeConnected(final NodeConnectionEvent event) {
     System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is now connected ***");
   }
 
@@ -48,8 +45,7 @@ public class MyNodeConnectionListener implements NodeConnectionListener
    * {@inheritDoc}
    */
   @Override
-  public void nodeDisconnected(final NodeConnectionEvent event)
-  {
+  public void nodeDisconnected(final NodeConnectionEvent event) {
     System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is disconnected ***");
   }
 
@@ -58,10 +54,9 @@ public class MyNodeConnectionListener implements NodeConnectionListener
    * @param info the information from which to extract the identifier segments.
    * @return a string in the format 'management_host:management_port'.
    */
-  private String computeIdentifier(final JPPFManagementInfo info)
-  {
-    String host = info.getHost();
-    int port = info.getPort();
+  private static String computeIdentifier(final JPPFManagementInfo info) {
+    final String host = info.getHost();
+    final int port = info.getPort();
     return host + ':' + port;
   }
 }

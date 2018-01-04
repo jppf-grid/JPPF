@@ -48,18 +48,18 @@ public class Runner {
     try {
       client = new JPPFClient();
       // configure the driver so it behaves suitably for this demo
-      int nbNodes = configureDriver();
+      final int nbNodes = configureDriver();
       System.out.println("updated load-balancing settings, " + nbNodes + " nodes connected to the driver");
       // Create the persistence manager, the root path of the underlying store
       // is in the folder "job_store" under the current directory
       persistenceManager = new DefaultFilePersistenceManager("./job_store");
-      Collection<String> keys = persistenceManager.allKeys();
+      final Collection<String> keys = persistenceManager.allKeys();
       // if there is no job in the persistent store,
       // we submit a job normally and simulate an application crash
       if (keys.isEmpty()) {
-        int nbTasks = 10 * nbNodes;
+        final int nbTasks = 10 * nbNodes;
         System.out.println("no job found in persistence store, creating a new job with " + nbTasks + " tasks");
-        JPPFJob job = new JPPFJob();
+        final JPPFJob job = new JPPFJob();
         // add 10 tasks per node, each task waiting for 1 second
         for (int i = 0; i < nbTasks; i++)
           job.add(new MyTask(1000L, i + 1));
@@ -67,12 +67,12 @@ public class Runner {
         // each time completed tasks are received from the driver
         job.setPersistenceManager(persistenceManager);
         // the application will exit after 6 seconds (simulated crash)
-        Runnable quit = new Runnable() {
+        final Runnable quit = new Runnable() {
           @Override
           public void run() {
             try {
               Thread.sleep(6000L);
-            } catch (@SuppressWarnings("unused") Exception e) {
+            } catch (@SuppressWarnings("unused") final Exception e) {
             }
             System.exit(1);
           }
@@ -85,9 +85,9 @@ public class Runner {
       // we load them and execute them on the grid
       else {
         System.out.println("found jobs in persistence store: " + keys);
-        for (String key : keys) {
+        for (final String key : keys) {
           // load the job from the persistent store, using its key (= job uuid)
-          JPPFJob job = persistenceManager.loadJob(key);
+          final JPPFJob job = persistenceManager.loadJob(key);
           System.out.println("loaded job '" + key + "' from persistence store " + persistenceManager);
           // don't forget this! the application may crash again
           job.setPersistenceManager(persistenceManager);
@@ -97,7 +97,7 @@ public class Runner {
           persistenceManager.deleteJob(key);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -111,8 +111,8 @@ public class Runner {
    * @throws Exception if any error occurs.
    */
   private static void executeJob(final JPPFJob job) throws Exception {
-    List<Task<?>> results = client.submitJob(job);
-    for (Task<?> task : results) {
+    final List<Task<?>> results = client.submitJob(job);
+    for (final Task<?> task : results) {
       if (task.getThrowable() != null) System.out.println("task " + task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("task " + task.getId() + " result: " + task.getResult());
     }
@@ -127,11 +127,11 @@ public class Runner {
    */
   private static int configureDriver() throws Exception {
     // get a connection to the driver's JMX server
-    JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     // obtain the current load-balancing settings
-    LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
+    final LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
     if (lbi == null) return 1;
-    TypedProperties props = lbi.getParameters();
+    final TypedProperties props = lbi.getParameters();
     props.setProperty("size", "1");
     // set load-balancing algorithm to "manual" with a size of 1
     jmxDriver.changeLoadBalancerSettings("manual", props);

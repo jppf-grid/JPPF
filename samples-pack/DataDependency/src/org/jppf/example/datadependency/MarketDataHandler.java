@@ -59,14 +59,14 @@ public class MarketDataHandler implements TickerListener {
    * @param marketDataList the list of data to distribute.
    */
   private void populateInParallel(final List<MarketData> marketDataList) {
-    int nbThreads = 8;
-    ExecutorService tmpExecutor = Executors.newFixedThreadPool(nbThreads);
-    List<Future<?>> futures = new ArrayList<>();
+    final int nbThreads = 8;
+    final ExecutorService tmpExecutor = Executors.newFixedThreadPool(nbThreads);
+    final List<Future<?>> futures = new ArrayList<>();
     for (int i=0; i<nbThreads; i++) futures.add(tmpExecutor.submit(new PopulateTask(i, nbThreads, marketDataList)));
-    for (Future<?> f: futures) {
+    for (final Future<?> f: futures) {
       try {
         f.get();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -125,7 +125,7 @@ public class MarketDataHandler implements TickerListener {
     @Override
     public void run() {
       for (int i=offset; i<marketDataList.size(); i += nbThreads) {
-        MarketData marketData = marketDataList.get(i);
+        final MarketData marketData = marketDataList.get(i);
         dataMap.put(marketData.getId(), marketData);
       }
     }

@@ -30,8 +30,7 @@ import javax.swing.border.EtchedBorder;
  * This class is an extension of JPanel whose goal is to draw an image in its component area.
  * @author Laurent Cohen
  */
-public class ImagePanel extends JPanel
-{
+public class ImagePanel extends JPanel {
   /**
    * The image to draw in this panel.
    */
@@ -40,8 +39,7 @@ public class ImagePanel extends JPanel
   /**
    * Default constructor.
    */
-  public ImagePanel()
-  {
+  public ImagePanel() {
     setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
   }
 
@@ -50,8 +48,7 @@ public class ImagePanel extends JPanel
    * {@inheritDoc}
    */
   @Override
-  protected void paintComponent(final Graphics g)
-  {
+  protected void paintComponent(final Graphics g) {
     // Now call the superclass behavior to paint the foreground.
     super.paintComponent(g);
     if (image != null) g.drawImage(image, 0, 0, null);
@@ -61,8 +58,7 @@ public class ImagePanel extends JPanel
    * Get the image to draw in this panel.
    * @return an <code>Image</code> instance.
    */
-  public Image getImage()
-  {
+  public Image getImage() {
     return image;
   }
 
@@ -70,8 +66,7 @@ public class ImagePanel extends JPanel
    * Set the image to draw in this panel.
    * @param image an {@code BufferedImage} instance.
    */
-  public void setImage(final BufferedImage image)
-  {
+  public void setImage(final BufferedImage image) {
     this.image = image;
     updateSize();
   }
@@ -81,19 +76,17 @@ public class ImagePanel extends JPanel
    * @param imagePath a string specifying the path ot an image file.
    * @throws Exception if the image could not be loaded.
    */
-  public void setImage(final String imagePath) throws Exception
-  {
+  public void setImage(final String imagePath) throws Exception {
     this.image = ImageIO.read(new File(imagePath));
     updateSize();
   }
-  
+
   /**
    * 
    */
-  private void updateSize()
-  {
-    Insets ins = getBorder().getBorderInsets(this);
-    Dimension d = new Dimension(image.getWidth() + ins.left + ins.right, image.getHeight() + ins.bottom + ins.top);
+  private void updateSize() {
+    final Insets ins = getBorder().getBorderInsets(this);
+    final Dimension d = new Dimension(image.getWidth() + ins.left + ins.right, image.getHeight() + ins.bottom + ins.top);
     setSize(d);
     setPreferredSize(d);
     setMaximumSize(d);

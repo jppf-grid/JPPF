@@ -34,8 +34,7 @@ import org.jppf.utils.FileUtils;
  * This component displays a preview of the image being computed by the JPPF tasks.
  * @author Laurent Cohen
  */
-public class FractalPreviewPanel extends JPanel
-{
+public class FractalPreviewPanel extends JPanel {
   /**
    * Holds the next points to draw.
    */
@@ -72,7 +71,7 @@ public class FractalPreviewPanel extends JPanel
     super(true);
     setOpaque(true);
     setBackground(Color.BLACK);
-    Dimension d = new Dimension(400, 400);
+    final Dimension d = new Dimension(400, 400);
     setSize(d);
     setPreferredSize(d);
     setMinimumSize(d);
@@ -80,7 +79,7 @@ public class FractalPreviewPanel extends JPanel
     BufferedImage bi = null;
     try (InputStream is = FileUtils.getFileInputStream("icons/mandelbrot.png")) {
       bi = ImageIO.read(is);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     buffer = (bi != null) ? bi : new BufferedImage(400, 400, BufferedImage.TYPE_INT_RGB);
@@ -93,10 +92,10 @@ public class FractalPreviewPanel extends JPanel
       gb.setColor(getBackground());
       gb.fillRect(0, 0, 400, 400);
     }
-    int size = queueSize.get();
+    final int size = queueSize.get();
     if (size > 0) {
       for (int i=0; i<size; i++) {
-        FractalPoint point = queue.poll();
+        final FractalPoint point = queue.poll();
         if (point == null) break;
         queueSize.decrementAndGet();
         gb.setColor(new Color(point.rgb));
@@ -117,8 +116,8 @@ public class FractalPreviewPanel extends JPanel
    * @param height the height of the original image.
    */
   public void updateScaling(final int width, final int height) {
-    double d1 = (double) getWidth() / (double) width;
-    double d2 = (double) getHeight() / (double) height;
+    final double d1 = (double) getWidth() / (double) width;
+    final double d2 = (double) getHeight() / (double) height;
     scale = Math.min(d1, d2);
     rectSize = (int) Math.ceil(scale);
     if (rectSize < 1) rectSize = 1;
@@ -128,7 +127,7 @@ public class FractalPreviewPanel extends JPanel
    * Reset the preview to a black background.
    */
   public void doReset() {
-    int size = queueSize.get();
+    final int size = queueSize.get();
     for (int i=0; i<size; i++) {
       if (queue.poll() == null) break;
       queueSize.decrementAndGet();

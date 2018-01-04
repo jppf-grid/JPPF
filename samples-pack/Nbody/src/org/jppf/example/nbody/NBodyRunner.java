@@ -54,8 +54,7 @@ import org.slf4j.*;
  * Runner class for the &quot;N-Body demo&quot; demo.
  * @author Laurent Cohen
  */
-public class NBodyRunner
-{
+public class NBodyRunner {
   /**
    * Logger for this class.
    */
@@ -85,19 +84,13 @@ public class NBodyRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
       perform();
-    }
-    catch(Throwable e)
-    {
+    } catch (final Throwable e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       jppfClient.close();
     }
   }
@@ -106,88 +99,79 @@ public class NBodyRunner
    * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform() throws Exception
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    double qp = config.getDouble("nbody.qp");
-    double b = config.getDouble("nbody.b");
-    double dt = config.getDouble("nbody.dt");
+  private static void perform() throws Exception {
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final double qp = config.getDouble("nbody.qp");
+    final double b = config.getDouble("nbody.b");
+    final double dt = config.getDouble("nbody.dt");
     radius = config.getDouble("nbody.radius");
-    int nbBodies = config.getInt("nbody.n");
-    int bodiesPerTask = config.getInt("nbody.bodies.per.task", 1);
-    int iterations = config.getInt("nbody.time.steps");
+    final int nbBodies = config.getInt("nbody.n");
+    final int bodiesPerTask = config.getInt("nbody.bodies.per.task", 1);
+    final int iterations = config.getInt("nbody.time.steps");
 
-    int nbTasks = nbBodies / bodiesPerTask + (nbBodies % bodiesPerTask == 0 ? 0 : 1);
-    print("Running N-Body demo with "+nbBodies+" bodies (protons), dt = "+dt+", for "+iterations+" time steps");
+    final int nbTasks = nbBodies / bodiesPerTask + (nbBodies % bodiesPerTask == 0 ? 0 : 1);
+    print("Running N-Body demo with " + nbBodies + " bodies (protons), dt = " + dt + ", for " + iterations + " time steps");
     // perform "iteration" times
     long totalTime = 0L;
     Vector2d[] positions = new Vector2d[nbBodies];
-    for (int i=0; i<nbBodies; i++)
-    {
-      positions[i] = new Vector2d(rand.nextDouble()*radius/2d+radius/4d, rand.nextDouble()*radius/2d+radius/4d);
+    for (int i = 0; i < nbBodies; i++) {
+      positions[i] = new Vector2d(rand.nextDouble() * radius / 2d + radius / 4d, rand.nextDouble() * radius / 2d + radius / 4d);
     }
     createUI();
     int count = 0;
-    DataProvider dp = new MemoryMapDataProvider();
-    dp.setParameter("qp_qp", Double.valueOf(qp*qp));
-    dp.setParameter("qp_b", Double.valueOf(qp*b));
+    final DataProvider dp = new MemoryMapDataProvider();
+    dp.setParameter("qp_qp", Double.valueOf(qp * qp));
+    dp.setParameter("qp_b", Double.valueOf(qp * b));
     dp.setParameter("dt", Double.valueOf(dt));
     List<Task<?>> tasks = new ArrayList<>(nbTasks);
-    for (int i=0; i<nbTasks; i++)
-    {
-      NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];
-      for (int j=0; j<bodies.length; j++)
-      {
+    for (int i = 0; i < nbTasks; i++) {
+      final NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];
+      for (int j = 0; j < bodies.length; j++) {
         bodies[j] = new NBody(count, positions[count]);
         count++;
       }
       tasks.add(new NBodyTask(bodies));
     }
-    for (int iter=0; iter<iterations; iter++)
-    {
-      JPPFJob job = new JPPFJob();
+    for (int iter = 0; iter < iterations; iter++) {
+      final JPPFJob job = new JPPFJob();
       job.setDataProvider(dp);
       job.setName("Time step #" + iter);
-      for (Task<?> task: tasks) job.add(task);
+      for (Task<?> task: tasks)
+        job.add(task);
       panel.updatePositions(positions);
       dp.setParameter("positions", positions);
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       // submit the tasks for execution
-      List<Task<?>> results = jppfClient.submitJob(job);
+      final List<Task<?>> results = jppfClient.submitJob(job);
       //System.out.println(msg);
-      for (Task<?> task: results)
-      {
-        Throwable t = task.getThrowable();
+      for (final Task<?> task: results) {
+        final Throwable t = task.getThrowable();
         if (t != null) throw t instanceof Exception ? (Exception) t : new Exception(t);
       }
       tasks = results;
       positions = new Vector2d[nbBodies];
-      for (int i=0; i<nbTasks; i++)
-      {
-        NBody[] bodies = ((NBodyTask) tasks.get(i)).getBodies();
-        for (NBody body: bodies) positions[body.number] = body.pos;
+      for (int i = 0; i < nbTasks; i++) {
+        final NBody[] bodies = ((NBodyTask) tasks.get(i)).getBodies();
+        for (final NBody body: bodies) positions[body.number] = body.pos;
       }
-      long elapsed = DateTimeUtils.elapsedFrom(start);
+      final long elapsed = DateTimeUtils.elapsedFrom(start);
       totalTime += elapsed;
       if (iter % 100 == 0) updateLabel("Time steps: " + iter);
       //log.info(msg);
     }
-    updateLabel("Total time:  " + StringUtils.toStringDuration(totalTime) + " (" + (totalTime/1000) + " seconds)" +
-        ", Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+    updateLabel(
+      "Total time:  " + StringUtils.toStringDuration(totalTime) + " (" + (totalTime / 1000) + " seconds)" + ", Average iteration time: " + StringUtils.toStringDuration(totalTime / iterations));
   }
 
   /**
    * Update the text of the label.
    * @param text the text to display.
    */
-  private static void updateLabel(final String text)
-  {
+  private static void updateLabel(final String text) {
     if (panel.isUpdating()) return;
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         label.setText(text);
       }
     });
@@ -197,10 +181,9 @@ public class NBodyRunner
    * Create the UI.
    * @throws Exception if any error occurs.
    */
-  private static void createUI() throws Exception
-  {
+  private static void createUI() throws Exception {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    JFrame frame = new JFrame("N-Body demo");
+    final JFrame frame = new JFrame("N-Body demo");
     frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     frame.addWindowListener(new WindowAdapter() {
       @Override
@@ -208,19 +191,19 @@ public class NBodyRunner
         System.exit(0);
       }
     });
-    JPanel topPanel = new JPanel();
+    final JPanel topPanel = new JPanel();
     label = new JLabel("Time steps: 0");
     label.setHorizontalAlignment(SwingConstants.LEFT);
     label.setAlignmentX(0f);
     topPanel.add(label, BorderLayout.WEST);
     frame.getContentPane().add(topPanel, BorderLayout.NORTH);
     panel = new NBodyPanel();
-    Dimension dim = new Dimension((int) radius, (int) radius);
+    final Dimension dim = new Dimension((int) radius, (int) radius);
     panel.setMinimumSize(dim);
     panel.setMaximumSize(dim);
     panel.setPreferredSize(dim);
     frame.getContentPane().add(panel, BorderLayout.CENTER);
-    frame.setSize((int) radius+50, (int) radius+70);
+    frame.setSize((int) radius + 50, (int) radius + 70);
     frame.setVisible(true);
   }
 
@@ -228,8 +211,7 @@ public class NBodyRunner
    * Print a message tot he log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }

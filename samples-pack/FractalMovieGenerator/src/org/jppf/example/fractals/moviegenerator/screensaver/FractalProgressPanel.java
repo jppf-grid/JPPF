@@ -54,12 +54,12 @@ public class FractalProgressPanel extends JPanel {
    */
   public FractalProgressPanel() {
     super(true);
-    GridBagLayout g = new GridBagLayout();
+    final GridBagLayout g = new GridBagLayout();
     setLayout(g);
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.gridy = 0;
     setBackground(Color.BLACK);
-    Dimension dim = new Dimension(400, 20);
+    final Dimension dim = new Dimension(400, 20);
     setSize(dim);
     setPreferredSize(dim);
     setMinimumSize(dim);
@@ -72,7 +72,7 @@ public class FractalProgressPanel extends JPanel {
   @Override
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    double r = getRatio();
+    final double r = getRatio();
     g.setColor(Color.GREEN.darker());
     g.fillRect(0, 0, (int) (400 * r), 20);
   }

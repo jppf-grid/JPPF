@@ -30,8 +30,7 @@ import org.jppf.utils.DateTimeUtils;
  * along with utility methods to submit a job and gather the results.
  * @author Laurent Cohen
  */
-public class Demo
-{
+public class Demo {
   /**
    * The singleton {@link JPPFClient} instance.
    */
@@ -41,16 +40,13 @@ public class Demo
    * Get a reference to the JPPF client, lazily initializing it if needed.
    * @return a{@link JPPFClient} instance.
    */
-  public static synchronized JPPFClient getClient()
-  {
-    if (jppfClient == null)
-    {
+  public static synchronized JPPFClient getClient() {
+    if (jppfClient == null) {
       jppfClient = new JPPFClient();
-      try
-      {
+      try {
         Thread.sleep(500L);
+      } catch (@SuppressWarnings("unused") final InterruptedException e) {
       }
-      catch(@SuppressWarnings("unused") InterruptedException e) { }
     }
     return jppfClient;
   }
@@ -62,37 +58,30 @@ public class Demo
    * @param taskDuration the duration in milliseconds of each task in the job.
    * @return the job result as a string message.
    */
-  public String submitJob(final String jobName, final int nbTasks, final long taskDuration)
-  {
-    long start = System.nanoTime();
+  public String submitJob(final String jobName, final int nbTasks, final long taskDuration) {
+    final long start = System.nanoTime();
     JPPFJob job = null;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("<h2>Results for job ").append(jobName).append("</h2>");
-    try
-    {
+    try {
       job = new JPPFJob();
       job.setName(jobName);
-      for (int i=1; i<=nbTasks; i++)
-      {
-        LongTask task = new LongTask(taskDuration);
+      for (int i = 1; i <= nbTasks; i++) {
+        final LongTask task = new LongTask(taskDuration);
         task.setId("" + i);
         job.add(task);
       }
-      List<Task<?>> results = getClient().submitJob(job);
-      for (Task<?> task: results)
-      {
+      final List<Task<?>> results = getClient().submitJob(job);
+      for (final Task<?> task: results) {
         sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
       }
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       sb.append(e.getClass().getName()).append(" : ").append(e.getMessage()).append("<br/>");
-      for (StackTraceElement elt: e.getStackTrace())
-      {
+      for (final StackTraceElement elt: e.getStackTrace()) {
         sb.append(elt).append("<br/>");
       }
     }
-    long elapsed = DateTimeUtils.elapsedFrom(start);
+    final long elapsed = DateTimeUtils.elapsedFrom(start);
     sb.append("<p> Total processing time: ").append(elapsed).append(" ms");
     return sb.toString();
   }

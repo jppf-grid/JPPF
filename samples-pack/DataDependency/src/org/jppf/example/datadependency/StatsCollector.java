@@ -28,8 +28,7 @@ import org.jppf.node.protocol.Task;
  * This class collects statistics about job and tasks executions
  * @author Laurent Cohen
  */
-public class StatsCollector
-{
+public class StatsCollector {
   /**
    * Total number of data updates.
    */
@@ -50,8 +49,7 @@ public class StatsCollector
   /**
    * Increment the number of updates.
    */
-  public void dataUpdated()
-  {
+  public void dataUpdated() {
     nbUpdates.incrementAndGet();
   }
 
@@ -60,8 +58,7 @@ public class StatsCollector
    * @param results the results of the job that was processed.
    * @param time the job's total processing time.
    */
-  public void jobProcessed(final List<Task<?>> results, final long time)
-  {
+  public void jobProcessed(final List<Task<?>> results, final long time) {
     nbJobs.incrementAndGet();
     nbTasks.addAndGet(results.size());
     totalTime.addAndGet(time);
@@ -71,8 +68,7 @@ public class StatsCollector
    * Get the total number of updates.
    * @return the number of updates as an int value.
    */
-  public int getNbUpdates()
-  {
+  public int getNbUpdates() {
     return nbUpdates.get();
   }
 
@@ -80,8 +76,7 @@ public class StatsCollector
    * Get the total number of jobs.
    * @return the number of jobs as an int value.
    */
-  public int getNbJobs()
-  {
+  public int getNbJobs() {
     return nbJobs.get();
   }
 
@@ -89,8 +84,7 @@ public class StatsCollector
    * Get the total number of tasks.
    * @return the number of tasks as an int value.
    */
-  public int getNbTasks()
-  {
+  public int getNbTasks() {
     return nbTasks.get();
   }
 
@@ -98,8 +92,7 @@ public class StatsCollector
    * Get the total processing time.
    * @return the total time as a long value.
    */
-  public long getTotalTime()
-  {
+  public long getTotalTime() {
     return totalTime.get();
   }
 
@@ -107,8 +100,7 @@ public class StatsCollector
    * Set the total processing time.
    * @param time the total time as a long value.
    */
-  public void setTotalTime(final long time)
-  {
+  public void setTotalTime(final long time) {
     totalTime.set(time);
   }
 
@@ -118,23 +110,22 @@ public class StatsCollector
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append("total updates:        ").append(getNbUpdates()).append("\n");
     sb.append("total jobs:           ").append(getNbJobs()).append("\n");
     sb.append("total tasks:          ").append(getNbTasks()).append("\n");
     sb.append("total time:           ").append(getTotalTime()).append(" ms\n");
-    NumberFormat nf = NumberFormat.getInstance();
+    final NumberFormat nf = NumberFormat.getInstance();
     nf.setMinimumFractionDigits(2);
     nf.setMaximumFractionDigits(2);
     nf.setMinimumIntegerDigits(1);
-    sb.append("avg jobs per update:  ").append(nf.format(nbJobs.doubleValue()/nbUpdates.get())).append("\n");
-    sb.append("avg tasks per update: ").append(nf.format(nbTasks.doubleValue()/nbUpdates.get())).append("\n");
-    sb.append("avg tasks per job:    ").append(nf.format(nbTasks.doubleValue()/nbJobs.get())).append("\n");
-    sb.append("avg time per update:  ").append(nf.format(totalTime.doubleValue()/nbUpdates.get())).append(" ms\n");
-    sb.append("avg time per job:     ").append(nf.format(totalTime.doubleValue()/nbJobs.get())).append(" ms\n");
-    sb.append("avg time per task:    ").append(nf.format(totalTime.doubleValue()/nbTasks.get())).append(" ms\n");
+    sb.append("avg jobs per update:  ").append(nf.format(nbJobs.doubleValue() / nbUpdates.get())).append("\n");
+    sb.append("avg tasks per update: ").append(nf.format(nbTasks.doubleValue() / nbUpdates.get())).append("\n");
+    sb.append("avg tasks per job:    ").append(nf.format(nbTasks.doubleValue() / nbJobs.get())).append("\n");
+    sb.append("avg time per update:  ").append(nf.format(totalTime.doubleValue() / nbUpdates.get())).append(" ms\n");
+    sb.append("avg time per job:     ").append(nf.format(totalTime.doubleValue() / nbJobs.get())).append(" ms\n");
+    sb.append("avg time per task:    ").append(nf.format(totalTime.doubleValue() / nbTasks.get())).append(" ms\n");
     return sb.toString();
   }
 }

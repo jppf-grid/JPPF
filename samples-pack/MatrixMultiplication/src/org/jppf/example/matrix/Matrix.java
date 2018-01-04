@@ -55,7 +55,7 @@ public class Matrix implements Serializable {
    * Initialize this matrix with random values.
    */
   public void assignRandomValues() {
-    Random rand = new Random(System.nanoTime());
+    final Random rand = new Random(System.nanoTime());
     for (int i=0; i<values.length; i++) {
       for (int j=0; j<values[i].length; j++)
         // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
@@ -108,7 +108,7 @@ public class Matrix implements Serializable {
    */
   public Matrix multiply(final Matrix matrix) {
     if (matrix.getSize() != size) return null;
-    Matrix result = new Matrix(size);
+    final Matrix result = new Matrix(size);
     for (int i=0; i<size; i++) {
       for (int j=0; j<size; j++) {
         double value = 0d;
@@ -127,7 +127,7 @@ public class Matrix implements Serializable {
    * @return a new row represented as an array of <code>double</code> values.
    */
   public double[] multiplyRow(final int n, final Matrix matrix) {
-    double[] result = new double[size];
+    final double[] result = new double[size];
     for (int col=0; col<size; col++) {
       double sum = 0d;
       for (int row=0; row<size; row++) {

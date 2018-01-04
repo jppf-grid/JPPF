@@ -59,7 +59,7 @@ public class FractalPoint implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("x=").append(x);
     sb.append(", y=").append(y);
     sb.append(", rgb=").append(rgb);

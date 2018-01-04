@@ -45,7 +45,7 @@ public abstract class AbstractFractalConfiguration implements Serializable {
    * Initialize this configuration.
    */
   public AbstractFractalConfiguration() {
-    TypedProperties jppfConfig = JPPFConfiguration.getProperties();
+    final TypedProperties jppfConfig = JPPFConfiguration.getProperties();
     this.width = jppfConfig.getInt("image.width", 800);
     this.height = jppfConfig.getInt("image.height", 600);
   }

@@ -67,10 +67,10 @@ public class DriverConnectionManager {
     // wait until there is a connection pool with the at least one active connection to the driver
     connectionPool = client.awaitActiveConnectionPool();
     // wait until at least one JMX connection wrapper is established
-    JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
-    ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
+    final ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
     this.masterSelector = new ExecutionPolicySelector(masterPolicy);
     this.maxAllowedNodes = maxAllowedNodes;
     this.maxAllowedPoolSize = maxAllowedPoolSize;
@@ -86,7 +86,7 @@ public class DriverConnectionManager {
     // Adjust the connection pool size
     int newPoolSize = computePoolSize(nbJobs);
     if (newPoolSize > maxAllowedPoolSize) newPoolSize = maxAllowedPoolSize;
-    int currentPoolSize = connectionPool.connectionCount();
+    final int currentPoolSize = connectionPool.connectionCount();
     if (newPoolSize != currentPoolSize) {
       AdaptiveGridDemo.print("%screasing the number of server connections to %d", (newPoolSize > currentPoolSize) ? "in" : "de", newPoolSize);
       connectionPool.setSize(newPoolSize);
@@ -95,20 +95,20 @@ public class DriverConnectionManager {
     }
 
     // Adjust the number of nodes
-    int newNbNodes = computeNbNodes(nbJobs);
+    final int newNbNodes = computeNbNodes(nbJobs);
     if (newNbNodes != currentNodes) {
       AdaptiveGridDemo.print("%screasing the number of nodes to %d", (newNbNodes > currentNodes) ? "in" : "de", newNbNodes);
       try {
         // -1 because the master node is counted as a an execution node
         updateSlaveNodes(newNbNodes - 1);
         currentNodes = newNbNodes;
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
         // We don't know how many nodes were actually started,
         // so we have to ask the server
         try {
           currentNodes = connectionPool.getJmxConnection().nbNodes();
-        } catch(Exception e2) {
+        } catch(final Exception e2) {
           e2.printStackTrace();
         }
       }

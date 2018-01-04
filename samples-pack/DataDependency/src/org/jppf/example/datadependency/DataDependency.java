@@ -34,12 +34,12 @@ public class DataDependency {
     try {
       // create the JPPFClient
       AbstractTradeUpdater.openJPPFClient();
-      String s = JPPFConfiguration.getProperties().getString("runMode", "event");
+      final String s = JPPFConfiguration.getProperties().getString("runMode", "event");
 
       // create a runner instance.
-      AbstractTradeUpdater tradeUpdater = "event".equalsIgnoreCase(s) ? new EventBasedTradeUpdater() : new SnapshotBasedTradeUpdater();
+      final AbstractTradeUpdater tradeUpdater = "event".equalsIgnoreCase(s) ? new EventBasedTradeUpdater() : new SnapshotBasedTradeUpdater();
       tradeUpdater.run();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     } finally {
       AbstractTradeUpdater.closeJPPFClient();

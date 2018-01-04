@@ -94,7 +94,7 @@ public class AparapiTask extends AbstractTask<Object> {
       // set the multiplication result as the result of this task
       setResult(new SquareMatrix(kernel.getKernelResults()));
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     } finally {
       if (kernel != null) kernel.dispose();
@@ -109,9 +109,9 @@ public class AparapiTask extends AbstractTask<Object> {
    * Print information on the available OpenCL devices.
    */
   private void printDevicesInformation() {
-    MyDeviceSelector selector = new MyDeviceSelector();
+    final MyDeviceSelector selector = new MyDeviceSelector();
     OpenCLDevice.select(selector);
-    List<OpenCLDevice> list = selector.getDevices();
+    final List<OpenCLDevice> list = selector.getDevices();
     int count = 0;
     for (OpenCLDevice device: list) System.out.println("#" + count++ + ": " + device);
   }

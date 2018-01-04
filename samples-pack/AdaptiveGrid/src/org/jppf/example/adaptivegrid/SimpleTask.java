@@ -43,7 +43,7 @@ public class SimpleTask extends AbstractTask<String> {
     try {
       if (duration > 0L) Thread.sleep(duration);
       setResult("execution successful");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

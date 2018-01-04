@@ -36,8 +36,7 @@ import org.slf4j.*;
  * and changes the icon accordingly.
  * @author Laurent Cohen
  */
-public class NodeSystemTray extends NodeLifeCycleListenerAdapter
-{
+public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   /**
    * Logger for this class.
    */
@@ -70,12 +69,10 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
   /**
    * Default constructor.
    */
-  public NodeSystemTray()
-  {
-    try
-    {
-      SystemTray tray = SystemTray.getSystemTray();
-      TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
+  public NodeSystemTray() {
+    try {
+      final SystemTray tray = SystemTray.getSystemTray();
+      final TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
       if (oldTrayIcon != null) tray.remove(oldTrayIcon);
       trayIcon = new TrayIcon(images[1]);
       trayIcon.setImageAutoSize(true);
@@ -83,9 +80,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
       NodeRunner.setPersistentData("JPPFNodeTrayIcon", trayIcon);
       initJMX();
       trayIcon.setToolTip(generateTooltipText());
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -93,33 +88,14 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
   /**
    * Initialize the JMX wrapper and register a listener to the task monitor mbean notifications.
    */
-  private void initJMX()
-  {
-    try
-    {
-      /*
-      try
-      {
-       // if the node is running within the server's JVM (local node)
-        if (JPPFDriver.getLocalNode() != null) jmxServer = JPPFDriver.getLocalNode().getJmxServer();
-      }
-      catch(NoClassDefFoundError e)
-      {
-        jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
-      }
-      catch(Exception e)
-      {
-        jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
-      }
-      */
+  private void initJMX() {
+    try {
       wrapper = new JMXNodeConnectionWrapper();
       wrapper.connectAndWait(5000);
       trayIcon.setImage(images[1]);
       taskMonitor = wrapper.getJPPFNodeTaskMonitorProxy();
       taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -128,14 +104,12 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
    * Generate the tooltip for the tray icon.
    * @return the tooltip as a string.
    */
-  private String generateTooltipText()
-  {
-    StringBuilder sb = new StringBuilder();
+  private String generateTooltipText() {
+    final StringBuilder sb = new StringBuilder();
     sb.append("Node ");
     if (jmxServer != null) sb.append(jmxServer.getManagementHost()).append(':').append(jmxServer.getManagementPort());
     sb.append('\n');
-    if (taskMonitor != null)
-    {
+    if (taskMonitor != null) {
       sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
       sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
       sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
@@ -148,8 +122,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
   /**
    * Listener for task-level events.
    */
-  public class JMXNotificationListener implements NotificationListener
-  {
+  public class JMXNotificationListener implements NotificationListener {
     /**
      * Handle task-level notifications. Here, we simply update the tray icon's tooltip text.
      * @param notification the notification.
@@ -157,17 +130,12 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
      * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
      */
     @Override
-    public void handleNotification(final Notification notification, final Object handback)
-    {
-      if (lock.tryLock())
-      {
-        try
-        {
-          String s = generateTooltipText();
+    public void handleNotification(final Notification notification, final Object handback) {
+      if (lock.tryLock()) {
+        try {
+          final String s = generateTooltipText();
           trayIcon.setToolTip(s);
-        }
-        finally
-        {
+        } finally {
           lock.unlock();
         }
       }
@@ -175,72 +143,56 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter
   }
 
   @Override
-  public void nodeStarting(final NodeLifeCycleEvent event)
-  {
+  public void nodeStarting(final NodeLifeCycleEvent event) {
     trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
-    if (jmxServer == null)
-    {
-      try
-      {
+    if (jmxServer == null) {
+      try {
         jmxServer = ((AbstractNode) event.getNode()).getJmxServer();
-      }
-      catch (Exception e)
-      {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
     lock.lock();
-    try
-    {
+    try {
       // node is disconnected, display the green icon
       trayIcon.setImage(images[0]);
-      String s = generateTooltipText();
+      final String s = generateTooltipText();
       trayIcon.setToolTip(s);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public void nodeEnding(final NodeLifeCycleEvent event)
-  {
+  public void nodeEnding(final NodeLifeCycleEvent event) {
     trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
     lock.lock();
-    try
-    {
+    try {
       // node is disconnected, display the red icon
       trayIcon.setImage(images[1]);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
-  {
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobStarting(final NodeLifeCycleEvent event)
-  {
+  public void jobStarting(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobEnding(final NodeLifeCycleEvent event)
-  {
+  public void jobEnding(final NodeLifeCycleEvent event) {
   }
 
   /**
    * Initialize the icons used in the tray panel.
    * @return an array of {@link Image} objects.
    */
-  private static Image[] initializeImages()
-  {
-    Image[] img = new Image[2];
+  private static Image[] initializeImages() {
+    final Image[] img = new Image[2];
     img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/example/nodetray/node_green.gif"));
     img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/example/nodetray/node_red.gif"));
     return img;

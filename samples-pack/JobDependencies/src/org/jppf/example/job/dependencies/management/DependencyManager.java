@@ -36,7 +36,7 @@ public class DependencyManager implements DependencyManagerMBean {
 
   @Override
   public String[] getNodeIds() {
-    Set<String> set = DependencyGraph.getInstance().getNodeIds();
+    final Set<String> set = DependencyGraph.getInstance().getNodeIds();
     return set.toArray(new String[set.size()]);
   }
 }

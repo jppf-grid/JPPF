@@ -38,15 +38,15 @@ public class Runner {
    */
   public static void main(final String[] args) {
     // extract the parameters of the demo from the JPPF configuration
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int nbTasks = config.getInt("demo.nbTasks", 1);
-    long duration = config.getLong("demo.taskDuration", 2000L);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int nbTasks = config.getInt("demo.nbTasks", 1);
+    final long duration = config.getLong("demo.taskDuration", 2000L);
     System.out.printf("Android demo parameters: nb tasks=%,d; task duration=%,d ms�n", nbTasks, duration);
     // create and start the JPPF client
-    try (JPPFClient client = new JPPFClient()) {
+    try (final JPPFClient client = new JPPFClient()) {
       // create the JPPF job
       System.out.println("creating job");
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName("JPPF Android Demo");
       for (int i=1; i<=nbTasks; i++) {
         job.add(new DemoAndroidTask(duration)).setId("#" + i);
@@ -58,13 +58,13 @@ public class Runner {
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(5L * 60_000L));
       // submit the job and get the resutls
       System.out.println("submitting job");
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       // process the job's results
-      for (Task<?> task : results) {
+      for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("task %s raised an exception : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));
         else System.out.printf("Task %s has a result: %s%n", task.getId(), task.getResult());
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -77,10 +77,10 @@ public class Runner {
    */
   public static void addToJobClassPath(final JPPFJob job, final File file) throws Exception {
     // copy the file in memory
-    Location<String> fileLoc = new FileLocation(file);
-    Location<byte[]> memoryLoc = fileLoc.copyTo(new MemoryLocation(file.length()));
+    final Location<String> fileLoc = new FileLocation(file);
+    final Location<byte[]> memoryLoc = fileLoc.copyTo(new MemoryLocation(file.length()));
     // add the memory location to the classpath
-    ClassPath classpath = job.getSLA().getClassPath();
+    final ClassPath classpath = job.getSLA().getClassPath();
     classpath.add(file.getName(), memoryLoc);
   }
 }

@@ -41,7 +41,7 @@ public abstract class AbstractDataFactory implements DataFactory {
    */
   @Override
   public int getRandomInt(final int min, final int max) {
-    int m = (max < min) ? min : max;
+    final int m = (max < min) ? min : max;
     if (m == min) return min;
     return min + getRandomInt(m - min + 1);
   }
@@ -55,7 +55,7 @@ public abstract class AbstractDataFactory implements DataFactory {
    */
   @Override
   public List<MarketData> generateDataMarketObjects(final int n) {
-    List<MarketData> result = new ArrayList<>();
+    final List<MarketData> result = new ArrayList<>();
     for (int i = 1; i <= n; i++) result.add(new MarketData("D" + i));
     return result;
   }
@@ -74,15 +74,15 @@ public abstract class AbstractDataFactory implements DataFactory {
    */
   @Override
   public List<Trade> generateTradeObjects(final int nbTrades, final List<MarketData> dataList, final int minData, final int maxData) {
-    List<Trade> result = new ArrayList<>();
+    final List<Trade> result = new ArrayList<>();
     for (int i = 1; i < nbTrades; i++) {
-      Trade trade = new Trade("T" + i);
-      int n = getRandomInt(minData, maxData);
-      SortedSet<String> dependencies = trade.getDataDependencies();
-      List<Integer> indices = new LinkedList<>();
+      final Trade trade = new Trade("T" + i);
+      final int n = getRandomInt(minData, maxData);
+      final SortedSet<String> dependencies = trade.getDataDependencies();
+      final List<Integer> indices = new LinkedList<>();
       for (int k = 0; k < dataList.size(); k++) indices.add(k);
       for (int j = 0; j < n; j++) {
-        int p = indices.remove(getRandomInt(indices.size()));
+        final int p = indices.remove(getRandomInt(indices.size()));
         dependencies.add(dataList.get(p).getId());
       }
       result.add(trade);

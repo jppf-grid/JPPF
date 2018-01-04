@@ -54,7 +54,7 @@ public interface RepositoryFilter extends Serializable {
     @Override
     public boolean accepts(final String name, final String signature) {
       if (classpath == null) return false;
-      String classpathSignature = classpath.getElementSignature(name);
+      final String classpathSignature = classpath.getElementSignature(name);
       return ((classpathSignature == null) || !classpathSignature.equals(signature));
     }
 
@@ -108,8 +108,7 @@ public interface RepositoryFilter extends Serializable {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       return getClass().getSimpleName() + "(" + regEx + ")";
     }
   }

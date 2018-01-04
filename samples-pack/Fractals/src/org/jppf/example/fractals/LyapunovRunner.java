@@ -56,36 +56,36 @@ public class LyapunovRunner extends AbstractRunner {
 
   @Override
   protected synchronized List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
-    LyapunovConfiguration config = (LyapunovConfiguration) cfg;
-    int nbTask = config.width;
+    final LyapunovConfiguration config = (LyapunovConfiguration) cfg;
+    final int nbTask = config.width;
     log.info("Executing " + nbTask + " tasks");
     for (int i = 0; i < nbTask; i++)
       job.add(new LyapunovTask(i));
-    List<Task<?>> results = jppfClient.submitJob(job);
+    final List<Task<?>> results = jppfClient.submitJob(job);
     return results;
   }
 
   @Override
   public BufferedImage generateImage(final List<Task<?>> taskList, final AbstractFractalConfiguration cfg) throws Exception {
-    LyapunovConfiguration config = (LyapunovConfiguration) cfg;
+    final LyapunovConfiguration config = (LyapunovConfiguration) cfg;
     double min = 0d;
     double max = 0d;
     // compute the min and max lambda
     for (int j = 0; j < config.width; j++) {
-      LyapunovTask task = (LyapunovTask) taskList.get(j);
-      double[] values = task.getResult();
+      final LyapunovTask task = (LyapunovTask) taskList.get(j);
+      final double[] values = task.getResult();
       for (int i = 0; i < config.height; i++) {
         if (values[i] > max) max = values[i];
         if (values[i] < min) min = values[i];
       }
     }
 
-    BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
+    final BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
     for (int j = 0; j < config.width; j++) {
-      LyapunovTask task = (LyapunovTask) taskList.get(j);
-      double[] values = task.getResult();
+      final LyapunovTask task = (LyapunovTask) taskList.get(j);
+      final double[] values = task.getResult();
       for (int i = 0; i < config.height; i++) {
-        int rgb = computeLyapunovRGB(values[i], min, max);
+        final int rgb = computeLyapunovRGB(values[i], min, max);
         image.setRGB(j, config.height - i - 1, rgb);
       }
     }
@@ -100,8 +100,8 @@ public class LyapunovRunner extends AbstractRunner {
    * @param max the maximum lambda value found.
    * @return an RGB value represented as an int.
    */
-  private int computeLyapunovRGB(final double lambda, final double min, final double max) {
-    double[] rgb_f = new double[3];
+  private static int computeLyapunovRGB(final double lambda, final double min, final double max) {
+    final double[] rgb_f = new double[3];
     if (lambda > 0) {
       rgb_f[0] = 0d;
       rgb_f[1] = 0d;

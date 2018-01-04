@@ -78,11 +78,11 @@ public class DependencyNode {
    * @param node the node to add as a dependency.
    */
   void addDependency(final DependencyNode node) {
-    String depId = node.getId();
-    LinkedList<String> cycle = new LinkedList<>();
+    final String depId = node.getId();
+    final LinkedList<String> cycle = new LinkedList<>();
     if (hasCycle(node, new HashSet<String>(), cycle)) {
       // print the full cycle
-      StringBuilder sb = new StringBuilder(getId()).append(" ==> ");
+      final StringBuilder sb = new StringBuilder(getId()).append(" ==> ");
       for (String id: cycle) sb.append(id).append(" ==> ");
       sb.append(getId());
       Utils.print("cycle detected while adding dependency '%s' to '%s' : %s", depId, getId(), sb);
@@ -204,7 +204,7 @@ public class DependencyNode {
    * @return a list of nodes whose associated jobs should be resumed.
    */
   List<DependencyNode> onCompleted(final boolean completed) {
-    List<DependencyNode> result = new ArrayList<>();
+    final List<DependencyNode> result = new ArrayList<>();
     this.completed = completed;
     for (DependencyNode node: dependedOn.values()) {
       if (node != null) {

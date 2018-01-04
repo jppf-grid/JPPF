@@ -28,8 +28,7 @@ import org.jppf.node.protocol.AbstractTask;
  * This task performs the alignment of 2 DNA or protein sequences.
  * @author Laurent Cohen
  */
-public class SequenceAlignmentTask extends AbstractTask<Float>
-{
+public class SequenceAlignmentTask extends AbstractTask<Float> {
   /**
    * Data provider key for the target sequence.
    */
@@ -48,8 +47,7 @@ public class SequenceAlignmentTask extends AbstractTask<Float>
    * @param sequence the sequence as a string.
    * @param number uniquely identifies this task.
    */
-  public SequenceAlignmentTask(final String sequence, final int number)
-  {
+  public SequenceAlignmentTask(final String sequence, final int number) {
     this.sequence = sequence;
     setId("" + number);
   }
@@ -59,18 +57,14 @@ public class SequenceAlignmentTask extends AbstractTask<Float>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
-      Sequence seq = SequenceParser.parse(sequence);
-      Sequence target = getDataProvider().getParameter(TARGET_SEQUENCE);
-      Matrix matrix = getDataProvider().getParameter(SCORING_MATRIX);
-      Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
+  public void run() {
+    try {
+      final Sequence seq = SequenceParser.parse(sequence);
+      final Sequence target = getDataProvider().getParameter(TARGET_SEQUENCE);
+      final Matrix matrix = getDataProvider().getParameter(SCORING_MATRIX);
+      final Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
       setResult(a.calculateScore());
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -79,17 +73,15 @@ public class SequenceAlignmentTask extends AbstractTask<Float>
    * Get the sequence number of this task.
    * @return the sequence number as an int.
    */
-  public int getNumber()
-  {
+  public int getNumber() {
     return Integer.valueOf(getId());
   }
 
   /**
    * Get the sequence to align with the target sequence.
-   * @return  the sequence as a string.
+   * @return the sequence as a string.
    */
-  public String getSequence()
-  {
+  public String getSequence() {
     return sequence;
   }
 }

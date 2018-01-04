@@ -56,39 +56,39 @@ public class CustomLoadBalancerRunner {
       jppfClient = new JPPFClient();
 
       // create a runner instance.
-      CustomLoadBalancerRunner runner = new CustomLoadBalancerRunner();
+      final CustomLoadBalancerRunner runner = new CustomLoadBalancerRunner();
 
       // Create a "heavy" job
       // The is the maximum memory footprint of a task in the job
-      int taskFootprint = 20 * MB;
+      final int taskFootprint = 20 * MB;
       // We want 40 MB available for each heavy task running concurrently.
       // This is not easily doable with a standard execution policy, so we create a custom one.
       // We use double the task footprint because it will take approximately twice the memory footprint
       // when each task is serialized or deserialized in the node (serialized data + the object itself).
-      ExecutionPolicy heavyPolicy = new MyCustomPolicy("" + (2 * taskFootprint));
+      final ExecutionPolicy heavyPolicy = new MyCustomPolicy("" + (2 * taskFootprint));
       // Tasks in the job will have 20 MB data size, will last at most 5 seconds,
       // and the maximum execution time for a set of tasks will be no more than 60 seconds.
       // With 4 tasks and the node's heap set to 64 MB, the load-balancer will be forced to split the job in 2 at least.
-      JPPFJob heavyJob = runner.createJob("Heavy Job", 4, taskFootprint, 5L * 1000L, 60L * 1000L, heavyPolicy);
+      final JPPFJob heavyJob = runner.createJob("Heavy Job", 4, taskFootprint, 5L * 1000L, 60L * 1000L, heavyPolicy);
       // This job has long-running tasks, so we can submit it and create the second job while it is executing.
       jppfClient.submitJob(heavyJob);
 
       // Create a "light" job
       // We want at least 2 light tasks executing concurrently in a node, to mitigate the network overhead.
-      ExecutionPolicy lightPolicy = new AtLeast("jppf.processing.threads", 2);
+      final ExecutionPolicy lightPolicy = new AtLeast("jppf.processing.threads", 2);
       // Tasks in the job will have 10 KB data size, will last at most 80 milliseconds,
       // and the maximum execution time for a set of tasks will be no more than 3 seconds.
       // Here the allowed time will be the limiting factor for the number of tasks that can be sent to a node,
       // so the if the node has 4 threads, the job should be split in 2: one set of 150 tasks, then one set of 50 (approximately).
       // (total time = 200 * 80 / 4)
-      JPPFJob lightJob = runner.createJob("Light Job", 200, 10 * KB, 80L, 3L * 1000L, lightPolicy);
+      final JPPFJob lightJob = runner.createJob("Light Job", 200, 10 * KB, 80L, 3L * 1000L, lightPolicy);
       // Submit the light job.
       jppfClient.submitJob(lightJob);
 
       // now we obtain and process the results - this will cause a lot of logging to the console!
       runner.processJobResults(heavyJob);
       runner.processJobResults(lightJob);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -108,13 +108,13 @@ public class CustomLoadBalancerRunner {
    */
   public JPPFJob createJob(final String jobName, final int nbTasks, final int size, final long duration, final long allowedTime, final ExecutionPolicy policy) throws Exception {
     // Create a JPPF job.
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
 
     // Give this job a readable unique id that we can use to monitor and manage it.
     job.setName(jobName);
 
     // Specify the job metadata.
-    JobMetadata metadata = job.getMetadata();
+    final JobMetadata metadata = job.getMetadata();
     metadata.setParameter("task.memory", "" + size);
     metadata.setParameter("task.time", "" + duration);
     metadata.setParameter("allowed.time", "" + allowedTime);
@@ -123,7 +123,7 @@ public class CustomLoadBalancerRunner {
     // Add the tasks to the job.
     for (int i = 1; i <= nbTasks; i++) {
       // create a task with the specified data size and duration
-      Task<?> task = new CustomLoadBalancerTask(size, duration);
+      final Task<?> task = new CustomLoadBalancerTask(size, duration);
       // task id contains the job name for easier identification
       task.setId(jobName + " - task " + i);
       job.add(task);
@@ -150,14 +150,14 @@ public class CustomLoadBalancerRunner {
     // We are now ready to get the results of the job execution.
     // We use JPPFJob.awaitResults() for this. This method returns immediately with the
     // results if the job has completed, otherwise it waits until the job execution is complete.
-    List<Task<?>> results = job.awaitResults();
+    final List<Task<?>> results = job.awaitResults();
 
     // Process the results
     for (Task<?> task : results) {
       // If the task execution resulted in an exception, display the stack trace.
       if (task.getThrowable() != null) {
         // process the exception here ...
-        StringWriter sw = new StringWriter();
+        final StringWriter sw = new StringWriter();
         task.getThrowable().printStackTrace(new PrintWriter(sw));
         System.out.println("Exception occurred while executing task " + task.getId() + ":");
         System.out.println(sw.toString());

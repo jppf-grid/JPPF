@@ -54,7 +54,7 @@ public class ClassPathHelper {
   public static String computeSignature(final String filename) {
     try {
       return computeSignature(FileUtils.getFileInputStream(filename));
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }
@@ -67,7 +67,7 @@ public class ClassPathHelper {
   public static String computeSignature(final File file) {
     try {
       return computeSignature(new BufferedInputStream( new FileInputStream(file)));
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }
@@ -80,7 +80,7 @@ public class ClassPathHelper {
   public static String computeSignature(final URL url) {
     try {
       return computeSignature(url.openStream());
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       return null;
     }
   }
@@ -91,17 +91,16 @@ public class ClassPathHelper {
    * @return a hexadecimal representation of the signature.
    */
   public static String computeSignature(final InputStream is) {
-    try
-    {
+    try {
       // compute the signature
-      MessageDigest digest = MessageDigest.getInstance(SIGNATURE_ALGORITHM);
-      byte[] buffer = new byte[2048];
+      final MessageDigest digest = MessageDigest.getInstance(SIGNATURE_ALGORITHM);
+      final byte[] buffer = new byte[2048];
       int numBytes;
       while ((numBytes = is.read(buffer)) != -1) digest.update(buffer, 0, numBytes);
-      byte[] sig = digest.digest();
+      final byte[] sig = digest.digest();
       // convert the signature to a hexadecimal string
       return StringUtils.toHexString(sig);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       StreamUtils.closeSilent(is);
@@ -118,11 +117,11 @@ public class ClassPathHelper {
    * @return a normalized fiie path.
    */
   public static File getLibFilePath(final String rootDir, final String libName, final String signature) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(rootDir).append('/');
-    int n = libName.lastIndexOf('.');
-    String ext = libName.substring(n);
-    String s = libName.substring(0, n);
+    final int n = libName.lastIndexOf('.');
+    final String ext = libName.substring(n);
+    final String s = libName.substring(0, n);
     sb.append(s).append('-').append(signature).append(ext);
     return new File(sb.toString());
   }
@@ -133,10 +132,10 @@ public class ClassPathHelper {
    * @return a {@link ClassPath} object loaded with the files found in the folder.
    */
   public static ClassPath createClassPathFromRootFolder(final String rootFolder) {
-    ClassPathImpl cp = new ClassPathImpl(rootFolder);
+    final ClassPathImpl cp = new ClassPathImpl(rootFolder);
     try {
       return cp.loadFromFileSystem();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return cp;
@@ -151,8 +150,8 @@ public class ClassPathHelper {
     ClassPathImpl cp = null;
     if ((files != null) && (files.length > 0)) {
       cp = new ClassPathImpl();
-      for (String filename: files) {
-        String signature = computeSignature(filename);
+      for (final String filename: files) {
+        final String signature = computeSignature(filename);
         cp.addElement(filename, signature);
       }
     }
@@ -174,12 +173,12 @@ public class ClassPathHelper {
     for (int i=0; i<args.length; i++) {
       if ("-c".equalsIgnoreCase(args[i])) {
         // convert the file pattern to a java regex
-        String regex = wildcardToRegex(args[i + 1]);
+        final String regex = wildcardToRegex(args[i + 1]);
         final Pattern pattern = Pattern.compile(regex);
 
         // get the files in the root dir that match the pattern
-        File dir = new File(rootDir);
-        File[] files = dir.listFiles(new FileFilter() {
+        final File dir = new File(rootDir);
+        final File[] files = dir.listFiles(new FileFilter() {
           @Override
           public boolean accept(final File pathname) {
             return pattern.matcher(pathname.getName()).matches();
@@ -189,9 +188,9 @@ public class ClassPathHelper {
         // build the classpath from the matching files
         if ((files != null) && (files.length > 0)) {
           cp = new ClassPathImpl();
-          for (File file: files) {
-            String name = file.getName();
-            String signature = computeSignature(file);
+          for (final File file: files) {
+            final String name = file.getName();
+            final String signature = computeSignature(file);
             if (signature != null) cp.addElement(name, signature);
           }
         }
@@ -214,7 +213,7 @@ public class ClassPathHelper {
     RepositoryFilter filter = null;
     for (int i=0; i<args.length; i++) {
       if ("-d".equalsIgnoreCase(args[i])) {
-        String regex = args[i + 1];
+        final String regex = args[i + 1];
         filter = new RepositoryFilter.RegExFilter(regex);
         break;
       }
@@ -228,9 +227,9 @@ public class ClassPathHelper {
    * @return a <code>java.util.regex.Pattern</code> instance.
    */
   public static String wildcardToRegex(final String patternString) {
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
     for (int i=0; i<patternString.length(); i++) {
-      char c = patternString.charAt(i);
+      final char c = patternString.charAt(i);
       switch(c) {
         case '*':
         case '?':

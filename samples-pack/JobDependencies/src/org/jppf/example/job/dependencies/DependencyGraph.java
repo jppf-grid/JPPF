@@ -84,8 +84,8 @@ public final class DependencyGraph {
    * @return the list of jobs that no longer have any dependency and may thus be resumed.
    */
   synchronized List<DependencyNode> jobEnded(final String jobUuid) {
-    DependencyNode node = getNodeByJobUuid(jobUuid);
-    List<DependencyNode> toResume = node.onCompleted(true);
+    final DependencyNode node = getNodeByJobUuid(jobUuid);
+    final List<DependencyNode> toResume = node.onCompleted(true);
     return toResume;
   }
 
@@ -96,7 +96,7 @@ public final class DependencyGraph {
    * @return the added {@link DependencyNode}.
    */
   synchronized DependencyNode addNode(final DependencySpec spec, final String jobUuid) {
-    DependencyNode node = addNode(spec.getId(), jobUuid, spec.getDependencies());
+    final DependencyNode node = addNode(spec.getId(), jobUuid, spec.getDependencies());
     node.setRemoveUponCompletion(spec.isRemoveUponCompletion());
     //Utils.print("graph: added '%s' with dependencies %s", node.getId(), node.getDependenciesIds());
     Utils.print("graph: added %s", node);
@@ -130,8 +130,8 @@ public final class DependencyGraph {
       nodesByUuid.put(jobUuid, node);
     }
     if ((dependencies != null) && (dependencies.length > 0)) {
-      for (String depId: dependencies) {
-        DependencyNode depNode = addNode(depId, null, null);
+      for (final String depId: dependencies) {
+        final DependencyNode depNode = addNode(depId, null, null);
         node.addDependency(depNode);
       }
     }
@@ -143,7 +143,7 @@ public final class DependencyGraph {
    * @param id the id of the node to remove.
    */
   public synchronized void removeNode(final String id) {
-    DependencyNode node = getNode(id);
+    final DependencyNode node = getNode(id);
     if (node != null) removeNode(node);
   }
 
@@ -153,8 +153,8 @@ public final class DependencyGraph {
    */
   synchronized void removeNode(final DependencyNode node) {
     // to avoid COncurrentModificationException
-    List<DependencyNode> dependencies = new ArrayList<>(node.getDependencies());
-    for (DependencyNode dependency: dependencies) {
+    final List<DependencyNode> dependencies = new ArrayList<>(node.getDependencies());
+    for (final DependencyNode dependency: dependencies) {
       if (nodes.containsKey(dependency.getId())) removeNode(dependency);
     }
     for (DependencyNode dependent: node.getDependendedOn()) dependent.removeDependency(node);

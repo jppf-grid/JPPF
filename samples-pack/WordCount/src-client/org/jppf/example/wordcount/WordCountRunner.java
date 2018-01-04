@@ -40,7 +40,7 @@ public class WordCountRunner {
    * @param args not used.
    */
   public static void main(final String...args) {
-    Parameters params = new Parameters();
+    final Parameters params = new Parameters();
     TimeMarker marker = null;
     JobProvider provider = null;
     try (JPPFClient client = new JPPFClient();
@@ -49,18 +49,18 @@ public class WordCountRunner {
       provider = jobProvider;
       System.out.printf(Locale.US, "Processing '%s' with %,d articles per task, %,d tasks per job, nb channels = %d, max concurrent jobs = %d%n",
         params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
-      JPPFConnectionPool pool = client.awaitActiveConnectionPool();
+      final JPPFConnectionPool pool = client.awaitActiveConnectionPool();
       // set the pool size to the desired number of connections
       pool.setSize(params.jobCapacity);
       marker = new TimeMarker().start();
       // read the wikipedia file and build jobs according to the configuration parameters
-      for (JPPFJob job:  jobProvider) {
+      for (final JPPFJob job:  jobProvider) {
         if (job != null) client.submitJob(job);
       }
       // wait until all job results have been processed
       while (jobProvider.hasPendingJob()) Thread.sleep(10L);
 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     try {
@@ -71,7 +71,7 @@ public class WordCountRunner {
       System.out.printf(Locale.US, "processed %,d jobs for %,d articles in %s; total redirects = %,d; average article length = %,.0f; min = %,d; max = %,d%n",
         provider.getJobCount(), (provider.getTotalArticles() - provider.getTotalRedirects()), marker.stop().getLastElapsedAsString(), provider.getTotalRedirects(),
         provider.getAverageArticleLength(), provider.getMinArticleLength(), provider.getMaxArticleLength());
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -83,8 +83,8 @@ public class WordCountRunner {
    */
   private static CollectionMap<Long, String> sortResults(final Map<String, Long> mergedResults) {
     System.out.printf("sorting %s results ... ", mergedResults.size());
-    TimeMarker marker = new TimeMarker().start();
-    Comparator<Long> comp = new Comparator<Long>() {
+    final TimeMarker marker = new TimeMarker().start();
+    final Comparator<Long> comp = new Comparator<Long>() {
       @Override
       public int compare(final Long o1, final Long o2) {
         if (o1 == null) return o2 == null ? 0 : -1;
@@ -93,8 +93,8 @@ public class WordCountRunner {
       }
     };
     // using a multimap (JPPF implementation) makes code a lot simpler
-    CollectionMap<Long, String> result = new SortedSetSortedMap<>(comp);
-    for (Map.Entry<String, Long> entry: mergedResults.entrySet()) result.putValue(entry.getValue(), entry.getKey());
+    final CollectionMap<Long, String> result = new SortedSetSortedMap<>(comp);
+    for (final Map.Entry<String, Long> entry: mergedResults.entrySet()) result.putValue(entry.getValue(), entry.getKey());
     System.out.printf("done in %s%n", marker.stop().getLastElapsedAsString());
     return result;
   }
@@ -106,13 +106,13 @@ public class WordCountRunner {
    * @throws Exception if any error occurs.
    */
   private static void writeResults(final CollectionMap<Long, String> results, final String destFile) throws Exception {
-    String filename = "WordCountResults.txt";
+    final String filename = "WordCountResults.txt";
     System.out.printf("writing results to '%s' ... ", filename);
-    TimeMarker marker = new TimeMarker().start();
-    try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
+    final TimeMarker marker = new TimeMarker().start();
+    try (final PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
       for (Map.Entry<Long, Collection<String>> entry: results.entrySet()) {
-        long n = entry.getKey();
-        for (String word: entry.getValue()) {
+        final long n = entry.getKey();
+        for (final String word: entry.getValue()) {
           writer.printf(Locale.US, "%-26s: %,12d%n", word, n);
         }
       }

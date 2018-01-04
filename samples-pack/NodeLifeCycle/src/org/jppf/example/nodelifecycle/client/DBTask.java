@@ -53,9 +53,9 @@ public class DBTask extends AbstractTask<String> {
   public void run() {
     try {
       // submit the SQL update as a task in the transaction's worker thread
-      SQLCallable callable = new SQLCallable();
-      Integer n = NodeListener.submit(callable);
-      Throwable t = callable.throwable;
+      final SQLCallable callable = new SQLCallable();
+      final Integer n = NodeListener.submit(callable);
+      final Throwable t = callable.throwable;
       // if the SQL update failed, we store the exception into the JPPF task
       if (t != null) {
         setThrowable(t);
@@ -66,7 +66,7 @@ public class DBTask extends AbstractTask<String> {
       }
       // sleep to allow enough time to kill the node and test the recovery mechanism.
       Thread.sleep(sleepTime);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -90,25 +90,25 @@ public class DBTask extends AbstractTask<String> {
       PreparedStatement ps = null;
       try {
         c = NodeListener.getDataSource().getConnection();
-        String sql = "INSERT INTO task_result (task_id, message) VALUES(?, ?)";
+        final String sql = "INSERT INTO task_result (task_id, message) VALUES(?, ?)";
         ps = c.prepareStatement(sql);
         ps.setString(1, getId());
         ps.setString(2, getId() + ": task execution successful");
         //NodeListener.output("before executing prepared statement: " + ps);
-        int n = ps.executeUpdate();
+        final int n = ps.executeUpdate();
         return n;
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         throwable = t;
         return null;
       } finally {
         try {
           if (ps != null) ps.close();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
           if (throwable == null) throwable = t;
         }
         try {
           if (c != null) c.close();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
           if (throwable == null) throwable = t;
         }
       }

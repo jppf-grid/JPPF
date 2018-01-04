@@ -58,18 +58,18 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
   @Override
   public synchronized void handleNotification(final Notification notification, final Object handback) {
     try {
-      DependencyGraph graph = DependencyGraph.getInstance();
-      JobNotification jobNotif = (JobNotification) notification;
-      JobInformation info = jobNotif.getJobInformation();
-      String jobUuid = info.getJobUuid();
-      String jobName = info.getJobName();
+      final DependencyGraph graph = DependencyGraph.getInstance();
+      final JobNotification jobNotif = (JobNotification) notification;
+      final JobInformation info = jobNotif.getJobInformation();
+      final String jobUuid = info.getJobUuid();
+      final String jobName = info.getJobName();
 
       switch(jobNotif.getEventType()) {
         // job received from a client
         case JOB_QUEUED:
           Utils.print("processor: '%s' was queued", jobName);
-          JPPFDistributedJob job = getJob(jobUuid);
-          DependencySpec spec = job.getMetadata().getParameter(DependencySpec.DEPENDENCIES_METADATA_KEY, null);
+          final JPPFDistributedJob job = getJob(jobUuid);
+          final DependencySpec spec = job.getMetadata().getParameter(DependencySpec.DEPENDENCIES_METADATA_KEY, null);
           // incrementally update the dependency graph
           DependencyNode node = graph.addNode(spec, jobUuid);
           if (node.hasPendingDependency()) {
@@ -85,8 +85,8 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
         case JOB_ENDED:
           Utils.print("processor: '%s' has ended", jobName);
           // Retrieve the jobs whose only remaining dependency is the current job and resume them
-          List<DependencyNode> toResume = graph.jobEnded(jobUuid);
-          for (DependencyNode jobNode: toResume) {
+          final List<DependencyNode> toResume = graph.jobEnded(jobUuid);
+          for (final DependencyNode jobNode: toResume) {
             Utils.print("processor: resuming '%s'", jobNode.getId());
             jobManager.resumeJob(jobNode.getJobUuid());
           }
@@ -94,7 +94,7 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
           if ((node != null) && node.isRemoveUponCompletion()) graph.removeNode(node);
           break;
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -104,7 +104,7 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
    * @param jobUuid the uuid of the job to lookup.
    * @return a {@link JPPFDistributedJob} object, or {@code null} if there is no job with this uuid.
    */
-  private JPPFDistributedJob getJob(final String jobUuid) {
+  private static JPPFDistributedJob getJob(final String jobUuid) {
     return JPPFDriver.getInstance().getJob(jobUuid);
   }
 
@@ -116,14 +116,13 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
   @Override
   public final void run() {
     Utils.print("processor: Initializing %s", getClass().getSimpleName());
-    try {
-      // create a connection to the local (same JVM as the server) JMX server
-      JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
+    // create a connection to the local (same JVM as the server) JMX server
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
       jmx.connect();
       jobManager = jmx.getJobManager();
       // register for notifications of job events
       jobManager.addNotificationListener(this, null, null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }

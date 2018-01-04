@@ -76,7 +76,7 @@ public class LongTask extends AbstractTask<String> {
         Thread.sleep(taskLength);
         elapsed = (taskStart);
         setResult("task has run for " + elapsed + " ms");
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         setThrowable(e);
         setResult("error executing this task: " + e.getMessage());
       }

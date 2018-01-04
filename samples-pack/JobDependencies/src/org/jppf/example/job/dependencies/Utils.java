@@ -51,8 +51,8 @@ public class Utils {
    * @throws Exception if any error occurs.
    */
   static List<DependencySpec> readDependencies() throws Exception {
-    List<DependencySpec> result = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new FileReader("dependency_graph.txt"))) {
+    final List<DependencySpec> result = new ArrayList<>();
+    try (final BufferedReader reader = new BufferedReader(new FileReader("dependency_graph.txt"))) {
       String s;
       while ((s = reader.readLine()) != null) {
         s = s.trim();
@@ -60,15 +60,15 @@ public class Utils {
         if (s.isEmpty() || s.startsWith("#")) continue;
         // each line is in the form jobId ==> dependency1, ..., dependencyN | remove
         // the list of dependencies can be empty and the '| remove' flag is optional
-        String[] keyValue = s.split("==>");
+        final String[] keyValue = s.split("==>");
         if ((keyValue == null) || (keyValue.length <= 0)) continue;
-        String jobId = keyValue[0].trim();
+        final String jobId = keyValue[0].trim();
         String[] dependencies = NO_DEPENDENCY;
         boolean removeUponCompletion = false;
         if (keyValue.length > 1) {
-          String val = keyValue[1].trim();
+          final String val = keyValue[1].trim();
           // check if we have '| remove' at the end
-          String[] values = val.split("\\|");
+          final String[] values = val.split("\\|");
           if (values.length > 1) removeUponCompletion = true;
           dependencies = values[0].split(",");
           if ((dependencies != null) && (dependencies.length > 0)) {

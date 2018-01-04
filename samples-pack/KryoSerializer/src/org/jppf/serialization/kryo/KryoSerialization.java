@@ -55,16 +55,16 @@ public class KryoSerialization implements JPPFSerialization {
   private static ObjectPool<Kryo> pool = new AbstractObjectPoolQueue<Kryo>() {
     @Override
     protected Kryo create() {
-      Kryo kryo = createKryo();
+      final Kryo kryo = createKryo();
       return kryo;
     }
   };
 
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
-    Kryo kryo = pool.get();
+    final Kryo kryo = pool.get();
     try {
-      Output out = new Output(os);
+      final Output out = new Output(os);
       kryo.writeClassAndObject(out, o);
       out.flush();
     } finally {
@@ -74,11 +74,11 @@ public class KryoSerialization implements JPPFSerialization {
 
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    Kryo kryo = pool.get();
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    final Kryo kryo = pool.get();
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     if (cl != null)  kryo.setClassLoader(cl);
     try {
-      Input in = new Input(is);
+      final Input in = new Input(is);
       return kryo.readClassAndObject(in);
     } finally {
       pool.put(kryo);
@@ -106,7 +106,7 @@ public class KryoSerialization implements JPPFSerialization {
     public Object newInstance() {
       try {
         return SerializationReflectionHelper.create(c);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         throw new RuntimeException(e);
       }
     }
@@ -129,7 +129,7 @@ public class KryoSerialization implements JPPFSerialization {
    * @return an instance of {@link Kryo}.
    */
   private static Kryo createKryo() {
-    Kryo kryo = new Kryo(new CustomClassResolver(), new MapReferenceResolver());
+    final Kryo kryo = new Kryo(new CustomClassResolver(), new MapReferenceResolver());
     kryo.setAutoReset(true);
     kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 

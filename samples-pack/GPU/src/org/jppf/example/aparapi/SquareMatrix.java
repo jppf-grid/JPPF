@@ -58,7 +58,7 @@ public class SquareMatrix implements Serializable {
    */
   public SquareMatrix(final float[] values) {
     if ((values == null) || (values.length < 1)) throw new IllegalArgumentException("matrix values must be a non empty float[]");
-    int newSize = (int) (Math.sqrt(values.length));
+    final int newSize = (int) (Math.sqrt(values.length));
     if (newSize * newSize != values.length) throw new IllegalArgumentException("not a square matrix");
     this.size = newSize;
     this.values = values;
@@ -68,7 +68,7 @@ public class SquareMatrix implements Serializable {
    * Initialize this matrix with random values.
    */
   public void assignRandomValues() {
-    Random rand = new Random(System.nanoTime());
+    final Random rand = new Random(System.nanoTime());
     for (int i = 0; i < values.length; i++) {
       // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
       values[i] = RANDOM_RANGE * (2f * rand.nextFloat() - 1f);
@@ -110,7 +110,7 @@ public class SquareMatrix implements Serializable {
    */
   public SquareMatrix multiply(final SquareMatrix otherMatrix) {
     if (otherMatrix.getSize() != size) return null;
-    SquareMatrix result = new SquareMatrix(size);
+    final SquareMatrix result = new SquareMatrix(size);
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         float value = 0f;
@@ -130,7 +130,7 @@ public class SquareMatrix implements Serializable {
    * @return a new row represented as an array of <code>float</code> values.
    */
   public float[] multiplyRow(final int n, final SquareMatrix matrix) {
-    float[] result = new float[size];
+    final float[] result = new float[size];
     for (int col = 0; col < size; col++) {
       float sum = 0f;
       for (int row = 0; row < size; row++) {

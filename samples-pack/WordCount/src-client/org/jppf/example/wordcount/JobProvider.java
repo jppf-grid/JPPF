@@ -105,7 +105,7 @@ public class JobProvider extends AbstractJPPFJobStream {
     executor.shutdown();
     try {
       while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS));
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       e.printStackTrace();
     }
   }
@@ -115,7 +115,7 @@ public class JobProvider extends AbstractJPPFJobStream {
     int taskCount  = 0;
     int totalJobArticles = 0;
     long totalLength = 0L;
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(String.format("WordCount-%04d", (getJobCount() + 1)));
     // job can be sent over this number of channels in parallel
     job.getClientSLA().setMaxChannels(params.nbChannels);
@@ -124,14 +124,14 @@ public class JobProvider extends AbstractJPPFJobStream {
       while (!reader.isClosed() && (taskCount < params.nbTasks)) {
         int articleCount = 0;
         String article = null;
-        List<String> list = new ArrayList<>(params.nbArticles);
+        final List<String> list = new ArrayList<>(params.nbArticles);
         // read up to {params.nbArticles} articles for each task
         while (!reader.isClosed() && (articleCount < params.nbArticles)) {
           article = reader.nextArticle();
           if (article == null) break;
           list.add(article);
           articleCount++;
-          int len = article.length();
+          final int len = article.length();
           totalLength+= len;
           if (len < minArticleLength) minArticleLength = len;
           if (len > maxArticleLength) maxArticleLength = len;
@@ -149,7 +149,7 @@ public class JobProvider extends AbstractJPPFJobStream {
         job.getMetadata().setParameter("startTime", System.nanoTime());
         return job;
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     return null;
@@ -238,23 +238,23 @@ public class JobProvider extends AbstractJPPFJobStream {
       long jobRedirects = 0L;
       long jobArticles = 0L;
       for (Task<?> task: job.getAllResults()) {
-        WordCountTask wTask = (WordCountTask) task;
-        int nbRedirects = wTask.getNbRedirects();
+        final WordCountTask wTask = (WordCountTask) task;
+        final int nbRedirects = wTask.getNbRedirects();
         if (nbRedirects > 0) totalRedirects.addAndGet(nbRedirects);
         jobRedirects += nbRedirects;
         jobArticles += wTask.getNbArticles();
-        Map<String, Long> map = wTask.getResult();
+        final Map<String, Long> map = wTask.getResult();
         if (map == null) continue;
         task.setResult(null); // to free some memory asap
-        for (Map.Entry<String, Long> entry: map.entrySet()) {
-          Long count = mergedResults.get(entry.getKey());
-          long n = entry.getValue() + (count == null ? 0L : count);
+        for (final Map.Entry<String, Long> entry: map.entrySet()) {
+          final Long count = mergedResults.get(entry.getKey());
+          final long n = entry.getValue() + (count == null ? 0L : count);
           mergedResults.put(entry.getKey(), n);
         }
       }
       totalTasksProcessed.addAndGet(job.executedTaskCount());
       // job completion time in millis
-      long jobCompletionTime = (System.nanoTime() - (Long) job.getMetadata().getParameter("startTime")) / 1_000_000L;
+      final long jobCompletionTime = (System.nanoTime() - (Long) job.getMetadata().getParameter("startTime")) / 1_000_000L;
       System.out.printf("processed results of job '%s' - %,4d tasks, %,6d articles, including %,5d redirects. Completion time: %s%n",
         job.getName(), job.executedTaskCount(), jobArticles, jobRedirects, StringUtils.toStringDuration(jobCompletionTime));
     }

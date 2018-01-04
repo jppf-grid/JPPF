@@ -34,22 +34,22 @@ public class NetworkInterceptorDemo {
    * @param args not used.
    */
   public static void main(final String[] args) {
-    String userName = System.getProperty("jppf.user.name");
+    final String userName = System.getProperty("jppf.user.name");
     System.out.println("demo: running network interceptor demo with user name = " + userName);
     // upon creating the client, the interceptor will be invoked
-    try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = new JPPFJob();
+    try (final JPPFClient client = new JPPFClient()) {
+      final JPPFJob job = new JPPFJob();
       job.setName("Network Interceptor Demo");
       job.add(new MyTask()).setId("task 1");
       System.out.println("demo: submitting demo job");
-      List<Task<?>> results = client.submitJob(job);
+      final List<Task<?>> results = client.submitJob(job);
       System.out.printf("demo: ***** results for '%s' *****%n", job.getName());
-      for (Task<?> task : results) {
+      for (final Task<?> task : results) {
         if (task.getThrowable() != null) System.out.printf("demo: got exception: %s%n",
           ExceptionUtils.getStackTrace(task.getThrowable()));
         else System.out.printf("demo: got result: %s%n", task.getResult());
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

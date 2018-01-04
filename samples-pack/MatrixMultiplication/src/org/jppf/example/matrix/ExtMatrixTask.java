@@ -65,7 +65,7 @@ public class ExtMatrixTask extends AbstractTask<double[][]> {
         }
       }
       setResult(computeResult);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     } finally {
       // no need to serialize and transport the input back to the client

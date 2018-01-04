@@ -60,7 +60,7 @@ final class CryptoHelper {
   public static void main(final String... args) {
     try {
       generateKeyStore(args[0]);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -71,26 +71,26 @@ final class CryptoHelper {
    * @throws Exception if any error occurs.
    */
   private static void generateKeyStore(final String pwd) throws Exception {
-    byte[] passwordBytes = pwd.getBytes();
+    final byte[] passwordBytes = pwd.getBytes();
     // encode the password in Base64
-    byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
+    final byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
     // store the encoded password to a file
-    try (FileOutputStream fos = new FileOutputStream(getPasswordFilename())) {
+    try (final FileOutputStream fos = new FileOutputStream(getPasswordFilename())) {
       fos.write(encodedBytes);
       fos.flush();
     }
-    char[] password = pwd.toCharArray();
-    KeyStore ks = KeyStore.getInstance(getKeystoreProvider());
+    final char[] password = pwd.toCharArray();
+    final KeyStore ks = KeyStore.getInstance(getKeystoreProvider());
     // create an empty keystore
     ks.load(null, password);
     // generate the initial secret key
-    KeyGenerator gen = KeyGenerator.getInstance(getAlgorithm());
-    SecretKey key = gen.generateKey();
+    final KeyGenerator gen = KeyGenerator.getInstance(getAlgorithm());
+    final SecretKey key = gen.generateKey();
     // save the key in the keystore
-    KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(key);
+    final KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(key);
     ks.setEntry(getKeyAlias(), skEntry, new KeyStore.PasswordProtection(password));
     // save the keystore to a file
-    try (FileOutputStream fos = new FileOutputStream(getKeystoreFilename())) {
+    try (final FileOutputStream fos = new FileOutputStream(getKeystoreFilename())) {
       ks.store(fos, password);
     }
   }
@@ -102,14 +102,14 @@ final class CryptoHelper {
   static char[] getPassword() {
     if (some_chars == null) {
       try {
-        String path = getKeystoreFolder() + getPasswordFilename();
-        InputStream is = CryptoHelper.class.getClassLoader().getResourceAsStream(path);
+        final String path = getKeystoreFolder() + getPasswordFilename();
+        final InputStream is = CryptoHelper.class.getClassLoader().getResourceAsStream(path);
         // read the encoded password
-        byte[] encodedBytes = StreamUtils.getInputStreamAsByte(is);
+        final byte[] encodedBytes = StreamUtils.getInputStreamAsByte(is);
         // decode the password from Base64
-        byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
+        final byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
         some_chars = new String(passwordBytes).toCharArray();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -128,15 +128,15 @@ final class CryptoHelper {
     if (secretKey == null) {
       try {
         // get the keystore password
-        char[] password = getPassword();
-        ClassLoader cl = CryptoHelper.class.getClassLoader();
-        InputStream is = cl.getResourceAsStream(getKeystoreFolder() + getKeystoreFilename());
-        KeyStore ks = KeyStore.getInstance(getKeystoreProvider());
+        final char[] password = getPassword();
+        final ClassLoader cl = CryptoHelper.class.getClassLoader();
+        final InputStream is = cl.getResourceAsStream(getKeystoreFolder() + getKeystoreFilename());
+        final KeyStore ks = KeyStore.getInstance(getKeystoreProvider());
         // load the keystore
         ks.load(is, password);
         // get the secret key from the keystore
         secretKey = (SecretKey) ks.getKey(getKeyAlias(), password);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }
@@ -151,17 +151,17 @@ final class CryptoHelper {
    */
   static void encryptAndWrite(final String message, final OutputStream destination) throws Exception {
     // create a cipher instance
-    Cipher cipher = Cipher.getInstance(getTransformation());
+    final Cipher cipher = Cipher.getInstance(getTransformation());
     // init the cipher in encryption mode
     cipher.init(Cipher.ENCRYPT_MODE, getSecretKey());
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     // obtain a cipher output stream
-    try (DataOutputStream cos = new DataOutputStream(new CipherOutputStream(baos, cipher))) {
+    try (final DataOutputStream cos = new DataOutputStream(new CipherOutputStream(baos, cipher))) {
       // finally, encrypt the message
       cos.writeUTF(message);
     }
-    DataOutputStream dos = new DataOutputStream(destination);
-    byte[] encrypted = baos.toByteArray();
+    final DataOutputStream dos = new DataOutputStream(destination);
+    final byte[] encrypted = baos.toByteArray();
     // write the length of the encrypted data
     dos.writeInt(encrypted.length);
     // write the encrypted data
@@ -176,18 +176,18 @@ final class CryptoHelper {
    * @throws Exception if any error occurs while decrypting the data.
    */
   static String readAndDecrypt(final InputStream source) throws Exception {
-    DataInputStream dis = new DataInputStream(source);
+    final DataInputStream dis = new DataInputStream(source);
     // read the length of the encrypted data
-    int len = dis.readInt();
-    byte[] encrypted = new byte[len];
+    final int len = dis.readInt();
+    final byte[] encrypted = new byte[len];
     // read the encrypted data
     dis.read(encrypted);
     // decrypt the message using the secret key stored in the keystore
-    Cipher cipher = Cipher.getInstance(getTransformation());
+    final Cipher cipher = Cipher.getInstance(getTransformation());
     // init the cipher in decryption mode
     cipher.init(Cipher.DECRYPT_MODE, getSecretKey());
     // obtain a cipher input stream
-    try (DataInputStream cis = new DataInputStream(
+    try (final DataInputStream cis = new DataInputStream(
       new CipherInputStream(new ByteArrayInputStream(encrypted), cipher))) {
       // finally, decrypt the message
       return cis.readUTF();

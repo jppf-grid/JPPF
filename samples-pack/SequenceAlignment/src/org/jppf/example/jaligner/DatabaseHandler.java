@@ -29,8 +29,7 @@ import org.jppf.utils.streams.StreamUtils;
  * as the sequences in the database.
  * @author Laurent Cohen
  */
-public class DatabaseHandler
-{
+public class DatabaseHandler {
   /**
    * Data Input Stream from which to read the length of the sequences.
    */
@@ -64,8 +63,7 @@ public class DatabaseHandler
    * If null, the default charset will be used.
    * @throws Exception if an IO error occurs.
    */
-  public DatabaseHandler(final String path, final String indexPath, final String charset) throws Exception
-  {
+  public DatabaseHandler(final String path, final String indexPath, final String charset) throws Exception {
     this.charset = (charset == null) ? Charset.defaultCharset().name() : charset;
     dis = new DataInputStream(new BufferedInputStream(new FileInputStream(indexPath)));
     reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), this.charset));
@@ -76,30 +74,24 @@ public class DatabaseHandler
    * @return the sequence as a string or null if end of file was reached.
    * @throws Exception if an IO error occurs.
    */
-  public String nextSequence() throws Exception
-  {
+  public String nextSequence() throws Exception {
     if (eof) return null;
     int length = 0;
-    try
-    {
+    try {
       length = dis.readInt();
-    }
-    catch(@SuppressWarnings("unused") EOFException e)
-    {
+    } catch (@SuppressWarnings("unused") final EOFException e) {
       eof = true;
       StreamUtils.closeSilent(dis);
       StreamUtils.closeSilent(reader);
       return null;
     }
-    if (length > buffSize)
-    {
+    if (length > buffSize) {
       buffSize = length;
       buffer = new char[buffSize];
     }
     int count = 0;
-    while (count < length)
-    {
-      int n = reader.read(buffer, 0, length);
+    while (count < length) {
+      final int n = reader.read(buffer, 0, length);
       if (n < 0) break;
       count += n;
     }
@@ -115,61 +107,47 @@ public class DatabaseHandler
    * @return the number of sequences in the database.
    * @throws Exception if an IO error occurs.
    */
-  public static int generateIndex(final String path, final String indexPath, final String charset) throws Exception
-  {
+  public static int generateIndex(final String path, final String indexPath, final String charset) throws Exception {
     String cs = charset;
     if (cs == null) cs = Charset.defaultCharset().name();
-    Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
-    DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
+    final Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
+    final DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
     int nbSequences = 0;
-    try
-    {
+    try {
       boolean end = false;
       int c = reader.read();
-      while (!end)
-      {
+      while (!end) {
         int length = 0;
-        if (c == '>')
-        {
+        if (c == '>') {
           length++;
           boolean lineEnd = false;
-          while (!lineEnd)
-          {
+          while (!lineEnd) {
             c = reader.read();
-            if (c == -1)
-            {
+            if (c == -1) {
               lineEnd = true;
               end = true;
-            }
-            else
-            {
+            } else {
               length++;
               if (c == '\n') lineEnd = true;
             }
           }
           boolean sequenceEnd = false;
-          while (!sequenceEnd)
-          {
+          while (!sequenceEnd) {
             c = reader.read();
-            if ((c == '>') || (c == -1))
-            {
+            if ((c == '>') || (c == -1)) {
               sequenceEnd = true;
               dos.writeInt(length);
               nbSequences++;
               //if (nbSequences % 100 == 0) System.out.println("indexed "+nbSequences+" sequences");
-              if (c == -1)
-              {
+              if (c == -1) {
                 end = true;
               }
-            }
-            else length++;
+            } else length++;
           }
         }
       }
       dos.flush();
-    }
-    finally
-    {
+    } finally {
       dos.close();
       reader.close();
     }

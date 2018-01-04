@@ -47,7 +47,7 @@ public class MyTask extends AbstractTask<String> {
       Thread.sleep(duration);
       System.out.println("task " + getId() + " completed successfully");
       setResult("successful completion");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       System.out.println("task " + getId() + " completed with error [" + e.getClass().getName() + ": " + e.getMessage() + ']');
       setThrowable(e);
     }

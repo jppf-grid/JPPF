@@ -91,13 +91,13 @@ public class ClassPathDiff {
    * @param target the target classpath.
    */
   private void computeDifferences(final ClassPath source, final ClassPath target) {
-    for (Map.Entry<String, String> sourceEntry : source.elements().entrySet()) {
-      String name = sourceEntry.getKey();
-      String targetSignature = target.getElementSignature(name);
+    for (final Map.Entry<String, String> sourceEntry : source.elements().entrySet()) {
+      final String name = sourceEntry.getKey();
+      final String targetSignature = target.getElementSignature(name);
       // element in the source but not in the target: it has been deleted
       if (targetSignature == null) deletedElements.add(name);
       else {
-        String sourceSignature = sourceEntry.getValue();
+        final String sourceSignature = sourceEntry.getValue();
         // source signature different from the target: element has been updated
         if (!targetSignature.equals(sourceSignature)) updatedElements.add(name);
         // signatures are equal: no change
@@ -105,9 +105,9 @@ public class ClassPathDiff {
       }
     }
     // compute which elements were added
-    for (Map.Entry<String, String> targetEntry : target.elements().entrySet()) {
-      String name = targetEntry.getKey();
-      String sourceSignature = source.getElementSignature(name);
+    for (final Map.Entry<String, String> targetEntry : target.elements().entrySet()) {
+      final String name = targetEntry.getKey();
+      final String sourceSignature = source.getElementSignature(name);
       // element in the target but not in the source: it has been added
       if (sourceSignature == null) newElements.add(name);
     }
@@ -115,7 +115,7 @@ public class ClassPathDiff {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[unchanged=").append(unchangedElements);
     sb.append(", new=").append(newElements);

@@ -82,7 +82,7 @@ public class WebCrawlerRunner {
     WebCrawlerRunner.option = option;
     urlCount = 0;
     createOrDisplayWaitWindow();
-    CrawlExecution exec = new CrawlExecution(url, query, depth);
+    final CrawlExecution exec = new CrawlExecution(url, query, depth);
     executor.execute(exec);
   }
 
@@ -96,11 +96,11 @@ public class WebCrawlerRunner {
    */
   public static List<Task<?>> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception {
     int n = 0;
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     for (String url : urls) {
       try {
         job.add(new CrawlerTask(url, query, ++n, doSearch));
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         log.error(t.getMessage(), t);
         if (t instanceof Exception) throw (Exception) t;
         else if (t instanceof Error) throw (Error) t;
@@ -135,8 +135,8 @@ public class WebCrawlerRunner {
       }
       progressBar = new JProgressBar();
       progressBar.setIndeterminate(true);
-      Font font = progressBar.getFont();
-      Font f = new Font(font.getName(), Font.BOLD, 14);
+      final Font font = progressBar.getFont();
+      final Font f = new Font(font.getName(), Font.BOLD, 14);
       progressBar.setFont(f);
       progressBar.setString("Calculating, please wait ...");
       progressBar.setStringPainted(true);
@@ -147,10 +147,10 @@ public class WebCrawlerRunner {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        Dimension d = window.getOwner().getSize();
-        Point p = window.getOwner().getLocationOnScreen();
-        int w = 300;
-        int h = 60;
+        final Dimension d = window.getOwner().getSize();
+        final Point p = window.getOwner().getLocationOnScreen();
+        final int w = 300;
+        final int h = 60;
         window.setBounds(p.x + (d.width - w) / 2, p.y + (d.height - h) / 2, w, h);
         updateProgress(0);
         window.setVisible(true);
@@ -219,29 +219,29 @@ public class WebCrawlerRunner {
     @Override
     public void run() {
       try {
-        long start = System.nanoTime();
-        Set<LinkMatch> results = new TreeSet<>(new LinkMatch.Comparator());
-        Set<String> toSearch = new HashSet<>();
+        final long start = System.nanoTime();
+        final Set<LinkMatch> results = new TreeSet<>(new LinkMatch.Comparator());
+        final Set<String> toSearch = new HashSet<>();
         toSearch.add(url);
-        List<String> temp = new ArrayList<>();
+        final List<String> temp = new ArrayList<>();
         temp.add(url);
         for (int i = 0; i <= depth; i++) {
-          boolean doSearch = (i >= depth);
-          List<Task<?>> tasks = doPerform(doSearch ? toSearch : temp, query, doSearch);
+          final boolean doSearch = (i >= depth);
+          final List<Task<?>> tasks = doPerform(doSearch ? toSearch : temp, query, doSearch);
           temp.clear();
-          for (Task<?> t : tasks) {
-            CrawlerTask task = (CrawlerTask) t;
+          for (final Task<?> t : tasks) {
+            final CrawlerTask task = (CrawlerTask) t;
             if (task.getThrowable() != null) {
-              String msg = "Exception in task #" + task.getNumber() + ", url: " + task.getUrl();
+              final String msg = "Exception in task #" + task.getNumber() + ", url: " + task.getUrl();
               log.info(msg, task.getThrowable());
               continue;
             }
-            Collection<LinkMatch> matchList = task.getMatchedLinks();
-            for (LinkMatch lm : matchList) {
+            final Collection<LinkMatch> matchList = task.getMatchedLinks();
+            for (final LinkMatch lm : matchList) {
               if (!results.contains(lm)) results.add(lm);
             }
-            Collection<String> urlList = task.getToVisit();
-            for (String s : urlList) {
+            final Collection<String> urlList = task.getToVisit();
+            for (final String s : urlList) {
               if (!toSearch.contains(s)) {
                 toSearch.add(s);
                 temp.add(s);
@@ -249,16 +249,16 @@ public class WebCrawlerRunner {
             }
           }
         }
-        StringBuilder sb = new StringBuilder();
-        for (LinkMatch lm : results) {
+        final StringBuilder sb = new StringBuilder();
+        for (final LinkMatch lm : results) {
           sb.append(StringUtils.padLeft("" + lm.relevance, ' ', 6)).append("     ");
           sb.append(lm.url).append('\n');
         }
         ((AbstractOption) option.findFirstWithName("/resultText")).setValue(sb.toString());
-        long elapsed = DateTimeUtils.elapsedFrom(start);
+        final long elapsed = DateTimeUtils.elapsedFrom(start);
         hideWaitWindow();
         log.info("Computation done in " + elapsed + " ms");
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

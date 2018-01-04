@@ -54,12 +54,12 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
       if (debugEnabled) log.debug("starting trade updater");
       initializeData();
       // start the ticker
-      Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
+      final Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
           config.getInt("nbTickerEvents", 0), dataFactory);
       ticker.addTickerListener(marketDataHandler);
       ticker.addTickerListener(this);
       print("starting ticker ...");
-      long start = System.nanoTime();
+      final long start = System.nanoTime();
       new Thread(ticker, "ticker thread").start();
       // let it run for the configured time
       Thread.sleep(config.getLong("simulationDuration", 60000L));
@@ -70,12 +70,12 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
       while (!jobExecutor.isTerminated()) Thread.sleep(10);
       resultsExecutor.shutdown();
       while (!resultsExecutor.isTerminated()) Thread.sleep(10);
-      long elapsed = DateTimeUtils.elapsedFrom(start);
+      final long elapsed = DateTimeUtils.elapsedFrom(start);
       statsCollector.setTotalTime(elapsed);
       print(statsCollector.toString());
       marketDataHandler.close();
       Hazelcast.shutdownAll();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       System.out.println(e.getMessage());
       log.error(e.getMessage(), e);
     }

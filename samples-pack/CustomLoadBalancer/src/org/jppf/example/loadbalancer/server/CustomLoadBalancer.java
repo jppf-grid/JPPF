@@ -124,17 +124,17 @@ public class CustomLoadBalancer extends AbstractBundler<LoadBalancingProfile> im
   private void computeBundleSize() {
     if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
     // Get the job metadata in an easy to use format
-    TypedProperties props = new TypedProperties(getJob().getMetadata().getAll());
+    final TypedProperties props = new TypedProperties(getJob().getMetadata().getAll());
     // the maximum memory footprint of each task in bytes
-    long taskMemory = props.getLong("task.memory", 10 * 1024);
+    final long taskMemory = props.getLong("task.memory", 10 * 1024);
     // fetch the length of a task in milliseconds
-    long taskTime = props.getLong("task.time", 10);
+    final long taskTime = props.getLong("task.time", 10);
     // fetch the maximum allowed time for execution of a single set of tasks on a node
     long allowedTime = props.getLong("allowed.time", -1);
     // if allowed time is not defined we assume no time limit
     if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
     // get the number of processing threads in the node
-    int nbThreads = getChannelConfiguration().getJppf().get(JPPFProperties.PROCESSING_THREADS);
+    final int nbThreads = getChannelConfiguration().getJppf().get(JPPFProperties.PROCESSING_THREADS);
     // max node heap size of the node in bytes
     long nodeMemory = getChannelConfiguration().getRuntime().getLong("maxMemory");
     // we assume 20 MB of the node's memory is taken by JPPF code and add-ons
@@ -155,7 +155,7 @@ public class CustomLoadBalancer extends AbstractBundler<LoadBalancingProfile> im
     // finally, store the computation result, ensuring that 1 <= size <= maxSize
     bundleSize = Math.max(1, Math.min(maxTasks, maxSize()));
     // for debugging and logging purposes
-    String id = props.getString("id", "unknown id");
+    final String id = props.getString("id", "unknown id");
     // log the new bundle size
     if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " computed new bundle size = " + bundleSize + " for job id = " + id);
   }

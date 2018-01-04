@@ -53,9 +53,9 @@ public class FTPTask extends AbstractTask<String> {
   public void run() {
     try {
       // retrieve the FTP host from the data provider
-      DataProvider dataProvider = getDataProvider();
-      String host = dataProvider.getParameter("ftp.host");
-      FTPClientWrapper client = new FTPClientWrapper();
+      final DataProvider dataProvider = getDataProvider();
+      final String host = dataProvider.getParameter("ftp.host");
+      final FTPClientWrapper client = new FTPClientWrapper();
       // this is just for demonstration purposes, the password should never be exposed like this!
       client.open(host, 12222, "admin", "admin");
 
@@ -69,7 +69,7 @@ public class FTPTask extends AbstractTask<String> {
       // set all occurrences of JPPF in bold
       text = text.replace("JPPF", "<b>JPPF</b>");
       // add barebone HTML header and footer
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append("<html><body>").append(text).append("</body></html>");
       FileUtils.writeTextFile(outFile, sb.toString());
       // upload the HTML file to the server.
@@ -77,7 +77,7 @@ public class FTPTask extends AbstractTask<String> {
 
       client.close();
       setResult("execution successful");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setResult("execution failed: " + e.getClass().getName() + ": " + e.getMessage());
       setThrowable(e);
     }

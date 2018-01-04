@@ -66,20 +66,20 @@ public class DiscoveryHook implements InitializationHook {
    * Read the servers from the configuration.
    * @return a {@link Queue} of <i<>host:port</i> strings.
    */
-  private Queue<String> populateServers() {
+  private static Queue<String> populateServers() {
     @SuppressWarnings("unchecked")
     Queue<String> queue = (Queue<String>) NodeRunner.getPersistentData("jppf.servers");
     if (queue == null) {
       queue = new ConcurrentLinkedQueue<>();
       // servers are configured via the property "jppf.drivers.discovery" in the node's configuration
-      String s = JPPFConfiguration.getProperties().getString("jppf.drivers.discovery", "").trim();
+      final String s = JPPFConfiguration.getProperties().getString("jppf.drivers.discovery", "").trim();
       if (!"".equals(s)) {
         // servers are defined as a space-separated list of host:port strings
         // this defines both the servers and the order in which the node will try
         // to connect to them.
-        String[] ids = s.split("\\s");
+        final String[] ids = s.split("\\s");
         System.out.println("*** found " + ids.length + " servers ***");
-        for (String id : ids) {
+        for (final String id : ids) {
           queue.offer(id);
           System.out.println("  registered server " + id);
         }
@@ -93,9 +93,9 @@ public class DiscoveryHook implements InitializationHook {
    * Set the specified server config in the current JPPF configuration.
    * @param server the server to configure.
    */
-  private void configureServer(final String server) {
-    TypedProperties jppfConfig = JPPFConfiguration.getProperties();
-    String[] tokens = server.split(":");
+  private static void configureServer(final String server) {
+    final TypedProperties jppfConfig = JPPFConfiguration.getProperties();
+    final String[] tokens = server.split(":");
     // modify the node configuration so it will ocnnect to the specified server
     jppfConfig.setProperty("jppf.server.host", tokens[0]);
     jppfConfig.setProperty("jppf.server.port", tokens[1]);

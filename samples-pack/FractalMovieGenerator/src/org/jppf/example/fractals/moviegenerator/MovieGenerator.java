@@ -77,15 +77,15 @@ public class MovieGenerator {
   public static void main(final String[] args) {
     MovieGenerator generator = null;
     try {
-      Map<String, Object> map = new CLIHandler().processArguments(args);
-      String inputFile = (String) map.get("-i");
+      final Map<String, Object> map = new CLIHandler().processArguments(args);
+      final String inputFile = (String) map.get("-i");
       String outputFile = (String) map.get("-o");
       if (!outputFile.toLowerCase().endsWith(".avi")) outputFile = outputFile + ".avi";
-      int frameRate = (Integer) map.get("-f");
-      int transitionTime = (Integer) map.get("-t");
+      final int frameRate = (Integer) map.get("-f");
+      final int transitionTime = (Integer) map.get("-t");
       generator = new MovieGenerator(inputFile, outputFile, frameRate, transitionTime);
       generator.generate();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (generator != null) generator.dispose();
@@ -103,15 +103,15 @@ public class MovieGenerator {
   public MovieGenerator(final String inputFile, final String outputFile, final int frameRate, final int transitionTime) throws Exception {
     this.frameRate = frameRate;
     this.transitionTime = transitionTime;
-    int maxJobs = JPPFConfiguration.getProperties().getInt("jppf.fractals.concurrent.jobs", 1);
+    final int maxJobs = JPPFConfiguration.getProperties().getInt("jppf.fractals.concurrent.jobs", 1);
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("MovieGenerator"));
     runner = new MandelbrotRunner(maxJobs) {
       @Override
       protected List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
         // override SLA settings to ensure a job won't get stuck if a node fails
-        TypedProperties config = JPPFConfiguration.getProperties();
-        int maxExpirations = config.getInt("jppf.fractals.dispatch.max.timeouts", 1);
-        long timeout = config.getLong("jppf.fractals.dispatch.timeout", 15000L);
+        final TypedProperties config = JPPFConfiguration.getProperties();
+        final int maxExpirations = config.getInt("jppf.fractals.dispatch.max.timeouts", 1);
+        final long timeout = config.getLong("jppf.fractals.dispatch.timeout", 15000L);
         job.getSLA().setMaxDispatchExpirations(maxExpirations);
         job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(timeout));
         return super.submitJob(job, cfg);
@@ -130,20 +130,20 @@ public class MovieGenerator {
    */
   public void generate() throws Exception {
     // -1 because we add the second parameter set as last transition step
-    int nbFrames = frameRate * transitionTime - 1;
-    List<AbstractFractalConfiguration> records = runner.getRecords();
-    DecimalFormat nf = new DecimalFormat("00000");
+    final int nbFrames = frameRate * transitionTime - 1;
+    final List<AbstractFractalConfiguration> records = runner.getRecords();
+    final DecimalFormat nf = new DecimalFormat("00000");
     // for each record, define the transition between it and the next record as nbFrames images
     for (int i=0; i<records.size()-1; i++) {
       System.out.println("computing " + (nbFrames+1) + " frames for transition #" + nf.format(i+1) + " ...");
-      MandelbrotConfiguration cfgFirst = (MandelbrotConfiguration) records.get(i);
-      MandelbrotConfiguration cfgLast = (MandelbrotConfiguration) records.get(i+1);
+      final MandelbrotConfiguration cfgFirst = (MandelbrotConfiguration) records.get(i);
+      final MandelbrotConfiguration cfgLast = (MandelbrotConfiguration) records.get(i+1);
       System.out.println("cfgFirst=" + cfgFirst + ", cfgLast=" + cfgLast);
-      AbstractStepVector sv = new NonLinearStepVector(cfgFirst, cfgLast, nbFrames);
+      final AbstractStepVector sv = new NonLinearStepVector(cfgFirst, cfgLast, nbFrames);
       System.out.println("sv=" + sv);
-      Queue<Future<Future<GeneratedImage>>> futures = new LinkedBlockingQueue<>();
+      final Queue<Future<Future<GeneratedImage>>> futures = new LinkedBlockingQueue<>();
       for (int j=0; j<nbFrames; j++) {
-        MandelbrotConfiguration cfg = new MandelbrotConfiguration(cfgFirst.x  + sv.getX(j), cfgFirst.y + sv.getY(j),
+        final MandelbrotConfiguration cfg = new MandelbrotConfiguration(cfgFirst.x  + sv.getX(j), cfgFirst.y + sv.getY(j),
             cfgFirst.d + sv.getD(j), cfgFirst.maxIterations + (int) Math.round(sv.getN(j)));
         cfg.width = cfgFirst.width;
         cfg.height = cfgFirst.height;
@@ -153,8 +153,8 @@ public class MovieGenerator {
       int j = 0;
       Future<Future<GeneratedImage>> future;
       while ((future = futures.poll()) != null) {
-        Future<GeneratedImage> f = future.get();
-        BufferedImage image = f.get().getImage();
+        final Future<GeneratedImage> f = future.get();
+        final BufferedImage image = f.get().getImage();
         if (j == 0) ImageIO.write(image, "png", new File("data/frame-0.png")); // for debug
         writeImageToStream(image);
         System.out.println("  transition #" + nf.format(i+1) + " frame #" + nf.format(j+1) + " done");
@@ -172,12 +172,12 @@ public class MovieGenerator {
    */
   private void initAviStream(final File file, final Format format, final AbstractFractalConfiguration cfg) throws IOException {
     // Make the format more specific
-    Format fmt  = format.prepend(MediaTypeKey, MediaType.VIDEO, FrameRateKey, new Rational(frameRate, 1), WidthKey, cfg.width, HeightKey, cfg.height);
+    final Format fmt  = format.prepend(MediaTypeKey, MediaType.VIDEO, FrameRateKey, new Rational(frameRate, 1), WidthKey, cfg.width, HeightKey, cfg.height);
     // Create the writer
     out = new AVIWriter(file);
     // Add a track to the writer
     out.addTrack(fmt);
-    ColorModel cm = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB).getColorModel();
+    final ColorModel cm = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB).getColorModel();
     out.setPalette(0, cm);
   }
 
@@ -198,7 +198,7 @@ public class MovieGenerator {
       if (out != null) out.close();
       if (runner != null) runner.dispose();
       if (executor != null) executor.shutdownNow();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }

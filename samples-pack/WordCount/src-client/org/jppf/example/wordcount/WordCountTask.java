@@ -57,27 +57,27 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
     Map<String, Long> countMap = null;
     try {
       for (String article: articles) {
-        String text = tagValue(article, "text");
+        final String text = tagValue(article, "text");
         // skip articles that are mere redirects
         if (text.startsWith("#REDIRECT")) {
           nbRedirects++;
           continue;
         }
-        int limit = text.length() - 1;
+        final int limit = text.length() - 1;
         StringBuilder sb = new StringBuilder();
         for (int i=0; i<text.length(); i++) {
-          char c = Character.toLowerCase(text.charAt(i));
-          boolean b = isWordChar(c);
+          final char c = Character.toLowerCase(text.charAt(i));
+          final boolean b = isWordChar(c);
           if (b) sb.append(c);
           if ((i >= limit) || !b) {
-            String key = sb.toString();
+            final String key = sb.toString();
             if (isWord(key)) {
               if (countMap == null) {
                 countMap = new HashMap<>();
                 countMap.put(key, 1L);
               } else {
-                Long count = countMap.get(key);
-                long n = (count == null) ? 1L : count + 1;
+                final Long count = countMap.get(key);
+                final long n = (count == null) ? 1L : count + 1;
                 countMap.put(key, n);
               }
             }
@@ -99,14 +99,14 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    * @param tag the tag to look for.
    * @return the tag content as a string.
    */
-  private String tagValue(final String text, final String tag) {
-    String startTag = "<" + tag;
+  private static String tagValue(final String text, final String tag) {
+    final String startTag = "<" + tag;
     int idx = text.indexOf(startTag);
     if (idx < 0) return null;
     idx = text.indexOf('>', idx + startTag.length());
     if (idx < 0) return null;
-    String endTag = "</" + tag + ">";
-    int idx2 = text.indexOf(endTag, idx);
+    final String endTag = "</" + tag + ">";
+    final int idx2 = text.indexOf(endTag, idx);
     if (idx2 < 0) return null;
     return text.substring(idx + 1, idx2);
   }
@@ -116,7 +116,7 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    * @param c the character to examine.
    * @return <code>true</code> if the character is part of a word, <code>false</code> otherwise.
    */
-  private boolean isWordChar(final char c) {
+  private static boolean isWordChar(final char c) {
     //return ((c >= 'a') && (c <='z')) || ((c >= 'A') && (c <='Z')) || (c == '-');
     return ((c >= 'a') && (c <='z')) || (c == '-');
   }
@@ -126,7 +126,7 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    * @param s the character sequence to examine.
    * @return <code>true</code> if the character is part of a word, <code>false</code> otherwise.
    */
-  private boolean isWord(final String s) {
+  private static boolean isWord(final String s) {
     return NodeListener.isInDictionary(s);
   }
 

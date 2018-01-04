@@ -37,7 +37,7 @@ public class MandelbrotRunner extends AbstractRunner {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(MandelbrotRunner.class);
+  private static Logger log = LoggerFactory.getLogger(MandelbrotRunner.class);
   /**
    * The android demo apk in memory, so it can be sent with a job to run on an Android node.
    */
@@ -68,7 +68,7 @@ public class MandelbrotRunner extends AbstractRunner {
 
   @Override
   protected List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
-    int nbTask = cfg.height;
+    final int nbTask = cfg.height;
     log.info("Executing " + nbTask + " tasks");
     job.getSLA().getClassPath().add("android-fractal-demo.apk", androidApk);
     job.getMetadata().setParameter("jppf.node.integration.class", "org.jppf.android.demo.FractalEventHandler");
@@ -78,11 +78,11 @@ public class MandelbrotRunner extends AbstractRunner {
 
   @Override
   protected BufferedImage generateImage(final List<Task<?>> taskList, final AbstractFractalConfiguration cfg) throws Exception {
-    MandelbrotConfiguration config = (MandelbrotConfiguration) cfg;
-    BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
+    final MandelbrotConfiguration config = (MandelbrotConfiguration) cfg;
+    final BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
     for (int j=0; j<config.height; j++) {
-      MandelbrotTask task = (MandelbrotTask) taskList.get(j);
-      int[] colors = task.getColors();
+      final MandelbrotTask task = (MandelbrotTask) taskList.get(j);
+      final int[] colors = task.getColors();
       for (int i=0; i<config.width; i++) image.setRGB(i, config.height - j - 1, colors[i]);
     }
     return image;
@@ -92,9 +92,9 @@ public class MandelbrotRunner extends AbstractRunner {
   public void loadRecords(final String filename) {
     try {
       records.clear();
-      List<String> list = FileUtils.textFileAsLines(new FileReader(filename));
+      final List<String> list = FileUtils.textFileAsLines(new FileReader(filename));
       for (String csv: list) records.add(new MandelbrotConfiguration(csv));
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
     }
   }
 
@@ -104,9 +104,9 @@ public class MandelbrotRunner extends AbstractRunner {
    */
   private static Location<?> initApk() {
     try {
-      Location<?> file = new FileLocation("data/android-fractal-demo.apk");
+      final Location<?> file = new FileLocation("data/android-fractal-demo.apk");
       return file.copyTo(new MemoryLocation((int) file.size()));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;

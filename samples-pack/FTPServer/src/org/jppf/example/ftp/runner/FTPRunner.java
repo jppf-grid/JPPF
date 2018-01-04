@@ -49,7 +49,7 @@ public class FTPRunner {
     try {
       jppfClient = new JPPFClient();
       perform();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -63,19 +63,19 @@ public class FTPRunner {
   private static void perform() throws Exception {
     output("Running FTP demo");
     long totalTime = System.nanoTime();
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("FTP server example job");
     // fetch the host from the JPPF client, so we don't have to hard-code it in the task.
-    JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-    String host = jmxDriver.getHost();
+    final JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final String host = jmxDriver.getHost();
     // store the host in a data provider
-    DataProvider dataProvider = new MemoryMapDataProvider();
+    final DataProvider dataProvider = new MemoryMapDataProvider();
     dataProvider.setParameter("ftp.host", host);
     job.setDataProvider(dataProvider);
     // add a single task
     job.add(new FTPTask("input.txt", "output.html"));
-    List<Task<?>> results = jppfClient.submitJob(job);
-    for (Task<?> t : results) {
+    final List<Task<?>> results = jppfClient.submitJob(job);
+    for (final Task<?> t : results) {
       if (t.getThrowable() != null) System.out.println("task error: " + ExceptionUtils.getStackTrace(t.getThrowable()));
       else System.out.println("task result: " + t.getResult());
     }

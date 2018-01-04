@@ -96,7 +96,7 @@ public class Ticker extends ThreadSynchronization implements Runnable {
   @Override
   public void run() {
     if (debugEnabled) log.debug("starting ticker");
-    int size = marketData.size();
+    final int size = marketData.size();
     eventCount.set(0);
     while (!isStopped()) {
       try {
@@ -109,7 +109,7 @@ public class Ticker extends ThreadSynchronization implements Runnable {
         fireTickerEvent(marketData.get(n));
         eventCount.incrementAndGet();
         if ((maxEvents > 0) && (eventCount.get() >= maxEvents)) setStopped(true);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         System.out.println(e.getMessage());
         log.error(e.getMessage(), e);
       }
@@ -157,14 +157,14 @@ public class Ticker extends ThreadSynchronization implements Runnable {
     /**
      * The data that was updated.
      */
-    private MarketData marketData = null;
+    private MarketData mktData = null;
 
     /**
      * Initialize this task with the specified market data.
      * @param marketData the market data that was updated.
      */
     public NotificationTask(final MarketData marketData) {
-      this.marketData = marketData;
+      this.mktData = marketData;
     }
 
     /**
@@ -173,8 +173,8 @@ public class Ticker extends ThreadSynchronization implements Runnable {
      */
     @Override
     public void run() {
-      TickerEvent event = new TickerEvent(marketData);
-      for (TickerListener l: listeners) l.marketDataUpdated(event);
+      final TickerEvent event = new TickerEvent(mktData);
+      for (final TickerListener l: listeners) l.marketDataUpdated(event);
       if (debugEnabled) log.debug("fired update event for " + event.getMarketData().getId());
     }
   }

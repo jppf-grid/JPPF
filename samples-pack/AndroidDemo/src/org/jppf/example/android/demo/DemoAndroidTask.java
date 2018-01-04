@@ -53,7 +53,7 @@ public class DemoAndroidTask extends AbstractTask<String> {
     try {
       Thread.sleep(duration);
       setResult("demo Android task successful");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

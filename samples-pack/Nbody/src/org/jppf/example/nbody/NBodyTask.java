@@ -44,8 +44,7 @@ import org.jppf.node.protocol.AbstractTask;
  * 
  * @author Laurent Cohen
  */
-public class NBodyTask extends AbstractTask<String>
-{
+public class NBodyTask extends AbstractTask<String> {
   /**
    * The bodies for which this task computes the position.
    */
@@ -55,8 +54,7 @@ public class NBodyTask extends AbstractTask<String>
    * Initialize this task with the specified parameters.
    * @param bodies the bodies to handle.
    */
-  public NBodyTask(final NBody[] bodies)
-  {
+  public NBodyTask(final NBody[] bodies) {
     this.bodies = bodies;
   }
 
@@ -65,25 +63,21 @@ public class NBodyTask extends AbstractTask<String>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
-      Vector2d[] positions = getDataProvider().getParameter("positions");
-      double qp_qp = getDataProvider().getParameter("qp_qp");
-      double qp_b = getDataProvider().getParameter("qp_b");
-      double dt = getDataProvider().getParameter("dt");
+  public void run() {
+    try {
+      final Vector2d[] positions = getDataProvider().getParameter("positions");
+      final double qp_qp = getDataProvider().getParameter("qp_qp");
+      final double qp_b = getDataProvider().getParameter("qp_b");
+      final double dt = getDataProvider().getParameter("dt");
 
-      for (NBody body: bodies)
-      {
-        Vector2d temp = new Vector2d();
-        for (int i=0; i<positions.length; i++)
-        {
+      for (final NBody body: bodies) {
+        final Vector2d temp = new Vector2d();
+        for (int i = 0; i < positions.length; i++) {
           if (i == body.number) continue;
-          double d = distance(body.pos, positions[i]);
+          final double d = distance(body.pos, positions[i]);
           temp.set(body.pos);
           temp.subtract(positions[i]);
-          temp.multiply(qp_qp / (d*d*d));
+          temp.multiply(qp_qp / (d * d * d));
           body.acceleration.add(temp);
         }
 
@@ -94,16 +88,14 @@ public class NBodyTask extends AbstractTask<String>
         temp.set(body.velocity);
         body.pos.add(temp.multiply(dt));
         temp.set(body.acceleration);
-        body.pos.add(temp.multiply(Math.sqrt(dt)/2d));
+        body.pos.add(temp.multiply(Math.sqrt(dt) / 2d));
         temp.set(body.acceleration);
         body.velocity.add(temp.multiply(dt));
 
         // Clear antiproton's acceleration for the next step.
         body.acceleration.clear();
       }
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -114,19 +106,17 @@ public class NBodyTask extends AbstractTask<String>
    * @param v2 the second vector.
    * @return the distance computed as sqrt((v2.x-v1.x)^2 + (v2.y-v1.y)^2).
    */
-  private double distance(final Vector2d v1, final Vector2d v2)
-  {
-    double dx = v2.x - v1.x;
-    double dy = v2.y - v1.y;
-    return Math.sqrt(dx*dx + dy*dy);
+  private static double distance(final Vector2d v1, final Vector2d v2) {
+    final double dx = v2.x - v1.x;
+    final double dy = v2.y - v1.y;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   /**
    * Get the bodies for which this task computes the position.
    * @return an array of <code>NBody</code> instances.
    */
-  public synchronized NBody[] getBodies()
-  {
+  public synchronized NBody[] getBodies() {
     return bodies;
   }
 }

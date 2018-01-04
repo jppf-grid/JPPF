@@ -79,7 +79,7 @@ public class ClassPathImpl implements ClassPath {
 
   @Override
   public boolean removeElement(final String key) {
-    String signature = elementsMap.remove(key);
+    final String signature = elementsMap.remove(key);
     return signature != null;
   }
 
@@ -113,12 +113,12 @@ public class ClassPathImpl implements ClassPath {
     elementsMap.clear();
     checkOrCreateDefinition();
     List<String> lines = new ArrayList<>();
-    Reader reader = FileUtils.getFileReader(indexFile);
+    final Reader reader = FileUtils.getFileReader(indexFile);
     lines = FileUtils.textFileAsLines(reader);
     for (String line: lines) {
       line = line.trim();
       if (!line.isEmpty()) {
-        String[] association = line.split("=");
+        final String[] association = line.split("=");
         addElement(association[0], association[1]);
       }
     }
@@ -148,9 +148,9 @@ public class ClassPathImpl implements ClassPath {
    * @throws IOException if the store could not be created.
    */
   private void checkOrCreateDefinition() throws IOException {
-    File idxFile = new File(indexFile);
+    final File idxFile = new File(indexFile);
     if (!idxFile.exists()) {
-      File dir = idxFile.getParentFile();
+      final File dir = idxFile.getParentFile();
       // if the folder does not exist, attemp to create it
       if (!dir.exists()) {
         if (!dir.mkdirs()) throw new IOException("could not create the library store at '" + dir.getCanonicalPath() + "'");
@@ -172,18 +172,18 @@ public class ClassPathImpl implements ClassPath {
    * @throws IOException if any I/O error occurs.
    */
   public ClassPath loadFromFileSystem() throws IOException {
-    File dir = new File(rootDir + '/');
+    final File dir = new File(rootDir + '/');
     // list all the jar files in the folder
-    File[] jars = dir.listFiles(new FileFilter() {
+    final File[] jars = dir.listFiles(new FileFilter() {
       @Override
       public boolean accept(final File file) {
         return !file.isDirectory() && file.getName().toLowerCase().endsWith(".jar");
       }
     });
     if ((jars != null) && (jars.length > 0)) {
-      for (File jar: jars) {
-        String name = jar.getName();
-        String signature = ClassPathHelper.computeSignature(jar);
+      for (final File jar: jars) {
+        final String name = jar.getName();
+        final String signature = ClassPathHelper.computeSignature(jar);
         addElement(name, signature);
       }
     }

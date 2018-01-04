@@ -34,13 +34,13 @@ public class CLIHandler {
    * @throws Exception if any error occurs.
    */
   public Map<String, Object> processArguments(final String[] args) throws Exception {
-    Map<String, Object> map = new HashMap<>();
+    final Map<String, Object> map = new HashMap<>();
     if (args == null) throwMessage("Error: no command-line arguments are provided");
     int count = 0;
-    List<String> options = Arrays.asList(new String[] {"-i", "-o", "-f", "-t"});
-    List<String> errors = new ArrayList<>();
+    final List<String> options = Arrays.asList(new String[] {"-i", "-o", "-f", "-t"});
+    final List<String> errors = new ArrayList<>();
     while (count <args.length) {
-      String s = args[count].toLowerCase();
+      final String s = args[count].toLowerCase();
       if ("-h".equals(s) || "-?".equals(s)) {
         displayUsage();
         System.exit(0);
@@ -49,12 +49,12 @@ public class CLIHandler {
         else errors.add("missing value for option '" + s + "'");
       } else if ("-f".equals(s) || "-t".equals(s)) {
         if (count++ < args.length-1) {
-          String s2 = args[count++];
+          final String s2 = args[count++];
           int n = -1;
           try {
             n = Integer.valueOf(s2);
             map.put(s, n);
-          } catch(@SuppressWarnings("unused") NumberFormatException e) {
+          } catch(@SuppressWarnings("unused") final NumberFormatException e) {
             errors.add("invalid number format for the value '" + s2 + "' of option '" + s + "'");
           }
         }
@@ -64,11 +64,11 @@ public class CLIHandler {
         count++;
       }
     }
-    for (String s: options) {
+    for (final String s: options) {
       if (!map.containsKey(s)) errors.add("missing or misplaced option '" + s +"'");
     }
     if (!errors.isEmpty()) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append('\n').append("command line arguments:");
       for (String s: args) sb.append(' ').append(s);
       sb.append("\n found errors:");
@@ -82,7 +82,7 @@ public class CLIHandler {
    * Display this program's usage followed by one or more error message(s).
    * @param message the error message(s) to display.
    */
-  private void throwMessage(final String message) {
+  private static void throwMessage(final String message) {
     displayUsage();
     System.out.println(message);
     System.exit(1);
@@ -91,7 +91,7 @@ public class CLIHandler {
   /**
    * Display usage intructions for this program.
    */
-  private void displayUsage() {
+  private static void displayUsage() {
     System.out.println("usage:");
     System.out.println("Windows: run.bat [option, ...]");
     System.out.println("Linux: ./run.sh [option, ...]");

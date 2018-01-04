@@ -52,11 +52,11 @@ public class MandelbrotTask extends AbstractTask<int[]> {
   public void run() {
     try {
       // retrieve the configuration from the data provider
-      MandelbrotConfiguration config = getDataProvider().getParameter("config");
-      int[] iter = new int[config.width];
+      final MandelbrotConfiguration config = getDataProvider().getParameter("config");
+      final int[] iter = new int[config.width];
       colors = new int[config.width];
-      double bval = config.i_lower + lineToCompute * (config.i_upper - config.i_lower) / config.height;
-      double astep = (config.r_upper - config.r_lower) / config.width;
+      final double bval = config.i_lower + lineToCompute * (config.i_upper - config.i_lower) / config.height;
+      final double astep = (config.r_upper - config.r_lower) / config.width;
       double aval = config.r_lower;
       for (int i=0; i<config.width; i++) {
         double x = aval;
@@ -64,7 +64,7 @@ public class MandelbrotTask extends AbstractTask<int[]> {
         int iteration = 0;
         boolean escaped = false;
         while (!escaped && (iteration < config.maxIterations)) {
-          double x1 = x*x - y*y + aval;
+          final double x1 = x*x - y*y + aval;
           y = 2*x*y + bval;
           x = x1;
           if (x*x + y*y > 4) escaped = true;
@@ -76,7 +76,7 @@ public class MandelbrotTask extends AbstractTask<int[]> {
         aval += astep;
       }
       setResult(iter);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       setThrowable(e);
     }
   }
@@ -87,14 +87,14 @@ public class MandelbrotTask extends AbstractTask<int[]> {
    * @param max the max escape time value.
    * @return an int value representing the rgb components for the point.
    */
-  private int computeRGB(final int value, final int max) {
+  private static int computeRGB(final int value, final int max) {
     if (value >= max) return 0;
-    double x, y, z, t;
+    final double x, y, z, t;
     t = 2 * Math.PI * value / max;
     x = 2 * t * (Math.cos(value) + 1);
     y = 2 * t * (Math.sin(t) + 1);
     z = t;
-    int rgb[] = { (int) (230 * x), (int) (230 * y), (int) (230 * z) };
+    final int rgb[] = { (int) (230 * x), (int) (230 * y), (int) (230 * z) };
     for (int i=0; i<3; i++) {
       if (rgb[i] > 460) rgb[i] = rgb[i] % 460;
       if (rgb[i] > 230) rgb[i] = 460 - rgb[i];

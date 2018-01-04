@@ -37,7 +37,7 @@ public class LinearStepVector extends AbstractStepVector {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("d=").append(d);
     sb.append(", x=").append(x);
     sb.append(", y=").append(y);

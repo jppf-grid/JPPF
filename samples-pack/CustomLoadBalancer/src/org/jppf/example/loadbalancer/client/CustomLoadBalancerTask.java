@@ -59,7 +59,7 @@ public class CustomLoadBalancerTask extends AbstractTask<String> {
     System.out.println("Starting execution of task " + this.getId());
     try {
       Thread.sleep(duration);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
     // set the execution results

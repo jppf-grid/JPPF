@@ -25,8 +25,7 @@ import org.jppf.node.protocol.AbstractTask;
  * the resulting image.
  * @author Laurent Cohen
  */
-public class LyapunovTask extends AbstractTask<double[]>
-{
+public class LyapunovTask extends AbstractTask<double[]> {
   /**
    * The line number, for which to compute the lambda exponent for each point in the line.
    */
@@ -40,8 +39,7 @@ public class LyapunovTask extends AbstractTask<double[]>
    * Initialize this task with the specified line number.
    * @param b the line number as an int value.
    */
-  public LyapunovTask(final int b)
-  {
+  public LyapunovTask(final int b) {
     this.b = b;
   }
 
@@ -50,28 +48,23 @@ public class LyapunovTask extends AbstractTask<double[]>
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       // retrieve the configuration from the data provider
-      LyapunovConfiguration config = getDataProvider().getParameter("config");
-      double[] lambda = new double[config.height];
-      double bval = config.bmin +
-      b * (config.bmax - config.bmin) / config.width;
-      double astep = (config.amax - config.amin) / config.height;
+      final LyapunovConfiguration config = getDataProvider().getParameter("config");
+      final double[] lambda = new double[config.height];
+      final double bval = config.bmin + b * (config.bmax - config.bmin) / config.width;
+      final double astep = (config.amax - config.amin) / config.height;
       double aval = config.amin;
-      for (int i=0; i<config.height; i++)
-      {
+      for (int i = 0; i < config.height; i++) {
         double x = 0.5d;
-        int len = config.sequence.length;
+        final int len = config.sequence.length;
         double r = 0d;
         double sum = 0d;
-        for (int n=0; n<config.nmax; n++)
-        {
+        for (int n = 0; n < config.nmax; n++) {
           r = config.sequence[n % len] ? aval : bval;
           x = r * x * (1d - x);
-          double term = Math.log(Math.abs(r * (1d - 2d * x)));
+          final double term = Math.log(Math.abs(r * (1d - 2d * x)));
           sum += term;
         }
         lambda[i] = sum / config.nmax;
@@ -79,9 +72,7 @@ public class LyapunovTask extends AbstractTask<double[]>
       }
       // set the results
       setResult(lambda);
-    }
-    catch(Exception e)
-    {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }
@@ -90,8 +81,7 @@ public class LyapunovTask extends AbstractTask<double[]>
    * Get the computed colors for each computed point.
    * @return an array of int values.
    */
-  public int[] getColors()
-  {
+  public int[] getColors() {
     return colors;
   }
 }

@@ -46,7 +46,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI {
   @Override
   public void run() {
     try {
-      Runnable hook = new Runnable() {
+      final Runnable hook = new Runnable() {
         @Override
         public void run() {
           stop();
@@ -54,7 +54,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI {
       };
       Runtime.getRuntime().addShutdownHook(new Thread(hook));
       start();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("FTP server initialization failed", e);
       // display the error message on the driver's shell console
       System.err.println("FTP server initialization failed: " + e.getMessage());
@@ -66,7 +66,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI {
    * @throws Exception if an error occurs while reading the configuration.
    */
   public void start() throws Exception {
-    String configPath = JPPFConfiguration.getProperties().getString("jppf.file.server.config", "config/ftpd.xml");
+    final String configPath = JPPFConfiguration.getProperties().getString("jppf.file.server.config", "config/ftpd.xml");
     server = new CommandLineExt(configPath).createServer();
     server.start();
   }
@@ -77,7 +77,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI {
   public void stop() {
     try {
       if ((server != null) && !server.isStopped()) server.stop();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
   }

@@ -50,8 +50,7 @@ import org.jppf.utils.concurrent.JPPFThreadFactory;
  * 
  * @author Laurent Cohen
  */
-public class NBodyPanel extends JPanel
-{
+public class NBodyPanel extends JPanel {
   /**
    * Foreground color for this panel.
    */
@@ -80,8 +79,7 @@ public class NBodyPanel extends JPanel
   /**
    * Default constructor.
    */
-  public NBodyPanel()
-  {
+  public NBodyPanel() {
     setOpaque(true);
     setBackground(BACKGROUND);
   }
@@ -92,27 +90,20 @@ public class NBodyPanel extends JPanel
    * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
    */
   @Override
-  protected void paintComponent(final Graphics g)
-  {
+  protected void paintComponent(final Graphics g) {
     //lock.lock();
-    try
-    {
+    try {
       updating.set(true);
       super.paintComponent(g);
       if (positions != null) drawBodies(g, positions, BACKGROUND);
-      if (newPositions != null)
-      {
+      if (newPositions != null) {
         positions = newPositions;
         newPositions = null;
       }
       if (positions != null) drawBodies(g, positions, FOREGROUND);
-    }
-    catch(Throwable e)
-    {
+    } catch (final Throwable e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       updating.set(false);
       //lock.unlock();
     }
@@ -124,10 +115,9 @@ public class NBodyPanel extends JPanel
    * @param pos the positions of the bodies to draw.
    * @param c the color in which to draw the bodies.
    */
-  protected void drawBodies(final Graphics g, final Vector2d[] pos, final Color c)
-  {
-    Color tmp = g.getColor();
-    Graphics2D g2 = (Graphics2D) g;
+  protected void drawBodies(final Graphics g, final Vector2d[] pos, final Color c) {
+    final Color tmp = g.getColor();
+    final Graphics2D g2 = (Graphics2D) g;
     g.setColor(c);
     for (Vector2d v: pos) g2.fillRect((int) v.x, (int) v.y, 3, 3);
     //for (Vector2d v: pos) g2.fillOval((int) v.x, (int) v.y, 3, 3);
@@ -138,8 +128,7 @@ public class NBodyPanel extends JPanel
    * Add an update request.
    * @param pos the new positions to display.
    */
-  public void updatePositions(final Vector2d[] pos)
-  {
+  public void updatePositions(final Vector2d[] pos) {
     if (!isUpdating()) executor.execute(new UpdateRequest(pos));
   }
 
@@ -147,26 +136,24 @@ public class NBodyPanel extends JPanel
    * Determine whether this panel is currently being updated.
    * @return true if this panel is being updated, false otherwise.
    */
-  public boolean isUpdating()
-  {
+  public boolean isUpdating() {
     return updating.get();
   }
 
   /**
    * Update request.
    */
-  public class UpdateRequest implements Runnable
-  {
+  public class UpdateRequest implements Runnable {
     /**
      * The new positions to display.
      */
     private Vector2d[] pos = null;
+
     /**
      * Add an update request.
      * @param pos the new positions to display.
      */
-    public UpdateRequest(final Vector2d[] pos)
-    {
+    public UpdateRequest(final Vector2d[] pos) {
       this.pos = pos;
     }
 
@@ -175,17 +162,13 @@ public class NBodyPanel extends JPanel
      * @see java.lang.Runnable#run()
      */
     @Override
-    public void run()
-    {
+    public void run() {
       if (updating.get()) return;
       //lock.lock();
-      try
-      {
+      try {
         newPositions = pos;
         NBodyPanel.this.repaint();
-      }
-      finally
-      {
+      } finally {
         //lock.unlock();
       }
     }

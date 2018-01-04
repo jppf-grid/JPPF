@@ -54,25 +54,25 @@ public class DBRunner {
    */
   public static void main(final String... args) {
     try {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      int nbTasks = config.getInt("job.nbtasks", 20);
-      long taskSleepTime = config.getLong("task.sleep.time", 2000L);
-      long timeBeforeRestartNode = config.getLong("time.before.restart.node", 6000L);
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final int nbTasks = config.getInt("job.nbtasks", 20);
+      final long taskSleepTime = config.getLong("task.sleep.time", 2000L);
+      final long timeBeforeRestartNode = config.getLong("time.before.restart.node", 6000L);
       if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
       else jppfClient = new JPPFClient();
       // Initialize the JMX connection to the node
       getNode();
       // Create a job with the specified number of tasks
-      JPPFJob job = new JPPFJob();
+      final JPPFJob job = new JPPFJob();
       job.setName("NodeLifeCycle demo job");
       for (int i = 1; i <= nbTasks; i++) {
-        DBTask task = new DBTask(taskSleepTime);
+        final DBTask task = new DBTask(taskSleepTime);
         task.setId("" + i);
         job.add(task);
       }
       job.setBlocking(false);
       // customize the result listener to display a message each time a task result is received
-      JobListener jobListener = new JobListenerAdapter() {
+      final JobListener jobListener = new JobListenerAdapter() {
         @Override
         public synchronized void jobReturned(final JobEvent event) {
           for (Task<?> task : event.getJobTasks()) {
@@ -92,7 +92,7 @@ public class DBRunner {
       // display the list of rows in the DB table
       if (config.getBoolean("display.db.content", false)) displayDBContent();
       output("demo ended");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();
@@ -106,9 +106,9 @@ public class DBRunner {
    */
   private static JMXNodeConnectionWrapper getNode() throws Exception {
     if (jmxNode == null) {
-      JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-      Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
-      JPPFManagementInfo info = nodesInfo.iterator().next();
+      final JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+      final Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
+      final JPPFManagementInfo info = nodesInfo.iterator().next();
       jmxNode = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
       jmxNode.connect();
     }
@@ -120,9 +120,9 @@ public class DBRunner {
    */
   private static void restartNode() {
     try {
-      JMXNodeConnectionWrapper jmxNode = getNode();
+      final JMXNodeConnectionWrapper jmxNode = getNode();
       jmxNode.restart();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       output("Could not restart a node:\n" + ExceptionUtils.getStackTrace(e));
     }
   }
@@ -133,15 +133,15 @@ public class DBRunner {
    */
   private static void displayDBContent() throws Exception {
     Class.forName("org.h2.Driver");
-    Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "jppf", "jppf");
+    final Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "jppf", "jppf");
     //Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jppf_samples", "jppf", "jppf");
-    String sql = "SELECT * FROM task_result";
-    Statement stmt = c.createStatement();
-    ResultSet rs = stmt.executeQuery(sql);
+    final String sql = "SELECT * FROM task_result";
+    final Statement stmt = c.createStatement();
+    final ResultSet rs = stmt.executeQuery(sql);
     int count = 1;
     output("\n***** displaying the DB table content *****");
     while (rs.next()) {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append("row ").append(count).append(": ");
       sb.append("id=").append(rs.getObject("id"));
       sb.append(", task_id=").append(rs.getObject("task_id"));

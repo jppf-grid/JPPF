@@ -46,12 +46,12 @@ public class FractalPanel extends NodePanel {
    */
   @Override
   protected JComponent createTopPanel() {
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setBackground(Color.BLACK);
     panel.setOpaque(false);
-    GridBagLayout g = new GridBagLayout();
+    final GridBagLayout g = new GridBagLayout();
     panel.setLayout(g);
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     addLayoutComp(panel, g, c, getFractalPreviewPanel());
     addLayoutComp(panel, g, c, Box.createVerticalStrut(5));
@@ -67,7 +67,7 @@ public class FractalPanel extends NodePanel {
       if (fractalPreviewPanel == null) {
         try {
           fractalPreviewPanel = new FractalPreviewPanel();
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
           e.printStackTrace();
         }
       }

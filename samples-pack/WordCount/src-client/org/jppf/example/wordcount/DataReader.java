@@ -78,7 +78,7 @@ public class DataReader {
       if (s.indexOf(ARTICLE_START) >= 0) found = true;
     }
     if (!found) return null;
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     found = false;
     while (!found) {
       s = reader.readLine();

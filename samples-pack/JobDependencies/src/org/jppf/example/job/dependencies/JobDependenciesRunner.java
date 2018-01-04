@@ -47,18 +47,18 @@ public class JobDependenciesRunner {
   public static void main(final String[] args) {
     try (JPPFClient client = new JPPFClient()) {
       // read the jobs and their dependencies from the "./dependency_graph.txt" file
-      List<DependencySpec> dependencies = Utils.readDependencies();
+      final List<DependencySpec> dependencies = Utils.readDependencies();
 
       // ensure all jobs can be submitted concurrently by adjusting the connection pool size
-      int n = Math.max(dependencies.size(), 1);
-      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+      final int n = Math.max(dependencies.size(), 1);
+      final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
       // wait until all connections are initialized
       pool.awaitWorkingConnections(Operator.AT_LEAST, n);
 
       // Create the jobs according to the dependency graph
-      List<JPPFJob> jobs = new ArrayList<>();
-      for (DependencySpec spec: dependencies) {
+      final List<JPPFJob> jobs = new ArrayList<>();
+      for (final DependencySpec spec: dependencies) {
         jobs.add(createJob(spec));
       }
 
@@ -67,7 +67,7 @@ public class JobDependenciesRunner {
       // await the jobs results and print them
       for (JPPFJob job: jobs) printJobResults(job);
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -79,7 +79,7 @@ public class JobDependenciesRunner {
    * @throws Exception if any error occurs.
    */
   private static JPPFJob createJob(final DependencySpec spec) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(spec.getId());
     // add the dependencies information to the job metadata
     job.getMetadata().setParameter(DependencySpec.DEPENDENCIES_METADATA_KEY, spec);
@@ -100,8 +100,8 @@ public class JobDependenciesRunner {
    */
   private static void printJobResults(final JPPFJob job) {
     Utils.print("runner: ***** awaiting results for '%s' *****", job.getName());
-    List<Task<?>> results = job.awaitResults();
-    for (Task<?> task : results) {
+    final List<Task<?>> results = job.awaitResults();
+    for (final Task<?> task : results) {
       if (task.getThrowable() != null) Utils.print("runner:   got exception: %s", ExceptionUtils.getStackTrace(task.getThrowable()));
       else Utils.print("runner:   got result: %s", task.getResult());
     }

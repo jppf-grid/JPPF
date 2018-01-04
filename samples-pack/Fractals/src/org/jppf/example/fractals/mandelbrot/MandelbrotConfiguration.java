@@ -76,7 +76,7 @@ public class MandelbrotConfiguration extends AbstractFractalConfiguration {
     d = diameter;
     x = xcenter;
     y = ycenter;
-    double r = d/2;
+    final double r = d/2;
     r_lower = x - r;
     r_upper = x + r;
     i_lower = y - r;
@@ -95,14 +95,14 @@ public class MandelbrotConfiguration extends AbstractFractalConfiguration {
 
   @Override
   public String toCSV() {
-    StringBuilder sb = new StringBuilder().append(width).append(',').append(height).append(',');
+    final StringBuilder sb = new StringBuilder().append(width).append(',').append(height).append(',');
     sb.append(d).append(',').append(x).append(',').append(y).append(',').append(maxIterations);
     return sb.toString();
   }
 
   @Override
   public MandelbrotConfiguration fromCSV(final String csv) {
-    String[] tokens = csv.split(",");
+    final String[] tokens = csv.split(",");
     try {
       width = Integer.valueOf(tokens[0]);
       height = Integer.valueOf(tokens[1]);
@@ -110,12 +110,12 @@ public class MandelbrotConfiguration extends AbstractFractalConfiguration {
       x = Double.valueOf(tokens[3]);
       y = Double.valueOf(tokens[4]);
       maxIterations = Integer.valueOf(tokens[5]);
-      double r = d/2d;
+      final double r = d/2d;
       r_lower = x - r;
       r_upper = x + r;
       i_lower = y - r;
       i_upper = y + r;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     return this;
@@ -123,7 +123,7 @@ public class MandelbrotConfiguration extends AbstractFractalConfiguration {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("width=").append(width);
     sb.append(", height=").append(height);
     sb.append(", d=").append(d);

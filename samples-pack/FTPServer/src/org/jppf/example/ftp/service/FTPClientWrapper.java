@@ -28,8 +28,7 @@ import org.apache.commons.net.ftp.*;
  * @see <a href="http://commons.apache.org/net">Apache Commons Net</a>
  * @author Laurent Cohen
  */
-public class FTPClientWrapper
-{
+public class FTPClientWrapper {
   /**
    * The underlying FTP client.
    */
@@ -43,8 +42,7 @@ public class FTPClientWrapper
    * @param password the user password.
    * @throws Exception if any error occurs.
    */
-  public void open(final String host, final int port, final String user, final String password) throws Exception
-  {
+  public void open(final String host, final int port, final String user, final String password) throws Exception {
     // create with implicit TLS
     ftpClient = new FTPSClient(true);
     ftpClient.connect(host, port);
@@ -55,22 +53,15 @@ public class FTPClientWrapper
    * Disconnect from the FTP server and close the connection.
    * @throws Exception if any error occurs.
    */
-  public void close() throws Exception
-  {
-    try
-    {
+  public void close() throws Exception {
+    try {
       ftpClient.logout();
-    }
-    catch(IOException e)
-    {
+    } catch (final IOException e) {
       System.err.println("error logging off the ftp client: " + e.getMessage());
     }
-    try
-    {
+    try {
       ftpClient.disconnect();
-    }
-    catch(IOException e)
-    {
+    } catch (final IOException e) {
       System.err.println("error disconnecting from the ftp client: " + e.getMessage());
     }
     ftpClient = null;
@@ -82,16 +73,12 @@ public class FTPClientWrapper
    * @param remotePath the path of the remote file.
    * @throws Exception if any error occurs during the file transfer.
    */
-  public void download(final String localPath, final String remotePath) throws Exception
-  {
+  public void download(final String localPath, final String remotePath) throws Exception {
     BufferedOutputStream bos = null;
-    try
-    {
+    try {
       bos = new BufferedOutputStream(new FileOutputStream(localPath));
       ftpClient.retrieveFile(remotePath, bos);
-    }
-    finally
-    {
+    } finally {
       if (bos != null) bos.close();
     }
   }
@@ -102,16 +89,12 @@ public class FTPClientWrapper
    * @param remotePath the path of the resulting remote file.
    * @throws Exception if any error occurs during the file transfer.
    */
-  public void upload(final String localPath, final String remotePath) throws Exception
-  {
+  public void upload(final String localPath, final String remotePath) throws Exception {
     BufferedInputStream bis = null;
-    try
-    {
+    try {
       bis = new BufferedInputStream(new FileInputStream(localPath));
       ftpClient.storeFile(remotePath, bis);
-    }
-    finally
-    {
+    } finally {
       if (bis != null) bis.close();
     }
   }
@@ -119,10 +102,9 @@ public class FTPClientWrapper
   /**
    * Get the underlying FTP client.
    * <br/>If this method is called before {@link #open() open()} has been invoked, the returned object will be null.
-   * @return  an <code>FTPClient</code> instance.
+   * @return an <code>FTPClient</code> instance.
    */
-  public FTPClient getFtpClient()
-  {
+  public FTPClient getFtpClient() {
     return ftpClient;
   }
 }

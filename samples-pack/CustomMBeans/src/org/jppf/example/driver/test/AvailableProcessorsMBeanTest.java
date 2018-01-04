@@ -24,20 +24,19 @@ import org.jppf.management.JMXDriverConnectionWrapper;
  * Simple class to test a custom node MBean
  * @author Laurent Cohen
  */
-public class AvailableProcessorsMBeanTest
-{
+public class AvailableProcessorsMBeanTest {
   /**
    * Entry point.
    * @param args not used.
    * @throws Exception if any error occurs.
    */
-  public static void main(final String...args) throws Exception
-  {
+  public static void main(final String... args) throws Exception {
     // we assume the node is on localhost and uses the management port 11198
-    JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper("localhost", 11198);
-    wrapper.connectAndWait(5000L);
-    // query the server for the available processors
-    int n = (Integer) wrapper.invoke("org.jppf.example.mbean:name=AvailableProcessors,type=driver", "queryAvailableProcessors", (Object[]) null, (String[]) null);
-    System.out.println("The server has " + n + " available processors");
+    try (JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper("localhost", 11198)) {
+      wrapper.connectAndWait(5000L);
+      // query the server for the available processors
+      final int n = (Integer) wrapper.invoke("org.jppf.example.mbean:name=AvailableProcessors,type=driver", "queryAvailableProcessors", (Object[]) null, (String[]) null);
+      System.out.println("The server has " + n + " available processors");
+    }
   }
 }

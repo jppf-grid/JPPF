@@ -55,18 +55,18 @@ public class NodeSelector {
     final int nbNodes = nodeIdList.size();
     final Trade[] tradeArray = trades.toArray(new Trade[0]);
     //for (int i=0; i<tradeArray.length; i++) tradeToNodeMap.put(tradeArray[i].getId(), nodeIdList.get(i % nbNodes));
-    ExecutorService executor = Executors.newFixedThreadPool(nbNodes);
-    List<Future<?>> futures = new ArrayList<>();
+    final ExecutorService executor = Executors.newFixedThreadPool(nbNodes);
+    final List<Future<?>> futures = new ArrayList<>();
     for (int i=0; i<nbNodes; i++) {
-      String nodeId = nodeIdList.get(i);
-      Map<String, Trade> hazelcastMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + nodeId);
+      final String nodeId = nodeIdList.get(i);
+      final Map<String, Trade> hazelcastMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + nodeId);
       nodeToHazelcastMap.put(nodeId, hazelcastMap);
       futures.add(executor.submit(new PopulateTradesTask(tradeArray, i, nbNodes, hazelcastMap)));
     }
-    for (Future<?> f: futures) {
+    for (final Future<?> f: futures) {
       try {
         f.get();
-      } catch(Exception e) {
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -137,7 +137,7 @@ public class NodeSelector {
 
     @Override
     public void run() {
-      String nodeId = nodeIdList.get(offset);
+      final String nodeId = nodeIdList.get(offset);
       hazelcastMap.clear();
       for (int i=offset; i<tradeArray.length; i+= nbNodes) {
         hazelcastMap.put(tradeArray[i].getId(), tradeArray[i]);

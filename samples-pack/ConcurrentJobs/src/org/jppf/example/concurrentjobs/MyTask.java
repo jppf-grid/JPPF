@@ -49,7 +49,7 @@ public class MyTask extends AbstractTask<String> {
       // wait for the specified time, to simulate actual execution
       if (duration > 0) Thread.sleep(duration);
       setResult("execution success for " + message);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       setThrowable(e);
     }
   }

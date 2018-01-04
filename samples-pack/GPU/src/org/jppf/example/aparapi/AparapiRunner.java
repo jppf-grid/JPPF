@@ -49,7 +49,7 @@ public class AparapiRunner {
       print("creating client");
       client = new JPPFClient();
       perform();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       client.close();
@@ -61,10 +61,10 @@ public class AparapiRunner {
    * @throws Throwable if any error occurs.
    */
   public static void perform() throws Throwable {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int iterations = config.getInt("iterations", 10);
-    int tasksPerJob = config.getInt("tasksPerJob", 1);
-    int matrixSize = config.getInt("matrixSize", 1500);
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int iterations = config.getInt("iterations", 10);
+    final int tasksPerJob = config.getInt("tasksPerJob", 1);
+    final int matrixSize = config.getInt("matrixSize", 1500);
     String execMode = config.getString("execMode", "GPU");
     if (!"GPU".equalsIgnoreCase(execMode) && !"JTP".equalsIgnoreCase(execMode)) execMode = "GPU";
     print("starting GPU test with " + iterations + " jobs, " + tasksPerJob + " tasks per job and a matrix size of " + matrixSize + ", execution mode: " + execMode);
@@ -76,24 +76,24 @@ public class AparapiRunner {
 
     // one job per iteration
     for (int n = 0; n < iterations; n++) {
-      SquareMatrix matrixA = new SquareMatrix(matrixSize);
+      final SquareMatrix matrixA = new SquareMatrix(matrixSize);
       matrixA.assignRandomValues();
-      SquareMatrix matrixB = new SquareMatrix(matrixSize);
+      final SquareMatrix matrixB = new SquareMatrix(matrixSize);
       matrixB.assignRandomValues();
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
+      final long start = System.nanoTime();
+      final JPPFJob job = new JPPFJob();
       job.setName("gpu_job_" + n);
       for (int i = 0; i < tasksPerJob; i++)
         job.add(new AparapiTask(matrixA, matrixB, execMode));
       // submit and get the results
-      List<Task<?>> results = client.submitJob(job);
-      for (Task<?> task : results) {
+      final List<Task<?>> results = client.submitJob(job);
+      for (final Task<?> task : results) {
         if (task.getThrowable() != null) throw task.getThrowable();
-        AparapiTask t = (AparapiTask) task;
+        final AparapiTask t = (AparapiTask) task;
         assert t.getResult() instanceof SquareMatrix;
         //print("result for " + task.getId() + ": " + task.getResult());
       }
-      long elapsed = (System.nanoTime() - start) / 1000000;
+      final long elapsed = (System.nanoTime() - start) / 1000000;
       if (elapsed < min) min = elapsed;
       if (elapsed > max) max = elapsed;
       totalIterationTime += elapsed;

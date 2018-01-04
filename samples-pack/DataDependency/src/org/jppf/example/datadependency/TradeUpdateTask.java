@@ -53,10 +53,10 @@ public class TradeUpdateTask extends AbstractTask<String> {
   @Override
   public void run() {
     String msg = "updating trade " + tradeId;
-    long taskStart = System.nanoTime();
-    Trade trade = DataDependencyStartup.getTrade(tradeId);
-    List<MarketData> data = new ArrayList<>();
-    for (String id : trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
+    final long taskStart = System.nanoTime();
+    final Trade trade = DataDependencyStartup.getTrade(tradeId);
+    final List<MarketData> data = new ArrayList<>();
+    for (final String id : trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
     // perform some dummy cpu-consuming computation
     long elapsed = 0L;
     for (; elapsed < taskDuration; elapsed = DateTimeUtils.elapsedFrom(taskStart)) {

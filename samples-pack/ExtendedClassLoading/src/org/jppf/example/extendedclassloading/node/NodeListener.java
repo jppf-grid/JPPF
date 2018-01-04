@@ -82,12 +82,12 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
    */
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
-    JPPFDistributedJob job = event.getJob();
+    final JPPFDistributedJob job = event.getJob();
     output("*** processing metadata for job '" + job.getName() + "' ***");
-    JobMetadata metadata = job.getMetadata();
+    final JobMetadata metadata = job.getMetadata();
 
     // get the optional delete filter and delete files in repository accordingly
-    RepositoryFilter filter = (RepositoryFilter) metadata.getParameter(ClassPathHelper.REPOSITORY_DELETE_FILTER);
+    final RepositoryFilter filter = (RepositoryFilter) metadata.getParameter(ClassPathHelper.REPOSITORY_DELETE_FILTER);
     if (filter != null) {
       output("attempting to delete the files matching " + filter);
       repository.delete(filter);
@@ -101,15 +101,15 @@ public class NodeListener extends NodeLifeCycleListenerAdapter {
     }
 
     // the set of urls held by the current class loader.
-    URL[] currentURLs = cl.getURLs();
+    final URL[] currentURLs = cl.getURLs();
 
     // fetch the requested classpath for the job
-    ClassPath classpath = (ClassPath) metadata.getParameter(ClassPathHelper.JOB_CLASSPATH);
+    final ClassPath classpath = (ClassPath) metadata.getParameter(ClassPathHelper.JOB_CLASSPATH);
     if (classpath != null) {
       output("requested libraries: " + classpath);
       // get the jar files already present in the repository
       // and download the missing ones from the client
-      URL[] urls = repository.download(classpath, cl);
+      final URL[] urls = repository.download(classpath, cl);
       if ((urls != null) && (urls.length > 0)) {
         // if a classpath is already set onto the current class loader, then create a new class loader for
         // the same client, which will now be used by the node; this will cause the old class loader to be discarded

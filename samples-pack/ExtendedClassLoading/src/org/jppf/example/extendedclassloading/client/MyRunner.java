@@ -65,19 +65,19 @@ public class MyRunner {
       client = new JPPFClient();
 
       // create the classpath specified with the '-c' command-line argument
-      ClassPath classpath = ClassPathHelper.createClassPathFromArguments(CLIENT_LIB_DIR, args);
+      final ClassPath classpath = ClassPathHelper.createClassPathFromArguments(CLIENT_LIB_DIR, args);
       //classpath = ClassPathHelper.createClassPathFromRootFolder(CLIENT_LIB_DIR);
       if ((classpath != null) && (classpath.size() > 0)) output("found dynamic libraries: " + classpath);
       else output("found no dynamic library");
 
       // create the jobs
       // setting a non-null classpath on the first job will cause the node to update the current task class loader
-      JPPFJob job1 = createJob(classpath, new MyTask1());
+      final JPPFJob job1 = createJob(classpath, new MyTask1());
       // setting a non-null classpath on the second job will cause the node to create a new task class loader
-      JPPFJob job2 = createJob(classpath, new MyTask2());
+      final JPPFJob job2 = createJob(classpath, new MyTask2());
 
       // if a file pattern is provided, add a corresponding filter to the metadata of the first job
-      RepositoryFilter filter = ClassPathHelper.getFilterFromArguments(args);
+      final RepositoryFilter filter = ClassPathHelper.getFilterFromArguments(args);
       if (filter != null) {
         job1.getMetadata().setParameter(ClassPathHelper.REPOSITORY_DELETE_FILTER, filter);
         output("requesting deletion of files matching " + filter);
@@ -87,7 +87,7 @@ public class MyRunner {
       executeJob(job1);
       executeJob(job2);
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     } finally {
       if (client != null) client.close();
@@ -102,7 +102,7 @@ public class MyRunner {
    * @throws Exception if any error occurs while creating the job.
    */
   private static JPPFJob createJob(final ClassPath classpath, final Task<?>...tasks) throws Exception {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName("Extended Class Loading " + jobCount++);
 
     // update the job metadata to specifiy which libraries are needed for the job
@@ -112,8 +112,8 @@ public class MyRunner {
 
     // add the tasks to the job
     int taskNumber = 1;
-    String prefix = job.getName() + ":task ";
-    for (Task<?> task: tasks) job.add(task).setId(prefix + taskNumber++);
+    final String prefix = job.getName() + ":task ";
+    for (final Task<?> task: tasks) job.add(task).setId(prefix + taskNumber++);
     return job;
   }
 
@@ -124,12 +124,12 @@ public class MyRunner {
    */
   private static void executeJob(final JPPFJob job) throws Exception {
     // submit the job to the grid
-    List<Task<?>> results = client.submitJob(job);
+    final List<Task<?>> results = client.submitJob(job);
 
     // process the results
     output("*** results for job '" + job.getName() + "'");
-    for (Task<?> task: results) {
-      String prefix = "task " + task.getId() + " ";
+    for (final Task<?> task: results) {
+      final String prefix = "task " + task.getId() + " ";
       if (task.getThrowable() != null) {
         // if an error occurred, show the exception stack trace
         output(prefix + "got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));

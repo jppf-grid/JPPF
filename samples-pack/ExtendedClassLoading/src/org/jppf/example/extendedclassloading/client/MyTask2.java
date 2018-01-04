@@ -32,7 +32,7 @@ public class MyTask2 extends AbstractTask<String> {
     try {
       new MyClientDynamicClass2().printHello();
       setResult("Successful execution");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       setThrowable(e);
     }

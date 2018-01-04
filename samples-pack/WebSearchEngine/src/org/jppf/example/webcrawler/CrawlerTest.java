@@ -65,7 +65,7 @@ public class CrawlerTest {
       //simpleCrawl();
       //luceneIndex();
       luceneSearch("+client +driver", 50);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -76,7 +76,7 @@ public class CrawlerTest {
    */
   @SuppressWarnings("rawtypes")
   public static void simpleCrawl() throws Exception {
-    Crawler crawler = new Crawler();
+    final Crawler crawler = new Crawler();
     crawler.setLinkFilter(new ServerFilter(server));
 
     crawler.addParserListener(new IParserEventListener() {
@@ -88,18 +88,18 @@ public class CrawlerTest {
     crawler.start(server, startPage);
 
     // show visited links
-    Collection visitedLinks = crawler.getModel().getVisitedURIs();
+    final Collection visitedLinks = crawler.getModel().getVisitedURIs();
     print("Links visited=" + visitedLinks.size());
 
-    Iterator list = visitedLinks.iterator();
+    final Iterator list = visitedLinks.iterator();
     while (list.hasNext())
       print("" + list.next());
 
     // show visited links
-    Collection notVisitedLinks = crawler.getModel().getToVisitURIs();
+    final Collection notVisitedLinks = crawler.getModel().getToVisitURIs();
 
     print("Links NOT visited=" + notVisitedLinks.size());
-    Iterator listNot = notVisitedLinks.iterator();
+    final Iterator listNot = notVisitedLinks.iterator();
     while (listNot.hasNext())
       print("" + listNot.next());
   }
@@ -110,15 +110,15 @@ public class CrawlerTest {
    */
   public static void luceneIndex() throws Exception {
     // setting default parameters
-    int depth = 3;
+    final int depth = 3;
 
     // create Lucene index writer
-    IndexWriter writer = new IndexWriter(index, new StandardAnalyzer(), true);
+    final IndexWriter writer = new IndexWriter(index, new StandardAnalyzer(), true);
     writer.setUseCompoundFile(true);
     writer.setMaxFieldLength(1000000);
 
     // common crawler settings
-    Crawler crawler = new Crawler();
+    final Crawler crawler = new Crawler();
     crawler.setLinkFilter(new ServerFilter(server));
     crawler.setModel(new MaxDepthModel(depth));
     crawler.addParserListener(new IParserEventListener() {
@@ -129,7 +129,7 @@ public class CrawlerTest {
     });
 
     // create Lucene parsing listener and add it
-    LuceneParserEventListener listener = new LuceneParserEventListener(writer);
+    final LuceneParserEventListener listener = new LuceneParserEventListener(writer);
     crawler.addParserListener(listener);
 
     // start crawler
@@ -150,17 +150,17 @@ public class CrawlerTest {
     print("Searching for: " + search);
     print("  max results: " + max);
 
-    IndexSearcher is = new IndexSearcher(index);
-    QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
+    final IndexSearcher is = new IndexSearcher(index);
+    final QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
 
-    Query query = parser.parse(search);
-    Hits hits = is.search(query);
+    final Query query = parser.parse(search);
+    final Hits hits = is.search(query);
 
     print("    results: " + hits.length());
 
     for (int i = 0; i < Math.min(hits.length(), max); i++) {
-      float relevance = ((float) Math.round(hits.score(i) * 1000)) / 10;
-      String url = hits.doc(i).getField("url").stringValue();
+      final float relevance = ((float) Math.round(hits.score(i) * 1000)) / 10;
+      final String url = hits.doc(i).getField("url").stringValue();
       print("No " + (i + 1) + " with relevance " + relevance + "% : " + url);
     }
 
