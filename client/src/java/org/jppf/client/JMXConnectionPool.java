@@ -66,9 +66,9 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   @Override
   public JMXDriverConnectionWrapper getConnection() {
     int count = 0;
-    int size = connectionCount();
+    final int size = connectionCount();
     while (count++ < size) {
-      JMXDriverConnectionWrapper jmx = nextConnection();
+      final JMXDriverConnectionWrapper jmx = nextConnection();
       if (jmx.isConnected()) return jmx;
     }
     return null;
@@ -82,8 +82,8 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    */
   synchronized List<JMXDriverConnectionWrapper> getConnections(final boolean connectedOnly) {
     if (!connectedOnly) return getConnections();
-    List<JMXDriverConnectionWrapper> list = new ArrayList<>();
-    for (JMXDriverConnectionWrapper connection: getConnections()) {
+    final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
+    for (final JMXDriverConnectionWrapper connection: getConnections()) {
       if (connection.isConnected()) list.add(connection);
     }
     return list;
@@ -93,17 +93,17 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   public synchronized int setSize(final int maxSize) {
     if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.size);
     if (maxSize == this.size) return this.size;
-    int diff = maxSize - this.size;
-    int size = connectionCount();
+    final int diff = maxSize - this.size;
+    final int size = connectionCount();
     if (diff < 0) {
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
-        JMXDriverConnectionWrapper c = connections.get(i);
+        final JMXDriverConnectionWrapper c = connections.get(i);
         if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
         try {
           c.close();
-        } catch(@SuppressWarnings("unused") Exception ignore) {
+        } catch(@SuppressWarnings("unused") final Exception ignore) {
         }
         remove(c);
         actual++;
@@ -111,7 +111,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
       this.size -= actual;
     } else {
       for (int i=0; i<diff; i++) {
-        JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
+        final JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
         this.add(c);
         c.connect();
       }
@@ -157,7 +157,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
     int n = 0;
     if ((n = connectionCount()) < size) {
       for (int i=n; i<size; i++) {
-        JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
+        final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
         this.add(jmx);
         jmx.connect();
       }

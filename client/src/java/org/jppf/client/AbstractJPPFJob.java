@@ -161,7 +161,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   public boolean equals(final Object obj) {
     if (this == obj) return true;
     if (!(obj instanceof AbstractJPPFJob)) return false;
-    AbstractJPPFJob other = (AbstractJPPFJob) obj;
+    final AbstractJPPFJob other = (AbstractJPPFJob) obj;
     return (uuid == null) ? other.uuid == null : uuid.equals(other.uuid);
   }
 
@@ -284,7 +284,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", uuid=").append(uuid);
@@ -353,8 +353,8 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
     synchronized(statusListeners) {
       if (debugEnabled) log.debug("job [" + uuid + "] fire status changed event for '" + newStatus + "'");
       if (!statusListeners.isEmpty()) {
-        JobStatusEvent event = new JobStatusEvent(uuid, newStatus);
-        for (JobStatusListener listener: statusListeners) listener.jobStatusChanged(event);
+        final JobStatusEvent event = new JobStatusEvent(uuid, newStatus);
+        for (final JobStatusListener listener: statusListeners) listener.jobStatusChanged(event);
       }
     }
     results.wakeUp();
@@ -365,6 +365,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @param out the output stream to which to write the job. 
    * @throws IOException if any I/O error occurs.
    */
+  @SuppressWarnings("static-method")
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
   }

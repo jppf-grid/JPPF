@@ -90,18 +90,18 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
         try {
           if (!handshakeDone) handshake();
           processNextRequest();
-        } catch(Exception e) {
+        } catch(final Exception e) {
           if (!isClosed()) {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
-            JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) owner;
+            final JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) owner;
             c.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
             c.submitInitialization();;
             break;
           }
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error('[' +getName()+"] "+e.getMessage(), e);
       close();
     }

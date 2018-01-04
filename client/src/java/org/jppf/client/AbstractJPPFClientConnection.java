@@ -95,7 +95,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
 
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
-    JPPFClientConnectionStatus oldStatus = getStatus();
+    final JPPFClientConnectionStatus oldStatus = getStatus();
     if (status != oldStatus) {
       if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
       this.status.set(status);
@@ -118,8 +118,8 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
    * @param oldStatus the connection status before the change.
    */
   void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
-    ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
+    final ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
+    for (final ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   /**
@@ -154,7 +154,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
 
   @Override
   TaskBundle sendHandshakeJob() throws Exception {
-    TaskBundle bundle = super.sendHandshakeJob();
+    final TaskBundle bundle = super.sendHandshakeJob();
     pool.setSystemInfo((JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM));
     pool.setDriverUuid((String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM));
     return bundle;
@@ -171,7 +171,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
     listeners.clear();
     try {
       sendCloseConnectionCommand();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
       else log.error('[' + name + "] " + e.getMessage());
     }
@@ -181,7 +181,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
       if (debugEnabled) log.debug("closing class server connection " + this);
       if (delegate != null) delegate.close();
       //if (debugEnabled) log.debug("closing jmx connection " + this);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
       else log.error('[' + name + "] " + e.getMessage());
     }

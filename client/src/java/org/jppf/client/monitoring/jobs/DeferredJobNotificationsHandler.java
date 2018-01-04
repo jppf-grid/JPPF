@@ -72,10 +72,10 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
   @Override
   void handleNotificationAsync(final JobNotification notif) {
-    JobInformation jobInfo = notif.getJobInformation();
-    JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
-    DriverNotif driverNotif = getDriverNotif(driver);
-    JPPFManagementInfo nodeInfo = notif.getNodeInfo();
+    final JobInformation jobInfo = notif.getJobInformation();
+    final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
+    final DriverNotif driverNotif = getDriverNotif(driver);
+    final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
     switch (notif.getEventType()) {
       case JOB_QUEUED:
         handleJobNotif(jobInfo, driverNotif, ADD);
@@ -100,19 +100,19 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
    */
   protected void publish() {
     try {
-      Map<String, DriverNotif> tmpMap = new HashMap<>();
+      final Map<String, DriverNotif> tmpMap = new HashMap<>();
       synchronized (driverMap) {
-        for (DriverNotif driverNotif : driverMap.values()) {
-          DriverNotif tmpDriverNotif = new DriverNotif(driverNotif.driver);
+        for (final DriverNotif driverNotif : driverMap.values()) {
+          final DriverNotif tmpDriverNotif = new DriverNotif(driverNotif.driver);
           tmpDriverNotif.jobs = driverNotif.jobs;
           driverNotif.jobs = new HashMap<>();
           tmpMap.put(tmpDriverNotif.driver.getUuid(), tmpDriverNotif);
         }
       }
       if (tmpMap.isEmpty()) return;
-      for (DriverNotif driverNotif : tmpMap.values()) {
+      for (final DriverNotif driverNotif : tmpMap.values()) {
         if (driverNotif.jobs.isEmpty()) continue;
-        JobDriver driver = driverNotif.driver;
+        final JobDriver driver = driverNotif.driver;
         Job job = null;
         for (JobNotif jn : driverNotif.jobs.values()) {
           switch (jn.type) {
@@ -137,8 +137,8 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
           if (jn.dispatches.isEmpty()) continue;
           job = driver.getJob(jn.jobInformation.getJobUuid());
           if (job != null) {
-            for (JobDispatchNotif jdn : jn.dispatches.values()) {
-              TopologyNode node = monitor.getTopologyManager().getNode(jdn.nodeInformation.getUuid());
+            for (final JobDispatchNotif jdn : jn.dispatches.values()) {
+              final TopologyNode node = monitor.getTopologyManager().getNode(jdn.nodeInformation.getUuid());
               switch (jdn.type) {
                 case ADD:
                   if (node != null) monitor.dispatchAdded(driver, job, new JobDispatch(jdn.jobInformation, node));
@@ -146,7 +146,7 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
                 case REMOVE:
                   if (node != null) {
-                    JobDispatch dispatch = job.getJobDispatch(node.getUuid());
+                    final JobDispatch dispatch = job.getJobDispatch(node.getUuid());
                     if (dispatch != null) monitor.dispatchRemoved(driver, job, dispatch);
                   }
                   break;
@@ -158,7 +158,7 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
         driverNotif.jobs.clear();
       }
       tmpMap.clear();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -187,9 +187,9 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
    */
   private void handleJobNotif(final JobInformation jobInfo, final DriverNotif driverNotif, final JobNotificationType type) {
     if (log.isTraceEnabled()) log.trace(String.format("type=%s, jobInfo=%s, driverNotif=%s", type, jobInfo, driverNotif));
-    JobNotif jn = new JobNotif(jobInfo, type);
+    final JobNotif jn = new JobNotif(jobInfo, type);
     synchronized (driverMap) {
-      JobNotif oldJN = driverNotif.jobs.get(jobInfo.getJobUuid());
+      final JobNotif oldJN = driverNotif.jobs.get(jobInfo.getJobUuid());
       if (oldJN == null) driverNotif.jobs.put(jobInfo.getJobUuid(), jn);
       else oldJN.merge(jn);
     }
@@ -212,8 +212,8 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
           driverNotif.jobs.put(jobInfo.getJobUuid(), jn);
         } else return;
       }
-      JobDispatchNotif jdn = new JobDispatchNotif(jobInfo, nodeInfo, type);
-      JobDispatchNotif oldJDN = jn.dispatches.get(nodeInfo.getUuid());
+      final JobDispatchNotif jdn = new JobDispatchNotif(jobInfo, nodeInfo, type);
+      final JobDispatchNotif oldJDN = jn.dispatches.get(nodeInfo.getUuid());
       if (oldJDN == null) jn.dispatches.put(nodeInfo.getUuid(), jdn);
       else oldJDN.merge(jdn);
     }

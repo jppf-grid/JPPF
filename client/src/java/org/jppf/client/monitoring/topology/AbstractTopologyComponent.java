@@ -30,6 +30,10 @@ import org.jppf.management.diagnostics.HealthSnapshot;
  */
 public abstract class AbstractTopologyComponent extends AbstractComponent<AbstractTopologyComponent> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Object describing the current health snapshot of a node or driver.
    */
   protected transient HealthSnapshot healthSnapshot = new HealthSnapshot();

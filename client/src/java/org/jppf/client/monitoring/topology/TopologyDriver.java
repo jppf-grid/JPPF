@@ -33,6 +33,10 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
  */
 public class TopologyDriver extends AbstractTopologyComponent {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * A driver connection.
    */
   private transient final JPPFClientConnection connection;
@@ -44,7 +48,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
   TopologyDriver(final JPPFClientConnection connection) {
     super(connection.getDriverUuid());
     this.connection = connection;
-    JPPFConnectionPool pool = connection.getConnectionPool();
+    final JPPFConnectionPool pool = connection.getConnectionPool();
     this.managementInfo = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
   }
 
@@ -78,11 +82,11 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    */
   public JPPFNodeForwardingMBean getForwarder() {
-    JMXDriverConnectionWrapper jmx = getJmx();
+    final JMXDriverConnectionWrapper jmx = getJmx();
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getNodeForwarder();
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }
     return null;
@@ -93,11 +97,11 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @return an instance of {@link DriverJobManagementMBean}.
    */
   public DriverJobManagementMBean getJobManager() {
-    JMXDriverConnectionWrapper jmx = getJmx();
+    final JMXDriverConnectionWrapper jmx = getJmx();
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getJobManager();
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }
     return null;
@@ -108,11 +112,11 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @return a {@link DiagnosticsMBean} instance.
    */
   public DiagnosticsMBean getDiagnostics() {
-    JMXDriverConnectionWrapper jmx = getJmx();
+    final JMXDriverConnectionWrapper jmx = getJmx();
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getDiagnosticsProxy();
-      } catch (@SuppressWarnings("unused") Exception ignore) {
+      } catch (@SuppressWarnings("unused") final Exception ignore) {
       }
     }
     return null;
@@ -120,7 +124,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("connection=").append(connection);
     sb.append(", managementInfo=").append(managementInfo);
     sb.append(", uuid=").append(uuid);
@@ -140,9 +144,9 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @since 5.1
    */
   public List<TopologyNode> getNodes() {
-    List<TopologyNode> nodes = new ArrayList<>(getChildCount());
+    final List<TopologyNode> nodes = new ArrayList<>(getChildCount());
     synchronized(this) {
-      for (AbstractTopologyComponent comp: children.values()) {
+      for (final AbstractTopologyComponent comp: children.values()) {
         if (comp.isNode()) nodes.add((TopologyNode) comp);
       }
     }
@@ -155,9 +159,9 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @since 5.1
    */
   public List<TopologyPeer> getPeers() {
-    List<TopologyPeer> peers = new ArrayList<>(getChildCount());
+    final List<TopologyPeer> peers = new ArrayList<>(getChildCount());
     synchronized(this) {
-      for (AbstractTopologyComponent comp: children.values()) {
+      for (final AbstractTopologyComponent comp: children.values()) {
         if (comp.isPeer()) peers.add((TopologyPeer) comp);
       }
     }
@@ -170,9 +174,9 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @since 5.1
    */
   public List<TopologyNode> getNodesAndPeers() {
-    List<TopologyNode> nodes = new ArrayList<>(getChildCount());
+    final List<TopologyNode> nodes = new ArrayList<>(getChildCount());
     synchronized(this) {
-      for (AbstractTopologyComponent comp: children.values()) nodes.add((TopologyNode) comp);
+      for (final AbstractTopologyComponent comp: children.values()) nodes.add((TopologyNode) comp);
     }
     return nodes;
   }

@@ -122,7 +122,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   public Task<?> add(final String method, final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-    Task <?>jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
+    final Task <?>jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
     tasks.add(jppfTask);
     jppfTask.setPosition(tasks.size()-1);
     return jppfTask;
@@ -189,7 +189,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel<ClientTaskBundle> channel, final List<Task<?>> tasks) {
     if (log.isDebugEnabled()) log.debug(String.format("firing %s event with %d tasks for %s", type, (tasks == null ? 0 : tasks.size()), this));
-    JobEvent event = new JobEvent(this, channel, tasks);
+    final JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
       break;
@@ -248,7 +248,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   public List<Task<?>> awaitResults(final long timeout) {
     try {
       await(timeout, false);
-    } catch (@SuppressWarnings("unused") TimeoutException ignore) {
+    } catch (@SuppressWarnings("unused") final TimeoutException ignore) {
     }
     return results.getResultsList();
   }
@@ -283,7 +283,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
     if (mayInterruptIfRunning || (getStatus() != JobStatus.EXECUTING)) {
       try {
         if (client != null) return client.cancelJob(uuid);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         log.error("error cancelling job {} : {}", this, ExceptionUtils.getStackTrace(e));
       }
     }
@@ -334,9 +334,9 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
    */
   void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
-    boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {
+    final boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
-        JobStatus status = getStatus();
+        final JobStatus status = getStatus();
         return (results.size() >= tasks.size()) && ((status == JobStatus.FAILED) || (status == JobStatus.COMPLETE));
       }
     }, timeout, 1000L);
@@ -360,9 +360,9 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
         if (persistenceManager != null) {
           try {
             @SuppressWarnings("unchecked")
-            JobPersistence<Object> pm = (JobPersistence<Object>) persistenceManager;
+            final JobPersistence<Object> pm = (JobPersistence<Object>) persistenceManager;
             pm.storeJob(pm.computeKey(this), this, tasks);
-          } catch (JobPersistenceException e) {
+          } catch (final JobPersistenceException e) {
             log.error(e.getMessage(), e);
           }
         }

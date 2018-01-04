@@ -30,6 +30,10 @@ import org.jppf.client.balancer.queue.JPPFPriorityQueue;
  */
 public class ClientQueueEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The job this event is for.
    */
   private final JPPFJob job;

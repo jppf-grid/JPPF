@@ -114,7 +114,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   public List<Task<?>> sendTasks(final ObjectSerializer ser, final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
-    TraversalList<String> uuidPath = new TraversalList<>();
+    final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     header.setTaskCount(job.unexecutedTaskCount());
@@ -122,21 +122,21 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    Task<?>[] tasks = prepareTasksToSend(header, job);
+    final Task<?>[] tasks = prepareTasksToSend(header, job);
 
-    SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    final SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
     try {
       IOHelper.sendData(socketClient, job.getDataProvider(), ser);
-    } catch(NotSerializableException e) {
+    } catch(final NotSerializableException e) {
       log.error("error serializing data provider for {} : {}\nthe job will be cancelled", job, ExceptionUtils.getStackTrace(e));
       IOHelper.sendData(socketClient, null, ser);
     }
-    List<Task<?>> notSerializableTasks = new ArrayList<>(tasks.length);
-    for (Task<?> task : tasks) {
+    final List<Task<?>> notSerializableTasks = new ArrayList<>(tasks.length);
+    for (final Task<?> task : tasks) {
       try {
         IOHelper.sendData(socketClient, task, ser);
-      } catch(NotSerializableException e) {
+      } catch(final NotSerializableException e) {
         log.error("error serializing task {} for {} : {}", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
         task.setThrowable(e);
         IOHelper.sendNullData(socketClient);
@@ -154,13 +154,13 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return an array of the tasks to send.
    */
   private Task<?>[] prepareTasksToSend(final TaskBundle header, final JPPFJob job) {
-    int count = job.unexecutedTaskCount();
-    int[] positions = new int[count];
-    int[] maxResubmits = new int[count];
-    Task<?>[] tasks = new Task<?>[count];
+    final int count = job.unexecutedTaskCount();
+    final int[] positions = new int[count];
+    final int[] maxResubmits = new int[count];
+    final Task<?>[] tasks = new Task<?>[count];
     int i = 0;
-    for (Task<?> task : job) {
-      int pos = task.getPosition();
+    for (final Task<?> task : job) {
+      final int pos = task.getPosition();
       if (!job.getResults().hasResult(pos)) {
         tasks[i] = task;
         positions[i] = pos;
@@ -180,9 +180,9 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    */
   TaskBundle sendHandshakeJob() throws Exception {
-    TaskBundle header = new JPPFTaskBundle();
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    TraversalList<String> uuidPath = new TraversalList<>();
+    final TaskBundle header = new JPPFTaskBundle();
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
@@ -193,7 +193,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setParameter(BundleParameter.CONNECTION_UUID, connectionUuid);
     header.setSLA(null);
     header.setMetadata(null);
-    SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    final SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser); // null data provider
     socketClient.flush();
@@ -205,9 +205,9 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    */
   void sendCloseConnectionCommand() throws Exception {
-    TaskBundle header = new JPPFTaskBundle();
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    TraversalList<String> uuidPath = new TraversalList<>();
+    final TaskBundle header = new JPPFTaskBundle();
+    final ObjectSerializer ser = new ObjectSerializerImpl();
+    final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(toDebugString() + " sending close command job, uuidPath=" + uuidPath);
@@ -217,7 +217,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setParameter(BundleParameter.CLOSE_COMMAND, true);
     header.setSLA(null);
     header.setMetadata(null);
-    SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    final SocketWrapper socketClient = taskServerConnection.getSocketClient();
     if (socketClient != null) {
       IOHelper.sendData(socketClient, header, ser);
       IOHelper.sendData(socketClient, null, ser); // null data provider
@@ -234,23 +234,23 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error is raised while reading the results from the server.
    */
   private Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
-    List<Task<?>> taskList = new LinkedList<>();
+    final List<Task<?>> taskList = new LinkedList<>();
     TaskBundle bundle = null;
-    ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
+    final ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
     try {
-      ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
+      final ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
       Thread.currentThread().setContextClassLoader(loader);
-      SocketWrapper socketClient = taskServerConnection.getSocketClient();
+      final SocketWrapper socketClient = taskServerConnection.getSocketClient();
       bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
-      int count = bundle.getTaskCount();
-      int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
+      final int count = bundle.getTaskCount();
+      final int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
       if (debugEnabled) {
         log.debug(toDebugString() + " : received bundle " + bundle + ", positions=" + StringUtils.buildString(positions));
       }
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try {
         for (int i = 0; i < count; i++) {
-          Task<?> task = (Task<?>) IOHelper.unwrappedData(socketClient, ser);
+          final Task<?> task = (Task<?>) IOHelper.unwrappedData(socketClient, ser);
           if (task != null) {
             if ((positions != null) && (i < positions.length)) task.setPosition(positions[i]);
             taskList.add(task);
@@ -261,14 +261,14 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       }
 
       // if an exception prevented the node from executing the tasks
-      Throwable t = bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+      final Throwable t = bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
       if (t != null) {
         if (debugEnabled) log.debug(toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
-        Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        for (Task<?> task : taskList) task.setThrowable(e);
+        final Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+        for (final Task<?> task : taskList) task.setThrowable(e);
       }
       return new Pair<>(bundle, taskList);
-    } catch (AsynchronousCloseException e) {
+    } catch (final AsynchronousCloseException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
     } finally {
@@ -298,7 +298,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception {
-    ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
+    final ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
     return receiveBundleAndResults(ser, cl).second();
   }
 
@@ -332,14 +332,14 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   public SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
-    ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
+    final ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
     Class<?> clazz = null;
-    for (ClassLoader cl: clArray) {
+    for (final ClassLoader cl: clArray) {
       try {
         if (cl == null) continue;
         clazz = Class.forName(helperClassName, true, cl);
         break;
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
       if (clazz == null) throw new IllegalStateException("could not load class " + helperClassName + " from any of these class loaders: " + Arrays.asList(clArray));
@@ -405,7 +405,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   protected String toDebugString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("connectionUuid=").append(connectionUuid);
     sb.append(", status=").append(status);

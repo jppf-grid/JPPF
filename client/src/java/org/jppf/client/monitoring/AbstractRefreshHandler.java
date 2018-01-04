@@ -96,7 +96,7 @@ public abstract class AbstractRefreshHandler {
     if (refreshTimer != null) return;
     if (refreshInterval <= 0L) return;
     refreshTimer = new Timer(name == null ? "RefreshHandler Timer" : name, true);
-    TimerTask task = new TimerTask() {
+    final TimerTask task = new TimerTask() {
       @Override
       public void run() {
         if (!suspended.get()) refresh();

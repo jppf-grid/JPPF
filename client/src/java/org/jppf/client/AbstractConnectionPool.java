@@ -132,12 +132,12 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
 
   @Override
   public void close() {
-    List<E> connections = getConnections();
-    for (E connection: connections) {
+    final List<E> connections = getConnections();
+    for (final E connection: connections) {
       try {
         connection.close();
-      } catch(Exception e) {
-        String format = "error while closing connection {} : {}";
+      } catch(final Exception e) {
+        final String format = "error while closing connection {} : {}";
         if (debugEnabled) log.debug(format, connection, ExceptionUtils.getMessage(e));
         else log.warn(format, connection, ExceptionUtils.getStackTrace(e));
       }
@@ -149,7 +149,7 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append(", size=").append(size);
     sb.append(", connectionCount=").append(connectionCount());
     sb.append(']');

@@ -23,14 +23,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.node.protocol.TaskState;
 
-
 /**
  * This map counts the number of each enum value that is put as a map value.
  * @author Laurent Cohen
  * @exclude
  */
-public class TaskStateMap extends TreeMap<Integer, TaskState>
-{
+public class TaskStateMap extends TreeMap<Integer, TaskState> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Maps for each state the number of tasks in this state.
    */
@@ -39,23 +41,21 @@ public class TaskStateMap extends TreeMap<Integer, TaskState>
   /**
    * Initialize this map.
    */
-  public TaskStateMap()
-  {
+  public TaskStateMap() {
     super();
-    for (TaskState state: TaskState.values()) stateCounts.put(state, new AtomicInteger(0));
+    for (TaskState state: TaskState.values())
+      stateCounts.put(state, new AtomicInteger(0));
   }
 
   @Override
-  public TaskState put(final Integer key, final TaskState state)
-  {
+  public TaskState put(final Integer key, final TaskState state) {
     if (state != null) stateCounts.get(state).incrementAndGet();
     return super.put(key, state);
   }
 
   @Override
-  public TaskState remove(final Object key)
-  {
-    TaskState state = super.remove(key);
+  public TaskState remove(final Object key) {
+    final TaskState state = super.remove(key);
     if (state != null) stateCounts.get(state).decrementAndGet();
     return state;
   }
@@ -65,16 +65,15 @@ public class TaskStateMap extends TreeMap<Integer, TaskState>
    * @param state the state for which to get a count.
    * @return the number of tasks that have this state.
    */
-  public int getStateCount(final TaskState state)
-  {
+  public int getStateCount(final TaskState state) {
     if (state == null) return 0;
     return stateCounts.get(state).get();
   }
 
   @Override
-  public void clear()
-  {
+  public void clear() {
     super.clear();
-    for (TaskState state: TaskState.values()) stateCounts.get(state).set(0);
+    for (TaskState state: TaskState.values())
+      stateCounts.get(state).set(0);
   }
 }

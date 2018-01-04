@@ -138,7 +138,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         taskQueueChecker.wakeUp();
       }
     });
-    Thread thread = new Thread(taskQueueChecker, "TaskQueueChecker");
+    final Thread thread = new Thread(taskQueueChecker, "TaskQueueChecker");
     thread.setDaemon(true);
     thread.start();
     this.queue.addQueueListener(client);
@@ -177,12 +177,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   protected void removeConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     try {
-      JPPFClientConnectionStatus status = wrapper.getStatus();
+      final JPPFClientConnectionStatus status = wrapper.getStatus();
       if (!status.isTerminatedStatus()) updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
-      /*
-      if (status.isTerminatedStatus()) updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, status);
-      else updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
-      */
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);
@@ -205,13 +201,13 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (wrapper == null) {
       try {
         wrapper = new ChannelWrapperRemote(cnn);
-        JPPFConnectionPool pool = cnn.getConnectionPool();
-        JPPFSystemInformation systemInfo = cnn.getSystemInfo();
+        final JPPFConnectionPool pool = cnn.getConnectionPool();
+        final JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), pool.getJmxPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
+        final JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), pool.getJmxPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         log.error("Error while adding connection " + cnn, e);
       } finally {
         synchronized(wrapperMap) {
@@ -261,11 +257,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @return a list of {@link ChannelWrapper} instances.
    */
   public List<ChannelWrapper> getWorkingRemoteConnections() {
-    List<ChannelWrapper> result = getWorkingConnections();
+    final List<ChannelWrapper> result = getWorkingConnections();
     if (isLocalExecutionEnabled()) {
-      Iterator<ChannelWrapper> it = result.iterator();
+      final Iterator<ChannelWrapper> it = result.iterator();
       while (it.hasNext()) {
-        ChannelWrapper channel = it.next();
+        final ChannelWrapper channel = it.next();
         if (channel.isLocal()) {
           it.remove();
           break;
@@ -294,11 +290,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
     if (wrapper != null) {
       if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
-        JPPFSystemInformation systemInfo = connection.getSystemInfo();
-        JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
+        final JPPFSystemInformation systemInfo = connection.getSystemInfo();
+        final JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
         wrapper.setSystemInformation(systemInfo);
         if (!wrapper.isLocal()) {
-          String driverUuid = connection.getDriverUuid();
+          final String driverUuid = connection.getDriverUuid();
           JPPFManagementInfo info = null;
           if (jmx != null) info = new JPPFManagementInfo(connection.getHost(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
           else info = new JPPFManagementInfo(connection.getHost(), -1, driverUuid != null ? driverUuid : "?", JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
@@ -329,19 +325,19 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (debugEnabled) log.debug(String.format("updating status from %s to %s for %s", oldStatus, newStatus, wrapper));
     if (wrapper == null || oldStatus == newStatus) return;
-    boolean bNew = newStatus.isWorkingStatus();
-    boolean bOld = oldStatus.isWorkingStatus();
-    int priority = wrapper.getPriority();
+    final boolean bNew = newStatus.isWorkingStatus();
+    final boolean bOld = oldStatus.isWorkingStatus();
+    final int priority = wrapper.getPriority();
     if (bNew && !bOld) {
       synchronized(priorityCounts) {
-        Integer n = priorityCounts.get(priority);
+        final Integer n = priorityCounts.get(priority);
         priorityCounts.put(priority, (n == null) ? 1 : n + 1);
         taskQueueChecker.setHighestPriority(priorityCounts.lastKey());
       }
       workingConnections.put(wrapper.getConnectionUuid(), wrapper);
     } else if (!bNew && bOld) {
       synchronized(priorityCounts) {
-        Integer n = priorityCounts.get(priority);
+        final Integer n = priorityCounts.get(priority);
         if (n != null) {
           if (n <= 1) priorityCounts.remove(priority);
           else priorityCounts.put(priority, n - 1);
@@ -367,10 +363,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   @Override
   public String submitJob(final JPPFJob job, final JobStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this jobmanager was closed");
-    List<Task<?>> pendingTasks = new ArrayList<>();
+    final List<Task<?>> pendingTasks = new ArrayList<>();
     if (listener != null) job.addJobStatusListener(listener);
-    List<Task<?>> tasks = job.getJobTasks();
-    for (Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
+    final List<Task<?>> tasks = job.getJobTasks();
+    for (final Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
     queue.addBundle(new ClientJob(job, pendingTasks));
     return job.getUuid();
   }
@@ -434,11 +430,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
 
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections() {
-    List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
-    Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
-    for (ChannelWrapper idleChannel : idleChannels) {
+    final List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
+    final Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
+    for (final ChannelWrapper idleChannel : idleChannels) {
       if (idleChannel instanceof ChannelWrapperRemote) {
-        ChannelWrapperRemote wrapperRemote = (ChannelWrapperRemote) idleChannel;
+        final ChannelWrapperRemote wrapperRemote = (ChannelWrapperRemote) idleChannel;
         availableConnections.add(wrapperRemote.getChannel());
       }
     }
@@ -483,7 +479,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   public LoadBalancingInformation getLoadBalancerSettings() {
     synchronized(loadBalancingInformationLock) {
       if (currentLoadBalancingInformation == null) {
-        LoadBalancingInformation info = bundlerFactory.getCurrentInfo();
+        final LoadBalancingInformation info = bundlerFactory.getCurrentInfo();
         currentLoadBalancingInformation = new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), bundlerFactory.getBundlerProviderNames());
       }
       return currentLoadBalancingInformation;
@@ -494,9 +490,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception {
     if (algorithm == null) throw new IllegalArgumentException("Error: no algorithm specified (null value)");
     if (!bundlerFactory.getBundlerProviderNames().contains(algorithm)) throw new IllegalArgumentException("Error: unknown algorithm '" + algorithm + '\'');
-    TypedProperties props = (parameters == null) ? new TypedProperties() : new TypedProperties(parameters);
+    final TypedProperties props = (parameters == null) ? new TypedProperties() : new TypedProperties(parameters);
     synchronized(loadBalancingInformationLock) {
-      LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
+      final LoadBalancingInformation lbi = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
       currentLoadBalancingInformation = bundlerFactory.setAndGetCurrentInfo(lbi);
     }
   }

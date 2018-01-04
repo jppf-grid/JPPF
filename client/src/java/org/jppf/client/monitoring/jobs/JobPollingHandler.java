@@ -58,22 +58,22 @@ class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringH
   @Override
   protected void performRefresh() {
     try {
-      for (JobDriver jobDriver: monitor.getJobDrivers()) {
-        DriverJobManagementMBean proxy = jobDriver.getJobManager();
+      for (final JobDriver jobDriver: monitor.getJobDrivers()) {
+        final DriverJobManagementMBean proxy = jobDriver.getJobManager();
         if (proxy == null) continue;
         try {
-          JobInformation[] jobInfos = proxy.getJobInformation(JobSelector.ALL_JOBS);
-          Map<String, NodeJobInformation[]> nodeJobInfos = proxy.getNodeInformation(JobSelector.ALL_JOBS);
+          final JobInformation[] jobInfos = proxy.getJobInformation(JobSelector.ALL_JOBS);
+          final Map<String, NodeJobInformation[]> nodeJobInfos = proxy.getNodeInformation(JobSelector.ALL_JOBS);
           refreshJobs(jobDriver, jobInfos);
-          for (Map.Entry<String, NodeJobInformation[]> entry: nodeJobInfos.entrySet()) {
-            Job job = jobDriver.getJob(entry.getKey());
+          for (final Map.Entry<String, NodeJobInformation[]> entry: nodeJobInfos.entrySet()) {
+            final Job job = jobDriver.getJob(entry.getKey());
             refreshDispatches(jobDriver, job, entry.getValue());
           }
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error("error getting jobs information for driver {} : {}", jobDriver, ExceptionUtils.getStackTrace(e));
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -85,12 +85,12 @@ class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringH
    * @throws Exception if any error occurs.
    */
   private void refreshJobs(final JobDriver jobDriver, final JobInformation[] jobInfos) throws Exception {
-    List<Job> monitorJobs = jobDriver.getJobs();
-    Map<String, JobInformation> jobInfoMap = new HashMap<>();
-    for (JobInformation info: jobInfos) jobInfoMap.put(info.getJobUuid(), info);
-    Set<String> driverUuids = new HashSet<>(jobInfoMap.keySet());
-    List<String> monitorUuids = new ArrayList<>(monitorJobs.size());
-    for (Job job: monitorJobs) monitorUuids.add(job.getUuid());
+    final List<Job> monitorJobs = jobDriver.getJobs();
+    final Map<String, JobInformation> jobInfoMap = new HashMap<>();
+    for (final JobInformation info: jobInfos) jobInfoMap.put(info.getJobUuid(), info);
+    final Set<String> driverUuids = new HashSet<>(jobInfoMap.keySet());
+    final List<String> monitorUuids = new ArrayList<>(monitorJobs.size());
+    for (final Job job: monitorJobs) monitorUuids.add(job.getUuid());
     // handle the jobs to remove
     List<String> toHandle = new ArrayList<>(monitorUuids);
     toHandle.removeAll(driverUuids);
@@ -102,11 +102,11 @@ class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringH
     // handle the jobs to update
     toHandle = new ArrayList<>(monitorUuids);
     toHandle.retainAll(driverUuids);
-    for (String uuid: toHandle) {
-      JobInformation oldInfo = jobDriver.getJob(uuid).getJobInformation();
-      JobInformation newInfo = jobInfoMap.get(uuid);
+    for (final String uuid: toHandle) {
+      final JobInformation oldInfo = jobDriver.getJob(uuid).getJobInformation();
+      final JobInformation newInfo = jobInfoMap.get(uuid);
       if (monitor.isJobUpdated(oldInfo, newInfo)) {
-        Job job = jobDriver.getJob(uuid);
+        final Job job = jobDriver.getJob(uuid);
         job.setJobInformation(newInfo);
         monitor.jobUpdated(jobDriver, job);
       }
@@ -122,12 +122,12 @@ class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringH
    */
   private void refreshDispatches(final JobDriver jobDriver, final Job job, final NodeJobInformation[] nodeInfos) throws Exception {
     if (job == null) return;
-    List<JobDispatch> monitorDispatches = job.getJobDispatches();
-    Map<String, NodeJobInformation> nodeJobInfoMap = new HashMap<>();
-    for (NodeJobInformation nji: nodeInfos) nodeJobInfoMap.put(nji.getNodeInfo().getUuid(), nji);
-    Set<String> driverUuids = new HashSet<>(nodeJobInfoMap.keySet());
-    List<String> monitorUuids = new ArrayList<>(monitorDispatches.size());
-    for (JobDispatch dispatch: monitorDispatches) monitorUuids.add(dispatch.getUuid());
+    final List<JobDispatch> monitorDispatches = job.getJobDispatches();
+    final Map<String, NodeJobInformation> nodeJobInfoMap = new HashMap<>();
+    for (final NodeJobInformation nji: nodeInfos) nodeJobInfoMap.put(nji.getNodeInfo().getUuid(), nji);
+    final Set<String> driverUuids = new HashSet<>(nodeJobInfoMap.keySet());
+    final List<String> monitorUuids = new ArrayList<>(monitorDispatches.size());
+    for (final JobDispatch dispatch: monitorDispatches) monitorUuids.add(dispatch.getUuid());
     // handle the dispatches to remove
     List<String> toHandle = new ArrayList<>(monitorUuids);
     toHandle.removeAll(driverUuids);
@@ -135,9 +135,9 @@ class JobPollingHandler extends AbstractRefreshHandler implements JobMonitoringH
     // handle the dispatches to add
     toHandle = new ArrayList<>(driverUuids);
     toHandle.removeAll(monitorUuids);
-    for (String uuid: toHandle) {
-      NodeJobInformation nji = nodeJobInfoMap.get(uuid);
-      TopologyNode node = monitor.getTopologyManager().getNode(uuid);
+    for (final String uuid: toHandle) {
+      final NodeJobInformation nji = nodeJobInfoMap.get(uuid);
+      final TopologyNode node = monitor.getTopologyManager().getNode(uuid);
       if (node != null) monitor.dispatchAdded(jobDriver, job, new JobDispatch(nji.getJobInformation(), node));
     }
   }

@@ -135,7 +135,6 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
-  @SuppressWarnings("deprecation")
   @Override
   public Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
     if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
@@ -144,7 +143,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
         this.bundler.dispose();
         if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       }
-      Pair<String, Bundler<?>> bp = getLoadBalancerPersistenceManager().loadBundler(channelID);
+      final Pair<String, Bundler<?>> bp = getLoadBalancerPersistenceManager().loadBundler(channelID);
       this.bundler = bp.second();
       this.bundlerAlgorithm = bp.first();
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
@@ -175,7 +174,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
       this.systemInfo = systemInfo;
       if (traceEnabled) log.trace("setting system info for " + this + ", jppf.channel.local=" + this.systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     } else if (traceEnabled) {
-      Exception e = new Exception("call stack for setSystemInfo(null)");
+      final Exception e = new Exception("call stack for setSystemInfo(null)");
       log.trace(e.getMessage(), e);
     }
   }
@@ -222,8 +221,8 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    */
   protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
     if (oldValue == newValue) return;
-    ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
-    for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
+    final ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
+    for (final ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
   @Override

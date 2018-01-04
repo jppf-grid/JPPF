@@ -28,6 +28,10 @@ import java.util.EventObject;
  */
 public class TopologyEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Data for the driver.
    */
   private final TopologyDriver driverData;
@@ -131,7 +135,7 @@ public class TopologyEvent extends EventObject {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("source=").append(getTopologyManager());
     sb.append(", driver=").append(getDriver());
     sb.append(", node/peer=").append(getNodeOrPeer());

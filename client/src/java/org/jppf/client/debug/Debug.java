@@ -49,11 +49,11 @@ public class Debug implements DebugMBean {
 
   @Override
   public String allConnections() {
-    List<JPPFConnectionPool> all = client.getConnectionPools();
-    StringBuilder sb = new StringBuilder();
+    final List<JPPFConnectionPool> all = client.getConnectionPools();
+    final StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (JPPFConnectionPool pool: all) {
-      for (JPPFClientConnection c: pool.getConnections()) {
+    for (final JPPFConnectionPool pool: all) {
+      for (final JPPFClientConnection c: pool.getConnections()) {
         if (count > 0) sb.append('\n');
         sb.append(c.toString());
         count++;
@@ -68,13 +68,13 @@ public class Debug implements DebugMBean {
    */
   public static void register(final JPPFClient client) {
     try {
-      Debug debug = new Debug(client);
-      StandardMBean mbean = new StandardMBean(debug, DebugMBean.class);
-      ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      final Debug debug = new Debug(client);
+      final StandardMBean mbean = new StandardMBean(debug, DebugMBean.class);
+      final ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
+      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       server.registerMBean(mbean, name);
       //System.out.println("registered client debug mbean: " + name);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -85,10 +85,10 @@ public class Debug implements DebugMBean {
    */
   public static void unregister(final JPPFClient client) {
     try {
-      ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      final ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
+      final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       if (server.isRegistered(name)) server.unregisterMBean(name);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
@@ -110,10 +110,10 @@ public class Debug implements DebugMBean {
 
   @Override
   public String allParameters() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (Map.Entry<String, String> param: parameters.entrySet()) {
-      if (count > 0) sb.append('\n');
+    for (final Map.Entry<String, String> param: parameters.entrySet()) {
+      if (count++ > 0) sb.append('\n');
       sb.append(param.getKey()).append(" = ").append(param.getValue());
     }
     return sb.toString();

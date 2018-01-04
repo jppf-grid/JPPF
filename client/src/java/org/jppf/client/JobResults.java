@@ -85,8 +85,8 @@ public class JobResults extends ThreadSynchronization implements Serializable {
    */
   public synchronized void addResults(final List<Task<?>> tasks) {
     if (debugEnabled) log.debug("adding {} results", tasks.size());
-    for (Task<?> task : tasks) {
-      int pos = task.getPosition();
+    for (final Task<?> task : tasks) {
+      final int pos = task.getPosition();
       if (traceEnabled) log.debug("adding result at positon {}", pos);
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
@@ -111,7 +111,7 @@ public class JobResults extends ThreadSynchronization implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("size=").append(size());
     synchronized (this) {
@@ -137,7 +137,7 @@ public class JobResults extends ThreadSynchronization implements Serializable {
    * @return the task whose results were received, or null if the timeout expired before it was received.
    */
   public synchronized Task<?> waitForTask(final int position, final long timeout) {
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     while (((System.nanoTime() - start) / 1_000_000L < timeout) && !hasResult(position)) goToSleep(1L);
     return getResultTask(position);
   }

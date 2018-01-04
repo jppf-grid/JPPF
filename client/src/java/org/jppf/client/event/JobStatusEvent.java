@@ -29,6 +29,10 @@ import org.jppf.client.JobStatus;
  */
 public class JobStatusEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The status of the job.
    */
   private JobStatus status = null;

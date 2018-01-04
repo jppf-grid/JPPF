@@ -97,8 +97,8 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
    * @return the process future.
    */
   private JPPFTaskFuture<V> processFuture(final JPPFTaskFuture<V> future) {
-    JPPFJob job = future.getJob();
-    String uuid = job.getUuid();
+    final JPPFJob job = future.getJob();
+    final String uuid = job.getUuid();
     synchronized(futureMap) {
       Map<Integer, JPPFTaskFuture<V>> map = futureMap.get(uuid);
       if (map == null) {
@@ -119,7 +119,7 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
     if (future == null) throw new IllegalArgumentException("future should not be null");
     try {
       future.getResult(0L);
-    } catch (TimeoutException e) {
+    } catch (final TimeoutException e) {
       e.printStackTrace();
     }
     queue.offer(future);
@@ -133,10 +133,10 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
   private class ResultCollectorListener extends JobListenerAdapter {
     @Override
     public void jobReturned(final JobEvent event) {
-      List<Task<?>> tasks = event.getJobTasks();
+      final List<Task<?>> tasks = event.getJobTasks();
       if (tasks != null) {
-        JPPFJob job = event.getJob();
-        String uuid = job.getUuid();
+        final JPPFJob job = event.getJob();
+        final String uuid = job.getUuid();
         Map<Integer, JPPFTaskFuture<V>> map = null;
         synchronized(futureMap) {
           map = futureMap.get(uuid);
@@ -158,15 +158,15 @@ public class JPPFCompletionService<V> implements CompletionService<V> {
 
     @Override
     public void jobEnded(final JobEvent event) {
-      JPPFJob job = event.getJob();
-      String uuid = job.getUuid();
+      final JPPFJob job = event.getJob();
+      final String uuid = job.getUuid();
       Map<Integer, JPPFTaskFuture<V>> map = null;
       synchronized(futureMap) {
         map = futureMap.remove(uuid);
       }
       if (map != null) {
-        for (Map.Entry<Integer, JPPFTaskFuture<V>> entry: map.entrySet()) {
-          JPPFTaskFuture<V> future = entry.getValue();
+        for (final Map.Entry<Integer, JPPFTaskFuture<V>> entry: map.entrySet()) {
+          final JPPFTaskFuture<V> future = entry.getValue();
           processFutureCompletion(future);
           if (debugEnabled) log.debug("added future[job uuid=" + uuid + ", position=" + future.getPosition() + "] to the queue");
         }

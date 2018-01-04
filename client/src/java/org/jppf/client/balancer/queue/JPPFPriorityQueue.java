@@ -73,7 +73,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   @Override
   public ClientJob addBundle(final ClientJob clientJob) {
-    JobSLA sla = clientJob.getSLA();
+    final JobSLA sla = clientJob.getSLA();
     final String jobUuid = clientJob.getUuid();
     if (sla.isBroadcastJob() && (clientJob.getBroadcastUUID() == null)) {
       if (debugEnabled) log.debug("before processing broadcast job " + clientJob.getJob());
@@ -123,7 +123,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      int size = getSize(bundleWrapper);
+      final int size = getSize(bundleWrapper);
       decrementSizeCount(size);
       if (nbTasks >= bundleWrapper.getTaskCount()) {
         bundleWrapper.setOnRequeue(new Runnable() {
@@ -198,11 +198,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   private void processBroadcastJob(final ClientJob clientJob, final List<ChannelWrapper> workingRemoteConnections) {
     scheduleManager.handleStartJobSchedule(clientJob);
     scheduleManager.handleExpirationJobSchedule(clientJob);
-    JPPFJob bundle = clientJob.getJob();
-    List<ChannelWrapper> connections = jobManager.getAllConnections();
-    for (Iterator<ChannelWrapper> it=connections.iterator(); it.hasNext();) {
-      ChannelWrapper ch = it.next();
-      ExecutorStatus status = ch.getExecutionStatus();
+    final JPPFJob bundle = clientJob.getJob();
+    final List<ChannelWrapper> connections = jobManager.getAllConnections();
+    for (final Iterator<ChannelWrapper> it=connections.iterator(); it.hasNext();) {
+      final ChannelWrapper ch = it.next();
+      final ExecutorStatus status = ch.getExecutionStatus();
       if (ch.isLocal() || !((status == ExecutorStatus.ACTIVE) || (status == ExecutorStatus.EXECUTING))) it.remove();
     }
     if (log.isTraceEnabled()) log.trace(String.format("%d connection(s) for broadcast job '%s' : %s", connections.size(), bundle.getName(), connections));
@@ -211,14 +211,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       return;
     }
     pendingBroadcasts.remove(bundle.getUuid());
-    JobSLA sla = bundle.getSLA();
-    List<ClientJob> jobList = new ArrayList<>(connections.size());
-    Set<String> uuidSet = new HashSet<>();
-    for (ChannelWrapper connection : connections) {
-      String uuid = connection.getUuid();
+    final JobSLA sla = bundle.getSLA();
+    final List<ClientJob> jobList = new ArrayList<>(connections.size());
+    final Set<String> uuidSet = new HashSet<>();
+    for (final ChannelWrapper connection : connections) {
+      final String uuid = connection.getUuid();
       if ((uuid != null) && (uuid.length() > 0) && uuidSet.add(uuid)) {
-        ClientJob newBundle = clientJob.createBroadcastJob(uuid);
-        JPPFManagementInfo info = connection.getManagementInfo();
+        final ClientJob newBundle = clientJob.createBroadcastJob(uuid);
+        final JPPFManagementInfo info = connection.getManagementInfo();
         newBundle.setClientSLA(bundle.getClientSLA().copy());
         newBundle.setSLA(sla.copy());
         newBundle.setMetadata(bundle.getMetadata());
@@ -247,7 +247,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * @param clientJob the job to prepare.
    */
   private void prepareClientJob(final ClientJob clientJob) {
-    ClientJob other = jobMap.get(clientJob.getUuid());
+    final ClientJob other = jobMap.get(clientJob.getUuid());
     if (other != null) throw new IllegalStateException("Job " + clientJob.getUuid() + " already enqueued");
     clientJob.addOnDone(new Runnable() {
       @Override
@@ -274,9 +274,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   public void updatePriority(final String jobUuid, final int newPriority) {
     lock.lock();
     try {
-      ClientJob job = jobMap.get(jobUuid);
+      final ClientJob job = jobMap.get(jobUuid);
       if (job == null) return;
-      int oldPriority = job.getJob().getSLA().getPriority();
+      final int oldPriority = job.getJob().getSLA().getPriority();
       if (oldPriority != newPriority) {
         job.getJob().getSLA().setPriority(newPriority);
         priorityMap.removeValue(oldPriority, job);
@@ -296,7 +296,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     if (debugEnabled) log.debug("requesting cancel of jobId=" + jobId);
     lock.lock();
     try {
-      ClientJob job = jobMap.get(jobId);
+      final ClientJob job = jobMap.get(jobId);
       return job == null ? false : job.cancel(false);
     } finally {
       lock.unlock();
@@ -346,8 +346,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   public void processPendingBroadcasts() {
     if (!jobManager.hasWorkingConnection() || pendingBroadcasts.isEmpty()) return;
-    for (Map.Entry<String, ClientJob> entry: pendingBroadcasts.entrySet()) {
-      ClientJob clientJob = entry.getValue();
+    for (final Map.Entry<String, ClientJob> entry: pendingBroadcasts.entrySet()) {
+      final ClientJob clientJob = entry.getValue();
       if (log.isTraceEnabled()) log.trace("queuing broadcast job " + clientJob.getJob());
       processBroadcastJob(clientJob, jobManager.getWorkingRemoteConnections());
     }
@@ -362,10 +362,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   public List<JPPFJob> getJPPFJobs() {
     lock.lock();
     try {
-      int size = priorityMap.size();
+      final int size = priorityMap.size();
       if (size <= 0) return Collections.<JPPFJob>emptyList();
-      List<JPPFJob> list = new ArrayList<>(size);
-      for (ClientJob clientJob: priorityMap) list.add(clientJob.getJob());
+      final List<JPPFJob> list = new ArrayList<>(size);
+      for (final ClientJob clientJob: priorityMap) list.add(clientJob.getJob());
       return list;
     } finally {
       lock.unlock();

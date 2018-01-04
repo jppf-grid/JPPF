@@ -290,7 +290,7 @@ public abstract class AbstractClientJob {
    * Called when task was cancelled or finished.
    */
   protected void done() {
-    Runnable[] runnables;
+    final Runnable[] runnables;
     synchronized (onDoneList) {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
@@ -377,10 +377,10 @@ public abstract class AbstractClientJob {
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
     if (traceEnabled) log.trace(String.format("job '%s' : pending=%b, expired=%b, nb channels=%d, max channels=%d", job.getName(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
     if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
-    ExecutionPolicy policy = clientSla.getExecutionPolicy();
+    final ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;
     if (policy != null) {
-      JPPFSystemInformation info = channel.getSystemInformation();
+      final JPPFSystemInformation info = channel.getSystemInformation();
       preparePolicy(policy);
       b = policy.evaluate(info);
       if (traceEnabled) log.trace("policy result = " + b);

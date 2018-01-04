@@ -139,7 +139,7 @@ public class JPPFClient extends AbstractGenericClient {
     JobManager jobManager = null;
     try {
       jobManager = new JobManagerClient(this, bundlerFactory);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Can't initialize job Manager", e);
     }
     return jobManager;
@@ -218,7 +218,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public JPPFConnectionPool awaitConnectionPool(final long timeout, final JPPFClientConnectionStatus...statuses) {
-    List<JPPFConnectionPool> list = awaitConnectionPools(timeout, statuses);
+    final List<JPPFConnectionPool> list = awaitConnectionPools(timeout, statuses);
     return list.isEmpty() ? null : list.get(0);
   }
 
@@ -300,10 +300,10 @@ public class JPPFClient extends AbstractGenericClient {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
-        List<JPPFConnectionPool> result = new ArrayList<>();
-        List<JPPFConnectionPool> temp = findConnectionPools(statuses);
-        for (JPPFConnectionPool pool: temp) {
-          List<JPPFClientConnection> list = pool.getConnections(statuses);
+        final List<JPPFConnectionPool> result = new ArrayList<>();
+        final List<JPPFConnectionPool> temp = findConnectionPools(statuses);
+        for (final JPPFConnectionPool pool: temp) {
+          final List<JPPFClientConnection> list = pool.getConnections(statuses);
           if (connectionOperator.evaluate(list.size(), expectedConnections)) result.add(pool);
         }
         ref.setSynchronized(result, pools);
@@ -325,9 +325,9 @@ public class JPPFClient extends AbstractGenericClient {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
-        List<JPPFConnectionPool> result = new ArrayList<>();
-        List<JPPFConnectionPool> temp = getConnectionPools();
-        for (JPPFConnectionPool pool: temp) {
+        final List<JPPFConnectionPool> result = new ArrayList<>();
+        final List<JPPFConnectionPool> temp = getConnectionPools();
+        for (final JPPFConnectionPool pool: temp) {
           if (filter.accepts(pool)) result.add(pool);
         }
         return !ref.setSynchronized(result, pools).isEmpty();
@@ -364,7 +364,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.2.7
    */
   public LoadBalancingInformation getLoadBalancerSettings() {
-    JobManager manager = getJobManager();
+    final JobManager manager = getJobManager();
     return (manager == null) ? null : manager.getLoadBalancerSettings();
   }
 
@@ -376,7 +376,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.2.7
    */
   public void setLoadBalancerSettings(final String algorithm, final Properties parameters) throws Exception {
-    JobManager manager = getJobManager();
+    final JobManager manager = getJobManager();
     if (manager != null) manager.setLoadBalancerSettings(algorithm, parameters);
   }
 

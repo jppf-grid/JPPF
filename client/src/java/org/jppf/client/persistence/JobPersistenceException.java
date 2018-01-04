@@ -24,15 +24,18 @@ import org.jppf.JPPFException;
  * Exception thrown when an error occurs during a job persistence operation.
  * @author Laurent Cohen
  */
-public class JobPersistenceException extends JPPFException
-{
+public class JobPersistenceException extends JPPFException {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JobPersistenceException(final String message, final Throwable cause)
-  {
+  public JobPersistenceException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -40,8 +43,7 @@ public class JobPersistenceException extends JPPFException
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JobPersistenceException(final String message)
-  {
+  public JobPersistenceException(final String message) {
     super(message);
   }
 
@@ -49,8 +51,7 @@ public class JobPersistenceException extends JPPFException
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JobPersistenceException(final Throwable cause)
-  {
+  public JobPersistenceException(final Throwable cause) {
     super(cause);
   }
 }

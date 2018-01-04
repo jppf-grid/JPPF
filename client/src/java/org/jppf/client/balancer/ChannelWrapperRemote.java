@@ -28,7 +28,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.load.balancer.BundlerHelper;
-import org.jppf.load.balancer.persistence.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
@@ -65,7 +65,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   public ChannelWrapperRemote(final JPPFClientConnection channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     this.channel = (JPPFClientConnectionImpl) channel;
-    JPPFConnectionPool pool = channel.getConnectionPool();
+    final JPPFConnectionPool pool = channel.getConnectionPool();
     this.uuid = pool.getDriverUuid();
     priority = pool.getPriority();
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
@@ -88,21 +88,21 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       if (uuid != null && uuid.isEmpty()) uuid = null;
     }
     try {
-      TaskServerConnectionHandler handler = channel.getTaskServerConnection();
-      SocketWrapper socketClient = handler.getSocketClient();
+      final TaskServerConnectionHandler handler = channel.getTaskServerConnection();
+      final SocketWrapper socketClient = handler.getSocketClient();
       if (socketClient != null) {
-        StringBuilder sb = new StringBuilder();
-        String ip = NetworkUtils.getNonLocalHostAddress();
+        final StringBuilder sb = new StringBuilder();
+        final String ip = NetworkUtils.getNonLocalHostAddress();
         sb.append(channel.getName());
         sb.append('[').append(ip == null ? "localhost" : ip).append(']');
-        InetSocketAddress sa = (InetSocketAddress) socketClient.getSocket().getRemoteSocketAddress();
+        final InetSocketAddress sa = (InetSocketAddress) socketClient.getSocket().getRemoteSocketAddress();
         sb.append(sa.getAddress().getHostAddress()).append(':').append(socketClient.getPort());
         sb.append(channel.isSSLEnabled());
-        String s = sb.toString();
+        final String s = sb.toString();
         channelID = new Pair<>(s, CryptoUtils.computeHash(s, channel.getPool().getClient().getBundlerFactory().getHashAlgorithm()));
         if (debugEnabled) log.debug("computed channelID for {} : {}", this, channelID);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -149,7 +149,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("submitting {} to {}", bundle, this);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    ExecutorService executor = channel.getClient().getExecutor();
+    final ExecutorService executor = channel.getClient().getExecutor();
     executor.execute(new RemoteRunnable(bundle, channel));
     if (debugEnabled) log.debug("end submitting {} to {}", bundle, this);
     return null;
@@ -172,7 +172,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   @Override
   public boolean cancel(final ClientTaskBundle bundle) {
     if (bundle.isCancelled()) return false;
-    String uuid = bundle.getClientJob().getUuid();
+    final String uuid = bundle.getClientJob().getUuid();
     if (debugEnabled) log.debug("requesting cancel of jobId=" + uuid);
     bundle.cancel();
     return true;
@@ -215,22 +215,22 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     @Override
     public void run() {
       Exception exception = null;
-      List<Task<?>> tasks = this.clientBundle.getTasksL();
+      final List<Task<?>> tasks = this.clientBundle.getTasksL();
       try {
-        long start = System.nanoTime();
+        final long start = System.nanoTime();
         int count = 0;
 
         boolean completed = false;
-        JPPFJob newJob = createNewJob(clientBundle, tasks);
+        final JPPFJob newJob = createNewJob(clientBundle, tasks);
         if (debugEnabled) log.debug(String.format("%s executing %d tasks of job %s", ChannelWrapperRemote.this, tasks.size(), newJob));
-        Collection<ClassLoader> loaders = registerClassLoaders(newJob);
+        final Collection<ClassLoader> loaders = registerClassLoaders(newJob);
         while (!completed) {
-          TaskBundle bundle = createBundle(newJob);
+          final TaskBundle bundle = createBundle(newJob);
           bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
-          ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
-          ObjectSerializer ser = connection.makeHelper(cl).getSerializer();
-          List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
+          final ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
+          final ObjectSerializer ser = connection.makeHelper(cl).getSerializer();
+          final List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
           clientBundle.jobDispatched(ChannelWrapperRemote.this);
           if (!notSerializableTasks.isEmpty()) {
             if (debugEnabled) log.debug(String.format("%s got %d non-serializable tasks", ChannelWrapperRemote.this, notSerializableTasks.size()));
@@ -238,21 +238,21 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
             clientBundle.resultsReceived(notSerializableTasks);
           }
           while (count < tasks.size()) {
-            List<Task<?>> results = connection.receiveResults(ser, cl);
-            int n = results.size();
+            final List<Task<?>> results = connection.receiveResults(ser, cl);
+            final int n = results.size();
             count += n;
             if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
             this.clientBundle.resultsReceived(results);
           }
           completed = true;
         }
-        double elapsed = System.nanoTime() - start;
+        final double elapsed = System.nanoTime() - start;
         BundlerHelper.updateBundler(bundler, tasks.size(), elapsed);
         getLoadBalancerPersistenceManager().storeBundler(channelID, bundler, bundlerAlgorithm);
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
-        boolean channelClosed = channel.isClosed();
+        final boolean channelClosed = channel.isClosed();
         if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
         if (channelClosed && !resetting) return;
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
@@ -267,12 +267,12 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         }
       } finally {
         try {
-          boolean channelClosed = channel.isClosed();
+          final boolean channelClosed = channel.isClosed();
           if (debugEnabled) log.debug("finally: channelClosed={}, resetting={}", channelClosed, resetting);
           if (!channelClosed || resetting) clientBundle.taskCompleted(exception);
           clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
           if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -286,16 +286,16 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @throws Exception if any error occurs.
      */
     private JPPFJob createNewJob(final ClientTaskBundle job, final List<Task<?>> tasks) throws Exception {
-      JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
+      final JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
       newJob.setDataProvider(job.getJob().getDataProvider());
       newJob.setSLA(job.getSLA());
       newJob.setClientSLA(job.getJob().getClientSLA());
       newJob.setMetadata(job.getMetadata());
       newJob.setBlocking(job.getJob().isBlocking());
       newJob.setName(job.getName());
-      for (Task<?> task : tasks) {
+      for (final Task<?> task : tasks) {
         // needed as JPPFJob.addTask() resets the position
-        int pos = task.getPosition();
+        final int pos = task.getPosition();
         newJob.add(task);
         task.setPosition(pos);
       }
@@ -308,7 +308,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @return a JPPFTaskBundle instance.
      */
     private TaskBundle createBundle(final JPPFJob job) {
-      TaskBundle bundle = new JPPFTaskBundle();
+      final TaskBundle bundle = new JPPFTaskBundle();
       bundle.setUuid(job.getUuid());
       return bundle;
     }
@@ -320,13 +320,13 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      */
     private Collection<ClassLoader> registerClassLoaders(final JPPFJob job) {
       if (job == null) throw new IllegalArgumentException("job is null");
-      Set<ClassLoader> result = new HashSet<>();
+      final Set<ClassLoader> result = new HashSet<>();
       if (!job.getJobTasks().isEmpty()) {
-        JPPFClient client = connection.getClient();
-        for (Task<?> task: job.getJobTasks()) {
+        final JPPFClient client = connection.getClient();
+        for (final Task<?> task: job.getJobTasks()) {
           if (task != null) {
-            Object o = task.getTaskObject();
-            ClassLoader cl = (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
+            final Object o = task.getTaskObject();
+            final ClassLoader cl = (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
             if ((cl != null) && !result.contains(cl)) {
               client.registerClassLoader(cl, job.getUuid());
               result.add(cl);

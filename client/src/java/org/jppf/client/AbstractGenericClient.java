@@ -121,24 +121,24 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     resetting.set(false);
     this.config = initConfig(configuration);
     try {
-      Map<String, DataSource> result = JPPFDatasourceFactory.getInstance().createDataSources(config);
+      final Map<String, DataSource> result = JPPFDatasourceFactory.getInstance().createDataSources(config);
       log.info(String.format("created client-side datasources: %s", result.keySet()));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     this.bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT, config);
     this.loadBalancerPersistenceManager = new LoadBalancerPersistenceManager(this.bundlerFactory);
     try {
       HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    int coreThreads = Runtime.getRuntime().availableProcessors();
-    BlockingQueue<Runnable> queue = new SynchronousQueue<>();
+    final int coreThreads = Runtime.getRuntime().availableProcessors();
+    final BlockingQueue<Runnable> queue = new SynchronousQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (jobManager == null) jobManager = createJobManager();
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override
       public void run() {
         initPools(config);
@@ -179,19 +179,19 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       boolean initPeers;
       if (config.get(JPPFProperties.DISCOVERY_ENABLED)) {
         final int priority = config.get(JPPFProperties.DISCOVERY_PRIORITY);
-        boolean acceptMultipleInterfaces = config.get(JPPFProperties.DISCOVERY_ACCEPT_MULTIPLE_INTERFACES);
+        final boolean acceptMultipleInterfaces = config.get(JPPFProperties.DISCOVERY_ACCEPT_MULTIPLE_INTERFACES);
         if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
+            final boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
             if (info.hasValidPort(ssl)) {
-              int poolSize = config.get(JPPFProperties.POOL_SIZE);
-              int jmxPoolSize = config.get(JPPFProperties.JMX_POOL_SIZE);
+              final int poolSize = config.get(JPPFProperties.POOL_SIZE);
+              final int jmxPoolSize = config.get(JPPFProperties.JMX_POOL_SIZE);
               newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
             } else {
-              String type = ssl ? "secure" : "plain";
-              String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
+              final String type = ssl ? "secure" : "plain";
+              final String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
                 type, info.host, info.getValidPort(ssl), type);
               log.warn(msg);
             }
@@ -205,38 +205,38 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       }
 
       if (debugEnabled) log.debug("found peers in the configuration");
-      String[] names = config.get(JPPFProperties.DRIVERS);
+      final String[] names = config.get(JPPFProperties.DRIVERS);
       if (debugEnabled) log.debug("list of drivers: " + Arrays.asList(names));
-      for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
+      for (final String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
       if (initPeers) {
-        List<ClientConnectionPoolInfo> infoList = new ArrayList<>();
-        for (String name : names) {
+        final List<ClientConnectionPoolInfo> infoList = new ArrayList<>();
+        for (final String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
-            JPPFConnectionInformation info = new JPPFConnectionInformation();
-            boolean ssl = config.get(JPPFProperties.PARAM_SERVER_SSL_ENABLED, name);
-            String host =  config.get(JPPFProperties.PARAM_SERVER_HOST, name);
+            final JPPFConnectionInformation info = new JPPFConnectionInformation();
+            final boolean ssl = config.get(JPPFProperties.PARAM_SERVER_SSL_ENABLED, name);
+            final String host =  config.get(JPPFProperties.PARAM_SERVER_HOST, name);
             info.host = host;
-            int port = config.get(JPPFProperties.PARAM_SERVER_PORT, name);
+            final int port = config.get(JPPFProperties.PARAM_SERVER_PORT, name);
             if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
             if (receiverThread != null) receiverThread.addConnectionInformation(info);
-            int priority = config.get(JPPFProperties.PARAM_PRIORITY, name);
-            int poolSize = config.get(JPPFProperties.PARAM_POOL_SIZE, name);
-            int jmxPoolSize = config.get(JPPFProperties.PARAM_JMX_POOL_SIZE, name);
+            final int priority = config.get(JPPFProperties.PARAM_PRIORITY, name);
+            final int poolSize = config.get(JPPFProperties.PARAM_POOL_SIZE, name);
+            final int jmxPoolSize = config.get(JPPFProperties.PARAM_JMX_POOL_SIZE, name);
             infoList.add(new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize));
           }
         }
         Collections.sort(infoList, new Comparator<ClientConnectionPoolInfo>() { // order by decreasing priority
           @Override
           public int compare(final ClientConnectionPoolInfo o1, final ClientConnectionPoolInfo o2) {
-            int p1 = o1.getPriority(), p2 = o2.getPriority();
+            final int p1 = o1.getPriority(), p2 = o2.getPriority();
             return p1 > p2 ? -1 : (p1 < p2 ? 1 : 0);
           }
         });
         for (ClientConnectionPoolInfo poolInfo: infoList) newConnectionPool(poolInfo);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -253,7 +253,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   void newConnectionPool(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
     if (debugEnabled) log.debug("new connection pool: {}", name);
     final int size = poolSize > 0 ? poolSize : 1;
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override public void run() {
         final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), name, priority, size, ssl, jmxPoolSize);
         pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
@@ -281,7 +281,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   void newConnectionPool(final ClientConnectionPoolInfo info) {
     if (debugEnabled) log.debug("new connection pool: {}", info.getName());
     final int size = info.getPoolSize() > 0 ? info.getPoolSize() : 1;
-    Runnable r = new Runnable() {
+    final Runnable r = new Runnable() {
       @Override public void run() {
         final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), info);
         pool.setDriverPort(info.getPort());
@@ -308,7 +308,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void submitNewConnection(final JPPFConnectionPool pool) {
-    AbstractJPPFClientConnection c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
+    final AbstractJPPFClientConnection c = createConnection(pool.getName() + "-" + pool.nextSequence(), pool);
     newConnection(c);
   }
 
@@ -339,16 +339,16 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   protected void connectionFailed(final JPPFClientConnection connection) {
     if (debugEnabled) log.debug("Connection [{}] {}", connection.getName(), connection.getStatus());
-    JPPFConnectionPool pool = connection.getConnectionPool();
+    final JPPFConnectionPool pool = connection.getConnectionPool();
     connection.close();
-    boolean poolRemoved = removeClientConnection(connection);
+    final boolean poolRemoved = removeClientConnection(connection);
     fireConnectionRemoved(connection);
     if (poolRemoved) {
       fireConnectionPoolRemoved(pool);
       if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
-      ClientConnectionPoolInfo info = pool.getDiscoveryInfo();
+      final ClientConnectionPoolInfo info = pool.getDiscoveryInfo();
       if (info != null) {
-        boolean b = discoveryListener.onPoolRemoved(info);
+        final boolean b = discoveryListener.onPoolRemoved(info);
         if (debugEnabled) log.debug("removal of {} = {}", info, b);
       }
     }
@@ -402,7 +402,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
    */
   public boolean isLocalExecutionEnabled() {
-    JobManager jobManager = getJobManager();
+    final JobManager jobManager = getJobManager();
     return (jobManager != null) && jobManager.isLocalExecutionEnabled();
   }
 
@@ -411,7 +411,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
   public void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
-    JobManager jobManager = getJobManager();
+    final JobManager jobManager = getJobManager();
     if (jobManager != null) jobManager.setLocalExecutionEnabled(localExecutionEnabled);
   }
 
@@ -420,7 +420,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @return true if at least one connection is available, false otherwise.
    */
   public boolean hasAvailableConnection() {
-    JobManager jobManager = getJobManager();
+    final JobManager jobManager = getJobManager();
     return (jobManager != null) && jobManager.hasAvailableConnection();
   }
 
@@ -431,9 +431,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
     super.statusChanged(event);
-    JobManager jobManager = getJobManager();
+    final JobManager jobManager = getJobManager();
     if(jobManager != null) {
-      ClientConnectionStatusListener listener = jobManager.getClientConnectionStatusListener();
+      final ClientConnectionStatusListener listener = jobManager.getClientConnectionStatusListener();
       if (listener != null) listener.statusChanged(event);
       if (jobManager instanceof ThreadSynchronization) ((ThreadSynchronization) jobManager).wakeUp();
     }
@@ -530,11 +530,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void fireQueueEvent(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> qEvent, final boolean jobAdded) {
-    ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
+    final ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
     if (jobAdded) {
-      for (ClientQueueListener listener: queueListeners) listener.jobAdded(event);
+      for (final ClientQueueListener listener: queueListeners) listener.jobAdded(event);
     } else {
-      for (ClientQueueListener listener: queueListeners) listener.jobRemoved(event);
+      for (final ClientQueueListener listener: queueListeners) listener.jobRemoved(event);
     }
   }
 

@@ -56,7 +56,7 @@ class ClassLoaderRegistrationHandler implements AutoCloseable {
         // workaround for bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-237
         if (debugEnabled) log.debug("job '{}' may have been submitted by a different client instance, looking for an alternate class loader", uuid);
         ClassLoader rcl = null;
-        Iterator<ClassLoader> it = classLoaderRegistrations.iterator();
+        final Iterator<ClassLoader> it = classLoaderRegistrations.iterator();
         if (it.hasNext()) rcl = it.next();
         else {
           ClassLoader cl = Thread.currentThread().getContextClassLoader();

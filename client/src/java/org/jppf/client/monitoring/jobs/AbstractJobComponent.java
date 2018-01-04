@@ -27,6 +27,11 @@ import org.jppf.client.monitoring.AbstractComponent;
  */
 public abstract class AbstractJobComponent extends AbstractComponent<AbstractJobComponent> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this component with the specified uuid.
    * @param uuid the uuid assigned to this component.
    */

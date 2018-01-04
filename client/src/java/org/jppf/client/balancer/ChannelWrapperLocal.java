@@ -78,7 +78,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", "local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);
-    String s= "client-local-executor";
+    final String s= "client-local-executor";
     channelID = new Pair<>(s, CryptoUtils.computeHash(s, client.getBundlerFactory().getHashAlgorithm()));
   }
 
@@ -100,13 +100,13 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
     synchronized(getMonitor()) {
-      ExecutorStatus oldExecutionStatus = getExecutionStatus();
-      JPPFClientConnectionStatus oldValue = this.status;
+      final ExecutorStatus oldExecutionStatus = getExecutionStatus();
+      final JPPFClientConnectionStatus oldValue = this.status;
       if (oldValue.isTerminatedStatus()) return;
       if (debugEnabled) log.debug(String.format("status changing from %s to %s for %s", oldValue, status, this));
       this.status = status;
       fireStatusChanged(oldValue, this.status);
-      ExecutorStatus newExecutionStatus = getExecutionStatus();
+      final ExecutorStatus newExecutionStatus = getExecutionStatus();
       fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
     }
   }
@@ -128,15 +128,15 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
     if (oldStatus == newStatus) return;
-    ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
+    final ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
+    for (final ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   @Override
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    Runnable task = new LocalRunnable(bundle);
+    final Runnable task = new LocalRunnable(bundle);
     bundle.jobDispatched(this);
     client.getExecutor().execute(task);
     if (debugEnabled) log.debug("end locally submitting {}", bundle);
@@ -178,17 +178,17 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     @Override
     public void run() {
       Exception exception = null;
-      List<Task<?>> tasks = this.bundle.getTasksL();
+      final List<Task<?>> tasks = this.bundle.getTasksL();
       try {
-        long start = System.nanoTime();
-        DataProvider dataProvider = bundle.getJob().getDataProvider();
-        for (Task<?> task : tasks) task.setDataProvider(dataProvider);
+        final long start = System.nanoTime();
+        final DataProvider dataProvider = bundle.getJob().getDataProvider();
+        for (final Task<?> task : tasks) task.setDataProvider(dataProvider);
         executionManager.execute(bundle, tasks);
         bundle.resultsReceived(tasks);
-        double elapsed = System.nanoTime() - start;
+        final double elapsed = System.nanoTime() - start;
         BundlerHelper.updateBundler(bundler, tasks.size(), elapsed);
         getLoadBalancerPersistenceManager().storeBundler(channelID, bundler, bundlerAlgorithm);
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         bundle.resultsReceived(t);
@@ -219,7 +219,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     bundle.cancel();
     try {
       executionManager.cancelAllTasks(true, false);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return true;

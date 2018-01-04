@@ -69,7 +69,7 @@ public class JPPFDriverJobPersistence {
     try {
       this.persistedJobsManager = this.jmx.getPersistedJobsManager();
       if (this.persistedJobsManager == null) throw new IllegalStateException("persistedJobsManager is null");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IllegalStateException(e);
     }
   }
@@ -91,7 +91,7 @@ public class JPPFDriverJobPersistence {
    * @throws Exception if any error occurs while communicating with the driver.
    */
   public boolean deleteJob(final String uuid) throws Exception {
-    List<String> result = persistedJobsManager.deletePersistedJobs(new JobUuidSelector(uuid));
+    final List<String> result = persistedJobsManager.deletePersistedJobs(new JobUuidSelector(uuid));
     return (result != null) && result.contains(uuid);
   }
 
@@ -112,35 +112,35 @@ public class JPPFDriverJobPersistence {
    * @throws Exception if any error occurs while communicating with the driver.
    */
   public JPPFJob retrieveJob(final String uuid) throws Exception {
-    TaskBundle header = load(uuid, PersistenceObjectType.JOB_HEADER, -1);
+    final TaskBundle header = load(uuid, PersistenceObjectType.JOB_HEADER, -1);
     if (debugEnabled) log.debug("got job header for uuid={} : {}", uuid, header);
     if (header == null) return null;
-    JPPFJob job = new JPPFJob(header.getUuid());
+    final JPPFJob job = new JPPFJob(header.getUuid());
     job.setName(header.getName());
     job.setSLA(header.getSLA());
     job.setMetadata(header.getMetadata());
-    int[][] positions = persistedJobsManager.getPersistedJobPositions(uuid);
+    final int[][] positions = persistedJobsManager.getPersistedJobPositions(uuid);
     if (debugEnabled) log.debug("got task positions for uuid={} : {}", uuid, StringUtils.buildString(", ", "{", "}", positions[0]));
     if (debugEnabled) log.debug("got result positions for uuid={} : {}", uuid, StringUtils.buildString(", ", "{", "}", positions[1]));
     for (int i=0; i<2; i++) Arrays.sort(positions[i]);
-    List<PersistenceInfo> toLoad = new ArrayList<>(1 + positions[0].length + positions[1].length);
+    final List<PersistenceInfo> toLoad = new ArrayList<>(1 + positions[0].length + positions[1].length);
     toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.DATA_PROVIDER, -1, null));
     for (int i=0; i<positions[0].length; i++) toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.TASK, positions[0][i], null));
     for (int i=0; i<positions[1].length; i++) toLoad.add(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.TASK_RESULT, positions[1][i], null));
     long requestId = -1L;
     try {
       requestId = persistedJobsManager.requestLoad(toLoad);
-      DataProvider dataProvider = load(requestId, uuid, PersistenceObjectType.DATA_PROVIDER, -1);
+      final DataProvider dataProvider = load(requestId, uuid, PersistenceObjectType.DATA_PROVIDER, -1);
       if (traceEnabled) log.trace("got dataprovider for uuid={} : {}", uuid, dataProvider);
       job.setDataProvider(dataProvider);
       for (int i=0; i<positions[0].length; i++) {
-        Task<?> task = load(requestId, uuid, PersistenceObjectType.TASK, positions[0][i]);
+        final Task<?> task = load(requestId, uuid, PersistenceObjectType.TASK, positions[0][i]);
         if (traceEnabled) log.trace(String.format("got task at position %d for uuid=%s : %s", positions[0][i], uuid, task));
         job.add(task);
       }
-      List<Task<?>> results = new ArrayList<>(positions[1].length);
+      final List<Task<?>> results = new ArrayList<>(positions[1].length);
       for (int i=0; i<positions[1].length; i++) {
-        Task<?> task = load(requestId, uuid, PersistenceObjectType.TASK_RESULT, positions[1][i]);
+        final Task<?> task = load(requestId, uuid, PersistenceObjectType.TASK_RESULT, positions[1][i]);
         if (traceEnabled) log.trace(String.format("got task result at position %d for uuid=%s : %s", positions[1][i], uuid, task));
         results.add(task);
       }
@@ -183,10 +183,10 @@ public class JPPFDriverJobPersistence {
    */
   @SuppressWarnings("unchecked")
   private <T> T load(final String uuid, final PersistenceObjectType type, final int position) throws Exception {
-    byte[] bytes = (byte[]) persistedJobsManager.getPersistedJobObject(uuid, type, position);
+    final byte[] bytes = (byte[]) persistedJobsManager.getPersistedJobObject(uuid, type, position);
     if (bytes == null) return null;
     if (traceEnabled) log.trace("got byte[{}]", bytes.length);
-    try (ByteArrayInputStream is = new ByteArrayInputStream(bytes)) {
+    try (final ByteArrayInputStream is = new ByteArrayInputStream(bytes)) {
       return (T) JPPFSerialization.Factory.getSerialization().deserialize(is);
     }
   }
@@ -203,10 +203,10 @@ public class JPPFDriverJobPersistence {
    */
   @SuppressWarnings("unchecked")
   private <T> T load(final long requestId, final String uuid, final PersistenceObjectType type, final int position) throws Exception {
-    byte[] bytes = (byte[]) persistedJobsManager.getPersistedJobObject(requestId, uuid, type, position);
+    final byte[] bytes = (byte[]) persistedJobsManager.getPersistedJobObject(requestId, uuid, type, position);
     if (bytes == null) return null;
     if (traceEnabled) log.trace("got byte[{}]", bytes.length);
-    try (ByteArrayInputStream is = new ByteArrayInputStream(bytes)) {
+    try (final ByteArrayInputStream is = new ByteArrayInputStream(bytes)) {
       return (T) JPPFSerialization.Factory.getSerialization().deserialize(is);
     }
   }

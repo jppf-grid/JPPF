@@ -31,6 +31,10 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
  */
 public class JobDriver extends AbstractJobComponent {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The associated driver from the topology monitor.
    */
   private transient final TopologyDriver driver;
@@ -74,14 +78,14 @@ public class JobDriver extends AbstractJobComponent {
    * @return a list of {@link Job} instances, possibly empty.
    */
   public List<Job> getJobs() {
-    List<Job> list = new ArrayList<>(getChildCount());
-    for (AbstractJobComponent comp: getChildren()) list.add((Job) comp);
+    final List<Job> list = new ArrayList<>(getChildCount());
+    for (final AbstractJobComponent comp: getChildren()) list.add((Job) comp);
     return list;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", driver=").append(driver);
     sb.append(']');

@@ -184,16 +184,16 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
         lock.lock();
         try {
           while (!isStopped() && (currentJobRef.get() == null)) {
-            long batchTimeout = getBatchTimeout();
+            final long batchTimeout = getBatchTimeout();
             if (batchTimeout > 0) {
-              long n = batchTimeout - elapsed;
+              final long n = batchTimeout - elapsed;
               if (n > 0) jobReady.await(n, TimeUnit.MILLISECONDS);
             }
             else jobReady.await();
             updateNextJob(false);
           }
           if (isStopped()) break;
-          JPPFJob job = currentJobRef.get();
+          final JPPFJob job = currentJobRef.get();
           if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getJobTasks().size() + " tasks");
           configureJob(job);
           executor.submitJob(job);
@@ -203,7 +203,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
         } finally {
           lock.unlock();
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -214,10 +214,10 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * @param sendSignal true if signal is to be sent, false otherwise.
    */
   private void updateNextJob(final boolean sendSignal) {
-    JPPFJob job = nextJobRef.get();
-    int size = job.getJobTasks().size();
-    long batchTimeout = getBatchTimeout();
-    int batchSize = getBatchSize();
+    final JPPFJob job = nextJobRef.get();
+    final int size = job.getJobTasks().size();
+    final long batchTimeout = getBatchTimeout();
+    final int batchSize = getBatchSize();
     if (batchTimeout > 0L) elapsed = (System.nanoTime() - start) / 1_000_000L;
     if (size == 0) {
       if ((batchTimeout > 0L) && (elapsed >= batchTimeout)) resetTimeout();
@@ -233,7 +233,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
         jobReady.signal();
         try {
           submittingJob.await();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
           throw new RejectedExecutionException(e);
         }
       }
@@ -260,11 +260,11 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     try {
       if (debugEnabled) log.debug("submitting one JPPFTask");
       Future<T> future = null;
-      JPPFJob job = nextJobRef.get();
+      final JPPFJob job = nextJobRef.get();
       try {
         job.add(task);
         future = new JPPFTaskFuture<>(job, task.getPosition());
-      } catch (JPPFException e) {
+      } catch (final JPPFException e) {
         log.error(e.getMessage(), e);
         throw new RejectedExecutionException(e);
       }
@@ -287,13 +287,13 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     try {
       if (debugEnabled) log.debug("submitting one Runnable task with result");
       Future<T> future = null;
-      JPPFJob job = nextJobRef.get();
+      final JPPFJob job = nextJobRef.get();
       try {
-        JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.add(task);
+        final JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.add(task);
         t.setResult(result);
         configureTask(t);
         future = new JPPFTaskFuture<>(job, t.getPosition());
-      } catch (JPPFException e) {
+      } catch (final JPPFException e) {
         log.error(e.getMessage(), e);
         throw new RejectedExecutionException(e);
       }
@@ -315,12 +315,12 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     try {
       if (debugEnabled) log.debug("submitting one Callable Task");
       Future<T> future = null;
-      JPPFJob job = nextJobRef.get();
+      final JPPFJob job = nextJobRef.get();
       try {
-        JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.add(task);
+        final JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.add(task);
         configureTask(jppfTask);
         future = new JPPFTaskFuture<>(job, jppfTask.getPosition());
-      } catch (JPPFException e) {
+      } catch (final JPPFException e) {
         log.error(e.getMessage(), e);
         throw new RejectedExecutionException(e);
       }
@@ -342,16 +342,16 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     try {
       if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable Tasks");
       Pair<JPPFJob, Integer> pair = null;
-      JPPFJob job = nextJobRef.get();
+      final JPPFJob job = nextJobRef.get();
       int start = 0;
       try {
-        List<Task<?>> jobTasks = job.getJobTasks();
+        final List<Task<?>> jobTasks = job.getJobTasks();
         start = jobTasks.size();
-        for (Callable<?> task: tasks) {
-          Task<?> t = job.add(task);
+        for (final Callable<?> task: tasks) {
+          final Task<?> t = job.add(task);
           configureTask((JPPFAnnotatedTask) t);
         }
-      } catch (JPPFException e) {
+      } catch (final JPPFException e) {
         log.error(e.getMessage(), e);
         throw new RejectedExecutionException(e);
       }
@@ -368,7 +368,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * @return a {@link JPPFJob} instance.
    */
   private JPPFJob createJob() {
-    JPPFJob job = new JPPFJob();
+    final JPPFJob job = new JPPFJob();
     job.setName(getClass().getSimpleName() + " job " + JOB_COUNT.incrementAndGet());
     job.setBlocking(false);
     job.addJobListener(executor);
@@ -383,7 +383,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private synchronized void configureJob(final JPPFJob job) {
     if (config != null) {
-      JobConfiguration jc = config.getJobConfiguration();
+      final JobConfiguration jc = config.getJobConfiguration();
       job.setSLA(jc.getSLA());
       job.setClientSLA(jc.getClientSLA());
       job.setMetadata(jc.getMetadata());
@@ -400,7 +400,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private synchronized void configureTask(final JPPFAnnotatedTask task) {
     if (config != null) {
-      TaskConfiguration tc = config.getTaskConfiguration();
+      final TaskConfiguration tc = config.getTaskConfiguration();
       task.setCancelCallback(tc.getOnCancelCallback());
       task.setTimeoutCallback(tc.getOnTimeoutCallback());
       task.setTimeoutSchedule(tc.getTimeoutSchedule());

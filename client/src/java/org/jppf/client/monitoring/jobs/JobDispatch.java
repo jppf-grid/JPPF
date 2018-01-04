@@ -28,6 +28,10 @@ import org.jppf.job.JobInformation;
  */
 public class JobDispatch extends AbstractJobComponent {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Information on the node.
    */
   private transient final TopologyNode node;
@@ -73,7 +77,7 @@ public class JobDispatch extends AbstractJobComponent {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", jobInfo=").append(jobInfo);
     sb.append(", node=").append(node);

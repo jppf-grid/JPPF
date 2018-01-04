@@ -27,6 +27,10 @@ import org.jppf.management.*;
  */
 public class TopologyNode extends AbstractTopologyComponent {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * EMpty state used when no state can be determined.
    */
   private static final JPPFNodeState EMPTY_STATE = new JPPFNodeState();
@@ -138,7 +142,7 @@ public class TopologyNode extends AbstractTopologyComponent {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("managementInfo=").append(managementInfo);
     sb.append(", uuid=").append(uuid);
     sb.append(", nodeState=").append(nodeState);

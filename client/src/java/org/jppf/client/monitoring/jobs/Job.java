@@ -29,6 +29,10 @@ import org.jppf.job.JobInformation;
  */
 public class Job extends AbstractJobComponent {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Information on the job.
    */
   private transient JobInformation jobInfo;
@@ -80,14 +84,14 @@ public class Job extends AbstractJobComponent {
    * @return a list of {@link JobDispatch} instances, possibly empty.
    */
   public List<JobDispatch> getJobDispatches() {
-    List<JobDispatch> list = new ArrayList<>(getChildCount());
-    for (AbstractJobComponent child: getChildren()) list.add((JobDispatch) child);
+    final List<JobDispatch> list = new ArrayList<>(getChildCount());
+    for (final AbstractJobComponent child: getChildren()) list.add((JobDispatch) child);
     return list;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", jobInfo=").append(jobInfo);
     sb.append(']');

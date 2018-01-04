@@ -70,16 +70,16 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
         if (debugEnabled) log.debug("sending JPPF identifier");
         socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
         if (owner.isSSLEnabled()) createSSLConnection();
-        TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
-        int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
-        int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
+        final TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+        final int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
+        final int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
         owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);
         msg = "[client: " + name + "] Reconnected to the JPPF task server";
         System.out.println(msg);
         log.info(msg);
         done = true;
-      } catch (Exception e) {
-        String format = "error initializing connection to job server: {}";
+      } catch (final Exception e) {
+        final String format = "error initializing connection to job server: {}";
         if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
         else log.warn(format, ExceptionUtils.getMessage(e));
       }

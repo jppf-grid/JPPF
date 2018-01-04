@@ -29,6 +29,10 @@ import org.jppf.client.*;
  */
 public class ConnectionPoolEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The connection that triggered this event.
    */
   private final JPPFClientConnection connection;
@@ -71,7 +75,7 @@ public class ConnectionPoolEvent extends EventObject {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName())
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName())
       .append('[')
       .append("pool=").append(getConnectionPool())
       .append(", connection=").append(connection)

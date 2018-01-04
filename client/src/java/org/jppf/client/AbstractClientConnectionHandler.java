@@ -76,8 +76,8 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     this.owner = owner;
     this.name = name;
     //long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
-    TypedProperties config = owner.getConnectionPool().getClient().getConfig();
-    long configSocketIdle = config.get(JPPFProperties.SOCKET_MAX_IDLE);
+    final TypedProperties config = owner.getConnectionPool().getClient().getConfig();
+    final long configSocketIdle = config.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
     socketInitializer = new SocketInitializerImpl(config);
   }
@@ -114,7 +114,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
       //socketInitializer = null;
       if (socketClient != null) socketClient.close();
       socketClient = null;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error('[' + name + "] " + e.getMessage(), e);
     }
     if (debugEnabled) log.debug(name  + " closed");

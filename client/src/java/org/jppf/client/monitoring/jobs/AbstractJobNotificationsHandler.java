@@ -120,8 +120,8 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
   private class DriverListener extends TopologyListenerAdapter {
     @Override
     public void driverAdded(final TopologyEvent event) {
-      TopologyDriver driver = event.getDriver();
-      JmxInitializer jinit = new JmxInitializer(driver);
+      final TopologyDriver driver = event.getDriver();
+      final JmxInitializer jinit = new JmxInitializer(driver);
       synchronized(initializerMap) {
         initializerMap.put(driver.getUuid(), jinit);
       }
@@ -130,7 +130,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
 
     @Override
     public void driverRemoved(final TopologyEvent event) {
-      String uuid = event.getDriver().getUuid();
+      final String uuid = event.getDriver().getUuid();
       if (uuid != null) {
         JmxInitializer jinit = null;
         synchronized(initializerMap) {
@@ -164,7 +164,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
       boolean done = false;
       while (!done && !isStopped()) {
         try {
-          DriverJobManagementMBean mbean = driver.getJobManager();
+          final DriverJobManagementMBean mbean = driver.getJobManager();
           if (mbean != null) {
             done = true;
             mbean.addNotificationListener(AbstractJobNotificationsHandler.this, null, null);
@@ -173,7 +173,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
               initializerMap.remove(driver.getUuid());
             }
           } else goToSleep(10L);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }

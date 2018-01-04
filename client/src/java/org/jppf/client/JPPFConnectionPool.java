@@ -67,16 +67,16 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
 
   @Override
   public int setSize(final int newSize) {
-    int currentSize = getSize();
+    final int currentSize = getSize();
     if (currentSize == newSize) return currentSize;
     if (debugEnabled) log.debug("requesting new size={}, current size={}", newSize, currentSize);
-    int diff = newSize - currentSize;
-    int size = connectionCount();
+    final int diff = newSize - currentSize;
+    final int size = connectionCount();
     if (diff < 0) {
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
-        JPPFClientConnection c = getConnection(i);
+        final JPPFClientConnection c = getConnection(i);
         if (connectionHasStatus(c, false, JPPFClientConnectionStatus.EXECUTING)) {
           if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
           c.close();

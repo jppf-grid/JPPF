@@ -140,9 +140,9 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    * @return a list of {@link JobDriver} instances, possibly empty.
    */
   public List<JobDriver> getDriversForJob(final String jobUuid) {
-    List<JobDriver> result = new ArrayList<>();
+    final List<JobDriver> result = new ArrayList<>();
     synchronized(lock) {
-      Collection<JobDriver> drivers = jobDriverMap.getValues(jobUuid);
+      final Collection<JobDriver> drivers = jobDriverMap.getValues(jobUuid);
       if (drivers != null) result.addAll(drivers);
     }
     return result;
@@ -154,12 +154,12 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    * @return a list of {@link JobDispatch} instances, possibly empty.
    */
   public List<JobDispatch> getAllJobDispatches(final String jobUuid) {
-    List<JobDispatch> result = new ArrayList<>();
+    final List<JobDispatch> result = new ArrayList<>();
     synchronized(lock) {
-      Collection<JobDriver> drivers = jobDriverMap.getValues(jobUuid);
+      final Collection<JobDriver> drivers = jobDriverMap.getValues(jobUuid);
       if (drivers != null) {
-        for (JobDriver driver: drivers) {
-          Job job = driver.getJob(jobUuid);
+        for (final JobDriver driver: drivers) {
+          final Job job = driver.getJob(jobUuid);
           if (job != null) result.addAll(job.getJobDispatches());
         }
       }
@@ -211,7 +211,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    */
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    String uuid = event.getDriver().getUuid();
+    final String uuid = event.getDriver().getUuid();
     JobDriver driver = null;
     synchronized(lock) {
       driver = driverMap.get(uuid);
@@ -338,7 +338,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
         default:
           break;
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(String.format("error dispatching event of type %s, event=%s, exception: %s", type, event, ExceptionUtils.getStackTrace(e)));
     }
   }
@@ -359,7 +359,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
     try {
       listeners.clear();
       refreshHandler.close();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }

@@ -86,7 +86,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
     while (currentNbJobs >= concurrencyLimit) {
       try {
         wait();
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         e.printStackTrace();
       }
     }
@@ -98,7 +98,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    * @return the created job.
    */
   private JPPFJob buildJob() {
-    JPPFJob job = createNextJob();
+    final JPPFJob job = createNextJob();
     if ((job == null) || job.getJobTasks().isEmpty()) return null;
     submittedJobCount++;
     taskCount += job.getJobTasks().size();

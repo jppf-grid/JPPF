@@ -52,7 +52,7 @@ class JobScheduleAction implements Runnable {
   public void run() {
     synchronized (bundleWrapper) {
       if (debugEnabled) {
-        String jobId = bundleWrapper.getName();
+        final String jobId = bundleWrapper.getName();
         if (debugEnabled) log.debug("job '" + jobId + "' is resuming");
       }
       bundleWrapper.setPending(false);

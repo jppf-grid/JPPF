@@ -138,21 +138,21 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
-    long start = System.nanoTime();
-    long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
+    final long start = System.nanoTime();
+    final long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     if (debugEnabled) log.debug("timeout in millis: " + millis);
-    Pair<JPPFJob, Integer> pair = batchHandler.addTasks(tasks);
-    JPPFJob job = pair.first();
+    final Pair<JPPFJob, Integer> pair = batchHandler.addTasks(tasks);
+    final JPPFJob job = pair.first();
     int position = pair.second();
-    List<Future<T>> futureList = new ArrayList<>(tasks.size());
-    for (Callable<T> task : tasks) {
+    final List<Future<T>> futureList = new ArrayList<>(tasks.size());
+    for (final Callable<T> task : tasks) {
       if (task == null) throw new NullPointerException("a task cannot be null");
-      JPPFTaskFuture<T> future = new JPPFTaskFuture<>(job, position);
+      final JPPFTaskFuture<T> future = new JPPFTaskFuture<>(job, position);
       futureList.add(future);
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       try {
         future.getResult(millis - elapsed);
-      } catch (@SuppressWarnings("unused") TimeoutException ignore) {
+      } catch (@SuppressWarnings("unused") final TimeoutException ignore) {
       }
       position++;
     }
@@ -165,9 +165,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param futureList the list of futures to handle.
    */
   private static <T> void handleFutureList(final List<Future<T>> futureList) {
-    for (Future<T> f : futureList) {
+    for (final Future<T> f : futureList) {
       if (!f.isDone()) {
-        JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
+        final JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
         future.setDone();
         future.setCancelled();
       }
@@ -191,7 +191,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
     try {
       return invokeAny(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    } catch (@SuppressWarnings("unused") TimeoutException e) {
+    } catch (@SuppressWarnings("unused") final TimeoutException e) {
       return null;
     }
   }
@@ -215,9 +215,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   @Override
   public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-    List<Future<T>> futureList = invokeAll(tasks, timeout, unit);
+    final List<Future<T>> futureList = invokeAll(tasks, timeout, unit);
     handleFutureList(futureList);
-    for (Future<T> f : futureList) {
+    for (final Future<T> f : futureList) {
       if (f.isDone() && !f.isCancelled()) return f.get();
     }
     return null;
@@ -287,7 +287,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   @Override
   public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
-    long millis = DateTimeUtils.toMillis(timeout, unit);
+    final long millis = DateTimeUtils.toMillis(timeout, unit);
     waitForTerminated(millis);
     return isTerminated();
   }
@@ -377,13 +377,13 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   private void waitForTerminated(final long timeout) {
     long elapsed = 0L;
-    long maxWait = timeout <= 0L ? Long.MAX_VALUE : timeout;
-    long start = System.nanoTime();
+    final long maxWait = timeout <= 0L ? Long.MAX_VALUE : timeout;
+    final long start = System.nanoTime();
     while (!isTerminated() && (elapsed < maxWait)) {
       synchronized (this) {
         try {
           wait(timeout - elapsed);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
           log.error(e.getMessage(), e);
         }
         elapsed = (System.nanoTime() - start) / 1_000_000L;
@@ -399,7 +399,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   @Override
   public void jobReturned(final JobEvent event) {
-    String jobUuid = event.getJob().getUuid();
+    final String jobUuid = event.getJob().getUuid();
     synchronized (jobMap) {
       jobMap.remove(jobUuid);
       if (isShutdown() && jobMap.isEmpty()) setTerminated();

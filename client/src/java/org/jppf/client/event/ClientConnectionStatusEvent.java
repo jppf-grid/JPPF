@@ -26,8 +26,11 @@ import org.jppf.client.JPPFClientConnectionStatus;
  * Event sent to notify of a status change for a client connection.
  * @author Laurent Cohen
  */
-public class ClientConnectionStatusEvent extends EventObject
-{
+public class ClientConnectionStatusEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The connection status before the change.
    */
@@ -38,8 +41,7 @@ public class ClientConnectionStatusEvent extends EventObject
    * @param source the event source.
    * @param oldStatus the connection status before the change.
    */
-  public ClientConnectionStatusEvent(final ClientConnectionStatusHandler source, final JPPFClientConnectionStatus oldStatus)
-  {
+  public ClientConnectionStatusEvent(final ClientConnectionStatusHandler source, final JPPFClientConnectionStatus oldStatus) {
     super(source);
     this.oldStatus = oldStatus;
   }
@@ -48,8 +50,7 @@ public class ClientConnectionStatusEvent extends EventObject
    * Get the source of this event.
    * @return the event source as a <code>ClientConnectionStatusHandler</code> instance.
    */
-  public ClientConnectionStatusHandler getClientConnectionStatusHandler()
-  {
+  public ClientConnectionStatusHandler getClientConnectionStatusHandler() {
     return (ClientConnectionStatusHandler) getSource();
   }
 
@@ -57,8 +58,7 @@ public class ClientConnectionStatusEvent extends EventObject
    * Get the connection status before the change.
    * @return a {@link JPPFClientConnectionStatus} enum value.
    */
-  public JPPFClientConnectionStatus getOldStatus()
-  {
+  public JPPFClientConnectionStatus getOldStatus() {
     return oldStatus;
   }
 }

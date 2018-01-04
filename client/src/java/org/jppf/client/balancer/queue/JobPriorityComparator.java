@@ -26,15 +26,13 @@ import org.jppf.client.balancer.ClientJob;
  * A Comparator which compare CLientJob objects in descending order of their priority.
  * @author Laurent Cohen
  */
-class JobPriorityComparator implements Comparator<ClientJob>
-{
+class JobPriorityComparator implements Comparator<ClientJob> {
   @Override
-  public int compare(final ClientJob o1, final ClientJob o2)
-  {
+  public int compare(final ClientJob o1, final ClientJob o2) {
     if (o1 == null) return (o2 == null) ? 0 : -1;
     if (o2 == null) return 1;
-    int p1 = o1.getJob().getSLA().getPriority();
-    int p2 = o2.getJob().getSLA().getPriority();
+    final int p1 = o1.getJob().getSLA().getPriority();
+    final int p2 = o2.getJob().getSLA().getPriority();
     return (p1 < p2) ? 1 : (p1 > p2 ? -1 : 0);
   }
 }

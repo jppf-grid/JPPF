@@ -136,7 +136,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
     if (owner.isSSLEnabled()) createSSLConnection();
     if (debugEnabled) log.debug(formattedName + " : sending initial resource");
-    JPPFResourceWrapper resource = new JPPFResourceWrapper();
+    final JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
     resource.addUuid(clientUuid);
     resource.setData(ResourceIdentifier.CONNECTION_UUID, owner.getConnectionUuid());
@@ -153,23 +153,23 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected void processNextRequest() throws Exception {
     boolean found = true;
-    JPPFResourceWrapper resource = readResource();
-    String name = resource.getName();
+    final JPPFResourceWrapper resource = readResource();
+    final String name = resource.getName();
     if (debugEnabled) log.debug(formattedName + " resource requested: " + resource);
-    Collection<ClassLoader> loaders = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoaders(resource.getRequestUuid());
+    final Collection<ClassLoader> loaders = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoaders(resource.getRequestUuid());
     //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
     if (debugEnabled) log.debug(formattedName + " using classloaders=" + loaders);
-    boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
+    final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, loaders, fileLookup);
+      final List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, loaders, fileLookup);
       if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
     } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
-      String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(loaders, fileLookup, names);
+      final String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
+      final Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(loaders, fileLookup, names);
       resource.setData(ResourceIdentifier.RESOURCE_MAP, result);
     } else {
       byte[] b;
-      byte[] callable = resource.getCallable();
+      final byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
       else b = resourceProvider.getResource(name, loaders, fileLookup);
       if (b == null) found = false;

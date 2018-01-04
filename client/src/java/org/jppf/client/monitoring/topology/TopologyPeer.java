@@ -27,6 +27,10 @@ import org.jppf.management.JPPFManagementInfo;
  * @since 5.0
  */
 public class TopologyPeer extends TopologyNode {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Initialize this topology peer.

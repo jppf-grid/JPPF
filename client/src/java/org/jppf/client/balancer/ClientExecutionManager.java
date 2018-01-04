@@ -67,8 +67,8 @@ public class ClientExecutionManager extends AbstractExecutionManager {
     try {
       taskClassLoader = getTaskClassLoader(taskList.get(0));
       usedClassLoader = threadManager.useClassLoader(taskClassLoader);
-    } catch (Exception e) {
-      String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
+    } catch (final Exception e) {
+      final String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
       if (debugEnabled) log.debug(msg, e);
       else log.warn(msg);
     }
@@ -97,7 +97,7 @@ public class ClientExecutionManager extends AbstractExecutionManager {
    * @param task the task from which to get the class laoder.
    * @return an instance of {@link ClassLoader}.
    */
-  private ClassLoader getTaskClassLoader(final Task<?> task) {
+  private static ClassLoader getTaskClassLoader(final Task<?> task) {
     return task.getTaskClassLoader();
   }
 }

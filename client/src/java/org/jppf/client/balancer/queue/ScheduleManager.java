@@ -54,13 +54,13 @@ class ScheduleManager {
   void handleStartJobSchedule(final ClientJob clientJob) {
     final String uuid = clientJob.getUuid();
     if (jobStartHandler.hasAction(uuid)) return;
-    JPPFSchedule schedule = clientJob.getClientSLA().getJobSchedule();
+    final JPPFSchedule schedule = clientJob.getClientSLA().getJobSchedule();
     if (schedule != null) {
       clientJob.setPending(true);
-      String name = clientJob.getName();
+      final String name = clientJob.getName();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + name);
       try {
-        long dt = clientJob.getJobReceivedTime();
+        final long dt = clientJob.getJobReceivedTime();
         jobStartHandler.scheduleAction(uuid, schedule, new JobScheduleAction(clientJob), dt);
         clientJob.addOnDone(new Runnable() {
           @Override
@@ -68,7 +68,7 @@ class ScheduleManager {
             jobStartHandler.cancelAction(uuid);
           }
         });
-      } catch (ParseException e) {
+      } catch (final ParseException e) {
         clientJob.setPending(false);
         log.error(String.format("Unparseable start date for job '%s' : date = %s, date format = %s", name , schedule.getDate(), schedule.getFormat()), e);
       }
@@ -84,11 +84,11 @@ class ScheduleManager {
   void handleExpirationJobSchedule(final ClientJob clientJob) {
     final String uuid = clientJob.getUuid();
     if (jobExpirationHandler.hasAction(uuid)) return;
-    JPPFSchedule schedule = clientJob.getClientSLA().getJobExpirationSchedule();
+    final JPPFSchedule schedule = clientJob.getClientSLA().getJobExpirationSchedule();
     if (schedule != null) {
-      String name = clientJob.getName();
+      final String name = clientJob.getName();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + name);
-      long dt = clientJob.getJobReceivedTime();
+      final long dt = clientJob.getJobReceivedTime();
       try {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(clientJob), dt);
         clientJob.addOnDone(new Runnable() {
@@ -97,7 +97,7 @@ class ScheduleManager {
             jobExpirationHandler.cancelAction(uuid);
           }
         });
-      } catch (ParseException e) {
+      } catch (final ParseException e) {
         log.error(String.format("Unparseable expiration date for job '%s' : date = %s, date format = %s", name , schedule.getDate(), schedule.getFormat()), e);
       }
     }

@@ -26,15 +26,13 @@ import org.jppf.client.balancer.ChannelWrapper;
  * A Comparator which compare ChannelWrapper objects in descending order of their priority.
  * @author Laurent Cohen
  */
-class ChannelPriorityComparator implements Comparator<ChannelWrapper>
-{
+class ChannelPriorityComparator implements Comparator<ChannelWrapper> {
   @Override
-  public int compare(final ChannelWrapper o1, final ChannelWrapper o2)
-  {
+  public int compare(final ChannelWrapper o1, final ChannelWrapper o2) {
     if (o1 == null) return (o2 == null) ? 0 : -1;
     if (o2 == null) return 1;
-    int p1 = o1.getPriority();
-    int p2 = o2.getPriority();
+    final int p1 = o1.getPriority();
+    final int p2 = o2.getPriority();
     return (p1 < p2) ? 1 : (p1 > p2 ? -1 : 0);
   }
 }

@@ -124,9 +124,9 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
   @Override
   public synchronized JPPFClientConnection getConnection() {
     int count = 0;
-    int size = connections.size();
+    final int size = connections.size();
     while (count++ < size) {
-      JPPFClientConnection c = nextConnection();
+      final JPPFClientConnection c = nextConnection();
       if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE) return c;
     }
     return null;
@@ -229,8 +229,8 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * @return a list of {@link JPPFClientConnection} instances, possibly empty but never {@code null}.
    */
   public List<JPPFClientConnection> getConnections(final JPPFClientConnectionStatus...statuses) {
-    List<JPPFClientConnection> list = new ArrayList<>(getSize());
-    for (JPPFClientConnection c: getConnections()) {
+    final List<JPPFClientConnection> list = new ArrayList<>(getSize());
+    for (final JPPFClientConnection c: getConnections()) {
       if (connectionHasStatus(c, true, statuses)) list.add(c);
     }
     if (log.isTraceEnabled()) log.trace("statuses={}, got connections {}", Arrays.asList(statuses), list);
@@ -247,8 +247,8 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
   boolean connectionHasStatus(final JPPFClientConnection connection, final boolean has, final JPPFClientConnectionStatus...statuses) {
     if (connection == null) return !has;
     if ((statuses == null) || (statuses.length <= 0)) return has;
-    JPPFClientConnectionStatus status = connection.getStatus();
-    for (JPPFClientConnectionStatus s: statuses) {
+    final JPPFClientConnectionStatus status = connection.getStatus();
+    for (final JPPFClientConnectionStatus s: statuses) {
       if (status == s) return has;
     }
     return !has;

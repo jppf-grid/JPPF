@@ -31,6 +31,10 @@ import org.jppf.node.protocol.Task;
  */
 public class JobEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The type of event.
    * @exclude
    */

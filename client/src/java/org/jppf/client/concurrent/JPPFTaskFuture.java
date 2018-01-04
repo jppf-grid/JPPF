@@ -82,7 +82,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
     V v = null;
     try {
       v = get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    } catch(TimeoutException e) {
+    } catch(final TimeoutException e) {
       if (debugEnabled) log.debug("wait timed out, but it shouldn't have", e);
     }
     return v;
@@ -101,7 +101,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    */
   @Override
   public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-    long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
+    final long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     getResult(millis);
     if (timedout.get()) throw new TimeoutException("wait timed out");
     else if (throwable != null) throw new ExecutionException(throwable);
@@ -150,7 +150,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    */
   public Task<?> getTask() {
     //TODO: why can the result task be null? to investigate
-    Task<?> task = job.getResults().getResultTask(position);
+    final Task<?> task = job.getResults().getResultTask(position);
     return task != null ? task : job.getJobTasks().get(position);
   }
 

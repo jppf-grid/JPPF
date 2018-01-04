@@ -215,7 +215,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       synchronized (idleChannels) {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) {
-          int size = idleChannels.size();
+          final int size = idleChannels.size();
           if (size == 1) log.debug("1 channel idle: {}", idleChannels.getValues(idleChannels.firstKey()));
           else log.debug("{} channels idle", size);
         }
@@ -223,9 +223,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         ClientJob selectedBundle = null;
         queueLock.lock();
         try {
-          Iterator<ClientJob> it = queue.iterator();
+          final Iterator<ClientJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
-            ClientJob bundleWrapper = it.next();
+            final ClientJob bundleWrapper = it.next();
             channel = findIdleChannelIndex(bundleWrapper);
             if (channel != null) selectedBundle = bundleWrapper;
           }
@@ -234,13 +234,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
             dispatchJobToChannel(channel, selectedBundle);
             dispatched = true;
           }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
         } finally {
           queueLock.unlock();
         }
       }
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       log.error("An error occurred while preparing for bundle creation and dispatching.", ex);
     }
     return dispatched;
@@ -252,15 +252,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
   private ChannelWrapper findIdleChannelIndex(final ClientJob bundle) {
-    int idleChannelsSize = idleChannels.size();
-    List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
-    int highestPriority = getHighestPriority();
-    Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
+    final int idleChannelsSize = idleChannels.size();
+    final List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
+    final int highestPriority = getHighestPriority();
+    final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
     if (channels == null) return null;
-    Iterator<ChannelWrapper> iterator = channels.iterator();
-    Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
+    final Iterator<ChannelWrapper> iterator = channels.iterator();
+    final Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
     while (iterator.hasNext()) {
-      ChannelWrapper ch = iterator.next();
+      final ChannelWrapper ch = iterator.next();
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         channelsToRemove.offer(ch);
@@ -274,7 +274,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       ChannelWrapper ch = null;
       while ((ch = channelsToRemove.poll()) != null) idleChannels.removeValue(ch.getPriority(), ch);
     }
-    int size = acceptableChannels.size();
+    final int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
     return (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
   }
@@ -292,11 +292,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       try {
         updateBundler(selectedBundle.getJob(), channel);
         size = channel.getBundler().getBundleSize();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
         size = bundlerFactory.getFallbackBundler().getBundleSize();
       }
-      ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
+      final ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
       selectedBundle.addChannel(channel);
       channel.submit(bundleWrapper);
     }

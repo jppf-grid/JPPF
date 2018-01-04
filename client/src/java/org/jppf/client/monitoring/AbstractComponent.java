@@ -31,6 +31,10 @@ import java.util.*;
 @SuppressWarnings("rawtypes")
 public abstract class AbstractComponent<E extends AbstractComponent> implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The children of this component.
    */
   protected transient final Map<String, E> children = new HashMap<>();
@@ -146,7 +150,7 @@ public abstract class AbstractComponent<E extends AbstractComponent> implements 
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    AbstractComponent<?> other = (AbstractComponent<?>) obj;
+    final AbstractComponent<?> other = (AbstractComponent<?>) obj;
     if (uuid == null) return other.getUuid() == null;
     return uuid.equals(other.getUuid());
   }

@@ -29,6 +29,10 @@ import org.jppf.client.monitoring.AbstractComponent;
  */
 public class JobMonitoringEvent extends EventObject {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The job driver where this event originates from.
    */
   private final JobDriver jobDriver;
@@ -132,7 +136,7 @@ public class JobMonitoringEvent extends EventObject {
    * @param comp the component whose name to get.
    * @return a string representing the component.
    */
-  private String name(final AbstractComponent<?> comp) {
+  private static String name(final AbstractComponent<?> comp) {
     return (comp == null) ? "none" : comp.getDisplayName();
   }
 }

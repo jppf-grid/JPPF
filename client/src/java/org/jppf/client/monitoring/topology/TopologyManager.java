@@ -160,11 +160,11 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * Initialize the topology tree.
    */
   private void init() {
-    for (JPPFConnectionPool pool: client.getConnectionPools()) {
+    for (final JPPFConnectionPool pool: client.getConnectionPools()) {
       List<JPPFClientConnection> list = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
       if (list.isEmpty()) list = pool.getConnections();
       if (!list.isEmpty()) {
-        JPPFClientConnection c = list.get(0);
+        final JPPFClientConnection c = list.get(0);
         connectionAdded(new ConnectionPoolEvent(pool, c));
       }
     }
@@ -281,9 +281,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   @Override
   public void connectionAdded(final ConnectionPoolEvent event) {
     final JPPFClientConnection c = event.getConnection();
-    StatusListener listener = new StatusListener();
+    final StatusListener listener = new StatusListener();
     if (c.getStatus().isWorkingStatus()) {
-      TopologyDriver driver = new TopologyDriver(c);
+      final TopologyDriver driver = new TopologyDriver(c);
       if (debugEnabled) log.debug("before adding driver {}", driver);
       driverAdded(driver);
     }
@@ -298,12 +298,12 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   @Override
   public void connectionRemoved(final ConnectionPoolEvent event) {
     final JPPFClientConnection c = event.getConnection();
-    String uuid = c.getDriverUuid();
+    final String uuid = c.getDriverUuid();
     if (uuid != null) {
-      TopologyDriver driver = driverMap.remove(uuid);
+      final TopologyDriver driver = driverMap.remove(uuid);
       if (driver != null) driverRemoved(driver);
     }
-    StatusListener listener = (StatusListener) statusListenerMap.remove(c);
+    final StatusListener listener = (StatusListener) statusListenerMap.remove(c);
     if (listener != null) c.removeClientConnectionStatusListener(listener);
   }
 
@@ -346,7 +346,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
     synchronized(driversLock) {
       driverMap.put(driver.getUuid(), driver);
     }
-    TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
+    final TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_ADDED);
   }
 
@@ -356,14 +356,14 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    */
   void driverRemoved(final TopologyDriver driver) {
     if (debugEnabled) log.debug("removing driver {}", driver);
-    JPPFClientConnection c = driver.getConnection();
-    ClientConnectionStatusListener listener = statusListenerMap.remove(c);
+    final JPPFClientConnection c = driver.getConnection();
+    final ClientConnectionStatusListener listener = statusListenerMap.remove(c);
     if (listener != null) c.removeClientConnectionStatusListener(listener);
-    for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
+    for (final AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
     synchronized(driversLock) {
       driverMap.remove(driver.getUuid());
     }
-    TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
+    final TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_REMOVED);
   }
 
@@ -373,7 +373,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param updateType the type of update.
    */
   void driverUpdated(final TopologyDriver driver, final TopologyEvent.UpdateType updateType) {
-    TopologyEvent event = new TopologyEvent(this, driver, null, updateType);
+    final TopologyEvent event = new TopologyEvent(this, driver, null, updateType);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_UPDATED);
   }
 
@@ -385,13 +385,13 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   void nodeAdded(final TopologyDriver driver, final TopologyNode node) {
     if (debugEnabled) log.debug(String.format("adding %s %s to driver %s", node.isPeer() ? "peer" : "node", node, driver));
     if (node.isNode()) {
-      TopologyNode other = getNodeOrPeer(node.getUuid());
+      final TopologyNode other = getNodeOrPeer(node.getUuid());
       if (other != null) nodeRemoved((TopologyDriver) other.getParent(), other);
     }
     driver.add(node);
     if (node.isNode()) nodeMap.put(node.getUuid(), node);
     else peerMap.put(node.getUuid(), (TopologyPeer) node);
-    TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
+    final TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_ADDED);
   }
 
@@ -403,10 +403,9 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   void nodeRemoved(final TopologyDriver driver, final TopologyNode node) {
     if (debugEnabled) log.debug(String.format("removing %s %s from driver %s", (node.isNode() ? "node" : "peer"), node, driver));
     driver.remove(node);
-    TopologyEvent event = null;
     if (node.isNode()) nodeMap.remove(node.getUuid());
     else peerMap.remove(node.getUuid());
-    event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
+    final TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_REMOVED);
   }
 
@@ -417,7 +416,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param updateType the type of update.
    */
   void nodeUpdated(final TopologyDriver driverData, final TopologyNode node, final TopologyEvent.UpdateType updateType) {
-    TopologyEvent event = new TopologyEvent(this, driverData, node, updateType);
+    final TopologyEvent event = new TopologyEvent(this, driverData, node, updateType);
     dispatchEvent(event, TopologyEvent.Type.NODE_UPDATED);
   }
 
@@ -427,7 +426,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param type the type of event.
    */
   private void dispatchEvent(final TopologyEvent event, final TopologyEvent.Type type) {
-    Runnable dispatchTask = new Runnable() {
+    final Runnable dispatchTask = new Runnable() {
       @Override public void run() {
         if (log.isTraceEnabled()) log.trace("dispatching event type={} : {}", type, event);
         switch (type) {
@@ -463,18 +462,18 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   private class StatusListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-      JPPFClientConnectionStatus newStatus = c.getStatus();
-      JPPFClientConnectionStatus oldStatus = event.getOldStatus();
+      final JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+      final JPPFClientConnectionStatus newStatus = c.getStatus();
+      final JPPFClientConnectionStatus oldStatus = event.getOldStatus();
       if (newStatus.isWorkingStatus() && !oldStatus.isWorkingStatus()) {
-        TopologyDriver driver = new TopologyDriver(c);
+        final TopologyDriver driver = new TopologyDriver(c);
         if (debugEnabled) log.debug("before adding driver {}", driver);
         driverAdded(driver);
       } else if (!newStatus.isWorkingStatus() && (c.getDriverUuid() != null)) {
-        TopologyDriver driver = getDriver(c.getDriverUuid());
+        final TopologyDriver driver = getDriver(c.getDriverUuid());
         if (driver != null) {
           if (oldStatus.isWorkingStatus()) {
-            for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
+            for (final AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
           }
           if (newStatus.isTerminatedStatus() && !oldStatus.isTerminatedStatus()) driverRemoved(driver);
         }

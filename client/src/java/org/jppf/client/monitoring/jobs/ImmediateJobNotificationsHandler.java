@@ -39,12 +39,12 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
   @Override
   void handleNotificationAsync(final JobNotification notif) {
-    JobInformation jobInfo = notif.getJobInformation();
-    JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
+    final JobInformation jobInfo = notif.getJobInformation();
+    final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
     if (driver == null) return;
-    Job job = driver.getJob(jobInfo.getJobUuid());
-    JPPFManagementInfo nodeInfo = notif.getNodeInfo();
-    TopologyNode node = (nodeInfo == null) ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
+    final Job job = driver.getJob(jobInfo.getJobUuid());
+    final JPPFManagementInfo nodeInfo = notif.getNodeInfo();
+    final TopologyNode node = (nodeInfo == null) ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
     switch (notif.getEventType()) {
       case JOB_QUEUED:
         monitor.jobAdded(driver, new Job(jobInfo));

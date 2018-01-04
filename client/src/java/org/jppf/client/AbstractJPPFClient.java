@@ -133,10 +133,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public JPPFClientConnection getClientConnection(final int priority, final JPPFClientConnectionStatus...statuses) {
     synchronized(pools) {
-      Collection<JPPFConnectionPool> pls = pools.getValues(priority);
+      final Collection<JPPFConnectionPool> pls = pools.getValues(priority);
       if (pls == null) return null;
-      for (JPPFConnectionPool pool: pls) {
-        List<JPPFClientConnection> list = pool.getConnections(statuses);
+      for (final JPPFConnectionPool pool: pls) {
+        final List<JPPFClientConnection> list = pool.getConnections(statuses);
         if (!list.isEmpty()) return list.get(0);
       }
     }
@@ -158,7 +158,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
-    JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+    final JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
     if (c.getStatus().isTerminatedStatus() && !event.getOldStatus().isTerminatedStatus()) connectionFailed(c);
   }
 
@@ -179,7 +179,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     if (connection == null) throw new IllegalArgumentException("connection is null");
     if (debugEnabled) log.debug("removing connection {}", connection);
     connection.removeClientConnectionStatusListener(this);
-    JPPFConnectionPool pool = connection.getConnectionPool();
+    final JPPFConnectionPool pool = connection.getConnectionPool();
     boolean poolRemoved = false;
     if (pool != null) {
       pool.remove(connection);
@@ -223,8 +223,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @param c the connection that triggered the event.
    */
   void fireConnectionRemoved(final JPPFClientConnection c) {
-    ConnectionPoolEvent event = new ConnectionPoolEvent(c.getConnectionPool(), c);
-    for (ConnectionPoolListener listener : connectionPoolListeners) listener.connectionRemoved(event);
+    final ConnectionPoolEvent event = new ConnectionPoolEvent(c.getConnectionPool(), c);
+    for (final ConnectionPoolListener listener : connectionPoolListeners) listener.connectionRemoved(event);
   }
 
   /**
@@ -232,8 +232,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @param c the connection that was added.
    */
   void fireConnectionAdded(final JPPFClientConnection c) {
-    ConnectionPoolEvent event = new ConnectionPoolEvent(c.getConnectionPool(), c);
-    for (ConnectionPoolListener listener : connectionPoolListeners) listener.connectionAdded(event);
+    final ConnectionPoolEvent event = new ConnectionPoolEvent(c.getConnectionPool(), c);
+    for (final ConnectionPoolListener listener : connectionPoolListeners) listener.connectionAdded(event);
   }
 
   /**
@@ -241,8 +241,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @param pool the connection pool that triggered the event.
    */
   void fireConnectionPoolRemoved(final JPPFConnectionPool pool) {
-    ConnectionPoolEvent event = new ConnectionPoolEvent(pool);
-    for (ConnectionPoolListener listener : connectionPoolListeners) listener.connectionPoolRemoved(event);
+    final ConnectionPoolEvent event = new ConnectionPoolEvent(pool);
+    for (final ConnectionPoolListener listener : connectionPoolListeners) listener.connectionPoolRemoved(event);
   }
 
   /**
@@ -250,8 +250,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @param pool the connection pool that was added.
    */
   void fireConnectionPoolAdded(final JPPFConnectionPool pool) {
-    ConnectionPoolEvent event = new ConnectionPoolEvent(pool);
-    for (ConnectionPoolListener listener : connectionPoolListeners) listener.connectionPoolAdded(event);
+    final ConnectionPoolEvent event = new ConnectionPoolEvent(pool);
+    for (final ConnectionPoolListener listener : connectionPoolListeners) listener.connectionPoolAdded(event);
   }
 
   /**
@@ -300,9 +300,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public ConnectionPool<?> findConnectionPool(final int priority, final int poolId) {
     ConnectionPool<?> pool = null;
     synchronized (pools) {
-      Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
+      final Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
       if (priorityPools != null) {
-        for (JPPFConnectionPool p: priorityPools) {
+        for (final JPPFConnectionPool p: priorityPools) {
           if (p.getId() == poolId) {
             pool = p;
             break;
@@ -351,9 +351,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @since 4.2
    */
   public List<JPPFConnectionPool> findConnectionPools(final JPPFClientConnectionStatus...statuses) {
-    List<JPPFConnectionPool> list = new ArrayList<>();
+    final List<JPPFConnectionPool> list = new ArrayList<>();
     synchronized (pools) {
-      for (JPPFConnectionPool pool: pools) {
+      for (final JPPFConnectionPool pool: pools) {
         if (!pool.getConnections(statuses).isEmpty()) list.add(pool);
       }
     }
@@ -368,9 +368,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @since 4.2
    */
   public List<JPPFConnectionPool> findConnectionPools(final ConnectionPoolFilter<JPPFConnectionPool> filter) {
-    List<JPPFConnectionPool> list = new ArrayList<>();
+    final List<JPPFConnectionPool> list = new ArrayList<>();
     synchronized (pools) {
-      for (JPPFConnectionPool pool: pools) {
+      for (final JPPFConnectionPool pool: pools) {
         if ((filter == null) || filter.accepts(pool)) list.add(pool);
       }
     }
@@ -384,10 +384,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @since 4.2
    */
   public List<JPPFConnectionPool> findConnectionPools(final String pattern) {
-    Pattern p = Pattern.compile(pattern);
-    List<JPPFConnectionPool> result = new ArrayList<>();
+    final Pattern p = Pattern.compile(pattern);
+    final List<JPPFConnectionPool> result = new ArrayList<>();
     synchronized (pools) {
-      for (JPPFConnectionPool pool: pools) {
+      for (final JPPFConnectionPool pool: pools) {
         if (p.matcher(pool.getName()).matches()) result.add(pool);
       }
     }
@@ -400,7 +400,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @since 4.2
    */
   public JPPFConnectionPool getConnectionPool() {
-    List<JPPFConnectionPool> list = findConnectionPools(JPPFClientConnectionStatus.ACTIVE);
+    final List<JPPFConnectionPool> list = findConnectionPools(JPPFClientConnectionStatus.ACTIVE);
     return list.isEmpty() ? null : list.get(0);
   }
 
@@ -411,10 +411,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @since 4.1
    */
   public List<JPPFConnectionPool> getConnectionPools(final int priority) {
-    Collection<JPPFConnectionPool> coll;
+    final Collection<JPPFConnectionPool> coll;
     synchronized(pools) {
       if ((coll = pools.getValues(priority)) != null) {
-        List<JPPFConnectionPool> list = new ArrayList<>(coll.size());
+        final List<JPPFConnectionPool> list = new ArrayList<>(coll.size());
         list.addAll(coll);
         return list;
       }
