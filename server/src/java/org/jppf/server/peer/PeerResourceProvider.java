@@ -67,9 +67,9 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
   @Override
   void postInit() throws Exception {
     try {
-      SocketChannel socketChannel = socketClient.getChannel();
+      final SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
+      final ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
       context = (ClientClassContext) channel.getContext();
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);
@@ -78,9 +78,9 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
         context.setSsl(true);
         server.configureSSL(channel);
       }
-      JPPFResourceWrapper resource = new JPPFResourceWrapper();
+      final JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      String uuid = JPPFDriver.getInstance().getUuid();
+      final String uuid = JPPFDriver.getInstance().getUuid();
       context.setConnectionUuid(connectionUuid);
       resource.setData(ResourceIdentifier.NODE_UUID, uuid);
       resource.setData(ResourceIdentifier.PEER, Boolean.TRUE);
@@ -89,7 +89,7 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
       context.serializeResource();
       server.getTransitionManager().transitionChannel(channel, ClientClassTransition.TO_SENDING_PEER_INITIATION_REQUEST);
       socketClient = null;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage());
       throw new JPPFRuntimeException(e);
     }

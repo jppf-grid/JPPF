@@ -138,11 +138,11 @@ public class DriverInitializer {
     if (JPPFDriver.JPPF_DEBUG) {
       if (debugEnabled) log.debug("registering debug mbean");
       try {
-        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         serverDebug = new ServerDebug();
-        StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
+        final StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
         server.registerMBean(mbean, new ObjectName(ServerDebugMBean.MBEAN_NAME));
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -153,7 +153,7 @@ public class DriverInitializer {
    * @throws Exception if the registration failed.
    */
   void registerProviderMBeans() throws Exception {
-    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
     registerNodeConfigListener();
   }
@@ -172,7 +172,7 @@ public class DriverInitializer {
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
       try {
         connectionInfo.host = InetAddress.getLocalHost().getHostName();
-      } catch(@SuppressWarnings("unused") UnknownHostException e) {
+      } catch(@SuppressWarnings("unused") final UnknownHostException e) {
         connectionInfo.host = "localhost";
       }
       if (config.get(RECOVERY_ENABLED)) connectionInfo.recoveryPort = config.get(RECOVERY_SERVER_PORT);
@@ -217,7 +217,7 @@ public class DriverInitializer {
    */
   void initPeers(final ClientClassNioServer classServer) {
     boolean initPeers;
-    TypedProperties props = JPPFConfiguration.getProperties();
+    final TypedProperties props = JPPFConfiguration.getProperties();
     final boolean ssl = props.get(PEER_SSL_ENABLED);
     if (props.get(PEER_DISCOVERY_ENABLED)) {
       if (debugEnabled) log.debug("starting peers discovery");
@@ -233,22 +233,22 @@ public class DriverInitializer {
       peerDiscoveryThread = null;
       initPeers = true;
     }
-    String discoveryNames = props.get(PEERS);
+    final String discoveryNames = props.get(PEERS);
     if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
-      String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);
+      final String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
       if (initPeers) {
-        for (String name : names) {
+        for (final String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
-            JPPFConnectionInformation info = new JPPFConnectionInformation();
+            final JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.get(PARAM_PEER_SERVER_HOST, name);
-            int[] ports = { props.get(PARAM_PEER_SERVER_PORT, name) };
+            final int[] ports = { props.get(PARAM_PEER_SERVER_PORT, name) };
             boolean peerSSL = ssl;
             if (props.containsKey(PARAM_PEER_SSL_ENABLED.resolveName(new String[] {name}))) peerSSL = props.get(PARAM_PEER_SSL_ENABLED, name);
             if (peerSSL) info.sslServerPorts = ports;
             else info.serverPorts = ports;
-            int size = props.get(PARAM_PEER_POOL_SIZE, name);
+            final int size = props.get(PARAM_PEER_POOL_SIZE, name);
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             if (debugEnabled) log.debug(String.format("read peer configuration: name=%s, size=%d, secure=%b, info=%s", name, size, peerSSL, info));
             peerConnectionPoolHandler.newPool(name, size, info, peerSSL, false);
@@ -303,23 +303,23 @@ public class DriverInitializer {
    */
   private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
-    JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
-    String tmp = ssl ? "secure " : "";
+    final JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
+    final String tmp = ssl ? "secure " : "";
     try {
       // default is false for ssl, true for plain connection
       if (config.get(prop)) {
         if (debugEnabled) log.debug("initializing {}management", tmp);
-        String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
+        final String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
         JPPFProperty<Integer> jmxProp = null;
         if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = ssl ? SERVER_SSL_PORT : SERVER_PORT;
         else jmxProp = ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT;
         server = JMXServerFactory.createServer(driver.getUuid(), ssl, jmxProp);
         server.start(getClass().getClassLoader());
-        String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
+        final String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
         System.out.println(msg);
         if (debugEnabled) log.debug(msg);
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       config.set(prop, false);
       String s = e.getMessage();
@@ -337,7 +337,7 @@ public class DriverInitializer {
     try {
       if (debugEnabled) log.debug("stopping JMX server");
       if (jmxServer != null) jmxServer.stop();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -397,21 +397,19 @@ public class DriverInitializer {
    */
   void registerNodeConfigListener() {
     if (debugEnabled) log.debug("registering NodeConfigListener");
-    JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
-    jmx.connect();
-    try {
-      NotificationListener listener = new NotificationListener() {
-        @SuppressWarnings("deprecation")
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
+      jmx.connect();
+      final NotificationListener listener = new NotificationListener() {
         @Override
         public void handleNotification(final Notification notification, final Object handback) {
-          Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
-          String nodeUuid = (String) notif.getSource();
-          TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
+          final Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
+          final String nodeUuid = (String) notif.getSource();
+          final TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
           if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
-          AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
+          final AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
           if (node == null) return;
           synchronized(node.getMonitor()) {
-            TypedProperties oldConfig = node.getSystemInformation().getJppf();
+            final TypedProperties oldConfig = node.getSystemInformation().getJppf();
             oldConfig.clear();
             oldConfig.putAll(nodeConfig);
             if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
@@ -419,7 +417,7 @@ public class DriverInitializer {
         }
       };
       jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -432,18 +430,18 @@ public class DriverInitializer {
    * @return an array of int port numbers.
    */
   private static int[] parsePorts(final String s, final int def) {
-    String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
-    List<Integer> portsList = new ArrayList<>(strPorts.length);
+    final String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
+    final List<Integer> portsList = new ArrayList<>(strPorts.length);
     for (int i=0; i<strPorts.length; i++) {
       try {
-        int n = Integer.valueOf(strPorts[i].trim());
+        final int n = Integer.valueOf(strPorts[i].trim());
         portsList.add(n);
-      } catch(@SuppressWarnings("unused") NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") final NumberFormatException e) {
         if (debugEnabled) log.debug("invalid port number value '" + strPorts[i] + "'");
       }
     }
     if (portsList.isEmpty() && (def > 0)) portsList.add(def);
-    int[] ports = new int[portsList.size()];
+    final int[] ports = new int[portsList.size()];
     for (int i=0; i<ports.length; i++) ports[i] = portsList.get(i);
     return ports;
   }
@@ -461,8 +459,8 @@ public class DriverInitializer {
    * Create and initialize the datasources found inthe configurarion.
    */
   void initDatasources() {
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     factory.configure(config, JPPFDatasourceFactory.Scope.LOCAL);
     //factory.configure(config, JPPFDatasourceFactory.Scope.ANY);
   }

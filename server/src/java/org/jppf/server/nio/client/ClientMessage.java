@@ -27,14 +27,12 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  * Representation of a message sent or received by a remote node.
  * @author Laurent Cohen
  */
-public class ClientMessage extends AbstractTaskBundleMessage
-{
+public class ClientMessage extends AbstractTaskBundleMessage {
   /**
    * Initialize this nio message with the specified ssl flag.
    * @param channel the channel to read from or write to.
    */
-  public ClientMessage(final ChannelWrapper<?> channel)
-  {
+  public ClientMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
@@ -43,8 +41,7 @@ public class ClientMessage extends AbstractTaskBundleMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void afterFirstRead() throws Exception
-  {
+  protected void afterFirstRead() throws Exception {
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0));
     nbObjects = bundle.getTaskCount() + 2;
   }
@@ -54,15 +51,13 @@ public class ClientMessage extends AbstractTaskBundleMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void beforeFirstWrite() throws Exception
-  {
+  protected void beforeFirstWrite() throws Exception {
     nbObjects = bundle.getTaskCount() + 1;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);

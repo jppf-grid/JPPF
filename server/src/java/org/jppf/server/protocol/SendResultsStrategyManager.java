@@ -27,8 +27,7 @@ import org.jppf.node.protocol.SendResultsStrategyConstants;
  * @author Laurent Cohen
  * @exclude
  */
-public class SendResultsStrategyManager
-{
+public class SendResultsStrategyManager {
   /**
    * A mapping of strategy names to {@link SendResultsStrategy} instances.
    */
@@ -42,9 +41,8 @@ public class SendResultsStrategyManager
    * Initialize the map of available strategies.
    * @return a mapping of strategy names to {@link SendResultsStrategy} instances.
    */
-  private static Map<String, SendResultsStrategy> initializeMap()
-  {
-    Map<String, SendResultsStrategy> map = new HashMap<>();
+  private static Map<String, SendResultsStrategy> initializeMap() {
+    final Map<String, SendResultsStrategy> map = new HashMap<>();
     map.put(SendResultsStrategyConstants.ALL_RESULTS, new SendResultsStrategy.SendAllResultsStrategy());
     map.put(SendResultsStrategyConstants.NODE_RESULTS, new SendResultsStrategy.SendNodeResultsStrategy());
     return map;
@@ -56,10 +54,9 @@ public class SendResultsStrategyManager
    * @param name the name of the strtaegy to find.
    * @return a {@link SendResultsStrategy} instance.
    */
-  public static SendResultsStrategy getStrategy(final String name)
-  {
+  public static SendResultsStrategy getStrategy(final String name) {
     if (name == null) return DEFAULT_STRATEGY;
-    SendResultsStrategy strategy = strategyMap.get(name);
+    final SendResultsStrategy strategy = strategyMap.get(name);
     return strategy != null ? strategy : DEFAULT_STRATEGY;
   }
 }

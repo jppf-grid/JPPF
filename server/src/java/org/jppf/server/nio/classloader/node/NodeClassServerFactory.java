@@ -46,7 +46,7 @@ final class NodeClassServerFactory extends NioServerFactory<NodeClassState, Node
    */
   @Override
   public Map<NodeClassState, NioState<NodeClassTransition>> createStateMap() {
-    Map<NodeClassState, NioState<NodeClassTransition>> map = new EnumMap<>(NodeClassState.class);
+    final Map<NodeClassState, NioState<NodeClassTransition>> map = new EnumMap<>(NodeClassState.class);
     map.put(WAITING_INITIAL_NODE_REQUEST, new WaitingInitialNodeRequestState((NodeClassNioServer) server));
     map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingInitialNodeResponseState((NodeClassNioServer) server));
     map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState((NodeClassNioServer) server));
@@ -62,7 +62,7 @@ final class NodeClassServerFactory extends NioServerFactory<NodeClassState, Node
    */
   @Override
   public Map<NodeClassTransition, NioTransition<NodeClassState>> createTransitionMap() {
-    Map<NodeClassTransition, NioTransition<NodeClassState>> map = new EnumMap<>(NodeClassTransition.class);
+    final Map<NodeClassTransition, NioTransition<NodeClassState>> map = new EnumMap<>(NodeClassTransition.class);
     map.put(TO_WAITING_INITIAL_NODE_REQUEST, transition(WAITING_INITIAL_NODE_REQUEST, R));
     map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));

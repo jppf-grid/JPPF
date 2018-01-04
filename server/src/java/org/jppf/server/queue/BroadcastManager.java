@@ -108,8 +108,8 @@ public class BroadcastManager {
    * @param newStatus the connection status after the change.
    */
   void updateWorkingConnections(final ExecutorStatus oldStatus, final ExecutorStatus newStatus) {
-    boolean bNew = (newStatus == ExecutorStatus.ACTIVE) || (newStatus == ExecutorStatus.EXECUTING);
-    boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
+    final boolean bNew = (newStatus == ExecutorStatus.ACTIVE) || (newStatus == ExecutorStatus.EXECUTING);
+    final boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
     if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
     else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }
@@ -122,9 +122,9 @@ public class BroadcastManager {
    */
   void processBroadcastJob(final ServerTaskBundleClient clientBundle) {
     final String jobUuid = clientBundle.getUuid();
-    ServerJob serverJob = jobMap.get(jobUuid);
+    final ServerJob serverJob = jobMap.get(jobUuid);
     if (serverJob == null) {
-      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, queue.jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
+      final ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, queue.jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
       broadcastJob.setSubmissionStatus(SubmissionStatus.PENDING);
       broadcastJob.setQueueEntryTime(System.currentTimeMillis());
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
@@ -168,12 +168,12 @@ public class BroadcastManager {
     List<AbstractNodeContext> connections;
     try {
       connections = callableAllConnections.call();
-    } catch (@SuppressWarnings("unused") Throwable e) {
+    } catch (@SuppressWarnings("unused") final Throwable e) {
       connections = Collections.emptyList();
     }
     if (connections.isEmpty()) return;
-    for (Map.Entry<String, ServerJobBroadcast> entry: pendingBroadcasts.entrySet()) {
-      ServerJobBroadcast broadcastJob = entry.getValue();
+    for (final Map.Entry<String, ServerJobBroadcast> entry: pendingBroadcasts.entrySet()) {
+      final ServerJobBroadcast broadcastJob = entry.getValue();
       if (debugEnabled) log.debug("queuing job " + broadcastJob.getJob());
       processPendingBroadcast(connections, broadcastJob);
     }
@@ -187,16 +187,16 @@ public class BroadcastManager {
   private void processPendingBroadcast(final List<AbstractNodeContext> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     if (pendingBroadcasts.remove(broadcastJob.getUuid()) == null) return;
-    JobSLA sla = broadcastJob.getSLA();
-    List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
-    Set<String> uuidSet = new HashSet<>();
-    for (AbstractNodeContext connection : connections) {
-      ExecutorStatus status = connection.getExecutionStatus();
+    final JobSLA sla = broadcastJob.getSLA();
+    final List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
+    final Set<String> uuidSet = new HashSet<>();
+    for (final AbstractNodeContext connection : connections) {
+      final ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
-        String uuid = connection.getUuid();
+        final String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
-          JPPFManagementInfo info = connection.getManagementInfo();
-          ExecutionPolicy policy = sla.getExecutionPolicy();
+          final JPPFManagementInfo info = connection.getManagementInfo();
+          final ExecutionPolicy policy = sla.getExecutionPolicy();
           TaskQueueChecker.preparePolicy(policy, broadcastJob, JPPFDriver.getInstance().getStatistics(), 0);
           if ((policy != null) && !policy.evaluate(info.getSystemInfo())) {
             if (debugEnabled) log.debug("node uuid={} refused for broadcast {}", uuid, broadcastJob);
@@ -204,7 +204,7 @@ public class BroadcastManager {
           }
           ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
           if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
-          ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
+          final ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
           newBundle.setSLA(sla.copy());
           newBundle.setMetadata(broadcastJob.getMetadata());
           newBundle.getSLA().setExecutionPolicy(broadcastPolicy);

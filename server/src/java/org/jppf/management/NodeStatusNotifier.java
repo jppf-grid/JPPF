@@ -69,7 +69,7 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
       n += nodeAdmin.getNodeState().getNbTasksExecuted();
       try {
         nodeAdmin.setTaskCounter(n);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         e.printStackTrace();
       }
     }

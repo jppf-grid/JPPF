@@ -68,17 +68,17 @@ public class JPPFLocalContainer extends JPPFContainer {
    */
   @Override
   public int deserializeObjects(final Object[] list, final int count, final ExecutorService executor) throws Exception {
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(classLoader);
-      CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
-      List<DataLocation> locations = currentMessage.getLocations();
+      final CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
+      final List<DataLocation> locations = currentMessage.getLocations();
       for (int i = 0; i < count; i++) {
         completionService.submit(new ObjectDeserializationTask(locations.get(i + 1), i));
       }
       for (int i=0; i<count; i++) {
-        Future<ObjectDeserializationTask> f = completionService.take();
-        ObjectDeserializationTask task = f.get();
+        final Future<ObjectDeserializationTask> f = completionService.take();
+        final ObjectDeserializationTask task = f.get();
         list[task.getIndex() + 1] = task.getObject();
       }
       return 0;
@@ -122,12 +122,12 @@ public class JPPFLocalContainer extends JPPFContainer {
      */
     @Override
     public ObjectDeserializationTask call() {
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
         object = IOHelper.unwrappedData(dl, helper.getSerializer());
         if (traceEnabled) log.debug("deserialized object index = " + index);
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         log.error(t.getMessage() + " [object index: " + index + ']', t);
         object = t;
       } finally {

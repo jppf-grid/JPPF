@@ -80,14 +80,14 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   public JPPFNodeTaskMonitor(final String objectName) {
     try {
       OBJECT_NAME = new ObjectName(objectName);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
   @Override
   public synchronized void taskExecuted(final TaskExecutionEvent event) {
-    TaskInformation info = event.getTaskInformation();
+    final TaskInformation info = event.getTaskInformation();
     taskCount++;
     if (info.hasError()) taskInErrorCount++;
     else taskSuccessfulCount++;

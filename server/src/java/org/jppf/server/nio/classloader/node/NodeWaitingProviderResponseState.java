@@ -59,18 +59,16 @@ class NodeWaitingProviderResponseState extends NodeClassServerState {
    */
   @Override
   public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    NodeClassContext context = (NodeClassContext) channel.getContext();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (!context.hasPendingResponse()) return sendResponse(context);
-    Map<JPPFResourceWrapper, ResourceRequest>  pendingResponses = context.getPendingResponses();
-    JPPFResourceWrapper res = context.getResource();
-    Queue<JPPFResourceWrapper> toRemove = new LinkedList<>();
+    final Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = context.getPendingResponses();
+    final JPPFResourceWrapper res = context.getResource();
+    final Queue<JPPFResourceWrapper> toRemove = new LinkedList<>();
     CompositeResourceWrapper composite = null;
     if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
-    for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
-    {
-      JPPFResourceWrapper resource = entry.getValue().getResource();
-      switch(resource.getState())
-      {
+    for (final Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet()) {
+      final JPPFResourceWrapper resource = entry.getValue().getResource();
+      switch (resource.getState()) {
         case NODE_RESPONSE:
         case NODE_RESPONSE_ERROR:
           if (debugEnabled) log.debug(build("node[id=", channel.getId(), "] got response for resource ", resource));

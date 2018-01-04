@@ -42,7 +42,7 @@ public class PeerConnectionPoolHandler {
    * @return the newly created pool.
    */
   public PeerConnectionPool newPool(final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
-    PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
+    final PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
     pools.add(pool);
     return pool;
   }

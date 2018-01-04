@@ -75,7 +75,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    */
   @Override
   public JPPFNodeState state() throws Exception {
-    JPPFNodeState ns = nodeState.copy();
+    final JPPFNodeState ns = nodeState.copy();
     if (log.isTraceEnabled()) log.trace("nn threads = " + ns.getThreadPoolSize());
     return ns;
   }
@@ -100,8 +100,8 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception {
-    JPPFSystemInformation info = node.getSystemInformation();
-    ExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
+    final JPPFSystemInformation info = node.getSystemInformation();
+    final ExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
     info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime / 1000000L));
     return info;
   }
@@ -122,7 +122,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public void restart(final Boolean interruptIfRunning) throws Exception {
     if (debugEnabled) log.debug("node restart requested with interruptIfRunning={}", interruptIfRunning);
-    boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
+    final boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
     shutdownOrRestart(interrupt, true);
   }
 
@@ -142,7 +142,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public void shutdown(final Boolean interruptIfRunning) throws Exception {
     if (debugEnabled) log.debug("node shutdown requested with interruptIfRunning={}", interruptIfRunning);
-    boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
+    final boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
     shutdownOrRestart(interrupt, false);
   }
 
@@ -157,12 +157,12 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   private void shutdownOrRestart(final boolean interrupt, final boolean restart) throws Exception {
     if (node.isLocal()) return;
     final String s = restart ? "restart" : "shutdown";
-    String msg = String.format("%s node %s requested", (interrupt ? "immediate" : "deferred"), s);
+    final String msg = String.format("%s node %s requested", (interrupt ? "immediate" : "deferred"), s);
     System.out.println(msg);
     log.info(msg);
     if (interrupt || !node.isExecuting()) {
       if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
-        Runnable r = new Runnable() {
+        final Runnable r = new Runnable() {
           @Override
           public void run() {
             try {
@@ -233,7 +233,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     if (debugEnabled) log.debug(String.format("node request to change configuration, restart=%b, interruptIfRunning=%b", restart, interruptIfRunning));
     // we don't allow the node uuid to be overriden
     if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
-    TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
+    final TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
     JPPFConfiguration.getProperties().putAll(overrides);
     new ConfigurationOverridesHandler().save(overrides);
     node.triggerConfigChanged();
@@ -292,7 +292,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public boolean cancelPendingAction() {
     log.info("cancelPendingAction() requested");
-    boolean b = node.cancelShutdownRequest();
+    final boolean b = node.cancelShutdownRequest();
     if (b) nodeState.setPendingAction(NodePendingAction.NONE);
     return b;
   }

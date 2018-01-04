@@ -46,9 +46,8 @@ public class IdleProviderState extends ClientClassServerState {
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientClassContext context = (ClientClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal())
-    {
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (channel.isReadable() && !channel.isLocal()) {
       server.removeProviderConnection(context.getUuid(), channel);
       throw new ConnectException("provider " + channel + " has been disconnected");
     }

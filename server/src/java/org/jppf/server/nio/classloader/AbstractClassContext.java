@@ -55,7 +55,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    */
   public JPPFResourceWrapper deserializeResource() throws Exception {
     requestStartTime = System.nanoTime();
-    DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
+    final DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
     resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, JPPFDriver.getSerializer());
     return resource;
   }
@@ -65,7 +65,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    * @throws Exception if an error occurs while serializing.
    */
   public void serializeResource() throws Exception {
-    DataLocation location = IOHelper.serializeData(resource, JPPFDriver.getSerializer());
+    final DataLocation location = IOHelper.serializeData(resource, JPPFDriver.getSerializer());
     message = new BaseNioMessage(getChannel());
     ((BaseNioMessage) message).addLocation(location);
   }
@@ -105,7 +105,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
     boolean b = false;
     try {
       b = super.readMessage(wrapper);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       updateInStats();
       throw e;
     }
@@ -118,7 +118,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
     boolean b = false;
     try {
       b = super.writeMessage(wrapper);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       updateOutStats();
       throw e;
     }
@@ -131,7 +131,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    */
   private void updateInStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : (isProvider() ? CLIENT_IN_TRAFFIC : NODE_IN_TRAFFIC), n);
     }
   }
@@ -141,7 +141,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    */
   private void updateOutStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : (isProvider() ? CLIENT_OUT_TRAFFIC : NODE_OUT_TRAFFIC), n);
     }
   }
@@ -152,11 +152,11 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    * @return <code>true</code> if the specified resource is a request for a single resource definition, <code>false</code> otherwise.
    */
   public static String getResourceName(final JPPFResourceWrapper resource) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null) sb.append(ResourceIdentifier.MULTIPLE).append('.').append(resource.getName());
     else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
       sb.append(ResourceIdentifier.MULTIPLE_NAMES).append('[').append(resource.getName());
-      String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
+      final String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
       for (int i=0; i<names.length; i++) {
         if (i > 0) sb.append(',');
         sb.append(names[i]);

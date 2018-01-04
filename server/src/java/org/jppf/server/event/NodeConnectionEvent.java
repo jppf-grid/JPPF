@@ -26,14 +26,17 @@ import org.jppf.management.JPPFManagementInfo;
  * Event emitted when a node connects to or disconnects from the server.
  * @author Laurent Cohen
  */
-public class NodeConnectionEvent extends EventObject
-{
+public class NodeConnectionEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this event with the specified source.
    * @param nodeInfo a {@link JPPFManagementInfo} instance.
    */
-  public NodeConnectionEvent(final JPPFManagementInfo nodeInfo)
-  {
+  public NodeConnectionEvent(final JPPFManagementInfo nodeInfo) {
     super(nodeInfo);
   }
 
@@ -41,8 +44,7 @@ public class NodeConnectionEvent extends EventObject
    * Get the node information for this event.
    * @return a {@link JPPFManagementInfo} instance.
    */
-  public JPPFManagementInfo getNodeInformation()
-  {
+  public JPPFManagementInfo getNodeInformation() {
     return (JPPFManagementInfo) getSource();
   }
 }

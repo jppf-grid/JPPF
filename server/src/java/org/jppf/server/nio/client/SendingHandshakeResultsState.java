@@ -31,8 +31,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for some action.
  * @author Laurent Cohen
  */
-class SendingHandshakeResultsState extends ClientServerState
-{
+class SendingHandshakeResultsState extends ClientServerState {
   /**
    * Logger for this class.
    */
@@ -41,12 +40,12 @@ class SendingHandshakeResultsState extends ClientServerState
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public SendingHandshakeResultsState(final ClientNioServer server)
-  {
+  public SendingHandshakeResultsState(final ClientNioServer server) {
     super(server);
   }
 
@@ -58,19 +57,16 @@ class SendingHandshakeResultsState extends ClientServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (channel.isReadable())
-    {
+    if (channel.isReadable()) {
       throw new ConnectException("client " + channel + " has been disconnected");
     }
 
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     if (context.getMessage() == null) context.serializeBundle();
-    if (context.writeMessage(channel))
-    {
-      ServerTaskBundleClient bundleWrapper = context.getBundle();
+    if (context.writeMessage(channel)) {
+      final ServerTaskBundleClient bundleWrapper = context.getBundle();
       if (debugEnabled) log.debug("sent entire bundle" + bundleWrapper.getJob() + " to client " + channel);
       context.setBundle(null);
       context.setClientMessage(null);

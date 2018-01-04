@@ -121,7 +121,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   protected boolean merge(final List<ServerTask> taskList, final boolean after) {
     lock.lock();
     try {
-      boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
+      final boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
       if (!after) this.tasks.addAll(0, taskList);
       else this.tasks.addAll(taskList);
       return requeue;
@@ -136,7 +136,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public void jobDispatched(final ServerTaskBundleNode bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    boolean empty;
+    final boolean empty;
     synchronized (dispatchSet) {
       empty = dispatchSet.isEmpty();
       dispatchSet.put(bundle.getId(), bundle);
@@ -247,7 +247,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
     sb.append(", job uuid=").append(uuid);
@@ -289,7 +289,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     @Override
     public void bundleEnded(final ServerTaskBundleClient bundle) {
       if (bundle == null) throw new IllegalArgumentException("bundle is null");
-      Runnable r = new Runnable() {
+      final Runnable r = new Runnable() {
         @Override
         public void run() {
           if (debugEnabled) log.debug("bundle ended: {}", bundle);
@@ -301,7 +301,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
             tasks.removeAll(bundle.getTaskList());
             if (completionBundles != null) completionBundles.remove(bundle);
             if (clientBundles.isEmpty() && tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (debugEnabled) log.debug(e.getMessage(), e);
           } finally {
             lock.unlock();

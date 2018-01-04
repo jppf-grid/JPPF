@@ -35,6 +35,10 @@ import org.slf4j.*;
  */
 public class ServerDebug implements ServerDebugMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ServerDebug.class);
@@ -58,8 +62,8 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set of channels to get a string representation of.
    * @return the channels as as an array of strings.
    */
-  private String classLoaderChannels(final Set<ChannelWrapper<?>> set) {
-    StringBuilder sb = new StringBuilder();
+  private static String classLoaderChannels(final Set<ChannelWrapper<?>> set) {
+    final StringBuilder sb = new StringBuilder();
     synchronized(set) {
       for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
@@ -78,12 +82,12 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String nodeMessages() {
-    Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
-    StringBuilder sb = new StringBuilder();
+    final Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
+    final StringBuilder sb = new StringBuilder();
     for (ChannelWrapper<?> ch: set) {
-      long id = ch.getId();
-      AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
-      String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
+      final long id = ch.getId();
+      final AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
+      final String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
       sb.append("channelId=").append(id).append(", message=").append(s).append('\n');
     }
     return sb.toString();
@@ -91,7 +95,7 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String all() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("jobs in queue:").append('\n');
     sb.append(dumpQueueDetails()).append('\n');
     sb.append('\n').append("node class loader channels:").append('\n');
@@ -110,8 +114,8 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private String viewChannels(final Set<ChannelWrapper<?>> set) {
-    StringBuilder sb = new StringBuilder();
+  private static String viewChannels(final Set<ChannelWrapper<?>> set) {
+    final StringBuilder sb = new StringBuilder();
     synchronized(set) {
       for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
@@ -120,7 +124,7 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String allChannels() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append("node class loader channels:").append('\n');
     sb.append(nodeClassLoaderChannels()).append('\n');
     sb.append('\n').append("client class loader channels:").append('\n');
@@ -135,24 +139,24 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public String dumpQueue() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
-    Set<String> set = queue.getAllJobIds();
-    StringBuilder sb = new StringBuilder();
-    for (String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final Set<String> set = queue.getAllJobIds();
+    final StringBuilder sb = new StringBuilder();
+    for (final String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
     return sb.toString();
   }
 
   @Override
   public String dumpQueueDetails() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     return dumpJobDetails(queue.getAllJobIds());
   }
 
   @Override
   public String dumpQueueDetailsFromPriorityMap() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     return dumpJobDetails(queue.getAllJobIdsFromPriorityMap());
   }
 
@@ -161,28 +165,28 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set of job uuids.
    * @return .
    */
-  private String dumpJobDetails(final Set<String> set) {
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
-    StringBuilder sb = new StringBuilder();
-    String hr = StringUtils.padRight("", '-', 80) + '\n';
-    for (String uuid: set) {
-      ServerJob serverJob = queue.getJob(uuid);
+  private static String dumpJobDetails(final Set<String> set) {
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final StringBuilder sb = new StringBuilder();
+    final String hr = StringUtils.padRight("", '-', 80) + '\n';
+    for (final String uuid: set) {
+      final ServerJob serverJob = queue.getJob(uuid);
       if (serverJob != null) {
         sb.append(hr);
         sb.append(serverJob).append('\n');
-        List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
+        final List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
         if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
         else {
           sb.append("client bundles:\n");
           for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
         }
-        List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
+        final List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
         if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
         else {
           sb.append("client completion bundles:\n");
           for (ServerTaskBundleClient clientBundle: completionBundles) sb.append("- ").append(clientBundle).append("\n");
         }
-        Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
+        final Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
         if (dispatchSet.isEmpty()) sb.append("node bundles: empty\n");
         else {
           sb.append("node bundles:\n");
@@ -214,9 +218,9 @@ public class ServerDebug implements ServerDebugMBean {
    * @return a set of {@link ChannelWrapper} instances.
    */
   private Set<ChannelWrapper<?>> nodeSet() {
-    List<AbstractNodeContext> list = driver.getNodeNioServer().getAllChannels();
-    Set<ChannelWrapper<?>> set = new HashSet<>();
-    for (AbstractNodeContext ctx: list) set.add(ctx.getChannel());
+    final List<AbstractNodeContext> list = driver.getNodeNioServer().getAllChannels();
+    final Set<ChannelWrapper<?>> set = new HashSet<>();
+    for (final AbstractNodeContext ctx: list) set.add(ctx.getChannel());
     return set;
   }
 
@@ -230,9 +234,9 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String taskQueueCheckerChannels() {
-    List<AbstractNodeContext> list = driver.getNodeNioServer().getIdleChannels();
-    StringBuilder sb = new StringBuilder();
-    for (AbstractNodeContext ctx: list) sb.append(ctx).append('\n');
+    final List<AbstractNodeContext> list = driver.getNodeNioServer().getIdleChannels();
+    final StringBuilder sb = new StringBuilder();
+    for (final AbstractNodeContext ctx: list) sb.append(ctx).append('\n');
     return sb.toString();
   }
 
@@ -253,13 +257,13 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String[] getReservedJobs() {
-    Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
+    final Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
     return set.toArray(new String[set.size()]);
   }
 
   @Override
   public String[] getReservedNodes() {
-    Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
+    final Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
     return set.toArray(new String[set.size()]);
   }
 
@@ -273,7 +277,7 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
     if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
-    ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
+    final ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
     if (runner == null) throw new IllegalStateException("Could not instantiate a script runner for language = " + language);
     try {
       return runner.evaluate(script, null);

@@ -47,11 +47,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The task bundle to send or receive.
    */
@@ -163,7 +163,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         this.bundler.dispose();
         if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
       }
-      Pair<String, Bundler<?>> pair = JPPFDriver.getInstance().getNodeNioServer().getBundlerHandler().loadBundler(nodeIdentifier);
+      final Pair<String, Bundler<?>> pair = JPPFDriver.getInstance().getNodeNioServer().getBundlerHandler().loadBundler(nodeIdentifier);
       bundler = pair.second();
       bundlerAlgorithm = pair.first();
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(jppfContext);
@@ -180,8 +180,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         if (exception != null) log.debug("handling '{}' for {}", ExceptionUtils.getMessage(exception), channel);
         else log.debug("handling null for {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());
       }
-      ServerTaskBundleNode tmpBundle = bundle;
-      NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
+      final ServerTaskBundleNode tmpBundle = bundle;
+      final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
       try {
         if (tmpBundle != null) {
           server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
@@ -197,10 +197,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           if (!applyMaxResubmit) tmpBundle.resubmit();
           else {
             int count = 0;
-            List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
-            for (ServerTask task: tmpBundle.getTaskList()) {
+            final List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
+            for (final ServerTask task: tmpBundle.getTaskList()) {
               results.add(task.getInitialTask());
-              int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
+              final int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
               if (task.incResubmitCount() <= max) {
                 task.resubmit();
                 count++;
@@ -214,7 +214,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           if (callTaskCompleted) tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
           updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("error in handleException() for " + this + " : " , e);
       }
     }
@@ -232,9 +232,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void cleanup() {
     if (debugEnabled) log.debug("handling cleanup for {}", channel);
-    NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
+    final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     if (reservationTansition == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
-    Bundler<?> bundler = getBundler();
+    final Bundler<?> bundler = getBundler();
     if (bundler != null) {
       bundler.dispose();
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
@@ -251,8 +251,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
     bundle.checkTaskCount();
-    TaskBundle taskBundle = bundle.getJob();
-    AbstractTaskBundleMessage message = newMessage();
+    final TaskBundle taskBundle = bundle.getJob();
+    final AbstractTaskBundleMessage message = newMessage();
     if (!taskBundle.isHandshake()) {
       taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
@@ -271,9 +271,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @throws Exception if an error occurs during the deserialization.
    */
   BundleResults deserializeBundle() throws Exception {
-    List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
-    TaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
-    List<DataLocation> tasks = new ArrayList<>();
+    final List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
+    final TaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
+    final List<DataLocation> tasks = new ArrayList<>();
     if (locations.size() > 1) {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
@@ -292,7 +292,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     boolean b = false;
     try {
       b = message.read();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       updateInStats();
       throw e;
     }
@@ -305,7 +305,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     boolean b = false;
     try {
       b = message.write();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       updateOutStats();
       throw e;
     }
@@ -352,8 +352,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public boolean setState(final NodeState state) {
-    ExecutorStatus oldExecutionStatus = getExecutionStatus();
-    boolean b = super.setState(state);
+    final ExecutorStatus oldExecutionStatus = getExecutionStatus();
+    final boolean b = super.setState(state);
     switch (state) {
       case IDLE:
         executionStatus = (getChannel().isOpen() && isEnabled()) ? ExecutorStatus.ACTIVE : ExecutorStatus.FAILED;
@@ -376,7 +376,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (debugEnabled) log.debug("closing channel {}", getChannel());
     try {
       getChannel().close();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     final JMXConnectionWrapper jmx = isPeer() ? peerJmxConnection : jmxConnection;
@@ -387,7 +387,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         @Override public void run() {
           try {
             jmx.close();
-          } catch (@SuppressWarnings("unused") Exception ignore) {
+          } catch (@SuppressWarnings("unused") final Exception ignore) {
           }
         }
       }).start();
@@ -403,7 +403,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Initialize the jmx connection using the specified jmx id.
    */
   private void initializeJmxConnection() {
-    JPPFManagementInfo info = getManagementInfo();
+    final JPPFManagementInfo info = getManagementInfo();
     if (channel.isOpen()) {
       if (debugEnabled) log.debug("establishing JMX connection for {}", info);
       JMXConnectionWrapper jmx = null;
@@ -442,7 +442,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (jmxConnection != null && jmxConnection.isConnected()) {
       try {
         jmxConnection.cancelJob(jobId, requeue);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
         throw e;
@@ -491,8 +491,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
     if (oldValue == newValue) return;
-    ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
-    for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
+    final ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
+    for (final ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
   @Override
@@ -520,7 +520,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   private void updateInStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) JPPFDriver.getInstance().getStatistics().addValue(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC, n);
     }
   }
@@ -530,7 +530,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   private void updateOutStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) JPPFDriver.getInstance().getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
     }
   }
@@ -540,7 +540,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param resubmittedTaskCount the number of tasks to resubmit.
    */
   void updateStatsUponTaskResubmit(final int resubmittedTaskCount) {
-    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, resubmittedTaskCount);
   }
 

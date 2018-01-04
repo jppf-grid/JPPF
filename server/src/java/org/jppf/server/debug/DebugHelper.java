@@ -44,7 +44,7 @@ public final class DebugHelper {
     if (!JPPFDriver.JPPF_DEBUG) return null;
     List<ServerTask> list = null;
     synchronized(resultsMap) {
-      Collection<Integer> positions = resultsMap.getValues(jobUuid);
+      final Collection<Integer> positions = resultsMap.getValues(jobUuid);
       if (positions == null) {
         for (ServerTask task: results) resultsMap.putValue(jobUuid, task.getJobPosition());
       } else {
@@ -78,7 +78,7 @@ public final class DebugHelper {
    */
   public static String showResults() {
     if (!JPPFDriver.JPPF_DEBUG) return null;
-    StringBuilder sb = new StringBuilder(resultsMap.getClass().getSimpleName()).append("[");
+    final StringBuilder sb = new StringBuilder(resultsMap.getClass().getSimpleName()).append("[");
     synchronized(resultsMap) {
       for (Map.Entry<String, Collection<Integer>> entry: resultsMap.entrySet()) {
         sb.append("\n  ").append(entry.getKey()).append('=').append(entry.getValue());
@@ -98,7 +98,7 @@ public final class DebugHelper {
     if (!JPPFDriver.JPPF_DEBUG) return null;
     List<ServerTask> list = null;
     synchronized(resultsMap) {
-      Collection<Integer> positions = resultsMap.getValues(jobUuid);
+      final Collection<Integer> positions = resultsMap.getValues(jobUuid);
       if (positions != null) {
         for (ServerTask task: results) {
           if (positions.contains(task.getJobPosition())) {

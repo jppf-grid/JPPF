@@ -75,16 +75,16 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   @Override
   public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    NodeClassContext context = (NodeClassContext) channel.getContext();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (context.readMessage(channel)) {
-      JPPFResourceWrapper res = context.deserializeResource();
+      final JPPFResourceWrapper res = context.deserializeResource();
       if (debugEnabled) log.debug("read resource request {} from node: {}", res, channel);
       if (res.getState() == JPPFResourceWrapper.State.CLOSE_CHANNEL) {
         if (debugEnabled) log.debug("processing channel close request for node {}", channel);
         NodeClassNioServer.closeConnection(channel);
         if (context.isPeer()) {
-          String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
-          AbstractNodeContext ctx = driver.getNodeNioServer().getConnection(uuid);
+          final String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
+          final AbstractNodeContext ctx = driver.getNodeNioServer().getConnection(uuid);
           if (ctx != null) ctx.closeChannel();
         }
         return null;
@@ -106,7 +106,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
    * @throws Exception if any error occurs.
    */
   private boolean processResource(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
-    boolean dynamic = resource.isDynamic();
+    final boolean dynamic = resource.isDynamic();
     if (!dynamic || (resource.getRequestUuid() == null)) return processNonDynamic(channel, resource);
     return processDynamic(channel, resource);
   }
@@ -120,23 +120,23 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   private boolean processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
-    String name = resource.getName();
-    TraversalList<String> uuidPath = resource.getUuidPath();
+    final String name = resource.getName();
+    final TraversalList<String> uuidPath = resource.getUuidPath();
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
-      boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
+      final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, (ClassLoader) null, fileLookup);
+        final List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, (ClassLoader) null, fileLookup);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
         if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
-        String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes((ClassLoader) null, fileLookup, names);
+        final String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
+        final Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes((ClassLoader) null, fileLookup, names);
         resource.setData(ResourceIdentifier.RESOURCE_MAP, map);
       } else {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
         if (uuid != null) b = classCache.getCacheContent(uuid, name);
-        boolean alreadyInCache = (b != null);
+        final boolean alreadyInCache = (b != null);
         if (debugEnabled) log.debug(build("resource ", alreadyInCache ? "" : "not ", "found [", name, "] in cache for node: ", channel));
         if (!alreadyInCache) {
           b = server.getResourceProvider().getResource(name, fileLookup);
@@ -161,9 +161,9 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   private boolean processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
-    String name = resource.getName();
-    TraversalList<String> uuidPath = resource.getUuidPath();
-    NodeClassContext context = (NodeClassContext) channel.getContext();
+    final String name = resource.getName();
+    final TraversalList<String> uuidPath = resource.getUuidPath();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (resource.isSingleResource()) {
       b = classCache.getCacheContent(uuidPath.getFirst(), name);
       if (b != null) {
@@ -175,12 +175,12 @@ class WaitingNodeRequestState extends NodeClassServerState {
       resource.setData(ResourceIdentifier.DRIVER_CALLABLE_ID, callableSeq.incrementAndGet());
     }
     uuidPath.decPosition();
-    String uuid = resource.getUuidPath().getCurrentElement();
-    ChannelWrapper<?> provider = findProviderConnection(uuid);
+    final String uuid = resource.getUuidPath().getCurrentElement();
+    final ChannelWrapper<?> provider = findProviderConnection(uuid);
     if (provider != null) {
       if (debugEnabled) log.debug(build("requesting resource " + resource + " from client: ", provider, " for node: ", channel));
-      ClientClassContext providerContext = (ClientClassContext) provider.getContext();
-      ResourceRequest request = new ResourceRequest(channel, resource);
+      final ClientClassContext providerContext = (ClientClassContext) provider.getContext();
+      final ResourceRequest request = new ResourceRequest(channel, resource);
       resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
       context.addPendingResponse(resource, request);
       providerContext.addRequest(request);
@@ -200,13 +200,13 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception {
     ChannelWrapper<?> result = null;
-    ClientClassNioServer clientClassServer = driver.getClientClassServer();
-    List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
+    final ClientClassNioServer clientClassServer = driver.getClientClassServer();
+    final List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
     if (connections == null) return null;
     int minRequests = Integer.MAX_VALUE;
-    for (ChannelWrapper<?> channel: connections) {
-      ClientClassContext ctx = (ClientClassContext) channel.getContext();
-      int size = ctx.getNbPendingRequests();
+    for (final ChannelWrapper<?> channel: connections) {
+      final ClientClassContext ctx = (ClientClassContext) channel.getContext();
+      final int size = ctx.getNbPendingRequests();
       if (size < minRequests) {
         minRequests = size;
         result = channel;

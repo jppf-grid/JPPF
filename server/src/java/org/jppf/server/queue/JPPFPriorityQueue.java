@@ -93,20 +93,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public ServerJob addBundle(final ServerTaskBundleClient clientBundle) {
     if (debugEnabled) log.debug("adding bundle=" + clientBundle);
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
-    JobSLA sla = clientBundle.getSLA();
+    final JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
     ServerJob serverJob = null;
-    TaskBundle header = clientBundle.getJob();
+    final TaskBundle header = clientBundle.getJob();
     lock.lock();
     try {
       if (sla.isBroadcastJob()) {
         if (debugEnabled) log.debug("before processing broadcast job {}", header);
         broadcastManager.processBroadcastJob(clientBundle);
       } else {
-        boolean queued;
+        final boolean queued;
         serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
-          int n = header.getTaskCount();
+          final int n = header.getTaskCount();
           header.setDriverQueueTaskCount(n);
           queued = true;
           serverJob = new ServerJob(new ReentrantLock(), jobManager, header, clientBundle.getDataProvider());
@@ -175,7 +175,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, serverJob.getTaskCount());
-      int size = getSize(serverJob);
+      final int size = getSize(serverJob);
       decrementSizeCount(size);
       if (nbTasks >= serverJob.getTaskCount()) {
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
@@ -242,9 +242,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public void updatePriority(final String jobUuid, final int newPriority) {
     lock.lock();
     try {
-      ServerJob job = jobMap.get(jobUuid);
+      final ServerJob job = jobMap.get(jobUuid);
       if (job == null) return;
-      int oldPriority = job.getJob().getSLA().getPriority();
+      final int oldPriority = job.getJob().getSLA().getPriority();
       if (oldPriority != newPriority) {
         job.getJob().getSLA().setPriority(newPriority);
         priorityMap.removeValue(oldPriority, job);
@@ -260,7 +260,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public boolean cancelJob(final String jobId) {
     lock.lock();
     try {
-      ServerJob job = jobMap.get(jobId);
+      final ServerJob job = jobMap.get(jobId);
       boolean res = job != null;
       if (res) {
         decrementSizeCount(getSize(job));
@@ -354,7 +354,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public Set<String> getAllJobIdsFromPriorityMap() {
     lock.lock();
     try {
-      Set<String> set = new HashSet<>();
+      final Set<String> set = new HashSet<>();
       for (ServerJob job: priorityMap.allValues()) set.add(job.getUuid());
       return set;
     } finally {
@@ -434,10 +434,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   public List<ServerJob> selectJobs(final JobSelector selector) {
     if ((selector == null) || (selector instanceof AllJobsSelector)) return getAllJobs();
-    List<ServerJob> list = new ArrayList<>();
+    final List<ServerJob> list = new ArrayList<>();
     lock.lock();
     try {
-      for (ServerJob job: jobMap.values()) {
+      for (final ServerJob job: jobMap.values()) {
         if (selector.accepts(job.getJob())) list.add(job);
       }
     } finally {
@@ -451,7 +451,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @param job the job to update.
    */
   public void updateSchedules(final ServerJob job) {
-    JobSLA sla = job.getSLA();
+    final JobSLA sla = job.getSLA();
     scheduleManager.clearSchedules(job.getUuid());
     if (sla.getJobSchedule() != null) scheduleManager.handleStartJobSchedule(job);
     if (sla.getJobExpirationSchedule() != null) scheduleManager.handleExpirationJobSchedule(job);

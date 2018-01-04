@@ -122,8 +122,8 @@ public class PeerConnectionPool implements AutoCloseable {
    */
   private void init() {
     for (int i=1; i<=size; i++) {
-      String name = String.format("%s-%d", peerName, connectionSequence.incrementAndGet());
-      JPPFPeerInitializer initializer = new JPPFPeerInitializer(name, connectionInfo, secure, fromDiscovery);
+      final String name = String.format("%s-%d", peerName, connectionSequence.incrementAndGet());
+      final JPPFPeerInitializer initializer = new JPPFPeerInitializer(name, connectionInfo, secure, fromDiscovery);
       initializers.add(initializer);
       initializer.start();
     }

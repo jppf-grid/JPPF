@@ -18,9 +18,7 @@
 
 package org.jppf.management.forwarding;
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
+import org.jppf.management.forwarding.JPPFNodeForwarding.ForwardCallback;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 
 /**
@@ -40,44 +38,37 @@ abstract class AbstractForwardingTask implements Runnable {
    */
   final String memberName;
   /**
-   * The results map.
+   * The result.
    */
-  final Map<String, Object> resultMap;
+  Object result;
   /**
    * 
    */
-  final CountDownLatch latch;
+  final ForwardCallback callback;
 
   /**
    * Initialize this task.
-   * @param latch .
    * @param context represents the node to which a request is sent.
-   * @param resultMap the results map.
+   * @param callback .
    * @param mbeanName the name of the node MBean to which the request is sent.
    * @param memberName the name of the method to invoke, or the attribute to get or set.
    */
-  AbstractForwardingTask(final CountDownLatch latch, final AbstractNodeContext context, final Map<String, Object> resultMap, final String mbeanName, final String memberName) {
-    this.latch = latch;
+  AbstractForwardingTask(final AbstractNodeContext context, final ForwardCallback callback, final String mbeanName, final String memberName) {
     this.context = context;
-    this.resultMap = resultMap;
+    this.callback = callback;
     this.mbeanName = mbeanName;
     this.memberName = memberName;
   }
 
-
   @Override
   public void run() {
-    String uuid = context.getUuid();
-    Object result = null;
     try {
       result = execute();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       result = e;
+    } finally {
+      callback.gotResult(context.getUuid(), result);
     }
-    synchronized(resultMap) {
-      resultMap.put(uuid, result);
-    }
-    latch.countDown();
   }
 
   /**

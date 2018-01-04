@@ -65,10 +65,10 @@ class SendingBundleState extends NodeServerState {
     if (traceEnabled) log.trace("exec() for " + channel);
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
-    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) {
-      ServerTaskBundleNode nodeBundle = context.getBundle();
-      TaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
+      final ServerTaskBundleNode nodeBundle = context.getBundle();
+      final TaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
       if (bundle != null) {
         if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
         nodeBundle.setOffline(context.isOffline());
@@ -88,10 +88,10 @@ class SendingBundleState extends NodeServerState {
     }
     if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
-      ServerTaskBundleNode nodeBundle = context.getBundle();
-      JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
+      final ServerTaskBundleNode nodeBundle = context.getBundle();
+      final JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
       if (schedule != null) {
-        NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server, nodeBundle, context.isOffline() ? null : context);
+        final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server, nodeBundle, context.isOffline() ? null : context);
         server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
       }
       context.setMessage(null);

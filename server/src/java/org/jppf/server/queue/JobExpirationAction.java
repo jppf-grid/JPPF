@@ -54,12 +54,12 @@ class JobExpirationAction implements Runnable {
    */
   @Override
   public void run() {
-    String jobId = serverJob.getName();
+    final String jobId = serverJob.getName();
     try {
       if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
       serverJob.jobExpired();
       serverJob.cancel(true);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Error while cancelling job id = " + jobId, e);
     }
   }

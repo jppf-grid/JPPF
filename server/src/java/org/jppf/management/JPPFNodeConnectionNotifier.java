@@ -78,7 +78,7 @@ public final class JPPFNodeConnectionNotifier extends NotificationBroadcasterSup
    * @param connected {@code true} to indicate that the node is connected, {@code false} otherwise.
    */
   private void notify(final JPPFManagementInfo info, final boolean connected) {
-    Notification notif = new Notification(connected ? CONNECTED : DISCONNECTED, JPPFNodeConnectionNotifierMBean.MBEAN_NAME, sequence.incrementAndGet(), System.currentTimeMillis());
+    final Notification notif = new Notification(connected ? CONNECTED : DISCONNECTED, JPPFNodeConnectionNotifierMBean.MBEAN_NAME, sequence.incrementAndGet(), System.currentTimeMillis());
     notif.setUserData(info);
     sendNotification(notif);
   }

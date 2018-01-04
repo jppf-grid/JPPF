@@ -34,8 +34,7 @@ import org.slf4j.*;
  * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
-class WaitingHandshakeState extends ClientServerState
-{
+class WaitingHandshakeState extends ClientServerState {
   /**
    * Logger for this class.
    */
@@ -49,8 +48,7 @@ class WaitingHandshakeState extends ClientServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public WaitingHandshakeState(final ClientNioServer server)
-  {
+  public WaitingHandshakeState(final ClientNioServer server) {
     super(server);
   }
 
@@ -61,28 +59,25 @@ class WaitingHandshakeState extends ClientServerState
    * @throws Exception if an error occurs while transitioning to another state.
    */
   @Override
-  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClientContext context = (ClientContext) channel.getContext();
+  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    final ClientContext context = (ClientContext) channel.getContext();
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
-    if (context.readMessage(channel))
-    {
-      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      TaskBundle header = bundleWrapper.getJob();
+    if (context.readMessage(channel)) {
+      final ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
+      final TaskBundle header = bundleWrapper.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
       context.setConnectionUuid((String) header.getParameter(BundleParameter.CONNECTION_UUID));
       header.getUuidPath().incPosition();
-      String uuid = header.getUuidPath().getCurrentElement();
+      final String uuid = header.getUuidPath().getCurrentElement();
       context.setUuid(uuid);
       // wait until a class loader channel is up for the same client uuid
-      ClientClassNioServer classServer = driver.getClientClassServer();
+      final ClientClassNioServer classServer = driver.getClientClassServer();
       List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
-      while ((list == null) || list.isEmpty())
-      {
+      while ((list == null) || list.isEmpty()) {
         Thread.sleep(1L);
         list = classServer.getProviderConnections(uuid);
       }
-      String driverUUID = driver.getUuid();
+      final String driverUUID = driver.getUuid();
       header.getUuidPath().add(driverUUID);
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
 
@@ -93,9 +88,9 @@ class WaitingHandshakeState extends ClientServerState
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());
       header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driverUUID);
       JMXServer jmxServer = driver.getInitializer().getJmxServer(false);
-      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, jmxServer != null ? jmxServer.getManagementPort(): -1);
+      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, jmxServer != null ? jmxServer.getManagementPort() : -1);
       jmxServer = driver.getInitializer().getJmxServer(true);
-      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, jmxServer != null ? jmxServer.getManagementPort(): -1);
+      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, jmxServer != null ? jmxServer.getManagementPort() : -1);
       return TO_SENDING_HANDSHAKE_RESULTS;
     }
     return TO_WAITING_HANDSHAKE;

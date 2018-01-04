@@ -26,8 +26,7 @@ import org.jppf.node.protocol.TaskBundle;
  * A message is the transformation of a job into an more easily transportable format.
  * @author Laurent Cohen
  */
-public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
-{
+public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
   /**
    * The latest bundle that was sent or received.
    */
@@ -37,8 +36,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
-  public AbstractTaskBundleMessage(final ChannelWrapper<?> channel)
-  {
+  public AbstractTaskBundleMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
@@ -47,8 +45,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * @param channel the channel to read from or write to.
    * @param debug to enable debug-level logging.
    */
-  protected AbstractTaskBundleMessage(final ChannelWrapper<?> channel, final boolean debug)
-  {
+  protected AbstractTaskBundleMessage(final ChannelWrapper<?> channel, final boolean debug) {
     super(channel, debug);
   }
 
@@ -56,8 +53,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * Get the latest bundle that was sent or received.
    * @return a <code>JPPFTaskBundle</code> instance.
    */
-  public TaskBundle getBundle()
-  {
+  public TaskBundle getBundle() {
     return bundle;
   }
 
@@ -65,15 +61,13 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * Set the latest bundle that was sent or received.
    * @param bundle a <code>JPPFTaskBundle</code> instance.
    */
-  public void setBundle(final TaskBundle bundle)
-  {
+  public void setBundle(final TaskBundle bundle) {
     this.bundle = bundle;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);

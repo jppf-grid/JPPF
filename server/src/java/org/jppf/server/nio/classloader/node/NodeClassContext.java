@@ -56,7 +56,7 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
 
   @Override
   public boolean setState(final NodeClassState state) {
-    boolean b = super.setState(state);
+    final boolean b = super.setState(state);
     if (NodeClassState.IDLE_NODE.equals(state)) {
       synchronized(getChannel()) {
         getChannel().notifyAll();
@@ -155,7 +155,7 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource == null ? "null" : resource.getName());

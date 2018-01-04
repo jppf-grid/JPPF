@@ -74,7 +74,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   public void initLocalChannel(final ChannelWrapper<?> localChannel) {
     if (JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       this.localChannel = localChannel;
-      ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
+      final ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
       localChannel.setInterestOps(0);
@@ -101,7 +101,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
         transitionManager.transitionChannel(channel, NodeClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
         if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeConnection(channel);
@@ -146,22 +146,22 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    NodeClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
-    NodeClassContext context = (NodeClassContext) channel.getContext();
-    String uuid = context.getUuid();
+    final NodeClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
+    final String uuid = context.getUuid();
     if (uuid != null) server.removeNodeConnection(uuid);
     try {
       channel.close();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
     if (context.isPeer()) {
       try {
-        NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
-        AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
+        final NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
+        final AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
         if (ctx != null) ctx.handleException(ctx.getChannel(), null);
-      } catch(Exception e) {
+      } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(e.getMessage());
       }
@@ -170,10 +170,10 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
 
   @Override
   public void connectionFailed(final ReaperEvent event) {
-    ServerConnection c = event.getConnection();
+    final ServerConnection c = event.getConnection();
     if (!c.isOk()) {
-      String uuid = c.getUuid();
-      ChannelWrapper<?> channel = getNodeConnection(uuid);
+      final String uuid = c.getUuid();
+      final ChannelWrapper<?> channel = getNodeConnection(uuid);
       if (debugEnabled) log.debug("about to close channel = " + channel + " with uuid = " + uuid);
       closeConnection(channel);
     }
@@ -186,13 +186,13 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   @Override
   public synchronized void removeAllConnections() {
     if (!isStopped()) return;
-    List<ChannelWrapper<?>> list  = new ArrayList<>(nodeConnections.values());
+    final List<ChannelWrapper<?>> list  = new ArrayList<>(nodeConnections.values());
     nodeConnections.clear();
     super.removeAllConnections();
     for (ChannelWrapper<?> channel: list) {
       try {
         closeConnection(channel);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
       }
     }
@@ -205,7 +205,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
 
   @Override
   public List<ChannelWrapper<?>> getAllConnections() {
-    List<ChannelWrapper<?>> list = super.getAllConnections();
+    final List<ChannelWrapper<?>> list = super.getAllConnections();
     if (localChannel != null) list.add(localChannel);
     return list;
   }

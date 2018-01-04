@@ -78,7 +78,7 @@ public class JobEventTask implements Runnable {
    */
   @Override
   public void run() {
-    JobNotification event = new JobNotification(jobManager.getEmitterUuid(), eventType, jobInfo, nodeInfo, timestamp);
+    final JobNotification event = new JobNotification(jobManager.getEmitterUuid(), eventType, jobInfo, nodeInfo, timestamp);
     jobManager.fireJobEvent(event);
   }
 }

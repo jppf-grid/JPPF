@@ -85,7 +85,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
   @Override
   public void resume() {
     suspended.set(false);
-    checkerThread.suspended.set(false);
+    checkerThread.nodeSuspended.set(false);
     checkerThread.wakeUp();
   }
 
@@ -100,10 +100,10 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
    * Wait until the checks are effectively suspended.
    */
   private void waitSuspended() {
-    while (!checkerThread.suspended.get()) {
-      long start = System.nanoTime();
+    while (!checkerThread.nodeSuspended.get()) {
+      final long start = System.nanoTime();
       suspendedLock.goToSleep();
-      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) log.debug("suspended time: " + elapsed);
     }
   }
@@ -115,24 +115,24 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
     /**
      * 
      */
-    private final AtomicBoolean suspended = new AtomicBoolean(true);
+    private final AtomicBoolean nodeSuspended = new AtomicBoolean(true);
 
     @Override
     public void run() {
       while (!isStopped()) {
         if (isSuspended()) {
-          if (this.suspended.compareAndSet(false, true)) suspendedLock.wakeUp();
+          if (this.nodeSuspended.compareAndSet(false, true)) suspendedLock.wakeUp();
           goToSleep();
         }
         if (isStopped()) return;
         if (isSuspended()) continue;
-        long start = System.nanoTime();
+        final long start = System.nanoTime();
         try {
           socketWrapper.receiveBytes(1);
-        } catch (@SuppressWarnings("unused") SocketTimeoutException ignore) {
-          double elapsed = (System.nanoTime() - start) / 1e6d;
+        } catch (@SuppressWarnings("unused") final SocketTimeoutException ignore) {
+          final double elapsed = (System.nanoTime() - start) / 1e6d;
           if (debugEnabled) log.debug("receive time: " + elapsed);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           exception = e;
           node.getExecutionManager().cancelAllTasks(false, false);
         }

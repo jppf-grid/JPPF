@@ -62,16 +62,16 @@ class WaitingProviderResponseState extends ClientClassServerState {
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientClassContext context = (ClientClassContext) channel.getContext();
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (context.readMessage(channel)) {
-      ResourceRequest request = context.getCurrentRequest();
-      JPPFResourceWrapper resource = context.deserializeResource();
+      final ResourceRequest request = context.getCurrentRequest();
+      final JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", request.getChannel(), ", resource: ", resource.getName()));
       if ((resource.getDefinition() != null) && resource.isSingleResource())
         classCache.setCacheContent(resource.getUuidPath().getFirst(), resource.getName(), resource.getDefinition());
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", request.getChannel()));
-      double elapsed = (System.nanoTime() - request.getRequestStartTime()) / 1_000_000d;
+      final double elapsed = (System.nanoTime() - request.getRequestStartTime()) / 1_000_000d;
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENT_CLASS_REQUESTS_TIME, elapsed);
       context.sendNodeResponse(request, resource);
       context.setCurrentRequest(null);

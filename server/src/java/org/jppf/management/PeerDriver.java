@@ -31,6 +31,10 @@ import org.jppf.utils.TypedProperties;
  */
 public final class PeerDriver extends NotificationBroadcasterSupport implements PeerDriverMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * The JPPF driver.
    */
   private static JPPFDriver driver = JPPFDriver.getInstance();
@@ -47,8 +51,8 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
 
   @Override
   public TypedProperties getPeerProperties() {
-    TypedProperties props = new TypedProperties();
-    PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
+    final TypedProperties props = new TypedProperties();
+    final PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
     props.setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());
     props.setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
     return props;

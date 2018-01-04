@@ -101,9 +101,9 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
    */
   public synchronized void init() throws Exception {
     if (socketClient == null) socketClient = initSocketChannel();
-    String cname = String.format("%s@%s:%d", name, socketClient.getHost(), socketClient.getPort());
+    final String cname = String.format("%s@%s:%d", name, socketClient.getHost(), socketClient.getPort());
     if (printConnectionMessage) {
-      String msg = "Attempting connection to remote peer " + cname;
+      final String msg = "Attempting connection to remote peer " + cname;
       log.info(msg);
       System.out.println(msg);
     }
@@ -112,7 +112,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
     if (debugEnabled) log.debug("Connected to peer {}, sending channel identifier", cname);
     socketClient.writeInt(channelIdentifier);
     if (printConnectionMessage) {
-      String msg = "Reconnected to remote peer " + cname;
+      final String msg = "Reconnected to remote peer " + cname;
       log.info(msg);
       System.out.println("Reconnected to remote peer " + cname);
     }
@@ -133,7 +133,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   private SocketChannelClient initSocketChannel() throws Exception {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
-    int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
+    final int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
     return new SocketChannelClient(host, port, false);
   }
 }

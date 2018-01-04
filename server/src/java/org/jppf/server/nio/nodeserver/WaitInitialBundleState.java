@@ -66,25 +66,24 @@ class WaitInitialBundleState extends NodeServerState {
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    */
-  @SuppressWarnings("deprecation")
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception  {
-    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("received handshake response for channel id = {}", context.getChannel().getId());
-      BundleResults received = context.deserializeBundle();
-      TaskBundle bundle = received.bundle();
-      boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
+      final BundleResults received = context.deserializeBundle();
+      final TaskBundle bundle = received.bundle();
+      final boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
       if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
-      String uuid = bundle.getParameter(NODE_UUID_PARAM);
+      final String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
-      JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
+      final JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
       context.nodeIdentifier = NodeServerUtils.getNodeIdentifier(server.getBundlerFactory(), channel, systemInfo);
       if (debugEnabled) log.debug("nodeID = {} for node = {}", context.nodeIdentifier, context);
-      boolean isPeer = bundle.getParameter(IS_PEER, false);
+      final boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (systemInfo != null) {
         systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
@@ -92,30 +91,30 @@ class WaitInitialBundleState extends NodeServerState {
         context.setNodeInfo(systemInfo, false);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
       context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
-      int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
+      final int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
       String host = NodeServerUtils.getChannelHost(channel);
-      HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
-      boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-      boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+      final HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
+      final boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
+      final boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
       int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
-          DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
-          JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
+          final DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
+          final JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
         if ((systemInfo != null) && (systemInfo.getJppf().get(JPPFProperties.NODE_ANDROID))) type |= JPPFManagementInfo.ANDROID;
-        JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
+        final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
         if (debugEnabled) log.debug(String.format("configuring management for node %s", info));
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
       } else {
         if (offline || (port < 0)) {
-          JPPFManagementInfo info = new JPPFManagementInfo(hostIP, -1, context.getUuid(), type, sslEnabled);
+          final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, -1, context.getUuid(), type, sslEnabled);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           context.setManagementInfo(info);
         }
@@ -134,7 +133,7 @@ class WaitInitialBundleState extends NodeServerState {
    * @return the next transition to process.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition finalizeTransition(final AbstractNodeContext context) throws Exception {
+  private static NodeTransition finalizeTransition(final AbstractNodeContext context) throws Exception {
     context.setMessage(null);
     context.setBundle(null);
     return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
@@ -151,32 +150,32 @@ class WaitInitialBundleState extends NodeServerState {
     String host = NodeServerUtils.getChannelHost(channel);
     String ip = host;
     try {
-      InetAddress addr = InetAddress.getByName(host);
+      final InetAddress addr = InetAddress.getByName(host);
       ip = addr.getHostAddress();
       if (host.equals(ip)) host = addr.getHostName();
       if (!host.equals(ip)) {
         if (log.isTraceEnabled()) log.trace("resolved host from reverse DNS lookup: host={}, ip={}", host, ip);
         return new HostIP(host, ip);
       }
-    } catch (@SuppressWarnings("unused") UnknownHostException ignore) {
+    } catch (@SuppressWarnings("unused") final UnknownHostException ignore) {
     }
     // if host couldn't be resolved via reverse DNS lookup
-    JPPFSystemInformation info = ((AbstractNodeContext) channel.getContext()).getSystemInformation();
+    final JPPFSystemInformation info = ((AbstractNodeContext) channel.getContext()).getSystemInformation();
     if (info != null) {
-      for (HostIP hostIP: info.parseIPV4Addresses()) {
+      for (final HostIP hostIP: info.parseIPV4Addresses()) {
         if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
           if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
           return hostIP;
         }
       }
-      for (HostIP hostIP: info.parseIPV6Addresses()) {
+      for (final HostIP hostIP: info.parseIPV6Addresses()) {
         if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
           if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
           return hostIP;
         }
       }
     }
-    HostIP hostIP = resolveIPs ? NetworkUtils.getHostIP(host) : new HostIP(host, host);
+    final HostIP hostIP = resolveIPs ? NetworkUtils.getHostIP(host) : new HostIP(host, host);
     if (log.isTraceEnabled()) log.trace("{}: {}", (resolveIPs ? "resolved host from NetworkUtils.getHostIP()" : "unresolved host"), hostIP);
     return hostIP;
   }
@@ -189,17 +188,17 @@ class WaitInitialBundleState extends NodeServerState {
    * @throws Exception if any error occurs.
    */
   private NodeTransition processOfflineReopen(final BundleResults received, final AbstractNodeContext context) throws Exception {
-    TaskBundle bundle = received.bundle();
-    String jobUuid = bundle.getParameter(JOB_UUID);
-    long id = bundle.getParameter(NODE_BUNDLE_ID);
-    ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
+    final TaskBundle bundle = received.bundle();
+    final String jobUuid = bundle.getParameter(JOB_UUID);
+    final long id = bundle.getParameter(NODE_BUNDLE_ID);
+    final ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
     // if the driver was restarted, we discard the results
     if (nodeBundle == null) return finalizeTransition(context);
     if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
     context.setBundle(nodeBundle);
-    WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
-    NodeTransition transition = wrs.process(received, context);
-    boolean closeCommand = bundle.getParameter(BundleParameter.CLOSE_COMMAND, false);
+    final WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
+    final NodeTransition transition = wrs.process(received, context);
+    final boolean closeCommand = bundle.getParameter(BundleParameter.CLOSE_COMMAND, false);
     if (closeCommand) {
       context.cleanup();
       return null;

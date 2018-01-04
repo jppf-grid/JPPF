@@ -71,7 +71,7 @@ class NodeDispatchTimeoutAction implements Runnable {
     if (!nodeBundle.getJob().isHandshake()) {
       if (debugEnabled) log.debug("node dispatch expiring : {}", nodeBundle);
       nodeBundle.expire();
-      String jobUuid = nodeBundle.getJob().getUuid();
+      final String jobUuid = nodeBundle.getJob().getUuid();
       if (context == null) {
         server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
         nodeBundle.setJobReturnReason(JobReturnReason.DISPATCH_TIMEOUT);
@@ -79,7 +79,7 @@ class NodeDispatchTimeoutAction implements Runnable {
       } else {
         try {
           context.cancelJob(jobUuid, false);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           if (debugEnabled) log.debug("error cancelling job {} : {}", context, ExceptionUtils.getStackTrace(e));
           else log.warn("error cancelling job {} : {}", context, ExceptionUtils.getMessage(e));
         }

@@ -60,7 +60,7 @@ class SendingInitialNodeResponseState extends NodeClassServerState {
     if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("node " + channel + " has been disconnected");
     }
-    NodeClassContext context = (NodeClassContext) channel.getContext();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent node init response for uuid = {}", context.getUuid());
       if (debugEnabled) log.debug("sent uuid=" + context.getResource().getProviderUuid() + " to node " + channel);

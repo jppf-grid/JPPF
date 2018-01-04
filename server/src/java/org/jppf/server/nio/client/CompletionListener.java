@@ -68,7 +68,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
     if (!isChannelValid()) {
       if (debugEnabled) log.debug("channel is invalid: {}", channel);
-      ClientContext context = (ClientContext) channel.getContext();
+      final ClientContext context = (ClientContext) channel.getContext();
       context.setNbTasksToSend(context.getNbTasksToSend() - results.size());
       removeJobFromQueue(bundle);
       return;
@@ -80,14 +80,14 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
     if (bundle.isCancelled()) bundle.removeCompletionListener(this);
     else {
-      ClientContext context = (ClientContext) channel.getContext();
+      final ClientContext context = (ClientContext) channel.getContext();
       context.offerCompletedBundle(bundle);
       synchronized(channel) {
         if (debugEnabled) log.debug("*** context state=" + context.getState() + " for " + bundle + ", channel=" + channel);
         if (context.getState() == ClientState.IDLE) {
           try {
             transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-          } catch(Exception e) {
+          } catch(final Exception e) {
             if (debugEnabled) log.debug("error while transitioning {} : {}", channel, ExceptionUtils.getStackTrace(e));
             else log.info("error while transitioning {} : {}", channel, ExceptionUtils.getMessage(e));
           }
@@ -115,12 +115,12 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    * @param bundle the job to remove.
    */
   private void removeJobFromQueue(final ServerTaskBundleClient bundle) {
-    String uuid = bundle.getUuid();
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
-    ServerJob job = queue.getBundleForJob(uuid);
+    final String uuid = bundle.getUuid();
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final ServerJob job = queue.getBundleForJob(uuid);
     if (job != null) {
       if (debugEnabled) log.debug("job {} : status={}, submissionStatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});
-      ClientContext context = (ClientContext) channel.getContext();
+      final ClientContext context = (ClientContext) channel.getContext();
       if (job.isDone() || (context.getNbTasksToSend() <= 0)) queue.removeBundle(job);
     }
   }

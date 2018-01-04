@@ -70,21 +70,21 @@ public class JPPFRemoteContainer extends JPPFContainer {
    */
   @Override
   public int deserializeObjects(final Object[] list, final int count, final ExecutorService executor) throws Throwable {
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(classLoader);
-      CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
-      InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
+      final CompletionService<ObjectDeserializationTask> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<ObjectDeserializationTask>>(count));
+      final InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
       for (int i = 0; i < count; i++) {
-        DataLocation dl = IOHelper.readData(is);
+        final DataLocation dl = IOHelper.readData(is);
         if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
         completionService.submit(new ObjectDeserializationTask(dl, i));
       }
       Throwable t = null;
       for (int i=0; i<count; i++) {
-        Future<ObjectDeserializationTask> f = completionService.take();
-        ObjectDeserializationTask task = f.get();
-        Object o = task.getObject();
+        final Future<ObjectDeserializationTask> f = completionService.take();
+        final ObjectDeserializationTask task = f.get();
+        final Object o = task.getObject();
         if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
         list[task.getIndex() + 1] = o;
       }

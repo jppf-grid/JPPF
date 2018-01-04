@@ -67,10 +67,10 @@ class SendingPeerHandshakeState extends ClientServerState {
       throw new ConnectException("client " + channel + " has been disconnected");
     }
 
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     if (context.getMessage() == null) {
-      TaskBundle header = new JPPFTaskBundle();
-      TraversalList<String> uuidPath = new TraversalList<>();
+      final TaskBundle header = new JPPFTaskBundle();
+      final TraversalList<String> uuidPath = new TraversalList<>();
       uuidPath.add(driver.getUuid());
       header.setUuidPath(uuidPath);
       if (debugEnabled) log.debug("sending handshake job, uuidPath=" + uuidPath);
@@ -81,22 +81,22 @@ class SendingPeerHandshakeState extends ClientServerState {
       header.setParameter(BundleParameter.CONNECTION_UUID, context.getConnectionUuid());
       header.setParameter(BundleParameter.IS_PEER, true);
       header.setParameter(BundleParameter.NODE_UUID_PARAM, driver.getUuid());
-      JMXServer jmxServer = driver.getInitializer().getJmxServer(context.isSecure());
+      final JMXServer jmxServer = driver.getInitializer().getJmxServer(context.isSecure());
       header.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
-      PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
-      JPPFSystemInformation systemInformation = driver.getSystemInformation();
+      final PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
+      final JPPFSystemInformation systemInformation = driver.getSystemInformation();
       systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
       systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
       header.setSLA(null);
       header.setMetadata(null);
-      DataLocation dataProvider = IOHelper.serializeData(null);
-      ServerTaskBundleClient bundle = new ServerTaskBundleClient(header, dataProvider, Collections.<DataLocation>emptyList(), true);
+      final DataLocation dataProvider = IOHelper.serializeData(null);
+      final ServerTaskBundleClient bundle = new ServerTaskBundleClient(header, dataProvider, Collections.<DataLocation>emptyList(), true);
       context.setBundle(bundle);
       context.serializeBundle();
     }
     if (context.writeMessage(channel)) {
-      ServerTaskBundleClient bundleWrapper = context.getBundle();
+      final ServerTaskBundleClient bundleWrapper = context.getBundle();
       if (debugEnabled) log.debug("sent entire handshake bundle" + bundleWrapper.getJob() + " to peer " + channel);
       context.setBundle(null);
       context.setClientMessage(null);

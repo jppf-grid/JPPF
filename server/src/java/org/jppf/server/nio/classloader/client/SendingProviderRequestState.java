@@ -60,17 +60,17 @@ class SendingProviderRequestState extends ClientClassServerState {
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientClassContext context = (ClientClassContext) channel.getContext();
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException(build("provider ", channel, " has been disconnected"));
     ResourceRequest request = context.getCurrentRequest();
     if (request == null) {
       request = context.pollPendingRequest();
       if (request != null) {
         context.setMessage(null);
-        JPPFResourceWrapper resource = request.getResource();
+        final JPPFResourceWrapper resource = request.getResource();
         if (resource.isSingleResource()) {
-          String uuid = resource.getUuidPath().getFirst();
-          byte[] content = server.getClassCache().getCacheContent(uuid, resource.getName());
+          final String uuid = resource.getUuidPath().getFirst();
+          final byte[] content = server.getClassCache().getCacheContent(uuid, resource.getName());
           if (content != null) {
             if (debugEnabled) log.debug("resource [uuid={}, res={}] found in the cache, request will not be sent to the client", uuid, resource.getName());
             resource.setDefinition(content);

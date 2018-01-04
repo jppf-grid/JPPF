@@ -80,7 +80,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return true if a job was dispatched, false otherwise.
    */
   private boolean dispatch() {
-    boolean dispatched = false;
+    final boolean dispatched = false;
     try {
       queue.getBroadcastManager().processPendingBroadcasts();
       C channel = null;
@@ -90,10 +90,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
         queueLock.lock();
         try {
-          Iterator<ServerJob> it = queue.iterator();
+          final Iterator<ServerJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
-            ServerJob job = it.next();
-            JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
+            final ServerJob job = it.next();
+            final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
             if (spec != null) {
               if ((reservationHandler.getNbReservedNodes(job.getUuid()) >= job.getSLA().getMaxNodes()) &&
                 !reservationHandler.hasReadyNode(job.getUuid())) continue;
@@ -103,8 +103,8 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
             if (channel != null) {
               synchronized(channel.getMonitor()) {
                 if (spec != null) {
-                  String readyJobUUID = reservationHandler.getReadyJobUUID(channel);
-                  String pendingJobUUID = reservationHandler.getPendingJobUUID(channel);
+                  final String readyJobUUID = reservationHandler.getReadyJobUUID(channel);
+                  final String pendingJobUUID = reservationHandler.getPendingJobUUID(channel);
                   if ((pendingJobUUID == null) && (readyJobUUID == null)) {
                     reservationHandler.doReservation(job, channel);
                     channel = null;
@@ -122,7 +122,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
                   try {
                     dispatchJobToChannel(channel, nodeBundle);
                     return true;
-                  } catch (Exception e) {
+                  } catch (final Exception e) {
                     log.error(String.format("%s%nchannel=%s%njob=%s%nstack trace: %s", ExceptionUtils.getMessage(e), channel, nodeBundle, ExceptionUtils.getStackTrace(e)));
                     channel.unclose();
                     channel.handleException(channel.getChannel(), e);
@@ -132,13 +132,13 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
             }
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle " : "channel found for bundle " + channel);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", e);
         } finally {
           queueLock.unlock();
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("An error occurred while preparing for bundle creation and dispatching.", e);
     }
     return dispatched;
@@ -166,7 +166,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     try {
       updateBundler(selectedBundle.getJob(), channel);
       size = channel.getBundler().getBundleSize();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
@@ -182,7 +182,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
   private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) throws Exception {
     if (debugEnabled) log.debug(String.format("dispatching %d tasks of job '%s' to node %s", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid()));
     synchronized(channel.getMonitor()) {
-      Future<?> future = channel.submit(nodeBundle);
+      final Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);
     }
   }
@@ -193,21 +193,21 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
   private C findIdleChannelIndex(final ServerJob job) {
-    JobSLA sla = job.getJob().getSLA();
-    ExecutionPolicy policy = sla.getExecutionPolicy();
-    JPPFNodeConfigSpec spec =  sla.getDesiredNodeConfiguration();
-    TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
+    final JobSLA sla = job.getJob().getSLA();
+    final ExecutionPolicy policy = sla.getExecutionPolicy();
+    final JPPFNodeConfigSpec spec =  sla.getDesiredNodeConfiguration();
+    final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + job + " has an execution policy:\n" + policy);
     List<C> acceptableChannels = new ArrayList<>(idleChannels.size());
-    List<C> toRemove = new LinkedList<>();
-    List<String> uuidPath = job.getJob().getUuidPath().getList();
-    Iterator<C> iterator = idleChannels.iterator();
-    int nbJobChannels = job.getNbChannels();
-    int nbReservedNodes = reservationHandler.getNbReservedNodes(job.getUuid());
-    Collection<String> readyNodes = (spec == null) ? null : reservationHandler.getReadyNodes(job.getUuid());
+    final List<C> toRemove = new LinkedList<>();
+    final List<String> uuidPath = job.getJob().getUuidPath().getList();
+    final Iterator<C> iterator = idleChannels.iterator();
+    final int nbJobChannels = job.getNbChannels();
+    final int nbReservedNodes = reservationHandler.getNbReservedNodes(job.getUuid());
+    final Collection<String> readyNodes = (spec == null) ? null : reservationHandler.getReadyNodes(job.getUuid());
     if (debugEnabled) log.debug(String.format("jobUuid=%s, readyNodes=%s", job.getUuid(), readyNodes));
     while (iterator.hasNext()) {
-      C channel = iterator.next();
+      final C channel = iterator.next();
       synchronized(channel.getMonitor()) {
         if ((channel.getExecutionStatus() != ExecutorStatus.ACTIVE) || !channel.getChannel().isOpen() || channel.isClosed() || !channel.isEnabled()) {
           if (debugEnabled) log.debug("channel is not opened: " + channel);
@@ -221,7 +221,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           continue;
         }
         if (job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(channel.getUuid())) continue;
-        JPPFSystemInformation info = channel.getSystemInformation();
+        final JPPFSystemInformation info = channel.getSystemInformation();
         if (channel.isPeer() && !disptachtoPeersWithoutNode) {
           if ((info != null) && (info.getJppf().getInt(PeerAttributesHandler.PEER_TOTAL_NODES, 0) <= 0)) continue;
         }
@@ -230,7 +230,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           try {
             preparePolicy(policy, job, stats, nbJobChannels);
             b = policy.evaluate(info);
-          } catch(Exception ex) {
+          } catch(final Exception ex) {
             log.error("An error occurred while running the execution policy to determine node participation.", ex);
           }
           if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + job.getUuid() + " on local channel=" + channel);
@@ -239,7 +239,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
         if (!checkMaxNodeGroups(channel, job)) continue;
         if (desiredConfiguration != null) {
           if (reservationHandler.getPendingJobUUID(channel) != null) continue;
-          String readyJobUuid = reservationHandler.getReadyJobUUID(channel);
+          final String readyJobUuid = reservationHandler.getReadyJobUUID(channel);
           boolean b = true;
           if (readyNodes != null) {
             b = readyNodes.contains(channel.getUuid());
@@ -259,9 +259,9 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     }
     //if ((desiredConfiguration != null) && !reservationHandler.hasPendingNode(job.getUuid())) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);
-    int size = acceptableChannels.size();
+    final int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    C channel = (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
+    final C channel = (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
     return channel;
   }
 
@@ -285,9 +285,9 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @param job encapsulates the job information.
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
-  private boolean checkJobState(final ServerJob job) {
+  private static boolean checkJobState(final ServerJob job) {
     if (job.isCancelled()) return false;
-    JobSLA sla = job.getJob().getSLA();
+    final JobSLA sla = job.getJob().getSLA();
     if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
     if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
     if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
@@ -301,19 +301,19 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
   private boolean checkMaxNodeGroups(final C currentNode, final ServerJob job) {
-    JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
+    final JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
     if (currentInfo == null) return true;
-    String currentMasterUuid = getMasterUuid(currentInfo);
+    final String currentMasterUuid = getMasterUuid(currentInfo);
     if (currentMasterUuid == null) return true;
-    int maxNodeGroups = job.getJob().getSLA().getMaxNodeProvisioningGroupss();
+    final int maxNodeGroups = job.getJob().getSLA().getMaxNodeProvisioningGroupss();
     if ((maxNodeGroups == Integer.MAX_VALUE) || (maxNodeGroups <= 0)) return true;
-    Set<ServerTaskBundleNode> nodes = job.getDispatchSet();
-    Set<String> masterUuids = new HashSet<>();
+    final Set<ServerTaskBundleNode> nodes = job.getDispatchSet();
+    final Set<String> masterUuids = new HashSet<>();
     masterUuids.add(currentMasterUuid);
-    for (ServerTaskBundleNode node: nodes) {
-      AbstractNodeContext ctx = (AbstractNodeContext) node.getChannel();
-      JPPFManagementInfo info = ctx.getManagementInfo();
-      String uuid = getMasterUuid(info);
+    for (final ServerTaskBundleNode node: nodes) {
+      final AbstractNodeContext ctx = (AbstractNodeContext) node.getChannel();
+      final JPPFManagementInfo info = ctx.getManagementInfo();
+      final String uuid = getMasterUuid(info);
       if (uuid != null) {
         if (!masterUuids.contains(uuid)) masterUuids.add(uuid);
         if (masterUuids.size() > maxNodeGroups) return false;
@@ -327,10 +327,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @param info represents the node information.
    * @return the corresponding master uuid.
    */
-  private String getMasterUuid(final JPPFManagementInfo info) {
+  private static String getMasterUuid(final JPPFManagementInfo info) {
     if (info.isMasterNode()) return info.getUuid();
     else if (info.isSlaveNode()) {
-      JPPFSystemInformation systemInfo = info.getSystemInfo();
+      final JPPFSystemInformation systemInfo = info.getSystemInfo();
       if (systemInfo != null) return systemInfo.getJppf().get(JPPFProperties.PROVISIONING_MASTER_UUID);
     }
     return null;
@@ -341,10 +341,9 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @param taskBundle the job.
    * @param context the current node context.
    */
-  @SuppressWarnings("deprecation")
   private void updateBundler(final TaskBundle taskBundle, final C context) {
     context.checkBundler(bundlerFactory, jppfContext);
-    Bundler<?> ctxBundler = context.getBundler();
+    final Bundler<?> ctxBundler = context.getBundler();
     if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJob(taskBundle);
   }
 
@@ -355,7 +354,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return {@code true} if the job has no grid policy or the policy matches with the current grid state, {@code false} otherwise.
    */
   private boolean checkGridPolicy(final ServerJob job) {
-    ExecutionPolicy policy = job.getSLA().getGridExecutionPolicy();
+    final ExecutionPolicy policy = job.getSLA().getGridExecutionPolicy();
     if (policy != null) {
       preparePolicy(policy, job, stats, job.getNbChannels());
       return policy.evaluate(this.driverInfo);
@@ -370,31 +369,31 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return one or more channels with the minimum computed score.
    */
   private List<C> filterLowestDistances(final ServerJob job, final List<C> channels) {
-    JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
-    TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
-    CollectionSortedMap<Integer, C> scoreMap = new SetSortedMap<>();
-    TypedPropertiesSimilarityEvaluator ev = new TypedPropertiesSimilarityEvaluator();
+    final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
+    final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
+    final CollectionSortedMap<Integer, C> scoreMap = new SetSortedMap<>();
+    final TypedPropertiesSimilarityEvaluator ev = new TypedPropertiesSimilarityEvaluator();
     if (debugEnabled) log.debug(String.format("computing scores for job '%s', uuid=%s", job.getName(), job.getUuid()));
-    for (C channel: channels) {
+    for (final C channel: channels) {
       if (!channel.isLocal() && !channel.isOffline() && !channel.isPeer()) {
-        String reservedJobUuid = server.getNodeReservationHandler().getPendingJobUUID(channel);
+        final String reservedJobUuid = server.getNodeReservationHandler().getPendingJobUUID(channel);
         if ((reservedJobUuid != null) && reservedJobUuid.equals(job.getUuid())) continue;
         else {
-          TypedProperties props = channel.getSystemInformation().getJppf();
-          int score = ev.computeDistance(desiredConfiguration, props);
+          final TypedProperties props = channel.getSystemInformation().getJppf();
+          final int score = ev.computeDistance(desiredConfiguration, props);
           channel.reservationScore = score;
           scoreMap.putValue(score, channel);
         }
       }
     }
     if (debugEnabled) {
-      CollectionMap<Integer, String> map = new SetSortedMap<>();
+      final CollectionMap<Integer, String> map = new SetSortedMap<>();
       for (Map.Entry<Integer, Collection<C>> entry: scoreMap.entrySet()) {
-        for (C c: entry.getValue()) map.putValue(entry.getKey(), c.getUuid());
+        for (final C c: entry.getValue()) map.putValue(entry.getKey(), c.getUuid());
       }
       log.debug("computed scores: {}", map);
     }
-    int n = scoreMap.firstKey();
+    final int n = scoreMap.firstKey();
     return (scoreMap.isEmpty()) ? Collections.<C>emptyList() : new ArrayList<>(scoreMap.getValues(n));
   }
 }

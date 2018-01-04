@@ -121,7 +121,7 @@ public class JPPFPeerInitializer implements Runnable, AutoCloseable {
         };
         node.init();
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       if (provider != null) {
         provider.close();
@@ -132,9 +132,9 @@ public class JPPFPeerInitializer implements Runnable, AutoCloseable {
         node = null;
       }
       if (fromDiscovery) {
-        PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
+        final PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
         if (pdt != null) {
-          boolean removed = pdt.removeConnectionInformation(connectionInfo);
+          final boolean removed = pdt.removeConnectionInformation(connectionInfo);
           if (debugEnabled) log.debug((removed ? "successfully removed " : "failure to remove ") + "{}", connectionInfo);
         }
       }

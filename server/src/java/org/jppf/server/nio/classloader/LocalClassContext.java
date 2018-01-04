@@ -55,7 +55,7 @@ public class LocalClassContext extends NodeClassContext {
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
+    final LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
     JPPFResourceWrapper res;
     synchronized(channel.getServerLock()) {
@@ -76,7 +76,7 @@ public class LocalClassContext extends NodeClassContext {
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
-    LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
+    final LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     channel.setNodeResource(resource);
     if (traceEnabled) log.trace("message written for " + wrapper + ", resource=" + resource);
     return true;

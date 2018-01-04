@@ -92,14 +92,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector, final boolean includePeers) {
     try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
-      List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
-      for (AbstractNodeContext context : nodes) {
-        JPPFManagementInfo info = context.getManagementInfo();
+      final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
+      final List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
+      for (final AbstractNodeContext context : nodes) {
+        final JPPFManagementInfo info = context.getManagementInfo();
         if (info != null) list.add(info);
       }
       return list;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -112,10 +112,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
+    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
     if (nodes == null) return -1;
     int result = 0;
-    for (AbstractNodeContext node: nodes) {
+    for (final AbstractNodeContext node: nodes) {
       if (getNodeNioServer().isIdle(node.getChannel())) result++;
     }
     return result;
@@ -129,16 +129,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) {
     try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
-      List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
-      for (AbstractNodeContext context : nodes) {
+      final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
+      final List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
+      for (final AbstractNodeContext context : nodes) {
         if (getNodeNioServer().isIdle(context.getChannel())) {
-          JPPFManagementInfo info = context.getManagementInfo();
+          final JPPFManagementInfo info = context.getManagementInfo();
           if (info != null) list.add(info);
         }
       }
       return list;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -147,10 +147,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public JPPFStatistics statistics() throws Exception {
     try {
-      JPPFStatistics stats = driver.getStatistics();
+      final JPPFStatistics stats = driver.getStatistics();
       if (log.isTraceEnabled()) log.trace("stats request = " + stats);
       return stats;
-    } catch(Throwable e) {
+    } catch(final Throwable e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -160,16 +160,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public String changeLoadBalancerSettings(final String algorithm, final Map<Object, Object> parameters) throws Exception {
     try {
       if (algorithm == null) return "Error: no algorithm specified (null value)";
-      NodeNioServer server = getNodeNioServer();
-      JPPFBundlerFactory factory = server.getBundlerFactory();
+      final NodeNioServer server = getNodeNioServer();
+      final JPPFBundlerFactory factory = server.getBundlerFactory();
       if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + '\'';
-      TypedProperties props = new TypedProperties(parameters);
+      final TypedProperties props = new TypedProperties(parameters);
       synchronized(loadBalancingInformationLock) {
         currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, loadBalancerInformation().getAlgorithmNames());
         factory.setAndGetCurrentInfo(currentLoadBalancingInformation);
       }
       return "load.balancing.updated";
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return "Error : " + e.getMessage();
     }
@@ -188,9 +188,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
    * @return a {@link LoadBalancingInformation} instance.
    */
   private LoadBalancingInformation computeCurrentLoadBalancingInformation() {
-    JPPFBundlerFactory factory = getNodeNioServer().getBundlerFactory();
-    LoadBalancingInformation info = factory.getCurrentInfo();
-    List<String> algorithmsList = factory.getBundlerProviderNames();
+    final JPPFBundlerFactory factory = getNodeNioServer().getBundlerFactory();
+    final LoadBalancingInformation info = factory.getCurrentInfo();
+    final List<String> algorithmsList = factory.getBundlerProviderNames();
     return new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), algorithmsList);
   }
 
@@ -198,10 +198,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception {
     try {
       if (debugEnabled) log.debug("request to restart/shutdown this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
-      boolean restart = restartDelay >= 0L;
+      final boolean restart = restartDelay >= 0L;
       driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
       return localize("request.acknowledged");
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
       return "Error : " + e.getMessage();
     }
@@ -220,11 +220,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public void resetStatistics() throws Exception {
     if (debugEnabled) log.debug("statistics reset requested");
-    JPPFStatistics stats = driver.getStatistics();
-    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS, JOB_COUNT, TASK_QUEUE_COUNT);
+    final JPPFStatistics stats = driver.getStatistics();
+    final JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS, JOB_COUNT, TASK_QUEUE_COUNT);
     stats.reset(filter);
-    for (String s: new String[] {JOB_COUNT, TASK_QUEUE_COUNT}) {
-      JPPFSnapshot snapshot = stats.getSnapshot(s);
+    for (final String s: new String[] {JOB_COUNT, TASK_QUEUE_COUNT}) {
+      final JPPFSnapshot snapshot = stats.getSnapshot(s);
       if (snapshot instanceof AbstractJPPFSnapshot) ((AbstractJPPFSnapshot) snapshot).assignLatestToMax();
     }
   }
@@ -245,28 +245,28 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public void toggleActiveState(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    for (AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), !node.isActive());
+    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    for (final AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), !node.isActive());
   }
 
   @Override
   public Map<String, Boolean> getActiveState(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    Map<String, Boolean> result = new HashMap<>(nodes.size());
-    for (AbstractNodeContext node: nodes) result.put(node.getUuid(), node.isActive());
+    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    final Map<String, Boolean> result = new HashMap<>(nodes.size());
+    for (final AbstractNodeContext node: nodes) result.put(node.getUuid(), node.isActive());
     return result;
   }
 
   @Override
   public void setActiveState(final NodeSelector selector, final boolean active) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    for (AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), active);
+    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    for (final AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), active);
   }
 
   @Override
   public void setBroadcasting(final boolean broadcasting) throws Exception {
-    DriverInitializer di = driver.getInitializer();
-    boolean b = di.isBroadcasting();
+    final DriverInitializer di = driver.getInitializer();
+    final boolean b = di.isBroadcasting();
     if (b == broadcasting) return;
     if (b) di.initBroadcaster();
     else di.stopBroadcaster();

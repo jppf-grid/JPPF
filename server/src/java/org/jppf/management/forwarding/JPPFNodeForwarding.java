@@ -33,7 +33,7 @@ import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.Logger;
 
@@ -44,14 +44,17 @@ import org.slf4j.Logger;
  */
 public class JPPFNodeForwarding extends NotificationBroadcasterSupport implements JPPFNodeForwardingMBean {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggingUtils.getLogger(JPPFNodeForwarding.class, false);
-  //private static final Logger log = LoggerFactory.getLogger(JPPFNodeForwarding.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Flag to indicate a task which invokes an MBean method.
    */
@@ -75,15 +78,15 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   /**
    * Manages the forwarding of node notifications to the registered clients.
    */
-  final ForwardingNotificationManager manager;
+  private final ForwardingNotificationManager manager;
   /**
    * Provides an API for selecting nodes based on a {@link NodeSelector}.
    */
-  final NodeSelectionHelper selectionHelper;
+  private final NodeSelectionHelper selectionHelper;
   /**
    * Use to send management/monitoring requests in parallel with regards to the nodes.
    */
-  private ExecutorService executor;
+  private final ExecutorService executor;
 
   /**
    * Initialize this MBean implementation.
@@ -93,19 +96,19 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
     @SuppressWarnings("unused")
-    int core = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
-    executor = ConcurrentUtils.newFixedExecutor(50, "NodeForwarding");
-    //executor = ConcurrentUtils.newFixedExecutor(core, "NodeForwarding");
+    final int core = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
+    executor = ConcurrentUtils.newFixedExecutor(core, "NodeForwarding");
     //executor = ConcurrentUtils.newBoundedQueueExecutor(core, 2500, 15000L, "NodeForwarding");
     //executor = ConcurrentUtils.newDirectHandoffExecutor(core, 15000L, "NodeForwarding");
-    //executor = ConcurrentUtils.newJPPFThreadPool(core, Integer.MAX_VALUE, 15000L, "NodeForwarding");
+    //executor = ConcurrentUtils.newJPPFFixedThreadPool(50, "NodeForwarding");
+    //executor = ConcurrentUtils.newJPPFDirectHandoffExecutor(core, core, 15000L, "NodeForwarding");
     //executor = NioHelper.getGlobalexecutor();
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }
 
   @Override
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
+    final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     if (debugEnabled) log.debug("invoking {}() on mbean={} for selector={} ({} channels)", new Object[] {methodName, name, selector, channels.size()});
     return forward(INVOKE_METHOD, channels, name, methodName, params, signature);
   }
@@ -117,13 +120,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   @Override
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
-    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
+    final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     return forward(GET_ATTRIBUTE, channels, name, attribute);
   }
 
   @Override
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
-    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
+    final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     return forward(SET_ATTRIBUTE, channels, name, attribute, value);
   }
 
@@ -215,7 +218,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     if (debugEnabled) log.debug("before registering listener with selector=" + selector + ", mbean=" + mBeanName);
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (mBeanName == null) throw new IllegalArgumentException("mBeanName cannot be null");
-    String id = StringUtils.build(driver.getUuid(), ':', listenerSequence.incrementAndGet());
+    final String id = StringUtils.build(driver.getUuid(), ':', listenerSequence.incrementAndGet());
     this.manager.addNotificationListener(id, selector, mBeanName);
     if (debugEnabled) log.debug("registered listener id=" + id);
     return id;
@@ -306,40 +309,85 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   Map<String, Object> forward(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
     try {
-      int size = nodes.size();
+      final int size = nodes.size();
       if (size <= 0) return Collections.<String, Object>emptyMap();
-      CountDownLatch latch = new CountDownLatch(size); 
-      final Map<String, Object> map = new HashMap<>(size);
-      for (AbstractNodeContext node: nodes) {
-        AbstractForwardingTask task = null;
+      final ForwardCallback callback = new ForwardCallback(size);
+      AbstractForwardingTask task;
+      for (final AbstractNodeContext node: nodes) {
         switch(type) {
           case INVOKE_METHOD:
-            task = new InvokeMethodTask(latch, node, map, mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
+            task = new InvokeMethodTask(node, callback, mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
             break;
           case GET_ATTRIBUTE:
-            task = new GetAttributeTask(latch, node, map, mbeanName, memberName);
+            task = new GetAttributeTask(node, callback, mbeanName, memberName);
             break;
           case SET_ATTRIBUTE:
-            task = new SetAttributeTask(latch, node, map, mbeanName, memberName, params[0]);
+            task = new SetAttributeTask(node, callback, mbeanName, memberName, params[0]);
             break;
           default:
-            continue;
+            throw new IllegalArgumentException(
+              String.format("unknown type of operation %d for mbean=%s, memeber=%s, param=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         }
         if (debugEnabled) log.debug(String.format("about to forward with type=%d, mbean=%s, member=%s, params=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         executor.execute(task);
       }
-      latch.await();
-      /*
-      if (!latch.await(15_000L, TimeUnit.MILLISECONDS))
-        log.warn(String.format("forwarding exceeded timeout for type=%s, mbean=%s, member=%s, params=%s, map=%s", type, mbeanName, memberName, Arrays.deepToString(otherParams), map));
-      */
-      return map;
-    } catch (Exception e) {
+      callback.await();
+      return callback.resultMap;
+    } catch (final Exception e) {
       if (debugEnabled) {
         log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
           type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e)));
       }
       throw e;
+    }
+  }
+
+  /**
+   * A callback invoked by each submitted forwarding task to notify that results have arrived from a node.
+   */
+  static class ForwardCallback {
+    /**
+     * The map holding the results from all nodes.
+     */
+    private final Map<String, Object> resultMap;
+    /**
+     * The expected total number of results.
+     */
+    private final int expectedCount;
+    /**
+     * The current count of received results.
+     */
+    private int count;
+
+    /**
+     * Initialize with the specified expected total number of results.
+     * @param expectedCount the expected total number of results.
+     */
+    ForwardCallback(final int expectedCount) {
+      this.resultMap = new HashMap<>(expectedCount);
+      this.expectedCount = expectedCount;
+    }
+
+    /**
+     * Called when a result is received from a node.
+     * @param uuid the uuid of the node.
+     * @param result the result of exception returned by the JMX call.
+     */
+    void gotResult(final String uuid, final Object result) {
+      synchronized(this) {
+        resultMap.put(uuid, result);
+        if (++count == expectedCount) notify();
+      }
+    }
+
+    /**
+     * Wait until the number of results reaches the expected count.
+     * @throws Exception if any error occurs.
+     */
+    void await() throws Exception {
+      synchronized(this) {
+        while (count < expectedCount) wait();
+      }
     }
   }
 
@@ -356,10 +404,10 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   Map<String, Object> forward2(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
     try {
-      int size = nodes.size();
+      final int size = nodes.size();
       if (size <= 0) return Collections.<String, Object>emptyMap();
       final Map<String, Object> map = new HashMap<>(size);
-      CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
+      final CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
       for (AbstractNodeContext node: nodes) {
         AbstractForwardingTask2 task = null;
         switch(type) {
@@ -372,18 +420,16 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
           case SET_ATTRIBUTE:
             task = new SetAttributeTask2(node, mbeanName, memberName, params[0]);
             break;
-          default:
-            continue;
         }
         completionService.submit(task);
       }
       for (int i=0; i<size; i++) {
-        Future<Pair<String, Object>> f = completionService.take();
-        Pair<String, Object> result = f.get();
+        final Future<Pair<String, Object>> f = completionService.take();
+        final Pair<String, Object> result = f.get();
         if (result != null) map.put(result.first(), result.second());
       }
       return map;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) {
         log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
           type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e)));

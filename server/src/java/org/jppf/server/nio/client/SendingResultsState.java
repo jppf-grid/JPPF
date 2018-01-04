@@ -58,7 +58,7 @@ class SendingResultsState extends ClientServerState {
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     if (channel.isReadable()) throw new ConnectException("client {}" + channel + " has been disconnected");
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     ServerTaskBundleClient clientBundle = context.getBundle();
     if (clientBundle == null) {
       clientBundle = context.pollCompletedBundle();

@@ -54,7 +54,7 @@ public class ChannelJobPair extends Pair<ExecutorChannel<?>, AbstractServerJob>
   {
     if (obj == null) return false;
     if (!obj.getClass().equals(this.getClass())) return false;
-    ChannelJobPair pair = (ChannelJobPair) obj;
+    final ChannelJobPair pair = (ChannelJobPair) obj;
     if (first() == null) return pair.first() == null;
     if (pair.first() == first()) return true;
     return first().equals(pair.first());

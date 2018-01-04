@@ -85,8 +85,8 @@ public class LocalNodeIO extends AbstractNodeIO {
       channel.setReadyOps(0);
       channel.setNodeResource(null);
     }
-    DataLocation location = currentMessage.getLocations().get(0);
-    TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
+    final DataLocation location = currentMessage.getLocations().get(0);
+    final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     node.getExecutionManager().setBundle(bundle);
     result = deserializeObjects(bundle);
@@ -96,17 +96,17 @@ public class LocalNodeIO extends AbstractNodeIO {
 
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
-    int count = bundle.getTaskCount();
+    final int count = bundle.getTaskCount();
     //List<Object> list = new ArrayList<>(count + 1);
-    Object[] list = new Object[count + 2];
+    final Object[] list = new Object[count + 2];
     list[0] = bundle;
     try {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
         //JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
-        boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
-        JPPFLocalContainer cont = (JPPFLocalContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
+        final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
+        final JPPFLocalContainer cont = (JPPFLocalContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
@@ -116,7 +116,7 @@ public class LocalNodeIO extends AbstractNodeIO {
         // skip null data provider
       }
       if (debugEnabled) log.debug("got all data");
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
@@ -129,16 +129,16 @@ public class LocalNodeIO extends AbstractNodeIO {
   @Override
   protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
-    ExecutorService executor = node.getExecutionManager().getExecutor();
+    final ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizeBundleData(bundle, tasks);
-    List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
-    JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+    final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
+    final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
     futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
     for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
-    LocalNodeContext ctx = channel.getChannel();
-    LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
-    for (Future<DataLocation> f: futureList) {
-      DataLocation location = f.get();
+    final LocalNodeContext ctx = channel.getChannel();
+    final LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
+    for (final Future<DataLocation> f: futureList) {
+      final DataLocation location = f.get();
       message.addLocation(location);
     }
     message.setBundle(bundle);

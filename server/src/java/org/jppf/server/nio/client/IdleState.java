@@ -61,7 +61,7 @@ class IdleState extends ClientServerState {
     if (channel.isReadable()) {
       throw new ConnectException("client " + channel + " has been disconnected");
     }
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
   }
 }

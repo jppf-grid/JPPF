@@ -59,7 +59,7 @@ class SendInitialBundleState extends NodeServerState {
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
     if (!channel.isOpen() || (channel.isReadable() && !channel.isLocal())) throw new ConnectException("node " + channel + " has been disconnected");
-    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) {
       if (debugEnabled) log.debug("serializing initial bundle for " + channel);
       context.setBundle(server.getInitialBundle());

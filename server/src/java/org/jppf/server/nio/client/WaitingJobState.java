@@ -57,14 +57,14 @@ class WaitingJobState extends ClientServerState {
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel)) {
-      ServerTaskBundleClient clientBundle = context.deserializeBundle();
-      TaskBundle header = clientBundle.getJob();
-      boolean closeCommand = header.getParameter(BundleParameter.CLOSE_COMMAND, false);
+      final ServerTaskBundleClient clientBundle = context.deserializeBundle();
+      final TaskBundle header = clientBundle.getJob();
+      final boolean closeCommand = header.getParameter(BundleParameter.CLOSE_COMMAND, false);
       if (closeCommand) return closeChannel(channel);
-      int count = header.getTaskCount();
+      final int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle " + clientBundle + " from client " + channel + " done: received " + count + " tasks");
       if (clientBundle.getJobReceivedTime() == 0L) clientBundle.setJobReceivedTime(System.currentTimeMillis());
 
@@ -95,10 +95,10 @@ class WaitingJobState extends ClientServerState {
    * @param channel the channel.
    * @return a <code>null</code> transition.
    */
-  private ClientTransition closeChannel(final ChannelWrapper<?> channel) {
+  private static ClientTransition closeChannel(final ChannelWrapper<?> channel) {
     try {
       channel.getContext().handleException(channel, null);
-    } catch (@SuppressWarnings("unused") Exception e) {
+    } catch (@SuppressWarnings("unused") final Exception e) {
       if (debugEnabled) log.debug("exception while trying to close the channel {}" + channel);
     }
     return null;

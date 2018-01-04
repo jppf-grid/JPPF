@@ -58,7 +58,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     if (selector instanceof AllNodesSelector) return true;
     if (node.isPeer()) return false;
     if (selector instanceof ExecutionPolicySelector) {
-      ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
+      final ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
       TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
       return policy.evaluate(node.getSystemInformation());
     }
@@ -68,7 +68,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   @Override
   public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector) {
     if (nodeUuid == null) throw new IllegalArgumentException("node uuid cannot be null");
-    AbstractNodeContext node = getNodeNioServer().getConnection(nodeUuid);
+    final AbstractNodeContext node = getNodeNioServer().getConnection(nodeUuid);
     if (node == null) throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
     return isNodeAccepted(node, selector);
   }
@@ -92,9 +92,9 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   public Set<AbstractNodeContext> getChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof ExecutionPolicySelector) return getChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
-    Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
-    Set<AbstractNodeContext> result = new HashSet<>();
-    for (AbstractNodeContext ctx : fullSet) {
+    final Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
+    final Set<AbstractNodeContext> result = new HashSet<>();
+    for (final AbstractNodeContext ctx : fullSet) {
       if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result.add(ctx);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
@@ -109,12 +109,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
   private Set<AbstractNodeContext> getChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
-    ExecutionPolicy policy = selector.getPolicy();
+    final ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    Set<AbstractNodeContext> result = new HashSet<>();
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+    final Set<AbstractNodeContext> result = new HashSet<>();
+    final List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (AbstractNodeContext context : allChannels) {
+    for (final AbstractNodeContext context : allChannels) {
       if (nodeAccepted(selector, context, includePeers, forForwarding)) result.add(context);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
@@ -126,10 +126,10 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param context the node for which to get the management info.
    * @return a {@link JPPFManagementInfo} instyance, or {@code null}.
    */
-  private JPPFManagementInfo getManagementInfo(final AbstractNodeContext context) {
+  private static JPPFManagementInfo getManagementInfo(final AbstractNodeContext context) {
     JPPFManagementInfo info = context.getManagementInfo();
     if (info == null) {
-      JPPFSystemInformation sysInfo = context.getSystemInformation();
+      final JPPFSystemInformation sysInfo = context.getSystemInformation();
       if (sysInfo != null) {
         info = new JPPFManagementInfo(new HostIP("", ""), -1, context.getUuid(), -1, false);
         info.setSystemInfo(sysInfo);
@@ -148,9 +148,9 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   public int getNbChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof ExecutionPolicySelector) return getNbChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
-    Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
+    final Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     int result = 0;
-    for (AbstractNodeContext ctx : fullSet) {
+    for (final AbstractNodeContext ctx : fullSet) {
       if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result++;
     }
     return result;
@@ -164,12 +164,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
   private int getNbChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
-    ExecutionPolicy policy = selector.getPolicy();
+    final ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     int result = 0;
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+    final List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (AbstractNodeContext context : allChannels) {
+    for (final AbstractNodeContext context : allChannels) {
       if (nodeAccepted(selector, context, includePeers, forForwarding)) result++;
     }
     return result;
@@ -189,9 +189,9 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param ctx the context associated witht he node.
    * @return {@code true} if node has a working JMX connection, {@code false} otherwise.
    */
-  private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx) {
+  private static boolean hasWorkingJmxConnection(final AbstractNodeContext ctx) {
     if (ctx.isPeer()) return true;
-    JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
+    final JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
     return (jmx != null) && jmx.isConnected();
   }
 
@@ -203,14 +203,14 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return {@code true} if the node is accepted, {@code false} otherwise.
    */
-  private boolean nodeAccepted(final NodeSelector selector, final AbstractNodeContext context, final boolean includePeers, final boolean forForwarding) {
+  private static boolean nodeAccepted(final NodeSelector selector, final AbstractNodeContext context, final boolean includePeers, final boolean forForwarding) {
     if (!includePeers && context.isPeer()) return false;
-    boolean hasJmx = hasWorkingJmxConnection(context);
+    final boolean hasJmx = hasWorkingJmxConnection(context);
     if (forForwarding && !hasJmx) return false;
     boolean offline = false;
     if (context instanceof RemoteNodeContext) offline = ((RemoteNodeContext) context).isOffline();
     if (!forForwarding && !hasJmx && !offline) return false;
-    JPPFManagementInfo info = getManagementInfo(context);
+    final JPPFManagementInfo info = getManagementInfo(context);
     if (traceEnabled) log.trace("node '{}', info={}", context.getUuid(), info);
     if (info == null) return false;
     return selector.accepts(info);

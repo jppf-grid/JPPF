@@ -30,6 +30,11 @@ import org.jppf.utils.Pair;
  */
 class BundleResults extends Pair<TaskBundle, List<DataLocation>> {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize with the specified task bundle and task data.
    * @param bundle the header received from the node.
    * @param data a list of {@link DataLocation} instances.

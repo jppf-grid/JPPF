@@ -59,24 +59,24 @@ class WaitingPeerHandshakeResultsState extends ClientServerState {
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientContext context = (ClientContext) channel.getContext();
+    final ClientContext context = (ClientContext) channel.getContext();
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel)) {
-      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      TaskBundle header = bundleWrapper.getJob();
+      final ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
+      final TaskBundle header = bundleWrapper.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
       //context.setConnectionUuid((String) header.getParameter(BundleParameter.CONNECTION_UUID));
       header.getUuidPath().incPosition();
-      String uuid = header.getUuidPath().getCurrentElement();
+      final String uuid = header.getUuidPath().getCurrentElement();
       context.setUuid(uuid);
       // wait until a class loader channel is up for the same client uuid
-      ClientClassNioServer classServer = driver.getClientClassServer();
+      final ClientClassNioServer classServer = driver.getClientClassServer();
       List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
       while ((list == null) || list.isEmpty()) {
         Thread.sleep(1L);
         list = classServer.getProviderConnections(uuid);
       }
-      String driverUUID = driver.getUuid();
+      final String driverUUID = driver.getUuid();
       header.getUuidPath().add(driverUUID);
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
 

@@ -28,8 +28,7 @@ import org.slf4j.*;
  * A cache for resources loaded by client class loaders.
  * @author Laurent Cohen
  */
-public class ClassCache
-{
+public class ClassCache {
   /**
    * Logger for this class.
    */
@@ -39,7 +38,7 @@ public class ClassCache
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Determines whether this cache is enabled. 
+   * Determines whether this cache is enabled.
    */
   private boolean enabled = JPPFConfiguration.getProperties().getBoolean("jppf.server.class.cache.enabled", true);
   /**
@@ -62,14 +61,12 @@ public class ClassCache
    * @param name name of the resource.
    * @param content content of the resource.
    */
-  public void setCacheContent(final String uuid, final String name, final byte[] content)
-  {
+  public void setCacheContent(final String uuid, final String name, final byte[] content) {
     if (!enabled) return;
     if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + ']');
-    CacheClassContent cacheContent = new CacheClassContent(content);
-    CacheClassKey cacheKey = new CacheClassKey(uuid, name);
-    synchronized(classCache)
-    {
+    final CacheClassContent cacheContent = new CacheClassContent(content);
+    final CacheClassKey cacheKey = new CacheClassKey(uuid, name);
+    synchronized (classCache) {
       classCache.put(cacheKey, cacheContent);
     }
   }
@@ -80,13 +77,11 @@ public class ClassCache
    * @param name name of the resource.
    * @return the content of the resource as an array of bytes.
    */
-  public byte[] getCacheContent(final String uuid, final String name)
-  {
+  public byte[] getCacheContent(final String uuid, final String name) {
     if (!enabled) return null;
-    CacheClassContent content;
-    boolean contentNull;
-    synchronized(classCache)
-    {
+    final CacheClassContent content;
+    final boolean contentNull;
+    synchronized (classCache) {
       contentNull = (content = classCache.get(new CacheClassKey(uuid, name))) == null;
       nbLookups++;
       if (!contentNull) nbHits++;

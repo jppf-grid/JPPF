@@ -138,12 +138,12 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    */
   void addIdleChannel(final C channel) {
     if (channel == null) {
-      String message  = "channel is null";
+      final String message  = "channel is null";
       log.error(message);
       throw new IllegalArgumentException(message);
     }
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) { 
-      String message  = "channel is not active: " + channel;
+      final String message  = "channel is not active: " + channel;
       log.error(message);
       throw new IllegalStateException(message);
     }
@@ -157,7 +157,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
             if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
             if (idleChannels.add(channel)) {
               channel.idle.set(true);
-              JPPFSystemInformation info = channel.getSystemInformation();
+              final JPPFSystemInformation info = channel.getSystemInformation();
               if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
               stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
             }
@@ -179,7 +179,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
     synchronized(idleChannels) {
       if (idleChannels.remove(channel)) {
         channel.idle.set(false);
-        JPPFSystemInformation info = channel.getSystemInformation();
+        final JPPFSystemInformation info = channel.getSystemInformation();
         if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
         stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
       } // else log.warn("could not remove idle channel {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());

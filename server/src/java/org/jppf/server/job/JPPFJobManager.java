@@ -93,7 +93,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   public List<ChannelJobPair> getNodesForJob(final String jobUuid) {
     if (jobUuid == null) return Collections.emptyList();
     synchronized(jobMap) {
-      List<ChannelJobPair> list = (List<ChannelJobPair>) jobMap.getValues(jobUuid);
+      final List<ChannelJobPair> list = (List<ChannelJobPair>) jobMap.getValues(jobUuid);
       return list == null ? Collections.<ChannelJobPair>emptyList() : Collections.unmodifiableList(list);
     }
   }
@@ -104,7 +104,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public String[] getAllJobIds() {
     synchronized(jobMap) {
-      Set<String> keys = jobMap.keySet();
+      final Set<String> keys = jobMap.keySet();
       if (debugEnabled) log.debug("keys = {}", keys);
       return keys.toArray(new String[keys.size()]);
     }
@@ -112,8 +112,8 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
-    TaskBundle bundle = nodeBundle.getJob();
-    String jobUuid = bundle.getUuid();
+    final TaskBundle bundle = nodeBundle.getJob();
+    final String jobUuid = bundle.getUuid();
     synchronized(jobMap) {
       jobMap.putValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
@@ -124,8 +124,8 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
-    TaskBundle bundle = nodeBundle.getJob();
-    String jobUuid = bundle.getUuid();
+    final TaskBundle bundle = nodeBundle.getJob();
+    final String jobUuid = bundle.getUuid();
     synchronized(jobMap) {
       if (!jobMap.removeValue(jobUuid, new ChannelJobPair(channel, serverJob))) {
         log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
@@ -141,10 +141,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param serverJob the queued job.
    */
   public void jobQueued(final ServerJob serverJob) {
-    TaskBundle bundle = serverJob.getJob();
+    final TaskBundle bundle = serverJob.getJob();
     if (debugEnabled) log.debug("jobId '{}' queued", bundle.getName());
     submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
-    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
     stats.addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
@@ -157,17 +157,16 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   public void jobEnded(final ServerJob serverJob) {
     if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
     if (serverJob.getJob().isHandshake()) return; // skip notifications for handshake bundles
-
-    TaskBundle bundle = serverJob.getJob();
-    long time = System.currentTimeMillis() - serverJob.getJobReceivedTime();
-    String jobUuid = bundle.getUuid();
+    final TaskBundle bundle = serverJob.getJob();
+    final long time = System.currentTimeMillis() - serverJob.getJobReceivedTime();
+    final String jobUuid = bundle.getUuid();
     synchronized(jobMap) {
       jobMap.removeValues(jobUuid);
     }
     if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
     //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
-    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
@@ -298,8 +297,8 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     JPPFDriver.getInstance().getQueue().getPersistenceHandler().storeResults(job, tasks);
     if (!taskReturnListeners.isEmpty()) {
       if (debugEnabled) log.debug(String.format("results received with channel=%s, job=%s, nb Tasks=%d", channel, job, tasks.size()));
-      JobTasksEvent event = createJobTasksEvent(channel, job, tasks);
-      for (JobTasksListener listener: taskReturnListeners) listener.resultsReceived(event);
+      final JobTasksEvent event = createJobTasksEvent(channel, job, tasks);
+      for (final JobTasksListener listener: taskReturnListeners) listener.resultsReceived(event);
     }
   }
 
@@ -311,7 +310,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private void fireJobTasksEvent(final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle, final boolean isDispatch) {
     if (!taskReturnListeners.isEmpty()) {
-      JobTasksEvent event = createJobTasksEvent(channel, nodeBundle);
+      final JobTasksEvent event = createJobTasksEvent(channel, nodeBundle);
       if (isDispatch) {
         for (JobTasksListener listener: taskReturnListeners) listener.tasksDispatched(event);
       } else {
@@ -326,12 +325,12 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param nodeBundle the task bundle returned from the node.
    * @return an instance of {@link TaskReturnEvent}.
    */
-  private JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
-    List<ServerTask> tasks = nodeBundle.getTaskList();
-    List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
-    for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
+  private static JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
+    final List<ServerTask> tasks = nodeBundle.getTaskList();
+    final List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
+    for (final ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
       task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
-    TaskBundle job = nodeBundle.getJob();
+    final TaskBundle job = nodeBundle.getJob();
     return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
   }
 
@@ -342,9 +341,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param tasks the job's tasks for which there are results.
    * @return an instance of {@link TaskReturnEvent}.
    */
-  private JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerJob job, final Collection<ServerTask> tasks) {
-    List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
-    for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
+  private static JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerJob job, final Collection<ServerTask> tasks) {
+    final List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
+    for (final ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
       task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount(), task.getResult()));
     return new JobTasksEvent(job.getUuid(), job.getName(), job.getSLA(), job.getMetadata(), taskInfos, JobReturnReason.RESULTS_RECEIVED, channel.getManagementInfo());
   }
@@ -352,11 +351,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Load all the dispatch listeners defined in the classpath with SPI.
    */
-  @SuppressWarnings("deprecation")
   public void loadTaskReturnListeners() {
     if (debugEnabled) log.debug("loading task return listeners");
-    List<JobTasksListener> list2 = new ServiceFinder().findProviders(JobTasksListener.class);
-    for (JobTasksListener listener: list2) addJobTasksListener(listener);
+    final List<JobTasksListener> list2 = new ServiceFinder().findProviders(JobTasksListener.class);
+    for (final JobTasksListener listener: list2) addJobTasksListener(listener);
   }
 
   /**
@@ -379,7 +377,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Increment the current count of notifications and update the peak value.
    */
   private void incNotifCount() {
-    int n = notifCount.incrementAndGet();
+    final int n = notifCount.incrementAndGet();
     if (n > notifMax.get()) notifMax.set(n);
   }
 }

@@ -67,9 +67,9 @@ class PeerNode extends AbstractPeerConnectionHandler {
   @Override
   void postInit() throws Exception {
     try {
-      SocketChannel socketChannel = socketClient.getChannel();
+      final SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
+      final ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
       context = (ClientContext) channel.getContext();
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);
@@ -81,7 +81,7 @@ class PeerNode extends AbstractPeerConnectionHandler {
       }
       server.getTransitionManager().transitionChannel(channel, ClientTransition.TO_SENDING_PEER_HANDSHAKE);
       socketClient = null;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage());
       throw new JPPFRuntimeException(e);
     }

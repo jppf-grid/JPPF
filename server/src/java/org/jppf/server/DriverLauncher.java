@@ -31,21 +31,16 @@ import org.jppf.process.ProcessLauncher;
  * @author Laurent Cohen
  * @exclude
  */
-public class DriverLauncher
-{
+public class DriverLauncher {
   /**
    * Start this application, then the JPPF driver a subprocess.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
-      ProcessLauncher launcher = new ProcessLauncher("org.jppf.server.JPPFDriver", false);
+  public static void main(final String... args) {
+    try {
+      final ProcessLauncher launcher = new ProcessLauncher("org.jppf.server.JPPFDriver", false);
       launcher.run();
-    }
-    catch (Exception e)
-    {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     System.exit(0);

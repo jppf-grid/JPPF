@@ -71,14 +71,14 @@ public class ServerJob extends AbstractServerJobBase {
    * @return a new <code>ServerJob</code> instance.
    */
   public ServerTaskBundleNode copy(final int nbTasks) {
-    TaskBundle newTaskBundle;
+    final TaskBundle newTaskBundle;
     lock.lock();
     try {
-      int taskCount = (nbTasks > this.tasks.size()) ? this.tasks.size() : nbTasks;
-      List<ServerTask> subList = this.tasks.subList(0, taskCount);
+      final int taskCount = (nbTasks > this.tasks.size()) ? this.tasks.size() : nbTasks;
+      final List<ServerTask> subList = this.tasks.subList(0, taskCount);
       try {
         if (job.getCurrentTaskCount() > taskCount) {
-          int newSize = job.getCurrentTaskCount() - taskCount;
+          final int newSize = job.getCurrentTaskCount() - taskCount;
           newTaskBundle = job.copy();
           newTaskBundle.setTaskCount(taskCount);
           newTaskBundle.setCurrentTaskCount(taskCount);
@@ -105,20 +105,20 @@ public class ServerJob extends AbstractServerJobBase {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received {} results from {}", (results == null ? "null" : results.size()), bundle);
     if ((results != null) && results.isEmpty()) return;
-    CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
+    final CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
-      List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
+      final List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled() || (bundle.isExpired() && bundle.isOffline())) {
-        for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
+        for (final ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else if (results != null) {
         for (int i=0; i<bundleTasks.size(); i++) {
-          ServerTask task = bundleTasks.get(i);
+          final ServerTask task = bundleTasks.get(i);
           if (task.getState() == TaskState.RESUBMIT) {
             if (traceEnabled) log.trace("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
           } else {
-            DataLocation location = results.get(i);
+            final DataLocation location = results.get(i);
             task.resultReceived(location);
             map.putValue(task.getBundle(), task);
           }
@@ -140,10 +140,10 @@ public class ServerJob extends AbstractServerJobBase {
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (debugEnabled) log.debug("*** received exception '{}' from {}", ExceptionUtils.getMessage(throwable), bundle);
-    CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
+    final CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
-      for (ServerTask task : bundle.getTaskList()) {
+      for (final ServerTask task : bundle.getTaskList()) {
         task.resultReceived(throwable);
         map.putValue(task.getBundle(), task);
       }
@@ -161,15 +161,15 @@ public class ServerJob extends AbstractServerJobBase {
    */
   private void postResultsReceived(final CollectionMap<ServerTaskBundleClient, ServerTask> map, final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (debugEnabled) log.debug("client bundle map has {} keys: {}", map.keySet().size(), map.keySet());
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
+    for (final Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
       if (throwable == null) entry.getKey().resultReceived(entry.getValue());
       else entry.getKey().resultReceived(entry.getValue(), throwable);
       ((JPPFJobManager) notificationEmitter).jobResultsReceived(bundle.getChannel(), this, entry.getValue());
     }
     taskCompleted(bundle, throwable);
     if (getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) {
-      for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-        ServerTaskBundleClient clientBundle = entry.getKey();
+      for (final Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
+        final ServerTaskBundleClient clientBundle = entry.getKey();
         if (clientBundle.getPendingTasksCount() <= 0) clientBundle.bundleEnded();
       }
     }
@@ -181,7 +181,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @param src source list of <code>ServerTask</code> objects.
    */
   private static void addAll(final List<DataLocation> dst, final List<ServerTask> src) {
-    for (ServerTask item : src) dst.add(item.getInitialTask());
+    for (final ServerTask item : src) dst.add(item.getInitialTask());
   }
 
   /**
@@ -191,7 +191,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @param state the state of the server tasks to add.
    */
   private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state) {
-    for (ServerTask item : src) {
+    for (final ServerTask item : src) {
       if (item.getState() != state) dst.add(item.getInitialTask());
     }
   }
@@ -203,15 +203,15 @@ public class ServerJob extends AbstractServerJobBase {
    */
   public void taskCompleted(final ServerTaskBundleNode bundle, final Throwable throwable) {
     boolean requeue = false;
-    List<DataLocation> list = new ArrayList<>();
+    final List<DataLocation> list = new ArrayList<>();
     lock.lock();
     try {
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
       } else {
-        List<ServerTask> taskList = new ArrayList<>();
-        for (ServerTask task : bundle.getTaskList()) {
+        final List<ServerTask> taskList = new ArrayList<>();
+        for (final ServerTask task : bundle.getTaskList()) {
           if (task.getState() == TaskState.RESUBMIT) task.setState(TaskState.PENDING);
           if (task.getState() == TaskState.PENDING) taskList.add(task);
         }
@@ -235,20 +235,20 @@ public class ServerJob extends AbstractServerJobBase {
    * Perform the necessary actions for when this job has been cancelled.
    */
   private void handleCancelledStatus() {
-    Map<Long, ServerTaskBundleNode> map;
+    final Map<Long, ServerTaskBundleNode> map;
     synchronized (dispatchSet) {
       map = new HashMap<>(dispatchSet);
     }
     if (debugEnabled) log.debug("cancelling {} dispatches for {}", map.size(), this);
-    for (Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
+    for (final Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
       try {
-        ServerTaskBundleNode nodeBundle = entry.getValue();
-        Future<?> future = nodeBundle.getFuture();
+        final ServerTaskBundleNode nodeBundle = entry.getValue();
+        final Future<?> future = nodeBundle.getFuture();
         if (!future.isDone()) {
           future.cancel(false);
           nodeBundle.resultsReceived((List<DataLocation>) null);
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("Error cancelling job " + this, e);
       }
     }
@@ -259,8 +259,8 @@ public class ServerJob extends AbstractServerJobBase {
    */
   private void handleCancelledTasks() {
     if (debugEnabled) log.debug("cancelling tasks for {}", this);
-    CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
-    for (ServerTask task: tasks) {
+    final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
+    for (final ServerTask task: tasks) {
       if (!task.isDone()) {
         task.cancel();
         clientMap.putValue(task.getBundle(), task);
@@ -299,17 +299,17 @@ public class ServerJob extends AbstractServerJobBase {
    * @return array of <code>NodeManagementInfo</code> instances.
    */
   public NodeJobInformation[] getNodeJobInformation() {
-    ServerTaskBundleNode[] entries;
+    final ServerTaskBundleNode[] entries;
     synchronized (dispatchSet) {
       if (dispatchSet.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
       entries = dispatchSet.values().toArray(new ServerTaskBundleNode[dispatchSet.size()]);
     }
-    NodeJobInformation[] result = new NodeJobInformation[entries.length];
+    final NodeJobInformation[] result = new NodeJobInformation[entries.length];
     int i = 0;
-    for (ServerTaskBundleNode nodeBundle : entries) {
-      JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
-      TaskBundle bundle = nodeBundle.getJob();
-      JobInformation jobInfo = new JobInformation(bundle);
+    for (final ServerTaskBundleNode nodeBundle : entries) {
+      final JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
+      final TaskBundle bundle = nodeBundle.getJob();
+      final JobInformation jobInfo = new JobInformation(bundle);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i++] = new NodeJobInformation(nodeInfo, jobInfo);
     }

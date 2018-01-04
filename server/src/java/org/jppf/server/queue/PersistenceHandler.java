@@ -69,24 +69,24 @@ public class PersistenceHandler {
    */
   void storeJob(final ServerJob job, final ServerTaskBundleClient clientBundle, final boolean tasksOnly) {
     if (!isPersistent(job)) return;
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     try {
       if (debugEnabled) log.debug("persisting {} job {}", tasksOnly ? "existing" : "new", job);
-      List<ServerTask> taskList = clientBundle.getTaskList();
-      List<PersistenceInfo> infos = new ArrayList<>(taskList.size() + (tasksOnly ? 0 : 2));
+      final List<ServerTask> taskList = clientBundle.getTaskList();
+      final List<PersistenceInfo> infos = new ArrayList<>(taskList.size() + (tasksOnly ? 0 : 2));
       if (!tasksOnly) {
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, IOHelper.serializeData(job.getJob())));
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.DATA_PROVIDER, -1, clientBundle.getDataProvider()));
       }
-      for (ServerTask task: taskList) {
-        DataLocation dl = IOHelper.serializeData(task);
+      for (final ServerTask task: taskList) {
+        final DataLocation dl = IOHelper.serializeData(task);
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK, task.getJobPosition(), dl));
       }
       persistence.store(infos);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    final long elapsed = (System.nanoTime() - start) / 1_000_000L;
     if (debugEnabled) log.debug(String.format("took %,d ms to store job %s", elapsed, job.getName()));
   }
 
@@ -99,9 +99,9 @@ public class PersistenceHandler {
     try {
       if (debugEnabled) log.debug("updating header for job {}", job);
       //job.getJob().setParameter(BundleParameter.ALREADY_PERSISTED, true);
-      DataLocation data = IOHelper.serializeData(job.getJob());
+      final DataLocation data = IOHelper.serializeData(job.getJob());
       persistence.store(Arrays.asList((PersistenceInfo) new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.JOB_HEADER, -1, data)));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -115,12 +115,12 @@ public class PersistenceHandler {
     if (!isPersistent(job)) return;
     try {
       if (debugEnabled) log.debug("persisting {} results for job {}", tasks.size(), job);
-      List<PersistenceInfo> infos = new ArrayList<>(tasks.size());
-      for (ServerTask task: tasks) {
+      final List<PersistenceInfo> infos = new ArrayList<>(tasks.size());
+      for (final ServerTask task: tasks) {
         infos.add(new PersistenceInfoImpl(job.getUuid(), job.getJob(), PersistenceObjectType.TASK_RESULT, task.getJobPosition(), task.getResult()));
       }
       persistence.store(infos);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -142,7 +142,7 @@ public class PersistenceHandler {
     if (debugEnabled) log.debug("removing job {} from persistence store", jobUuid);
     try {
       persistence.deleteJob(jobUuid);
-    } catch (JobPersistenceException e) {
+    } catch (final JobPersistenceException e) {
       log.error("error deleting persistent job {} : {}", jobUuid, ExceptionUtils.getStackTrace(e));
     }
   }
@@ -157,43 +157,43 @@ public class PersistenceHandler {
     if (persistence == null) return null;
     if (debugEnabled) log.debug("loading job with uuid = {}", jobUuid);
     try {
-      TaskBundle header = loadHeader(jobUuid);
+      final TaskBundle header = loadHeader(jobUuid);
       if (header == null) return null;
       if (useAutoExecuteOnRestart && !header.getSLA().getPersistenceSpec().isAutoExecuteOnRestart()) {
         if (debugEnabled) log.debug("job with uuid = {} has autoExecuteOnRestart=false, it will not be loaded", jobUuid);
         return null;
       }
       header.setParameter(BundleParameter.FROM_PERSISTENCE, true);
-      int[] taskPositions = persistence.getTaskPositions(jobUuid);
+      final int[] taskPositions = persistence.getTaskPositions(jobUuid);
       Arrays.sort(taskPositions);
-      int[] resultPositions = persistence.getTaskResultPositions(jobUuid);
+      final int[] resultPositions = persistence.getTaskResultPositions(jobUuid);
       Arrays.sort(resultPositions);
       if (Arrays.equals(taskPositions, resultPositions) && header.getSLA().getPersistenceSpec().isDeleteOnCompletion()) {
         if (debugEnabled) log.debug("job already has completed: {}", header);
         persistence.deleteJob(jobUuid);
         return null;
       }
-      int[] positionsToLoad = new int[taskPositions.length - resultPositions.length];
+      final int[] positionsToLoad = new int[taskPositions.length - resultPositions.length];
       int i = 0;
       for (int pos: taskPositions) {
         if (Arrays.binarySearch(resultPositions, pos) < 0) positionsToLoad[i++] = pos;
       }
       if (debugEnabled) log.debug("positions to load for jobUuid={} : {}", jobUuid, StringUtils.buildString(positionsToLoad));
-      List<PersistenceInfo> infos = new ArrayList<>(positionsToLoad.length + 1);
+      final List<PersistenceInfo> infos = new ArrayList<>(positionsToLoad.length + 1);
       infos.add(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.DATA_PROVIDER, -1, null));
       for (int pos: positionsToLoad) {
         infos.add(new PersistenceInfoImpl(jobUuid, header, PersistenceObjectType.TASK, pos, null));
       }
-      List<InputStream> streams = persistence.load(infos);
-      DataLocation dataProvider = load(streams.get(0)); 
-      List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
+      final List<InputStream> streams = persistence.load(infos);
+      final DataLocation dataProvider = load(streams.get(0)); 
+      final List<ServerTask> pendingTasks = new ArrayList<>(taskPositions.length - resultPositions.length);
       for (i=1; i<streams.size(); i++) {
-        DataLocation taskData = load(streams.get(i));
-        ServerTask task = (ServerTask) IOHelper.unwrappedData(taskData);
+        final DataLocation taskData = load(streams.get(i));
+        final ServerTask task = (ServerTask) IOHelper.unwrappedData(taskData);
         pendingTasks.add(task);
       }
       return new ServerTaskBundleClient(pendingTasks, header, dataProvider);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;
@@ -206,16 +206,16 @@ public class PersistenceHandler {
     if (persistence == null) return;
     try {
       if (debugEnabled) log.debug("loading persisted jobs");
-      List<String> uuids = persistence.getPersistedJobUuids();
-      for (String uuid: uuids) {
+      final List<String> uuids = persistence.getPersistedJobUuids();
+      for (final String uuid: uuids) {
         try {
-          ServerTaskBundleClient bundle = loadJob(uuid, true);
+          final ServerTaskBundleClient bundle = loadJob(uuid, true);
           if (bundle != null) queue.addBundle(bundle);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -227,7 +227,7 @@ public class PersistenceHandler {
    * @throws Exception if any error occurs.
    */
   public DataLocation load(final PersistenceInfo info) throws Exception {
-    List<DataLocation> list = load(Arrays.asList(info));
+    final List<DataLocation> list = load(Arrays.asList(info));
     return (list == null) || list.isEmpty() ? null : list.get(0);
   }
 
@@ -238,14 +238,14 @@ public class PersistenceHandler {
    * @throws Exception if any error occurs.
    */
   public List<DataLocation> load(final Collection<PersistenceInfo> infos) throws Exception {
-    long start = System.nanoTime();
+    final long start = System.nanoTime();
     List<DataLocation> result = null;
-    List<InputStream> list = persistence.load(infos);
+    final List<InputStream> list = persistence.load(infos);
     if ((list != null) && !list.isEmpty()) {
       result = new ArrayList<>(infos.size());
       for (InputStream is: list) result.add(load(is));
     }
-    long elapsed = System.nanoTime() - start;
+    final long elapsed = System.nanoTime() - start;
     if (debugEnabled) log.debug("took {} ms to load {} job elements", elapsed / 1_000_000L, infos.size());
     return result;
   }
@@ -256,9 +256,9 @@ public class PersistenceHandler {
    * @return the job element as a {@link DataLocation} object.
    * @throws Exception if any error occurs.
    */
-  private DataLocation load(final InputStream stream) throws Exception {
+  private static DataLocation load(final InputStream stream) throws Exception {
     List<JPPFBuffer> buffers = null;
-    try (InputStream is = stream; MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
+    try (final InputStream is = stream; MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
       if (is == null) return null;
       StreamUtils.copyStream(is, os, false);
       buffers = os.toBufferList();
@@ -284,11 +284,11 @@ public class PersistenceHandler {
    * @throws Exception if any error occurs.
    */
   public DataLocation loadToDisk(final PersistenceInfo info) throws Exception {
-    File dir = FileUtils.getJPPFTempDir();
-    File file = File.createTempFile(info.getType().name(), ".tmp", dir);
-    List<InputStream> list = persistence.load(Arrays.asList(info));
+    final File dir = FileUtils.getJPPFTempDir();
+    final File file = File.createTempFile(info.getType().name(), ".tmp", dir);
+    final List<InputStream> list = persistence.load(Arrays.asList(info));
     if ((list == null) || list.isEmpty()) return null;
-    try (InputStream is = list.get(0); BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+    try (final InputStream is = list.get(0); BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
       StreamUtils.copyStream(is, os, false);
     }
     return new FileDataLocation(file);

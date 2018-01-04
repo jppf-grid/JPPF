@@ -93,16 +93,16 @@ class ForwardingNotificationDispatcher {
     lock.lock();
     try {
       if (handlerMap.containsKey(mBeanName)) return false;
-      JMXNodeConnectionWrapper jmx = node.getJmxConnection();
+      final JMXNodeConnectionWrapper jmx = node.getJmxConnection();
       if (jmx != null) {
-        ForwardingNotificationHandler handler = new ForwardingNotificationHandler(mBeanName);
+        final ForwardingNotificationHandler handler = new ForwardingNotificationHandler(mBeanName);
         try {
           if (debugEnabled) log.debug("mBeanName={}, handler={}", mBeanName, handler);
           jmx.addNotificationListener(mBeanName, handler);
           handlerMap.put(mBeanName, handler);
           return true;
-        } catch (Exception e) {
-          String format = "failed to add notification listener for node=%s : exception=%s";
+        } catch (final Exception e) {
+          final String format = "failed to add notification listener for node=%s : exception=%s";
           if (debugEnabled) log.debug(String.format(format, node, ExceptionUtils.getStackTrace(e)));
           else log.info(String.format(format, node, ExceptionUtils.getMessage(e)));
         }
@@ -121,15 +121,15 @@ class ForwardingNotificationDispatcher {
   public boolean removeNotificationListener(final String mBeanName) {
     lock.lock();
     try {
-      ForwardingNotificationHandler handler = handlerMap.remove(mBeanName);
+      final ForwardingNotificationHandler handler = handlerMap.remove(mBeanName);
       if (handler == null) return false;
-      JMXNodeConnectionWrapper jmx = node.getJmxConnection();
+      final JMXNodeConnectionWrapper jmx = node.getJmxConnection();
       if (jmx != null) {
         try {
           jmx.removeNotificationListener(mBeanName, handler);
           return true;
-        } catch (Exception e) {
-          String message = String.format("error removing notification listener for node=%s, mBeanName=%s", nodeUuid, mBeanName);
+        } catch (final Exception e) {
+          final String message = String.format("error removing notification listener for node=%s, mBeanName=%s", nodeUuid, mBeanName);
           if (debugEnabled) log.debug(message, e);
           else log.info("{} : {}", message, ExceptionUtils.getMessage(e));
         }
@@ -180,8 +180,8 @@ class ForwardingNotificationDispatcher {
    * @param notification the notification to dispatch.
    */
   public void fireNotificationEvent(final String mBeanName, final Notification notification) {
-    ForwardingNotificationEvent event = new ForwardingNotificationEvent(nodeUuid, mBeanName, notification);
-    ForwardingNotificationEventListener[] tmp;
+    final ForwardingNotificationEvent event = new ForwardingNotificationEvent(nodeUuid, mBeanName, notification);
+    final ForwardingNotificationEventListener[] tmp;
     synchronized (listenerList) {
       tmp = listenerArray;
     }
@@ -210,7 +210,7 @@ class ForwardingNotificationDispatcher {
       try {
         if (debugEnabled) log.debug(String.format("received notification from node=%s, mbean=%s, notification=%s, handback=%s", nodeUuid, mBeanName, notification, handback));
         fireNotificationEvent(mBeanName, notification);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
     }

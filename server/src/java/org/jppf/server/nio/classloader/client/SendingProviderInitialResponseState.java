@@ -57,7 +57,7 @@ public class SendingProviderInitialResponseState extends ClientClassServerState 
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientClassContext context = (ClientClassContext) channel.getContext();
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }

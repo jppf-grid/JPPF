@@ -61,9 +61,9 @@ class SendingNodeResponseState extends NodeClassServerState {
     if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException(build("node ", channel, " has been disconnected"));
     }
-    NodeClassContext context = (NodeClassContext) channel.getContext();
+    final NodeClassContext context = (NodeClassContext) channel.getContext();
     if (context.writeMessage(channel)) {
-      long elapsed = (System.nanoTime() - context.getRequestStartTime()) / 1_000_000L;
+      final long elapsed = (System.nanoTime() - context.getRequestStartTime()) / 1_000_000L;
       driver.getStatistics().addValues(JPPFStatisticsHelper.NODE_CLASS_REQUESTS_TIME, elapsed, context.getResource().getResources().length);
       if (debugEnabled) log.debug(build("node: ", channel, ", response [", context.getResource(), "] sent to the node"));
       context.setMessage(null);

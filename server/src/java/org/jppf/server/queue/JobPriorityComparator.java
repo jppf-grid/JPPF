@@ -27,18 +27,13 @@ import org.jppf.server.protocol.ServerJob;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JobPriorityComparator implements Comparator<ServerJob>
-{
-  /**
-   * {@inheritDoc}
-   */
+public class JobPriorityComparator implements Comparator<ServerJob> {
   @Override
-  public int compare(final ServerJob o1, final ServerJob o2)
-  {
+  public int compare(final ServerJob o1, final ServerJob o2) {
     if (o1 == null) return (o2 == null) ? 0 : -1;
     if (o2 == null) return 1;
-    int p1 = o1.getJob().getSLA().getPriority();
-    int p2 = o2.getJob().getSLA().getPriority();
+    final int p1 = o1.getJob().getSLA().getPriority();
+    final int p2 = o2.getJob().getSLA().getPriority();
     return (p1 < p2) ? 1 : (p1 > p2 ? -1 : 0);
   }
 }

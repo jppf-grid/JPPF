@@ -97,7 +97,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
     try {
       receiver = new JPPFMulticastReceiver(ipFilter);
       while (!isStopped()) {
-        JPPFConnectionInformation info = receiver.receive();
+        final JPPFConnectionInformation info = receiver.receive();
         synchronized(this) {
           if (lastCleanupTime + REMOVAL_CLEANUP_INTERVAL >= System.currentTimeMillis()) cleanRemovals();
         }
@@ -107,7 +107,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
           onNewConnection("Peer-" + count.incrementAndGet(), info);
         }
       }
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     } finally {
       if (receiver != null) receiver.setStopped(true);
@@ -176,9 +176,9 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    * Perform cleanup of entries to remove.
    */
   private synchronized void cleanRemovals() {
-    long now = System.currentTimeMillis();
-    List<String> toRemove = new ArrayList<>();
-    for (Map.Entry<String, Long> entry: removalMap.entrySet()) {
+    final long now = System.currentTimeMillis();
+    final List<String> toRemove = new ArrayList<>();
+    for (final Map.Entry<String, Long> entry: removalMap.entrySet()) {
       if (entry.getValue() + REMOVAL_CLEANUP_INTERVAL <= now) toRemove.add(entry.getKey());
     }
     for (String uuid: toRemove) removalMap.remove(uuid);

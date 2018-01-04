@@ -53,7 +53,7 @@ public class LocalNodeContext extends AbstractNodeContext {
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (debugEnabled) log.debug("reading message from " + channel);
-    LocalNodeChannel handler = (LocalNodeChannel) channel;
+    final LocalNodeChannel handler = (LocalNodeChannel) channel;
     handler.getServerLock().wakeUp();
     LocalNodeMessage lnm;
     synchronized (handler.getServerLock()) {
@@ -67,7 +67,7 @@ public class LocalNodeContext extends AbstractNodeContext {
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
-    LocalNodeChannel handler = (LocalNodeChannel) channel;
+    final LocalNodeChannel handler = (LocalNodeChannel) channel;
     if (debugEnabled) log.debug("wrote " + message + " to " + channel);
     handler.setNodeResource((LocalNodeMessage) message);
     return true;

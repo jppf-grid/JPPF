@@ -26,8 +26,7 @@ import org.jppf.nio.ChannelWrapper;
 /**
  * Instances of this class represent a class loading request from a node to a client channel.
  */
-public class ResourceRequest
-{
+public class ResourceRequest {
   /**
    * The node class loader channel.
    */
@@ -46,8 +45,7 @@ public class ResourceRequest
    * @param channel the node class loader channel.
    * @param resource the resource to lookup in the client.
    */
-  public ResourceRequest(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource)
-  {
+  public ResourceRequest(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) {
     this.channel = channel;
     this.resource = resource;
   }
@@ -56,8 +54,7 @@ public class ResourceRequest
    * Get the node class loader channel.
    * @return a {@link ChannelWrapper} instance.
    */
-  public ChannelWrapper<?> getChannel()
-  {
+  public ChannelWrapper<?> getChannel() {
     return channel;
   }
 
@@ -65,8 +62,7 @@ public class ResourceRequest
    * Get the resource to lookup in the client.
    * @return a {@link JPPFResourceWrapper} instance.
    */
-  public JPPFResourceWrapper getResource()
-  {
+  public JPPFResourceWrapper getResource() {
     return resource;
   }
 
@@ -74,23 +70,21 @@ public class ResourceRequest
    * Set the resource to lookup in the client.
    * @param resource a {@link JPPFResourceWrapper} instance.
    */
-  public void setResource(final JPPFResourceWrapper resource)
-  {
+  public void setResource(final JPPFResourceWrapper resource) {
     Object o = null;
     for (ResourceIdentifier id: new ResourceIdentifier[] { DEFINITION, RESOURCE_LIST, RESOURCE_MAP }) {
       if ((o = resource.getData(id)) != null) {
         this.resource.setData(id, o);
       }
     }
-    long callableId = resource.getCallableID();
+    final long callableId = resource.getCallableID();
     if ((callableId == this.resource.getCallableID()) && (callableId >= 0) && ((o = resource.getCallable()) != null)) this.resource.setCallable((byte[]) o);
     this.resource.setState(resource.getState());
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", resource=").append(resource);
     sb.append(']');
@@ -101,8 +95,7 @@ public class ResourceRequest
    * Get the time at which this request was submitted.
    * @return the time in nanoseconds.
    */
-  public long getRequestStartTime()
-  {
+  public long getRequestStartTime() {
     return requestStartTime;
   }
 
@@ -110,8 +103,7 @@ public class ResourceRequest
    * Set the time at which this request was submitted.
    * @param requestStartTime the time in nanoseconds.
    */
-  public void setRequestStartTime(final long requestStartTime)
-  {
+  public void setRequestStartTime(final long requestStartTime) {
     this.requestStartTime = requestStartTime;
   }
 }

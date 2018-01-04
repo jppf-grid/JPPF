@@ -66,11 +66,11 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
 
   @Override
   public boolean setState(final ClientClassState state) {
-    boolean b = super.setState(state);
+    final boolean b = super.setState(state);
     if (ClientClassState.IDLE_PROVIDER.equals(state)) {
       try {
         processRequests();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (e instanceof RuntimeException) throw (RuntimeException) e;
         else throw new IllegalStateException(e);
       }
@@ -85,7 +85,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * @throws Exception if any error occurs.
    */
   public void addRequest(final ResourceRequest request) throws Exception {
-    String uuid = request.getResource().getUuidPath().getFirst();
+    final String uuid = request.getResource().getUuidPath().getFirst();
     if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {
       request.setRequestStartTime(System.nanoTime());
       pendingRequests.offer(request);
@@ -163,8 +163,8 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    */
   protected void handleProviderError() {
     try {
-      ResourceRequest currentRequest;
-      List<ResourceRequest> pendingList;
+      final ResourceRequest currentRequest;
+      final List<ResourceRequest> pendingList;
       synchronized (this) {
         currentRequest = getCurrentRequest();
         pendingList = new ArrayList<>(pendingRequests);
@@ -176,21 +176,21 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
       }
       if (!pendingList.isEmpty()) {
         if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
-        ClientClassNioServer clientClassServer = driver.getClientClassServer();
-        NodeClassNioServer nodeClassServer = driver.getNodeClassServer();
-        Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
-        for (ResourceRequest mainRequest : pendingList) {
-          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, getResourceName(mainRequest.getResource()));
+        final ClientClassNioServer clientClassServer = driver.getClientClassServer();
+        final NodeClassNioServer nodeClassServer = driver.getNodeClassServer();
+        final Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
+        for (final ResourceRequest mainRequest : pendingList) {
+          final Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, getResourceName(mainRequest.getResource()));
           if (coll == null) continue;
-          for (ResourceRequest request: coll) {
-            ChannelWrapper<?> nodeChannel = request.getChannel();
+          for (final ResourceRequest request: coll) {
+            final ChannelWrapper<?> nodeChannel = request.getChannel();
             if (!nodeSet.contains(nodeChannel)) nodeSet.add(nodeChannel);
             request.getResource().setState(State.NODE_RESPONSE_ERROR);
           }
         }
         for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, nodeClassServer);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -201,21 +201,21 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * @param channel the requesting node channel to reset.
    * @param server the server handling the node.
    */
-  private void resetNodeState(final ChannelWrapper<?> channel, final NodeClassNioServer server) {
+  private static void resetNodeState(final ChannelWrapper<?> channel, final NodeClassNioServer server) {
     try {
       if (debugEnabled) log.debug(build("resetting channel state for node ", channel));
       server.getTransitionManager().transitionChannel(channel, NodeClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE, true);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("error while trying to send response to node {}, this node may be unavailable : {}", e);
     }
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     try {
       sb.append("channel=").append(channel.getClass().getSimpleName());
-    } catch(@SuppressWarnings("unused") Exception e) {
+    } catch(@SuppressWarnings("unused") final Exception e) {
       sb.append("???[");
     }
     sb.append("[id=").append(channel.getId()).append(']');
@@ -240,16 +240,16 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * @throws Exception if any error occurs.
    */
   public void sendNodeResponse(final ResourceRequest request, final JPPFResourceWrapper resource) throws Exception {
-    String uuid = request.getResource().getUuidPath().getFirst();
-    ClientClassNioServer server = driver.getClientClassServer();
-    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, getResourceName(resource));
-    StateTransitionManager<NodeClassState, NodeClassTransition> tm = driver.getNodeClassServer().getTransitionManager();
-    for (ResourceRequest req: allRequests) {
-      ChannelWrapper<?> nodeChannel = req.getChannel();
-      NodeClassContext nodeContext = (NodeClassContext) nodeChannel.getContext();
+    final String uuid = request.getResource().getUuidPath().getFirst();
+    final ClientClassNioServer server = driver.getClientClassServer();
+    final Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, getResourceName(resource));
+    final StateTransitionManager<NodeClassState, NodeClassTransition> tm = driver.getNodeClassServer().getTransitionManager();
+    for (final ResourceRequest req: allRequests) {
+      final ChannelWrapper<?> nodeChannel = req.getChannel();
+      final NodeClassContext nodeContext = (NodeClassContext) nodeChannel.getContext();
       synchronized(nodeChannel) {
         while (NodeClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
-        ResourceRequest pendingResponse = nodeContext.getPendingResponse(req.getResource());
+        final ResourceRequest pendingResponse = nodeContext.getPendingResponse(req.getResource());
         if (pendingResponse == null) {
           if (debugEnabled) log.debug("node {} has {} pending responses, but none for {}, pendingResponses={}",
               new Object[] {nodeChannel.getId(), nodeContext.getNbPendingResponses(), resource, nodeContext.getPendingResponses()});
@@ -259,5 +259,4 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
       }
     }
   }
-
 }

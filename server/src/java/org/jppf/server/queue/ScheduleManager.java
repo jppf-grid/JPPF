@@ -55,15 +55,15 @@ class ScheduleManager {
   void handleStartJobSchedule(final ServerJob serverJob) {
     final String uuid = serverJob.getUuid();
     if (jobStartHandler.hasAction(uuid)) return;
-    JPPFSchedule schedule = serverJob.getSLA().getJobSchedule();
+    final JPPFSchedule schedule = serverJob.getSLA().getJobSchedule();
     if (schedule != null) {
       serverJob.setPending(true);
-      String jobId = serverJob.getName();
+      final String jobId = serverJob.getName();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
       try {
-        long dt = serverJob.getJobReceivedTime();
+        final long dt = serverJob.getJobReceivedTime();
         jobStartHandler.scheduleAction(uuid, schedule, new JobScheduleAction(serverJob), dt);
-      } catch (ParseException e) {
+      } catch (final ParseException e) {
         serverJob.setPending(false);
         log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
@@ -79,14 +79,14 @@ class ScheduleManager {
   void handleExpirationJobSchedule(final ServerJob serverJob) {
     final String uuid = serverJob.getUuid();
     if (jobExpirationHandler.hasAction(uuid)) return;
-    JPPFSchedule schedule = serverJob.getSLA().getJobExpirationSchedule();
+    final JPPFSchedule schedule = serverJob.getSLA().getJobExpirationSchedule();
     if (schedule != null) {
-      String jobId = serverJob.getName();
+      final String jobId = serverJob.getName();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-      long dt = serverJob.getJobReceivedTime();
+      final long dt = serverJob.getJobReceivedTime();
       try {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(serverJob), dt);
-      } catch (ParseException e) {
+      } catch (final ParseException e) {
         log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }

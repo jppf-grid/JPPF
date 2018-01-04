@@ -56,10 +56,10 @@ class WaitingPeerInitiationResponseState extends ClientClassServerState {
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClientClassContext context = (ClientClassContext) channel.getContext();
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (context.readMessage(channel)) {
-      JPPFResourceWrapper resource = context.deserializeResource();
-      String uuid = resource.getProviderUuid();
+      final JPPFResourceWrapper resource = context.deserializeResource();
+      final String uuid = resource.getProviderUuid();
       if (debugEnabled) log.debug("read initial response from peer " + channel + ", providerUuid=" + uuid);
       context.setUuid(uuid);
       server.addProviderConnection(uuid, channel);

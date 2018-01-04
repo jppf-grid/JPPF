@@ -126,15 +126,15 @@ public class ServerTaskBundleClient {
     this.job = job;
     this.dataProvider = dataProvider;
     if (!job.isHandshake() && !job.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
-      int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
-      int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
-      int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
+      final int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
+      final int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
+      final int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
       for (int index = 0; index < taskList.size(); index++) {
-        DataLocation dataLocation = taskList.get(index);
-        int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
+        final DataLocation dataLocation = taskList.get(index);
+        final int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
         int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
         if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
-        ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
+        final ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
         if (dataLocation == null) {
           nullTasks.add(task);
           task.resultReceived(task.getInitialTask());
@@ -173,7 +173,7 @@ public class ServerTaskBundleClient {
   private ServerTaskBundleClient(final ServerTaskBundleClient source, final List<ServerTask> taskList) {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
-    int size = taskList.size();
+    final int size = taskList.size();
     //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
     this.job.setTaskCount(size);
@@ -230,8 +230,8 @@ public class ServerTaskBundleClient {
     synchronized (this) {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("received " + results.size() + " tasks for " + this);
-      List<ServerTask> tasks = new ArrayList<>(results.size());
-      for (ServerTask task: results) {
+      final List<ServerTask> tasks = new ArrayList<>(results.size());
+      for (final ServerTask task: results) {
         if (task.getState() != TaskState.PENDING) {
           tasks.add(task);
           tasksToSendList.add(task);
@@ -239,7 +239,7 @@ public class ServerTaskBundleClient {
         }
       }
       done = pendingTasksCount.get() <= 0;
-      boolean shouldFire = done || strategy.sendResults(this, tasks);
+      final boolean shouldFire = done || strategy.sendResults(this, tasks);
       if (shouldFire) completedTasks = getAndClearCompletedTasks();
     }
     if (completedTasks != null) fireTasksCompleted(completedTasks);
@@ -256,7 +256,7 @@ public class ServerTaskBundleClient {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
       int count = 0;
-      for (ServerTask task: tasks) {
+      for (final ServerTask task: tasks) {
         if (task.getState() != TaskState.PENDING) {
           tasksToSendList.add(task);
           count++;
@@ -266,7 +266,7 @@ public class ServerTaskBundleClient {
         task.resultReceived(exception);
       }
       done = pendingTasksCount.get() <= 0;
-      boolean shouldFire = done || strategy.sendResults(this, tasks);
+      final boolean shouldFire = done || strategy.sendResults(this, tasks);
       if (shouldFire) completedTasks = getAndClearCompletedTasks();
     }
     if (completedTasks != null) fireTasksCompleted(completedTasks);
@@ -319,7 +319,7 @@ public class ServerTaskBundleClient {
    * @return a list of {@link ServerTask}s.
    */
   private synchronized List<ServerTask> getAndClearCompletedTasks() {
-    List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
+    final List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
     tasksToSendList.clear();
     return completedTasks;
   }
@@ -345,8 +345,8 @@ public class ServerTaskBundleClient {
    * @return the list of <code>DataLocation</code> instances.
    */
   public List<DataLocation> getDataLocationList() {
-    List<DataLocation> list = new ArrayList<>(taskList.size());
-    for (ServerTask task : taskList) list.add(task.getInitialTask());
+    final List<DataLocation> list = new ArrayList<>(taskList.size());
+    for (final ServerTask task : taskList) list.add(task.getInitialTask());
     return list;
   }
 
@@ -388,9 +388,9 @@ public class ServerTaskBundleClient {
    */
   private void fireTasksCompleted(final List<ServerTask> completedTasks) {
     if (completedTasks != null) {
-      ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
+      final ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
       if (debugEnabled) log.debug("created bundle id=" + bundle.id + " for " + this);
-      for (CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
+      for (final CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
     }
   }
 
@@ -399,7 +399,7 @@ public class ServerTaskBundleClient {
    */
   public void bundleEnded() {
     if (debugEnabled) log.debug("bundle ended {}", this);
-    for (CompletionListener listener : listenerList) listener.bundleEnded(this);
+    for (final CompletionListener listener : listenerList) listener.bundleEnded(this);
   }
 
   /**
@@ -423,7 +423,7 @@ public class ServerTaskBundleClient {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
     sb.append(", pendingTasks=").append(pendingTasksCount);

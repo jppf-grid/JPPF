@@ -79,7 +79,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
   @Override
   public Object getPersistedJobObject(final String uuid, final PersistenceObjectType type, final int position) throws Exception {
     if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d", uuid, type, position));
-    DataLocation data = handler.load(new PersistenceInfoImpl(uuid, null, type, position, null));
+    final DataLocation data = handler.load(new PersistenceInfoImpl(uuid, null, type, position, null));
     if (debugEnabled) {
       if (data != null) log.debug(String.format("got object=%s for uuid=%s, type=%s, pos=%d", data, uuid, type, position));
       else log.debug(String.format("could not find persisted object for uuid=%s, type=%s, pos=%d", uuid, type, position));
@@ -94,13 +94,13 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public List<String> deletePersistedJobs(final JobSelector selector) throws Exception {
-    List<String> persisted = getMatchingUuids(selector);
-    List<String> result = new ArrayList<>();
+    final List<String> persisted = getMatchingUuids(selector);
+    final List<String> result = new ArrayList<>();
     for (String uuid: persisted) {
       try {
         handler.deleteJob(uuid);
         result.add(uuid);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         if (debugEnabled) log.debug("error deleting job with uuid={} : {}", uuid, ExceptionUtils.getStackTrace(e));
         else log.warn("error deleting job with uuid={} : {}", uuid, ExceptionUtils.getMessage(e));
       }
@@ -116,10 +116,10 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public boolean isJobComplete(final String uuid) throws Exception {
-    TaskBundle header = handler.loadHeader(uuid);
+    final TaskBundle header = handler.loadHeader(uuid);
     if (header == null) return false;
-    int n = header.getTaskCount();
-    int[][] positions = getPersistedJobPositions(uuid);
+    final int n = header.getTaskCount();
+    final int[][] positions = getPersistedJobPositions(uuid);
     if ((positions == null) || (positions.length < 2)) return false;
     for (int i=0; i<2; i++) {
       if ((positions[i] == null) || (positions[i].length == 0) || positions[i].length < n) return false;
@@ -135,14 +135,14 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
    * @throws Exception if any error occurs.
    */
   private List<String> getMatchingUuids(final JobSelector selector) throws Exception {
-    JobSelector sel = (selector == null) ? JobSelector.ALL_JOBS : selector;
-    List<String> uuids = handler.getPersistedJobUuids();
-    List<String> result = new ArrayList<>(uuids.size());
+    final JobSelector sel = (selector == null) ? JobSelector.ALL_JOBS : selector;
+    final List<String> uuids = handler.getPersistedJobUuids();
+    final List<String> result = new ArrayList<>(uuids.size());
     for (String uuid: uuids) {
       if ((sel instanceof AllJobsSelector) || ((sel instanceof JobUuidSelector) && ((JobUuidSelector) sel).getUuids().contains(uuid))) result.add(uuid);
       else {
-        DataLocation headerData = handler.load(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.JOB_HEADER, -1, null));
-        TaskBundle header = (TaskBundle) IOHelper.unwrappedData(headerData);
+        final DataLocation headerData = handler.load(new PersistenceInfoImpl(uuid, null, PersistenceObjectType.JOB_HEADER, -1, null));
+        final TaskBundle header = (TaskBundle) IOHelper.unwrappedData(headerData);
         if (sel.accepts(header)) result.add(uuid);
       }
     }
@@ -152,9 +152,9 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public long requestLoad(final Collection<PersistenceInfo> infos) throws Exception {
-    long id = loadRequestSequence.incrementAndGet();
-    List<DataLocation> list = handler.load(infos);
-    Map<PersistenceInfoKey, DataLocation> map = new HashMap<>(list.size());
+    final long id = loadRequestSequence.incrementAndGet();
+    final List<DataLocation> list = handler.load(infos);
+    final Map<PersistenceInfoKey, DataLocation> map = new HashMap<>(list.size());
     int i = 0;
     for (PersistenceInfo info: infos) map.put(new PersistenceInfoKey(info), list.get(i++));
     loadRequests.put(id, map);
@@ -164,10 +164,10 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
   @Override
   public Object getPersistedJobObject(final long requestId, final String uuid, final PersistenceObjectType type, final int position) throws Exception {
     if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d, requestId=%d", uuid, type, position, requestId));
-    Map<PersistenceInfoKey, DataLocation> map = loadRequests.get(requestId);
+    final Map<PersistenceInfoKey, DataLocation> map = loadRequests.get(requestId);
     if (map == null) return null;
-    PersistenceInfoKey key = new PersistenceInfoKey(uuid, type, position);
-    DataLocation data = map.remove(key);
+    final PersistenceInfoKey key = new PersistenceInfoKey(uuid, type, position);
+    final DataLocation data = map.remove(key);
     if (map.isEmpty()) loadRequests.remove(requestId);
     if (traceEnabled) {
       if (data != null) log.trace(String.format("got object=%s for uuid=%s, type=%s, pos=%d, requestId=%d", data, uuid, type, position, requestId));
@@ -183,15 +183,15 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
    * @return the deserialized object.
    * @throws Exception if any error occurs.
    */
-  private Object deserialize(final DataLocation data, final PersistenceObjectType type) throws Exception {
+  private static Object deserialize(final DataLocation data, final PersistenceObjectType type) throws Exception {
     if (data == null) return null;
     DataLocation dl = data;
     if (type == PersistenceObjectType.TASK) {
-      ServerTask task = (ServerTask) IOHelper.unwrappedData(data);
+      final ServerTask task = (ServerTask) IOHelper.unwrappedData(data);
       dl = task.getInitialTask();
     }
-    JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream(dl.getSize());
-    long l = StreamUtils.copyStream(dl.getInputStream(), baos, true);
+    final JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream(dl.getSize());
+    final long l = StreamUtils.copyStream(dl.getInputStream(), baos, true);
     if (debugEnabled) log.debug("copied {} bytes", l);
     return baos.toByteArray();
   }

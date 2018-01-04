@@ -48,9 +48,9 @@ class GetAttributeTask2 extends AbstractForwardingTask2 {
 
   @Override
   protected Pair<String, Object> execute() throws Exception {
-    String uuid = context.getUuid();
-    JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-    Object o = wrapper.getAttribute(mbeanName, memberName);
+    final String uuid = context.getUuid();
+    final JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
+    final Object o = wrapper.getAttribute(mbeanName, memberName);
     if (debugEnabled) log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, uuid));
     return new Pair<>(uuid, o);
   }

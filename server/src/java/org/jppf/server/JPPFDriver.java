@@ -154,7 +154,7 @@ public class JPPFDriver {
    */
   protected JPPFDriver() {
     config = JPPFConfiguration.getProperties();
-    String s;
+    final String s;
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
@@ -177,13 +177,13 @@ public class JPPFDriver {
    */
   public void run() throws Exception {
     if (debugEnabled) log.debug("starting JPPF driver");
-    JPPFConnectionInformation info = initializer.getConnectionInformation();
+    final JPPFConnectionInformation info = initializer.getConnectionInformation();
     initializer.registerDebugMBean();
     initializer.initRecoveryServer();
 
-    RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    int[] sslPorts = extractValidPorts(info.sslServerPorts);
-    boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
+    final RecoveryServer recoveryServer = initializer.getRecoveryServer();
+    final int[] sslPorts = extractValidPorts(info.sslServerPorts);
+    final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL)));
@@ -199,9 +199,9 @@ public class JPPFDriver {
     startServer(recoveryServer, acceptorServer);
 
     if (config.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
-      LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
+      final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       localClassChannel.getContext().setChannel(localClassChannel);
-      LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
+      final LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
       localNodeChannel.getContext().setChannel(localNodeChannel);
       final boolean offline = JPPFConfiguration.get(JPPFProperties.NODE_OFFLINE);
       localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
@@ -292,7 +292,7 @@ public class JPPFDriver {
    * @return a {@link JPPFDistributedJob} instance, or {@code null} if there is no job with the specified uuid.
    */
   public JPPFDistributedJob getJob(final String uuid) {
-    ServerJob serverJob = this.getQueue().getJob(uuid);
+    final ServerJob serverJob = this.getQueue().getJob(uuid);
     return (serverJob == null) ? null : serverJob.getJob();
   }
 
@@ -311,8 +311,8 @@ public class JPPFDriver {
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
     if (shutdownSchduled.compareAndSet(false, true)) {
       log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
-      Timer timer = new Timer();
-      ShutdownRestartTask task = new ShutdownRestartTask(restart, restartDelay, this);
+      final Timer timer = new Timer();
+      final ShutdownRestartTask task = new ShutdownRestartTask(restart, restartDelay, this);
       timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
     } else {
       log.info("shutdown/restart request ignored because a previous request is already scheduled");
@@ -376,13 +376,13 @@ public class JPPFDriver {
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
-        int port = Integer.parseInt(args[0]);
+        final int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
       instance = new JPPFDriver();
       if (debugEnabled) log.debug("Driver system properties: {}", SystemUtils.printSystemProperties());
       instance.run();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       if (JPPFConfiguration.get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) System.exit(1);
@@ -400,7 +400,7 @@ public class JPPFDriver {
     if (nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if (debugEnabled) log.debug("starting nio server {}", nioServer);
     if (recoveryServer != null && nioServer instanceof ReaperListener) {
-      Reaper reaper = recoveryServer.getReaper();
+      final Reaper reaper = recoveryServer.getReaper();
       reaper.addReaperListener((ReaperListener) nioServer);
     }
     nioServer.start();
@@ -415,7 +415,7 @@ public class JPPFDriver {
    * @param name the name to use for the server.
    */
   private static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     if (name != null) {
       sb.append(name);
       sb.append(" initialized");
@@ -456,13 +456,13 @@ public class JPPFDriver {
    * @param ports the array of port numbers to check.
    * @return an array, possibly of length 0, containing all the valid port numbers in the input array.
    */
-  private int[] extractValidPorts(final int[] ports) {
+  private static int[] extractValidPorts(final int[] ports) {
     if ((ports == null) || (ports.length == 0)) return ports;
-    List<Integer> list = new ArrayList<>();
+    final List<Integer> list = new ArrayList<>();
     for (int port: ports) {
       if (port >= 0) list.add(port);
     }
-    int[] result = new int[list.size()];
+    final int[] result = new int[list.size()];
     for (int i=0; i<result.length; i++) result[i] = list.get(i);
     return result;
   }

@@ -99,18 +99,18 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       if (debugEnabled && (e != null)) log.debug("exception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
       ClientNioServer.closeClient(channel);
       if (uuid != null) {
-        ClientClassNioServer classServer = JPPFDriver.getInstance().getClientClassServer();
-        List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
-        String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
+        final ClientClassNioServer classServer = JPPFDriver.getInstance().getClientClassServer();
+        final List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+        final String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
         if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
         if ((list != null) && !list.isEmpty()) {
           for (ChannelWrapper<?> classChannel: list) {
-            ClientClassContext ctx = (ClientClassContext) classChannel.getContext();
+            final ClientClassContext ctx = (ClientClassContext) classChannel.getContext();
             if (ctx.getConnectionUuid().equals(connectionUuid)) {
               if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
               try {
                 ClientClassNioServer.closeConnection(classChannel, false);
-              } catch (Exception e2) {
+              } catch (final Exception e2) {
                 log.error(e2.getMessage(), e2);
               }
               break;
@@ -128,12 +128,12 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * @throws Exception if any error occurs.
    */
   public void serializeBundle() throws Exception {
-    ClientMessage message = newMessage();
-    TaskBundle bundle = clientBundle.getJob();
+    final ClientMessage message = newMessage();
+    final TaskBundle bundle = clientBundle.getJob();
     bundle.setSLA(null);
     bundle.setMetadata(null);
-    List<ServerTask> tasks = clientBundle.getTaskList();
-    int[] positions = new int[tasks.size()];
+    final List<ServerTask> tasks = clientBundle.getTaskList();
+    final int[] positions = new int[tasks.size()];
     for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
     if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
     bundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
@@ -150,8 +150,8 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * @throws Exception if an error occurs during the deserialization.
    */
   public ServerTaskBundleClient deserializeBundle() throws Exception {
-    List<DataLocation> locations = ((ClientMessage) message).getLocations();
-    TaskBundle bundle = ((ClientMessage) message).getBundle();
+    final List<DataLocation> locations = ((ClientMessage) message).getLocations();
+    final TaskBundle bundle = ((ClientMessage) message).getBundle();
     this.jobUuid = bundle.getUuid();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
     return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()), isPeer());
@@ -187,7 +187,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
     boolean b = false;
     try {
       b = message.read();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       updateInStats();
       throw e;
     }
@@ -200,7 +200,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
     boolean b = false;
     try {
       b = message.write();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       updateOutStats();
       throw e;
     }
@@ -252,7 +252,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * Send the job ended notification.
    */
   void jobEnded() {
-    ServerTaskBundleClient bundle;
+    final ServerTaskBundleClient bundle;
     if ((bundle = getInitialBundleWrapper()) != null) {
       if (debugEnabled) log.debug("bundle={}", bundle);
       bundle.bundleEnded();
@@ -264,29 +264,29 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * Cancel the job upon client disconnection.
    */
   void cancelJobOnClose() {
-    String jobUuid = getJobUuid();
-    int tasksToSend = getNbTasksToSend();
-    ServerTaskBundleClient clientBundle = getInitialBundleWrapper();
+    final String jobUuid = getJobUuid();
+    final int tasksToSend = getNbTasksToSend();
+    final ServerTaskBundleClient clientBundle = getInitialBundleWrapper();
     if (clientBundle != null) {
-      TaskBundle header = clientBundle.getJob();
+      final TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
         try {
-          ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
+          final ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
           int taskCount = 0;
           if (job != null) {
             taskCount = job.getTaskCount();
             if (debugEnabled) log.debug("cancelling job {}", job);
             job.cancel(true);
           }
-          int tasksToSend2 = getNbTasksToSend();
-          int n = tasksToSend - tasksToSend2 - taskCount;
+          final int tasksToSend2 = getNbTasksToSend();
+          final int n = tasksToSend - tasksToSend2 - taskCount;
           if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", new Object[] {tasksToSend, tasksToSend2, n, taskCount, job});
-          JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+          final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
           driver.getQueue().removeBundle(job);
           setInitialBundleWrapper(null);
-        } catch(Exception e) {
+        } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -344,7 +344,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    */
   private void updateInStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : CLIENT_IN_TRAFFIC, n);
     }
   }
@@ -354,7 +354,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    */
   private void updateOutStats() {
     if (message != null) {
-      long n = message.getChannelCount();
+      final long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : CLIENT_OUT_TRAFFIC, n);
     }
   }

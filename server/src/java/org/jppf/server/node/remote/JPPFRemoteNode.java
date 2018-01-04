@@ -42,7 +42,7 @@ public class JPPFRemoteNode extends AbstractRemoteNode {
   @Override
   protected synchronized void init() throws Exception {
     super.init();
-    JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+    final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     factory.configure(JPPFConfiguration.getProperties(), JPPFDatasourceFactory.Scope.LOCAL, getSystemInformation());
   }
 }

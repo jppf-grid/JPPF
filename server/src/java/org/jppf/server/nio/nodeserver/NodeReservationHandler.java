@@ -109,7 +109,7 @@ public class NodeReservationHandler {
    */
   synchronized void removeReservation(final AbstractNodeContext node) {
     if (debugEnabled) log.debug(String.format("removing reservation for node %s", node));
-    String uuid = node.getUuid();
+    final String uuid = node.getUuid();
     if (uuid != null) {
       String jobUuid = pendingMap.remove(uuid);
       if (jobUuid != null) jobPendingMap.removeValue(jobUuid, node.getUuid());
@@ -200,13 +200,13 @@ public class NodeReservationHandler {
    * @return .
    */
   boolean transitionReservation(final AbstractNodeContext node) {
-    TypedProperties config = node.getSystemInformation().getJppf();
-    String reservedUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
+    final TypedProperties config = node.getSystemInformation().getJppf();
+    final String reservedUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
     if (reservedUuid != null) {
       if (debugEnabled) log.debug(String.format("node %s is reserved for job %s", node.getUuid(), reservedUuid));
-      String oldNodeUuid = config.get(JPPFProperties.NODE_RESERVED_UUID);
+      final String oldNodeUuid = config.get(JPPFProperties.NODE_RESERVED_UUID);
       synchronized(this) {
-        String pendingJobUuid = pendingMap.get(oldNodeUuid);
+        final String pendingJobUuid = pendingMap.get(oldNodeUuid);
         if (debugEnabled) log.debug(String.format("node %s previous uuid was %s and was reserved for job %s", node.getUuid(), oldNodeUuid, pendingJobUuid));
         if (reservedUuid.equals(pendingJobUuid)) {
           if (debugEnabled) log.debug(String.format("oldNodeUuid=%s, nodeUuid=%s, jobUuid=%s", oldNodeUuid, node.getUuid(), pendingJobUuid));
@@ -227,7 +227,7 @@ public class NodeReservationHandler {
    * @return a set of job uuids.
    */
   public synchronized Set<String> getReservedJobs() {
-    Set<String> set = new HashSet<>(jobPendingMap.keySet());
+    final Set<String> set = new HashSet<>(jobPendingMap.keySet());
     set.addAll(jobReadyMap.keySet());
     return set;
   }
@@ -237,7 +237,7 @@ public class NodeReservationHandler {
    * @return a set of node uuids.
    */
   public synchronized Set<String> getReservedNodes() {
-    Set<String> set = new HashSet<>(pendingMap.keySet());
+    final Set<String> set = new HashSet<>(pendingMap.keySet());
     set.addAll(readyMap.keySet());
     return set;
   }
@@ -270,14 +270,14 @@ public class NodeReservationHandler {
     public void run() {
       final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
       final TypedProperties desiredConfig = spec.getConfiguration();
-      TypedProperties config = new TypedProperties(desiredConfig)
+      final TypedProperties config = new TypedProperties(desiredConfig)
         .set(JPPFProperties.NODE_RESERVED_JOB, job.getUuid())
         .set(JPPFProperties.NODE_RESERVED_UUID, node.getUuid());
-      JMXNodeConnectionWrapper jmx = node.getJmxConnection();
+      final JMXNodeConnectionWrapper jmx = node.getJmxConnection();
       if ((jmx != null) && jmx.isConnected()) {
         try {
           if (debugEnabled) log.debug(String.format("about to restart node %s reserved for job %s with config=%s", node.getUuid(), job.getUuid(), config));
-          boolean restart =  spec.isForceRestart() || (node.reservationScore > 0);
+          final boolean restart =  spec.isForceRestart() || (node.reservationScore > 0);
           node.reservationTansition = Transition.KEEP;
           jmx.updateConfiguration(config, restart);
           // if node is not restarted, synchronize server version of the node's config
@@ -285,7 +285,7 @@ public class NodeReservationHandler {
             node.getSystemInformation().getJppf().putAll(config);
             transitionReservation(node);
           }
-        } catch (@SuppressWarnings("unused") Exception e) {
+        } catch (@SuppressWarnings("unused") final Exception e) {
           log.error(String.format("error reserving node %s for job %s", node, job));
         }
       }

@@ -56,13 +56,13 @@ class WaitingInitialNodeRequestState extends NodeClassServerState {
   @Override
   public NodeClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception {
     // we don't know yet which whom we are talking, is it a node or a provider?
-    NodeClassContext context = (NodeClassContext) wrapper.getContext();
+    final NodeClassContext context = (NodeClassContext) wrapper.getContext();
     if (context.readMessage(wrapper)) {
-      JPPFResourceWrapper resource = context.deserializeResource();
+      final JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("read initial request from node " + wrapper);
       context.setPeer((Boolean) resource.getData(ResourceIdentifier.PEER, Boolean.FALSE));
       if (debugEnabled) log.debug("initiating node: " + wrapper);
-      String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
+      final String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
       if (debugEnabled) log.debug("received node init request for uuid = {}", uuid);
       if (uuid != null) {
         context.setUuid(uuid);

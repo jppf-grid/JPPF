@@ -234,9 +234,9 @@ public abstract class AbstractServerJob {
    * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
    */
   public void setPending(final boolean pending) {
-    boolean oldValue = isPending();
+    final boolean oldValue = isPending();
     this.pending = pending;
-    boolean newValue = isPending();
+    final boolean newValue = isPending();
     if (oldValue != newValue) fireJobUpdated(true);
   }
 
@@ -254,7 +254,7 @@ public abstract class AbstractServerJob {
    * @param requeue <code>true</code> to indicate that job should be requeued, <code>false</code> otherwise.
    */
   public void setSuspended(final boolean suspended, final boolean requeue) {
-    JobSLA sla = getJob().getSLA();
+    final JobSLA sla = getJob().getSLA();
     if (sla.isSuspended() == suspended) return;
     sla.setSuspended(suspended);
     fireJobUpdated(true);
@@ -322,7 +322,7 @@ public abstract class AbstractServerJob {
    * Called when task was cancelled or finished.
    */
   protected void done() {
-    Runnable[] runnables;
+    final Runnable[] runnables;
     synchronized (onDoneList) {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
@@ -418,7 +418,7 @@ public abstract class AbstractServerJob {
     lock.lock();
     try {
       if (this.submissionStatus == submissionStatus) return;
-      SubmissionStatus oldValue = this.submissionStatus;
+      final SubmissionStatus oldValue = this.submissionStatus;
       this.submissionStatus = submissionStatus;
       fireStatusChanged(oldValue, this.submissionStatus);
     } finally {
@@ -501,15 +501,15 @@ public abstract class AbstractServerJob {
     DataLocation dl = null;
     try {
       lock.lock();
-      int size = (jobDataLocation == null) ? -1 : jobDataLocation.getSize();
-      ObjectSerializer ser = IOHelper.getDefaultserializer();
+      final int size = (jobDataLocation == null) ? -1 : jobDataLocation.getSize();
+      final ObjectSerializer ser = IOHelper.getDefaultserializer();
       if (size <= 0) dl = IOHelper.serializeData(job, ser);
       else {
         if (IOHelper.fitsInMemory(size)) dl = IOHelper.serializeDataToMemory(job, ser);
         else dl = IOHelper.serializeDataToFile(job, ser);
       }
       jobDataLocation = dl;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       log.error(e.getMessage(), e);
     } finally {
       lock.unlock();

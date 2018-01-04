@@ -28,14 +28,12 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  * Representation of a message sent or received by a remote node.
  * @author Laurent Cohen
  */
-public class RemoteNodeMessage extends AbstractTaskBundleMessage
-{
+public class RemoteNodeMessage extends AbstractTaskBundleMessage {
   /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
-  public RemoteNodeMessage(final ChannelWrapper<?> channel)
-  {
+  public RemoteNodeMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
@@ -44,8 +42,7 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
    * @param channel the channel to read from or write to.
    * @param debug to enable debug-level logging.
    */
-  protected RemoteNodeMessage(final ChannelWrapper<?> channel, final boolean debug)
-  {
+  protected RemoteNodeMessage(final ChannelWrapper<?> channel, final boolean debug) {
     super(channel, debug);
   }
 
@@ -54,8 +51,7 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void afterFirstRead() throws Exception
-  {
+  protected void afterFirstRead() throws Exception {
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), JPPFDriver.getSerializer());
     nbObjects = bundle.getTaskCount() + 1;
   }
@@ -65,15 +61,13 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected void beforeFirstWrite() throws Exception
-  {
+  protected void beforeFirstWrite() throws Exception {
     nbObjects = bundle.getTaskCount() + 2;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);

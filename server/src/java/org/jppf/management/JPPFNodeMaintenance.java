@@ -25,8 +25,11 @@ import org.jppf.server.node.JPPFNode;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeMaintenance implements JPPFNodeMaintenanceMBean
-{
+public class JPPFNodeMaintenance implements JPPFNodeMaintenanceMBean {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The node whose this MBean is registered with.
    */
@@ -36,14 +39,12 @@ public class JPPFNodeMaintenance implements JPPFNodeMaintenanceMBean
    * Initialize this node management bean with the specified node.
    * @param node the node whose state is monitored.
    */
-  public JPPFNodeMaintenance(final JPPFNode node)
-  {
+  public JPPFNodeMaintenance(final JPPFNode node) {
     this.node = node;
   }
 
   @Override
-  public void requestResourceCacheReset() throws Exception
-  {
+  public void requestResourceCacheReset() throws Exception {
     node.requestResourceCacheReset();
   }
 }

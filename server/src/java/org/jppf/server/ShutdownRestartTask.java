@@ -88,7 +88,7 @@ class ShutdownRestartTask extends TimerTask {
             lock.goToSleep(restartDelay);
             log.info("Initiating restart");
             System.exit(2);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             log.error(e.getMessage(), e);
             throw new JPPFError("Could not restart the JPPFDriver");
           }

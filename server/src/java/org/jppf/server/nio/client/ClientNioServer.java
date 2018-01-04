@@ -71,7 +71,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
     try {
       channels.add(channel);
       if (!channel.getContext().isPeer()) transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeClient(channel);
@@ -100,8 +100,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
     ChannelWrapper<?> channel = null;
     if (debugEnabled) log.debug("closing client channel with connectionUuid=" + connectionUuid);
     synchronized (channels) {
-      for (ChannelWrapper<?> ch : channels) {
-        ClientContext context = (ClientContext) ch.getContext();
+      for (final ChannelWrapper<?> ch : channels) {
+        final ClientContext context = (ClientContext) ch.getContext();
         if (context.getConnectionUuid().equals(connectionUuid)) {
           channel = ch;
           break;
@@ -120,12 +120,12 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
     try {
       driver.getClientNioServer().removeChannel(channel);
       channel.close();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
     try {
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -143,12 +143,12 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   @Override
   public synchronized void removeAllConnections() {
     if (!isStopped()) return;
-    List<ChannelWrapper<?>> list = new ArrayList<>(channels);
+    final List<ChannelWrapper<?>> list = new ArrayList<>(channels);
     channels.clear();
     for (ChannelWrapper<?> channel : list) {
       try {
         closeClient(channel);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
       }
     }

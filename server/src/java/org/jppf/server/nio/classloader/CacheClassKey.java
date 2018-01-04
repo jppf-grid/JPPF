@@ -23,23 +23,25 @@ import org.jppf.utils.Pair;
  * This class represents the key used in the class cache.
  * @author Domingos Creado
  */
-public class CacheClassKey extends Pair<String, String>
-{
+public class CacheClassKey extends Pair<String, String> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Initialize this key with a specified provider uuid and resource string.
    * @param uuid the provider uuid.
    * @param res string describing the cached resource.
    */
-  public CacheClassKey(final String uuid, final String res)
-  {
+  public CacheClassKey(final String uuid, final String res) {
     super(uuid, res);
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
     if (res == null) throw new IllegalArgumentException("res is null");
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append("[uuid=").append(first).append(", res=").append(second).append(']').toString();
   }
 }

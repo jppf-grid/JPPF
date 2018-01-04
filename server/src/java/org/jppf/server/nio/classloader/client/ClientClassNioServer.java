@@ -85,7 +85,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
           if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeConnection(channel);
@@ -110,20 +110,20 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    ClientClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
-    ClientClassContext context = (ClientClassContext) channel.getContext();
+    final ClientClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
+    final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (debugEnabled) log.debug("closing {}", context);
-    String uuid = context.getUuid();
+    final String uuid = context.getUuid();
     if (uuid != null) server.removeProviderConnection(uuid, channel);
     else if (debugEnabled) log.debug("null uuid for {}", context);
     try {
       channel.close();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
     if (removeJobConnection) {
-      String connectionUuid = context.getConnectionUuid();
+      final String connectionUuid = context.getConnectionUuid();
       JPPFDriver.getInstance().getClientNioServer().closeClientConnection(connectionUuid);
     }
   }
@@ -154,7 +154,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * @return a list of connection channels.
    */
   public List<ChannelWrapper<?>> getProviderConnections(final String uuid) {
-    Collection<ChannelWrapper<?>> channels = providerConnections.getValues(uuid);
+    final Collection<ChannelWrapper<?>> channels = providerConnections.getValues(uuid);
     return channels == null ? null : new ArrayList<>(channels);
   }
 
@@ -164,7 +164,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    */
   @Override
   public List<ChannelWrapper<?>> getAllConnections() {
-    Collection<ChannelWrapper<?>> channels = providerConnections.allValues();
+    final Collection<ChannelWrapper<?>> channels = providerConnections.allValues();
     return channels == null ? null : new ArrayList<>(channels);
   }
 
@@ -175,14 +175,14 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   @Override
   public synchronized void removeAllConnections() {
     if (!isStopped()) return;
-    List<ChannelWrapper<?>> list = providerConnections.allValues();
+    final List<ChannelWrapper<?>> list = providerConnections.allValues();
     providerConnections.clear();
     super.removeAllConnections();
     if (list != null) {
-      for (ChannelWrapper<?> channel: list) {
+      for (final ChannelWrapper<?> channel: list) {
         try {
           closeConnection(channel);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
         }
       }
@@ -201,11 +201,11 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
    */
   public boolean addResourceRequest(final String uuid, final ResourceRequest request) {
-    CacheClassKey key = new CacheClassKey(uuid, AbstractClassContext.getResourceName(request.getResource()));
+    final CacheClassKey key = new CacheClassKey(uuid, AbstractClassContext.getResourceName(request.getResource()));
     if (debugEnabled) log.debug("adding resource request for {}", key);
     lockRequests.lock();
     try {
-      boolean result = requestMap.containsKey(key);
+      final boolean result = requestMap.containsKey(key);
       requestMap.putValue(key, request);
       return result;
     } finally {
@@ -220,11 +220,11 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
    */
   public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name) {
-    CacheClassKey key = new CacheClassKey(uuid, name);
+    final CacheClassKey key = new CacheClassKey(uuid, name);
     if (debugEnabled) log.debug("removing resource request for {}", key);
     lockRequests.lock();
     try {
-      Collection<ResourceRequest> c = requestMap.removeKey(key);
+      final Collection<ResourceRequest> c = requestMap.removeKey(key);
       if (debugEnabled) log.debug("removing resource request for {} : {} requests", key, c == null ? "null" : c.size());
       return c;
     } finally {

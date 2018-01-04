@@ -56,13 +56,13 @@ class WaitingProviderInitialRequestState extends ClientClassServerState {
    */
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception {
-    // we don't know yet which whom we are talking, is it a node or a provider?
-    ClientClassContext context = (ClientClassContext) wrapper.getContext();
+    // we don't know yet whith whom we are talking, is it a node or a provider?
+    final ClientClassContext context = (ClientClassContext) wrapper.getContext();
     if (context.readMessage(wrapper)) {
-      JPPFResourceWrapper resource = context.deserializeResource();
+      final JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("read initial request from provider " + wrapper);
       if (debugEnabled) log.debug("initiating provider: " + wrapper);
-      String uuid = resource.getUuidPath().getFirst();
+      final String uuid = resource.getUuidPath().getFirst();
       // it is a provider
       server.addProviderConnection(uuid, wrapper);
       context.setUuid(uuid);

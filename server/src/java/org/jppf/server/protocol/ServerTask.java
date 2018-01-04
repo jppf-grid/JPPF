@@ -31,6 +31,10 @@ import org.slf4j.*;
  */
 public class ServerTask implements Serializable {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ServerTask.class);
@@ -286,7 +290,7 @@ public class ServerTask implements Serializable {
     out.writeObject(throwable);
     try {
       IOHelper.writeData(initialTask, new StreamOutputDestination(out));
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
   }
@@ -308,7 +312,7 @@ public class ServerTask implements Serializable {
       initialTask = IOHelper.readData(new StreamInputSource(in));
     } catch(IOException | ClassNotFoundException e) {
       throw  e;
-    } catch(Exception e) {
+    } catch(final Exception e) {
       throw new IOException(e);
     }
   }

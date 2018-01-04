@@ -61,9 +61,9 @@ class WaitingResultsState extends NodeServerState {
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     //if (debugEnabled) log.debug("exec() for " + channel);
-    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.readMessage(channel)) {
-      BundleResults received = context.deserializeBundle();
+      final BundleResults received = context.deserializeBundle();
       return process(received, context);
     }
     return TO_WAITING_RESULTS;
@@ -77,15 +77,15 @@ class WaitingResultsState extends NodeServerState {
    * @throws Exception if any error occurs.
    */
   public NodeTransition process(final BundleResults received, final AbstractNodeContext context) throws Exception {
-    ServerTaskBundleNode nodeBundle = context.getBundle();
+    final ServerTaskBundleNode nodeBundle = context.getBundle();
     server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
     //server.getNodeReservationHandler().removeReservation(context);
     boolean requeue = false;
     try {
-      TaskBundle newBundle = received.bundle();
+      final TaskBundle newBundle = received.bundle();
       if (debugEnabled) log.debug("read bundle " + newBundle + " from node " + context);
       requeue = processResults(context, received);
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
       nodeBundle.setJobReturnReason(JobReturnReason.DRIVER_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
@@ -106,14 +106,13 @@ class WaitingResultsState extends NodeServerState {
    * @return A boolean requeue indicator.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("deprecation")
   private boolean processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
-    TaskBundle newBundle = received.bundle();
+    final TaskBundle newBundle = received.bundle();
     // if an exception prevented the node from executing the tasks or sending back the results
-    Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
-    Bundler<?> bundler = context.getBundler();
-    ServerTaskBundleNode nodeBundle = context.getBundle();
-    Lock lock = nodeBundle.getClientJob().getLock();
+    final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
+    final Bundler<?> bundler = context.getBundler();
+    final ServerTaskBundleNode nodeBundle = context.getBundle();
+    final Lock lock = nodeBundle.getClientJob().getLock();
     lock.lock();
     try {
       if (t != null) {
@@ -127,7 +126,7 @@ class WaitingResultsState extends NodeServerState {
         if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
         if (!nodeBundle.isExpired()) {
           Set<Integer> resubmitSet = null;
-          int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
+          final int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
           if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
           if (resubmitPositions != null) {
             resubmitSet = new HashSet<>();
@@ -135,7 +134,7 @@ class WaitingResultsState extends NodeServerState {
             if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
           }
           int count = 0;
-          for (ServerTask task: nodeBundle.getTaskList()) {
+          for (final ServerTask task: nodeBundle.getTaskList()) {
             if ((resubmitSet != null) && resubmitSet.contains(task.getJobPosition())) {
               if (task.incResubmitCount() <= task.getMaxResubmits()) {
                 task.resubmit();
@@ -145,14 +144,14 @@ class WaitingResultsState extends NodeServerState {
           }
           if (count > 0) context.updateStatsUponTaskResubmit(count);
         } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
-        List<DataLocation> data = received.data();
+        final List<DataLocation> data = received.data();
         if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
         if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
         nodeBundle.resultsReceived(data);
-        long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
+        final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
         updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
         if (bundler instanceof BundlerEx) {
-          long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
+          final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
           BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
         } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
         server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
@@ -160,8 +159,8 @@ class WaitingResultsState extends NodeServerState {
     } finally {
       lock.unlock();
     }
-    boolean requeue = newBundle.isRequeue();
-    JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
+    final boolean requeue = newBundle.isRequeue();
+    final JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
     if (systemInfo != null) {
       context.setNodeInfo(systemInfo, true);
       if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
@@ -175,8 +174,8 @@ class WaitingResultsState extends NodeServerState {
    * @param elapsed server/node round trip time.
    * @param elapsedInNode time spent in the node.
    */
-  private void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
-    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+  private static void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
+    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_DISPATCH, nbTasks);
     stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);
     stats.addValues(JPPFStatisticsHelper.NODE_EXECUTION, elapsedInNode, nbTasks);

@@ -27,8 +27,11 @@ import javax.management.Notification;
  * @author Laurent Cohen
  * @exclude
  */
-public class ForwardingNotificationEvent extends EventObject
-{
+public class ForwardingNotificationEvent extends EventObject {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Name of the MBean who emitted the notification.
    */
@@ -44,8 +47,7 @@ public class ForwardingNotificationEvent extends EventObject
    * @param mBeanName the name of the MBean who emitted the notification.
    * @param notification the notification to dispatch.
    */
-  public ForwardingNotificationEvent(final String nodeUuid, final String mBeanName, final Notification notification)
-  {
+  public ForwardingNotificationEvent(final String nodeUuid, final String mBeanName, final Notification notification) {
     super(nodeUuid);
     this.mBeanName = mBeanName;
     this.notification = notification;
@@ -55,8 +57,7 @@ public class ForwardingNotificationEvent extends EventObject
    * Get the the uuid of the node that emitted the event.
    * @return the node uuid as a string.
    */
-  public String getNodeUuid()
-  {
+  public String getNodeUuid() {
     return (String) getSource();
   }
 
@@ -64,8 +65,7 @@ public class ForwardingNotificationEvent extends EventObject
    * Get the name of the MBean who emitted the notification.
    * @return the MBean name as a string.
    */
-  public String getMBeanName()
-  {
+  public String getMBeanName() {
     return mBeanName;
   }
 
@@ -73,8 +73,7 @@ public class ForwardingNotificationEvent extends EventObject
    * Get the notification to dispatch.
    * @return a {@link Notification} instance.
    */
-  public Notification getNotification()
-  {
+  public Notification getNotification() {
     return notification;
   }
 }

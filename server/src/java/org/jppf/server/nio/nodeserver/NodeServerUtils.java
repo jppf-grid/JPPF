@@ -41,27 +41,27 @@ class NodeServerUtils {
    * @throws Exception if any error occurs.
    */
   static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final ChannelWrapper<?> channel, final JPPFSystemInformation info) throws Exception {
-    StringBuilder sb = new StringBuilder();
-    String ip = NetworkUtils.getNonLocalHostAddress();
+    final StringBuilder sb = new StringBuilder();
+    final String ip = NetworkUtils.getNonLocalHostAddress();
     sb.append('[').append(ip == null ? "localhost" : ip);
     if (channel instanceof SelectionKeyWrapper) {
-      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
-      SocketChannel ch = (SocketChannel) skw.getChannel().channel();
+      final SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
+      final SocketChannel ch = (SocketChannel) skw.getChannel().channel();
       sb.append(':').append(ch.socket().getLocalPort()).append(']');
-      InetSocketAddress isa = (InetSocketAddress) ch.getRemoteAddress();
+      final InetSocketAddress isa = (InetSocketAddress) ch.getRemoteAddress();
       sb.append(isa.getAddress().getHostAddress());
     } else if (channel.isLocal()) {
       sb.append( "local_channel").append(']');
     }
-    TypedProperties jppf = info.getJppf();
-    boolean master = jppf.get(JPPFProperties.PROVISIONING_MASTER);
-    boolean slave = jppf.get(JPPFProperties.PROVISIONING_SLAVE);
+    final TypedProperties jppf = info.getJppf();
+    final boolean master = jppf.get(JPPFProperties.PROVISIONING_MASTER);
+    final boolean slave = jppf.get(JPPFProperties.PROVISIONING_SLAVE);
     if (master || slave) {
       sb.append(master ? "master" : "slave");
       sb.append(jppf.get(JPPFProperties.PROVISIONING_SLAVE_PATH_PREFIX));
       if (slave) sb.append(jppf.get(JPPFProperties.PROVISIONING_SLAVE_ID));
     }
-    String s = sb.toString();
+    final String s = sb.toString();
     return new Pair<>(s, CryptoUtils.computeHash(s, factory.getHashAlgorithm()));
   }
 
@@ -73,8 +73,8 @@ class NodeServerUtils {
    */
   static String getChannelHost(final ChannelWrapper<?> channel) throws Exception {
     if (channel instanceof SelectionKeyWrapper) {
-      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
-      SocketChannel ch = (SocketChannel) skw.getChannel().channel();
+      final SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
+      final SocketChannel ch = (SocketChannel) skw.getChannel().channel();
       return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
     } else if (channel.isLocal()) {
       return "localhost";

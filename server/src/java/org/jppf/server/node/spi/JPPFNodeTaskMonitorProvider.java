@@ -27,15 +27,13 @@ import org.jppf.server.node.JPPFNode;
  * SPI Provider implementation for task-level monitoring MBean.
  * @author Laurent Cohen
  */
-public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
-{
+public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider {
   /**
    * Return the fully qualified name of the management interface defined by this provider.
    * @return the fully qualified interface name as a string.
    */
   @Override
-  public String getMBeanInterfaceName()
-  {
+  public String getMBeanInterfaceName() {
     return JPPFNodeTaskMonitorMBean.class.getName();
   }
 
@@ -46,9 +44,8 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
    * @return an <code>Object</code> that is an implementation of the MBean interface.
    */
   @Override
-  public Object createMBean(final Node node)
-  {
-    JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.MBEAN_NAME);
+  public Object createMBean(final Node node) {
+    final JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.MBEAN_NAME);
     ((JPPFNode) node).getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(monitor);
     return monitor;
   }
@@ -60,8 +57,7 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
    * @return the MBean name for this MBean provider.
    */
   @Override
-  public String getMBeanName()
-  {
+  public String getMBeanName() {
     return JPPFNodeTaskMonitorMBean.MBEAN_NAME;
   }
 }

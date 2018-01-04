@@ -73,11 +73,11 @@ public class ServerTaskBundleNode {
   /**
    * Job cancel indicator.
    */
-  private boolean cancelled  = false;
+  private boolean cancelled = false;
   /**
    * Job dispatch expiration indicator.
    */
-  private boolean expired  = false;
+  private boolean expired = false;
   /**
    * The job this submission is for.
    */
@@ -101,11 +101,11 @@ public class ServerTaskBundleNode {
   /**
    * Offline node indicator.
    */
-  private boolean offline  = false;
+  private boolean offline = false;
 
   /**
    * Initialize this task bundle and set its build number.
-   * @param job   the job to execute.
+   * @param job the job to execute.
    * @param taskBundle the job.
    * @param taskList the tasks to execute.
    */
@@ -117,7 +117,7 @@ public class ServerTaskBundleNode {
     this.job = job;
     this.taskBundle = taskBundle;
     this.taskList = new ArrayList<>(taskList);
-    int size = this.taskList.size();
+    final int size = this.taskList.size();
     this.taskBundle.setTaskCount(size);
     this.taskBundle.setCurrentTaskCount(size);
     this.dataProvider = job.getDataProvider();
@@ -178,13 +178,13 @@ public class ServerTaskBundleNode {
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param channel the node to which the job is dispatched.
-   * @param future  future assigned to bundle execution.
+   * @param future future assigned to bundle execution.
    */
   public void jobDispatched(final ExecutorChannel<?> channel, final Future<?> future) {
     if (channel == null) throw new IllegalArgumentException("channel is null for " + this);
     if (future == null) throw new IllegalArgumentException("future is null for " + this);
     this.channel = channel;
-    this.future  = future;
+    this.future = future;
     job.jobDispatched(this);
   }
 
@@ -213,8 +213,7 @@ public class ServerTaskBundleNode {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final Throwable exception) {
-    if (debugEnabled && (exception != null))
-      log.debug(String.format("received exception for %s : %s%ncall stack:%n%s" , this, ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack()));
+    if (debugEnabled && (exception != null)) log.debug(String.format("received exception for %s : %s%ncall stack:%n%s", this, ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack()));
     try {
       job.jobReturned(this);
     } finally {
@@ -227,9 +226,10 @@ public class ServerTaskBundleNode {
    */
   public void resubmit() {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
-    synchronized(this) {
+    synchronized (this) {
       requeued = true;
-      for (ServerTask task: taskList) task.resubmit();
+      for (ServerTask task: taskList)
+        task.resubmit();
     }
   }
 
@@ -238,8 +238,8 @@ public class ServerTaskBundleNode {
    */
   public void expire() {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot expire.
-    int max = job.getSLA().getMaxDispatchExpirations();
-    synchronized(this) {
+    final int max = job.getSLA().getMaxDispatchExpirations();
+    synchronized (this) {
       for (ServerTask task: taskList) {
         if (task.incExpirationCount() > max) task.cancel();
         else task.resubmit();
@@ -261,7 +261,8 @@ public class ServerTaskBundleNode {
    */
   public synchronized void cancel() {
     this.cancelled = true;
-    for (ServerTask task: taskList) task.cancel();
+    for (ServerTask task: taskList)
+      task.cancel();
   }
 
   /**
@@ -307,15 +308,13 @@ public class ServerTaskBundleNode {
    * Get the number of tasks in this node bundle.
    * @return the number of tasks as an int.
    */
-  public int getTaskCount()
-  {
+  public int getTaskCount() {
     return taskCount;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
     sb.append(", name=").append(job.getName());
@@ -330,8 +329,7 @@ public class ServerTaskBundleNode {
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + (int) (id ^ (id >>> 32));
@@ -339,12 +337,11 @@ public class ServerTaskBundleNode {
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    ServerTaskBundleNode other = (ServerTaskBundleNode) obj;
+    final ServerTaskBundleNode other = (ServerTaskBundleNode) obj;
     return id == other.id;
   }
 
@@ -352,8 +349,7 @@ public class ServerTaskBundleNode {
    * Get the unique id for this node bundle.
    * @return the id as a long value.
    */
-  public long getId()
-  {
+  public long getId() {
     return id;
   }
 
@@ -362,8 +358,7 @@ public class ServerTaskBundleNode {
    * @param bundle a {@link ServerTaskBundleNode} instance.
    * @return a unique key as a string.
    */
-  public static String makeKey(final ServerTaskBundleNode bundle)
-  {
+  public static String makeKey(final ServerTaskBundleNode bundle) {
     return makeKey(bundle.getJob().getUuid(), bundle.getId());
   }
 
@@ -373,8 +368,7 @@ public class ServerTaskBundleNode {
    * @param bundleId the id of the bundle.
    * @return a unique key as a string.
    */
-  public static String makeKey(final String jobUuid, final long bundleId)
-  {
+  public static String makeKey(final String jobUuid, final long bundleId) {
     return new StringBuilder(jobUuid).append('|').append(bundleId).toString();
   }
 

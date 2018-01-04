@@ -72,7 +72,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Initialize this handler.
    */
   public PeerAttributesHandler() {
-    int nbThreads = Math.max(1, JPPFConfiguration.getProperties().getInt("jppf.peer.handler.threads", 1));
+    final int nbThreads = Math.max(1, JPPFConfiguration.getProperties().getInt("jppf.peer.handler.threads", 1));
     executor = Executors.newFixedThreadPool(nbThreads, new JPPFThreadFactory("PeerHandler"));
   }
 
@@ -97,19 +97,18 @@ public class PeerAttributesHandler implements NotificationListener {
    * @param peer the peer to update.
    * @param props the updated attributes.
    */
-  @SuppressWarnings("deprecation")
-  private void updatePeer(final AbstractNodeContext peer, final TypedProperties props) {
-    int newNodes = props.getInt(PEER_TOTAL_NODES, 0);
-    int newThreads = props.getInt(PEER_TOTAL_THREADS, 0);
-    JPPFSystemInformation info = peer.getSystemInformation();
+  private static void updatePeer(final AbstractNodeContext peer, final TypedProperties props) {
+    final int newNodes = props.getInt(PEER_TOTAL_NODES, 0);
+    final int newThreads = props.getInt(PEER_TOTAL_THREADS, 0);
+    final JPPFSystemInformation info = peer.getSystemInformation();
     if (info != null) {
-      TypedProperties jppf = info.getJppf();
-      int nodes = jppf.getInt(PEER_TOTAL_NODES);
-      int threads = jppf.getInt(PEER_TOTAL_THREADS);
+      final TypedProperties jppf = info.getJppf();
+      final int nodes = jppf.getInt(PEER_TOTAL_NODES);
+      final int threads = jppf.getInt(PEER_TOTAL_THREADS);
       if ((nodes != newNodes) || (threads != newThreads)) {
         if (debugEnabled) log.debug("newNodes={}, newThreads={} for " + peer, newNodes, newThreads);
         jppf.setInt(PEER_TOTAL_NODES, newNodes).setInt(PEER_TOTAL_THREADS, newThreads);
-        Bundler<?> bundler = peer.getBundler();
+        final Bundler<?> bundler = peer.getBundler();
         if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(info);
       }
     }
@@ -122,19 +121,19 @@ public class PeerAttributesHandler implements NotificationListener {
   void onCloseNode(final AbstractNodeContext context) {
     if (!context.isPeer()) {
       totalNodes.decrementAndGet();
-      JPPFSystemInformation sys = context.getSystemInformation();
+      final JPPFSystemInformation sys = context.getSystemInformation();
       if (sys != null) {
-        int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
+        final int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
         totalThreads.addAndGet(-nbThreads);
       }
       sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
-      JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
+      final JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
       if (jmx != null) {
         try {
           jmx.removeNotificationListener(PeerDriverMBean.MBEAN_NAME, this, null, context);
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
     }
@@ -147,19 +146,19 @@ public class PeerAttributesHandler implements NotificationListener {
   void onNodeConnected(final AbstractNodeContext context) {
     if (!context.isPeer()) {
       totalNodes.incrementAndGet();
-      JPPFSystemInformation sys = context.getSystemInformation();
+      final JPPFSystemInformation sys = context.getSystemInformation();
       if (sys != null) {
-        int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
+        final int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
         totalThreads.addAndGet(nbThreads);
       }
       sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
-      JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
+      final JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
       if (jmx != null) {
         try {
           jmx.addNotificationListener(PeerDriverMBean.MBEAN_NAME, this, null, context);
-        } catch (@SuppressWarnings("unused") Exception ignore) {
+        } catch (@SuppressWarnings("unused") final Exception ignore) {
         }
       }
     }
@@ -169,8 +168,8 @@ public class PeerAttributesHandler implements NotificationListener {
    * Send the current attributes values as a JMX notification.
    */
   private void sendNotification() {
-    Notification notif = new Notification("peer.attribute", PeerDriverMBean.MBEAN_NAME, notifCount.incrementAndGet(), System.currentTimeMillis());
-    TypedProperties props = new TypedProperties();
+    final Notification notif = new Notification("peer.attribute", PeerDriverMBean.MBEAN_NAME, notifCount.incrementAndGet(), System.currentTimeMillis());
+    final TypedProperties props = new TypedProperties();
     props.setInt(PEER_TOTAL_NODES, totalNodes.get());
     props.setInt(PEER_TOTAL_THREADS, totalThreads.get());
     notif.setUserData(props);
@@ -189,7 +188,7 @@ public class PeerAttributesHandler implements NotificationListener {
     executor.execute(new Runnable() {
       @Override
       public void run() {
-        TypedProperties props = (TypedProperties) notification.getUserData();
+        final TypedProperties props = (TypedProperties) notification.getUserData();
         updatePeer((AbstractNodeContext) handback, props);
       }
     });

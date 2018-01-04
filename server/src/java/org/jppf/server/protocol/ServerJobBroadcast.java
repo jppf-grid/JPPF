@@ -107,7 +107,7 @@ public class ServerJobBroadcast extends ServerJob {
    */
   public ServerJobBroadcast createBroadcastJob(final String broadcastUUID) {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
-    ServerJobBroadcast broadcastJob;
+    final ServerJobBroadcast broadcastJob;
     lock.lock();
     try {
       broadcastJob = new ServerJobBroadcast(lock, notificationEmitter, job, getDataProvider(), this, broadcastUUID);
@@ -133,7 +133,7 @@ public class ServerJobBroadcast extends ServerJob {
   protected void broadcastDispatched(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     if (debugEnabled) log.debug("dispatched broadcast {}", broadcastJob);
-    boolean empty;
+    final boolean empty;
     lock.lock();
     try {
       broadcastSet.remove(broadcastJob);
@@ -170,8 +170,8 @@ public class ServerJobBroadcast extends ServerJob {
   public void jobEnded() {
     if (debugEnabled) log.debug("broadcast job ended {}", this);
     setSubmissionStatus(SubmissionStatus.ENDED);
-    CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
-    for (ServerTask task: tasks) {
+    final CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
+    for (final ServerTask task: tasks) {
       if (!task.isDone()) {
         task.broadcastResultReceived();
         clientMap.putValue(task.getBundle(), task);
@@ -203,11 +203,11 @@ public class ServerJobBroadcast extends ServerJob {
     lock.lock();
     try {
       if (parentJob == null) {
-        boolean b = super.addBundle(clientBundle);
-        List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
+        final boolean b = super.addBundle(clientBundle);
+        final List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
-        for (ServerJobBroadcast broadcastJob: list) addBundle(broadcastJob, clientBundle);
+        for (final ServerJobBroadcast broadcastJob: list) addBundle(broadcastJob, clientBundle);
         return b;
       }
       return false;
@@ -241,11 +241,11 @@ public class ServerJobBroadcast extends ServerJob {
     try {
       if (parentJob == null) {
         if (!setCancelled(mayInterruptIfRunning)) return false;
-        List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
+        final List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
         broadcastSet.clear();
-        for (ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
+        for (final ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
         jobEnded();
         return true;
       } else {

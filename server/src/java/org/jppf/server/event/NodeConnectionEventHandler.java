@@ -68,8 +68,8 @@ public class NodeConnectionEventHandler {
    * @param info encapsulates the information about the node.
    */
   public void fireNodeConnected(final JPPFManagementInfo info) {
-    NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (NodeConnectionListener listener : listeners) listener.nodeConnected(event);
+    final NodeConnectionEvent event = new NodeConnectionEvent(info);
+    for (final NodeConnectionListener listener : listeners) listener.nodeConnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
   }
 
@@ -78,8 +78,8 @@ public class NodeConnectionEventHandler {
    * @param info encapsulates the information about the node.
    */
   public void fireNodeDisconnected(final JPPFManagementInfo info) {
-    NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (NodeConnectionListener listener : listeners) listener.nodeDisconnected(event);
+    final NodeConnectionEvent event = new NodeConnectionEvent(info);
+    for (final NodeConnectionListener listener : listeners) listener.nodeDisconnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeDisconnected(info);
   }
 
@@ -87,10 +87,10 @@ public class NodeConnectionEventHandler {
    * Load all listener instances found in the class path via a service definition.
    */
   public void loadListeners() {
-    Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
-    List<NodeConnectionListener> list = new ArrayList<>();
+    final Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
+    final List<NodeConnectionListener> list = new ArrayList<>();
     while (it.hasNext()) {
-      NodeConnectionListener listener = it.next();
+      final NodeConnectionListener listener = it.next();
       if (listener == null) continue;
       list.add(listener);
       if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());

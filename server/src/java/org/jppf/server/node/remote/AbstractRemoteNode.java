@@ -64,7 +64,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
 
   @Override
   public void initDataChannel() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = JPPFConfiguration.getProperties();
     (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
     if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
@@ -82,7 +82,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
     if (nodeConnection != null) nodeConnection.close();
     if (recoveryConnection != null) {
-      ClientConnection tmp = recoveryConnection;
+      final ClientConnection tmp = recoveryConnection;
       if (tmp != null) {
         recoveryConnection = null;
         tmp.close();
@@ -95,7 +95,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     try {
       if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
       closeDataChannel();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
   }
