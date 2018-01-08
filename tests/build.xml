@@ -215,7 +215,7 @@
   <!-- ========================================================================= -->
 
   <target name="test.pattern">
-    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, tests pattern=${pattern}"/>
     <delete dir="${report}" quiet="true"/>
     <mkdir dir="${report}"/>
     <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true">

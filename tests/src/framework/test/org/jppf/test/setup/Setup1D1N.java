@@ -18,6 +18,7 @@
 
 package test.org.jppf.test.setup;
 
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.junit.*;
 
 
@@ -33,6 +34,10 @@ public class Setup1D1N extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
+      jmx.connectAndWait(5000L);
+      Assert.assertTrue(jmx.isConnected());
+    }
   }
 
   /**

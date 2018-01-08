@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -48,6 +49,10 @@ public class BaseTestHelper {
    * Prefix and suffix of messages to send to the serevr log.
    */
   public static final String STARS = "*****";
+  /**
+   * Parameter types for the {@code log()} method of the drivers and nodes debug MBean.
+   */
+  private final static String[] LOG_METHOD_SIGNATURE = { String[].class.getName() };
 
   /**
    * Find a constructor with the specfied number of parameters for the specified class.
@@ -231,7 +236,7 @@ public class BaseTestHelper {
         JMXDriverConnectionWrapper jmx = jmxConnections.get(0);
         if (toServers) {
           try {
-            jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+            jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
           } catch (Exception e) {
             System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n",
               BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
@@ -239,7 +244,8 @@ public class BaseTestHelper {
         }
         if (toNodes) {
           try {
-            jmx.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+            final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+            if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
           } catch (Exception e) {
             System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
               BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
