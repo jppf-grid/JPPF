@@ -243,6 +243,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     props.set(JPPFProperties.PROVISIONING_SLAVE, true);
     props.setInt(SLAVE_ID_PROPERTY, id);
     props.set(JPPFProperties.PROVISIONING_MASTER_UUID, NodeRunner.getUuid());
+    final int range = 65535 - 1024;
+    final int mgtPort = 1024 + ((props.get(JPPFProperties.MANAGEMENT_PORT_NODE) + id - 1024) % range);
+    props.set(JPPFProperties.MANAGEMENT_PORT_NODE, mgtPort);
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }
