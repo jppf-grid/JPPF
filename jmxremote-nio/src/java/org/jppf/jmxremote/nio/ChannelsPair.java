@@ -124,10 +124,8 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * @throws Exception if any error occurs.
    */
   public void close() throws Exception {
-    if (closed.compareAndSet(false, true)) try {
-      first().close();
-    } finally {
-      second().close();
+    if (closed.compareAndSet(false, true)) {
+      this.getSelectionKey().channel().close();
     }
   }
 

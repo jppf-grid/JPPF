@@ -55,19 +55,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
    * Mapping of notification listener ids to actual listeners.
    */
   private final Map<Integer, ClientListenerInfo> listenerMap = new HashMap<>();
-  /**
-   * The nio server.
-   */
-  private final JMXNioServer server;
 
   /**
    * Initialize with the specified message handler.
    * @param messageHandler performs the communication with the server.
-   * @param server the nio server.
    */
-  public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler, final JMXNioServer server) {
+  public JPPFMBeanServerConnection(final JMXMessageHandler messageHandler) {
     this.messageHandler = messageHandler;
-    this.server = server;
   }
 
   @Override
@@ -401,9 +395,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     try {
       if (debugEnabled) log.debug("closing {}", channels);
       channels.requestClose();
+      /*
       channels.disableRead();
       messageHandler.sendRequestNoResponse(CLOSE);
       server.closeConnection(connectionID, null, true);
+      */
+      messageHandler.sendRequestNoResponse(CLOSE);
+      channels.getSelectionKey().channel().close();
     } catch (final IOException e) {
       throw e;
     } catch (final Exception e) {

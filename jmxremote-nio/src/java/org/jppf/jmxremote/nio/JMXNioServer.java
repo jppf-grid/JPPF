@@ -18,11 +18,12 @@
 
 package org.jppf.jmxremote.nio;
 
+import java.io.EOFException;
 import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
 import javax.management.*;
@@ -103,7 +104,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     super(JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL) + "-" + instanceCount.incrementAndGet(), JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
     serverNotificationHandler = new ServerNotificationHandler(this);
     //this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    this.selectTimeout = 1L;
+    this.selectTimeout = 10L;
     registerMBean();
   }
 
@@ -177,29 +178,26 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       final ChannelsPair pair = (ChannelsPair) key.attachment();
       try {
         if (pair.isClosed()) continue;
-        int ops = 0;
         final boolean readable = key.isReadable(), writable = key.isWritable();
-        if (readable) {
-          if (pair.isClosing()) continue;
-          //ops = SelectionKey.OP_READ;
-        }
-        if (writable) ops |= SelectionKey.OP_WRITE;
-        //if (ops == 0) continue;
-        if (ops != 0) updateInterestOpsNoWakeup(key, ops, false);
-        //if (readable && !pair.getReadingTask().incrementCountIfNeeded()) transitionManager.submit(pair.getReadingTask());
-        if (readable) {
-          JMXMessageReader.read(pair.readingChannel().getContext());
-        }
         if (writable) {
+          updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
           //final JMXTransitionTask task = pair.getWritingTask();
           //if (!task.incrementCountIfNeeded()) transitionManager.submit(task);
           final JMXTransitionTask task = pair.getNonSelectingWritingTask();
           if (!task.incrementCountIfNeeded()) task.run();
         }
+        if (readable) {
+          if (pair.isClosing()) continue;
+          JMXMessageReader.read(pair.readingChannel().getContext());
+        }
       } catch (final CancelledKeyException e) {
         if ((pair != null) && !pair.isClosing() && !pair.isClosed()) {
           log.error(e.getMessage(), e);
           closeConnection(pair.getConnectionID(), e, false);
+        }
+      } catch (final EOFException e) {
+        if (debugEnabled) {
+          log.debug(e.getMessage(), e);
         }
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
@@ -353,17 +351,15 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       if (pair != null) {
         if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
         pair.requestClose();
+        pair.close();
         final JMXChannelWrapper channel = pair.readingChannel();
         final JMXContext context = channel.context;
         context.getMessageHandler().close();
-        if (pair.isServerSide()) synchronized(mapsLock) {
-          channelsByConnectionID.remove(connectionID);
-          connectionsByServerPort.removeValue(pair.getServerPort(), connectionID);
-        }
-        try {
-          pair.close();
-        } catch (final Exception e) {
-          if (ex != null) ex = e;
+        if (pair.isServerSide()) {
+          synchronized(mapsLock) {
+            channelsByConnectionID.remove(connectionID);
+            connectionsByServerPort.removeValue(pair.getServerPort(), connectionID);
+          }
         }
       }
     } catch (final Exception e) {

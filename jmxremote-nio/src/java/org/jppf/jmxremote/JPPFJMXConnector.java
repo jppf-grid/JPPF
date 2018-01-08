@@ -32,6 +32,7 @@ import org.jppf.comm.socket.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.utils.JPPFIdentifiers;
+import org.slf4j.*;
 
 /**
  * Implementation of the {@link JMXConnector} interface for the JPPF JMX remote connector.
@@ -41,11 +42,11 @@ public class JPPFJMXConnector implements JMXConnector {
   /**
    * Logger for this class.
    */
-  //private static final Logger log = LoggerFactory.getLogger(JPPFJMXConnector.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFJMXConnector.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  //private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The environment for this connector.
    */
@@ -151,22 +152,22 @@ public class JPPFJMXConnector implements JMXConnector {
     final int port = address.getPort();
     @SuppressWarnings("resource")
     final SocketChannelClient socketClient =  new SocketChannelClient(host, port, true);
-    //if (debugEnabled) log.debug("Attempting connection to remote peer at {}", address);
+    if (debugEnabled) log.debug("Attempting connection to remote peer at {}", address);
     final SocketInitializerImpl socketInitializer = new SocketInitializerImpl();
     if (!socketInitializer.initializeSocket(socketClient)) {
       final Exception e = socketInitializer.getLastException();
       throw (e == null) ? new ConnectException("could not connect to remote JMX server " + address) : e;
     }
     if (!InterceptorHandler.invokeOnConnect(socketClient.getChannel())) throw new JPPFException("peer connection denied by interceptor");
-    //if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier", address);
+    if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier", address);
     socketClient.writeInt(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
-    //if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
+    if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
     final JMXNioServer server = JMXNioServerPool.getServer();
     final ChannelsPair pair = server.createChannelsPair(environment, "", port, socketClient.getChannel(), secure, true);
     final JMXMessageHandler messageHandler = pair.readingChannel().getContext().getMessageHandler();
-    mbsc = new JPPFMBeanServerConnection(messageHandler, server);
+    mbsc = new JPPFMBeanServerConnection(messageHandler);
     pair.setMbeanServerConnection(mbsc);
-    //if (debugEnabled) log.debug("sending connection request");
+    if (debugEnabled) log.debug("sending connection request");
     connectionID = mbsc.receiveConnectionID();
     pair.setConnectionID(connectionID);
   }
