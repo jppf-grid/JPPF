@@ -36,7 +36,9 @@ public class Setup1D1N extends BaseTest {
   public static void setup() throws Exception {
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
-    Assert.assertTrue(new JMXDriverConnectionWrapper("localhost", 11201).connectAndWait(5000L));
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
+      Assert.assertTrue(jmx.connectAndWait(5000L));
+    }
   }
 
   /**
