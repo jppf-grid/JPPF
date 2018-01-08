@@ -106,7 +106,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   public AbstractGenericClient(final String uuid, final TypedProperties configuration, final ConnectionPoolListener... listeners) {
     super(uuid);
     this.classLoaderRegistrationHandler = new ClassLoaderRegistrationHandler();
-    if ((listeners != null) && (listeners.length > 0)) for (ConnectionPoolListener listener : listeners) addConnectionPoolListener(listener);
+    if ((listeners != null) && (listeners.length > 0)) {
+      for (ConnectionPoolListener listener: listeners) {
+        if (listener != null) addConnectionPoolListener(listener);
+      }
+    }
     discoveryListener = new ClientDriverDiscoveryListener(this);
     init(configuration);
   }

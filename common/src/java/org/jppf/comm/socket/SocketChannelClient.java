@@ -236,14 +236,15 @@ public class SocketChannelClient implements SocketWrapper {
   @Override
   public void open() throws ConnectException, IOException {
     channel = SocketChannel.open();
-    channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-    channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-    channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
-    channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
+    final Socket socket = channel.socket();
+    socket.setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+    socket.setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
+    socket.setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
+    socket.setKeepAlive(IO.SOCKET_KEEPALIVE);
     channel.configureBlocking(blocking);
     final InetSocketAddress address = new InetSocketAddress(host, port);
     channel.connect(address);
-    if (!channel.isBlocking()) {
+    if (!blocking) {
       while (!channel.finishConnect()) {
         try {
           Thread.sleep(1L);
