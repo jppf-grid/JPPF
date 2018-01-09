@@ -55,8 +55,7 @@ public final class VersionUtils {
     String result = null;
     TypedProperties props = new TypedProperties();
     Version v = null;
-    try {
-      InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
+    try (InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties")) {
       props.load(is);
       v = new Version(props.getString("version.number", ""), props.getString("build.number", ""), props.getString("build.date", ""));
     } catch (Exception e) {
