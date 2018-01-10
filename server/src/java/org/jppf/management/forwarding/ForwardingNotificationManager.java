@@ -185,9 +185,11 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     final ForwardingNotificationDispatcher dispatcher = nodeMap.get(uuid);
     if (dispatcher == null) return;
     final CollectionMap<String, NotificationListenerWrapper> map = clientMap.get(uuid);
-    map.removeValue(mbean, wrapper);
-    if (!map.containsKey(mbean)) dispatcher.removeNotificationListener(mbean);
-    if (map.isEmpty()) clientMap.remove(uuid);
+    if (map != null) {
+      map.removeValue(mbean, wrapper);
+      if (!map.containsKey(mbean)) dispatcher.removeNotificationListener(mbean);
+      if (map.isEmpty()) clientMap.remove(uuid);
+    }
     if (!dispatcher.hasNotificationListener()) {
       dispatcher.removeForwardingNotificationEventListener(this);
       nodeMap.remove(uuid);

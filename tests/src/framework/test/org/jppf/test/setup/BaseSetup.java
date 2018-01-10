@@ -223,8 +223,8 @@ public class BaseSetup {
   private static void close() {
     try {
       generateClientThreadDump();
-      generateDriverThreadDump(client);
       if (client != null) {
+        generateDriverThreadDump(client);
         client.close();
         client = null;
         Thread.sleep(500L);
