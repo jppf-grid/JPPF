@@ -30,6 +30,7 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 
 /**
@@ -37,6 +38,14 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  */
 public class BaseSetup {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(BaseSetup.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The default configuratin used when none is specified.
    */
@@ -250,10 +259,14 @@ public class BaseSetup {
    */
   public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
     for (JMXDriverConnectionWrapper jmx: jmxConnections) {
-      if ((jmx != null) && jmx.isConnected()) {
-        DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
-        String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
-        FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+      try {
+        if ((jmx != null) && jmx.isConnected()) {
+          DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+          String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+          FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
+        }
+      } catch(final Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
       }
     }
   }
