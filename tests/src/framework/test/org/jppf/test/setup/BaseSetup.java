@@ -209,9 +209,9 @@ public class BaseSetup {
    * @throws Exception if a process could not be stopped.
    */
   private static void close() throws Exception {
-    String text = TextThreadDumpWriter.printToString(new Diagnostics("client").threadDump(), "client thread dump");
-    FileUtils.writeTextFile("client_thread_dump.log", text);
+    generateClientThreadDump();
     if (client != null) {
+      generateDriverThreadDump(client);
       client.close();
       client = null;
       Thread.sleep(500L);
@@ -231,13 +231,26 @@ public class BaseSetup {
   }
 
   /**
+   * Generates a thread dump for each of the drivers the specified client is connected to.
+   * @param client the JPPF client.
+   * @throws Exception if any error occurs.
+   */
+  public static void generateDriverThreadDump(final JPPFClient client) throws Exception {
+    if (client == null) return;
+    final List<JPPFConnectionPool> pools = client.awaitWorkingConnectionPools(1000L);
+    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[pools.size()];
+    for (int i=0; i<pools.size(); i++) jmxArray[i] = pools.get(i).awaitWorkingJMXConnection();
+    generateDriverThreadDump(jmxArray);
+  }
+
+  /**
    * Generates a thread dump for each of the specified drivers.
    * @param jmxConnections JMX connections to the drivers.
    * @throws Exception if any error occurs.
    */
   public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
     for (JMXDriverConnectionWrapper jmx: jmxConnections) {
-      if (jmx != null) {
+      if ((jmx != null) && jmx.isConnected()) {
         DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
         String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
         FileUtils.writeTextFile("driver_thread_dump_" + jmx.getPort() + ".log", text);
@@ -286,10 +299,13 @@ public class BaseSetup {
     int sum = 0;
     while (sum < nbNodes) {
       sum = 0;
-      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
-        Integer n = entry.getValue().nbNodes();
-        if (n != null) sum += n;
-        else break;
+      for (final Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
+        final JMXDriverConnectionWrapper jmx = entry.getValue();
+        if ((jmx != null) && jmx.isConnected()) {
+          Integer n = jmx.nbNodes();
+          if (n != null) sum += n;
+          else break;
+        }
       }
     }
   }

@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -60,6 +61,9 @@ public class TestJobListener extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
+    final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201);
+    jmx.connectAndWait(5000L);
+    if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     BaseSetup.cleanup();
   }
 
