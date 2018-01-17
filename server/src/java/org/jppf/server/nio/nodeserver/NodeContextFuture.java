@@ -21,11 +21,20 @@ package org.jppf.server.nio.nodeserver;
 import java.util.concurrent.FutureTask;
 
 import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
 
 /**
  * Future associated with a context which handles the job cancellation.
  */
 class NodeContextFuture extends FutureTask<Object> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeContextFuture.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The node context.
    */
@@ -40,7 +49,7 @@ class NodeContextFuture extends FutureTask<Object> {
   };
 
   /**
-   * Initialize witht he specified runnable and result object.
+   * Initialize with the specified runnable and result object.
    * @param context the node context.
    */
   public NodeContextFuture(final AbstractNodeContext context) {
@@ -50,7 +59,7 @@ class NodeContextFuture extends FutureTask<Object> {
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (AbstractNodeContext.debugEnabled) AbstractNodeContext.log.debug("cancelling " + context + ", isCancelled()=" + isCancelled());
+    if (debugEnabled) log.debug("cancelling " + context + ", isCancelled()=" + isCancelled());
     if (isDone()) return false;
     if (isCancelled()) return true;
     if (context.bundle == null) return false;
@@ -58,8 +67,8 @@ class NodeContextFuture extends FutureTask<Object> {
       context.bundle.cancel();
       context.cancelJob(context.bundle.getClientJob().getUuid(), false);
     } catch (Exception e) {
-      if (AbstractNodeContext.debugEnabled) AbstractNodeContext.log.debug(e.getMessage(), e);
-      else AbstractNodeContext.log.warn(ExceptionUtils.getMessage(e));
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     } finally {
       return super.cancel(false);
     }

@@ -47,11 +47,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The task bundle to send or receive.
    */
