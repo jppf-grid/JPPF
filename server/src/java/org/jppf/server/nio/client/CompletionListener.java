@@ -70,7 +70,12 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
       if (debugEnabled) log.debug("channel is invalid: {}", channel);
       final ClientContext context = (ClientContext) channel.getContext();
       context.setNbTasksToSend(context.getNbTasksToSend() - results.size());
-      removeJobFromQueue(bundle);
+      transitionManager.submit(new Runnable() {
+        @Override
+        public void run() {
+          removeJobFromQueue(bundle);
+        }
+      });
       return;
     }
     if (results.isEmpty()) {

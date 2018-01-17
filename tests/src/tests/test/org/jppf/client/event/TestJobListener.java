@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -128,6 +129,10 @@ public class TestJobListener extends BaseTest {
       taskListener.await();
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
       jppfClient.reset();
+      final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+      final DiagnosticsMBean d = jmx.getDiagnosticsProxy();
+      assertNotNull(d);
+      assertFalse("driver deadlock detected", d.hasDeadlock());
       print(false, false, "getting job results");
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
