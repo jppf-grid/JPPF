@@ -18,8 +18,12 @@
 
 package test.org.jppf.test.setup;
 
+import org.jppf.JPPFException;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.StringUtils;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 
 /**
@@ -28,16 +32,38 @@ import org.junit.*;
  */
 public class Setup1D1N extends BaseTest {
   /**
+   * 
+   */
+  private static JMXDriverConnectionWrapper driverJmx;
+  /** */
+  @Rule
+  public TestWatcher testDriverDiscoveryInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      try {
+        String msg = String.format( "***** start of method %s() *****", description.getMethodName());
+        String banner = StringUtils.padLeft("", '*', msg.length(), false);
+        logInServer(driverJmx, banner, msg, banner);
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+  };
+
+  /**
    * Launches a driver and node.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
   public static void setup() throws Exception {
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
-      jmx.connectAndWait(5000L);
-      Assert.assertTrue(jmx.isConnected());
-    }
+    driverJmx = new JMXDriverConnectionWrapper("localhost", 11201);
+    driverJmx.connectAndWait(5000L);
+    Assert.assertTrue(driverJmx.isConnected());
+    long elapsed;
+    long start = System.nanoTime();
+    while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < 5000L) && (driverJmx.nbNodes() < 1)) Thread.sleep(10L);
+    if (elapsed >= 5000L) throw new JPPFException("node not connected");
   }
 
   /**
@@ -46,11 +72,10 @@ public class Setup1D1N extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    try {
-      BaseSetup.cleanup();
-    } catch(Exception e) {
-      e.printStackTrace();
-      throw e;
+    try (final JMXDriverConnectionWrapper jmx = driverJmx) {
+      jmx.connectAndWait(5000L);
+      if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     }
+    BaseSetup.cleanup();
   }
 }
