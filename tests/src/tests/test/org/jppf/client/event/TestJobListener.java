@@ -130,9 +130,11 @@ public class TestJobListener extends BaseTest {
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
       jppfClient.reset();
       final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-      final DiagnosticsMBean d = jmx.getDiagnosticsProxy();
-      assertNotNull(d);
-      assertFalse("driver deadlock detected", d.hasDeadlock());
+      if (jmx != null) {
+        final DiagnosticsMBean d = jmx.getDiagnosticsProxy();
+        assertNotNull(d);
+        assertFalse("driver deadlock detected", d.hasDeadlock());
+      }
       print(false, false, "getting job results");
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);

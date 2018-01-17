@@ -267,7 +267,7 @@ public class BaseSetup {
    * @throws Exception if any error occurs.
    */
   public static void generateDriverThreadDump(final JMXDriverConnectionWrapper... jmxConnections) throws Exception {
-    for (JMXDriverConnectionWrapper jmx: jmxConnections) {
+    for (final JMXDriverConnectionWrapper jmx: jmxConnections) {
       if ((jmx != null) && jmx.isConnected()) {
         try {
           final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
