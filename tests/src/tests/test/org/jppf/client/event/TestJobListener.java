@@ -129,7 +129,7 @@ public class TestJobListener extends BaseTest {
       taskListener.await();
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
       jppfClient.reset();
-      final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+      final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(jppfClient);
       if (jmx != null) {
         final DiagnosticsMBean d = jmx.getDiagnosticsProxy();
         assertNotNull(d);
