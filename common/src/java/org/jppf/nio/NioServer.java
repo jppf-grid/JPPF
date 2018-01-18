@@ -238,6 +238,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     try {
       lock.lock();
       selector.wakeup();
+      end();
     } finally {
       lock.unlock();
     }
