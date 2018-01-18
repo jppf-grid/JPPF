@@ -18,6 +18,7 @@
 package org.jppf.comm.socket;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
@@ -27,19 +28,19 @@ import org.slf4j.*;
  * When no attempt succeeded, a <code>JPPFError</code> is thrown, and the application should normally exit.
  * @author Laurent Cohen
  */
-public class SocketInitializerImpl extends AbstractSocketInitializer {
+public class SocketInitializerImpl extends ThreadSynchronization implements SocketInitializer {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SocketInitializerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SocketInitializerImpl.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The configuration to use.
    */
@@ -48,6 +49,18 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
    * The last captured exception.
    */
   private Exception lastException;
+  /**
+   * Determines whether any connection attempt succeeded.
+   */
+  private boolean successful;
+  /**
+   * Determine whether this socket initializer has been intentionally closed.
+   */
+  private boolean closed;
+  /**
+   * Name given to this initializer.
+   */
+  private String name;
 
   /**
    * Instantiate this SocketInitializer with a specified socket wrapper.
@@ -64,31 +77,36 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
     this.config = config;
   }
 
-  /**
-   * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
-   * <code>TimerTask</code> until a specified amount of time has passed.
-   * @param socketWrapper the socket wrapper to initialize.
-   */
+  @Override
+  public boolean isClosed() {
+    return closed;
+  }
+
+  @Override
+  public boolean isSuccessful() {
+    return successful;
+  }
+
   @Override
   public boolean initializeSocket(final SocketWrapper socketWrapper) {
     successful = false;
     if (closed) return false;
     name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
-    try {
-      if (debugEnabled) log.debug("{} about to close socket wrapper", name);
-      socketWrapper.close();
-    } catch(@SuppressWarnings("unused") final Exception e) {
+    if (socketWrapper.isOpened()) {
+      try {
+        if (debugEnabled) log.debug("{} about to close socket wrapper", name);
+        socketWrapper.close();
+      } catch(@SuppressWarnings("unused") final Exception e) {
+      }
     }
-    long delay = 1000L * config.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
-    if (delay <= 0L) delay = 1L + rand.nextInt(10);
+    final long delay = 1000L * config.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
     final long maxTime = config.get(JPPFProperties.RECONNECT_MAX_TIME);
     final long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
     long period = 1000L * config.get(JPPFProperties.RECONNECT_INTERVAL);
     if (period <= 0L) period = 1000L;
-    goToSleep(delay);
-    long elapsed = 0L;
+    if (delay > 0L) goToSleep(delay);
     final long start = System.nanoTime();
-    while ((elapsed < maxDuration) && !successful && !closed) {
+    while (((System.nanoTime() - start) / 1_000_000L < maxDuration) && !successful && !closed) {
       try {
         if (traceEnabled) log.trace("{} opening the socket connection", name);
         socketWrapper.open();
@@ -97,9 +115,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer {
       } catch(final Exception e) {
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
         lastException = e;
+        if (!closed) goToSleep(period);
       }
-      if (!successful && !closed) goToSleep(period);
-      elapsed = (System.nanoTime() - start) / 1_000_000L;
     }
     return successful;
   }

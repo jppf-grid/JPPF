@@ -22,8 +22,7 @@ package org.jppf.comm.socket;
  * Common interface for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
  */
-public interface SocketInitializer
-{
+public interface SocketInitializer {
   /**
    * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
    * <code>TimerTask</code> until a specified amount of time has passed.

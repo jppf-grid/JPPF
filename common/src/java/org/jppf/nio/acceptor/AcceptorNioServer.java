@@ -19,17 +19,19 @@
 package org.jppf.nio.acceptor;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 import javax.net.ssl.SSLEngine;
 
+import org.jppf.JPPFException;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
 import org.jppf.nio.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -56,7 +58,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   /**
    * 
    */
-  private final BlockingQueue<ChannelRegistration<AcceptorContext>> registrationQueue = new LinkedBlockingQueue<>();
+  private final NioState<AcceptorTransition> identifyingState;
 
   /**
    * Initialize this server with the specified port numbers.
@@ -80,6 +82,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     //this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.selectTimeout = 1L;
     this.stats = stats;
+    identifyingState = factory.getState(AcceptorState.IDENTIFYING_PEER);
   }
 
   @Override
@@ -87,20 +90,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     try {
       final boolean hasTimeout = selectTimeout > 0L;
       int n = 0;
-      ChannelRegistration<AcceptorContext> reg;
       while (!isStopped() && !externalStopCondition()) {
-        while ((reg = registrationQueue.poll()) != null) {
-          synchronized(reg) {
-            reg.key = reg.channel.register(selector, reg.interestOps, reg.attachment);
-            reg.notify();
-          }
-        }
-        sync.waitForZeroAndSetToMinusOne();
-        try {
-          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        } finally {
-          sync.setToZeroIfNegative();
-        }
+        n = hasTimeout ? selector.select(selectTimeout) : selector.select();
         if (n > 0) go(selector.selectedKeys());
       }
     } catch (final Throwable t) {
@@ -127,16 +118,17 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
         if (key.isAcceptable()) doAccept(key);
         else if (key.isReadable()) {
           context = (AcceptorContext) key.attachment();
-          updateInterestOpsNoWakeup(key, SelectionKey.OP_READ, false);
-          transitionManager.submit(new AcceptorTransitionTask(context.getChannel(), AcceptorState.IDENTIFYING_PEER, this));
+          identifyingState.performTransition(context.getChannel());
         }
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
         if (context != null) context.handleException(context.getChannel(), e);
-        if (!(key.channel() instanceof ServerSocketChannel)) try {
-          key.channel().close();
-        } catch (final Exception e2) {
-          log.error(e2.getMessage(), e2);
+        if (!(key.channel() instanceof ServerSocketChannel)) {
+          try {
+            key.channel().close();
+          } catch (final Exception e2) {
+            log.error(e2.getMessage(), e2);
+          }
         }
       }
     }
@@ -162,7 +154,22 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       return;
     }
     if (channel == null) return;
-    transitionManager.submit(new AcceptorAcceptTask(this, serverSocketChannel, channel, ssl));
+    try {
+      if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
+      channel.setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
+      channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
+      channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
+      channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
+      if (InterceptorHandler.hasInterceptor()) {
+        channel.configureBlocking(true);
+        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+      }
+      if (channel.isBlocking()) channel.configureBlocking(false);
+      accept(serverSocketChannel, channel, null, ssl, false);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+      StreamUtils.close(channel, log);
+    }
   }
 
   /**
@@ -186,12 +193,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     context.setPeer(peer);
     context.setState(AcceptorState.IDENTIFYING_PEER);
     if (sslHandler != null) context.setSSLHandler(sslHandler);
-    final ChannelRegistration<AcceptorContext> reg = new ChannelRegistration<>(channel, 0, context);
-    registrationQueue.offer(reg);
-    synchronized(reg) {
-      while (reg.key == null) reg.wait();
-    }
-    final SelectionKey selKey = reg.key;
+    final SelectionKey selKey;
+    selKey = channel.register(selector, 0, context);
     final SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
     context.setChannel(wrapper);
     context.setSsl(ssl);
@@ -201,33 +204,9 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       configureSSLEngine(engine);
       context.setSSLHandler(new SSLHandler(wrapper, engine));
     }
-    updateInterestOps(selKey, SelectionKey.OP_READ, true);
+    updateInterestOpsNoWakeup(selKey, SelectionKey.OP_READ, true);
     if (debugEnabled) log.debug("{} channel {} accepted", this, channel);
     return wrapper;
-  }
-
-  /**
-   * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   * @throws Exception if any error occurs.
-   */
-  public void updateInterestOps(final SelectionKey key, final int update, final boolean add) throws Exception {
-    final AcceptorContext context = (AcceptorContext) key.attachment();
-    final int ops = context.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      context.setInterestOps(newOps);
-      sync.wakeUpAndSetOrIncrement();
-      try {
-        key.interestOps(newOps);
-      } finally {
-        sync.decrement();
-      }
-    }
   }
 
   /**
@@ -260,25 +239,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   protected NioServerFactory<AcceptorState, AcceptorTransition> createFactory() {
     return new AcceptorServerFactory(this);
   }
-
-  /*
-  @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer,
-    final Object... params) throws Exception {
-    return super.accept(serverSocketChannel, channel, sslHandler, ssl, peer, serverSocketChannel);
-  }
-
-  @Override
-  public void postAccept(final ChannelWrapper<?> channel) {
-    try {
-      transitionManager.transitionChannel(channel, AcceptorTransition.TO_IDENTIFYING_PEER);
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(ExceptionUtils.getMessage(e));
-      closeChannel(channel);
-    }
-  }
-   */
 
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
@@ -330,8 +290,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
           return;
         }
       }
-      final ServerSocketChannel server = ServerSocketChannel.open();
-      server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+      final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
       final InetSocketAddress addr = new InetSocketAddress(port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
       server.socket().bind(addr);

@@ -284,6 +284,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     try {
       lock.lock();
       wakeUpSelectorIfNeeded();
+      end();
     } finally {
       lock.unlock();
     }
@@ -364,6 +365,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     lock.lock();
     try {
       wakeUpSelectorIfNeeded();
+      if (channel.isBlocking()) channel.configureBlocking(false);
       selKey = channel.register(selector, 0, context);
     } finally {
       lock.unlock();

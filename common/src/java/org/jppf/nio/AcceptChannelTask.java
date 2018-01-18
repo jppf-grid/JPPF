@@ -18,6 +18,7 @@
 
 package org.jppf.nio;
 
+import java.net.StandardSocketOptions;
 import java.nio.channels.*;
 
 import org.jppf.JPPFException;
@@ -74,10 +75,10 @@ public class AcceptChannelTask implements Runnable {
   public void run() {
     try {
       if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
-      channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-      channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
-      channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
+      channel.setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
+      channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
+      channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
+      channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
       intercept();
       if (channel.isBlocking()) channel.configureBlocking(false);
       server.accept(serverSocketChannel, channel, null, ssl, false);

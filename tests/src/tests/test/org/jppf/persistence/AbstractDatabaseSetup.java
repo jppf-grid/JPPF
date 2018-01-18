@@ -115,7 +115,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   @AfterClass
   public static void dbTeardown() throws Exception {
     BaseSetup.generateClientThreadDump();
-    BaseSetup.generateDriverThreadDump(BaseSetup.getClient());
+    BaseSetup.generateDriverThreadDump(client);
     JPPFDatasourceFactory.getInstance().clear();
     if (h2Server != null) {
       // generate sql dump file of the database
@@ -152,7 +152,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   }
 
   /**
-   * Create a jmx connection not independent of the specified client.
+   * Create a jmx connection independent of the specified client.
    * @param client .
    * @return a {@link JMXDriverConnectionWrapper}.
    * @throws Exception if any error occurs.

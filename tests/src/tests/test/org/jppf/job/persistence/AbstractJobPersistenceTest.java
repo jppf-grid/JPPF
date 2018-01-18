@@ -29,6 +29,7 @@ import org.jppf.client.event.*;
 import org.jppf.job.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.test.addons.common.AddonSimpleTask;
 import org.jppf.utils.*;
@@ -50,6 +51,10 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * 
    */
   private static final long WAIT_TIME_EMPTY_UUIDS = 5000L;
+  /**
+   * 
+   */
+  private int dumpSequence;
 
   /** */
   @Rule
@@ -72,7 +77,24 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       if (b) {
         final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
         mgr.deleteJobs(JobSelector.ALL_JOBS);
+        final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
+        if (proxy.hasDeadlock()) {
+          final String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
+          FileUtils.writeTextFile("driver_thread_dump_" + ++dumpSequence  + "_" + jmx.getPort() + ".log", text);
+          assertTrue("driver deadlock detected", false);
+        }
       }
+    }
+  }
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  @AfterClass
+  public static void tearAbstractJobPersistenceTest() throws Exception {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
+      jmx.connectAndWait(5_000L);
+      if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     }
   }
 
@@ -164,9 +186,12 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
       client.submitJob(job);
       listener.await();
-      jmx.restartShutdown(500L, 1L);
+      Thread.sleep(500L);
+      print(false, false, "about to request driver restart");
+      jmx.restartShutdown(1L, 1L);
     }
     Thread.sleep(500L);
+    print(false, false, "waiting for job results");
     final List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {

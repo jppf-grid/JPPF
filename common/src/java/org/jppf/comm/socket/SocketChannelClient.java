@@ -37,7 +37,11 @@ public class SocketChannelClient implements SocketWrapper {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SocketChannelClient.class);
+  private static final Logger log = LoggerFactory.getLogger(SocketChannelClient.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The channel associated with the underlying socket connection.
    */
@@ -236,12 +240,10 @@ public class SocketChannelClient implements SocketWrapper {
   @Override
   public void open() throws ConnectException, IOException {
     channel = SocketChannel.open();
-    final Socket socket = channel.socket();
-    socket.setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-    socket.setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-    socket.setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
-    socket.setKeepAlive(IO.SOCKET_KEEPALIVE);
-    channel.configureBlocking(blocking);
+    channel.setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
+    channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
+    channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
+    channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
     final InetSocketAddress address = new InetSocketAddress(host, port);
     channel.connect(address);
     if (!blocking) {
@@ -253,7 +255,7 @@ public class SocketChannelClient implements SocketWrapper {
       }
     }
     opened = true;
-    if (log.isDebugEnabled()) log.debug("getReceiveBufferSize() = " + channel.socket().getReceiveBufferSize());
+    if (debugEnabled) log.debug("getReceiveBufferSize() = {}", channel.getOption(StandardSocketOptions.SO_RCVBUF));
   }
 
   /**
