@@ -213,12 +213,8 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    try {
-      sb.append("channel=").append(channel.getClass().getSimpleName());
-    } catch(@SuppressWarnings("unused") final Exception e) {
-      sb.append("???[");
-    }
-    sb.append("[id=").append(channel.getId()).append(']');
+    sb.append("channel=").append(channel == null ? "null channel" : channel.getClass().getSimpleName());
+    sb.append("[id=").append(channel == null ? -1L : channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource == null ? "null" : resource.getName());
     sb.append(", pendingRequests=").append(getNbPendingRequests());
