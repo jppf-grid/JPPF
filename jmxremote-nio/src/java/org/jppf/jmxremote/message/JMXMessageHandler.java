@@ -86,6 +86,7 @@ public class JMXMessageHandler {
    */
   public JMXMessageHandler(final ChannelsPair channels, final Map<String, ?> env) {
     this.channels = channels;
+    channels.setMessageHandler(this);
     this.server = channels.readingChannel().getContext().getServer();
     this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());

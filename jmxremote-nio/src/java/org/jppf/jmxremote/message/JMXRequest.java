@@ -94,7 +94,7 @@ public class JMXRequest extends AbstractJMXMessage {
     final int n = params.length;
     out.writeByte(n);
     if (n > 0) {
-      for (Object o: params) out.writeObject(o);
+      for (final Object o: params) out.writeObject(o);
     }
   }
 

@@ -86,7 +86,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @return the connection id.
    */
   public String getConnectionID() {
-    return getMessageHandler().getChannels().getConnectionID();
+    return messageHandler.getChannels().getConnectionID();
   }
 
   /**

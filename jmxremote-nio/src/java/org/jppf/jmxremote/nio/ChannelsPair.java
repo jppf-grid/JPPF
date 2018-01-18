@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.management.*;
 
 import org.jppf.jmxremote.*;
+import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.utils.*;
 import org.slf4j.Logger;
 
@@ -92,6 +93,10 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * Selection key for the associated socket channel and nio server selector.
    */
   private SelectionKey selectionKey;
+  /**
+   * The associated message handler.
+   */
+  private JMXMessageHandler messageHandler;
 
   /**
    * @param first the reading channel.
@@ -124,9 +129,7 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * @throws Exception if any error occurs.
    */
   public void close() throws Exception {
-    if (closed.compareAndSet(false, true)) {
-      this.getSelectionKey().channel().close();
-    }
+    if (closed.compareAndSet(false, true)) this.getSelectionKey().channel().close();
   }
 
   /**
@@ -325,5 +328,20 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    */
   public void setSelectionKey(final SelectionKey selectionKey) {
     this.selectionKey = selectionKey;
+  }
+
+  /**
+   * @return the associated message handler.
+   */
+  public JMXMessageHandler getMessageHandler() {
+    return messageHandler;
+  }
+
+  /**
+   * Set the associated message handler.
+   * @param messageHandler the message handler to set.
+   */
+  public void setMessageHandler(final JMXMessageHandler messageHandler) {
+    this.messageHandler = messageHandler;
   }
 }

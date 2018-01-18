@@ -164,7 +164,7 @@ public class JPPFJMXConnector implements JMXConnector {
     if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
     final JMXNioServer server = JMXNioServerPool.getServer();
     final ChannelsPair pair = server.createChannelsPair(environment, "", port, socketClient.getChannel(), secure, true);
-    final JMXMessageHandler messageHandler = pair.readingChannel().getContext().getMessageHandler();
+    final JMXMessageHandler messageHandler = pair.getMessageHandler();
     mbsc = new JPPFMBeanServerConnection(messageHandler);
     pair.setMbeanServerConnection(mbsc);
     if (debugEnabled) log.debug("sending connection request");

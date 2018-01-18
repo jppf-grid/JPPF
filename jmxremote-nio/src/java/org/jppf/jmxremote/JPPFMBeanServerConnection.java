@@ -395,11 +395,6 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     try {
       if (debugEnabled) log.debug("closing {}", channels);
       channels.requestClose();
-      /*
-      channels.disableRead();
-      messageHandler.sendRequestNoResponse(CLOSE);
-      server.closeConnection(connectionID, null, true);
-      */
       messageHandler.sendRequestNoResponse(CLOSE);
       channels.getSelectionKey().channel().close();
     } catch (final IOException e) {

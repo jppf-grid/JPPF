@@ -104,7 +104,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     super(JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL) + "-" + instanceCount.incrementAndGet(), JPPFIdentifiers.JMX_REMOTE_CHANNEL, false);
     serverNotificationHandler = new ServerNotificationHandler(this);
     //this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    this.selectTimeout = 10L;
+    this.selectTimeout = 1L;
     registerMBean();
   }
 
@@ -230,7 +230,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
         connectionsByServerPort.putValue(port, connectionID);
       }
       ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
-      pair.writingChannel().getContext().getMessageHandler().sendMessage(new JMXResponse(JMXMessageHandler.CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT, connectionID));
+      pair.getMessageHandler().sendMessage(new JMXResponse(JMXMessageHandler.CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT, connectionID));
       return pair.writingChannel();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -347,25 +347,23 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     if (debugEnabled) log.debug("closing JMX channels for connectionID = {}", connectionID);
     Exception ex = exception;
     final ChannelsPair pair = channelsByConnectionID.get(connectionID);
+    if (pair == null) return;
     try {
-      if (pair != null) {
-        if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
-        pair.requestClose();
-        pair.close();
-        final JMXChannelWrapper channel = pair.readingChannel();
-        final JMXContext context = channel.context;
-        context.getMessageHandler().close();
-        if (pair.isServerSide()) {
-          synchronized(mapsLock) {
-            channelsByConnectionID.remove(connectionID);
-            connectionsByServerPort.removeValue(pair.getServerPort(), connectionID);
-          }
-        }
-      }
+      if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
+      pair.requestClose();
+      pair.close();
+      pair.getMessageHandler().close();
     } catch (final Exception e) {
       if (ex == null) ex = e;
+    } finally {
+      if (pair.isServerSide()) {
+        synchronized(mapsLock) {
+          channelsByConnectionID.remove(connectionID);
+          connectionsByServerPort.removeValue(pair.getServerPort(), connectionID);
+        }
+      }
     }
-    if ((pair != null) && pair.isServerSide()) {
+    if (pair.isServerSide()) {
       final ConnectionEventType type = (ex != null) ? ConnectionEventType.FAILED : ConnectionEventType.CLOSED;
       try {
         if (ex != null) fireNotification(type, new JMXConnectionStatusEvent(connectionID, ex));
@@ -463,7 +461,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     synchronized(mapsLock) {
       for (final String connectionID: connectionIDs) {
         final ChannelsPair channels = channelsByConnectionID.get(connectionID);
-        if (channels != null) result.put(connectionID, channels.readingChannel().context.getMessageHandler());
+        if (channels != null) result.put(connectionID, channels.getMessageHandler());
       }
     }
     return result;
