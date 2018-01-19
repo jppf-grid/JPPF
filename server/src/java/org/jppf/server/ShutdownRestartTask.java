@@ -71,7 +71,6 @@ class ShutdownRestartTask extends TimerTask {
 
   /**
    * Perform the actual shutdown, and eventually restart, as specified in the constructor.
-   * @see java.util.TimerTask#run()
    */
   @Override
   public void run() {

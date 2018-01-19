@@ -112,7 +112,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   }
 
   /**
-   * Close a connection to a node.
+   * Close a connection to a client.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
   public static void closeClient(final ChannelWrapper<?> channel) {
@@ -141,16 +141,21 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   }
 
   @Override
-  public synchronized void removeAllConnections() {
+  public void removeAllConnections() {
     if (!isStopped()) return;
-    final List<ChannelWrapper<?>> list = new ArrayList<>(channels);
-    channels.clear();
-    for (ChannelWrapper<?> channel : list) {
-      try {
-        closeClient(channel);
-      } catch (final Exception e) {
-        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+    lock.lock();
+    try {
+      final List<ChannelWrapper<?>> list = new ArrayList<>(channels);
+      channels.clear();
+      for (ChannelWrapper<?> channel : list) {
+        try {
+          closeClient(channel);
+        } catch (final Exception e) {
+          log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+        }
       }
+    } finally {
+      lock.unlock();
     }
     super.removeAllConnections();
   }
