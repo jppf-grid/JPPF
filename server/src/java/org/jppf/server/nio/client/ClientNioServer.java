@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class ClientNioServer extends NioServer<ClientState, ClientTransition>
-{
+public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   /**
    * Logger for this class.
    */
@@ -55,8 +54,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
-  {
+  public ClientNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
 
@@ -65,21 +63,16 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   @Override
-  protected NioServerFactory<ClientState, ClientTransition> createFactory()
-  {
+  protected NioServerFactory<ClientState, ClientTransition> createFactory() {
     return new ClientServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper<?> channel)
-  {
-    try
-    {
+  public void postAccept(final ChannelWrapper<?> channel) {
+    try {
       channels.add(channel);
       transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeClient(channel);
@@ -150,16 +143,21 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   @Override
-  public synchronized void removeAllConnections() {
+  public void removeAllConnections() {
     if (!isStopped()) return;
-    List<ChannelWrapper<?>> list  = new ArrayList<>(channels);
-    channels.clear();
-    for (ChannelWrapper<?> channel: list) {
-      try {
-        closeClient(channel);
-      } catch (Exception e) {
-        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+    lock.lock();
+    try {
+      final List<ChannelWrapper<?>> list = new ArrayList<>(channels);
+      channels.clear();
+      for (ChannelWrapper<?> channel : list) {
+        try {
+          closeClient(channel);
+        } catch (final Exception e) {
+          log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+        }
       }
+    } finally {
+      lock.unlock();
     }
     super.removeAllConnections();
   }
