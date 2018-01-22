@@ -148,13 +148,10 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("invoking mbean '%s' method '%s(%s)' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature))));
       return null;
     }
-    /*
-    synchronized(this) {
-    }
-    */
     Object result = null;
     try {
-      final ObjectName mbeanName = new ObjectName(name);
+      //final ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
     } catch(final IOException e) {
       final String msg = String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e));
@@ -189,13 +186,10 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("getting mbean '%s' attribute '%s' while not connected", name, attribute));
       return null;
     }
-    /*
-    synchronized(this) {
-    }
-    */
     Object result = null;
     try {
-      final ObjectName mbeanName = new ObjectName(name);
+      //final ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       result = getMbeanConnection().getAttribute(mbeanName, attribute);
     } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
@@ -217,12 +211,9 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       log.warn(String.format("setting mbean '%s' attribute '%s' while not connected", name, attribute));
       return;
     }
-    /*
-    synchronized(this) {
-    }
-    */
     try {
-      final ObjectName mbeanName = new ObjectName(name);
+      //final ObjectName mbeanName = new ObjectName(name);
+      final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
     } catch(final IOException e) {
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
@@ -272,7 +263,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public <T> T getProxy(final String name, final Class<T> inf) throws Exception {
-    return getProxy(new ObjectName(name), inf);
+    return getProxy(ObjectNameCache.getObjectName(name), inf);
   }
 
   /**
@@ -308,7 +299,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public void addNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception {
-    mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, null, null);
+    mbeanConnection.get().addNotificationListener(ObjectNameCache.getObjectName(mBeanName), listener, null, null);
   }
 
   /**
@@ -320,7 +311,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public void addNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
-    mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
+    mbeanConnection.get().addNotificationListener(ObjectNameCache.getObjectName(mBeanName), listener, filter, handback);
   }
 
   /**
@@ -330,7 +321,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public void removeNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception {
-    mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, null, null);
+    mbeanConnection.get().removeNotificationListener(ObjectNameCache.getObjectName(mBeanName), listener, null, null);
   }
 
   /**
@@ -342,7 +333,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public void removeNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
-    mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
+    mbeanConnection.get().removeNotificationListener(ObjectNameCache.getObjectName(mBeanName), listener, filter, handback);
   }
 
   /**
@@ -352,7 +343,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    * @throws Exception if any error occurs.
    */
   public MBeanNotificationInfo[] getNotificationInfo(final String mBeanName) throws Exception {
-    return mbeanConnection.get().getMBeanInfo(new ObjectName(mBeanName)).getNotifications();
+    return mbeanConnection.get().getMBeanInfo(ObjectNameCache.getObjectName(mBeanName)).getNotifications();
   }
 
   @Override

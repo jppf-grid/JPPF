@@ -45,7 +45,7 @@ public class MultipleBuffersInputStream extends InputStream {
   /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */
-  private final JPPFBuffer[] list;
+  private final List<JPPFBuffer> list;
   /**
    * The JPPFBuffer currently being read from.
    */
@@ -67,16 +67,8 @@ public class MultipleBuffersInputStream extends InputStream {
    * Initialize this input stream with the specified buffers.
    * @param buffers an array of {@link JPPFBuffer} instances.
    */
-  public MultipleBuffersInputStream(final JPPFBuffer... buffers) {
-    list = buffers;
-  }
-
-  /**
-   * Initialize this input stream with the specified buffers.
-   * @param buffers an array of {@link JPPFBuffer} instances.
-   */
   public MultipleBuffersInputStream(final List<JPPFBuffer> buffers) {
-    list = buffers.toArray(new JPPFBuffer[buffers.size()]);
+    list = buffers;
   }
 
   /**
@@ -137,12 +129,12 @@ public class MultipleBuffersInputStream extends InputStream {
    */
   private void nextBuffer() {
     bufferIndex++;
-    if (bufferIndex >= list.length) {
+    if (bufferIndex >= list.size()) {
       eofReached = true;
       currentBuffer = null;
       return;
     }
-    currentBuffer = list[bufferIndex];
+    currentBuffer = list.get(bufferIndex);
     currentBuffer.pos = 0;
   }
 
@@ -156,7 +148,7 @@ public class MultipleBuffersInputStream extends InputStream {
         totalSize += buf.length;
     }
     sb.append("totalSize=").append(totalSize);
-    sb.append(", nbBuffers=").append(list.length);
+    sb.append(", nbBuffers=").append(list.size());
     sb.append(", bufferIndex=").append(bufferIndex);
     if (currentBuffer == null) sb.append(", currentBuffer=null");
     else {

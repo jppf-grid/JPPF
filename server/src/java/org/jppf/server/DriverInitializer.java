@@ -141,7 +141,7 @@ public class DriverInitializer {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         serverDebug = new ServerDebug();
         final StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
-        server.registerMBean(mbean, new ObjectName(ServerDebugMBean.MBEAN_NAME));
+        server.registerMBean(mbean, ObjectNameCache.getObjectName(ServerDebugMBean.MBEAN_NAME));
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }

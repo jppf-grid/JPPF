@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.jppf.management.ObjectNameCache;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.*;
 import org.slf4j.*;
@@ -97,7 +98,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   private boolean registerProviderMBean(final Object impl, final Class<?> intf, final String name) {
     try {
       if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
-      final ObjectName objectName = new ObjectName(name);
+      final ObjectName objectName = ObjectNameCache.getObjectName(name);
       if (!server.isRegistered(objectName)) {
         server.registerMBean(impl, objectName);
         return true;
@@ -116,7 +117,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
     while (!registeredMBeanNames.isEmpty()) {
       final String s = registeredMBeanNames.remove(0);
       try {
-        server.unregisterMBean(new ObjectName(s));
+        server.unregisterMBean(ObjectNameCache.getObjectName(s));
         if (debugEnabled) log.debug("MBean un-registration succeeded for [{}]", s);
       } catch(final Exception e) {
         final String format = "MBean un-registration failed for [{}] : {}";

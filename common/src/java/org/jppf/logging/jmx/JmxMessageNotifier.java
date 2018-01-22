@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.*;
 
+import org.jppf.management.ObjectNameCache;
 import org.jppf.utils.ExceptionUtils;
 
 /**
@@ -96,11 +97,11 @@ public class JmxMessageNotifier {
    */
   private void initObjectName(final String name) {
     try {
-      if (objectName == null) objectName = new ObjectName(name);
+      if (objectName == null) objectName = ObjectNameCache.getObjectName(name);
     } catch (final Exception e) {
       try {
         System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + ExceptionUtils.getMessage(e) + ')');
-        objectName = new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
+        objectName = ObjectNameCache.getObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
       } catch (final Exception e2) {
         System.out.println("Failed to initialize jmx based logging with default MBean name:" + ExceptionUtils.getMessage(e2));
       }

@@ -29,7 +29,7 @@ public interface SocketInitializer {
    * @param socketWrapper the socket wrapper to initialize.
    * @return whether the initialization was successful.
    */
-  boolean initializeSocket(SocketWrapper socketWrapper);
+  boolean initialize(SocketWrapper socketWrapper);
 
   /**
    * Close this initializer.
@@ -37,14 +37,14 @@ public interface SocketInitializer {
   void close();
 
   /**
-   * Determine whether any connection attempt succeeded.
-   * @return true if any attempt was successful, false otherwise.
-   */
-  boolean isSuccessful();
-
-  /**
    * Determine whether this socket initializer has been intentionally closed.
    * @return true if this socket initializer has been intentionally closed, false otherwise.
    */
   boolean isClosed();
+
+  /**
+   * Get the last captured exception.
+   * @return the last captured exception, if any, otherwise {@code null}.
+   */
+  Exception getLastException();
 }

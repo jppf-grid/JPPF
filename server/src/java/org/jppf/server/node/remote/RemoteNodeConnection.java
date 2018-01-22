@@ -77,7 +77,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
       if (debugEnabled) log.debug("end socket client initialization");
       //if (!NodeRunner.isOffline())
       System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
-      if (!socketInitializer.initializeSocket(channel)) {
+      if (!socketInitializer.initialize(channel)) {
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("the JPPF node job channel could not reconnect to the driver", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       }

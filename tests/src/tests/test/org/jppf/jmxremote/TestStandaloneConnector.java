@@ -27,6 +27,7 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.jppf.jmxremote.*;
+import org.jppf.management.ObjectNameCache;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.collections.*;
@@ -63,7 +64,7 @@ public class TestStandaloneConnector extends BaseTest {
     BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
     url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
     //url = new JMXServiceURL("service:jmx:jppf://192.168.1.24:12001");
-    connectorTestName = new ObjectName(ConnectorTestMBean.MBEAN_NAME);
+    connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
   }
 

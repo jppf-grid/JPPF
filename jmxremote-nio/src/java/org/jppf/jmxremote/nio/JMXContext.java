@@ -151,11 +151,9 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   /**
    * Set the object that handles messages correlations.
    * @param messageHandler a {@link JMXMessageHandler} instance.
-   * @return this context, for method chaining.
    */
-  public JMXContext setMessageHandler(final JMXMessageHandler messageHandler) {
+  public void setMessageHandler(final JMXMessageHandler messageHandler) {
     this.messageHandler = messageHandler;
-    return this;
   }
 
   @Override

@@ -180,11 +180,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
    * Set whether this pair of channels represents a server-side connection.
    * @param serverSide {@code true} for a server-side connection, {@code false} otherwise.
-   * @return this {@code ChannelsPair}, for method call chaining.
    */
-  public ChannelsPair setServerSide(final boolean serverSide) {
+  public void setServerSide(final boolean serverSide) {
     this.serverSide = serverSide;
-    return this;
   }
 
   /**
@@ -197,11 +195,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
    * Set the server port on which the connection was established.
    * @param serverPort the port number.
-   * @return this channels pair, for method call chaining.
    */
-  public ChannelsPair setServerPort(final int serverPort) {
+  public void setServerPort(final int serverPort) {
     this.serverPort = serverPort;
-    return this;
   }
 
   /**
@@ -214,11 +210,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
    * Set the associated MBeanServer (server-side).
    * @param mbeanServer a {@link MBeanServer} instance.
-   * @return this channels pair, for method call chaining.
    */
-  public ChannelsPair setMbeanServer(final MBeanServer mbeanServer) {
+  public void setMbeanServer(final MBeanServer mbeanServer) {
     this.mbeanServer = mbeanServer;
-    return this;
   }
 
   /**
@@ -231,11 +225,9 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   /**
    * Set the associated MBeanServerConnection (client-side).
    * @param mbeanServerConnection the {@link MBeanServerConnection} to set.
-   * @return this channels pair, for method call chaining.
    */
-  public ChannelsPair setMbeanServerConnection(final JPPFMBeanServerConnection mbeanServerConnection) {
+  public void setMbeanServerConnection(final JPPFMBeanServerConnection mbeanServerConnection) {
     this.mbeanServerConnection = mbeanServerConnection;
-    return this;
   }
 
   /**

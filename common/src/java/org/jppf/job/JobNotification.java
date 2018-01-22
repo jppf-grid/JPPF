@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 
 /**
@@ -125,7 +125,7 @@ public class JobNotification extends Notification {
   private static ObjectName createObjectName() {
     ObjectName name = null;
     try {
-      name = new ObjectName(DriverJobManagementMBean.MBEAN_NAME);
+      name = ObjectNameCache.getObjectName(DriverJobManagementMBean.MBEAN_NAME);
     } catch (@SuppressWarnings("unused") final Exception e) {
     }
     return name;

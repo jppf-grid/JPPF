@@ -75,7 +75,7 @@ public class JMXMessageHandler {
    */
   private final StateTransitionManager<JMXState, JMXTransition> mgr;
   /**
-   * 
+   * The initial connection request, whose expected response is a connection id.
    */
   private final JMXRequest connectionRequest;
 
@@ -162,7 +162,7 @@ public class JMXMessageHandler {
       if (debugEnabled) log.debug("received response {}, channels={}", response, channels);
       synchronized(request) {
         request.setResponse(response);
-        request.notifyAll();
+        request.notify();
       }
     } else {
       log.warn("no matching request for {}, channels={}", response, channels);
@@ -201,7 +201,7 @@ public class JMXMessageHandler {
     if (request == null) log.warn("no matching request for {}", message);
     else if (request != message) log.warn("message and request do not match, request = {}, message = {}", request, message);
     synchronized(message) {
-      message.notifyAll();
+      message.notify();
     }
   }
 
@@ -228,7 +228,7 @@ public class JMXMessageHandler {
         for (Map.Entry<Long, JMXRequest> entry: requestMap.entrySet()) {
           final JMXRequest request = entry.getValue();
           synchronized(request) {
-            request.notifyAll();
+            request.notify();
           }
         }
         requestMap.clear();

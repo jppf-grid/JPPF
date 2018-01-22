@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
+import org.jppf.management.ObjectNameCache;
+
 /**
  * Implementation of a simple logger that sends logged messages as JMX notifications.
  * @author Laurent Cohen
@@ -58,7 +60,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
    */
   private static ObjectName makeObjectName() {
     try {
-      return new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
+      return ObjectNameCache.getObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
     } catch (final Exception e) {
       System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ')');
     }

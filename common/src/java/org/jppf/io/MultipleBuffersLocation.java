@@ -45,15 +45,15 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   /**
    * The current count of bytes read from/written to the underlying file.
    */
-  private int count = 0;
+  private int count;
   /**
    * Current buffer being read.
    */
-  private JPPFBuffer currentBuffer = null;
+  private JPPFBuffer currentBuffer;
   /**
    * Index of the current buffer.
    */
-  private int currentBufferIndex = 0;
+  private int currentBufferIndex;
 
   /**
    * Initialize this location with the specified size.
@@ -119,10 +119,12 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
       currentBuffer = list.get(0);
       currentBufferIndex = 0;
       currentBuffer.pos = 0;
-      if (!blocking) {
+      /*
+      if (!blocking && (list.size() > 1)) {
         list.clear();
         list.add(currentBuffer);
       }
+      */
       count = 0;
     }
     try {

@@ -24,6 +24,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.client.*;
+import org.jppf.management.ObjectNameCache;
 
 /**
  *
@@ -70,7 +71,7 @@ public class Debug implements DebugMBean {
     try {
       final Debug debug = new Debug(client);
       final StandardMBean mbean = new StandardMBean(debug, DebugMBean.class);
-      final ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
+      final ObjectName name = ObjectNameCache.getObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       server.registerMBean(mbean, name);
       //System.out.println("registered client debug mbean: " + name);
@@ -85,7 +86,7 @@ public class Debug implements DebugMBean {
    */
   public static void unregister(final JPPFClient client) {
     try {
-      final ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
+      final ObjectName name = ObjectNameCache.getObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       if (server.isRegistered(name)) server.unregisterMBean(name);
     } catch (final Exception e) {

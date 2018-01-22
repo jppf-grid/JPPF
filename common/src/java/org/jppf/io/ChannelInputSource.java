@@ -53,8 +53,7 @@ public class ChannelInputSource implements InputSource {
    */
   @Override
   public int read(final byte[] data, final int offset, final int len) throws Exception {
-    final ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
-    return read(buffer);
+    return read(ByteBuffer.wrap(data, offset, len));
   }
 
   /**
@@ -71,9 +70,8 @@ public class ChannelInputSource implements InputSource {
    */
   @Override
   public int read(final ByteBuffer data) throws Exception {
-    ByteBuffer tmpBuffer = null;
+    final ByteBuffer tmpBuffer = DirectBufferPool.provideBuffer();
     try {
-      tmpBuffer = DirectBufferPool.provideBuffer();
       final int remaining = data.remaining();
       int count = 0;
       while (count < remaining) {
@@ -81,12 +79,10 @@ public class ChannelInputSource implements InputSource {
         final int n = channel.read(tmpBuffer);
         if (n < 0) throw new EOFException();
         else if (n == 0) break;
-        else {
-          count += n;
-          tmpBuffer.flip();
-          data.put(tmpBuffer);
-          tmpBuffer.clear();
-        }
+        count += n;
+        tmpBuffer.flip();
+        data.put(tmpBuffer);
+        tmpBuffer.clear();
       }
       return count;
     } finally {

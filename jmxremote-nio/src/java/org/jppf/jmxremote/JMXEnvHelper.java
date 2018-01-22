@@ -36,17 +36,17 @@ public class JMXEnvHelper {
    * @return the value of the proerty if the property is found, or the property's default value if it is not found.
    */
   public static long getLong(final JPPFProperty<Long> prop, final Map<String, ?> env, final TypedProperties config) {
-    long value = prop.getDefaultValue();
     final String name = prop.getName();
-    if (env.containsKey(name)) value = (Long) env.get(name);
-    else if (config.containsProperty(prop)) value = config.get(prop);
-    else { 
+    Long value = (Long) env.get(name);
+    if (value == null) value = config.get(prop);
+    if (value == null) { 
       final String s = System.getProperty(name);
       if (s != null) value = Long.valueOf(s);
     }
-    if (prop instanceof LongProperty) {
+    if (value == null) value = prop.getDefaultValue();
+    else if (prop instanceof LongProperty) {
       final LongProperty p = (LongProperty) prop;
-      if ((value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
+      if (p.hasMinAndMax() && (value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
     }
     return value;
   }
@@ -59,17 +59,17 @@ public class JMXEnvHelper {
    * @return the value of the proerty if the property is found, or the property's default value if it is not found.
    */
   public static int getInt(final JPPFProperty<Integer> prop, final Map<String, ?> env, final TypedProperties config) {
-    int value = 0;
     final String name = prop.getName();
-    if (env.containsKey(name)) value = (Integer) env.get(name);
-    else if (config.containsProperty(prop)) value = config.get(prop);
-    else { 
+    Integer value = (Integer) env.get(name);
+    if (value == null) value = config.get(prop);
+    if (value == null) { 
       final String s = System.getProperty(name);
       if (s != null) value = Integer.valueOf(s);
     }
-    if (prop instanceof IntProperty) {
+    if (value == null) value = prop.getDefaultValue();
+    else if (prop instanceof IntProperty) {
       final IntProperty p = (IntProperty) prop;
-      if ((value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
+      if (p.hasMinAndMax() && (value < p.getMinValue()) || (value > p.getMaxValue())) value = prop.getDefaultValue();
     }
     return value;
   }

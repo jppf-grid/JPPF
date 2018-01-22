@@ -53,9 +53,8 @@ public class ChannelOutputDestination implements OutputDestination {
    */
   @Override
   public int write(final byte[] data, final int offset, final int len) throws Exception {
-    ByteBuffer tmpBuffer = null;
+    final ByteBuffer tmpBuffer = DirectBufferPool.provideBuffer();
     try {
-      tmpBuffer = DirectBufferPool.provideBuffer();
       final int cap = tmpBuffer.capacity();
       int count = 0;
       while (count < len) {

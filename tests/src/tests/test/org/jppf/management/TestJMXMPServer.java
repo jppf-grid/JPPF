@@ -52,7 +52,7 @@ public class TestJMXMPServer extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    server.registerMBean(new StandardMBean(new MyTest(), MyTestMBean.class), new ObjectName(MyTestMBean.MBEAN_NAME));
+    server.registerMBean(new StandardMBean(new MyTest(), MyTestMBean.class), ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
   }
 
   /**
@@ -63,7 +63,7 @@ public class TestJMXMPServer extends BaseTest {
   public static void teardown() throws Exception {
     JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    server.unregisterMBean(new ObjectName(MyTestMBean.MBEAN_NAME));
+    server.unregisterMBean(ObjectNameCache.getObjectName(MyTestMBean.MBEAN_NAME));
   }
 
   /**

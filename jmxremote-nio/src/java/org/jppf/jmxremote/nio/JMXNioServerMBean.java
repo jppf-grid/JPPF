@@ -21,7 +21,7 @@ package org.jppf.jmxremote.nio;
 import java.io.Serializable;
 
 /**
- * 
+ * Interface for an MBean that collects statistics on a {@link JMXNioServer} instance.
  * @author Laurent Cohen
  */
 public interface JMXNioServerMBean extends Serializable {

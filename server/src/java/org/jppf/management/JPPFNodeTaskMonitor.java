@@ -79,7 +79,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    */
   public JPPFNodeTaskMonitor(final String objectName) {
     try {
-      OBJECT_NAME = new ObjectName(objectName);
+      OBJECT_NAME = ObjectNameCache.getObjectName(objectName);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }

@@ -38,6 +38,10 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
    * The maximum accepted value for this property.
    */
   final Comparable<T> maxValue;
+  /**
+   * 
+   */
+  final boolean hasMinAndMax;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -49,6 +53,7 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
     super(name, defaultValue, aliases);
     this.minValue = null;
     this.maxValue = null;
+    this.hasMinAndMax = false;
   }
 
   /**
@@ -66,6 +71,7 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
     if (minValue.doubleValue() > maxValue.doubleValue()) throw new IllegalArgumentException(String.format("min value must be <= max value (name=%s; min=%s; max=%s)", name, minValue, minValue));
     this.minValue = (Comparable<T>) minValue;
     this.maxValue = (Comparable<T>) maxValue;
+    this.hasMinAndMax = (this.minValue != null) && (this.maxValue != null);
   }
 
   /**
@@ -90,8 +96,8 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
    * Whether this property has a min and max values.
    * @return {@code true} if min and max values are defined, {@code false} otherwise.
    */
-  private boolean hasMinAndMax() {
-    return (minValue != null) && (maxValue != null);
+  public boolean hasMinAndMax() {
+    return hasMinAndMax;
   }
 
   /**

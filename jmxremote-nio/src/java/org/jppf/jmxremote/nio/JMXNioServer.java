@@ -33,6 +33,7 @@ import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.notification.ServerNotificationHandler;
+import org.jppf.management.ObjectNameCache;
 import org.jppf.nio.*;
 import org.jppf.ssl.*;
 import org.jppf.utils.*;
@@ -92,10 +93,6 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    * The peak number of connections.
    */
   private int peakConnections;
-  /**
-   * Queue of pending channel registrations.
-   */
-  //private final BlockingQueue<ChannelRegistration<ChannelsPair>> registrationQueue = new LinkedBlockingQueue<>();
 
   /**
    * @throws Exception if any error occurs.
@@ -118,17 +115,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     try {
       final boolean hasTimeout = selectTimeout > 0L;
       int n = 0;
-      //ChannelRegistration<ChannelsPair> reg;
       while (!isStopped() && !externalStopCondition()) {
-        /*
-        while ((reg = registrationQueue.poll()) != null) {
-          synchronized(reg) {
-            reg.key = reg.channel.register(selector, reg.interestOps, reg.attachment);
-            reg.attachment.setSelectionKey(reg.key);
-            reg.notify();
-          }
-        }
-        */
         sync.waitForZeroAndSetToMinusOne();
         try {
           n = hasTimeout ? selector.select(selectTimeout) : selector.select();
@@ -222,7 +209,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       if (addr instanceof Inet6Address) ip =  "[" + ip + "]";
       //e.g. "jppf://192.168.1.12:12001 2135"
       final String connectionID = String.format("%s://%s:%d %d", JMXHelper.JPPF_JMX_PROTOCOL, ip, port, connectionIdSequence.incrementAndGet());
-      final ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false).setServerSide(true);
+      final ChannelsPair pair = createChannelsPair(env, connectionID, port, channel, ssl, false);
+      pair.setServerSide(true);
       synchronized(mapsLock) {
         channelsByConnectionID.put(connectionID, pair);
         final int n = channelsByConnectionID.size();
@@ -256,24 +244,22 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     final ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this);
     final JMXMessageHandler handler = new JMXMessageHandler(pair, env);
     final MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
-    pair.setConnectionID(connectionID).setMbeanServer(mbeanServer).setServerPort(port);
-    readingChannel.context.setMessageHandler(handler).setState(JMXState.RECEIVING_MESSAGE);
-    writingChannel.context.setMessageHandler(handler).setState(JMXState.SENDING_MESSAGE);
+    pair.setConnectionID(connectionID);
+    pair.setMbeanServer(mbeanServer);
+    pair.setServerPort(port);
+    JMXContext context = readingChannel.context;
+    context.setMessageHandler(handler);
+    context.setState(JMXState.RECEIVING_MESSAGE);
+    context = writingChannel.context;
+    context.setMessageHandler(handler);
+    context.setState(JMXState.SENDING_MESSAGE);
     pair.setInterestOps(SelectionKey.OP_READ);
     sync.wakeUpAndSetOrIncrement();
     try {
-      final SelectionKey key = channel.register(selector, SelectionKey.OP_READ, pair);
-      pair.setSelectionKey(key);
+      pair.setSelectionKey(channel.register(selector, SelectionKey.OP_READ, pair));
     } finally {
       sync.decrement();
     }
-    /*
-    final ChannelRegistration<ChannelsPair> reg = new ChannelRegistration<>(channel, SelectionKey.OP_READ, pair);
-    registrationQueue.offer(reg);
-    synchronized(reg) {
-      while (reg.key == null) reg.wait();
-    }
-    */
     return pair;
   }
 
@@ -309,7 +295,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    * @return a SSLHandler instance.
    * @throws Exception if any error occurs.
    */
-  static SSLHandler configureSSL(final Map<String, ?> env, final JMXChannelWrapper channelWrapper, final SocketChannel channel) throws Exception {
+  private static SSLHandler configureSSL(final Map<String, ?> env, final JMXChannelWrapper channelWrapper, final SocketChannel channel) throws Exception {
     final SSLHelper2 helper = SSLHelper.getJPPFJMXremoteSSLHelper(env);
     final SSLContext sslContext = helper.getSSLContext(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
     final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
@@ -416,11 +402,11 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
   }
 
   /**
-   * .
+   * Register this server as an MBean that collects statistics.
    */
   private void registerMBean() {
     try {
-      ManagementFactory.getPlatformMBeanServer().registerMBean(this, new ObjectName(JMXNioServerMBean.MBEAN_NAME + "-" + getName()));
+      ManagementFactory.getPlatformMBeanServer().registerMBean(this, ObjectNameCache.getObjectName(JMXNioServerMBean.MBEAN_NAME + "-" + getName()));
     } catch (final Exception e) {
       log.error("error creating JPPF JMX remote server", e);
     }

@@ -79,7 +79,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
           if (debugEnabled) log.debug("initializing connection");
           initChannel();
           System.out.println("Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort());
-          if (!socketInitializer.initializeSocket(channel)) {
+          if (!socketInitializer.initialize(channel)) {
             channel = null;
             throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           }

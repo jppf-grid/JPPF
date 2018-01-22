@@ -25,6 +25,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.jppf.management.ObjectNameCache;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
@@ -155,7 +156,7 @@ public final class PermissionsFactory {
       addPermission(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"), "management");
       //p.add(new MBeanServerPermission("createMBeanServer"));
       addPermission(new MBeanServerPermission("*"), "management");
-      addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
+      addPermission(new MBeanPermission("*", "*", ObjectNameCache.getObjectName("*:*"), "*"), "management");
       // TODO: find a way to be more restrictive on RMI permissions
       addPermission(new SocketPermission("*:1024-", "accept,connect,listen,resolve"), "management");
     } catch (final Exception e) {

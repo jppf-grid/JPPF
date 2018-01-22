@@ -85,15 +85,13 @@ public class PlainNioObject extends AbstractNioObject {
   public boolean read() throws Exception {
     if (count >= size) return true;
     if (source == null) source = new ChannelInputSource(channel.getSocketChannel());
-    int n;
-    do {
-      n = location.transferFrom(source, false);
-      if (n > 0) {
-        count += n;
-        channelCount = count;
-      }
+    while (count < size) {
+      final int n = location.transferFrom(source, false);
+      if (n <= 0) break;
+      count += n;
+      channelCount = count;
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
-    } while ((n > 0) && (count < size));
+    }
     return count >= size;
   }
 
@@ -106,15 +104,13 @@ public class PlainNioObject extends AbstractNioObject {
   public boolean write() throws Exception {
     if (count >= size) return true;
     if (dest == null) dest = new ChannelOutputDestination(channel.getSocketChannel());
-    int n;
-    do {
-      n = location.transferTo(dest, false);
-      if (n > 0) {
-        count += n;
-        channelCount = count;
-      }
+    while (count < size) {
+      final int n = location.transferTo(dest, false);
+      if (n <= 0) break;
+      count += n;
+      channelCount = count;
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
-    } while ((n > 0) && (count < size));
+    }
     return count >= size;
   }
 

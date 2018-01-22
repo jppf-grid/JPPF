@@ -19,7 +19,7 @@ package org.jppf.comm.socket;
 
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -50,10 +50,6 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
    */
   private Exception lastException;
   /**
-   * Determines whether any connection attempt succeeded.
-   */
-  private boolean successful;
-  /**
    * Determine whether this socket initializer has been intentionally closed.
    */
   private boolean closed;
@@ -79,18 +75,15 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
 
   @Override
   public boolean isClosed() {
-    return closed;
+    synchronized(this) {
+      return closed;
+    }
   }
 
   @Override
-  public boolean isSuccessful() {
-    return successful;
-  }
-
-  @Override
-  public boolean initializeSocket(final SocketWrapper socketWrapper) {
-    successful = false;
-    if (closed) return false;
+  public boolean initialize(final SocketWrapper socketWrapper) {
+    boolean successful = false;
+    if (isClosed()) return false;
     name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     if (socketWrapper.isOpened()) {
       try {
@@ -106,7 +99,7 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
     if (period <= 0L) period = 1000L;
     if (delay > 0L) goToSleep(delay);
     final long start = System.nanoTime();
-    while (((System.nanoTime() - start) / 1_000_000L < maxDuration) && !successful && !closed) {
+    while (((System.nanoTime() - start) / 1_000_000L < maxDuration) && !successful && !isClosed()) {
       try {
         if (traceEnabled) log.trace("{} opening the socket connection", name);
         socketWrapper.open();
@@ -115,7 +108,7 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
       } catch(final Exception e) {
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
         lastException = e;
-        if (!closed) goToSleep(period);
+        if (!isClosed()) goToSleep(period);
       }
     }
     return successful;
@@ -123,17 +116,16 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
 
   @Override
   public void close() {
-    if (!closed) {
-      if (debugEnabled) log.debug("{} closing socket initializer", name);
-      closed = true;
-      wakeUp();
+    synchronized(this) {
+      if (!closed) {
+        if (debugEnabled) log.debug("{} closing socket initializer", name);
+        closed = true;
+        wakeUp();
+      }
     }
   }
 
-  /**
-   * Get the last captured exception.
-   * @return the last captured exception, if any, otherwise {@code null}.
-   */
+  @Override
   public Exception getLastException() {
     return lastException;
   }
