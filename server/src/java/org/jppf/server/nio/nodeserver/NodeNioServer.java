@@ -447,6 +447,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     lock.lock();
     try {
       wakeUpSelectorIfNeeded();
+      stopped.set(true);
+    } catch(final Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      lock.unlock();
+    }
+    try {
       if (taskQueueChecker != null) {
         taskQueueChecker.setStopped(true);
         taskQueueChecker.wakeUp();
@@ -463,8 +470,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       allConnections.clear();
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
-    } finally {
-      lock.unlock();
     }
     super.removeAllConnections();
   }

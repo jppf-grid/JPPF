@@ -280,14 +280,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Initiates shutdown of this server.
    */
   public void shutdown() {
-    requestShutdown.set(true);
-    try {
-      lock.lock();
-      wakeUpSelectorIfNeeded();
-      end();
-    } finally {
-      lock.unlock();
-    }
+    if (requestShutdown.compareAndSet(false, true)) end();
   }
 
   /**
@@ -400,9 +393,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Close the underlying server socket and stop this socket server.
    */
   public void end() {
-    if (!isStopped()) {
+    if (stopped.compareAndSet(false, true)) {
       if (debugEnabled) log.debug("closing server {}", this);
-      stopped.set(true);
       wakeUpSelectorIfNeeded();
       removeAllConnections();
     }
