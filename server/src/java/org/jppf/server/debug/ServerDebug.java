@@ -285,4 +285,26 @@ public class ServerDebug implements ServerDebugMBean {
       ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
+
+  @Override
+  public void startProfiling() {
+    startProf();
+  }
+
+  @Override
+  public void endProfiling() {
+    endProf();
+  }
+
+  /**
+   * Trigger method for the profiler to start profiling.
+   */
+  public static void startProf() {
+  }
+
+  /**
+   * Trigger method for the profiler to stop profiling.
+   */
+  public static void endProf() {
+  }
 }

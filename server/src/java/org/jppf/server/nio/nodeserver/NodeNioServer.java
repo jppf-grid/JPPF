@@ -275,7 +275,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       taskQueueChecker.removeIdleChannelAsync(nodeContext);
       if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) {
         final String uuid = nodeContext.getUuid();
-        transitionManager.submit(new Runnable() {
+        transitionManager.execute(new Runnable() {
           @Override
           public void run() {
             queue.getBroadcastManager().cancelBroadcastJobs(uuid);

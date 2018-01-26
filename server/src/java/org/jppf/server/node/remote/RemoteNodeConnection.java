@@ -45,7 +45,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  private SocketInitializer socketInitializer = new SocketInitializerImpl();
+  private SocketInitializer socketInitializer = new QueuingSocketInitializer();
   /**
    * 
    */

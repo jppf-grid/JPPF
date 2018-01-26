@@ -48,25 +48,25 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
   /**
    * The last captured exception.
    */
-  private Exception lastException;
+  Exception lastException;
   /**
    * Determine whether this socket initializer has been intentionally closed.
    */
-  private boolean closed;
+  boolean closed;
   /**
    * Name given to this initializer.
    */
   private String name;
 
   /**
-   * Instantiate this SocketInitializer with a specified socket wrapper.
+   * Instantiate this SocketInitializer with the global JPPF configuration.
    */
   public SocketInitializerImpl() {
     this.config = JPPFConfiguration.getProperties();
   }
 
   /**
-   * Instantiate this SocketInitializer with a specified socket wrapper.
+   * Instantiate this SocketInitializer with a specified configuration.
    * @param config the configuration to use.
    */
   public SocketInitializerImpl(final TypedProperties config) {

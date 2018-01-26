@@ -48,7 +48,7 @@ public class CancelJob {
    */
   static void perform2() throws Exception {
     final String name = "org.jppf:name=my.test,type=test";
-    final ObjectName objName = new ObjectName(name);
+    final ObjectName objName = ObjectNameCache.getObjectName(name);
     final int port = 4444;
     JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
     System.out.println("registering MBean");

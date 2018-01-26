@@ -54,14 +54,18 @@ public class InterceptorHandler {
       m = log.getClass().getMethod("isDebugEnabled");
       debugEnabled = (Boolean) m.invoke(log);
       logDebugMethod = log.getClass().getMethod("debug", String.class);
-    } catch(final Throwable ignore) {
-      ignore.printStackTrace();
+    } catch(final Throwable t) {
+      t.printStackTrace();
     }
   }
   /**
    * The list of interceptors loaded via SPI.
    */
   static final List<NetworkConnectionInterceptor> INTERCEPTORS = Collections.unmodifiableList(loadInterceptors());
+  /**
+   * 
+   */
+  private static final boolean HAS_INTERCEPTOR = !INTERCEPTORS.isEmpty();
 
   /**
    * Load the interceptors via the SPI mechanism.
@@ -79,7 +83,7 @@ public class InterceptorHandler {
    * @return {@code true} if there is at least one interceptor, {@code false} otherwise.
    */
   public static boolean hasInterceptor() {
-    return !INTERCEPTORS.isEmpty();
+    return !HAS_INTERCEPTOR;
   }
 
   /**
@@ -88,7 +92,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnConnect(final Socket connectedSocket) {
-    if (INTERCEPTORS.isEmpty()) return true;
+    if (!HAS_INTERCEPTOR) return true;
     if (debugEnabled) debugLog("invoking onConnect() on %s", connectedSocket);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onConnect(connectedSocket)) return false;
@@ -102,7 +106,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnConnect(final SocketChannel connectedChannel) {
-    if (INTERCEPTORS.isEmpty()) return true;
+    if (!HAS_INTERCEPTOR) return true;
     if (debugEnabled) debugLog("invoking onConnect() on %s", connectedChannel);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onConnect(connectedChannel)) return false;
@@ -116,7 +120,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnAccept(final Socket acceptedSocket) {
-    if (INTERCEPTORS.isEmpty()) return true;
+    if (!HAS_INTERCEPTOR) return true;
     if (debugEnabled) debugLog("invoking onAccept() on %s", acceptedSocket);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onAccept(acceptedSocket)) return false;
@@ -130,7 +134,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnAccept(final SocketChannel acceptedChannel) {
-    if (INTERCEPTORS.isEmpty()) return true;
+    if (!HAS_INTERCEPTOR) return true;
     if (debugEnabled) debugLog("invoking onAccept() on %s", acceptedChannel);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onAccept(acceptedChannel)) return false;

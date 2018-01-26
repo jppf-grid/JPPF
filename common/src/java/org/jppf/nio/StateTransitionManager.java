@@ -93,7 +93,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Submit the specified runnable to the executor.
    * @param runnable the runnable to submit.
    */
-  public void submit(final Runnable runnable) {
+  public void execute(final Runnable runnable) {
     executor.execute(runnable);
   }
 
@@ -102,7 +102,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param runnable the runnable to submit.
    * @return a future.
    */
-  public Future<?> submitWithFuture(final Runnable runnable) {
+  public Future<?> submit(final Runnable runnable) {
     return executor.submit(runnable);
   }
 

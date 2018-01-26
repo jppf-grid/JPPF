@@ -26,11 +26,11 @@ import javax.management.*;
  */
 public class JMXMessageType {
   /**
-   * Identifier for the initial handshake of a copnnection.
+   * Identifier for the initial handshake of a connection.
    */
   public static final byte CONNECT = 1;
   /**
-   * Identifier a connection close request. A close request does not expect a response.
+   * Identifier for a connection close request. A close request does not expect a response.
    */
   public static final byte CLOSE = 2;
   /**

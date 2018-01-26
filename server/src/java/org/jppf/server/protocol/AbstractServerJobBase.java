@@ -309,7 +309,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
           if (newStatus != null) setSubmissionStatus(newStatus);
         }
       };
-      JPPFDriver.getInstance().getNodeNioServer().getTransitionManager().submit(r);
+      JPPFDriver.getInstance().getNodeNioServer().getTransitionManager().execute(r);
     }
   }
 }

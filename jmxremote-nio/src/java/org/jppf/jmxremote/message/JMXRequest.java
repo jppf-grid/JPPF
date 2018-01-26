@@ -21,6 +21,8 @@ package org.jppf.jmxremote.message;
 import java.io.*;
 import java.util.Arrays;
 
+import javax.management.ObjectName;
+
 /**
  * A specialized message that represents a request to the server.
  * @author Laurent Cohen
@@ -94,7 +96,9 @@ public class JMXRequest extends AbstractJMXMessage {
     final int n = params.length;
     out.writeByte(n);
     if (n > 0) {
-      for (final Object o: params) out.writeObject(o);
+      for (final Object o: params) {
+        out.writeObject((o instanceof ObjectName) ? new JPPFObjectName((ObjectName) o) : o);
+      }
     }
   }
 
@@ -109,7 +113,10 @@ public class JMXRequest extends AbstractJMXMessage {
     if (n <= 0) params = NO_PARAMS;
     else {
       params  = new Object[n];
-      for (int i=0; i<n; i++) params[i] = in.readObject();
+      for (int i=0; i<n; i++) {
+        params[i] = in.readObject();
+        if (params[i] instanceof JPPFObjectName) params[i] = ((JPPFObjectName) params[i]).getObjectName();
+      }
     }
   }
 }

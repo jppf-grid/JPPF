@@ -332,7 +332,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if (channel == null) return;
     final Runnable task = new AcceptChannelTask(this, serverSocketChannel, channel, ssl);
-    transitionManager.submit(task);
+    transitionManager.execute(task);
   }
 
   /**

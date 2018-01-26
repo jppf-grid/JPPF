@@ -48,7 +48,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  private SocketInitializer socketInitializer = new SocketInitializerImpl();
+  private SocketInitializer socketInitializer = new QueuingSocketInitializer();
   /**
    * Determines whether SSL is enabled.
    */

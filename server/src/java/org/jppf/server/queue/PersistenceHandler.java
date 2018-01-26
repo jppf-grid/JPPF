@@ -245,8 +245,8 @@ public class PersistenceHandler {
       result = new ArrayList<>(infos.size());
       for (InputStream is: list) result.add(load(is));
     }
-    final long elapsed = System.nanoTime() - start;
-    if (debugEnabled) log.debug("took {} ms to load {} job elements", elapsed / 1_000_000L, infos.size());
+    final long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    if (debugEnabled) log.debug("took {} ms to load {} job elements", elapsed, infos.size());
     return result;
   }
 
@@ -257,13 +257,11 @@ public class PersistenceHandler {
    * @throws Exception if any error occurs.
    */
   private static DataLocation load(final InputStream stream) throws Exception {
-    List<JPPFBuffer> buffers = null;
-    try (final InputStream is = stream; MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
+    try (final InputStream is = stream; final MultipleBuffersOutputStream os = new MultipleBuffersOutputStream()) {
       if (is == null) return null;
       StreamUtils.copyStream(is, os, false);
-      buffers = os.toBufferList();
+      return new MultipleBuffersLocation(os.toBufferList());
     }
-    return new MultipleBuffersLocation(buffers);
   }
 
   /**

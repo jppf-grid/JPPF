@@ -100,7 +100,7 @@ public class NodeReservationHandler {
       pendingMap.put(node.getUuid(), job.getUuid());
       jobPendingMap.putValue(job.getUuid(), node.getUuid());
     }
-    server.getTransitionManager().submit(new NodeReservationTask(job, node));
+    server.getTransitionManager().execute(new NodeReservationTask(job, node));
   }
 
   /**

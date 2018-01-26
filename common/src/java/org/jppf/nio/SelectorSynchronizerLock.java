@@ -92,7 +92,7 @@ public class SelectorSynchronizerLock implements SelectorSynchronizer {
     } catch (@SuppressWarnings("unused") final Exception e) {
     } finally {
       count = -1;
-      condition.signal();;
+      condition.signal();
       lock.unlock();
     }
   }
@@ -129,7 +129,7 @@ public class SelectorSynchronizerLock implements SelectorSynchronizer {
         selector.wakeup();
         count = 1;
       } else count++;
-      condition.signal();;
+      condition.signal();
     } finally {
       lock.unlock();
     }

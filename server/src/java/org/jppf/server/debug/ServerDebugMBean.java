@@ -142,4 +142,14 @@ public interface ServerDebugMBean extends Serializable {
    * @throws JPPFScriptingException if an error occurs while evaluating the script. 
    */
   Object executeScript(String language, String script) throws JPPFScriptingException;
+
+  /**
+   * Trigger method for the profiler to start profiling.
+   */
+  void startProfiling();
+
+  /**
+   * Trigger method for the profiler to stop profiling.
+   */
+  void endProfiling();
 }

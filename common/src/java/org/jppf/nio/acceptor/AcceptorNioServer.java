@@ -48,10 +48,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The statsistics to update, if any.
    */
   private final JPPFStatistics stats;
@@ -115,8 +111,9 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       if (!key.isValid()) continue;
       AcceptorContext context = null;
       try {
-        if (key.isAcceptable()) doAccept(key);
-        else if (key.isReadable()) {
+        if (key.isAcceptable()) {
+          doAccept(key);
+        } else if (key.isReadable()) {
           context = (AcceptorContext) key.attachment();
           identifyingState.performTransition(context.getChannel());
         }
@@ -160,17 +157,39 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
       channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
       channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
-      if (InterceptorHandler.hasInterceptor()) {
-        channel.configureBlocking(true);
-        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
-      }
-      if (channel.isBlocking()) channel.configureBlocking(false);
+      if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+      channel.configureBlocking(false);
       accept(serverSocketChannel, channel, null, ssl, false);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
       StreamUtils.close(channel, log);
     }
   }
+  /*
+  protected void doAccept(final SelectionKey key) {
+    final ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+    @SuppressWarnings("unchecked")
+    final Map<String, ?> map = (Map<String, ?>) key.attachment();
+    final boolean ssl = (Boolean) map.get("jppf.ssl");
+    while (true) {
+      try {
+        final SocketChannel channel = serverSocketChannel.accept();
+        if (channel == null) break;
+        if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
+        channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
+        channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
+        channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
+        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+        channel.configureBlocking(false);
+        accept(serverSocketChannel, channel, null, ssl, false);
+        if (debugEnabled) log.debug("accepted {}", channel);
+      } catch (final Exception e) {
+        log.error(e.getMessage(), e);
+      }
+    }
+  }
+  */
 
   /**
    * Register an incoming connection with this server's selector.
@@ -193,8 +212,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     context.setPeer(peer);
     context.setState(AcceptorState.IDENTIFYING_PEER);
     if (sslHandler != null) context.setSSLHandler(sslHandler);
-    final SelectionKey selKey;
-    selKey = channel.register(selector, 0, context);
+    final SelectionKey selKey = channel.register(selector, 0, context);
     final SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
     context.setChannel(wrapper);
     context.setSsl(ssl);
@@ -204,27 +222,10 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       configureSSLEngine(engine);
       context.setSSLHandler(new SSLHandler(wrapper, engine));
     }
-    updateInterestOpsNoWakeup(selKey, SelectionKey.OP_READ, true);
+    context.setInterestOps(SelectionKey.OP_READ);
+    selKey.interestOps(SelectionKey.OP_READ);
     if (debugEnabled) log.debug("{} channel {} accepted", this, channel);
     return wrapper;
-  }
-
-  /**
-   * Set the interest ops of a specified selection key.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   */
-  private static void updateInterestOpsNoWakeup(final SelectionKey key, final int update, final boolean add) {
-    final AcceptorContext context = (AcceptorContext) key.attachment();
-    final int ops = context.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      key.interestOps(newOps);
-      context.setInterestOps(newOps);
-    }
   }
 
   @Override

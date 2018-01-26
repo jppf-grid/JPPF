@@ -58,7 +58,7 @@ class JMXMessageReader {
         final SimpleNioMessage message = (SimpleNioMessage) context.getMessage();
         if (debugEnabled) log.debug("read message from {}", context);
         context.setMessage(null);
-        mgr.submit(new HandlingTask(context, message));
+        mgr.execute(new HandlingTask(context, message));
       } else if (context.byteCount <= 0L) break;
     }
   }

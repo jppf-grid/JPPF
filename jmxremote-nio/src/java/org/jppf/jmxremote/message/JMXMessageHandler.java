@@ -215,7 +215,7 @@ public class JMXMessageHandler {
     if (debugEnabled) log.debug("sending message {}", message);
     channels.writingChannel().getContext().offerJmxMessage(message);
     final JMXTransitionTask task = channels.getWritingTask();
-    if (!task.incrementCountIfNeeded()) mgr.submit(task);
+    if (!task.incrementCountIfNeeded()) mgr.execute(task);
     //server.updateInterestOps(channels.getSelectionKey(), SelectionKey.OP_WRITE, true);
   }
 

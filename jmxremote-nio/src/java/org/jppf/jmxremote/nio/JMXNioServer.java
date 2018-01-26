@@ -168,8 +168,6 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
         final boolean readable = key.isReadable(), writable = key.isWritable();
         if (writable) {
           updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
-          //final JMXTransitionTask task = pair.getWritingTask();
-          //if (!task.incrementCountIfNeeded()) transitionManager.submit(task);
           final JMXTransitionTask task = pair.getNonSelectingWritingTask();
           if (!task.incrementCountIfNeeded()) task.run();
         }
@@ -414,7 +412,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
 
   /**
    * Add a listener to the connection status events.
-   * @param listener the luistener to add.
+   * @param listener the listener to add.
    */
   public void addConnectionStatusListener(final JMXConnectionStatusListener listener) {
     if (listener != null) connectionStatusListeners.add(listener);
@@ -422,7 +420,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
 
   /**
    * Remove a listener from the connection status events.
-   * @param listener the luistener to remove.
+   * @param listener the listener to remove.
    */
   public void removeConnectionStatusListener(final JMXConnectionStatusListener listener) {
     if (listener != null) connectionStatusListeners.remove(listener);

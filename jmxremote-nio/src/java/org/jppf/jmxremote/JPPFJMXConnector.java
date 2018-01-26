@@ -150,7 +150,8 @@ public class JPPFJMXConnector implements JMXConnector {
     @SuppressWarnings("resource")
     final SocketChannelClient socketClient =  new SocketChannelClient(address.getHost(), address.getPort(), true);
     //if (debugEnabled) log.debug("Attempting connection to remote peer at {}", address);
-    final SocketInitializerImpl socketInitializer = new SocketInitializerImpl();
+    //final SocketInitializer socketInitializer = new SocketInitializerImpl();
+    final SocketInitializer socketInitializer = new QueuingSocketInitializer();
     if (!socketInitializer.initialize(socketClient)) {
       final Exception e = socketInitializer.getLastException();
       throw (e == null) ? new ConnectException("could not connect to remote JMX server " + address) : e;
