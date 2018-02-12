@@ -207,12 +207,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         receiverThread = null;
         initPeers = true;
       }
-
-      if (debugEnabled) log.debug("found peers in the configuration");
+      if (debugEnabled) log.debug("looking for peers in the configuration");
       final String[] names = config.get(JPPFProperties.DRIVERS);
-      if (debugEnabled) log.debug("list of drivers: " + Arrays.asList(names));
+      if (debugEnabled) log.debug("list of drivers: {}", Arrays.asList(names));
       for (final String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-
+      if (debugEnabled) log.debug("initPeers = {}", initPeers);
       if (initPeers) {
         final List<ClientConnectionPoolInfo> infoList = new ArrayList<>();
         for (final String name : names) {
@@ -228,9 +227,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             final int priority = config.get(JPPFProperties.PARAM_PRIORITY, name);
             final int poolSize = config.get(JPPFProperties.PARAM_POOL_SIZE, name);
             final int jmxPoolSize = config.get(JPPFProperties.PARAM_JMX_POOL_SIZE, name);
-            infoList.add(new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize));
+            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize);
+            if (debugEnabled) log.debug("found pool definition in the configuration: {}", ccpi);
+            infoList.add(ccpi);
           }
         }
+        if (debugEnabled) log.debug("found {} pool definitions in the configuration", infoList.size());
         Collections.sort(infoList, new Comparator<ClientConnectionPoolInfo>() { // order by decreasing priority
           @Override
           public int compare(final ClientConnectionPoolInfo o1, final ClientConnectionPoolInfo o2) {
