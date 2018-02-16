@@ -29,7 +29,7 @@ import org.slf4j.*;
 /**
  * Implementation of {@link NioObject} for reading or writing data from or to an SSL channel.
  * The channel and the corresponding {@link javax.net.ssl.SSLEngine SSLEngine} are both
- * encapsulated within an instance of {@link SSLHandler}.
+ * encapsulated within an instance of {@link SSLHandlerImpl}.
  * @author Laurent Cohen
  */
 public class SSLNioObject extends AbstractNioObject {
@@ -131,7 +131,7 @@ public class SSLNioObject extends AbstractNioObject {
       is = location.getInputStream();
       statefulCount = 0;
     }
-    //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     if (buf.hasRemaining() && (statefulCount < size)) {
       final int min = Math.min(size - statefulCount, buf.remaining());
       final int read = is.read(buf.array(), buf.position(), min);
@@ -140,14 +140,14 @@ public class SSLNioObject extends AbstractNioObject {
         buf.position(buf.position() + read);
       }
     }
-    //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
 
     int n;
     do {
       n = sslHandler.write();
       if (n > 0) count += n;
       sslHandler.flush();
-      //if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+      if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     } while (n > 0);
 
     final boolean b = count >= size;
