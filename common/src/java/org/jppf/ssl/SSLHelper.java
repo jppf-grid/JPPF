@@ -139,9 +139,7 @@ public final class SSLHelper {
    * Reset the SSL configuration.
    */
   public static void resetConfig() {
-    if (helper != null) {
-      helper = null;
-    }
+    if (helper != null) helper = null;
   }
 
   /**
@@ -150,7 +148,7 @@ public final class SSLHelper {
    * @return an id composed of a property name and its value, in the form "driverName.property_suffix=value".
    */
   public static String getClientConfigId(final String driverName) {
-    return helper.getClientConfigId(driverName);
+    return SSLHelper2.getClientConfigId(driverName);
   }
 
   /**
@@ -160,33 +158,38 @@ public final class SSLHelper {
    */
   public static SSLHelper2 getJPPFJMXremoteSSLHelper(final Map<String, ?> env) {
     final TypedProperties props = new TypedProperties();
-    String s = null;
-    Boolean b = null;
-    b = (Boolean) env.get("jppf.jmx.remote.tls.enabled");
+    final Boolean b = (Boolean) env.get("jppf.jmx.remote.tls.enabled");
     if ((b == null) || !b) return null;
     props.setBoolean("jppf.ssl.enabled", true);
-    s = (String) env.get("jppf.jmx.remote.tls.enabled.protocols");
-    if (s != null) props.put("jppf.ssl.protocols", s);
-    s = (String) env.get("jppf.jmx.remote.tls.enabled.cipher.suites");
-    if (s != null) props.put("jppf.ssl.cipher.suites", s);
-    s = (String) env.get("jppf.jmx.remote.tls.client.authentication");
-    if (s != null) props.setString("jppf.ssl.client.auth", s);
-    s = (String) env.get("jppf.jmx.remote.tls.truststore.password");
-    if (s != null) props.setString("jppf.ssl.truststore.password", s);
-    s = (String) env.get("jppf.jmx.remote.tls.truststore.password.source");
-    if (s != null) props.setString("jppf.ssl.truststore.password.source", s);
-    s = (String) env.get("jppf.jmx.remote.tls.truststore.file");
-    if (s != null) props.setString("jppf.ssl.truststore.file", s);
-    s = (String) env.get("jppf.jmx.remote.tls.truststore.source");
-    if (s != null) props.setString("jppf.ssl.truststore.source", s);
-    s = (String) env.get("jppf.jmx.remote.tls.keystore.password");
-    if (s != null) props.setString("jppf.ssl.keystore.password", s);
-    s = (String) env.get("jppf.jmx.remote.tls.keystore.password.source");
-    if (s != null) props.setString("jppf.ssl.keystore.password.source", s);
-    s = (String) env.get("jppf.jmx.remote.tls.keystore.file");
-    if (s != null) props.setString("jppf.ssl.keystore.file", s);
-    s = (String) env.get("jppf.jmx.remote.tls.keystore.source");
-    if (s != null) props.setString("jppf.ssl.keystore.source", s);
+    convert(env, props, "jppf.jmx.remote.tls.context.protocol",                  "jppf.ssl.context.protocol");
+    convert(env, props, "jppf.jmx.remote.tls.enabled.protocols",                 "jppf.ssl.protocols");
+    convert(env, props, "jppf.jmx.remote.tls.enabled.cipher.suites",             "jppf.ssl.cipher.suites");
+    convert(env, props, "jppf.jmx.remote.tls.client.authentication",             "jppf.ssl.client.auth");
+    convert(env, props, "jppf.jmx.remote.tls.client.distinct.truststore",        "jppf.ssl.client.distinct.truststore");
+    convert(env, props, "jppf.jmx.remote.tls.client.truststore.password",        "jppf.ssl.client.truststore.password");
+    convert(env, props, "jppf.jmx.remote.tls.client.truststore.password.source", "jppf.ssl.client.truststore.password.source");
+    convert(env, props, "jppf.jmx.remote.tls.client.truststore.file",            "jppf.ssl.client.truststore.file");
+    convert(env, props, "jppf.jmx.remote.tls.client.truststore.source",          "jppf.ssl.client.truststore.source");
+    convert(env, props, "jppf.jmx.remote.tls.truststore.password",               "jppf.ssl.truststore.password");
+    convert(env, props, "jppf.jmx.remote.tls.truststore.password.source",        "jppf.ssl.truststore.password.source");
+    convert(env, props, "jppf.jmx.remote.tls.truststore.file",                   "jppf.ssl.truststore.file");
+    convert(env, props, "jppf.jmx.remote.tls.truststore.source",                 "jppf.ssl.truststore.source");
+    convert(env, props, "jppf.jmx.remote.tls.keystore.password",                 "jppf.ssl.keystore.password");
+    convert(env, props, "jppf.jmx.remote.tls.keystore.password.source",          "jppf.ssl.keystore.password.source");
+    convert(env, props, "jppf.jmx.remote.tls.keystore.file",                     "jppf.ssl.keystore.file");
+    convert(env, props, "jppf.jmx.remote.tls.keystore.source",                   "jppf.ssl.keystore.source");
     return new SSLHelper2(props);
+  }
+
+  /**
+   * Convert the source property from the JMX environment into the destination SSL config property.
+   * @param env the JMX enviromentproperties from which to convert.
+   * @param props the properties to convert into.
+   * @param src the source property.
+   * @param dest the destination property.
+   */
+  private static void convert(final Map<String, ?> env, final TypedProperties props, final String src, final String dest) {
+    final String s = (String) env.get(src);
+    if (s != null) props.put(dest, s);
   }
 }
