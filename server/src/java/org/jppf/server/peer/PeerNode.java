@@ -77,7 +77,7 @@ class PeerNode extends AbstractPeerConnectionHandler {
       if (debugEnabled) log.debug("registered peer client channel " + channel);
       if (secure) {
         context.setSsl(true);
-        server.configureSSL(channel);
+        server.configurePeerSSL(channel);
       }
       server.getTransitionManager().transitionChannel(channel, ClientTransition.TO_SENDING_PEER_HANDSHAKE);
       socketClient = null;

@@ -76,7 +76,7 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
       if (debugEnabled) log.debug("registered class server channel " + channel);
       if (secure) {
         context.setSsl(true);
-        server.configureSSL(channel);
+        server.configurePeerSSL(channel);
       }
       final JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
