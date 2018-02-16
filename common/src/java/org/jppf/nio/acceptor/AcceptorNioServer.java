@@ -220,20 +220,12 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       if (debugEnabled) log.debug("creating SSLEngine for  {}", wrapper);
       final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
       configureSSLEngine(engine);
-      context.setSSLHandler(new SSLHandler(wrapper, engine));
+      context.setSSLHandler(new SSLHandlerImpl(wrapper, engine));
     }
     context.setInterestOps(SelectionKey.OP_READ);
     selKey.interestOps(SelectionKey.OP_READ);
     if (debugEnabled) log.debug("{} channel {} accepted", this, channel);
     return wrapper;
-  }
-
-  @Override
-  protected void createSSLContext() throws Exception {
-  }
-
-  @Override
-  protected void configureSSLEngine(final SSLEngine engine) throws Exception {
   }
 
   @Override
