@@ -17,6 +17,8 @@
  */
 package org.jppf.server.node;
 
+import static org.jppf.utils.configuration.JPPFProperties.MANAGEMENT_PORT_NODE;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -35,7 +37,7 @@ import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -441,7 +443,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       if ((jmxServer == null) || jmxServer.isStopped()) {
         if (debugEnabled) log.debug("starting JMX server");
         final boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
-        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, ssl ? JPPFProperties.MANAGEMENT_SSL_PORT_NODE : JPPFProperties.MANAGEMENT_PORT_NODE);
+        JPPFProperty<Integer> jmxProp = null;
+        /*
+        final String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
+        if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = SERVER_PORT;
+        else jmxProp = ssl ? MANAGEMENT_SSL_PORT_NODE : MANAGEMENT_PORT_NODE;
+        */
+        jmxProp = MANAGEMENT_PORT_NODE;
+        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, jmxProp);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
       }
