@@ -22,6 +22,8 @@ import java.io.*;
 import java.lang.reflect.InvocationHandler;
 import java.util.*;
 
+import javax.management.ObjectName;
+
 import org.jppf.serialization.*;
 import org.jppf.utils.pooling.*;
 import org.objenesis.instantiator.ObjectInstantiator;
@@ -50,7 +52,6 @@ public class KryoSerialization implements JPPFSerialization {
   /**
    * A fast dynamic pool of {@link Kryo} instances.
    * Using this provides a huge performance improvement vs creating a new Kryo instance each time we serialize or deserialize an object.
-   * @see org.jppf.utils.pooling.AbstractObjectPoolQueue
    */
   private static ObjectPool<Kryo> pool = new AbstractObjectPoolQueue<Kryo>() {
     @Override
@@ -132,7 +133,7 @@ public class KryoSerialization implements JPPFSerialization {
     final Kryo kryo = new Kryo(new CustomClassResolver(), new MapReferenceResolver());
     kryo.setAutoReset(true);
     kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
-
+    kryo.register(ObjectName.class, new ObjectNameSerializer());
     kryo.register(Arrays.asList( "" ).getClass(), new ArraysAsListSerializer() );
     kryo.register(Collections.EMPTY_LIST.getClass(), new CollectionsEmptyListSerializer() );
     kryo.register(Collections.EMPTY_MAP.getClass(), new CollectionsEmptyMapSerializer() );
