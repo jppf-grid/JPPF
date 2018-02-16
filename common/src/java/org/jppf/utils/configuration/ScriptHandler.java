@@ -79,10 +79,6 @@ public class ScriptHandler {
    */
   private static Logger log = LoggerFactory.getLogger(ScriptHandler.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The regex pattern for identifying scripted property values.
    */
   public static final Pattern SCRIPT_PATTERN = Pattern.compile("\\$(?:script|S|s)(?:\\:([^:]*?))?(?:\\:(.*?))?\\{(.*?)\\}\\$");
@@ -90,6 +86,10 @@ public class ScriptHandler {
    * Name of the property which sets the default script language to use.
    */
   private static final String DEFAULT_SOURCE_TYPE = "inline";
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The properties to evaluate.
    */

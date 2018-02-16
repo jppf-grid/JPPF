@@ -339,4 +339,22 @@ public class ReflectionUtils {
     sb.append('@').append(Integer.toHexString(System.identityHashCode(o)));
     return sb.toString();
   }
+
+  /**
+   * Determine whether two methids have the same signature.
+   * @param method1 the first method to compare.
+   * @param method2 the second method to compare.
+   * @return {@code true} if the methods have the same signature, {@code false} otherwise.
+   */
+  public static boolean sameSignature(final Method method1, final Method method2) {
+    if (!method1.getName().equals(method2.getName())) return false;
+    final Class<?>[] argTypes1 = method1.getParameterTypes();
+    final Class<?>[] argTypes2 = method2.getParameterTypes();
+    if (argTypes1.length != argTypes2.length) return false;
+    for (int i=0; i<argTypes1.length; i++) {
+      if (argTypes1[i] != argTypes2[i]) return false;
+    }
+    if (method1.getReturnType() != method2.getReturnType()) return false;
+    return true;
+  }
 }

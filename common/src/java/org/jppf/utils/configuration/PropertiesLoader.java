@@ -39,10 +39,6 @@ public class PropertiesLoader {
    */
   private static Logger log = LoggerFactory.getLogger(PropertiesLoader.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * White space pattern.
    */
   private static final Pattern WHITE_SPACE_PATTERN = Pattern.compile("\\s+");
@@ -67,6 +63,10 @@ public class PropertiesLoader {
    * Empty string constant.
    */
   private static final String EMPTY_STRING = "";
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Loads the properties from the specified reader into the specified Properties object.

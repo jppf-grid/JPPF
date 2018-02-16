@@ -39,29 +39,21 @@ public class MultipleBuffersInputStream extends InputStream {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Min data length for which to call {@code System.arraycopy()} instead of copying in a loop.
-   */
-  private static final int ARRAYCOPY_MIN_LENGTH = 10;
-  /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */
   private final List<JPPFBuffer> list;
   /**
    * The JPPFBuffer currently being read from.
    */
-  private JPPFBuffer currentBuffer = null;
+  private JPPFBuffer currentBuffer;
   /**
    * Current index in the list of buffers.
    */
   private int bufferIndex = -1;
   /**
-   * The total number of bytes written into this output stream.
-   */
-  private long totalSize = -1L;
-  /**
    * Determines whether end of file was reached.
    */
-  private boolean eofReached = false;
+  private boolean eofReached;
 
   /**
    * Initialize this input stream with the specified buffers.
@@ -83,7 +75,7 @@ public class MultipleBuffersInputStream extends InputStream {
     final byte b = currentBuffer.buffer[currentBuffer.pos];
     currentBuffer.pos++;
     if (traceEnabled) log.trace("read one byte '" + b + "' from " + this);
-    return b & 0xff;
+    return b;
   }
 
   /**
@@ -98,15 +90,12 @@ public class MultipleBuffersInputStream extends InputStream {
   public int read(final byte[] b, final int off, final int len) throws IOException {
     if (eofReached) return -1;
     int count = 0;
+    int n;
     while (count < len) {
       if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
       if (eofReached) break;
-      final int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
-      int bPos = off + count;
-      if (n >= ARRAYCOPY_MIN_LENGTH) System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, bPos, n);
-      else {
-        for (int i=currentBuffer.pos; i<currentBuffer.pos + n; i++) b[bPos++] = currentBuffer.buffer[i];
-      }
+      n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
+      System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
       count += n;
       currentBuffer.pos += n;
     }
@@ -132,22 +121,16 @@ public class MultipleBuffersInputStream extends InputStream {
     if (bufferIndex >= list.size()) {
       eofReached = true;
       currentBuffer = null;
-      return;
+    } else {
+      currentBuffer = list.get(bufferIndex);
+      currentBuffer.pos = 0;
     }
-    currentBuffer = list.get(bufferIndex);
-    currentBuffer.pos = 0;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    if (totalSize < 0) {
-      totalSize = 0;
-      for (JPPFBuffer buf : list)
-        totalSize += buf.length;
-    }
-    sb.append("totalSize=").append(totalSize);
     sb.append(", nbBuffers=").append(list.size());
     sb.append(", bufferIndex=").append(bufferIndex);
     if (currentBuffer == null) sb.append(", currentBuffer=null");

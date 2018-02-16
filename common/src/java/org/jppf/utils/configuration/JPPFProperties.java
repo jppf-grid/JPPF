@@ -124,7 +124,7 @@ public class JPPFProperties {
   /** JMX connection pool size when discovery is enabled. */
   public static final JPPFProperty<Integer> JMX_POOL_SIZE = new IntProperty("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
   /** JMX remote protocol. */
-  public static final JPPFProperty<String> JMX_REMOTE_PROTOCOL = new StringProperty("jppf.jmxremote.protocol", JMXHelper.JMXMP_PROTOCOL).setPossibleValues("jmxmp", "jppf");
+  public static final JPPFProperty<String> JMX_REMOTE_PROTOCOL = new StringProperty("jppf.jmxremote.protocol", JMXHelper.JPPF_JMX_PROTOCOL).setPossibleValues(JMXHelper.remoteProtocols());
   /** Timeout in milliseconds for JMX requests. */
   public static final JPPFProperty<Long> JMX_REMOTE_REQUEST_TIMEOUT = new LongProperty("jppf.jmxremote.request.timeout", Long.MAX_VALUE, 0L, Long.MAX_VALUE, "jppf.jmx.request.timeout");
   /** JVM options for the node or server process. */

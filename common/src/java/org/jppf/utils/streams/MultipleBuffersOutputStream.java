@@ -160,10 +160,4 @@ public class MultipleBuffersOutputStream extends OutputStream {
     sb.append(']');
     return sb.toString();
   }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-    //if (list != null) list.clear();
-  }
 }
