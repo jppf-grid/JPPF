@@ -87,13 +87,13 @@ public interface NioContext<S extends Enum<S>> {
 
   /**
    * Get the SSL engine manager associated with the channel.
-   * @return an instance of {@link SSLHandler}.
+   * @return an instance of {@link SSLHandlerImpl}.
    */
   SSLHandler getSSLHandler();
 
   /**
    * Get the SSL engine associated with the channel.
-   * @param sslHandler an instance of {@link SSLHandler}.
+   * @param sslHandler an instance of {@link SSLHandlerImpl}.
    */
   void setSSLHandler(SSLHandler sslHandler);
 

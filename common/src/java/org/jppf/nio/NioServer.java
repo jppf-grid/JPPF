@@ -145,7 +145,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     log.info("initializing {}({})", getClass().getSimpleName(), getName());
     this.identifier = identifier;
     selector = Selector.open();
-    //sync = new SelectorSynchronizerImpl(selector);
     sync = new SelectorSynchronizerLock(selector);
     transitionManager = createStateTransitionManager();
     factory = createFactory();
@@ -370,7 +369,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       if (debugEnabled) log.debug("creating SSLEngine for  {}", wrapper);
       final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
       configureSSLEngine(engine);
-      context.setSSLHandler(new SSLHandler(wrapper, engine));
+      context.setSSLHandler(new SSLHandlerImpl(wrapper, engine));
     }
     postAccept(wrapper);
     return wrapper;
@@ -407,22 +406,21 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     if (!isStopped()) return;
     lock.lock();
     try {
-      try {
-        wakeUpSelectorIfNeeded();
-        selector.close();
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-      }
+      wakeUpSelectorIfNeeded();
+      selector.close();
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     } finally {
       lock.unlock();
     }
     synchronized(servers) {
-      for (Map.Entry<Integer, ServerSocketChannel> entry: servers.entrySet())
+      for (Map.Entry<Integer, ServerSocketChannel> entry: servers.entrySet()) {
         try {
           entry.getValue().close();
         } catch (final Exception e) {
           log.error(e.getMessage(), e);
         }
+      }
       servers.clear();
     }
   }
@@ -507,14 +505,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   }
 
   /**
-   * Get the SSL context associated with this server.
-   * @return a {@link SSLContext} instance.
-   */
-  public SSLContext getSSLContext() {
-    return sslContext;
-  }
-
-  /**
    * Determines whether the specified channel is in an idle state.
    * @param channel the channel to check.
    * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
@@ -526,16 +516,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param channel the channel for which to configure SSL.
    * @throws Exception if any error occurs.
    */
-  public void configureSSL(final ChannelWrapper<?> channel) throws Exception {
+  public void configurePeerSSL(final ChannelWrapper<?> channel) throws Exception {
     final SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
     final NioContext<?> context = channel.getContext();
-    final SSLContext sslContext = getSSLContext();
     final Socket socket = socketChannel.socket();
     final SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
     final SSLParameters params = SSLHelper.getSSLParameters();
     engine.setUseClientMode(true);
     engine.setSSLParameters(params);
-    final SSLHandler sslHandler = new SSLHandler(channel, engine);
+    final SSLHandler sslHandler = new SSLHandlerImpl(channel, engine);
     context.setSSLHandler(sslHandler);
   }
 
