@@ -208,7 +208,7 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("jobId=").append(getName());
+    sb.append("name=").append(getName());
     sb.append(", jobUuid=").append(getUuid());
     sb.append(", initialTaskCount=").append(getInitialTaskCount());
     sb.append(", taskCount=").append(getTaskCount());

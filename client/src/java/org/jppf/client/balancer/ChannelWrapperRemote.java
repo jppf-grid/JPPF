@@ -18,7 +18,7 @@
 
 package org.jppf.client.balancer;
 
-import java.io.NotSerializableException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.*;
@@ -164,7 +164,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * Called when reconnection of this channel is required.
    */
   public void reconnect() {
-    if (channel.isClosed()) return;
+    if (channel.isClosed()) {
+      if (debugEnabled) log.debug("connection is closed, will not reconnect");
+      return;
+    }
     channel.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
     channel.submitInitialization();
   }
@@ -269,7 +272,9 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         try {
           final boolean channelClosed = channel.isClosed();
           if (debugEnabled) log.debug("finally: channelClosed={}, resetting={}", channelClosed, resetting);
-          if (!channelClosed || resetting) clientBundle.taskCompleted(exception);
+          if (!channelClosed || resetting) {
+            clientBundle.taskCompleted(exception instanceof IOException ? null : exception);
+          }
           clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
           if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
         } catch (final Exception e) {
