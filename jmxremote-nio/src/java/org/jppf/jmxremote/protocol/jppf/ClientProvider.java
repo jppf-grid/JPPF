@@ -26,11 +26,20 @@ import javax.management.remote.*;
 
 import org.jppf.jmx.*;
 import org.jppf.jmxremote.JPPFJMXConnector;
+import org.slf4j.*;
 
 /**
  *
  */
 public class ClientProvider implements JMXConnectorProvider {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ClientProvider.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Handles the envrionment providers that allow adding to, or overriding, the environment properties
    * passed to each new JMX connector instance.  
@@ -40,6 +49,7 @@ public class ClientProvider implements JMXConnectorProvider {
   @Override
   public JMXConnector newJMXConnector(final JMXServiceURL serviceURL, final Map<String, ?> environment) throws IOException {
     if (!JMXHelper.JPPF_JMX_PROTOCOL.equals(serviceURL.getProtocol())) throw new MalformedURLException("Protocol not " + JMXHelper.JPPF_JMX_PROTOCOL + ": " + serviceURL.getProtocol());
+    if (debugEnabled) log.debug("creating JPPFJMXConnector with serviceUrl = {}, env = {}", serviceURL, environment);
     final Map<String, Object> env = new HashMap<>(environment);
     for (final ClientEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {

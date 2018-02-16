@@ -82,7 +82,7 @@ public class JMXRequest extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(getMessageType())
+      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
       .append(", params=").append(Arrays.deepToString(params))
       .append(']').toString();
   }

@@ -18,10 +18,12 @@
 
 package org.jppf.jmxremote.message;
 
+import java.util.*;
+
 import javax.management.*;
 
 /**
- * ENumeration of the possible types of JMX messages.
+ * Enumeration of the possible types of JMX messages.
  * @author Laurent Cohen
  */
 public class JMXMessageType {
@@ -137,4 +139,54 @@ public class JMXMessageType {
    * Identifier for a notification.
    */
   public static final byte NOTIFICATION = 28;
+  /**
+   * A non-modifiable mapping of type values to readable names.
+   */
+  private static final Map<Byte, String> TYPE_NAMES = Collections.unmodifiableMap(initTypeNames());
+
+  /**
+   * Get a name corresponding to a message type.
+   * @param type the type of the message for which to get a name.
+   * @return a readable message name.
+   */
+  public static final String name(final byte type) {
+    final String s = TYPE_NAMES.get(type);
+    return (s == null) ? Byte.toString(type) : s;
+  }
+
+  /**
+   * @return a mapping of message type values to readable names.
+   */
+  private static Map<Byte, String> initTypeNames() {
+    final Map<Byte, String> map = new HashMap<>();
+    map.put(CONNECT, "CONNECT");
+    map.put(CLOSE, "CLOSE");
+    map.put(ADD_NOTIFICATION_LISTENER, "ADD_NOTIFICATION_LISTENER");
+    map.put(ADD_NOTIFICATION_LISTENER_OBJECTNAME, "ADD_NOTIFICATION_LISTENER_OBJECTNAME");
+    map.put(CREATE_MBEAN, "CREATE_MBEAN");
+    map.put(CREATE_MBEAN_PARAMS, "CREATE_MBEAN_PARAMS");
+    map.put(CREATE_MBEAN_LOADER, "CREATE_MBEAN_LOADER");
+    map.put(CREATE_MBEAN_LOADER_PARAMS, "CREATE_MBEAN_LOADER_PARAMS");
+    map.put(GET_ATTRIBUTE, "GET_ATTRIBUTE");
+    map.put(GET_ATTRIBUTES, "GET_ATTRIBUTES");
+    map.put(GET_DEFAULT_DOMAIN, "GET_DEFAULT_DOMAIN");
+    map.put(GET_DOMAINS, "GET_DOMAINS");
+    map.put(GET_MBEAN_COUNT, "GET_MBEAN_COUNT");
+    map.put(GET_MBEAN_INFO, "GET_MBEAN_INFO");
+    map.put(GET_OBJECT_INSTANCE, "GET_OBJECT_INSTANCE");
+    map.put(INVOKE, "INVOKE");
+    map.put(IS_INSTANCE_OF, "IS_INSTANCE_OF");
+    map.put(IS_REGISTERED, "IS_REGISTERED");
+    map.put(QUERY_MBEANS, "QUERY_MBEANS");
+    map.put(QUERY_NAMES, "QUERY_NAMES");
+    map.put(REMOVE_NOTIFICATION_LISTENER, "REMOVE_NOTIFICATION_LISTENER");
+    map.put(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, "REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK");
+    map.put(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME, "REMOVE_NOTIFICATION_LISTENER_OBJECTNAME");
+    map.put(REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK, "REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK");
+    map.put(SET_ATTRIBUTE, "SET_ATTRIBUTE");
+    map.put(SET_ATTRIBUTES, "SET_ATTRIBUTES");
+    map.put(UNREGISTER_MBEAN, "UNREGISTER_MBEAN");
+    map.put(NOTIFICATION, "NOTIFICATION");
+    return map;
+  }
 }

@@ -108,8 +108,9 @@ public class ReceivingMessageState extends JMXNioState {
       switch(request.getMessageType()) {
         case CONNECT: result = context.getConnectionID();
           break;
-        case CLOSE: context.getChannels().disableReadWrite();
-          jmxServer.closeConnection(context.getConnectionID(), null, true);
+        case CLOSE: context.getChannels().requestClose();
+          context.getChannels().close(null);
+          jmxServer.closeConnection(context.getChannels(), null, true);
           break;
         case INVOKE: result = mbs.invoke((ObjectName) p[0], (String) p[1], (Object[]) p[2], (String[]) p[3]);
           break;

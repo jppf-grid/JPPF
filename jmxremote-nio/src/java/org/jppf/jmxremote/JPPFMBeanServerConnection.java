@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 
 import javax.management.*;
+import javax.management.remote.JMXServiceURL;
 
 import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.nio.*;
@@ -406,12 +407,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
 
   /**
    * Obtain the connection ID from the remote server. This method should opnly be called once, after the JPPF identifier has been sent.
+   * @param url the service url for which to get a connection.
    * @return the connection ID string.
    * @throws IOException if any error occurs.
    */
-  String receiveConnectionID() throws IOException {
+  String receiveConnectionID(final JMXServiceURL url) throws IOException {
     try {
-      return connectionID = messageHandler.receiveConnectionID();
+      return connectionID = messageHandler.receiveConnectionID(url);
     } catch (final IOException e) {
       throw e;
     } catch (final Exception e) {

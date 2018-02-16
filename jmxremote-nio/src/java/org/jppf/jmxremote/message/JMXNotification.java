@@ -70,7 +70,7 @@ public class JMXNotification extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(getMessageType())
+      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
       .append(", listenerIDs=").append(Arrays.asList(listenerIDs))
       .append(", notification=").append(Arrays.asList(notification))
       .append(']').toString();

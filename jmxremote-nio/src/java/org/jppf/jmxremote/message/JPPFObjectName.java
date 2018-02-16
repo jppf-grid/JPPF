@@ -38,7 +38,7 @@ public class JPPFObjectName implements Serializable {
    *
    * @param objectName .
    */
-  JPPFObjectName(final ObjectName objectName) {
+  public JPPFObjectName(final ObjectName objectName) {
     this.objectName = objectName;
   }
 
@@ -65,9 +65,8 @@ public class JPPFObjectName implements Serializable {
    * @throws ClassNotFoundException if the class of an object in the object graph could not be found.
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    final String s = (String) in.readObject();
     try {
-      objectName = ObjectNameCache.getObjectName(s);
+      objectName = ObjectNameCache.getObjectName((String) in.readObject());
     } catch (final MalformedObjectNameException e) {
       throw new IOException(e);
     }

@@ -38,6 +38,10 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private static Logger log = LoggerFactory.getLogger(JMXContext.class);
   /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The last read or written JMX message.
    */
   private MessageWrapper currentMessageWrapper;
@@ -76,7 +80,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
     try {
-      server.closeConnection(getConnectionID(), exception, false);
+      server.closeConnection(getChannels(), exception, false);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -87,15 +91,6 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   public String getConnectionID() {
     return messageHandler.getChannels().getConnectionID();
-  }
-
-  /**
-   * Deserialize the last read message.
-   * @return a deserialzed message.
-   * @throws Exception if any error occurs.
-   */
-  public JMXMessage deserializeMessage() throws Exception {
-    return deserializeMessage((SimpleNioMessage) message);
   }
 
   /**
@@ -110,13 +105,13 @@ public class JMXContext extends SimpleNioContext<JMXState> {
 
   /**
    * Add a JMX message to the pending queue.
-   * @param message the JMX message to offer.
+   * @param jmxMessage the JMX message to offer.
    * @throws Exception if any error occurs.
    */
-  public void offerJmxMessage(final JMXMessage message) throws Exception {
+  public void offerJmxMessage(final JMXMessage jmxMessage) throws Exception {
     final SimpleNioMessage msg = new SimpleNioMessage(channel);
-    msg.setLocation(IOHelper.serializeData(message));
-    pendingJmxMessages.offer(new MessageWrapper(message, msg));
+    msg.setLocation(IOHelper.serializeData(jmxMessage));
+    pendingJmxMessages.offer(new MessageWrapper(jmxMessage, msg));
   }
 
   /**
@@ -230,6 +225,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
     byteCount = ((SimpleNioMessage) message).channelCount;
     final boolean b = message.read();
     byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    if (debugEnabled) log.debug("read {} bytes", byteCount);
     return b;
   }
 
@@ -244,6 +240,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
     byteCount = ((SimpleNioMessage) message).channelCount;
     final boolean b = message.write();
     byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    if (debugEnabled) log.debug("wrote {} bytes", byteCount);
     return b;
   }
 

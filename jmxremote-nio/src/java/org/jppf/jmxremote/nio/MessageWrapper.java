@@ -44,4 +44,9 @@ class MessageWrapper {
     this.jmxMessage = jmxMessage;
     this.nioMessage = nioMessage;
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[').append("jmxMessage=").append(jmxMessage).append(']').toString();
+  }
 }

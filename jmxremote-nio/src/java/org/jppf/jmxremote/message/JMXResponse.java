@@ -90,7 +90,7 @@ public class JMXResponse extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(getMessageType())
+      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
       .append(", result=").append(Arrays.asList(result))
       .append(", isException=").append(isException)
       .append(']').toString();

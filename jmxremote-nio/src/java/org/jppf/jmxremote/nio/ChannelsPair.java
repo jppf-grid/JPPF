@@ -19,6 +19,8 @@
 package org.jppf.jmxremote.nio;
 
 import java.nio.channels.SelectionKey;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.*;
@@ -97,6 +99,10 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * The associated message handler.
    */
   private JMXMessageHandler messageHandler;
+  /**
+   * Callbacks invoked upon {@link #close()}.
+   */
+  private final List<CloseCallback> closeCallbacks = new CopyOnWriteArrayList<>();
 
   /**
    * @param first the reading channel.
@@ -126,10 +132,17 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
 
   /**
    * Close the channels and the underlying socket channel.
+   * @param exception an optional exception that may have cause the close, may be null.
    * @throws Exception if any error occurs.
    */
-  public void close() throws Exception {
+  public void close(final Exception exception) throws Exception {
+    try {
     if (closed.compareAndSet(false, true)) this.getSelectionKey().channel().close();
+    } finally {
+      final List<CloseCallback> tmp = new ArrayList<>(closeCallbacks);
+      closeCallbacks.clear();
+      for (CloseCallback runnable: tmp) runnable.onClose(exception);
+    }
   }
 
   /**
@@ -335,5 +348,32 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    */
   public void setMessageHandler(final JMXMessageHandler messageHandler) {
     this.messageHandler = messageHandler;
+  }
+
+  /**
+   * Add a callback to invoke upon {@link #close()}.
+   * @param callback the callback to add.
+   */
+  public void addCloseCallback(final CloseCallback callback) {
+    if (callback != null) closeCallbacks.add(callback);
+  }
+
+  /**
+   * Remove a callback to invoke upon {@link #close()}.
+   * @param callback the callback to remove.
+   */
+  public void removeCloseCallback(final CloseCallback callback) {
+    if (callback != null) closeCallbacks.remove(callback);
+  }
+
+  /**
+   * 
+   */
+  public static interface CloseCallback {
+    /**
+     * Invoked when the {@link ChannelsPair#close(Exception)} is called.
+     * @param exception an optional exception that may have cause the close, may be null.
+     */
+    void onClose(final Exception exception);
   }
 }

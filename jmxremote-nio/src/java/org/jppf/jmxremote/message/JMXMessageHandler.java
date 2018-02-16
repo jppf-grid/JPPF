@@ -18,8 +18,11 @@
 
 package org.jppf.jmxremote.message;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.*;
+
+import javax.management.remote.JMXServiceURL;
 
 import org.jppf.JPPFTimeoutException;
 import org.jppf.jmxremote.JMXEnvHelper;
@@ -114,18 +117,22 @@ public class JMXMessageHandler {
 
   /**
    * Get the connection ID upon startup of a client connection.
+   * @param url the service url for which to get a connection.
    * @return the connection ID.
    * @throws Exception if any error occurs.
    */
-  public String receiveConnectionID() throws Exception {
+  public String receiveConnectionID(final JMXServiceURL url) throws Exception {
     synchronized(connectionRequest) {
       if (connectionRequest.getResponse() != null) {
         final JMXResponse response = connectionRequest.getResponse();
         if (response.getException() != null) throw response.getException();
         return (String) response.getResult();
       }
-      return (String) receiveResponse(connectionRequest, false);
+      //final String connectionID = (String) receiveResponse(connectionRequest, false);
+      final String connectionID = (String) receiveResponse(connectionRequest, true);
+      if (connectionID != null) return connectionID;
     }
+    throw new IOException("could not establish a connection to " + url);
   }
 
   /**
@@ -149,7 +156,7 @@ public class JMXMessageHandler {
       if (response.getException() != null) throw response.getException();
       return response.getResult();
     }
-    return null;
+    throw new IOException("could not obtain a response to request " + request);
   }
 
   /**
@@ -157,9 +164,10 @@ public class JMXMessageHandler {
    * @param response the repsonse to process.
    */
   public void responseReceived(final JMXResponse response) {
+    if (debugEnabled) log.debug("received response {}, channels={}", response, channels);
     final JMXRequest request = removeRequest(response.getMessageID());
     if (request != null) {
-      if (debugEnabled) log.debug("received response {}, channels={}", response, channels);
+      if (debugEnabled) log.debug("found matching request {}", request);
       synchronized(request) {
         request.setResponse(response);
         request.notify();

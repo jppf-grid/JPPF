@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
-import javax.management.*;
+import javax.management.MBeanServer;
 import javax.net.ssl.*;
 
 import org.jppf.jmx.JMXHelper;
@@ -166,27 +166,26 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       try {
         if (pair.isClosed()) continue;
         final boolean readable = key.isReadable(), writable = key.isWritable();
+        if (readable) {
+          if (pair.isClosing()) continue;
+          JMXMessageReader.read(pair.readingChannel().getContext());
+        }
         if (writable) {
           updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
           final JMXTransitionTask task = pair.getNonSelectingWritingTask();
           if (!task.incrementCountIfNeeded()) task.run();
         }
-        if (readable) {
-          if (pair.isClosing()) continue;
-          JMXMessageReader.read(pair.readingChannel().getContext());
-        }
       } catch (final CancelledKeyException e) {
         if ((pair != null) && !pair.isClosing() && !pair.isClosed()) {
-          log.error(e.getMessage(), e);
-          closeConnection(pair.getConnectionID(), e, false);
+          log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
+          closeConnection(pair, e, false);
         }
       } catch (final EOFException e) {
-        if (debugEnabled) {
-          log.debug(e.getMessage(), e);
-        }
+        if (debugEnabled) log.debug("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
+        closeConnection(pair, e, false);
       } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-        if (pair != null) closeConnection(pair.getConnectionID(), e, false);
+        log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
+        if (pair != null) closeConnection(pair, e, false);
       }
     }
   }
@@ -200,9 +199,9 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       final NioServer<?, ?> acceptor = NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
       @SuppressWarnings("unchecked")
       final Map<String, ?> env = (Map<String, ?>) serverSocketChannel.keyFor(acceptor.getSelector()).attachment();
-      final ServerSocket serverSocket = serverSocketChannel.socket();
-      final int port = serverSocket.getLocalPort();
-      final InetAddress addr = serverSocket.getInetAddress();
+      final InetSocketAddress saddr = (InetSocketAddress) serverSocketChannel.getLocalAddress();
+      final int port = saddr.getPort();
+      final InetAddress addr = saddr.getAddress();
       String ip = addr.getHostAddress();
       if (addr instanceof Inet6Address) ip =  "[" + ip + "]";
       //e.g. "jppf://192.168.1.12:12001 2135"
@@ -216,7 +215,11 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
         connectionsByServerPort.putValue(port, connectionID);
       }
       ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
-      pair.getMessageHandler().sendMessage(new JMXResponse(JMXMessageHandler.CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT, connectionID));
+      /*
+      final JMXResponse response = new JMXResponse(JMXMessageHandler.CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT, connectionID);
+      pair.getMessageHandler().sendMessage(response);
+      if (debugEnabled) log.debug("submitted response {}", response);
+      */
       return pair.writingChannel();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -237,8 +240,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    */
   public ChannelsPair createChannelsPair(final Map<String, ?> env, final String connectionID, final int port, final SocketChannel channel, final boolean ssl, final boolean client) throws Exception {
     if (channel.isBlocking()) channel.configureBlocking(false);
-    final JMXChannelWrapper readingChannel = createChannel(env, channel, ssl, true);
-    final JMXChannelWrapper writingChannel = createChannel(env, channel, ssl, false);
+    final JMXChannelWrapper readingChannel = createChannel(env, channel, ssl, true, null, client);
+    final JMXChannelWrapper writingChannel = createChannel(env, channel, ssl, false, readingChannel.context.getSSLHandler(), client);
     final ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this);
     final JMXMessageHandler handler = new JMXMessageHandler(pair, env);
     final MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
@@ -251,10 +254,11 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     context = writingChannel.context;
     context.setMessageHandler(handler);
     context.setState(JMXState.SENDING_MESSAGE);
-    pair.setInterestOps(SelectionKey.OP_READ);
+    final int ops = SelectionKey.OP_READ;
+    pair.setInterestOps(ops);
     sync.wakeUpAndSetOrIncrement();
     try {
-      pair.setSelectionKey(channel.register(selector, SelectionKey.OP_READ, pair));
+      pair.setSelectionKey(channel.register(selector, ops, pair));
     } finally {
       sync.decrement();
     }
@@ -267,20 +271,22 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    * @param channel the associated socket channel.
    * @param ssl whether the connection is secure.
    * @param reading {@code true} to create a reading channel, {@code false} to create a writing channel.
+   * @param sslHandler .
+   * @param client whether the created channels are client-side (true) or server-side (false).
    * @return a new {@link ChannelWrapper} instance.
+   * @throws Exception if any error occurs.
    */
-  private JMXChannelWrapper createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading) {
+  private JMXChannelWrapper createChannel(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading, final SSLHandler sslHandler, final boolean client)
+    throws Exception {
     final JMXContext context = createNioContext(reading);
     final JMXChannelWrapper wrapper = new JMXChannelWrapper(context, channel);
-    try {
-      context.setChannel(wrapper);
-      context.setSsl(ssl);
-      if (ssl) {
+    context.setChannel(wrapper);
+    context.setSsl(ssl);
+    if (ssl) {
+      if (sslHandler == null) {
         if (debugEnabled) log.debug("creating SSLEngine for {}", wrapper);
-        configureSSL(env, wrapper, channel);
-      }
-    } catch (final Exception e) {
-      log.error(e.getMessage(), e);
+        configureSSL(env, wrapper, client);
+      } else context.setSSLHandler(sslHandler);
     }
     return wrapper;
   }
@@ -289,21 +295,22 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    * Configure SSL for the specified channel accepted by the specified server.
    * @param env environment parameters to use for TLS properties.
    * @param channelWrapper the channel to configure.
-   * @param channel the associated socket channel.
-   * @return a SSLHandler instance.
+   * @param client whether the created channels are client-side (true) or server-side (false).
    * @throws Exception if any error occurs.
    */
-  private static SSLHandler configureSSL(final Map<String, ?> env, final JMXChannelWrapper channelWrapper, final SocketChannel channel) throws Exception {
+  private static void configureSSL(final Map<String, ?> env, final JMXChannelWrapper channelWrapper, final boolean client) throws Exception {
+    if (debugEnabled) log.debug(String.format("configuring %s-side SSL for %s, env = %s", (client ? "client" : "server"), channelWrapper, env));
     final SSLHelper2 helper = SSLHelper.getJPPFJMXremoteSSLHelper(env);
+    final SocketChannel channel = channelWrapper.getSocketChannel();
     final SSLContext sslContext = helper.getSSLContext(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
-    final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
+    final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
+    final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
     final SSLParameters params = helper.getSSLParameters();
-    engine.setUseClientMode(false);
+    engine.setUseClientMode(client);
     engine.setSSLParameters(params);
-    final JMXContext jmxContext = channelWrapper.context;
-    final SSLHandler sslHandler = new SSLHandler(channelWrapper, engine);
-    jmxContext.setSSLHandler(sslHandler);
-    return sslHandler;
+    if (debugEnabled) log.debug(String.format("created SSLEngine: useClientMode = %b, parameters = %s", engine.getUseClientMode(), engine.getSSLParameters()));
+    final SSLHandler sslHandler = new SSLHandlerImpl(channel, engine);
+    channelWrapper.context.setSSLHandler(sslHandler);
   }
 
   @Override
@@ -322,20 +329,19 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
 
   /**
    * Close a connection.
-   * @param connectionID the id of the connection to close.
+   * @param pair .
    * @param exception optional exception that caused the connection close.
    * @param clientRequestedClose .
    * @throws Exception if any error occurs.
    */
-  public void closeConnection(final String connectionID, final Exception exception, final boolean clientRequestedClose) throws Exception {
+  public void closeConnection(final ChannelsPair pair, final Exception exception, final boolean clientRequestedClose) {
+    final String connectionID = pair.getConnectionID();
     if (debugEnabled) log.debug("closing JMX channels for connectionID = {}", connectionID);
     Exception ex = exception;
-    final ChannelsPair pair = channelsByConnectionID.get(connectionID);
-    if (pair == null) return;
     try {
       if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
       pair.requestClose();
-      pair.close();
+      pair.close(exception);
       pair.getMessageHandler().close();
     } catch (final Exception e) {
       if (ex == null) ex = e;
@@ -365,11 +371,10 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
     synchronized(mapsLock) {
       connectionMap = new HashMap<>(channelsByConnectionID);
       for (final Map.Entry<String, ChannelsPair> entry: connectionMap.entrySet()) {
-        final String connectionID = entry.getKey();
         try {
-          closeConnection(connectionID, null, false);
+          closeConnection(entry.getValue(), null, false);
         } catch (final Exception e) {
-          log.error("error closing connectionID {} : {}", connectionID, ExceptionUtils.getStackTrace(e));
+          log.error("error closing connectionID {} : {}", entry.getKey(), ExceptionUtils.getStackTrace(e));
         }
       }
       channelsByConnectionID.clear();
@@ -390,7 +395,8 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
         connectionIDs = new ArrayList<>(coll);
         for (final String connectionID: connectionIDs) {
           try {
-            closeConnection(connectionID, null, false);
+            final ChannelsPair pair = channelsByConnectionID.get(connectionID);
+            if (pair != null) closeConnection(pair, null, false);
           } catch (final Exception e) {
             log.error("error closing connectionID " + connectionID, e);
           }
@@ -466,8 +472,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
       sb.append("nbConnections = ").append(channelsByConnectionID.size()).append('\n');
       sb.append("peakConnections = ").append(peakConnections).append('\n');
       sb.append("connectionsByServerPort:");
-      for (final Map.Entry<Integer, Collection<String>> entry: connectionsByServerPort.entrySet())
-        sb.append("\n  ").append(entry.getKey()).append(" --> ").append(entry.getValue().size());
+      for (final Map.Entry<Integer, Collection<String>> entry: connectionsByServerPort.entrySet()) sb.append("\n  ").append(entry.getKey()).append(" --> ").append(entry.getValue().size());
     }
     return sb.toString();
   }
