@@ -34,5 +34,12 @@ public class JMXHelper {
   /**
    * The protocol string for local connections.
    */
-  public static final String LOCAL_PROTOCOL = "jppf";
+  public static final String LOCAL_PROTOCOL = "local";
+
+  /**
+   * @return an array of all available remote protocols.
+   */
+  public static String[] remoteProtocols() {
+    return new String[] { JMXMP_PROTOCOL, JPPF_JMX_PROTOCOL };
+  }
 }

@@ -36,7 +36,7 @@ public class QueuingSocketInitializer extends SocketInitializerImpl {
   /**
    * 
    */
-  private static final ExecutorService executor = Executors.newFixedThreadPool(4, new JPPFThreadFactory("SocketInitializer"));
+  private static final ExecutorService executor = initExecutor();
 
   /**
    * Instantiate this SocketInitializer with the global JPPF configuration.
@@ -68,5 +68,17 @@ public class QueuingSocketInitializer extends SocketInitializerImpl {
       log.error(e.getMessage(), e);
     }
     return false;
+  }
+
+  /**
+   * @return an {@link ExecutorService}.
+   */
+  private static ExecutorService initExecutor() {
+    final TypedProperties config = JPPFConfiguration.getProperties();
+    final int core = config.getInt("jppf.socket.initializer.pool.size", 8);
+    final long ttl = config.getLong("jppf.socket.initializer.thread.ttl", 5000L);
+    final ThreadPoolExecutor tpe = new ThreadPoolExecutor(core, core, ttl, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("SocketInitializer"));
+    tpe.allowCoreThreadTimeOut(true);
+    return tpe;
   }
 }
