@@ -244,7 +244,7 @@ public class BaseTestHelper {
       messages = new String[] { s, msg, s };
     }
     if (toStdout) {
-      for (final String s: messages) System.out.println(s);
+      for (final String s: messages) System.out.printf("[  client] [%s] %s%n", BaseTest.getFormattedTimestamp(), s);
     }
     if (toClient) {
       for (final String s: messages) log.info(s);

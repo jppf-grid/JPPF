@@ -20,6 +20,7 @@ package test.org.jppf.test.setup;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.junit.*;
+import org.slf4j.*;
 
 
 /**
@@ -28,17 +29,25 @@ import org.junit.*;
  */
 public class Setup1D1N extends BaseTest {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(Setup1D1N.class);
+
+  /**
    * Launches a driver and node.
    * @throws Exception if a process could not be started.
    */
   @SuppressWarnings("resource")
   @BeforeClass
   public static void setup() throws Exception {
+    BaseSetup.resetClientConfig();
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201)) {
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+      log.info("initializing {}", jmx);
       Assert.assertTrue(jmx.connectAndWait(5000L));
     }
+    log.info("checked JMX connection");
   }
 
   /**
@@ -47,6 +56,9 @@ public class Setup1D1N extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+      if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
+    }
     try {
       BaseSetup.cleanup();
     } catch(final Exception e) {

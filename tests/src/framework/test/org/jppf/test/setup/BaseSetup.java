@@ -403,11 +403,13 @@ public class BaseSetup {
   public static TestConfiguration createDefaultConfiguration() {
     final TestConfiguration config = new TestConfiguration();
     final List<String> commonCP = new ArrayList<>();
+    final String dir = "classes/tests/config";
     commonCP.add("classes/addons");
-    commonCP.add("classes/tests/config");
+    commonCP.add(dir);
     commonCP.add("../node/classes");
     commonCP.add("../common/classes");
     commonCP.add("../jmxremote/classes");
+    commonCP.add("../jmxremote-nio/classes");
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
@@ -416,7 +418,6 @@ public class BaseSetup {
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
-    final String dir = "classes/tests/config";
     config.driverJppf = dir + "/driver.template.properties";
     config.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     config.driverClasspath = driverCP;

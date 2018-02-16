@@ -26,54 +26,49 @@ import test.org.jppf.test.setup.*;
  * SSL Unit Tests with 1-way authentication.
  * @author Laurent Cohen
  */
-public class TestSSL3 extends AbstractNonStandardSetup
-{
+public class TestSSL3 extends AbstractNonStandardSetup {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
-    client = BaseSetup.setup(1, 1, true, createConfig("ssl3"));
+  public static void setup() throws Exception {
+    final TestConfiguration config = createConfig("ssl3");
+    config.driverLog4j = "classes/tests/config/ssl3/log4j-driver.properties";
+    client = BaseSetup.setup(1, 1, true, config);
   }
 
   /**
    * Test a simple job.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJob() throws Exception {
     super.testSimpleJob(null);
   }
 
   @Override
-  @Test(timeout=15000)
-  public void testMultipleJobs() throws Exception
-  {
+  @Test(timeout = 15000)
+  public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
-  @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
-  @Test(timeout=5000)
-  public void testNotSerializableExceptionFromNode() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testNotSerializableExceptionFromNode() throws Exception {
     super.testNotSerializableExceptionFromNode();
   }
 
   @Override
-  @Test(timeout=8000)
-  public void testForwardingMBean() throws Exception
-  {
+  @Test(timeout = 8000)
+  public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
   }
 }

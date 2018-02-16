@@ -68,6 +68,7 @@ public class AbstractNonStandardSetup extends BaseTest {
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
     commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
     commonCP.add("../jmxremote/classes");
+    commonCP.add("../jmxremote-nio/classes");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");

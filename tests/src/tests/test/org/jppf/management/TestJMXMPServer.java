@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.*;
 import javax.management.remote.MBeanServerForwarder;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.management.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.collections.CollectionUtils;
@@ -109,7 +110,7 @@ public class TestJMXMPServer extends BaseTest {
       final Forwarder1 forwarder = (Forwarder1) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper("localhost", PORT, false);
+      client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
@@ -167,7 +168,7 @@ public class TestJMXMPServer extends BaseTest {
       final Forwarder2 forwarder = (Forwarder2) mbsf;
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
-      client = new JMXConnectionWrapper("localhost", PORT, false);
+      client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);

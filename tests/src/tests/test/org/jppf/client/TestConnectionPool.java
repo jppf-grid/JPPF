@@ -105,6 +105,7 @@ public class TestConnectionPool extends Setup1D1N {
    */
   @Test(timeout = 10000)
   public void testNumberOfPools() throws Exception {
+    BaseSetup.resetClientConfig();
     client = BaseSetup.createClient(null, false);
     BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
     final List<JPPFConnectionPool> pools = client.getConnectionPools();
@@ -136,14 +137,18 @@ public class TestConnectionPool extends Setup1D1N {
   /**
    * Configure the client for a connection pool.
    * @param localThreads a value greater than 0 to enable local execution with this number of threads, 0 or less otherwise.
+   * @throws Exception if any error occurs
    */
-  private static void configure(final int localThreads) {
-    JPPFConfiguration
+  private static void configure(final int localThreads) throws Exception {
+    //final TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = BaseSetup.resetClientConfig();
+    config.set(DISCOVERY_ENABLED, false)
       .set(LOAD_BALANCING_ALGORITHM, "proportional")
       .set(LOAD_BALANCING_PROFILE, "test")
       .setInt(LOAD_BALANCING_PROFILE.getName() + ".test.initialSize", 10)
       .setInt("driver1." + POOL_SIZE.getName(), 2);
-    if (localThreads > 0) JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, localThreads);
+    if (localThreads > 0) config.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, localThreads);
+    else config.set(LOCAL_EXECUTION_ENABLED, false);
   }
 
   /**

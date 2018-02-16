@@ -130,6 +130,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../jmxremote/classes");
+    addClasspathElement("../jmxremote-nio/classes");
     addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     final String libDir = "../JPPF/lib/";

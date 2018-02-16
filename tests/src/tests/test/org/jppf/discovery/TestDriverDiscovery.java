@@ -77,7 +77,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
     final long timeout = 60_000L;
     for (int i=0; i<JMX.length; i++) {
       BaseTest.print(false, false, "connecting to server %d", (i + 1));
-      JMX[i] = new JMXDriverConnectionWrapper("localhost", 11201 + i);
+      JMX[i] = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1 + i);
       final JMXDriverConnectionWrapper jmx = JMX[i];
       BaseTest.print(false, false, "connecting to %s", jmx);
       jmx.connectAndWait(timeout - (System.currentTimeMillis() - start));

@@ -61,7 +61,7 @@ public class TestJobListener extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201);
+    final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1);
     if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
     BaseSetup.cleanup();
   }

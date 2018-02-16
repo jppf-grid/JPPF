@@ -23,9 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.jppf.client.JPPFClient;
+import org.jppf.jmx.JMXHelper;
 import org.jppf.location.FileLocation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
@@ -37,10 +39,17 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class BaseTest {
+  static {
+    Locale.setDefault(Locale.US);
+  }
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger("TEST");
+  /** */
+  protected static final String JMX_REMOTE_PROTOCOL = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
+  /** */
+  protected static final int MANAGEMENT_PORT_BASE = (JMXHelper.JMXMP_PROTOCOL.equals(JMX_REMOTE_PROTOCOL)) ? 11200 : 11100;
   /** */
   private static PrintStream stdOut, stdErr;
   /** */

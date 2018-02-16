@@ -22,11 +22,13 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import javax.management.remote.generic.*;
+import javax.management.remote.*;
+import javax.management.remote.generic.GenericConnector;
 
+import org.jppf.jmxremote.JPPFJMXConnector;
 import org.jppf.management.*;
 import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -44,18 +46,19 @@ public class TestEnvironmentProviders extends BaseTest {
   @Test(timeout = 10000)
   public void testClientProvider() throws Exception {
     final int port = 4444;
-    JMXMPServer server = null;
+    JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
       TestClientEnvironmentProvider.active = true;
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
-      server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      //server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = JMXServerFactory.createServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       client = new JMXConnectionWrapper("localhost", port, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
-      final GenericConnector connector = (GenericConnector) client.getJmxconnector();
-      final Map<String, ?> actual = connector.getEnv();
+      final JMXConnector jmxc = client.getJmxconnector();
+      final Map<String, ?> actual = (jmxc instanceof GenericConnector) ? ((GenericConnector) jmxc).getEnv() : ((JPPFJMXConnector) jmxc).getEnvironment();
       final Map<String, ?> expected = TestClientEnvironmentProvider.env;
       for (final Map.Entry<String, ?> entry: expected.entrySet()) {
         final String key = entry.getKey();
@@ -90,17 +93,18 @@ public class TestEnvironmentProviders extends BaseTest {
   @Test(timeout = 10000)
   public void testServerProvider() throws Exception {
     final int port = 4444;
-    JMXMPServer server = null;
+    JMXServer server = null;
     JMXConnectionWrapper client = null;
     try {
       TestServerEnvironmentProvider.active = true;
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, port);
-      server = new JMXMPServer("serverTest", false, JPPFProperties.MANAGEMENT_PORT);
+      //server = new JMXMPServer("serverTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = JMXServerFactory.createServer("serverTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       client = new JMXConnectionWrapper("localhost", port, false);
       client.connectAndWait(3000L);
       assertTrue(client.isConnected());
-      final GenericConnectorServer connector = (GenericConnectorServer) server.getConnectorServer();
+      final JMXConnectorServer connector = server.getConnectorServer();
       final Map<String, ?> actual = connector.getAttributes();
       final Map<String, ?> expected = TestServerEnvironmentProvider.env;
       for (final Map.Entry<String, ?> entry: expected.entrySet()) {

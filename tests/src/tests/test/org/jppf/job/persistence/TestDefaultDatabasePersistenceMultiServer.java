@@ -81,7 +81,7 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
   public void tearDownInstance() throws Exception {
     JPPFDatasourceFactory.getInstance().clear();
     for (int i=1; i<=BaseSetup.nbDrivers(); i++) {
-      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11200 + i, false)) {
+      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + i, false)) {
         jmx.connectAndWait(5_000L);
         final boolean b = jmx.isConnected();
         print(false, false, "tearDownInstance() for driver %d : jmx connected = %b", i, b);
@@ -127,7 +127,7 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
     ConcurrentUtils.awaitInterruptibleCondition(cond, 5000L, true);
     print(false, false, "before job check, number of results = %d", queryNbResults(job.getUuid()));
     for (int i=1; i<=2; i++) {
-      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11200 + i)) {
+      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + i)) {
         print(false, false, "testing driver %d", i);
         jmx.connectAndWait(5000L);
         assertTrue(jmx.isConnected());

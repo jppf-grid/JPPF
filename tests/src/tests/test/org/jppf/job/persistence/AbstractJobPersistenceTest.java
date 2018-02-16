@@ -70,7 +70,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    */
   @After
   public void tearDownInstance() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
       final boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
@@ -92,7 +92,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    */
   @AfterClass
   public static void tearAbstractJobPersistenceTest() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", 11201, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
       if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     }

@@ -48,7 +48,7 @@ import test.org.jppf.test.setup.common.*;
 public class TestJPPFClient extends Setup1D1N {
   /**
    * Invocation of the <code>JPPFClient()</code> constructor.
-   * @throws Exception if any error occurs
+   * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception {
@@ -64,7 +64,7 @@ public class TestJPPFClient extends Setup1D1N {
 
   /**
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
-   * @throws Exception if any error occurs
+   * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
   public void testConstructorWithUuid() throws Exception {
@@ -75,7 +75,7 @@ public class TestJPPFClient extends Setup1D1N {
 
   /**
    * Test the submission of a job.
-   * @throws Exception if any error occurs
+   * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
   public void testSubmit() throws Exception {

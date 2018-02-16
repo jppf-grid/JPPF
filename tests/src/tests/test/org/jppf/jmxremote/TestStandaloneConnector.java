@@ -52,6 +52,14 @@ public class TestStandaloneConnector extends BaseTest {
    * Address of the JMX connector server.
    */
   private static JMXServiceURL url;
+  /**
+   * The server-side JMX connector.
+   */
+  private JMXConnectorServer server; 
+  /**
+   * The clientr-side JMX connector.
+   */
+  private JMXConnector clientConnector; 
 
   /**
    *
@@ -79,23 +87,66 @@ public class TestStandaloneConnector extends BaseTest {
   }
 
   /**
+   * Performs setup before each test.
+   * @throws Exception if any error occurs.
+   */
+  @Before
+  public void beforeInstance() throws Exception {
+    print(false, false, "***** starting connector server *****");
+    server = createConnectorServer();
+    print(false, true, "***** starting connector client *****");
+    clientConnector = createConnectorClient();
+  }
+
+  /**
+   * Performs cleanup after each test.
+   * @throws Exception if any error occurs.
+   */
+  @After
+  public void afterInstance() throws Exception {
+    if (clientConnector != null) {
+      clientConnector.close();
+      clientConnector = null;
+    }
+    if (server != null) {
+      server.stop();
+      server = null;
+    }
+  }
+
+  /**
    * Test connection.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
-  @Test
+  @Test(timeout = 10000)
   public void testConnection() throws Exception {
-    print(false, false, "***** starting connector server *****");
-    final JMXConnectorServer server = createConnectorServer();
-    print(false, true, "***** starting connector client *****");
-    final JMXConnector client = createConnectorClient();
-    final String connectionID = client.getConnectionId();
+    final String connectionID = clientConnector.getConnectionId();
     assertNotNull(connectionID);
     assertTrue(connectionID.startsWith("jppf://"));
-    final MBeanServerConnection mbsc = client.getMBeanServerConnection();
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
+    assertTrue(mbsc instanceof JPPFMBeanServerConnection);
+  }
+
+  /**
+   * Test invoking MBean methods.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testInvoke() throws Exception {
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
+    assertTrue(mbsc instanceof JPPFMBeanServerConnection);
     print(false, true, "***** testing invoke *****");
     final String invokeResult = (String) mbsc.invoke(connectorTestName, "test1", new Object[] { "testing", 13 }, new String[] { String.class.getName(), int.class.getName() });
     assertEquals("[testing - 13]", invokeResult);
+  }
+
+  /**
+   * Test getting and setting MBeanattributes.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testAttributes() throws Exception {
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, true, "***** testing string attribute *****");
     String s = (String) mbsc.getAttribute(connectorTestName, "StringParam");
     assertNull(s);
@@ -110,12 +161,30 @@ public class TestStandaloneConnector extends BaseTest {
     n = (Integer) mbsc.getAttribute(connectorTestName, "IntParam");
     assertEquals(13, n);
     assertTrue(mbsc.isInstanceOf(connectorTestName, ConnectorTestMBean.class.getName()));
+  }
+
+  /**
+   * Test MBean domains.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testDomains() throws Exception {
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
+    assertTrue(mbsc.isInstanceOf(connectorTestName, ConnectorTestMBean.class.getName()));
     print(false, false, "***** default domain: %s *****", mbsc.getDefaultDomain());
     final String[] domains = mbsc.getDomains();
     print(false, false, "***** domains: %s *****", Arrays.asList(domains));
     assertNotNull(domains);
     assertTrue(StringUtils.isOneOf("org.jppf", false, domains));
+  }
 
+  /**
+   * Test adding and removing notification listeners, receiving notifications.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testNotifications() throws Exception {
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, true, "***** testing notifications *****");
     final MyListener listener = new MyListener();
     mbsc.addNotificationListener(connectorTestName, listener, null, "l1");
@@ -144,14 +213,20 @@ public class TestStandaloneConnector extends BaseTest {
     mbsc.invoke(connectorTestName, "triggerNotifications", new Object[] { messages }, new String[] { String[].class.getName() });
     Thread.sleep(250L);
     assertTrue(infos.isEmpty());
+  }
 
+  /**
+   * Test MBean registration and unregistration.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testRegistration() throws Exception {
+    final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, true, "***** testing registration *****");
     assertTrue(mbsc.isRegistered(connectorTestName));
     mbsc.unregisterMBean(connectorTestName);
     assertFalse(mbsc.isRegistered(connectorTestName));
     print(false, false, "***** JPPF- thread count: %,d *****", countJMXThreads(0L));
-    client.close();
-    server.stop();
   }
 
   /**

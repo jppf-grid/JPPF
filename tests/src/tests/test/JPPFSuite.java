@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.client.concurrent.TestExecutorServiceConfiguration;
+import test.org.jppf.job.persistence.TestDefaultFilePersistence;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -28,7 +28,7 @@ import test.org.jppf.test.runner.RepeatingSuite;
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestExecutorServiceConfiguration.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=1, shuffleClasses=false, shuffleMethods=true,
+  classes={ TestDefaultFilePersistence.class })
 public class JPPFSuite {
 }
