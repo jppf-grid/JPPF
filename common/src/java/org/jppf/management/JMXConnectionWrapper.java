@@ -68,6 +68,17 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
 
   /**
    * Initialize the connection to the remote MBean server.
+   * @param protocol the JMX remote protocol to use.
+   * @param host the host the server is running on.
+   * @param port the port used by the server.
+   * @param sslEnabled specifies whether the jmx connection should be secure or not.
+   */
+  public JMXConnectionWrapper(final String protocol, final String host, final int port, final boolean sslEnabled) {
+    super(protocol, host, port, sslEnabled);
+  }
+
+  /**
+   * Initialize the connection to the remote MBean server.
    */
   @Override
   public void connect() {
@@ -110,27 +121,29 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
 
   @Override
   public void close() throws Exception {
-    connected.compareAndSet(true, false);
-    listeners.clear();
-    final JMXConnectionThread jct = connectionThread.get();
-    if (jct != null) {
-      jct.close();
-      connectionThread.set(null);
-    }
-    if (jmxc != null) {
-      final JMXConnector connector = jmxc;
-      jmxc = null;
-      final Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            connector.close();
-          } catch (final Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
+    if (closed.compareAndSet(false, true)) {
+      connected.compareAndSet(true, false);
+      listeners.clear();
+      final JMXConnectionThread jct = connectionThread.get();
+      if (jct != null) {
+        jct.close();
+        connectionThread.set(null);
+      }
+      if (jmxc != null) {
+        final JMXConnector connector = jmxc;
+        jmxc = null;
+        final Runnable r = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              connector.close();
+            } catch (final Exception e) {
+              if (debugEnabled) log.debug(e.getMessage(), e);
+            }
           }
-        }
-      };
-      new Thread(r, getDisplayName() + " closing").start();
+        };
+        new Thread(r, getDisplayName() + " closing").start();
+      }
     }
   }
 
@@ -279,6 +292,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     if (isConnected()) {
       final MBeanServerConnection mbsc = getMbeanConnection();
       return JMX.newMBeanProxy(mbsc, objectName, inf, true);
+      //return MBeanInvocationHandler.newMBeanProxy(inf, mbsc, objectName);
     }
     return null;
   }

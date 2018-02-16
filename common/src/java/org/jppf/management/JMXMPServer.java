@@ -21,7 +21,7 @@ package org.jppf.management;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
-import javax.management.remote.generic.ObjectWrapping;
+import javax.management.remote.generic.*;
 
 import org.jppf.jmx.JMXHelper;
 import org.jppf.ssl.SSLHelper;

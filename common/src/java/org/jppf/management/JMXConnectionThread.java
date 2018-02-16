@@ -59,7 +59,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
       synchronized(this) {
         this.thread = Thread.currentThread();
       }
-      while (!isStopped()) {
+      while (!isStopped() && !connectionWrapper.closed.get()) {
         try {
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
           connectionWrapper.performConnection();

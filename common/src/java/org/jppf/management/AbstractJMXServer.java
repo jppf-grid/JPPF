@@ -124,10 +124,7 @@ public abstract class AbstractJMXServer implements JMXServer {
     return managementHost;
   }
 
-  /**
-   * Get the JMX connector server.
-   * @return a {@link JMXConnectorServer} instance.
-   */
+  @Override
   public JMXConnectorServer getConnectorServer() {
     return connectorServer;
   }
@@ -135,6 +132,11 @@ public abstract class AbstractJMXServer implements JMXServer {
   @Override
   public MBeanServerForwarder getMBeanServerForwarder() {
     return  forwarder;
+  }
+
+  @Override
+  public Map<String, ?> getEnvironment() {
+    return connectorServer.getAttributes();
   }
 
   /**
@@ -148,7 +150,7 @@ public abstract class AbstractJMXServer implements JMXServer {
     int nbTries = 0;
     JMXServiceURL url = null;
     if (debugEnabled) log.debug("starting {} for protocol={}", getClass().getSimpleName(), protocol);
-    while (!found) {
+    while (!found)
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);
         connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
@@ -166,7 +168,6 @@ public abstract class AbstractJMXServer implements JMXServer {
         }
         else throw e;
       }
-    }
     stopped = false;
     if (debugEnabled) log.debug(String.format("%s started at URL %s after %d tries", getClass().getSimpleName(), url, nbTries));
   }

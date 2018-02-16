@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
-import javax.management.MBeanServerConnection;
+import javax.management.*;
 import javax.management.remote.*;
 import javax.management.remote.generic.GenericConnector;
 
@@ -170,7 +170,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    * Initiate the connection and wait until the connection is established or the timeout has expired, whichever comes first.
    * @param timeout the maximum time to wait for, a value of zero means no timeout and
    * this method just waits until the connection is established.
-   * @return {@code true} if the connection was established in the specified time, {@code false} otherwise. 
+   * @return {@code true} if the connection was established in the specified time, {@code false} otherwise.
    */
   public abstract boolean connectAndWait(final long timeout);
 
@@ -190,7 +190,15 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       return;
     }
     synchronized(connectionLock) {
-      if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
+      if (jmxc == null) {
+        jmxc = JMXConnectorFactory.newJMXConnector(url, env);
+        jmxc.addConnectionNotificationListener(new NotificationListener() {
+          @Override
+          public void handleNotification(final Notification notification, final Object handback) {
+            if (JMXConnectionNotification.FAILED.equals(notification.getType())) reset();
+          }
+        }, null, null);
+      }
       jmxc.connect();
       //connectionThread.get().close();
       connectionThread.get().setStopped(true);

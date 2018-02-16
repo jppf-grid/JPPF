@@ -18,8 +18,10 @@
 
 package org.jppf.management;
 
+import java.util.Map;
+
 import javax.management.MBeanServer;
-import javax.management.remote.MBeanServerForwarder;
+import javax.management.remote.*;
 
 /**
  * Interface for JMX remote servers associated to drivers and nodes.
@@ -83,4 +85,16 @@ public interface JMXServer {
    * @return an {@link MBeanServerForwarder} instance, or {@code null} if node is associated with this jmx server.
    */
   MBeanServerForwarder getMBeanServerForwarder();
+
+  /**
+   * Get the JMX connector server.
+   * @return a {@link JMXConnectorServer} instance.
+   */
+  JMXConnectorServer getConnectorServer();
+
+  /**
+   * Get the environment used at the creation of this server.
+   * @return a JMX environment map.
+   */
+  Map<String, ?> getEnvironment();
 }
