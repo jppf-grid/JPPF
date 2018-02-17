@@ -96,6 +96,7 @@ public class TestStandaloneConnector extends BaseTest {
     server = createConnectorServer();
     print(false, true, "***** starting connector client *****");
     clientConnector = createConnectorClient();
+    registerMBeans();
   }
 
   /**
@@ -255,7 +256,7 @@ public class TestStandaloneConnector extends BaseTest {
    * @throws Exception if any error occurs.
    */
   static void registerMBeans() throws Exception {
-    mbeanServer.registerMBean(new ConnectorTest(), connectorTestName);
+    if (!mbeanServer.isRegistered(connectorTestName)) mbeanServer.registerMBean(new ConnectorTest(), connectorTestName);
   }
 
   /**

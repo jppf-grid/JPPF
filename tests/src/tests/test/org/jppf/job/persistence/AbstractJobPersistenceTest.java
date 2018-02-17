@@ -81,7 +81,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
         if (proxy.hasDeadlock()) {
           final String text = TextThreadDumpWriter.printToString(proxy.threadDump(), "driver thread dump for " + jmx);
           FileUtils.writeTextFile("driver_thread_dump_" + ++dumpSequence  + "_" + jmx.getPort() + ".log", text);
-          assertTrue("driver deadlock detected", false);
+          fail("driver deadlock detected");
         }
       }
     }

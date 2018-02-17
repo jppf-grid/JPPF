@@ -291,8 +291,8 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     if (!isConnected()) connect();
     if (isConnected()) {
       final MBeanServerConnection mbsc = getMbeanConnection();
-      return JMX.newMBeanProxy(mbsc, objectName, inf, true);
-      //return MBeanInvocationHandler.newMBeanProxy(inf, mbsc, objectName);
+      //return JMX.newMBeanProxy(mbsc, objectName, inf, true);
+      return MBeanInvocationHandler.newMBeanProxy(inf, mbsc, objectName);
     }
     return null;
   }

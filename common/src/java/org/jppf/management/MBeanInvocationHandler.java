@@ -24,8 +24,8 @@ import java.util.concurrent.locks.*;
 
 import javax.management.*;
 
-import org.jppf.JPPFException;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.*;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 
 /**
@@ -37,7 +37,21 @@ public class MBeanInvocationHandler implements InvocationHandler {
    * Possible types of methods to invoke.
    */
   private static final int INVOKE = 1, SET_ATTRIBUTE = 2, GET_ATTRIBUTE = 3,
-    ADD_NOTIFICATION_LISTENER = 4, ADD_NOTIFICATION_LISTENER_FILTER_NANDBACK = 5, REMOVE_NOTIFICATION_LISTENER = 6;
+    ADD_NOTIFICATION_LISTENER = 4, REMOVE_NOTIFICATION_LISTENER = 5, REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK = 6;
+  /**
+   * Method {@code addNotificationListener(NotificationListener, NotificationFilter, Object)}.
+   */
+  private static final Method ADD_NOTIFICATION_LISTENER_METHOD =
+    ReflectionHelper.findMethod(NotificationBroadcaster.class, "addNotificationListener", NotificationListener.class, NotificationFilter.class, Object.class);
+  /**
+   * Method {@code removeNotificationListener(NotificationListener}.
+   */
+  private static final Method REMOVE_NOTIFICATION_LISTENER_METHOD = ReflectionHelper.findMethod(NotificationBroadcaster.class, "removeNotificationListener", NotificationListener.class);
+  /**
+   * Method {@code removeNotificationListener(NotificationListener, NotificationFilter, Object)}.
+   */
+  private static final Method REMOVE_NOTIFICATION_LISTENER_3_METHOD =
+    ReflectionHelper.findMethod(NotificationEmitter.class, "removeNotificationListener", NotificationListener.class, NotificationFilter.class, Object.class);
   /**
    * Constant for signature of methods with no parameters.
    */
@@ -90,8 +104,17 @@ public class MBeanInvocationHandler implements InvocationHandler {
         return mbsc.getAttribute(objectName, info.attribute);
       case INVOKE:
         return mbsc.invoke(objectName, method.getName(), args, info.signature);
+      case ADD_NOTIFICATION_LISTENER:
+        mbsc.addNotificationListener(objectName, (NotificationListener) args[0], (NotificationFilter) args[1], args[2]);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER:
+        mbsc.removeNotificationListener(objectName, (NotificationListener) args[0]);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
+        mbsc.removeNotificationListener(objectName, (NotificationListener) args[0], (NotificationFilter) args[1], args[2]);
+        break;
       default:
-        throw new JPPFException("unsupported method type for " + method);
+        throw new JPPFUnsupportedOperationException("unsupported method type for " + method);
     }
     return null;
   }
@@ -134,8 +157,12 @@ public class MBeanInvocationHandler implements InvocationHandler {
     private MethodInfo(final Method method) throws Exception {
       if (ReflectionUtils.isSetter(method)) type = SET_ATTRIBUTE;
       else if (ReflectionUtils.isGetter(method)) type = GET_ATTRIBUTE;
-      //else if ("addNotificationListener
-      else type = INVOKE;
+      else if ("addNotificationListener".equals(method.getName())) {
+        type = (ReflectionUtils.sameSignature(method, ADD_NOTIFICATION_LISTENER_METHOD)) ? ADD_NOTIFICATION_LISTENER : INVOKE;
+      } else if ("removeNotificationListener".equals(method.getName())) {
+        type = (ReflectionUtils.sameSignature(method, REMOVE_NOTIFICATION_LISTENER_METHOD))
+          ? REMOVE_NOTIFICATION_LISTENER : (ReflectionUtils.sameSignature(method, REMOVE_NOTIFICATION_LISTENER_3_METHOD) ? REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK : INVOKE);
+      } else type = INVOKE;
       switch(type) {
         case SET_ATTRIBUTE:
         case GET_ATTRIBUTE:
@@ -144,6 +171,9 @@ public class MBeanInvocationHandler implements InvocationHandler {
           break;
 
         case INVOKE:
+        case ADD_NOTIFICATION_LISTENER:
+        case REMOVE_NOTIFICATION_LISTENER:
+        case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
           attribute = null;
           final Class<?>[] paramTypes = method.getParameterTypes();
           if (paramTypes.length <= 0) signature = EMPTY_SIG;
@@ -154,7 +184,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
           break;
 
         default:
-          throw new JPPFException("unsupported method type for " + method);
+          throw new JPPFUnsupportedOperationException("unsupported method type for " + method);
       }
     }
   }
