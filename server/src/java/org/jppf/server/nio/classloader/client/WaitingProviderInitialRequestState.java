@@ -61,14 +61,15 @@ class WaitingProviderInitialRequestState extends ClientClassServerState {
     if (context.readMessage(wrapper)) {
       final JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("read initial request from provider " + wrapper);
-      if (debugEnabled) log.debug("initiating provider: " + wrapper);
       final String uuid = resource.getUuidPath().getFirst();
+      if (debugEnabled) log.debug("initializing provider with uuid={}", uuid);
       // it is a provider
       server.addProviderConnection(uuid, wrapper);
       context.setUuid(uuid);
       context.setConnectionUuid((String) resource.getData(ResourceIdentifier.CONNECTION_UUID));
       context.setMessage(null);
       context.serializeResource();
+      if (debugEnabled) log.debug("initialized provider {}", context);
       return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
     }
     return TO_WAITING_INITIAL_PROVIDER_REQUEST;
