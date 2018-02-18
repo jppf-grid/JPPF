@@ -45,7 +45,7 @@ public class TestJobListener extends BaseTest {
   private JPPFClient jppfClient = null;
 
   /**
-   * Launches 1 driver with 3 nodes and start the client.
+   * Launches 1 driver with 1 node.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -61,9 +61,11 @@ public class TestJobListener extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1);
-    if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
-    BaseSetup.cleanup();
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+      if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
+    } finally {
+      BaseSetup.cleanup();
+    }
   }
 
   /**
@@ -158,12 +160,14 @@ public class TestJobListener extends BaseTest {
    * @throws Exception if any error occurs
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
-    jppfClient = BaseSetup.createClient(null, false);
+    //jppfClient = BaseSetup.createClient(null, false);
+    jppfClient = new JPPFClient(JPPFConfiguration.getProperties());
     BaseTestHelper.printToServers(jppfClient, "start of %s()", name);
     final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     print(false, false, "submitting job %s", job.getName());
     final List<Task<?>> results = jppfClient.submitJob(job);
+    print(false, false, "got job results");
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     Thread.sleep(250L);
@@ -177,9 +181,13 @@ public class TestJobListener extends BaseTest {
    * @param poolSize the size of the connection pool.
    */
   private static void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
-    JPPFConfiguration.getProperties().set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled).set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
-    .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4).set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual").set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
-    .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5).set(JPPFProperties.POOL_SIZE, poolSize);
+    JPPFConfiguration.set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled)
+      .set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
+      .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4)
+      .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+      .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
+      .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
+      .set(JPPFProperties.POOL_SIZE, poolSize);
   }
 
   /**
