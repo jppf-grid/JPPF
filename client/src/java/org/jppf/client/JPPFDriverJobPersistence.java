@@ -81,7 +81,9 @@ public class JPPFDriverJobPersistence {
    * @throws Exception if any error occurs while communicating with the driver.
    */
   public List<String> listJobs(final JobSelector selector) throws Exception {
-    return persistedJobsManager.getPersistedJobUuids(selector);
+    final List<String> result = persistedJobsManager.getPersistedJobUuids(selector);
+    if (debugEnabled) log.debug("found jobs: {}", result);
+    return result;
   }
 
   /**
@@ -102,7 +104,9 @@ public class JPPFDriverJobPersistence {
    * @throws Exception if any error occurs while communicating with the driver.
    */
   public List<String> deleteJobs(final JobSelector selector) throws Exception {
-    return persistedJobsManager.deletePersistedJobs(selector);
+    final List<String> result = persistedJobsManager.deletePersistedJobs(selector);
+    if (debugEnabled) log.debug("deleted jobs: {}", result);
+    return result;
   }
 
   /**

@@ -48,22 +48,26 @@ public class BaseSetup {
    * The default configuratin used when none is specified.
    */
   public static final TestConfiguration DEFAULT_CONFIG = createDefaultConfiguration();
+  static {
+    TestConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
+    JPPFConfiguration.reset();
+  }
   /**
    * The jppf client to use.
    */
-  protected static JPPFClient client = null;
+  protected static JPPFClient client;
   /**
    * The node to lunch for the test.
    */
-  protected static NodeProcessLauncher[] nodes = null;
+  protected static NodeProcessLauncher[] nodes;
   /**
    * The node to lunch for the test.
    */
-  protected static DriverProcessLauncher[] drivers = null;
+  protected static DriverProcessLauncher[] drivers;
   /**
    * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
    */
-  protected static Thread shutdownHook = null;
+  protected static Thread shutdownHook;
 
   /**
    * Get a proxy ot the job management MBean.
@@ -223,7 +227,7 @@ public class BaseSetup {
   private static void close() {
     try {
       generateClientThreadDump();
-      if (client != null) {
+      if ((client != null) && !client.isClosed()) {
         generateDriverThreadDump(client);
         client.close();
         client = null;

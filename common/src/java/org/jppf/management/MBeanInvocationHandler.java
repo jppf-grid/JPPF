@@ -29,15 +29,34 @@ import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 
 /**
- *
+ * An invocation used by MBean proxies created by JPPF.
  * @author Laurent Cohen
  */
 public class MBeanInvocationHandler implements InvocationHandler {
   /**
-   * Possible types of methods to invoke.
+   * Invocation of an arbitrary MBean method other than an attribute setter or getter.
    */
-  private static final int INVOKE = 1, SET_ATTRIBUTE = 2, GET_ATTRIBUTE = 3,
-    ADD_NOTIFICATION_LISTENER = 4, REMOVE_NOTIFICATION_LISTENER = 5, REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK = 6;
+  private static final int INVOKE = 1;
+  /**
+   * Invocation of a {@code set<Attribute>(...)} method.
+   */
+  private static final int SET_ATTRIBUTE = 2;
+  /**
+   * Invocation of a {@code get<Attribute>()} method.
+   */
+  private static final int GET_ATTRIBUTE = 3;
+  /**
+   * Invocation of {@code addNotificationListener(NotificationListener, NotificationFilter, Object)}.
+   */
+  private static final int ADD_NOTIFICATION_LISTENER = 4;
+  /**
+   * Invocation of {@code removeNotificationListener(NotificationListener)}.
+   */
+  private static final int REMOVE_NOTIFICATION_LISTENER = 5;
+  /**
+   * Invocation of {@code removeNotificationListener(NotificationListener, NotificationFilter, Object)}.
+   */
+  private static final int REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK = 6;
   /**
    * Method {@code addNotificationListener(NotificationListener, NotificationFilter, Object)}.
    */
@@ -61,7 +80,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
    */
   private static final Map<Method, MethodInfo> methodMap = new SoftReferenceValuesMap<>();
   /**
-   * Used to synchronize acces to the map.
+   * Used to synchronize access to the method map.
    */
   private static final Lock mapLock = new ReentrantLock();
   /**
@@ -74,7 +93,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
   private final ObjectName objectName;
 
   /**
-   * 
+   * Initialize with the specified MBean connection and MBean object name.
    * @param mbsc the MBean server connection..
    * @param objectName the object name of the MBean to proxy.
    */
@@ -100,19 +119,25 @@ public class MBeanInvocationHandler implements InvocationHandler {
       case SET_ATTRIBUTE:
         mbsc.setAttribute(objectName, new Attribute(info.attribute, args[0]));
         break;
+
       case GET_ATTRIBUTE:
         return mbsc.getAttribute(objectName, info.attribute);
+
       case INVOKE:
         return mbsc.invoke(objectName, method.getName(), args, info.signature);
+
       case ADD_NOTIFICATION_LISTENER:
         mbsc.addNotificationListener(objectName, (NotificationListener) args[0], (NotificationFilter) args[1], args[2]);
         break;
+
       case REMOVE_NOTIFICATION_LISTENER:
         mbsc.removeNotificationListener(objectName, (NotificationListener) args[0]);
         break;
+
       case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
         mbsc.removeNotificationListener(objectName, (NotificationListener) args[0], (NotificationFilter) args[1], args[2]);
         break;
+
       default:
         throw new JPPFUnsupportedOperationException("unsupported method type for " + method);
     }
@@ -171,9 +196,6 @@ public class MBeanInvocationHandler implements InvocationHandler {
           break;
 
         case INVOKE:
-        case ADD_NOTIFICATION_LISTENER:
-        case REMOVE_NOTIFICATION_LISTENER:
-        case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
           attribute = null;
           final Class<?>[] paramTypes = method.getParameterTypes();
           if (paramTypes.length <= 0) signature = EMPTY_SIG;
@@ -181,6 +203,13 @@ public class MBeanInvocationHandler implements InvocationHandler {
             signature = new String[paramTypes.length];
             for (int i=0; i<paramTypes.length; i++) signature[i] = paramTypes[i].getName();
           }
+          break;
+
+        case ADD_NOTIFICATION_LISTENER:
+        case REMOVE_NOTIFICATION_LISTENER:
+        case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
+          attribute = null;
+          signature = EMPTY_SIG;
           break;
 
         default:

@@ -354,7 +354,8 @@ public class ReflectionUtils {
     for (int i=0; i<argTypes1.length; i++) {
       if (argTypes1[i] != argTypes2[i]) return false;
     }
-    if (method1.getReturnType() != method2.getReturnType()) return false;
+    //if (method1.getReturnType() != method2.getReturnType()) return false;
+    if (!method1.getReturnType().isAssignableFrom(method2.getReturnType())) return false;
     return true;
   }
 }

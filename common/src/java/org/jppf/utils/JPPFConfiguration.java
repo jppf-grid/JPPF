@@ -18,10 +18,11 @@
 package org.jppf.utils;
 
 import java.io.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -56,6 +57,10 @@ public final class JPPFConfiguration {
    * Holds the JPPF configuration properties.
    */
   private static TypedProperties props = null;
+  /**
+   * Used to synchronize propertie loading.
+   */
+  private static final Lock propertiesLock = new ReentrantLock();
 
   /**
    * Prevent instantiation from another class.
@@ -68,8 +73,13 @@ public final class JPPFConfiguration {
    * @return a TypedProperties instance.
    */
   public static TypedProperties getProperties() {
-    if (props == null) loadProperties();
-    return props;
+    propertiesLock.lock();
+    try {
+      if (props == null) loadProperties();
+      return props;
+    } finally {
+      propertiesLock.unlock();
+    }
   }
 
   /**
@@ -163,9 +173,14 @@ public final class JPPFConfiguration {
    * (after changing the values of the related system properties for instance).
    */
   public static void reset() {
-    SSLHelper.resetConfig();
-    loadProperties();
-    JPPFSerialization.Factory.reset();
+    propertiesLock.lock();
+    try {
+      SSLHelper.resetConfig();
+      loadProperties();
+      JPPFSerialization.Factory.reset();
+    } finally {
+      propertiesLock.unlock();
+    }
   }
 
   /**
@@ -174,9 +189,14 @@ public final class JPPFConfiguration {
    * @since 6.0
    */
   public static void reset(final TypedProperties newConfig) {
-    SSLHelper.resetConfig();
-    loadProperties(newConfig);
-    JPPFSerialization.Factory.reset();
+    propertiesLock.lock();
+    try {
+      SSLHelper.resetConfig();
+      loadProperties(newConfig);
+      JPPFSerialization.Factory.reset();
+    } finally {
+      propertiesLock.unlock();
+    }
   }
 
   /**

@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -63,9 +62,10 @@ public class TestJobListener extends BaseTest {
   public static void cleanup() throws Exception {
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
       if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
-    } finally {
-      BaseSetup.cleanup();
+    } catch(final Exception e) {
+      e.printStackTrace();
     }
+    BaseSetup.cleanup();
   }
 
   /**
@@ -117,8 +117,10 @@ public class TestJobListener extends BaseTest {
     try {
       final String name = ReflectionUtils.getCurrentMethodName();
       configure(true, false, 1);
+      print(false, false, "creating client");
       jppfClient = BaseSetup.createClient(null, false);
-      BaseTestHelper.printToServers(jppfClient, "start of %s()", name);
+      print(false, false, "got client");
+      BaseTestHelper.printToAll(jppfClient, false, false, true, false, false, "start of %s()", name);
       final CountingJobListener listener = new CountingJobListener();
       final String startNotification = "start notification";
       final AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(jppfClient, startNotification);
@@ -131,12 +133,6 @@ public class TestJobListener extends BaseTest {
       taskListener.await();
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
       jppfClient.reset();
-      final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(jppfClient);
-      if (jmx != null) {
-        final DiagnosticsMBean d = jmx.getDiagnosticsProxy();
-        assertNotNull(d);
-        assertFalse("driver deadlock detected", d.hasDeadlock());
-      }
       print(false, false, "getting job results");
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
@@ -160,9 +156,9 @@ public class TestJobListener extends BaseTest {
    * @throws Exception if any error occurs
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
-    //jppfClient = BaseSetup.createClient(null, false);
-    jppfClient = new JPPFClient(JPPFConfiguration.getProperties());
-    BaseTestHelper.printToServers(jppfClient, "start of %s()", name);
+    jppfClient = BaseSetup.createClient(null, false);
+    //jppfClient = new JPPFClient(JPPFConfiguration.getProperties());
+    BaseTestHelper.printToAll(jppfClient, false, false, true, false, false, "start of %s()", name);
     final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     print(false, false, "submitting job %s", job.getName());
@@ -188,6 +184,7 @@ public class TestJobListener extends BaseTest {
       .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
       .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
       .set(JPPFProperties.POOL_SIZE, poolSize);
+    print(false, false, "config properties after configure(): %s", JPPFConfiguration.getProperties());
   }
 
   /**
