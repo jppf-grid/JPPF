@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLEngine;
 
@@ -30,6 +31,7 @@ import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
 import org.jppf.nio.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -283,10 +285,17 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
           return;
         }
       }
+      final int maxBindRetries = JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3);
+      final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 1000L);
       final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
       final InetSocketAddress addr = new InetSocketAddress(port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
-      server.socket().bind(addr);
+      ConcurrentUtils.runWithRetry(maxBindRetries, retryDelay, new Callable<ServerSocketChannel>() {
+        @Override
+        public ServerSocketChannel call() throws Exception {
+          return server.bind(addr);
+        }
+      });
       if (debugEnabled) log.debug("server socket channel bound to address {}", addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.

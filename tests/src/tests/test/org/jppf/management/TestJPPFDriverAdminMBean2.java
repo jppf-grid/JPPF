@@ -45,7 +45,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
   @Test(timeout = 10000)
   public void testRestartDriverWhenBusy() throws Exception {
     final int nbTasks = 1;
-    final long duration = 2000L;
+    final long duration = 2500L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
@@ -53,7 +53,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     client.submitJob(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
-    restartDriver(driver, 1L, 1000L);
+    restartDriver(driver, 100L, 1000L);
     BaseTestHelper.printToAll(client, true, true, true, false, "getting job results");
     final List<Task<?>> results = job.awaitResults();
     checkResults(results, nbTasks);
@@ -77,7 +77,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final MyClientListener clientListener = new MyClientListener();
     conn.addClientConnectionStatusListener(clientListener);
     try {
-      restartDriver(driver, 1L, 1000L);
+      restartDriver(driver, 100L, 1000L);
       print(false, false, "waiting for 0 connection");
       while (!client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses()).isEmpty()) Thread.sleep(10L);
       print(false, false, "waiting for 1 connection");
