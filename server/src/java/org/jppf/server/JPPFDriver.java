@@ -314,11 +314,6 @@ public class JPPFDriver {
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
     log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
     shuttingDown = true;
-    if (acceptorServer != null) acceptorServer.shutdown();
-    if (clientClassServer != null) clientClassServer.shutdown();
-    if (nodeClassServer != null) nodeClassServer.shutdown();
-    if (nodeNioServer != null) nodeNioServer.shutdown();
-    if (clientNioServer != null) clientNioServer.shutdown();
     Timer timer = new Timer();
     ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay, this);
     timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
@@ -330,6 +325,11 @@ public class JPPFDriver {
    */
   public void shutdown() {
     log.info("Shutting down");
+    if (acceptorServer != null) acceptorServer.shutdown();
+    if (clientClassServer != null) clientClassServer.shutdown();
+    if (nodeClassServer != null) nodeClassServer.shutdown();
+    if (nodeNioServer != null) nodeNioServer.shutdown();
+    if (clientNioServer != null) clientNioServer.shutdown();
     StateTransitionManager.shutdown(true);
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();

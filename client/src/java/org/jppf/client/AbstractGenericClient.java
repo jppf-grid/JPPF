@@ -249,22 +249,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     Runnable r = new Runnable() {
       @Override public void run() {
         final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), info);
-        pool.setDriverPort(info.getPort());
-        synchronized(pools) {
-          pools.putValue(info.getPriority(), pool);
-        }
-        HostIP hostIP = new HostIP(info.getHost(), info.getHost());
-        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.getHost());
-        if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.getHost(), hostIP.hostName());
-        pool.setDriverHostIP(hostIP);
-        fireConnectionPoolAdded(pool);
-        for (int i=1; i<=size; i++) {
-          if (isClosed()) return;
-          submitNewConnection(pool);
-        }
+        newConnectionPool(pool, info.getHost(), info.getPort());
       }
     };
-    executor.submit(r);
+    executor.execute(r);
   }
 
   /**
@@ -283,22 +271,32 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     Runnable r = new Runnable() {
       @Override public void run() {
         final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), name, priority, size, ssl, jmxPoolSize);
-        pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
-        synchronized(pools) {
-          pools.putValue(priority, pool);
-        }
-        HostIP hostIP = new HostIP(info.host, info.host);
-        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
-        if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
-        pool.setDriverHostIP(hostIP);
-        fireConnectionPoolAdded(pool);
-        for (int i=1; i<=size; i++) {
-          if (isClosed()) return;
-          submitNewConnection(pool);
-        }
+        newConnectionPool(pool, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
       }
     };
-    executor.submit(r);
+    executor.execute(r);
+  }
+
+  /**
+   * Initialize a new connection pool.
+   * @param pool the pool to configure and init.
+   * @param host the driver host.
+   * @param port the driver port.
+   */
+  private void newConnectionPool(final JPPFConnectionPool pool, final String host, final int port) {
+    pool.setDriverPort(port);
+    synchronized(pools) {
+      pools.putValue(pool.getPriority(), pool);
+    }
+    HostIP hostIP = new HostIP(host, host);
+    if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(host);
+    if (debugEnabled) log.debug("'{}' was resolved into '{}'", host, hostIP.hostName());
+    pool.setDriverHostIP(hostIP);
+    fireConnectionPoolAdded(pool);
+    for (int i=1; i<=pool.getSize(); i++) {
+      if (isClosed()) return;
+      submitNewConnection(pool);
+    }
   }
 
   /**

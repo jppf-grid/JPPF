@@ -215,7 +215,7 @@ public class BaseTestHelper {
    */
   public static void printToAll(final JPPFClient client, final boolean toClient, final boolean toServers, final boolean toNodes,
     final boolean decorate, final String format, final Object...params) {
-    if (!toServers && !toNodes) return;
+    if (!toServers && !toNodes && !toClient) return;
     List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
     String fmt = String.format("%s %s %s", STARS, format, STARS);
@@ -230,6 +230,7 @@ public class BaseTestHelper {
     if (toClient) {
       for (String s: messages) log.info(s);
     }
+    if (!toServers && !toNodes) return;
     for (JPPFConnectionPool pool: pools) {
       List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
       if (!jmxConnections.isEmpty()) {

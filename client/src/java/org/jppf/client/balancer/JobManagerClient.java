@@ -202,6 +202,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), pool.getJmxPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
+      } catch (RuntimeException|Error e) {
+        log.error("Error while adding connection " + cnn, e);
+        throw e;
       } catch (Throwable e) {
         log.error("Error while adding connection " + cnn, e);
       } finally {

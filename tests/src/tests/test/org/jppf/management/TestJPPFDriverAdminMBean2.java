@@ -46,11 +46,12 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
   public void testRestartDriverWhenIdle() throws Exception {
     int nbTasks = 1;
     long duration = 1L;
+    print(false, false, "getting JMX connection");
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     print(false, false, "submitting job 1");
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, nbTasks, LifeCycleTask.class, duration));
     checkResults(results, nbTasks);
-    restartDriver(driver, 1L, 1000L);
+    restartDriver(driver, 100L, 1000L);
     print(false, false, "waiting for 0 connection");
     while (!client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING).isEmpty()) Thread.sleep(10L);
     print(false, false, "waiting for 1 connection");
@@ -67,15 +68,17 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
   @Test(timeout = 10000)
   public void testRestartDriverWhenBusy() throws Exception {
     int nbTasks = 1;
-    long duration = 2000L;
+    long duration = 2500L;
+    print(false, false, "getting JMX connection");
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     BaseTestHelper.printToAll(client, true, true, true, false, "submitting job");
+    print(false, false, "submitting job");
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, duration);
     AwaitJobListener listener = new AwaitJobListener(job, JobEvent.Type.JOB_DISPATCH);
     client.submitJob(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
-    restartDriver(driver, 1L, 1000L);
+    restartDriver(driver, 100L, 1000L);
     BaseTestHelper.printToAll(client, true, true, true, false, "getting job results");
     List<Task<?>> results = job.awaitResults();
     checkResults(results, nbTasks);

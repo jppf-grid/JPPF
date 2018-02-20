@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFTimeoutException;
+import org.slf4j.*;
 
 /**
  * A set of utility methods to facilitate concurrent and multithreaded rpogramming.
@@ -29,6 +30,15 @@ import org.jppf.JPPFTimeoutException;
  * @since 5.0
  */
 public final class ConcurrentUtils {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ConcurrentUtils.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+
   /**
    * Instantiation is not permitted.
    */
@@ -148,6 +158,36 @@ public final class ConcurrentUtils {
    */
   public static boolean awaitCondition(final Condition condition) {
     return awaitCondition(condition, 0L);
+  }
+
+  /**
+   * Execute the specified {@code Callable} in a retry loop.
+   * @param <T> the return type of the {@code Callable}.
+   * @param maxTries the maximum number of attempts to execute the {@code Callable}.
+   * @param retryDelay the delay between two attempts.
+   * @param callable the {@code Callable} to execute.
+   * @return the return value of the first successful execution of the {@code Callable}.
+   * @throws Exception if after maxRetries the {@code Callable} threw an exception.
+   */
+  public static <T> T runWithRetry(final int maxTries, final long retryDelay, final Callable<T> callable) throws Exception {
+    if (maxTries <= 0) throw new IllegalArgumentException("maxTries bust be > 0");
+    if (retryDelay <= 0L) throw new IllegalArgumentException("retryDelay bust be > 0");
+    if (callable == null) return null;
+    int tryCount = 0;
+    Exception lastException = null;
+    while (tryCount < maxTries) {
+      try {
+        return callable.call();
+      } catch (Exception e) {
+        tryCount++;
+        lastException = e;
+        if (tryCount < maxTries) {
+          if (debugEnabled) log.debug(String.format("Got exception at attempt %d/%d, retrying in %d ms: %s", tryCount, maxTries, retryDelay, ExceptionUtils.getMessage(e)));
+          Thread.sleep(retryDelay);
+        }
+      }
+    }
+    throw lastException;
   }
 
   /**

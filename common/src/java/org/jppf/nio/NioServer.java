@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -159,13 +160,20 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if any error occurs while initializing the server sockets.
    */
   private void init(final int[] portsToInit, final Boolean ssl) throws Exception {
+    final int maxBindRetries = JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3);
+    final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 1000L);
     for (int i=0; i<portsToInit.length; i++) {
       if (portsToInit[i] < 0) continue;
-      ServerSocketChannel server = ServerSocketChannel.open();
+      final ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
+      final InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
       //server.socket().bind(addr, 100);
-      server.socket().bind(addr);
+      ConcurrentUtils.runWithRetry(maxBindRetries, retryDelay, new Callable<ServerSocketChannel>() {
+        @Override
+        public ServerSocketChannel call() throws Exception {
+          return server.bind(addr);
+        }
+      });
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();

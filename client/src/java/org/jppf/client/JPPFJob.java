@@ -329,6 +329,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
     try {
       await(timeout, false);
     } catch (TimeoutException ignore) {
+      return null;
     }
     return results.getResultsList();
   }
