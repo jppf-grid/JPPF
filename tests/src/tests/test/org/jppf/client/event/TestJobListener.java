@@ -157,7 +157,6 @@ public class TestJobListener extends BaseTest {
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
     jppfClient = BaseSetup.createClient(null, false);
-    //jppfClient = new JPPFClient(JPPFConfiguration.getProperties());
     BaseTestHelper.printToAll(jppfClient, false, false, true, false, false, "start of %s()", name);
     final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
@@ -177,13 +176,15 @@ public class TestJobListener extends BaseTest {
    * @param poolSize the size of the connection pool.
    */
   private static void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
-    JPPFConfiguration.set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled)
+    final String driver = "driver1";
+    JPPFConfiguration.set(JPPFProperties.DRIVERS, new String[] { driver })
+      .set(JPPFProperties.PARAM_POOL_SIZE, poolSize, driver)
+      .set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled)
       .set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
       .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4)
       .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
       .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
-      .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
-      .set(JPPFProperties.POOL_SIZE, poolSize);
+      .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5);
     print(false, false, "config properties after configure(): %s", JPPFConfiguration.getProperties());
   }
 
