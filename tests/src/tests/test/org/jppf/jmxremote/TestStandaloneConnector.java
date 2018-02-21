@@ -62,7 +62,6 @@ public class TestStandaloneConnector extends BaseTest {
   private JMXConnector clientConnector; 
 
   /**
-   *
    * @throws Exception  if any error occurs.
    */
   @BeforeClass
@@ -77,7 +76,6 @@ public class TestStandaloneConnector extends BaseTest {
   }
 
   /**
-   *
    * @throws Exception  if any error occurs.
    */
   @AfterClass
@@ -94,7 +92,7 @@ public class TestStandaloneConnector extends BaseTest {
   public void beforeInstance() throws Exception {
     print(false, false, "***** starting connector server *****");
     server = createConnectorServer();
-    print(false, true, "***** starting connector client *****");
+    print(false, false, "***** starting connector client *****");
     clientConnector = createConnectorClient();
     registerMBeans();
   }
@@ -186,7 +184,7 @@ public class TestStandaloneConnector extends BaseTest {
   @Test(timeout = 10000)
   public void testNotifications() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
-    print(false, true, "***** testing notifications *****");
+    print(false, false, "***** testing notifications *****");
     final MyListener listener = new MyListener();
     mbsc.addNotificationListener(connectorTestName, listener, null, "l1");
     mbsc.addNotificationListener(connectorTestName, listener, new StartsWithFilter("a"), "l2");
@@ -223,11 +221,60 @@ public class TestStandaloneConnector extends BaseTest {
   @Test(timeout = 10000)
   public void testRegistration() throws Exception {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
-    print(false, true, "***** testing registration *****");
+    print(false, false, "***** testing registration *****");
     assertTrue(mbsc.isRegistered(connectorTestName));
     mbsc.unregisterMBean(connectorTestName);
     assertFalse(mbsc.isRegistered(connectorTestName));
     print(false, false, "***** JPPF- thread count: %,d *****", countJMXThreads(0L));
+  }
+
+  /**
+   * Test connector client connection status notifications.
+   * @throws Exception if any error occurs.
+   */
+  //@Test(timeout = 10000)
+  @Test
+  public void testClientConnectionNotifications() throws Exception {
+    final MyClientConnectionListener listener = new MyClientConnectionListener();
+    print(false, false, "***** closing connector client before testing *****");
+    clientConnector.close();
+    print(false, false, "***** creating connector client *****");
+    clientConnector = JMXConnectorFactory.newJMXConnector(url, null);
+    clientConnector.addConnectionNotificationListener(listener, null, null);
+    print(false, false, "***** connecting connector client *****");
+    clientConnector.connect();
+    print(false, false, "***** closing connector client *****");
+    clientConnector.close();
+    print(false, false, "***** re-creating connector client *****");
+    clientConnector = JMXConnectorFactory.newJMXConnector(url, null);
+    clientConnector.addConnectionNotificationListener(listener, null, null);
+    print(false, false, "***** re-connecting connector client *****");
+    clientConnector.connect();
+    print(false, false, "***** stopping connector server *****");
+    server.stop();
+    Thread.sleep(500L);
+    //clientConnector.close();
+    print(false, false, "***** checking connection notifications *****");
+    assertEquals(4, listener.notifs.size());
+    for (int i=0; i<listener.notifs.size(); i++) {
+      final Notification notification = listener.notifs.get(i);
+      assertTrue("notifs[" + i + "]", notification instanceof JMXConnectionNotification);
+      final JMXConnectionNotification notif = (JMXConnectionNotification) notification;
+      switch(i) {
+        case 0:
+        case 2:
+          assertEquals(JMXConnectionNotification.OPENED, notif.getType());
+          break;
+
+        case 1:
+          assertEquals(JMXConnectionNotification.CLOSED, notif.getType());
+          break;
+
+        case 3:
+          assertEquals(JMXConnectionNotification.FAILED, notif.getType());
+          break;
+      }
+    }
   }
 
   /**
@@ -292,6 +339,19 @@ public class TestStandaloneConnector extends BaseTest {
       final String msg = (String) notification.getUserData();
       synchronized(infos) {
         infos.putValue(handback, msg);
+      }
+    }
+  }
+
+  /** */
+  static class MyClientConnectionListener implements NotificationListener {
+    /** */
+    final List<Notification> notifs = new ArrayList<>();
+
+    @Override
+    public void handleNotification(final Notification notification, final Object handback) {
+      synchronized(notifs) {
+        notifs.add(notification);
       }
     }
   }
