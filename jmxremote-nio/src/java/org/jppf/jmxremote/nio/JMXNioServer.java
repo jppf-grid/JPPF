@@ -336,7 +336,7 @@ public final class JMXNioServer extends NioServer<JMXState, JMXTransition> imple
    */
   public void closeConnection(final ChannelsPair pair, final Exception exception, final boolean clientRequestedClose) {
     final String connectionID = pair.getConnectionID();
-    if (debugEnabled) log.debug("closing JMX channels for connectionID = {}", connectionID);
+    if (debugEnabled) log.debug("closing JMX channels for {}-side connectionID = {}", pair.isServerSide() ? "server" : "client", connectionID);
     Exception ex = exception;
     try {
       if (pair.isClosed() || (pair.isClosing() && !clientRequestedClose)) return;
