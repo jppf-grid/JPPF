@@ -128,7 +128,7 @@
     <exec executable="java">
       <arg value="-version"/>
     </exec>
-    <antcall target="javadoc.external"/>
+    <antcall target="javadoc.anttask"/>
     <copy todir="${javadoc}/resources" overwrite="true">
       <fileset dir="${bin}">
         <include name="*.gif"/>
