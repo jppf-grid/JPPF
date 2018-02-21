@@ -178,19 +178,22 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testJobAutoRecoveryOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 100L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 200L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
+    print(false, false, "getting JMX connection");
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
-      jmx.setReconnectOnError(false);
+      //jmx.setReconnectOnError(false);
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
+      print(false, false, "submitting job");
       client.submitJob(job);
+      print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
       Thread.sleep(500L);
       print(false, false, "about to request driver restart");
-      jmx.restartShutdown(1L, 1L);
+      jmx.restartShutdown(100L, 1L);
     }
-    Thread.sleep(500L);
+    Thread.sleep(400L);
     print(false, false, "waiting for job results");
     final List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
