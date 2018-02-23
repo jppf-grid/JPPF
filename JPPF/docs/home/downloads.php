@@ -109,7 +109,10 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads</h1>
+  <table style="width: 100%"><tr>
+    <td style="width: 59%""><h1 align="right">Downloads</h1></td>
+    <td style="font-size: 10pt"><div align="right">Powered by<a href="https://www.ej-technologies.com/products/jprofiler/overview.html"> <img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"/><br>Java profiler</a></div></td>
+  </tr></table>
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
