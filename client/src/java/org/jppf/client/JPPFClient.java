@@ -278,7 +278,7 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
-   * Wait until there is at least the specified expected connection pools satisfy the condition where where the number of connections with the specified statuses
+   * Wait until at least the specified expected connection pools satisfy the condition where the number of connections with the specified statuses
    * satisfy the specified connection operator, or until the specified timeout expires, whichever happens first.
    * <p>As an example, to wait for at least 2 pools having each at least one ACTIVE connection, with a timeout of 5 seconds, one would use:
    * <pre>
