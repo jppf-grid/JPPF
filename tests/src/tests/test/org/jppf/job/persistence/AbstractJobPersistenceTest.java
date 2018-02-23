@@ -20,6 +20,7 @@ package test.org.jppf.job.persistence;
 
 import static org.junit.Assert.*;
 
+import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -76,6 +77,11 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
       if (b) {
         final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+        final String[] dirs = { "persistence", "persistence1", "persistence2" };
+        for (String dir: dirs) {
+          final Path dirPath = Paths.get(dir);
+          if (Files.exists(dirPath)) Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
+        }
         mgr.deleteJobs(JobSelector.ALL_JOBS);
         final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
         if (proxy.hasDeadlock()) {
@@ -109,11 +115,15 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(true);
+    print(false, false, "submitting job");
     client.submitJob(job);
     final List<Task<?>> results = job.awaitResults();
+    print(false, false, "checking job results");
     checkJobResults(nbTasks, results, false);
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+    print(false, false, "waiting for no more jobs in store");
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
@@ -129,18 +139,23 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 0L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
+    print(false, false, "submitting job");
     client.submitJob(job);
     final List<Task<?>> results = job.awaitResults();
     if (h2Server != null) Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", "test1h2dump.log");
+    print(false, false, "checking job results");
     checkJobResults(nbTasks, results, false);
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
     final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
     assertNotNull(persistedUuids);
     assertEquals(1, persistedUuids.size());
+    print(false, false, "retrieving job 2 from store");
     final JPPFJob job2 = mgr.retrieveJob(job.getUuid());
     compareJobs(job, job2, true);
+    print(false, false, "checking job 2 results");
     checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
     assertEquals(JobStatus.COMPLETE, job2.getStatus());
     assertTrue(mgr.deleteJob(job.getUuid()));
@@ -158,12 +173,16 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, LifeCycleTask.class, 100L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(true);
+    print(false, false, "submitting job");
     client.submitJob(job);
     Thread.sleep(1000L);
+    print(false, false, "cancelling job");
     assertTrue(job.cancel());
     final List<Task<?>> results = job.awaitResults();
+    print(false, false, "checking job results");
     checkJobResults(nbTasks, results, true);
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     assertFalse(mgr.deleteJob(job.getUuid()));
@@ -198,6 +217,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final List<Task<?>> results = job.awaitResults();
     checkJobResults(nbTasks, results, false);
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
+      print(false, false, "got 2nd jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
@@ -217,20 +237,26 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   public void testJobAutoExecuteOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, AddonSimpleTask.class, 100L);
+    final JPPFJob job = BaseTestHelper.createJob(method, false, false, nbTasks, AddonSimpleTask.class, 200L);
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(true).setDeleteOnCompletion(false);
+    print(false, false, "getting JMX connection");
     try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
       jmx.setReconnectOnError(false);
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
+      print(false, false, "submitting job");
       client.submitJob(job);
+      print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
+      print(false, false, "closing client");
       client.close();
-      jmx.restartShutdown(500L, 1L);
+      print(false, false, "requesting driver restart");
+      jmx.restartShutdown(250L, 1L);
     }
     Thread.sleep(500L);
     client = BaseSetup.createClient(null);
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
+      print(false, false, "got 2nd jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
       assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
@@ -259,6 +285,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     try {
       client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", nbTasks / 2));
       pool.setSize(2);
+      print(false, false, "awaiting 2 connections");
       pool.awaitActiveConnections(Operator.EQUAL, 2);
       final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 100L);
       job.getSLA().setCancelUponClientDisconnect(false);
@@ -272,22 +299,28 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
         }
       };
       job.addJobListener(listener);
+      print(false, false, "submitting job");
       final List<Task<?>> results = client.submitJob(job);
       assertEquals(2, dispatchList.size());
       print(false, false, "dispatch list: %s", dispatchList);
       assertNotSame(dispatchList.get(0), dispatchList.get(1));
+      print(true, false, "checking job results");
       checkJobResults(nbTasks, results, false);
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+      print(false, false, "got jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
       assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
       assertEquals(1, persistedUuids.size());
+      print(false, false, "retrieving job 2 from store");
       final JPPFJob job2 = mgr.retrieveJob(job.getUuid());
       compareJobs(job, job2, true);
+      print(true, false, "checking job 2 results");
       checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
       assertEquals(JobStatus.COMPLETE, job2.getStatus());
       assertTrue(mgr.deleteJob(job.getUuid()));
+      print(true, false, "checking no more jobs in store");
       assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
     } finally {
       if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
