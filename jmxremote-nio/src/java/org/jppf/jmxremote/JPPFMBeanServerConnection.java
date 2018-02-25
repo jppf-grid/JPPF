@@ -447,11 +447,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
    */
   public void handleNotification(final JMXNotification jmxNotification) throws Exception {
     if (debugEnabled) log.debug("received notification {}", jmxNotification);
+    final List<ClientListenerInfo> infos = new ArrayList<>(jmxNotification.getListenerIDs().length);
     synchronized(listenerMap) {
       for (final Integer listenerID: jmxNotification.getListenerIDs()) {
         final ClientListenerInfo info = listenerMap.get(listenerID);
-        if (info != null) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+        if (info != null) infos.add(info);
       }
     }
+    for  (final ClientListenerInfo info: infos) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
   }
 }
