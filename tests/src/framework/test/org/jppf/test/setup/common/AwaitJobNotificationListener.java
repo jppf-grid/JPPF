@@ -110,13 +110,17 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * Wait for the specified event.
    * @throws Exception if any error occurs.
    */
-  public synchronized void await() throws Exception {
-    if (listenerRemoved) return;
-    while (!eventReceived) wait(100L);
-    if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
+  public void await() throws Exception {
+    synchronized (this) {
+      if (listenerRemoved) return;
+      while (!eventReceived) wait(100L);
+      if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
+      listenerRemoved = true;
+    }
     jobManager.removeNotificationListener(this);
-    listenerRemoved = true;
-    wait(100L);
+    synchronized (this) {
+      wait(100L);
+    }
   }
 
   /**
