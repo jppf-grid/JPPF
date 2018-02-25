@@ -106,6 +106,7 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
+    if (debugEnabled) log.debug("received notification for mbean={} : {}", handback, notification);
     final ObjectName mbeanName = (ObjectName) handback;
     List<ServerListenerInfo> infos = null;
     synchronized(listenerMap) {
@@ -117,13 +118,20 @@ public class MBeanServerNotificationDispatcher implements NotificationListener {
       for (final ServerListenerInfo info: infos) {
         if (info.getFilter().isNotificationEnabled(notification)) listenersPerConnection.putValue(info.getConnectionID(), info.getListenerID());
       }
-      final Map<String, JMXMessageHandler> handlersMap = server.getMessageHandlers(listenersPerConnection.keySet());
-      for (final Map.Entry<String, JMXMessageHandler> entry: handlersMap.entrySet()) {
-        final Collection<Integer> listenerIDs = listenersPerConnection.getValues(entry.getKey());
-        try {
-          entry.getValue().sendMessage(new JMXNotification(-1L, notification, listenerIDs.toArray(new Integer[listenerIDs.size()])));
-        } catch (final Exception e) {
-          log.error(e.getMessage(), e);
+      if (!listenersPerConnection.isEmpty()) {
+        final Map<String, JMXMessageHandler> handlersMap = server.getMessageHandlers(listenersPerConnection.keySet());
+        if (!handlersMap.isEmpty()) {
+          for (final Map.Entry<String, JMXMessageHandler> entry: handlersMap.entrySet()) {
+            final Collection<Integer> listenerIDs = listenersPerConnection.getValues(entry.getKey());
+            if ((listenerIDs != null) && !listenerIDs.isEmpty()) {
+              if (debugEnabled) log.debug("sending notification to listeners {} : via connection {}", listenerIDs, entry.getValue().getChannels().getConnectionID());
+              try {
+                entry.getValue().sendMessage(new JMXNotification(-1L, notification, listenerIDs.toArray(new Integer[listenerIDs.size()])));
+              } catch (final Exception e) {
+                log.error(e.getMessage(), e);
+              }
+            }
+          }
         }
       }
     }

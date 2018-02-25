@@ -18,9 +18,9 @@
 
 package org.jppf.jmxremote.message;
 
-import java.util.Arrays;
-
 import javax.management.Notification;
+
+import org.jppf.utils.StringUtils;
 
 /**
  * A specialized message that represents a JMX notification to dispatch on the client side.
@@ -71,8 +71,8 @@ public class JMXNotification extends AbstractJMXMessage {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
       .append(", messageType=").append(JMXMessageType.name(getMessageType()))
-      .append(", listenerIDs=").append(Arrays.asList(listenerIDs))
-      .append(", notification=").append(Arrays.asList(notification))
+      .append(", listenerIDs=").append(StringUtils.arrayToString(", ", "[", "]", listenerIDs))
+      .append(", notification=").append(notification)
       .append(']').toString();
   }
 }

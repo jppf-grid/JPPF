@@ -231,8 +231,9 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   @Override
   public void unregisterForwardingNotificationListener(final String listenerID) throws ListenerNotFoundException {
-    if (debugEnabled) log.debug("before unregistering listener id=" + listenerID);
+    if (debugEnabled) log.debug("before unregistering listener id={}", listenerID);
     manager.removeNotificationListener(listenerID);
+    if (debugEnabled) log.debug("unregistered listener id={}", listenerID);
   }
 
   @Override

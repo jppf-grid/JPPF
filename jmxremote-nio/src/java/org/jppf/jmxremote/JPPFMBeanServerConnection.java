@@ -27,7 +27,7 @@ import javax.management.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.jmxremote.message.*;
-import org.jppf.jmxremote.nio.*;
+import org.jppf.jmxremote.nio.ChannelsPair;
 import org.jppf.jmxremote.notification.ClientListenerInfo;
 import org.slf4j.*;
 
@@ -39,11 +39,12 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFMBeanServerConnection.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFMBeanServerConnection.class);
+  //private static final Logger log = new AsyncLogger(JPPFMBeanServerConnection.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The message handler.
    */
@@ -303,12 +304,10 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
           final ClientListenerInfo info = entry.getValue();
           if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
         }
-      }
-      if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
-      final int[] ids = new int[toRemove.size()];
-      for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
-      synchronized(listenerMap) {
+        if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
+        final int[] ids = new int[toRemove.size()];
+        for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
+        messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
         for (final int id: ids) listenerMap.remove(id);
       }
     } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
@@ -331,10 +330,8 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
             break;
           }
         }
-      }
-      if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
-      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
-      synchronized(listenerMap) {
+        if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
+        messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
         listenerMap.remove(toRemove.getListenerID());
       }
     } catch (final InstanceNotFoundException | ListenerNotFoundException | IOException e) {
@@ -397,7 +394,6 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
       if (debugEnabled) log.debug("closing {}", channels);
       channels.requestClose();
       messageHandler.sendRequestNoResponse(CLOSE);
-      //channels.getSelectionKey().channel().close();
       channels.close(null);
     } catch (final IOException e) {
       throw e;
@@ -445,25 +441,17 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
   }
 
   /**
-   * Get the listener information for the specified listener id.
-   * @param listenerID the id of the listener for which to get information.
-   * @return a {@link ClientListenerInfo} object, or {@code null} if no listener is registered witht he specified id.
-   */
-  public ClientListenerInfo getListenerInfo(final int listenerID) {
-    synchronized(listenerMap) {
-      return listenerMap.get(listenerID);
-    }
-  }
-
-  /**
    * Handle a new received notification.
    * @param jmxNotification the notification message to process.
    * @throws Exception if any error occurs.
    */
   public void handleNotification(final JMXNotification jmxNotification) throws Exception {
-    for (final Integer listenerID: jmxNotification.getListenerIDs()) {
-      final ClientListenerInfo info = getListenerInfo(listenerID);
-      if (info != null) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+    if (debugEnabled) log.debug("received notification {}", jmxNotification);
+    synchronized(listenerMap) {
+      for (final Integer listenerID: jmxNotification.getListenerIDs()) {
+        final ClientListenerInfo info = listenerMap.get(listenerID);
+        if (info != null) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+      }
     }
   }
 }

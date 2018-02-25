@@ -256,16 +256,20 @@ public class TestJPPFTask extends Setup1D1N1C {
     final int nbTasks = 20;
     final NotifyingTaskListener listener = new NotifyingTaskListener();
     String listenerID = null;
+    print(false, false, "getting JMX connection");
     final JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection();
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask2.class);
     try {
+      print(false, false, "registering forwarding listener");
       listenerID = driverJmx.registerForwardingNotificationListener(selector, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+      print(false, false, "got listenerID=%s, submitting job", listenerID);
       client.submitJob(job);
       Thread.sleep(1500L);
     } finally {
       driverJmx.unregisterForwardingNotificationListener(listenerID);
     }
-    assertEquals(2*nbTasks, listener.taskExecutionUserNotificationCount);
+    print(false, false, "checking notifications");
+    assertEquals(2 * nbTasks, listener.taskExecutionUserNotificationCount);
     assertEquals(nbTasks, listener.taskExecutionJppfNotificationCount);
     for (Task<?> task: job) {
       assertTrue(listener.userObjects.contains(task.getId()  + "#1"));

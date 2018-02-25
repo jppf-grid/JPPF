@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.client.event.TestJobListener;
+import test.org.jppf.server.protocol.TestJPPFTask;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 /**
@@ -29,6 +29,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  */
 @RunWith(RepeatingSuite.class)
 @RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestJobListener.class })
+  classes={ TestJPPFTask.class })
 public class JPPFSuite {
 }
