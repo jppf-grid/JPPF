@@ -36,7 +36,10 @@ public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
   public void testSetup() throws Exception {
     final TestConfiguration cfg = createConfig("ssl2_p2p");
     cfg.driverLog4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
-    client = BaseSetup.setup(2, 2, true, cfg);
+    print(false, false, ">>> setting up");
+    client = BaseSetup.setup(2, 2, true, false, cfg);
+    print(false, false, ">>> setup complete, awaiting peers initialized");
     awaitPeersInitialized();
+    print(false, false, ">>> initialization complete");
   }
 }

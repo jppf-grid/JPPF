@@ -31,7 +31,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
 
@@ -273,8 +273,32 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized() throws Exception {
+    print(false, false, ">>> awaiting 2 pools");
     final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-    for (final JPPFConnectionPool pool: pools) awaitNbIdleNodes(pool.awaitWorkingJMXConnection(), Operator.EQUAL, 1, 5000L);
+    if (pools.size() < 2) fail("timeout of 5,000 ms waiting for 2 pools expired");
+    final List<JMXDriverConnectionWrapper> jmxList = new ArrayList<>(2);
+    for (final JPPFConnectionPool pool: pools) {
+      print(false, false, ">>> awaiting JMX connection for %s", pool);
+      final MutableReference<JMXDriverConnectionWrapper> jmx = new MutableReference<>();
+      ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
+        @Override
+        public boolean evaluate() {
+          try {
+            jmx.set(pool.awaitWorkingJMXConnection());
+            return true;
+          } catch (@SuppressWarnings("unused") final Exception e) {
+            return false;
+          }
+        }
+      }, 5000L, true);
+      print(false, false, ">>> got JMX connection %s", jmx.get());
+      jmxList.add(jmx.get());
+    }
+    for (final JMXDriverConnectionWrapper jmx: jmxList) {
+      print(false, false, ">>> awaiting 1 idle node for %s", jmx);
+      awaitNbIdleNodes(jmx, Operator.EQUAL, 1, 5000L);
+      print(false, false, ">>> got 1 idle node for %s", jmx);
+    }
   }
 
 
@@ -287,7 +311,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs or the tiemout expires.
    */
   protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final Operator operator, final int nbNodes, final long timeout) throws Exception {
-      ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
+    ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
           try {

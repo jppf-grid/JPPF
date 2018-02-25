@@ -36,7 +36,7 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(2, 2, true, createConfig("ssl2_p2p"));
+    client = BaseSetup.setup(2, 2, true, false, createConfig("ssl2_p2p"));
   }
 
   /**
