@@ -92,6 +92,7 @@ class WaitInitialBundleState extends NodeServerState {
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
       context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
       final int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
+      if (debugEnabled) log.debug("management port = {} for node = {}", port, context);
       String host = NodeServerUtils.getChannelHost(channel);
       final HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
       final boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;

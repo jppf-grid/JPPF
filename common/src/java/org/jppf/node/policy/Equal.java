@@ -84,7 +84,7 @@ public class Equal extends LeftOperandRule {
 
   /**
    * Define an equality comparison between the string value of a property and another string value.
-   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a string value.
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
    */
@@ -96,7 +96,7 @@ public class Equal extends LeftOperandRule {
 
   /**
    * Define an equality comparison between the boolean value of a property and another boolean value.
-   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a numeric value.
+   * @param propertyNameOrExpression either a literal string which represents a property name, or an expression resolving to a boolean value.
    * @param a the value to compare with.
    */
   public Equal(final String propertyNameOrExpression, final boolean a) {

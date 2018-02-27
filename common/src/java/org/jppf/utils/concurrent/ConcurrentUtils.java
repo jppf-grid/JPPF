@@ -141,8 +141,25 @@ public final class ConcurrentUtils {
    */
   public static boolean awaitInterruptibleCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout)
     throws IllegalArgumentException, JPPFTimeoutException {
+    return awaitInterruptibleCondition(condition, millis, 1L, throwExceptionOnTImeout);
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the timeout in milliseconds. A value of zero means an infinite timeout.
+   * @param retryInterval the time to wait between 2 evaluations of the condition, must be > 0.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   * @throws JPPFTimeoutException if the timeout expires and {@code throwExceptionOnTImeout} is {@code true}.
+   */
+  public static boolean awaitInterruptibleCondition(final Condition condition, final long millis, final long retryInterval, final boolean throwExceptionOnTImeout)
+    throws IllegalArgumentException, JPPFTimeoutException {
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    if (retryInterval <= 0L) throw new IllegalArgumentException("retyInterval must be > 0");
     final long timeout = millis > 0L ? millis : Long.MAX_VALUE;
     final CountDownLatch countDown = new CountDownLatch(1);
     final ThreadSynchronization monitor = new ThreadSynchronization() { };
@@ -153,7 +170,7 @@ public final class ConcurrentUtils {
         boolean ok = false;
         synchronized(monitor) {
           try {
-            while (!(ok = condition.evaluate())) monitor.wait(1L);
+            while (!(ok = condition.evaluate())) monitor.wait(retryInterval);
           } catch (@SuppressWarnings("unused") final Exception e) {
             ok = false;
           }
