@@ -290,7 +290,7 @@ public class AbstractNonStandardSetup extends BaseTest {
             return false;
           }
         }
-      }, 5000L, 50L, true);
+      }, 5000L, 500L, true);
       print(false, false, ">>> got JMX connection %s", jmx.get());
       jmxList.add(jmx.get());
     }
@@ -321,7 +321,7 @@ public class AbstractNonStandardSetup extends BaseTest {
             return false;
           }
         }
-      }, timeout, 50L, true);
+      }, timeout, 500L, true);
   }
   /**
    * @return the number of nodes in the topology.
