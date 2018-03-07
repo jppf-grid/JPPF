@@ -59,7 +59,7 @@ public class SimpleNioMessage implements NioMessage {
   /**
    * The channel to read from or write to.
    */
-  protected final ChannelWrapper<?> channel;
+  protected final NioContext<?> channel;
   /**
    * Actual bytes sent to or received from the underlying channel.
    */
@@ -73,8 +73,18 @@ public class SimpleNioMessage implements NioMessage {
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
    */
-  public SimpleNioMessage(final ChannelWrapper<?> channel) {
+  public SimpleNioMessage(final NioContext<?> channel) {
     this.channel = channel;
+    this.sslHandler = channel.getSSLHandler();
+    this.ssl = sslHandler != null;
+  }
+
+  /**
+   * Initialize this nio message.
+   * @param channel the channel to read from or write to.
+   */
+  public SimpleNioMessage(final ChannelWrapper<?> channel) {
+    this.channel = channel.getContext();
     this.sslHandler = channel.getContext().getSSLHandler();
     this.ssl = sslHandler != null;
   }
@@ -90,7 +100,7 @@ public class SimpleNioMessage implements NioMessage {
   @Override
   public boolean read() throws Exception {
     if (currentLengthObject == null) {
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
       try {
@@ -108,7 +118,7 @@ public class SimpleNioMessage implements NioMessage {
     if (currentLength > 0) {
       if (currentObject == null) {
         location = IOHelper.createDataLocationMemorySensitive(currentLength);
-        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
+        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
       }
       try {
         if (!currentObject.read()) return false;
@@ -126,7 +136,7 @@ public class SimpleNioMessage implements NioMessage {
   public boolean write() throws Exception {
     if (currentLengthObject == null) {
       SerializationUtils.writeInt(location.getSize(), lengthBuf.getBuffer(0).buffer, 0);
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
       try {
@@ -140,7 +150,7 @@ public class SimpleNioMessage implements NioMessage {
       channelCount += currentLengthObject.getChannelCount();
     }
     if (currentLength > 0) {
-      if (currentObject == null) currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
+      if (currentObject == null) currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
       try {
         if (!currentObject.write()) return false;
       } catch(final Exception e) {

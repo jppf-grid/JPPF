@@ -16,19 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.jmxremote.nio;
+package org.jppf.utils;
 
 /**
- * Enumeration of the possible state transitions for a client job channel.
+ * An enumeration that contains no element.
  * @author Laurent Cohen
  */
-public enum JMXTransition {
-  /**
-   * Transition from a state to RECEIVING_MESSAGE.
-   */
-  TO_RECEIVING_MESSAGE,
-  /**
-   * Transition from a state to SENDING_MESSAGE.
-   */
-  TO_SENDING_MESSAGE
+public enum EmptyEnum {
 }

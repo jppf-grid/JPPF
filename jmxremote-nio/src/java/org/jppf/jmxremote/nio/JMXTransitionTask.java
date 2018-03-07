@@ -18,8 +18,9 @@
 
 package org.jppf.jmxremote.nio;
 
+import java.nio.channels.SelectionKey;
+
 import org.jppf.client.Operator;
-import org.jppf.nio.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.SynchronizedInteger;
 import org.slf4j.*;
@@ -45,19 +46,11 @@ public class JMXTransitionTask implements Runnable {
   /**
    * The channel whose state is changing.
    */
-  private final JMXChannelWrapper channel;
+  private final JMXContext context;
   /**
-   * The corresponding NIO state object.
+   * The associated nio srver.
    */
-  private final NioState<JMXTransition> nioState;
-  /**
-   * The associated JMX context.
-   */
-  private final JMXContext ctx;
-  /**
-   * 
-   */
-  private final NioTransition<JMXState> nioTransition;
+  private final JMXNioServer server;
   /**
    * 
    */
@@ -71,23 +64,11 @@ public class JMXTransitionTask implements Runnable {
    * Initialize this task with the specified key and factory.
    * @param channel the channel whose state is changing.
    * @param server the NIO server.
-   */
-  public JMXTransitionTask(final JMXChannelWrapper channel, final JMXNioServer server) {
-    this(channel, server, true);
-  }
-
-  /**
-   * Initialize this task with the specified key and factory.
-   * @param channel the channel whose state is changing.
-   * @param server the NIO server.
    * @param selecting whether the selector is selecting.
    */
-  public JMXTransitionTask(final JMXChannelWrapper channel, final JMXNioServer server, final boolean selecting) {
-    this.channel = channel;
-    final NioServerFactory<JMXState, JMXTransition>factory = server.getFactory();
-    this.nioState = factory.getState(JMXState.SENDING_MESSAGE);
-    this.ctx = channel.getContext();
-    this.nioTransition = factory.getTransition(JMXTransition.TO_SENDING_MESSAGE);
+  public JMXTransitionTask(final JMXContext channel, final JMXNioServer server, final boolean selecting) {
+    this.context = channel;
+    this.server = server;
     this.selecting = selecting;
   }
 
@@ -96,37 +77,34 @@ public class JMXTransitionTask implements Runnable {
     if (!requestCount.compareAndSet(0, 1)) return;
     try {
       try {
-        if (traceEnabled) log.trace("performing transition to state {} for {}", JMXState.SENDING_MESSAGE, channel);
-        JMXTransition result = null;
-        synchronized(channel) {
+        if (traceEnabled) log.trace("writing to channel {}", context);
+        boolean result = false;
+        synchronized(context) {
           while (requestCount.get() > 0) {
             try {
-              result = nioState.performTransition(channel);
+              result = JMXMessageWriter.write(context);
             } finally {
               requestCount.decrementAndGet();
             }
           }
         }
-        if (result != null) {
-          if (selecting) ctx.transitionChannel(nioTransition.getState(), nioTransition.getInterestOps(), true);
-          else {
-            ctx.setState(JMXState.SENDING_MESSAGE);
-            JMXNioServer.updateInterestOpsNoWakeup(ctx.getSelectionKey(), nioTransition.getInterestOps(), true);
-          }
+        if (result) {
+          if (selecting) server.updateInterestOps(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
+          else JMXNioServer.updateInterestOpsNoWakeup(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
         }
       } catch (Exception|Error  e) {
-        ctx.setEnabled(false);
+        context.setEnabled(false);
         throw e;
       }
     } catch(Exception|Error e) {
       try {
-        if (debugEnabled) log.debug("error on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
-        else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));
+        if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+        else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
       } catch (final Exception e2) {
         if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
         else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
       }
-      if (e instanceof Exception) ctx.handleException(channel, (Exception) e);
+      if (e instanceof Exception) context.handleException(null, (Exception) e);
       else throw (Error) e;
     }
   }

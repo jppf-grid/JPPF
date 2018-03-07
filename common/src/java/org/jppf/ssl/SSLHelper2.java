@@ -18,7 +18,9 @@
 
 package org.jppf.ssl;
 
-import java.io.*;
+import static org.jppf.jmx.JPPFJMXProperties.*;
+
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.security.KeyStore;
@@ -28,10 +30,10 @@ import java.util.concurrent.Callable;
 import javax.net.ssl.*;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.jmx.JMXHelper;
+import org.jppf.jmx.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -239,39 +241,45 @@ public final class SSLHelper2 {
   public void configureJPPFJMXProperties(final Map<String, Object> env) throws Exception {
     final Map<String, Object> newProps = new LinkedHashMap<>();
     final SSLContext sslContext = getSSLContext("jppf.ssl.client", "jppf.ssl");
-    newProps.put("jppf.jmx.remote.tls.enabled", true);
-    newProps.put("jppf.jmx.remote.tls.context.protocol", sslContext.getProtocol());
+    newProps.put("jppf.ssl", true);
+    newProps.put(TLS_ENABLED.getName(), true);
+    newProps.put(TLS_CONTEXT_PROTOCOL.getName(), sslContext.getProtocol());
     final SSLParameters params = getSSLParameters();
-    newProps.put("jppf.jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(" ", null, null, params.getProtocols()));
-    newProps.put("jppf.jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
-    if (params.getNeedClientAuth()) newProps.put("jppf.jmx.remote.tls.client.authentication", "need");
-    else if (params.getWantClientAuth()) newProps.put("jppf.jmx.remote.tls.client.authentication", "want");
-    convert(newProps, "jppf.ssl.client.distinct.truststore",        "jppf.jmx.remote.tls.client.distinct.truststore");
-    convert(newProps, "jppf.ssl.client.truststore.password",        "jppf.jmx.remote.tls.client.truststore.password");
-    convert(newProps, "jppf.ssl.client.truststore.password.source", "jppf.jmx.remote.tls.client.truststore.password.source");
-    convert(newProps, "jppf.ssl.client.truststore.file",            "jppf.jmx.remote.tls.client.truststore.file");
-    convert(newProps, "jppf.ssl.client.truststore.source",          "jppf.jmx.remote.tls.client.truststore.source");
-    convert(newProps, "jppf.ssl.truststore.password",               "jppf.jmx.remote.tls.truststore.password");
-    convert(newProps, "jppf.ssl.truststore.password.source",        "jppf.jmx.remote.tls.truststore.password.source");
-    convert(newProps, "jppf.ssl.truststore.file",                   "jppf.jmx.remote.tls.truststore.file");
-    convert(newProps, "jppf.ssl.truststore.source",                 "jppf.jmx.remote.tls.truststore.source");
-    convert(newProps, "jppf.ssl.keystore.password",                 "jppf.jmx.remote.tls.keystore.password");
-    convert(newProps, "jppf.ssl.keystore.password.source",          "jppf.jmx.remote.tls.keystore.password.source");
-    convert(newProps, "jppf.ssl.keystore.file",                     "jppf.jmx.remote.tls.keystore.file");
-    convert(newProps, "jppf.ssl.keystore.source",                   "jppf.jmx.remote.tls.keystore.source");
+    newProps.put(TLS_ENABLED_PROTOCOLS.getName(), StringUtils.arrayToString(" ", null, null, params.getProtocols()));
+    newProps.put(TLS_ENABLED_CIPHER_SUITES.getName(), StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
+    if (params.getNeedClientAuth()) newProps.put(TLS_CLIENT_AUTHENTICATION.getName(), "need");
+    else if (params.getWantClientAuth()) newProps.put(TLS_CLIENT_AUTHENTICATION.getName(), "want");
+    convert(newProps, JPPFProperties.SSL_CLIENT_DISTINCT_TRUSTSTORE,        TLS_CLIENT_DISTINCT_TRUSTSTORE);
+    convert(newProps, JPPFProperties.SSL_CLIENT_TRUSTSTORE_PASSWORD,        TLS_CLIENT_TRUSTSTORE_PASSWORD);
+    convert(newProps, JPPFProperties.SSL_CLIENT_TRUSTSTORE_PASSWORD_SOURCE, TLS_CLIENT_TRUSTSTORE_PASSWORD_SOURCE);
+    convert(newProps, JPPFProperties.SSL_CLIENT_TRUSTSTORE_FILE,            TLS_CLIENT_TRUSTSTORE_FILE);
+    convert(newProps, JPPFProperties.SSL_CLIENT_TRUSTSTORE_SOURCE,          TLS_CLIENT_TRUSTSTORE_SOURCE);
+    convert(newProps, JPPFProperties.SSL_CLIENT_TRUSTSTORE_TYPE,            TLS_CLIENT_TRUSTSTORE_TYPE);
+    convert(newProps, JPPFProperties.SSL_TRUSTSTORE_PASSWORD,               TLS_TRUSTSTORE_PASSWORD);
+    convert(newProps, JPPFProperties.SSL_TRUSTSTORE_PASSWORD_SOURCE,        TLS_TRUSTSTORE_PASSWORD_SOURCE);
+    convert(newProps, JPPFProperties.SSL_TRUSTSTORE_FILE,                   TLS_TRUSTSTORE_FILE);
+    convert(newProps, JPPFProperties.SSL_TRUSTSTORE_SOURCE,                 TLS_TRUSTSTORE_SOURCE);
+    convert(newProps, JPPFProperties.SSL_TRUSTSTORE_TYPE,                   TLS_TRUSTSTORE_TYPE);
+    convert(newProps, JPPFProperties.SSL_KEYSTORE_PASSWORD,                 TLS_KEYSTORE_PASSWORD);
+    convert(newProps, JPPFProperties.SSL_KEYSTORE_PASSWORD_SOURCE,          TLS_KEYSTORE_PASSWORD_SOURCE);
+    convert(newProps, JPPFProperties.SSL_KEYSTORE_FILE,                     TLS_KEYSTORE_FILE);
+    convert(newProps, JPPFProperties.SSL_KEYSTORE_SOURCE,                   TLS_KEYSTORE_SOURCE);
+    convert(newProps, JPPFProperties.SSL_KEYSTORE_TYPE,                     TLS_KEYSTORE_TYPE);
+
     env.putAll(newProps);
-    if (debugEnabled) log.debug("JMX SSL connection properties: {}", newProps);
+    if (debugEnabled) log.debug("JMX SSL connection properties: {} from props={}", newProps, sslConfig);
   }
 
   /**
    * Convert the source property from the ssl config into the destination property of the specified properties.
-   * @param props the properties to convert into.
+   * @param env the properties to convert into.
    * @param src the source property.
    * @param dest the destination property.
    */
-  private void convert(final Map<String, Object> props, final String src, final String dest) {
-    final String s = sslConfig.getString(src);
-    if (s != null) props.put(dest, s);
+  private void convert(final Map<String, Object> env, final JPPFProperty<?> src, final JPPFProperty<String> dest) {
+    @SuppressWarnings("unchecked")
+    final String s = (src.valueType() == String.class) ? JMXEnvHelper.getString((JPPFProperty<String>) src, null, sslConfig): sslConfig.getString(src.getName());
+    if (s != null) env.put(dest.getName(), s);
   }
 
   /**

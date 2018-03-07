@@ -21,7 +21,7 @@ package org.jppf.jmxremote.notification;
 import javax.management.*;
 
 /**
- * Server-side wrapper for a registered notiication listener.
+ * Server-side wrapper for a registered notification listener.
  * @author Laurent Cohen
  */
 public class ServerListenerInfo {

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.JPPFTimeoutException;
-import org.jppf.jmxremote.JMXEnvHelper;
+import org.jppf.jmx.JMXEnvHelper;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.nio.StateTransitionManager;
 import org.jppf.utils.*;
@@ -76,7 +76,7 @@ public class JMXMessageHandler {
   /**
    * The transition manager.
    */
-  private final StateTransitionManager<JMXState, JMXTransition> mgr;
+  private final StateTransitionManager<EmptyEnum, EmptyEnum> mgr;
   /**
    * The initial connection request, whose expected response is a connection id.
    */
@@ -90,7 +90,7 @@ public class JMXMessageHandler {
   public JMXMessageHandler(final ChannelsPair channels, final Map<String, ?> env) {
     this.channels = channels;
     channels.setMessageHandler(this);
-    this.server = channels.readingChannel().getContext().getServer();
+    this.server = channels.readingContext().getServer();
     this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
     connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
@@ -128,7 +128,6 @@ public class JMXMessageHandler {
         if (response.getException() != null) throw response.getException();
         return (String) response.getResult();
       }
-      //final String connectionID = (String) receiveResponse(connectionRequest, false);
       final String connectionID = (String) receiveResponse(connectionRequest, true);
       if (connectionID != null) return connectionID;
     }
@@ -186,6 +185,7 @@ public class JMXMessageHandler {
   public void sendRequestNoResponse(final byte type, final Object...params) throws Exception {
     if (closed.get()) return;
     try {
+      if (!channels.getSelectionKey().isValid()) return;
       final JMXRequest request = new JMXRequest(messageSequence.incrementAndGet(), type, params);
       if (debugEnabled) log.debug("sending request {}, channels={}", request, channels);
       putRequest(request);
@@ -221,10 +221,9 @@ public class JMXMessageHandler {
   public void sendMessage(final JMXMessage message) throws Exception {
     if (closed.get()) return;
     if (debugEnabled) log.debug("sending message {}", message);
-    channels.writingChannel().getContext().offerJmxMessage(message);
+    channels.writingContext().offerJmxMessage(message);
     final JMXTransitionTask task = channels.getWritingTask();
     if (!task.incrementCountIfNeeded()) mgr.execute(task);
-    //server.updateInterestOps(channels.getSelectionKey(), SelectionKey.OP_WRITE, true);
   }
 
   /**

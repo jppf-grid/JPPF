@@ -22,23 +22,26 @@ import org.jppf.jmxremote.message.JMXMessage;
 import org.jppf.nio.NioMessage;
 
 /**
- *
+ * Instances of this class associate a {@link JMXMessage} to its serialized form (a {@link NioMessage}, which holds a
+ * {@link org.jppf.io.DataLocation DataLocation}}). This allows the serialization to happen in a thread different from
+ * the I/O thread, while keeping meaningful information on the JMX message that can be used after the message is sent
+ * over the network channel.
  * @author Laurent Cohen
  */
 class MessageWrapper {
   /**
-   *
+   * The JMX message.
    */
   final JMXMessage jmxMessage;
   /**
-   *
+   * The {@code NioMessage} that holds the serialized JMX message.
    */
   final NioMessage nioMessage;
 
   /**
-   *
-   * @param jmxMessage .
-   * @param nioMessage .
+   * Initialize with the specified JMX message and associated serialized form.
+   * @param jmxMessage the JMX message.
+   * @param nioMessage the {@code NioMessage} that holds the serialized JMX message.
    */
   MessageWrapper(final JMXMessage jmxMessage, final NioMessage nioMessage) {
     this.jmxMessage = jmxMessage;

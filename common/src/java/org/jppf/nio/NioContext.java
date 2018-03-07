@@ -18,6 +18,7 @@
 
 package org.jppf.nio;
 
+import java.nio.channels.SocketChannel;
 
 /**
  * Context associated with an open communication channel.
@@ -132,4 +133,10 @@ public interface NioContext<S extends Enum<S>> {
    * @param enabled {@code true} to enable this context, {@code false} to disable it.
    */
   void setEnabled(boolean enabled);
+
+  /**
+   * Get the associated socket chanel, if any.
+   * @return a {@link SocketChannel} instance, or null if this wrapper has no associated socket chanel.
+   */
+  SocketChannel getSocketChannel();
 }

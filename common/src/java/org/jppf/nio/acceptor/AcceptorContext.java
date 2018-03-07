@@ -76,7 +76,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (nioObject == null) nioObject = new PlainNioObject(wrapper, 4);
+    if (nioObject == null) nioObject = new PlainNioObject(wrapper.getSocketChannel(), 4);
     boolean b = false;
     try {
       b = nioObject.read();

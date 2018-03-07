@@ -107,7 +107,7 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   }
 
   @Override
-  public synchronized int write() throws Exception {
+  public int write() throws Exception {
     synchronized(channel) {
       int remaining = applicationSendBuffer.position();
       if (traceEnabled) log.trace("position=" + applicationSendBuffer.position());
@@ -119,7 +119,7 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
         if (traceEnabled) log.trace("before wrap, " + printSendBuffers() + ", remaining=" + remaining);
         final SSLEngineResult sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
         final SSLEngineResult.Status status = sslEngineResult.getStatus();
-        if (traceEnabled) log.trace(String.format("after wrap, status = %s, %s, remaing=%d", status, printSendBuffers(), remaining));
+        if (traceEnabled) log.trace(String.format("after wrap, status = %s, %s, remaining=%d", status, printSendBuffers(), remaining));
         applicationSendBuffer.compact();
         switch (status) {
           case BUFFER_UNDERFLOW:

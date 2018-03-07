@@ -18,6 +18,7 @@
 
 package org.jppf.nio;
 
+import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.*;
@@ -80,6 +81,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * 
    */
   public long byteCount;
+  /**
+   * The associated socket channel.
+   */
+  protected SocketChannel socketChannel;
 
   @Override
   public S getState() {
@@ -248,5 +253,13 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
         log.error(String.format("error in onClose action for %s", this), e);
       }
     }
+  }
+
+  /**
+   * @return the associated socket channel.
+   */
+  @Override
+  public SocketChannel getSocketChannel() {
+    return socketChannel;
   }
 }

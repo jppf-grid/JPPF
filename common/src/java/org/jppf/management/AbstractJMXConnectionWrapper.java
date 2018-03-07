@@ -27,7 +27,7 @@ import javax.management.*;
 import javax.management.remote.*;
 import javax.management.remote.generic.GenericConnector;
 
-import org.jppf.jmx.JMXHelper;
+import org.jppf.jmx.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
@@ -130,6 +130,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
       if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
       else initJPPF();
+      if (debugEnabled) log.debug(String.format("created AbstractJMXConnectionWrapper with sslEnabled=%b, url=%s, env=%s", this.sslEnabled, url, env));
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -158,7 +159,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "org.jppf.jmxremote.protocol");
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
     env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
-    env.put(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT.getName(), JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT));
+    env.put(JPPFJMXProperties.REQUEST_TIMEOUT.getName(), JPPFConfiguration.get(JPPFJMXProperties.REQUEST_TIMEOUT));
+    env.put(JPPFJMXProperties.TLS_ENABLED.getName(), Boolean.valueOf(sslEnabled).toString());
   }
 
   /**

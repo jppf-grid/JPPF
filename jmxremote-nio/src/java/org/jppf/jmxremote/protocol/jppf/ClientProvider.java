@@ -29,7 +29,7 @@ import org.jppf.jmxremote.JPPFJMXConnector;
 import org.slf4j.*;
 
 /**
- *
+ * A provider for JMX clients that support {@link JMXServiceURL}s of type {@code service:jmx:jppf://<host>:<port>}.
  */
 public class ClientProvider implements JMXConnectorProvider {
   /**

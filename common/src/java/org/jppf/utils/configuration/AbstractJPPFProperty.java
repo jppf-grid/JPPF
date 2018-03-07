@@ -37,7 +37,7 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   /**
    * Location of the localization resource bundles.
    */
-  private  static final String I18N_BASE = "org.jppf.utils.configuration.i18n.JPPFProperties";
+  private String i18nBase = "org.jppf.utils.configuration.i18n.JPPFProperties";
   /**
    * Constant for an empty String array.
    */
@@ -138,14 +138,14 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
 
   @Override
   public String getDocumentation() {
-    return LocalizationUtils.getLocalized(I18N_BASE, name + ".doc");
+    return LocalizationUtils.getLocalized(i18nBase, name + ".doc");
   }
 
   @Override
   public Set<String> getTags() {
     if (tags == null) {
       tags = new TreeSet<>();
-      final List<String> tokens = StringUtils.parseStrings(LocalizationUtils.getLocalized(I18N_BASE, name + ".tags"), ",", false);
+      final List<String> tokens = StringUtils.parseStrings(LocalizationUtils.getLocalized(i18nBase, name + ".tags"), ",", false);
       if (tokens != null) {
         for (String token: tokens) {
           final String t = token.trim();
@@ -164,7 +164,7 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
 
   @Override
   public String getParameterDoc(final String param) {
-    return LocalizationUtils.getLocalized(I18N_BASE, name + "." + param);
+    return LocalizationUtils.getLocalized(i18nBase, name + "." + param);
   }
 
   /**
@@ -201,5 +201,22 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
       params.add(param);
     }
     return params.isEmpty() ? NO_PARAM : params.toArray(new String[params.size()]);
+  }
+
+  /**
+   * @return the location of the localization resource bundles.
+   * @exclude
+   */
+  public String getI18nBase() {
+    return i18nBase;
+  }
+
+  /**
+   * Set the location of the localization resource bundles.
+   * @param i18nBase the location to set.
+   * @exclude
+   */
+  public void setI18nBase(final String i18nBase) {
+    this.i18nBase = i18nBase;
   }
 }

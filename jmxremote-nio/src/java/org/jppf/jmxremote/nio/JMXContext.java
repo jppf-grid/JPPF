@@ -18,21 +18,22 @@
 
 package org.jppf.jmxremote.nio;
 
-import java.nio.channels.SelectionKey;
+import java.nio.channels.*;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.io.IOHelper;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
+import org.jppf.utils.EmptyEnum;
 import org.slf4j.*;
 
 /**
  * Context associated with a {@link JMXChannelWrapper}.
  * @author Laurent Cohen
  */
-public class JMXContext extends SimpleNioContext<JMXState> {
+public class JMXContext extends SimpleNioContext<EmptyEnum> {
   /**
    * Logger for this class.
    */
@@ -58,23 +59,29 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   private JMXMessageHandler messageHandler;
   /**
-   *
-   */
-  private final AtomicReference<JMXState> stateRef = new AtomicReference<>();
-  /**
-   *
+   * The selection key which associates this context with the {@code SocketChannel}.
    */
   private SelectionKey selectionKey;
+  /**
+   * 
+   */
+  private static final AtomicInteger idSequence = new AtomicInteger(0);
+  /**
+   * The unique id for this context.
+   */
+  private final int id = idSequence.incrementAndGet();
 
   /**
    * Initialize with the specified server.
    * @param server the JMX nio server to use.
+   * @param socketChannel the associated socket channel.
    * @param reading whether the associated channel performs read operations ({@code true}) or write operations ({@code false}).
    */
-  public JMXContext(final JMXNioServer server, final boolean reading) {
+  public JMXContext(final JMXNioServer server, final boolean reading, final SocketChannel socketChannel) {
     this.server = server;
     pendingJmxMessages = reading ? null : new LinkedBlockingQueue<MessageWrapper>();
     this.peer = false;
+    this.socketChannel = socketChannel;
   }
 
   @Override
@@ -109,7 +116,7 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @throws Exception if any error occurs.
    */
   public void offerJmxMessage(final JMXMessage jmxMessage) throws Exception {
-    final SimpleNioMessage msg = new SimpleNioMessage(channel);
+    final SimpleNioMessage msg = new SimpleNioMessage(this);
     msg.setLocation(IOHelper.serializeData(jmxMessage));
     pendingJmxMessages.offer(new MessageWrapper(jmxMessage, msg));
   }
@@ -154,48 +161,14 @@ public class JMXContext extends SimpleNioContext<JMXState> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append("id=").append(id);
     sb.append(", state=").append(getState());
     sb.append(", connectionID=").append(messageHandler == null ? "null" : getConnectionID());
     sb.append(", serverSide=").append(messageHandler == null ? "null" : getChannels().isServerSide());
     sb.append(", ssl=").append(ssl);
     if (pendingJmxMessages != null) sb.append(", pendingMessages=").append(pendingJmxMessages.size());
+    sb.append(", socketChannel=").append(socketChannel);
     return sb.append(']').toString();
-  }
-
-  @Override
-  public JMXState getState() {
-    return stateRef.get();
-  }
-
-  @Override
-  public boolean setState(final JMXState state) {
-    stateRef.set(state);
-    return true;
-  }
-
-  /**
-   * Compare the state to the expected one, and set it to the update value only if they are the same.
-   * @param expected the state to compare to.
-   * @param update the state value to update with.
-   * @return {@code true} if the update was performed, {@code false} otherwise.
-   */
-  public boolean compareAndSetState(final JMXState expected, final JMXState update) {
-    return stateRef.compareAndSet(expected, update);
-  }
-
-  /**
-   * Set the spcecified state to the channel and prepare it for selection.
-   * @param state the transition to set.
-   * @param updateOps the value to AND-wise update the interest ops with.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   * @return {@code null}.
-   * @throws Exception if any error occurs.
-   */
-  JMXTransition transitionChannel(final JMXState state, final int updateOps, final boolean add) throws Exception {
-    setState(state);
-    server.updateInterestOps(getSelectionKey(), updateOps, add);
-    return null;
   }
 
   /**
@@ -209,19 +182,13 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    * @return the channel's selection key.
    */
   public SelectionKey getSelectionKey() {
-    if (selectionKey == null) selectionKey = getChannel().getSocketChannel().keyFor(server.getSelector());
+    if (selectionKey == null) selectionKey = socketChannel.keyFor(server.getSelector());
     return selectionKey;
   }
 
-  /**
-   * Read data from a channel.
-   * @param wrapper the channel to read the data from.
-   * @return true if all the data has been read, false otherwise.
-   * @throws Exception if an error occurs while reading the data.
-   */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (message == null) message = new SimpleNioMessage(channel);
+    if (message == null) message = new SimpleNioMessage(this);
     byteCount = ((SimpleNioMessage) message).channelCount;
     final boolean b = message.read();
     byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
@@ -229,12 +196,6 @@ public class JMXContext extends SimpleNioContext<JMXState> {
     return b;
   }
 
-  /**
-   * Write data to a channel.
-   * @param wrapper the channel to write the data to.
-   * @return true if all the data has been written, false otherwise.
-   * @throws Exception if an error occurs while writing the data.
-   */
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
     byteCount = ((SimpleNioMessage) message).channelCount;
@@ -257,5 +218,12 @@ public class JMXContext extends SimpleNioContext<JMXState> {
    */
   void setCurrentMessageWrapper(final MessageWrapper currentMessageWrapper) {
     this.currentMessageWrapper = currentMessageWrapper;
+  }
+
+  /**
+   * @return The unique id for this context.
+   */
+  public int getId() {
+    return id;
   }
 }

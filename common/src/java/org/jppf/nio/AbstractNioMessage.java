@@ -159,7 +159,7 @@ public abstract class AbstractNioMessage implements NioMessage {
   protected boolean readNextObject() throws Exception {
     if (currentLengthObject == null) {
       lengthBuf.reset();
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
       try {
@@ -177,7 +177,7 @@ public abstract class AbstractNioMessage implements NioMessage {
     if (currentLength > 0) {
       if (currentObject == null) {
         final DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
+        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
       }
       try {
         if (!currentObject.read()) return false;
@@ -206,7 +206,7 @@ public abstract class AbstractNioMessage implements NioMessage {
     if (currentLengthObject == null) {
       currentDataLocation = locations.get(position);
       SerializationUtils.writeInt(currentDataLocation.getSize(), lengthBuf.reset().getBuffer(0).buffer, 0);
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel, lengthBuf);
+      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
       try {
@@ -222,7 +222,7 @@ public abstract class AbstractNioMessage implements NioMessage {
     if (currentLength > 0) {
       if (currentObject == null) {
         final DataLocation loc = currentDataLocation.copy();
-        currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel, loc);
+        currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel.getSocketChannel(), loc);
       }
       try {
         if (!currentObject.write()) return false;

@@ -18,58 +18,60 @@
 
 package org.jppf.jmxremote.nio;
 
-import org.jppf.jmxremote.JMXEnvHelper;
+import org.jppf.jmx.JMXEnvHelper;
 import org.jppf.jmxremote.message.*;
-import org.jppf.nio.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.Logger;
 
 /**
- * Writes all messages in the channel's context queue, if any, or keep writing the current message.
+ * Writes all messages in the channel's context queue, if any, or keeps writing the current message until the socket send buffer is full.
  * @author Laurent Cohen
  */
-public class SendingMessageState extends JMXNioState {
+public class JMXMessageWriter {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggingUtils.getLogger(SendingMessageState.class, JMXEnvHelper.isAsyncLoggingEnabled());
+  private static final Logger log = LoggingUtils.getLogger(JMXMessageWriter.class, JMXEnvHelper.isAsyncLoggingEnabled());
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
-   *
-   * @param server the server which handles the channels states and transitions.
+   * Write to the specified channel.
+   * @param context the context to write to.
+   * @return {@code true} if there is something left to write, {@code false} otherwise. 
+   * @throws Exception if any errort occurs.
    */
-  public SendingMessageState(final JMXNioServer server) {
-    super(server);
-  }
-
-  @Override
-  public JMXTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    final JMXContext context = ((JMXChannelWrapper) channel).context;
+  static boolean write(final JMXContext context) throws Exception {
     while (true) {
-      if (context.getChannels().isClosed()) return null;
+      if (context.getChannels().isClosed()) return false;
       if (context.getCurrentMessageWrapper() == null) {
         final MessageWrapper msg = context.pollJmxMessage();
-        if (msg == null) return null;
+        if (msg == null) return false;
         if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
         context.setCurrentMessageWrapper(msg);
         context.setMessage(msg.nioMessage);
       }
-      if (context.writeMessage(channel)) {
-        final MessageWrapper msg = context.getCurrentMessageWrapper();
-        if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
-        context.setMessage(null);
-        context.setCurrentMessageWrapper(null);
-        if (msg.jmxMessage.getMessageType() == JMXMessageType.CLOSE) {
-          if (debugEnabled) log.debug("handling CLOSE for context {}", context);
-          context.getMessageHandler().messageSent(msg.jmxMessage);
-          return null;
+      final MessageWrapper msg = context.getCurrentMessageWrapper();
+      try {
+        if (context.writeMessage(null)) {
+          if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
+          context.setMessage(null);
+          context.setCurrentMessageWrapper(null);
+          if (msg.jmxMessage.getMessageType() == JMXMessageType.CLOSE) {
+            if (debugEnabled) log.debug("handling CLOSE for context {}", context);
+            context.getMessageHandler().messageSent(msg.jmxMessage);
+            return false;
+          }
+        } else if (context.byteCount <= 0L) {
+          return true;
         }
-      } else if (context.byteCount <= 0L) {
-        return JMXTransition.TO_SENDING_MESSAGE;
+      } catch (final Exception e) {
+        if (msg.jmxMessage instanceof JMXRequest) {
+          context.getMessageHandler().messageSent(msg.jmxMessage);
+        }
+        throw e;
       }
     }
   }

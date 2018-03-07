@@ -25,28 +25,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.*;
 
-import org.jppf.jmxremote.*;
+import org.jppf.jmxremote.JPPFMBeanServerConnection;
 import org.jppf.jmxremote.message.JMXMessageHandler;
-import org.jppf.utils.*;
-import org.slf4j.Logger;
+import org.jppf.utils.Pair;
 
 /**
  * Convenience class to group a pair of channels respectively reading from and writing to the same socket channel.
  * @author Laurent Cohen
  */
-public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
+public class ChannelsPair extends Pair<JMXContext, JMXContext> {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggingUtils.getLogger(ChannelsPair.class, JMXEnvHelper.isAsyncLoggingEnabled());
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Whether this a close of the channels was request.
    */
@@ -84,10 +75,6 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    */
   private final JMXTransitionTask nonSelectingWritingTask;
   /**
-   * The associated nio server.
-   */
-  private final JMXNioServer server;
-  /**
    * The socket channel's interest ops.
    */
   private int interestOps;
@@ -109,24 +96,23 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
    * @param second the writing channel.
    * @param server the JMX nio server.
    */
-  public ChannelsPair(final JMXChannelWrapper first, final JMXChannelWrapper second, final JMXNioServer server) {
+  public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server) {
     super(first, second);
-    this.server = server;
-    writingTask = new JMXTransitionTask(second, server);
+    writingTask = new JMXTransitionTask(second, server, true);
     nonSelectingWritingTask = new JMXTransitionTask(second, server, false);
   }
 
   /**
    * @return the reading channel.
    */
-  public JMXChannelWrapper readingChannel() {
+  public JMXContext readingContext() {
     return first();
   }
 
   /**
    * @return the reading channel.
    */
-  public JMXChannelWrapper writingChannel() {
+  public JMXContext writingContext() {
     return second();
   }
 
@@ -243,51 +229,16 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
     this.mbeanServerConnection = mbeanServerConnection;
   }
 
-  /**
-   * Disable reading fron the channel.
-   * @throws Exception if any error occurs.
-   */
-  public void disableRead() throws Exception {
-    if (closed.get()) return;
-    if (debugEnabled) log.debug("disabling read on {}", this);
-    final JMXChannelWrapper readingChannel = readingChannel();
-    readingChannel.context.setState(null);
-    server.updateInterestOps(readingChannel.getContext().getSelectionKey(), SelectionKey.OP_READ, false);
-  }
-
-  /**
-   * Disable writing to the channel.
-   * @throws Exception if any error occurs.
-   */
-  public void disableWrite() throws Exception {
-    if (closed.get()) return;
-    if (debugEnabled) log.debug("disabling write on {}", this);
-    final JMXChannelWrapper writingChannel = writingChannel();
-    writingChannel.context.setState(null);
-    server.updateInterestOps(writingChannel.getContext().getSelectionKey(), SelectionKey.OP_WRITE, false);
-  }
-
-  /**
-   * Disable reading on the channel.
-   * @throws Exception if any error occurs.
-   */
-  public void disableReadWrite() throws Exception {
-    if (closed.get()) return;
-    if (debugEnabled) log.debug("disabling read and write on {}", this);
-    writingChannel().context.setState(null);
-    readingChannel().context.setState(null);
-    server.updateInterestOps(writingChannel().getContext().getSelectionKey(), SelectionKey.OP_READ | SelectionKey.OP_WRITE, false);
-  }
-
   @Override
   public String toString() {
     return  new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("readingChannelID=").append(readingChannel().getId())
-      .append(", writingChannelID=").append(writingChannel().getId())
+      .append("readingChannelID=").append(readingContext().getId())
+      .append(", writingChannelID=").append(writingContext().getId())
       .append(", connectionID=").append(connectionID)
       .append(", closed=").append(closed.get())
       .append(", closing=").append(closing.get())
       .append(", serverSide=").append(serverSide)
+      .append(", socketChannel=").append(selectionKey == null ? "null" : selectionKey.channel())
       .append(']').toString();
   }
 
@@ -367,7 +318,7 @@ public class ChannelsPair extends Pair<JMXChannelWrapper, JMXChannelWrapper> {
   }
 
   /**
-   * 
+   * A callback invoked upon closing the connection.
    */
   public static interface CloseCallback {
     /**

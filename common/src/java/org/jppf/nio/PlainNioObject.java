@@ -18,6 +18,8 @@
 
 package org.jppf.nio;
 
+import java.nio.channels.SocketChannel;
+
 import org.jppf.io.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,14 +48,14 @@ public class PlainNioObject extends AbstractNioObject {
   /**
    * The channel from which to read or write the data.
    */
-  private final ChannelWrapper<?> channel;
+  private final SocketChannel channel;
 
   /**
    * Initialize this NioObject with the specified channel and size.
    * @param channel where to read or write the data.
    * @param size the size of the internal buffer.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final int size) {
+  public PlainNioObject(final SocketChannel channel, final int size) {
     this(channel, new MultipleBuffersLocation(size));
   }
 
@@ -62,7 +64,7 @@ public class PlainNioObject extends AbstractNioObject {
    * @param channel where to read or write the data.
    * @param buf the internal buffer.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final JPPFBuffer buf) {
+  public PlainNioObject(final SocketChannel channel, final JPPFBuffer buf) {
     this(channel, new MultipleBuffersLocation(buf));
   }
 
@@ -71,7 +73,7 @@ public class PlainNioObject extends AbstractNioObject {
    * @param channel where to read or write the data.
    * @param location the location of the data to read from or write to.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final DataLocation location) {
+  public PlainNioObject(final SocketChannel channel, final DataLocation location) {
     super(location, location.getSize());
     this.channel = channel;
   }
@@ -84,7 +86,7 @@ public class PlainNioObject extends AbstractNioObject {
   @Override
   public boolean read() throws Exception {
     if (count >= size) return true;
-    if (source == null) source = new ChannelInputSource(channel.getSocketChannel());
+    if (source == null) source = new ChannelInputSource(channel);
     while (count < size) {
       final int n = location.transferFrom(source, false);
       if (n <= 0) break;
@@ -103,7 +105,7 @@ public class PlainNioObject extends AbstractNioObject {
   @Override
   public boolean write() throws Exception {
     if (count >= size) return true;
-    if (dest == null) dest = new ChannelOutputDestination(channel.getSocketChannel());
+    if (dest == null) dest = new ChannelOutputDestination(channel);
     while (count < size) {
       final int n = location.transferTo(dest, false);
       if (n <= 0) break;
@@ -118,7 +120,6 @@ public class PlainNioObject extends AbstractNioObject {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    sb.append("channel id=").append(channel.getId());
     sb.append(", size=").append(size);
     sb.append(", count=").append(count);
     sb.append(", source=").append(source);

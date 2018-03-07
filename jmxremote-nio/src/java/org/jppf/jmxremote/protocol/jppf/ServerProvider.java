@@ -29,7 +29,7 @@ import org.jppf.jmx.*;
 import org.jppf.jmxremote.JPPFJMXConnectorServer;
 
 /**
- * 
+ * A provider for JMX servers that support {@link JMXServiceURL}s of type {@code service:jmx:jppf://<host>:<port>}.
  */
 public class ServerProvider implements JMXConnectorServerProvider {
   /**

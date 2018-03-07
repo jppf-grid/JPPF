@@ -21,6 +21,7 @@ package org.jppf.jmxremote;
 import static org.jppf.jmxremote.message.JMXMessageType.*;
 
 import java.io.*;
+import java.nio.channels.*;
 import java.util.*;
 
 import javax.management.*;
@@ -393,8 +394,13 @@ public class JPPFMBeanServerConnection implements MBeanServerConnection, Closeab
     try {
       if (debugEnabled) log.debug("closing {}", channels);
       channels.requestClose();
-      messageHandler.sendRequestNoResponse(CLOSE);
-      channels.close(null);
+      try {
+        final SelectionKey key = channels.getSelectionKey();
+        final SocketChannel channel = (SocketChannel) key.channel();
+        if (key.isValid() && channel.isConnected() && channel.isOpen()) messageHandler.sendRequestNoResponse(CLOSE);
+      } finally {
+        channels.close(null);
+      }
     } catch (final IOException e) {
       throw e;
     } catch (final Exception e) {

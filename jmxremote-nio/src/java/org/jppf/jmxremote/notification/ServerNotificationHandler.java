@@ -26,7 +26,7 @@ import javax.management.*;
 import org.jppf.jmxremote.nio.JMXNioServer;
 
 /**
- *
+ * Server-side interface for registering and unregistering notifications listeners, as well as dispatching local notifications to remote listeners.
  * @author Laurent Cohen
  */
 public class ServerNotificationHandler {

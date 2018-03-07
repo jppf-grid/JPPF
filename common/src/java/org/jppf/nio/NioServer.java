@@ -236,9 +236,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     engine.setSSLParameters(params);
   }
 
-  /**
-   * Start the underlying server socket by making it accept incoming connections.
-   */
   @Override
   public void run() {
     try {
@@ -379,7 +376,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Process a channel that was accepted by the server socket channel.
    * @param key the selection key for the socket channel to process.
    */
-  public abstract void postAccept(ChannelWrapper<?> key);
+  public void postAccept(final ChannelWrapper<?> key) {
+  }
 
   /**
    * Define a context for a newly created channel.
@@ -507,9 +505,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Determines whether the specified channel is in an idle state.
    * @param channel the channel to check.
-   * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
+   * @return {@code true} if the channel is idle, {@code false} otherwise.
    */
-  public abstract boolean isIdle(ChannelWrapper<?> channel);
+  public boolean isIdle(final ChannelWrapper<?> channel) {
+    return false;
+  }
 
   /**
    * Configure the SSL options for the specified channel.

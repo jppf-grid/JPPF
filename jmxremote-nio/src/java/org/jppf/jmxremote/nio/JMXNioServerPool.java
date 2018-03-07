@@ -22,7 +22,7 @@ import org.jppf.JPPFError;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
- * 
+ * A pool of {@link JMXNioServer} instances, implemented as a singleton, which allows spreading the I/O operations over multiple NIO selector threads.
  * @author Laurent Cohen
  */
 public class JMXNioServerPool {
@@ -44,7 +44,7 @@ public class JMXNioServerPool {
   private static boolean closed;
 
   /**
-   * @return .
+   * @return an array of initialized and ready to serve {@link JMXNioServer}s.
    * @throws Exception if any error occurs.
    */
   private static JMXNioServer[]  initialize() {
@@ -85,7 +85,7 @@ public class JMXNioServerPool {
   }
 
   /**
-   * @return the servers.
+   * @return the servers in this pool.
    * @throws Exception if any error occurs.
    */
   public static JMXNioServer[] getServers() throws Exception {

@@ -31,6 +31,7 @@ import javax.security.auth.Subject;
 import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
+import org.jppf.jmx.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.jmxremote.nio.ChannelsPair.CloseCallback;
@@ -97,8 +98,11 @@ public class JPPFJMXConnector implements JMXConnector {
 
   @Override
   public void connect(final Map<String, ?> env) throws IOException {
+    if (debugEnabled) log.debug("env = {}, this.environment={}", env, this.environment);
     if (env != null) environment.putAll(env);
-    final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
+    final String s = JMXEnvHelper.getString(JPPFJMXProperties.TLS_ENABLED, environment, null);
+    if (debugEnabled) log.debug("secure='{}'", s);
+    final Boolean tls = Boolean.valueOf(s);
     secure = (tls == null) ? false : tls;
     try {
       init();
@@ -206,7 +210,7 @@ public class JPPFJMXConnector implements JMXConnector {
     if (!InterceptorHandler.invokeOnConnect(socketClient.getChannel())) throw new JPPFException("connection denied by interceptor");
     if (debugEnabled) log.debug("Connected to JMX server {}, sending channel identifier {}", address, JPPFIdentifiers.serverName(JPPFIdentifiers.JMX_REMOTE_CHANNEL));
     socketClient.writeInt(JPPFIdentifiers.JMX_REMOTE_CHANNEL);
-    if (debugEnabled) log.debug("Reconnected to JMX server {}", address);
+    if (debugEnabled) log.debug("Reconnected to JMX server {}, secure={}", address, secure);
     final ChannelsPair pair = JMXNioServerPool.getServer().createChannelsPair(environment, "", -1, socketClient.getChannel(), secure, true);
     pair.addCloseCallback(new CloseCallback() {
       @Override

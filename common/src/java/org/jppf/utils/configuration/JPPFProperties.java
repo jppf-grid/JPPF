@@ -19,13 +19,11 @@
 package org.jppf.utils.configuration;
 
 import java.io.File;
-import java.lang.reflect.*;
 import java.security.KeyStore;
-import java.util.*;
+import java.util.List;
 
 import org.jppf.jmx.JMXHelper;
 import org.jppf.job.persistence.impl.DefaultFilePersistence;
-import org.slf4j.*;
 
 /**
  * This class holds a static enumeration of the documented JPPF configuration properties.
@@ -33,10 +31,6 @@ import org.slf4j.*;
  * @since 5.2
 . */
 public class JPPFProperties {
-  /**
-   * Logger for this class.
-  . */
-  private static Logger log = LoggerFactory.getLogger(JPPFProperties.class);
   /** Server host name or IP address. */
   public static final JPPFProperty<String> SERVER_HOST = new StringProperty("jppf.server.host", "localhost");
   /** Server port. */
@@ -333,7 +327,7 @@ public class JPPFProperties {
   /** SSL configuration as an arbitrary source. */
   public static final JPPFProperty<String> SSL_CONFIGURATION_SOURCE = new StringProperty("jppf.ssl.configuration.source", null);
   /** {@link javax.net.ssl.SSLContext SSLContext} protocol. */
-  public static final JPPFProperty<String> SSL_CONTEXT_PROTOCOL = new StringProperty("jppf.ssl.context.protocol", "TLSv1");
+  public static final JPPFProperty<String> SSL_CONTEXT_PROTOCOL = new StringProperty("jppf.ssl.context.protocol", "TLSv1.2");
   /** Path to the key store in the file system or classpath. */
   public static final JPPFProperty<String> SSL_KEYSTORE_FILE = new StringProperty("jppf.ssl.keystore.file", null);
   /** Plain text key store password. */
@@ -456,22 +450,7 @@ public class JPPFProperties {
    * @return A list of {@link JPPFProperty} instances.
   */
   public synchronized static List<JPPFProperty<?>> allProperties() {
-    if (properties == null) {
-      properties = new ArrayList<>();
-      try {
-        final Field[] fields = JPPFProperties.class.getDeclaredFields();
-        for (Field field: fields) {
-          final int mod = field.getModifiers();
-          if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && (JPPFProperty.class == field.getType())) {
-            if (!field.isAccessible()) field.setAccessible(true);
-            final JPPFProperty<?> prop = (JPPFProperty<?>) field.get(null);
-            properties.add(prop);
-          }
-        }
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
+    if (properties == null) properties = ConfigurationUtils.allProperties(JPPFProperties.class);
     return properties;
   }
 }

@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 import javax.net.ssl.SSLEngine;
 
 /**
- * 
+ * Wrapper for an {@link SSLEngine} and an associated channel.
  * @author Laurent Cohen
  */
 public interface SSLHandler {
