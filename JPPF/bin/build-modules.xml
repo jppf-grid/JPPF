@@ -22,8 +22,16 @@
   <!--                 Package the runtime components for deployment             -->
   <!-- ========================================================================= -->
 
-  <target name="runtime" depends="rebuild, runtime.setup, runtime.driver, runtime.node, runtime.gui, application.template"/>
+  <target name="runtime" depends="rebuild, runtime.setup, runtime.driver, runtime.node, runtime.gui, application.template, runtime.jmxremote.nio"/>
 
+  <!--
+    Build a distributable zip module with predefined base libraries.
+    Attributes:
+    - module: the name of the module to buld
+    - zip-prefix: the prefix of the files in the zip, defaults to the value of 'module'.
+    Elements:
+    - module-elements: additonal zip filesets to add to the zip (optional)
+  -->
   <macrodef name="package-module">
     <attribute name="module"/>
     <attribute name="zip-prefix" default="@{module}"/>
@@ -43,7 +51,6 @@
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote-nio-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-jmxremote-nio-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="${ApacheCommons.inc}"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="${log4j.inc}"/>
         <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="${slf4j.inc}"/>
@@ -76,6 +83,7 @@
         <zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar"/>
         <zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
         <zipfileset dir="${application.template}/classes" prefix="${application-template.prefix}/classes" includes="**/*.*"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>
   </target>
@@ -90,6 +98,7 @@
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node-${version.number}.jar,jppf-server-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar,jppf-server-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>
   </target>
@@ -102,6 +111,7 @@
         <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${node.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>
   </target>
@@ -119,8 +129,17 @@
         <zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="${MigLayout.inc}"/>
         <zipfileset dir="${lib}/Jung" prefix="${gui.prefix}/lib" includes="*${Jung.inc}"/>
         <zipfileset dir="${lib}/RSyntaxTextArea" prefix="${gui.prefix}/lib" includes="*${RSyntaxTextArea.inc}"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>
+  </target>
+
+  <!-- =========== JPPF JMX REMOTE =========== -->
+  
+  <target name="runtime.jmxremote.nio">
+    <delete dir="${build}/config/jmxremote-nio" quiet="true"/>
+    <mkdir dir="${build}/config/jmxremote-nio"/>
+    <package-module module="jmxremote-nio" />
   </target>
 
 </project> 
