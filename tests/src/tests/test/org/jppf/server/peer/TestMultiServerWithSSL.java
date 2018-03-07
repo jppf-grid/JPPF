@@ -28,6 +28,7 @@ import test.org.jppf.test.setup.*;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
+@Ignore
 public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
   /**
    * Launches a 2 drivers with 1 node attached to each and start the client,
