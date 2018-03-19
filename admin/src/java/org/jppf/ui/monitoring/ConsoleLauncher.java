@@ -30,6 +30,7 @@ import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.*;
+import org.jppf.utils.VersionUtils.Version;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -162,7 +163,10 @@ public class ConsoleLauncher {
         Frame frame = OptionsHandler.getMainWindow();
         if (createFrame) {
           if (frame == null) {
-            frame = new JFrame(elt.getLabel());
+            //frame = new JFrame(elt.getLabel());
+            final Version version = VersionUtils.getVersion();
+            final String title = elt.getLabel().replace("${version}", version.getVersionNumber());
+            frame = new JFrame(title);
             OptionsHandler.setMainWindow(frame);
             DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
             frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
