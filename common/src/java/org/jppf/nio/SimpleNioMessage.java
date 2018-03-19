@@ -100,6 +100,7 @@ public class SimpleNioMessage implements NioMessage {
   @Override
   public boolean read() throws Exception {
     if (currentLengthObject == null) {
+      lengthBuf.reset();
       currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
@@ -135,6 +136,7 @@ public class SimpleNioMessage implements NioMessage {
   @Override
   public boolean write() throws Exception {
     if (currentLengthObject == null) {
+      lengthBuf.reset();
       SerializationUtils.writeInt(location.getSize(), lengthBuf.getBuffer(0).buffer, 0);
       currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }

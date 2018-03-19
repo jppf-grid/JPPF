@@ -85,7 +85,7 @@ public class JMXMPServer extends AbstractJMXServer {
       env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JMXMP_PROTOCOL, env);
       env.put("jmx.remote.object.wrapping", newObjectWrapping());
-      startConnectorServer("jmxmp", env);
+      startConnectorServer(JMXHelper.JMXMP_PROTOCOL, env);
     } finally {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);

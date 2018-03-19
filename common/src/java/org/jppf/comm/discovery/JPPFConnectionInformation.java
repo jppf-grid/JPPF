@@ -18,11 +18,9 @@
 
 package org.jppf.comm.discovery;
 
-import static org.jppf.utils.ComparisonUtils.*;
-
 import java.io.*;
 
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * This class encapsulates the connection information for a JPPF driver.
@@ -149,9 +147,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   public boolean isSame(final JPPFConnectionInformation other, final boolean compareUuid) {
     if (other == null) return false;
     if (this == other) return true;
-    if (!equalStrings(host, other.host)) return false;
-    if (!equalIntArrays(serverPorts, other.serverPorts)) return false;
-    if (!equalIntArrays(sslServerPorts, other.sslServerPorts)) return false;
+    if (!ComparisonUtils.equalStrings(host, other.host)) return false;
+    if (!ComparisonUtils.equalIntArrays(serverPorts, other.serverPorts)) return false;
+    if (!ComparisonUtils.equalIntArrays(sslServerPorts, other.sslServerPorts)) return false;
     if (recoveryPort != other.recoveryPort) return false;
     if (compareUuid) {
       if (uuid == null) return other.uuid == null;

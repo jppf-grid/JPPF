@@ -92,41 +92,39 @@ public class SSLNioObject extends AbstractNioObject {
   @Override
   public boolean read() throws Exception {
     if (count >= size) return true;
-    final ByteBuffer buf = sslHandler.getApplicationReceiveBuffer();
+    final ByteBuffer buf = sslHandler.getAppReceiveBuffer();
     if (os == null) os = location.getOutputStream();
-
     int n = 0;
     while (count < size) {
       if (buf.position() <= 0) {
         n = sslHandler.read();
         if (n == 0) return false;
-        if (n < 0) throw new EOFException();
+        else if (n < 0) throw new EOFException();
         channelCount += sslHandler.getChannelReadCount();
       }
       buf.flip();
       if (traceEnabled) log.trace("n1=" + n + ", count=" + count + ", size=" + size + ", buf=" + buf);
-
       n = Math.min(buf.remaining(), size - count);
       os.write(buf.array(), 0, n);
       count += n;
       buf.position(n);
       if (traceEnabled) log.trace("n2=" + n + " count=" + count + ", size=" + size + ", buf=" + buf);
       buf.compact();
-      if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + sslHandler.getChannelReceiveBuffer());
+      if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + sslHandler.getNetReceiveBuffer());
     }
-
     final boolean b = count >= size;
     if (b) {
       StreamUtils.close(os, log);
       os = null;
     }
+    //channelCount = count;
     return b;
   }
 
   @Override
   public boolean write() throws Exception {
     if (count >= size) return true;
-    final ByteBuffer buf = sslHandler.getApplicationSendBuffer();
+    final ByteBuffer buf = sslHandler.getAppSendBuffer();
     if (is == null) {
       is = location.getInputStream();
       statefulCount = 0;
@@ -141,23 +139,22 @@ public class SSLNioObject extends AbstractNioObject {
       }
     }
     if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-
     int n;
     do {
       n = sslHandler.write();
       if (n > 0) count += n;
-      sslHandler.flush();
+      //sslHandler.flush();
       if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     } while (n > 0);
-
     final boolean b = count >= size;
     if (b) {
-      sslHandler.flush();
+      //sslHandler.flush();
       buf.clear();
       StreamUtils.close(is, log);
       is = null;
     }
-    channelCount += sslHandler.getChannelWriteCount();
+    //channelCount += sslHandler.getChannelWriteCount();
+    channelCount = count;
     return b;
   }
 }

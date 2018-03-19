@@ -195,7 +195,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if any error occurs while initializing the server sockets.
    */
   private void init(final int[] portsToInit, final boolean ssl) throws Exception {
-    for (int i=0; i<portsToInit.length; i++) addServer(portsToInit[i], ssl, null);
+    for (int i=0; i<portsToInit.length; i++) addServer(portsToInit[i], ssl, null, true);
   }
 
   /**
@@ -203,9 +203,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param portToInit the array of ports to initiialize.
    * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
    * @param env optional map of parameters to associate with the server socket channel.
+   * @param retryOnException whether to retry if an exception occurs when binding the server.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env) throws Exception {
+  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
   }
 
   /**

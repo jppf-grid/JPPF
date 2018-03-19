@@ -76,9 +76,8 @@ public final class FileUtils {
     final List<String> lines = new ArrayList<>();
     try (BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader)) {
       String s;
-      while ((s = reader.readLine()) != null) {
+      while ((s = reader.readLine()) != null)
         if (!"".equals(s.trim())) lines.add(s);
-      }
     }
     return lines;
   }
@@ -139,7 +138,7 @@ public final class FileUtils {
    */
   public static void writeTextFile(final Writer dest, final String content) throws IOException {
     try (BufferedReader reader = new BufferedReader(new StringReader(content));
-        Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest)) {
+      Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest)) {
       String s = "";
       while (s != null) {
         s = reader.readLine();
@@ -356,12 +355,11 @@ public final class FileUtils {
    */
   public static URL[] toURLs(final File...files) {
     final URL[] urls = new URL[files.length];
-    for (int i=0; i<files.length; i++) {
+    for (int i=0; i<files.length; i++)
       try {
         urls[i] = files[i].toURI().toURL();
       } catch(@SuppressWarnings("unused") final MalformedURLException ignored) {
       }
-    }
     return urls;
   }
 
@@ -398,15 +396,10 @@ public final class FileUtils {
     try {
       if (path.isDirectory()) {
         final File[] files = path.listFiles();
-        if (files != null) {
-          for (File child: files) {
-            if (!deletePath(child)) success = false;
-          }
-        }
+        if (files != null) for (File child: files)
+          if (!deletePath(child)) success = false;
       }
-      if (!childrenOnly) {
-        if (!path.delete()) success = false;
-      }
+      if (!childrenOnly) if (!path.delete()) success = false;
     } catch (@SuppressWarnings("unused") final Exception e) {
       success = false;
     }
@@ -420,9 +413,7 @@ public final class FileUtils {
    */
   public static void mkdirs(final File file) throws IOException {
     final File folder = file.isDirectory() ? file : file.getParentFile();
-    if (!folder.exists()) {
-      if (!folder.mkdirs()) throw new IOException("could not create folder " + folder);
-    }
+    if (!folder.exists()) if (!folder.mkdirs()) throw new IOException("could not create folder " + folder);
   }
 
   /**
@@ -486,9 +477,7 @@ public final class FileUtils {
       if (!base.endsWith(File.separator)) base += File.separator;
       base += ".jppf";
       baseDir = new File(base, File.separator);
-      if (!baseDir.exists()) {
-        FileUtils.mkdirs(baseDir);
-      }
+      if (!baseDir.exists()) FileUtils.mkdirs(baseDir);
       log.info("JPPF temp folder " + base);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -537,7 +526,7 @@ public final class FileUtils {
       if ((matcher == null) || matcher.matches(file)) Files.delete(file);
       return FileVisitResult.CONTINUE;
     }
-  
+
     @Override
     public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
       if (e != null) throw e;

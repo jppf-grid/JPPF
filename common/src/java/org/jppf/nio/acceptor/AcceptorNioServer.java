@@ -31,7 +31,6 @@ import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
 import org.jppf.nio.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -167,31 +166,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       StreamUtils.close(channel, log);
     }
   }
-  /*
-  protected void doAccept(final SelectionKey key) {
-    final ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
-    @SuppressWarnings("unchecked")
-    final Map<String, ?> map = (Map<String, ?>) key.attachment();
-    final boolean ssl = (Boolean) map.get("jppf.ssl");
-    while (true) {
-      try {
-        final SocketChannel channel = serverSocketChannel.accept();
-        if (channel == null) break;
-        if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
-        channel.setOption(StandardSocketOptions.SO_SNDBUF, IO.SOCKET_BUFFER_SIZE);
-        channel.setOption(StandardSocketOptions.TCP_NODELAY, IO.SOCKET_TCP_NODELAY);
-        channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
-        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
-        channel.configureBlocking(false);
-        accept(serverSocketChannel, channel, null, ssl, false);
-        if (debugEnabled) log.debug("accepted {}", channel);
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-  }
-  */
 
   /**
    * Register an incoming connection with this server's selector.
@@ -261,18 +235,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     return false;
   }
 
-  /**
-   * Initialize the underlying server sockets for the spcified array of ports.
-   * @param portToInit the array of ports to initiialize.
-   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
-   * @param env optional map of parameters to associate with the server socket channel.
-   * @throws Exception if any error occurs while initializing the server sockets.
-   */
   @Override
-  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env) throws Exception {
+  public void addServer(final int portToInit, final boolean ssl, final Map<String, ?> env, final boolean retryOnException) throws Exception {
     int port = portToInit;
     if (debugEnabled) log.debug("adding server for port={}, ssl={}", port, ssl);
-    if (port > 0) {
+    if (port >= 0) {
       synchronized(servers) {
         final ServerSocketChannel server = servers.get(port);
         if (server != null) {
@@ -285,12 +252,12 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
           return;
         }
       }
-      final int maxBindRetries = JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3);
-      final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 1000L);
+      final int maxBindRetries = retryOnException ? JPPFConfiguration.getProperties().getInt("jppf.acceptor.bind.maxRetries", 3) : 1;
+      final long retryDelay = JPPFConfiguration.getProperties().getLong("jppf.acceptor.bind.retryDelay", 3000L);
       final ServerSocketChannel server = ServerSocketChannel.open().setOption(StandardSocketOptions.SO_RCVBUF, IO.SOCKET_BUFFER_SIZE);
       final InetSocketAddress addr = new InetSocketAddress(port);
       if (debugEnabled) log.debug("binding server socket channel to address {}", addr);
-      ConcurrentUtils.runWithRetry(maxBindRetries, retryDelay, new Callable<ServerSocketChannel>() {
+      RetryUtils.runWithRetry(maxBindRetries, retryDelay, new Callable<ServerSocketChannel>() {
         @Override
         public ServerSocketChannel call() throws Exception {
           return server.bind(addr);
@@ -304,15 +271,18 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       final Map<String, Object> map = new HashMap<>();
       map.put("jppf.ssl", ssl);
       if (env != null) map.putAll(env);
+      if (debugEnabled) log.debug("adding server {} on port {}", server, port);
       synchronized(servers) {
-        sync.wakeUpAndSetOrIncrement();
-        try {
-          server.register(selector, SelectionKey.OP_ACCEPT, map);
-        } finally {
-          sync.decrement();
-        }
-        servers.put(portToInit, server);
+        servers.put(port, server);
       }
+      if (debugEnabled) log.debug("registering server {} with selector", server);
+      sync.wakeUpAndSetOrIncrement();
+      try {
+        server.register(selector, SelectionKey.OP_ACCEPT, map);
+      } finally {
+        sync.decrement();
+      }
+      if (debugEnabled) log.debug("server {} registered with selector", server);
     }
     if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
   }

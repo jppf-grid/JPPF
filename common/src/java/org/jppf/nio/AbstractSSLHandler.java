@@ -62,19 +62,19 @@ public abstract class AbstractSSLHandler implements SSLHandler {
   /**
    * The data the application is sending.
    */
-  final ByteBuffer applicationSendBuffer;
+  final ByteBuffer appSendBuffer;
   /**
    * The SSL data sent by the <code>SSLEngine</code>.
    */
-  final ByteBuffer channelSendBuffer;
+  final ByteBuffer netSendBuffer;
   /**
    * The data the application is receiving.
    */
-  final ByteBuffer applicationReceiveBuffer;
+  final ByteBuffer appReceiveBuffer;
   /**
    * The data recevied yb the <code>SSLEngine</code>.
    */
-  final ByteBuffer channelReceiveBuffer;
+  final ByteBuffer netReceiveBuffer;
   /**
    * Count of bytes read from the channel, in the scope of a {@link #read()} invocation.
    * This count includes all the SSL overhead: encrypted data, handshaking, renegotiation, etc.
@@ -106,32 +106,32 @@ public abstract class AbstractSSLHandler implements SSLHandler {
     this.channel = channel;
     this.sslEngine = sslEngine;
     final SSLSession session = sslEngine.getSession();
-    this.applicationSendBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
-    this.channelSendBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
-    this.applicationReceiveBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
-    this.channelReceiveBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
+    this.appSendBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
+    this.netSendBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
+    this.appReceiveBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
+    this.netReceiveBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
     if (debugEnabled) log.debug(String.format("creating SSLHandler for channel %s, useClientMode=%b, ssl params = [%s]",
       channel, sslEngine.getUseClientMode(), SSLHelper2.dumpSSLParameters(sslEngine.getSSLParameters())));
   }
 
   @Override
-  public ByteBuffer getApplicationReceiveBuffer() {
-    return applicationReceiveBuffer;
+  public ByteBuffer getAppReceiveBuffer() {
+    return appReceiveBuffer;
   }
 
   @Override
-  public ByteBuffer getApplicationSendBuffer() {
-    return applicationSendBuffer;
+  public ByteBuffer getAppSendBuffer() {
+    return appSendBuffer;
   }
 
   @Override
-  public ByteBuffer getChannelReceiveBuffer() {
-    return channelReceiveBuffer;
+  public ByteBuffer getNetReceiveBuffer() {
+    return netReceiveBuffer;
   }
 
   @Override
-  public ByteBuffer getChannelSendBuffer() {
-    return channelSendBuffer;
+  public ByteBuffer getNetSendBuffer() {
+    return netSendBuffer;
   }
 
   /**
@@ -140,11 +140,10 @@ public abstract class AbstractSSLHandler implements SSLHandler {
    * @return a string representation of the buffers states.
    */
   String printBuffers() {
-    return new StringBuilder("applicationSendBuffer=").append(applicationSendBuffer)
-      .append(", channelSendBuffer=").append(channelSendBuffer)
-      .append(", applicationReceiveBuffer=").append(applicationReceiveBuffer)
-      .append(", channelReceiveBuffer=").append(channelReceiveBuffer)
-      .toString();
+    final StringBuilder sb = toString("appSendBuf=", new StringBuilder(), appSendBuffer);
+    toString(", netSendBuf=", sb, netSendBuffer);
+    toString(", appReceiveBuf=", sb, appReceiveBuffer);
+    return toString(", netReceiveBuf=", sb, netReceiveBuffer).toString();
   }
 
   /**
@@ -153,9 +152,8 @@ public abstract class AbstractSSLHandler implements SSLHandler {
    * @return a string representation of the buffers states.
    */
   String printReceiveBuffers() {
-    return new StringBuilder("applicationReceiveBuffer=").append(applicationReceiveBuffer)
-      .append(", channelReceiveBuffer=").append(channelReceiveBuffer)
-      .toString();
+    final StringBuilder sb = toString("appReceiveBuf=", new StringBuilder(), appReceiveBuffer);
+    return toString(", netReceiveBuf=", sb, netReceiveBuffer).toString();
   }
 
   /**
@@ -164,9 +162,8 @@ public abstract class AbstractSSLHandler implements SSLHandler {
    * @return a string representation of the send buffers states.
    */
   String printSendBuffers() {
-    return new StringBuilder("applicationSendBuffer=").append(applicationSendBuffer)
-      .append(", channelSendBuffer=").append(channelSendBuffer)
-      .toString();
+    final StringBuilder sb = toString("appSendBuf=", new StringBuilder(), appSendBuffer);
+    return toString(", netSendBuf=", sb, netSendBuffer).toString();
   }
 
   @Override
@@ -224,8 +221,24 @@ public abstract class AbstractSSLHandler implements SSLHandler {
       .append(']')
       .toString();
   }
+
   @Override
   public SSLEngine getSslEngine() {
     return sslEngine;
+  }
+
+  /**
+   * 
+   * @param prefix .
+   * @param sb .
+   * @param buf .
+   * @return .
+   */
+  static StringBuilder toString(final String prefix, final StringBuilder sb, final ByteBuffer buf) {
+    return sb.append(prefix).append(buf.getClass().getSimpleName()).append('[')
+      .append("pos=").append(buf.position())
+      .append(", lim=").append(buf.limit())
+      .append(", cap=").append(buf.capacity())
+      .append(']');
   }
 }

@@ -163,6 +163,7 @@ public abstract class AbstractJMXServer implements JMXServer {
         nbTries++;
         if (nbTries > 65530 - 1024) throw e;
         if ((e instanceof BindException) || StringUtils.hasOneOf(e.getMessage(), true, "bind", "address already in use")) {
+          if (debugEnabled) log.debug(String.format("starting %s server on port %d failed at attempt %,d because the port is already in use", protocol, managementPort, nbTries));
           if (managementPort >= 65530) managementPort = 1024;
           managementPort++;
         }

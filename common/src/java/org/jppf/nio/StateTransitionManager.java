@@ -209,7 +209,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     if (sslHandler == null) return false;
     final int interestOps = channel.getInterestOps();
     final boolean b = (interestOps != channel.getReadyOps()) && (interestOps != 0) && !server.isIdle(channel) &&
-      ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
+      ((sslHandler.getAppReceiveBuffer().position() > 0) || (sslHandler.getNetReceiveBuffer().position() > 0));
     return b;
   }
 
@@ -229,7 +229,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
       final SSLHandler sslHandler = channel.getContext().getSSLHandler();
       if (sslHandler == null) return false;
       final boolean b = (interestOps != readyOps) && (interestOps != 0) && !server.isIdle(channel) &&
-        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
+        ((sslHandler.getAppReceiveBuffer().position() > 0) || (sslHandler.getNetReceiveBuffer().position() > 0));
       return b;
     } catch (final RuntimeException e) {
       log.error(String.format("error for transition=%s, channel=%s, exception=%s", transition, channel, e));

@@ -79,7 +79,7 @@ public class JPPFJMXServer extends AbstractJMXServer {
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(JMXHelper.JPPF_JMX_PROTOCOL, env);
-      startConnectorServer("jppf", env);
+      startConnectorServer(JMXHelper.JPPF_JMX_PROTOCOL, env);
     } finally {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);

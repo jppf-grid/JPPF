@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.doc;
 
 import java.io.*;
 import java.util.*;
+
+import org.jppf.utils.FileUtils;
 
 /**
  * 

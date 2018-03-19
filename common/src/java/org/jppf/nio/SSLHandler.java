@@ -61,25 +61,25 @@ public interface SSLHandler {
    * Get the application receive buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  ByteBuffer getApplicationReceiveBuffer();
+  ByteBuffer getAppReceiveBuffer();
 
   /**
    * Get the application send buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  ByteBuffer getApplicationSendBuffer();
+  ByteBuffer getAppSendBuffer();
 
   /**
    * Get the channel receive buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  ByteBuffer getChannelReceiveBuffer();
+  ByteBuffer getNetReceiveBuffer();
 
   /**
    * Get the channel send buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  ByteBuffer getChannelSendBuffer();
+  ByteBuffer getNetSendBuffer();
 
   /**
    * Get the count of bytes read from the channel.

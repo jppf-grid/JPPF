@@ -39,7 +39,7 @@ public abstract class AbstractNioObject implements NioObject {
    */
   protected final DataLocation location;
   /**
-   * Actual bytes sent to or received from the underlying channel.
+   * Actual bytes sent to or received from the underlying channel (in encrypted form for secure channels).
    */
   protected long channelCount;
 

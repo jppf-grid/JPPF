@@ -30,7 +30,7 @@ public class TypedPropertiesSimilarityEvaluator {
    * @param props2 the rpoperties for which the transformation cost is computed.
    * @return an int representing the cost of transforming the values of props2 into the values of the properties defined in props1.
    */
-  public int computeDistance(final TypedProperties props1, final TypedProperties props2) {
+  public static int computeDistance(final TypedProperties props1, final TypedProperties props2) {
     int totalScore = 0;
     for (String name: props1.stringPropertyNames()) {
       totalScore += levenshteinDistance(props1.getString(name), props2.getString(name));

@@ -19,7 +19,8 @@
 package org.jppf.nio;
 
 import java.io.*;
-import java.nio.BufferUnderflowException;
+import java.net.SocketException;
+import java.nio.*;
 import java.nio.channels.SocketChannel;
 
 import javax.net.ssl.*;
@@ -65,43 +66,33 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   public int read() throws Exception {
     synchronized(channel) {
       channelReadCount = 0L;
-      int sslCount = 0;
-      int count = applicationReceiveBuffer.position();
-      do {
-        flush();
-        if (sslEngine.isInboundDone()) return count > 0 ? count : -1;
-        doRead();
-        channelReceiveBuffer.flip();
-        final SSLEngineResult sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
-        channelReceiveBuffer.compact();
-        if (traceEnabled) log.trace("{}", sslEngineResult.getStatus());
-        switch (sslEngineResult.getStatus()) {
-          case BUFFER_UNDERFLOW:
-            if (traceEnabled) log.trace("BUFFER_UNDERFLOW, " + printReceiveBuffers());
-            sslCount = doRead();
-            if (traceEnabled) log.trace("BUFFER_UNDERFLOW, sslCount=" + sslCount + ", " + printReceiveBuffers());
-            if (sslCount == 0) return count;
-            if (sslCount == -1) {
-              if (traceEnabled) log.trace("reached EOF, closing inbound");
-              sslEngine.closeInbound();
-            }
-            break;
-  
-          case BUFFER_OVERFLOW:
-            return 0;
-  
-          case CLOSED:
-            channel.shutdownInput();
-            break;
-  
-          case OK:
-            count = applicationReceiveBuffer.position();
-            break;
-        }
-        while (processHandshake());
-        count = applicationReceiveBuffer.position();
-      } while (count == 0);
-      if (sslEngine.isInboundDone()) count = -1;
+      final int pos = appReceiveBuffer.position();
+      //flush();
+      if (sslEngine.isInboundDone()) return -1;
+      int count = doRead();
+      netReceiveBuffer.flip();
+      final SSLEngineResult sslEngineResult = sslEngine.unwrap(netReceiveBuffer, appReceiveBuffer);
+      netReceiveBuffer.compact();
+      if (traceEnabled) log.trace("{}", sslEngineResult.getStatus());
+      switch (sslEngineResult.getStatus()) {
+        case BUFFER_UNDERFLOW:
+          if (traceEnabled) log.trace("BUFFER_UNDERFLOW, " + printReceiveBuffers());
+          return 0;
+
+        case BUFFER_OVERFLOW:
+          throw new BufferOverflowException();
+
+        case CLOSED:
+          channel.shutdownInput();
+          break;
+
+        case OK:
+          break;
+      }
+      while (processHandshake());
+      if (count == -1) sslEngine.closeInbound();
+      if (sslEngine.isInboundDone()) return -1;
+      count = appReceiveBuffer.position() - pos;
       return count;
     }
   }
@@ -109,46 +100,31 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   @Override
   public int write() throws Exception {
     synchronized(channel) {
-      int remaining = applicationSendBuffer.position();
-      if (traceEnabled) log.trace("position=" + applicationSendBuffer.position());
-      channelWriteCount = 0L;
-      int writeCount = 0;
-      if ((remaining > 0) && (flush() > 0)) return 0;
-      while (remaining > 0) {
-        applicationSendBuffer.flip();
-        if (traceEnabled) log.trace("before wrap, " + printSendBuffers() + ", remaining=" + remaining);
-        final SSLEngineResult sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
-        final SSLEngineResult.Status status = sslEngineResult.getStatus();
-        if (traceEnabled) log.trace(String.format("after wrap, status = %s, %s, remaining=%d", status, printSendBuffers(), remaining));
-        applicationSendBuffer.compact();
-        switch (status) {
-          case BUFFER_UNDERFLOW:
-            final Exception e = new BufferUnderflowException();
-            if (traceEnabled) log.trace("buffer underflow", e);
-            throw e;
-  
-          case BUFFER_OVERFLOW:
-            if (traceEnabled) log.trace("BUFFER_OVERFLOW, before flush(), " + printSendBuffers());
-            final int flushCount = flush();
-            if (traceEnabled) log.trace("BUFFER_OVERFLOW, after flush(), =" + printSendBuffers() + ", flushCount=" + flushCount);
-            if (flushCount == 0) return 0;
-            continue;
-  
-          case CLOSED:
-            if (traceEnabled) log.trace("closed");
-            throw new SSLException("outbound closed");
-  
-          case OK:
-            final int n = sslEngineResult.bytesConsumed();
-            if (traceEnabled) log.trace("ok, n = {}", n);
-            //if (n == 0) return writeCount;
-            writeCount += n;
-            remaining -= n;
-            break;
-        }
-        while (processHandshake());
+      final int pos = appSendBuffer.position();
+      netSendBuffer.clear();
+      appSendBuffer.flip();
+      if (traceEnabled) log.trace("before wrap, " + printSendBuffers() + ", pos=" + pos);
+      final SSLEngineResult sslEngineResult = sslEngine.wrap(appSendBuffer,netSendBuffer);
+      final SSLEngineResult.Status status = sslEngineResult.getStatus();
+      if (traceEnabled) log.trace(String.format("after wrap, status = %s, %s, pos=%d", status, printSendBuffers(), pos));
+      appSendBuffer.compact();
+      switch (sslEngineResult.getStatus()) {
+        case BUFFER_UNDERFLOW:
+          throw new BufferUnderflowException();
+
+        case BUFFER_OVERFLOW:
+          throw new BufferOverflowException();
+
+        case CLOSED:
+          throw new SSLException("SSLEngine is CLOSED");
+
+        case OK:
+          if (traceEnabled) log.trace("OK");
+          break;
       }
-      return writeCount;
+      while (processHandshake());
+      flush();
+      return pos - appSendBuffer.position();
     }
   }
 
@@ -160,7 +136,6 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   private boolean processHandshake() throws Exception {
     if (!checkChannel()) throw new IOException("invalid state for channel " + channel);
     if (traceEnabled) log.trace("buffers = {}", printBuffers());
-    int count;
     final SSLEngineResult sslEngineResult;
     final HandshakeStatus handshakeStatus = sslEngine.getHandshakeStatus();
     if (traceEnabled) log.trace("handshakeStatus = {}", handshakeStatus);
@@ -174,46 +149,55 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
         return true;
 
       case NEED_WRAP:
-        applicationSendBuffer.flip();
-        sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
+        appSendBuffer.flip();
+        sslEngineResult = sslEngine.wrap(appSendBuffer, netSendBuffer);
         if (traceEnabled) log.trace("{} engine status after wrap() = {}", handshakeStatus, sslEngineResult.getStatus());
-        applicationSendBuffer.compact();
-        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-          count = flush();
-          return count > 0;
+        appSendBuffer.compact();
+        try {
+          flush();
+        } catch (final SocketException e) {
+          if (sslEngineResult.getStatus() == SSLEngineResult.Status.CLOSED) log.debug(e.getMessage(), e);
+          else throw e;
         }
-        return true;
+        break;
 
       case NEED_UNWRAP:
-        channelReceiveBuffer.flip();
-        if (traceEnabled) log.trace(String.format("%s before unwrap, %s", handshakeStatus, printReceiveBuffers()));
-        sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
+        final int n = sslEngine.isInboundDone() ? -1 : channel.read(netReceiveBuffer);
+        netReceiveBuffer.flip();
+        if (traceEnabled) log.trace(String.format("%s before unwrap, %s, n=%d", handshakeStatus, printReceiveBuffers(), n));
+        sslEngineResult = sslEngine.unwrap(netReceiveBuffer, appReceiveBuffer);
         if (traceEnabled) log.trace(String.format("%s engine status after unwrap = %s, %s", handshakeStatus, sslEngineResult.getStatus(), printReceiveBuffers()));
-        channelReceiveBuffer.compact();
+        netReceiveBuffer.compact();
         if (traceEnabled) log.trace(String.format("%s engine status after compact = %s, %s", handshakeStatus, sslEngineResult.getStatus(), printReceiveBuffers()));
-        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW) {
-          if (sslEngine.isInboundDone()) count = -1;
-          else count = doRead();
-          if (traceEnabled) log.trace("NEED_UNWRAP ==> BUFFER_UNDERFLOW, readCount=" + count);
-          return count > 0;
-        }
-        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) return false;
-        return true;
+        break;
 
       default:
         return false;
     }
+    switch (sslEngineResult.getStatus()) {
+      case BUFFER_UNDERFLOW:
+      case BUFFER_OVERFLOW:
+        return false;
+
+      case CLOSED:
+        if (sslEngine.isOutboundDone()) channel.shutdownOutput();
+        return false;
+  
+       case OK:
+         break;
+    }
+    return true;
   }
 
   @Override
   public int flush() throws IOException {
     synchronized(channel) {
-      channelSendBuffer.flip();
-      if (traceEnabled) log.trace("channelSendBuffer = {}", channelSendBuffer);
-      final int n = channel.write(channelSendBuffer);
+      netSendBuffer.flip();
+      if (traceEnabled) log.trace("channelSendBuffer = {}", netSendBuffer);
+      final int n = channel.write(netSendBuffer);
       if (traceEnabled) log.trace("write result = {}", n);
       if (n > 0) channelWriteCount += n;
-      channelSendBuffer.compact();
+      netSendBuffer.compact();
       return n;
     }
   }
@@ -224,10 +208,10 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
    * @throws IOException if any error occurs.
    */
   private int doRead() throws IOException {
-    final int n = channel.read(channelReceiveBuffer);
+    final int n = channel.read(netReceiveBuffer);
     if (traceEnabled) log.trace("read result = {}", n);
     if (n > 0) channelReadCount += n;
-    else if (n < 0) throw new EOFException("EOF reading inbound channel");
+    //else if (n < 0) throw new EOFException("EOF reading inbound channel");
     return n;
   }
 
@@ -244,17 +228,17 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   public void close() throws Exception {
     synchronized(channel) {
       if (!sslEngine.isInboundDone() && !channel.isBlocking()) read();
-      while (channelSendBuffer.position() > 0) {
+      while (netSendBuffer.position() > 0) {
         final int n = flush();
         if (n == 0) {
-          log.error("unable to flush remaining " + channelSendBuffer.remaining() + " bytes");
+          log.error("unable to flush remaining " + netSendBuffer.remaining() + " bytes");
           break;
         }
       }
       sslEngine.closeOutbound();
       if (traceEnabled) log.trace("close outbound handshake");
       while (processHandshake());
-      if (channelSendBuffer.position() > 0 && flush() == 0) log.error("unable to flush remaining " + channelSendBuffer.position() + " bytes");
+      if (netSendBuffer.position() > 0 && flush() == 0) log.error("unable to flush remaining " + netSendBuffer.position() + " bytes");
       if (traceEnabled) log.trace("close outbound done");
       channel.close();
       if (traceEnabled) log.trace("SSLEngine closed");
