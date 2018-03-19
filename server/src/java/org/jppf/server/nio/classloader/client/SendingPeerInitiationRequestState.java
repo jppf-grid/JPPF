@@ -60,7 +60,7 @@ public class SendingPeerInitiationRequestState extends ClientClassServerState {
   @Override
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     final ClientClassContext context = (ClientClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal()) {
+    if (channel.isReadable() && !channel.isLocal() && !context.isSecure()) {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
     //if (context.writePeerInitiationMessage(channel))

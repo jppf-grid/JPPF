@@ -372,7 +372,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     final CollectionSortedMap<Integer, C> scoreMap = new SetSortedMap<>();
-    final TypedPropertiesSimilarityEvaluator ev = new TypedPropertiesSimilarityEvaluator();
     if (debugEnabled) log.debug(String.format("computing scores for job '%s', uuid=%s", job.getName(), job.getUuid()));
     for (final C channel: channels) {
       if (!channel.isLocal() && !channel.isOffline() && !channel.isPeer()) {
@@ -380,7 +379,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
         if ((reservedJobUuid != null) && reservedJobUuid.equals(job.getUuid())) continue;
         else {
           final TypedProperties props = channel.getSystemInformation().getJppf();
-          final int score = ev.computeDistance(desiredConfiguration, props);
+          final int score = TypedPropertiesSimilarityEvaluator.computeDistance(desiredConfiguration, props);
           channel.reservationScore = score;
           scoreMap.putValue(score, channel);
         }
