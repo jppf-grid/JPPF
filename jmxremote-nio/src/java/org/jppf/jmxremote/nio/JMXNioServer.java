@@ -211,6 +211,7 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
         connectionsByServerPort.putValue(port, connectionID);
       }
       ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
+      registerChannel(pair, channel);
       return null;
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -242,6 +243,17 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     pair.setServerPort(port);
     readingChannel.setMessageHandler(handler);
     writingChannel.setMessageHandler(handler);
+    if (debugEnabled) log.debug("created {}, env = {}", pair, env);
+    return pair;
+  }
+
+  /**
+   * Register the specified channel with this server's selectior.
+   * @param pair the ocntext associated with the channel.
+   * @param channel the channel to register.
+   * @throws Exception if any error occurs.
+   */
+  public void registerChannel(final ChannelsPair pair, final SocketChannel channel) throws Exception {
     final int ops = SelectionKey.OP_READ;
     pair.setInterestOps(ops);
     sync.wakeUpAndSetOrIncrement();
@@ -250,8 +262,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     } finally {
       sync.decrement();
     }
-    if (debugEnabled) log.debug("created {}, env = {}", pair, env);
-    return pair;
   }
 
   /**
@@ -370,11 +380,10 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
    * @param port the port to which the connection was established.
    */
   public void removeAllConnections(final int port) {
-    List<String> connectionIDs = null;
     synchronized(mapsLock) {
       final Collection<String> coll = connectionsByServerPort.getValues(port);
       if (coll != null) {
-        connectionIDs = new ArrayList<>(coll);
+        final  List<String> connectionIDs = new ArrayList<>(coll);
         for (final String connectionID: connectionIDs) {
           try {
             final ChannelsPair pair = channelsByConnectionID.get(connectionID);

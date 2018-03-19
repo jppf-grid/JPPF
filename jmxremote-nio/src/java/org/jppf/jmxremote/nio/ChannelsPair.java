@@ -110,7 +110,7 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
   }
 
   /**
-   * @return the reading channel.
+   * @return the writing channel.
    */
   public JMXContext writingContext() {
     return second();

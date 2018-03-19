@@ -51,21 +51,23 @@ class JMXMessageReader {
    */
   static void read(final JMXContext context) throws Exception {
     final StateTransitionManager<EmptyEnum, EmptyEnum> mgr = context.getServer().getTransitionManager();
-    while (true) {
-      boolean b = false;
-      try {
-        b = context.readMessage(context.getChannel());
-      } catch (final IOException e) {
-        final ChannelsPair pair = context.getChannels();
-        if (pair.isClosed() || pair.isClosing()) return;
-        else throw e;
+    synchronized(context.getSocketChannel()) {
+      while (true) {
+        boolean b = false;
+        try {
+          b = context.readMessage(context.getChannel());
+        } catch (final IOException e) {
+          final ChannelsPair pair = context.getChannels();
+          if (pair.isClosed() || pair.isClosing()) return;
+          else throw e;
+        }
+        if (b) {
+          final SimpleNioMessage message = (SimpleNioMessage) context.getMessage();
+          if (debugEnabled) log.debug("read message from {}", context);
+          context.setMessage(null);
+          mgr.execute(new HandlingTask(context, message));
+        } else if (context.byteCount <= 0L) break;
       }
-      if (b) {
-        final SimpleNioMessage message = (SimpleNioMessage) context.getMessage();
-        if (debugEnabled) log.debug("read message from {}", context);
-        context.setMessage(null);
-        mgr.execute(new HandlingTask(context, message));
-      } else if (context.byteCount <= 0L) break;
     }
   }
 

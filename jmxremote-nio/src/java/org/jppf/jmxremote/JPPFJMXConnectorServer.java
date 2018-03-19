@@ -81,7 +81,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       final int port = address.getPort();
       final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       final boolean secure = (tls == null) ? false : tls;
-      NioHelper.getAcceptorServer().addServer(port, secure, environment);
+      NioHelper.getAcceptorServer().addServer(port, secure, environment, false);
       if (debugEnabled) log.debug("server @{} added listener port {}", address, port);
       for (JMXNioServer server: JMXNioServerPool.getServers()) server.addConnectionStatusListener(this);
       started = true;

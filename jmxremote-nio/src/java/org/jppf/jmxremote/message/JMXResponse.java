@@ -18,8 +18,6 @@
 
 package org.jppf.jmxremote.message;
 
-import java.util.Arrays;
-
 /**
  * A specialized message that represents a repsponse to a previous request.
  * The correlation between request and response is realized via the {@link JMXMessage#getMessageID() messageID}.
@@ -91,8 +89,18 @@ public class JMXResponse extends AbstractJMXMessage {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
       .append(", messageType=").append(JMXMessageType.name(getMessageType()))
-      .append(", result=").append(Arrays.asList(result))
+      .append(", result=").append(checkLengthAndTruncateIfNeed(result))
       .append(", isException=").append(isException)
       .append(']').toString();
+  }
+
+  /**
+   * 
+   * @param source the source string to check.
+   * @return the result string.
+   */
+  private static String checkLengthAndTruncateIfNeed(final Object source) {
+    final String s = source == null ? "null" : (source instanceof String ? (String) source : source.toString());
+    return (s.length() > 100) ? s.substring(0, 100) : s;
   }
 }

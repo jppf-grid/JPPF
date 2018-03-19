@@ -44,34 +44,36 @@ public class JMXMessageWriter {
    * @throws Exception if any errort occurs.
    */
   static boolean write(final JMXContext context) throws Exception {
-    while (true) {
-      if (context.getChannels().isClosed()) return false;
-      if (context.getCurrentMessageWrapper() == null) {
-        final MessageWrapper msg = context.pollJmxMessage();
-        if (msg == null) return false;
-        if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
-        context.setCurrentMessageWrapper(msg);
-        context.setMessage(msg.nioMessage);
-      }
-      final MessageWrapper msg = context.getCurrentMessageWrapper();
-      try {
-        if (context.writeMessage(null)) {
-          if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
-          context.setMessage(null);
-          context.setCurrentMessageWrapper(null);
-          if (msg.jmxMessage.getMessageType() == JMXMessageType.CLOSE) {
-            if (debugEnabled) log.debug("handling CLOSE for context {}", context);
-            context.getMessageHandler().messageSent(msg.jmxMessage);
-            return false;
+    synchronized(context.getSocketChannel()) {
+      while (true) {
+        if (context.getChannels().isClosed()) return false;
+        if (context.getCurrentMessageWrapper() == null) {
+          final MessageWrapper msg = context.pollJmxMessage();
+          if (msg == null) return false;
+          if (debugEnabled) log.debug("about to send message {} from context {}", msg, context);
+          context.setCurrentMessageWrapper(msg);
+          context.setMessage(msg.nioMessage);
+        }
+        final MessageWrapper msg = context.getCurrentMessageWrapper();
+        try {
+          if (context.writeMessage(null)) {
+            if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
+            context.setMessage(null);
+            context.setCurrentMessageWrapper(null);
+            if (msg.jmxMessage.getMessageType() == JMXMessageType.CLOSE) {
+              if (debugEnabled) log.debug("handling CLOSE for context {}", context);
+              context.getMessageHandler().messageSent(msg.jmxMessage);
+              return false;
+            }
+          } else if (context.byteCount <= 0L) {
+            return true;
           }
-        } else if (context.byteCount <= 0L) {
-          return true;
+        } catch (final Exception e) {
+          if (msg.jmxMessage instanceof JMXRequest) {
+            context.getMessageHandler().messageSent(msg.jmxMessage);
+          }
+          throw e;
         }
-      } catch (final Exception e) {
-        if (msg.jmxMessage instanceof JMXRequest) {
-          context.getMessageHandler().messageSent(msg.jmxMessage);
-        }
-        throw e;
       }
     }
   }
