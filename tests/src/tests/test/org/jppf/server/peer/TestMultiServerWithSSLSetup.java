@@ -18,7 +18,7 @@
 
 package test.org.jppf.server.peer;
 
-import org.junit.*;
+import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
 
@@ -27,7 +27,7 @@ import test.org.jppf.test.setup.*;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
-@Ignore
+//@Ignore
 public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
   /**
    * Test a simple job.
@@ -39,9 +39,13 @@ public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
     cfg.driverLog4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
     cfg.nodeLog4j = "classes/tests/config/ssl2_p2p/log4j-node.template.properties";
     print(false, false, ">>> setting up");
-    client = BaseSetup.setup(2, 2, true, false, cfg);
-    print(false, false, ">>> setup complete, awaiting peers initialized");
-    awaitPeersInitialized();
+    TestConfigSource.setClientConfig(cfg.clientConfig);
+    BaseSetup.setup(2, 2, false, false, cfg);
+    //SSLHelper.resetConfig();
+    //JPPFConfiguration.reset();
+    //print(false, false, ">>> setup complete, awaiting peers initialized; configuration:%n%s", JPPFConfiguration.getProperties().asString());
+    //awaitPeersInitialized(15_000L);
+    checkPeers(15_000L, true);
     print(false, false, ">>> initialization complete");
   }
 }

@@ -43,7 +43,7 @@ public class Setup1D1N extends BaseTest {
     BaseSetup.resetClientConfig();
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
       log.info("initializing {}", jmx);
       Assert.assertTrue(jmx.connectAndWait(5000L));
     }
@@ -56,7 +56,7 @@ public class Setup1D1N extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
       if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
     }
     try {

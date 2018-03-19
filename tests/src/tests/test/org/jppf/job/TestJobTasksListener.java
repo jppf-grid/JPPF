@@ -58,7 +58,7 @@ public class TestJobTasksListener extends Setup1D1N {
   public static void setupClass() throws Exception {
     final long timeout = 60_000L;
     final long start = System.currentTimeMillis();
-    jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1);
+    jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
     jmx.connectAndWait(timeout - (System.currentTimeMillis() - start));
     assertTrue("failed to connect to " + jmx, jmx.isConnected());
     final String script = new StringBuilder()

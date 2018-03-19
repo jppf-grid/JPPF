@@ -35,7 +35,7 @@ import org.junit.runner.Description;
 import org.slf4j.*;
 
 /**
- *
+ * Base class for JPPF automated tests.
  * @author Laurent Cohen
  */
 public class BaseTest {
@@ -45,11 +45,19 @@ public class BaseTest {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger("TEST");
+  private static Logger log;
+  static {
+    System.out.println("Initializing 'TEST' logger");
+    log = LoggerFactory.getLogger("TEST");
+  }
   /** */
   protected static final String JMX_REMOTE_PROTOCOL = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
   /** */
-  protected static final int MANAGEMENT_PORT_BASE = (JMXHelper.JMXMP_PROTOCOL.equals(JMX_REMOTE_PROTOCOL)) ? 11200 : 11100;
+  protected static final int DRIVER_MANAGEMENT_PORT_BASE = (JMXHelper.JMXMP_PROTOCOL.equals(JMX_REMOTE_PROTOCOL)) ? 11200 : 11100;
+  /** */
+  protected static final int SSL_DRIVER_MANAGEMENT_PORT_BASE = (JMXHelper.JMXMP_PROTOCOL.equals(JMX_REMOTE_PROTOCOL)) ? 12200 : 12100;
+  /** */
+  protected static final int NODE_MANAGEMENT_PORT_BASE = 12300;
   /** */
   private static PrintStream stdOut, stdErr;
   /** */
@@ -236,7 +244,11 @@ public class BaseTest {
       if (logFiles != null) {
         for (final File file: logFiles) {
           if (file.exists()) {
-            if (!file.delete()) System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
+            log.info("deleting file {}", file);
+            if (!file.delete()) {
+              System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
+              log.error("could not delete {}", file);
+            }
           }
         }
       }

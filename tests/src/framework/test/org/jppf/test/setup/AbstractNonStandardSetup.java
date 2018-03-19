@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.io.NotSerializableException;
 import java.util.*;
 
+import org.jppf.JPPFTimeoutException;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
@@ -270,37 +271,86 @@ public class AbstractNonStandardSetup extends BaseTest {
 
   /**
    * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
+   * @param maxWait the maximum time to wait for completion of this method.
    * @throws Exception if any error occurs.
    */
-  protected static void awaitPeersInitialized() throws Exception {
+  protected static void awaitPeersInitialized(final long maxWait) throws Exception {
+    final long start = System.currentTimeMillis();
+    long timeout = maxWait;
     print(false, false, ">>> awaiting 2 pools");
-    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-    if (pools.size() < 2) fail("timeout of 5,000 ms waiting for 2 pools expired");
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, timeout, JPPFClientConnectionStatus.workingStatuses());
+    if (pools.size() < 2) fail("timeout of " + timeout + " ms waiting for 2 pools expired");
     final List<JMXDriverConnectionWrapper> jmxList = new ArrayList<>(2);
     for (final JPPFConnectionPool pool: pools) {
       print(false, false, ">>> awaiting JMX connection for %s", pool);
       final MutableReference<JMXDriverConnectionWrapper> jmx = new MutableReference<>();
-      ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
+      timeout = maxWait - (System.currentTimeMillis() - start);
+      if (timeout < 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+      ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
-          try {
-            jmx.set(pool.awaitWorkingJMXConnection());
-            return true;
-          } catch (@SuppressWarnings("unused") final Exception e) {
-            return false;
-          }
+          final JMXDriverConnectionWrapper driver = pool.getJmxConnection(true);
+          if (driver == null) return false;
+          jmx.set(driver);
+          return true;
         }
-      }, 5000L, 500L, true);
+      }, timeout, 500L, true);
       print(false, false, ">>> got JMX connection %s", jmx.get());
       jmxList.add(jmx.get());
     }
     for (final JMXDriverConnectionWrapper jmx: jmxList) {
       print(false, false, ">>> awaiting 1 idle node for %s", jmx);
-      awaitNbIdleNodes(jmx, Operator.EQUAL, 1, 5000L);
+      timeout = maxWait - (System.currentTimeMillis() - start);
+      if (timeout < 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+      awaitNbIdleNodes(jmx, Operator.EQUAL, 1, timeout);
       print(false, false, ">>> got 1 idle node for %s", jmx);
     }
   }
 
+
+  /**
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
+   * @param maxWait the maximum time to wait for completion of this method.
+   * @param secure whether to use SSL connections.
+   * @throws Exception if any error occurs.
+   */
+  protected static void checkPeers(final long maxWait, final boolean secure) throws Exception {
+    final long start = System.currentTimeMillis();
+    long timeout = maxWait;
+    print(false, false, ">>> creating 2 JMX connections");
+    //final JMXDriverConnectionWrapper[] jmxArray = { new JMXDriverConnectionWrapper("localhost", 12101, secure), new JMXDriverConnectionWrapper("localhost", 12102, secure) };
+    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[2];
+    final int base = secure ? SSL_DRIVER_MANAGEMENT_PORT_BASE : DRIVER_MANAGEMENT_PORT_BASE;
+    for (int i=0; i<2; i++) jmxArray[i] = new JMXDriverConnectionWrapper("localhost", base + i + 1, secure);
+    try {
+      for (final JMXDriverConnectionWrapper jmx: jmxArray) jmx.connect();
+      for (final JMXDriverConnectionWrapper jmx: jmxArray) {
+        print(false, false, ">>> awaiting JMX connection for %s", jmx);
+        timeout = maxWait - (System.currentTimeMillis() - start);
+        if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+        ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+          @Override
+          public boolean evaluate() {
+            final boolean b = jmx.isConnected();
+            return b;
+          }
+        }, timeout, 500L, true);
+        print(false, false, ">>> got JMX connection %s", jmx);
+      }
+      for (final JMXDriverConnectionWrapper jmx: jmxArray) {
+        print(false, false, ">>> awaiting 1 idle node for %s", jmx);
+        timeout = maxWait - (System.currentTimeMillis() - start);
+        if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+        awaitNbIdleNodes(jmx, Operator.EQUAL, 1, timeout);
+        print(false, false, ">>> got 1 idle node for %s", jmx);
+      }
+    } finally {
+      BaseSetup.generateDriverThreadDump(jmxArray);
+      for (final JMXDriverConnectionWrapper jmx: jmxArray) {
+        if (jmx.isConnected()) jmx.close();
+      }
+    }
+  }
 
   /**
    * Wait for the specified driver to have a number of idle nodes that satisfy the specified condition.
@@ -311,7 +361,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs or the tiemout expires.
    */
   protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final Operator operator, final int nbNodes, final long timeout) throws Exception {
-    ConcurrentUtils.awaitInterruptibleCondition(new ConcurrentUtils.Condition() {
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
           try {
@@ -323,6 +373,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }, timeout, 500L, true);
   }
+
   /**
    * @return the number of nodes in the topology.
    */

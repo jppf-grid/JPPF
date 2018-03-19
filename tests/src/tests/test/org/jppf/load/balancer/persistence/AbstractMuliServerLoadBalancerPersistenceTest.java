@@ -56,7 +56,7 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
    */
   @After
   public void tearDownInstance() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
       final boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);

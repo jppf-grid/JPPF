@@ -156,6 +156,8 @@ public class BaseSetup {
     if (createClient) {
       client = createClient(null, true, config, listeners);
       if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    } else {
+      JPPFConfiguration.reset();
     }
     return client;
   }
@@ -231,9 +233,9 @@ public class BaseSetup {
         generateDriverThreadDump(client);
         client.close();
         client = null;
-        Thread.sleep(500L);
+        //Thread.sleep(500L);
       }
-      System.gc();
+      //System.gc();
       stopProcesses();
       ConfigurationHelper.cleanup();
     } catch (final Exception e) {

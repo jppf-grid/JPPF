@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
+import org.jppf.test.addons.startups.DeadlockDetector;
+
 /**
  * Implementation of {@link NodeTestMBean}.
  * @author Laurent Cohen
@@ -41,6 +43,7 @@ public class NodeTest extends NotificationBroadcasterSupport implements NodeTest
    */
   public NodeTest() {
     System.out.println("initialized NodeTest");
+    DeadlockDetector.setup("node");
   }
 
   @Override

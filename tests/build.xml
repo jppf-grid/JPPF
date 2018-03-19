@@ -194,6 +194,8 @@
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
     <delete dir="${report}" quiet="true"/>
     <mkdir dir="${report}"/>
+    <delete dir="${basedir}/logs" quiet="true"/>
+    <mkdir dir="${basedir}/logs"/>
     <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed">
       <classpath refid="tests.classpath"/>
       <jvmarg value="-server"/>

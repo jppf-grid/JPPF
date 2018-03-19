@@ -28,7 +28,7 @@ import test.org.jppf.test.setup.*;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
-@Ignore
+//@Ignore
 public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
   /**
    * Launches a 2 drivers with 1 node attached to each and start the client,
@@ -46,7 +46,7 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
    */
   @Before
   public void instanceSetup() throws Exception {
-    awaitPeersInitialized();
+    awaitPeersInitialized(15_000L);
   }
 
   /**

@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.nio.file.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 import org.h2.tools.Script;
 import org.jppf.client.*;
@@ -71,7 +71,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    */
   @After
   public void tearDownInstance() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
       final boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
@@ -80,7 +80,15 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
         final String[] dirs = { "persistence", "persistence1", "persistence2" };
         for (String dir: dirs) {
           final Path dirPath = Paths.get(dir);
-          if (Files.exists(dirPath)) Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
+          if (Files.exists(dirPath)) {
+            RetryUtils.runWithRetryTimeout(5_000L, 500L, new Callable<Void>() {
+              @Override
+              public Void call() throws Exception {
+                Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
+                return null;
+              }
+            });
+          }
         }
         mgr.deleteJobs(JobSelector.ALL_JOBS);
         final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
@@ -98,7 +106,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    */
   @AfterClass
   public static void tearAbstractJobPersistenceTest() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1, false)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       jmx.connectAndWait(5_000L);
       if (jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     }

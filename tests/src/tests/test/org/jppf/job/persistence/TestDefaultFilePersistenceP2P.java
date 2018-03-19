@@ -58,7 +58,7 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
   @After
   public void tearDownInstance() throws Exception {
     for (int i=1; i<=BaseSetup.nbDrivers(); i++) {
-      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + i, false)) {
+      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + i, false)) {
         jmx.connectAndWait(5_000L);
         final boolean b = jmx.isConnected();
         print(false, false, "tearDownInstance() for driver %d : jmx connected = %b", i, b);
@@ -94,7 +94,7 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
       if (!set.contains(lct.getNodeUuid())) set.add(lct.getNodeUuid());
     }
     assertEquals(2, set.size());
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 1)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
       jmx.connectAndWait(5000L);
       assertTrue(jmx.isConnected());
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
@@ -108,7 +108,7 @@ public class TestDefaultFilePersistenceP2P extends AbstractDatabaseSetup {
       checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
       assertTrue(mgr.deleteJob(job.getUuid()));
     }
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", MANAGEMENT_PORT_BASE + 2)) {
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 2)) {
       jmx.connectAndWait(5000L);
       assertTrue(jmx.isConnected());
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);

@@ -58,7 +58,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @Before
   public void instanceSetup() throws Exception {
-    awaitPeersInitialized();
+    awaitPeersInitialized(15_000L);
   }
 
   @Override

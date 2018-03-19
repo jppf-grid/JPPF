@@ -100,7 +100,7 @@ public class MyJobTasksListener implements JobTasksListener {
           writer.append(String.format("%s;%s;%s;%s;%d;%d;%d%n", uuid, name, task.getId(), task.getResult(), sti.getExpirationCount(), sti.getResubmitCount(), sti.getMaxResubmits()));
         }
       } catch (final Exception e) {
-        print("MyJobTasksListener: error wiritng tasks to file '%s': %s", file, ExceptionUtils.getStackTrace(e));
+        print("MyJobTasksListener: error writing tasks to file '%s': %s", file, ExceptionUtils.getStackTrace(e));
       } finally {
         releaseLock();
       }
