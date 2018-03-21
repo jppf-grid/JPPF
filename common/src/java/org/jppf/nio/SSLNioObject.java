@@ -36,11 +36,11 @@ public class SSLNioObject extends AbstractNioObject {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SSLNioObject.class);
+  private static final Logger log = LoggerFactory.getLogger(SSLNioObject.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The source from which the data is read.
    */
@@ -50,7 +50,7 @@ public class SSLNioObject extends AbstractNioObject {
    */
   private OutputStream os;
   /**
-   * 
+   * The associated sslHandler, if any.
    */
   private final SSLHandler sslHandler;
   /**
@@ -93,7 +93,9 @@ public class SSLNioObject extends AbstractNioObject {
   public boolean read() throws Exception {
     if (count >= size) return true;
     final ByteBuffer buf = sslHandler.getAppReceiveBuffer();
-    if (os == null) os = location.getOutputStream();
+    if (os == null) {
+      os = location.getOutputStream();
+    }
     int n = 0;
     while (count < size) {
       if (buf.position() <= 0) {
@@ -143,12 +145,10 @@ public class SSLNioObject extends AbstractNioObject {
     do {
       n = sslHandler.write();
       if (n > 0) count += n;
-      //sslHandler.flush();
       if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     } while (n > 0);
     final boolean b = count >= size;
     if (b) {
-      //sslHandler.flush();
       buf.clear();
       StreamUtils.close(is, log);
       is = null;

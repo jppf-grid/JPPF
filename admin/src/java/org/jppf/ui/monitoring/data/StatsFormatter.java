@@ -63,8 +63,8 @@ public final class StatsFormatter {
   /**
    * The set of fields formated as int.
    */
-  private static final Set<Fields> MB_FORMATTED = EnumSet.of(CLIENT_INBOUND_MB, NODE_INBOUND_MB, UNIDENTIFIED_INBOUND_MB, TOTAL_INBOUND_MB, CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB,
-    UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB);
+  private static final Set<Fields> MB_FORMATTED = EnumSet.of(CLIENT_INBOUND_MB, NODE_INBOUND_MB, JMX_INBOUND_MB, TOTAL_INBOUND_MB, CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB,
+    JMX_OUTBOUND_MB, TOTAL_OUTBOUND_MB);
   /**
    * Formatter for integer values.
    */

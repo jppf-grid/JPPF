@@ -25,6 +25,15 @@ package org.jppf.nio;
  */
 public interface NioMessage {
   /**
+   * Read operation.
+   */
+  int READ = 0;
+  /**
+   * Write operation.
+   */
+  int WRITE = 1;
+
+  /**
    * Read data from a channel.
    * @return true if the data has been completely read from the channel, false otherwise.
    * @throws Exception if an IO error occurs.
@@ -45,8 +54,14 @@ public interface NioMessage {
   boolean isSSL();
 
   /**
-   * Get the actual bytes sent to or received from the underlying channel.
+   * Get the actual bytes received from the underlying channel.
    * @return the number of bytes as a long value.
    */
-  long getChannelCount();
+  long getChannelReadCount();
+
+  /**
+   * Get the actual bytes sent to the underlying channel.
+   * @return the number of bytes as a long value.
+   */
+  long getChannelWriteCount();
 }

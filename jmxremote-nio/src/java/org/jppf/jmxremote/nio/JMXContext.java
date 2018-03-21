@@ -18,6 +18,8 @@
 
 package org.jppf.jmxremote.nio;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+
 import java.nio.channels.*;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -107,7 +109,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
    * @throws Exception if any error occurs.
    */
   public JMXMessage deserializeMessage(final SimpleNioMessage message) throws Exception {
-    return (message != null) ? (JMXMessage) IOHelper.unwrappedData(message.getLocation()) : null;
+    return (message != null) ? (JMXMessage) IOHelper.unwrappedData(message.getCurrentDataLocation()) : null;
   }
 
   /**
@@ -117,7 +119,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
    */
   public void offerJmxMessage(final JMXMessage jmxMessage) throws Exception {
     final SimpleNioMessage msg = new SimpleNioMessage(this);
-    msg.setLocation(IOHelper.serializeData(jmxMessage));
+    msg.setCurrentDataLocation(IOHelper.serializeData(jmxMessage));
     pendingJmxMessages.offer(new MessageWrapper(jmxMessage, msg));
   }
 
@@ -189,20 +191,48 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (message == null) message = new SimpleNioMessage(this);
-    byteCount = ((SimpleNioMessage) message).channelCount;
-    final boolean b = message.read();
-    byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+    boolean b = false;
+    try {
+      b = message.read();
+    } catch (final Exception e) {
+      updateTrafficStats();
+      throw e;
+    }
+    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
     if (debugEnabled) log.debug("read {} bytes", byteCount);
+    if (b) updateTrafficStats();
     return b;
   }
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    byteCount = ((SimpleNioMessage) message).channelCount;
-    final boolean b = message.write();
-    byteCount = ((SimpleNioMessage) message).channelCount - byteCount;
+    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+    boolean b = false;
+    try {
+      b = message.write();
+    } catch (final Exception e) {
+      updateTrafficStats();
+      throw e;
+    }
+    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
     if (debugEnabled) log.debug("wrote {} bytes", byteCount);
+    if (b) updateTrafficStats();
     return b;
+  }
+
+  /**
+   * Update the inbound and outbound traffic statistics.
+   */
+  private void updateTrafficStats() {
+    if ((message != null) && (server.getStats() != null)) {
+      if (inSnapshot == null) inSnapshot = server.getStats().getSnapshot(JMX_IN_TRAFFIC);
+      if (outSnapshot == null) outSnapshot = server.getStats().getSnapshot(JMX_OUT_TRAFFIC);
+      double value = message.getChannelReadCount();
+      if (value > 0d) inSnapshot.addValues(value, 1L);
+      value = message.getChannelWriteCount();
+      if (value > 0d) outSnapshot.addValues(value, 1L);
+    }
   }
 
   /**

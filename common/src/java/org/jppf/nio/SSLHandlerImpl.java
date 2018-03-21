@@ -36,11 +36,11 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SSLHandlerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SSLHandlerImpl.class);
   /**
    * Determines whether TRACE logging level is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
 
   /**
    * Instantiate this SSLHandler with the specified channel and SSL engine.
@@ -65,9 +65,7 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
   @Override
   public int read() throws Exception {
     synchronized(channel) {
-      channelReadCount = 0L;
       final int pos = appReceiveBuffer.position();
-      //flush();
       if (sslEngine.isInboundDone()) return -1;
       int count = doRead();
       netReceiveBuffer.flip();
@@ -162,7 +160,7 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
         break;
 
       case NEED_UNWRAP:
-        final int n = sslEngine.isInboundDone() ? -1 : channel.read(netReceiveBuffer);
+        final int n = sslEngine.isInboundDone() ? -1 : doRead();
         netReceiveBuffer.flip();
         if (traceEnabled) log.trace(String.format("%s before unwrap, %s, n=%d", handshakeStatus, printReceiveBuffers(), n));
         sslEngineResult = sslEngine.unwrap(netReceiveBuffer, appReceiveBuffer);
@@ -189,17 +187,19 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
     return true;
   }
 
-  @Override
-  public int flush() throws IOException {
-    synchronized(channel) {
-      netSendBuffer.flip();
-      if (traceEnabled) log.trace("channelSendBuffer = {}", netSendBuffer);
-      final int n = channel.write(netSendBuffer);
-      if (traceEnabled) log.trace("write result = {}", n);
-      if (n > 0) channelWriteCount += n;
-      netSendBuffer.compact();
-      return n;
-    }
+  /**
+   * Flush unwritten bytes to the channel.
+   * @return the number of bytes written.
+   * @throws IOException if any error occurs.
+   */
+  private int flush() throws IOException {
+    netSendBuffer.flip();
+    if (traceEnabled) log.trace("channelSendBuffer = {}", netSendBuffer);
+    final int n = channel.write(netSendBuffer);
+    if (traceEnabled) log.trace("write result = {}", n);
+    if (n > 0) channelWriteCount += n;
+    netSendBuffer.compact();
+    return n;
   }
 
   /**
@@ -211,7 +211,6 @@ public class SSLHandlerImpl extends AbstractSSLHandler {
     final int n = channel.read(netReceiveBuffer);
     if (traceEnabled) log.trace("read result = {}", n);
     if (n > 0) channelReadCount += n;
-    //else if (n < 0) throw new EOFException("EOF reading inbound channel");
     return n;
   }
 

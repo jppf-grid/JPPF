@@ -31,6 +31,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey> {
    */
   public SelectionKeyWrapper(final SelectionKey channel) {
     super(channel);
+    //getContext().
   }
 
   @Override

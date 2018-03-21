@@ -32,10 +32,10 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (message == null) message = new BaseNioMessage(channel);
-    byteCount = ((AbstractNioMessage) message).channelCount;
+    if (message == null) message = new BaseNioMessage(this);
+    byteCount = ((AbstractNioMessage) message).channelReadCount;
     final boolean b = message.read();
-    byteCount = ((AbstractNioMessage) message).channelCount - byteCount;
+    byteCount = ((AbstractNioMessage) message).channelReadCount - byteCount;
     return b;
   }
 
@@ -47,9 +47,9 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    */
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    byteCount = ((AbstractNioMessage) message).channelCount;
+    byteCount = ((AbstractNioMessage) message).channelWriteCount;
     final boolean b = message.write();
-    byteCount = ((AbstractNioMessage) message).channelCount - byteCount;
+    byteCount = ((AbstractNioMessage) message).channelWriteCount - byteCount;
     return b;
   }
 }

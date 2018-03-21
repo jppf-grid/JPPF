@@ -27,6 +27,14 @@ public class BaseNioMessage extends AbstractNioMessage {
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
+  public BaseNioMessage(final NioContext<?> channel) {
+    super(channel, false);
+  }
+
+  /**
+   * Initialize this nio message with the specified sll flag.
+   * @param channel the channel to read from or write to.
+   */
   public BaseNioMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }

@@ -78,11 +78,11 @@ public class StatsConstants {
   /**
    * List of stats properties for inbound network traffic.
    */
-  public static final Fields[] INBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_INBOUND_MB, NODE_INBOUND_MB, UNIDENTIFIED_INBOUND_MB, TOTAL_INBOUND_MB };
+  public static final Fields[] INBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_INBOUND_MB, NODE_INBOUND_MB, JMX_INBOUND_MB, TOTAL_INBOUND_MB };
   /**
    * List of stats properties for inbound network traffic.
    */
-  public static final Fields[] OUTBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB };
+  public static final Fields[] OUTBOUND_NETWORK_TRAFFIC_FIELDS = { CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, JMX_OUTBOUND_MB, TOTAL_OUTBOUND_MB };
   /**
    * List of properties for health snapshots.
    * @since 5.0

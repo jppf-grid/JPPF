@@ -124,11 +124,11 @@ public final class JPPFStatisticsHelper {
   /**
    * Bytes received from unidentified remote peers.
    */
-  public static final String UNIDENTIFIED_IN_TRAFFIC = "unidentified.traffic.in";
+  public static final String JMX_IN_TRAFFIC = "jmx.traffic.in";
   /**
    * Bytes sent to unidentified remote peers.
    */
-  public static final String UNIDENTIFIED_OUT_TRAFFIC = "unidentified.traffic.out";
+  public static final String JMX_OUT_TRAFFIC = "jmx.traffic.out";
 
   /**
    * Determine wether the specified snapshot is a single value snapshot.
@@ -210,7 +210,7 @@ public final class JPPFStatisticsHelper {
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
     statistics.createSingleValueSnapshots(TASK_QUEUE_TOTAL, JOB_TOTAL, NODE_IN_TRAFFIC, NODE_OUT_TRAFFIC, CLIENT_IN_TRAFFIC, CLIENT_OUT_TRAFFIC,
-        PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, UNIDENTIFIED_IN_TRAFFIC, UNIDENTIFIED_OUT_TRAFFIC);
+        PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, JMX_IN_TRAFFIC, JMX_OUT_TRAFFIC);
     return statistics;
   }
 }

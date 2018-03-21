@@ -18,7 +18,6 @@
 
 package org.jppf.nio;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLEngine;
@@ -43,13 +42,6 @@ public interface SSLHandler {
    * @throws Exception if any error occurs.
    */
   int write() throws Exception;
-
-  /**
-   * Flush the underlying channel.
-   * @return the number of bytes flushed.
-   * @throws IOException if any error occurs.
-   */
-  int flush() throws IOException;
 
   /**
    * Close the underlying channel and SSL engine.
@@ -82,13 +74,13 @@ public interface SSLHandler {
   ByteBuffer getNetSendBuffer();
 
   /**
-   * Get the count of bytes read from the channel.
+   * Get the count of bytes read from the channel, including hansdhaking and encrypted data.
    * @return the byte count as a long value.
    */
   long getChannelReadCount();
 
   /**
-   * Get the count of bytes written to the channel.
+   * Get the count of bytes written to the channel, including hansdhaking and encrypted data.
    * @return the byte count as a long value.
    */
   long getChannelWriteCount();

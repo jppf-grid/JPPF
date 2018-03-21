@@ -252,11 +252,11 @@ public enum Fields {
   /**
    * Unidentitified inbound network traffic.
    */
-  UNIDENTIFIED_INBOUND_MB,
+  JMX_INBOUND_MB,
   /**
    * Unidentitified outbound network traffic.
    */
-  UNIDENTIFIED_OUTBOUND_MB,
+  JMX_OUTBOUND_MB,
   /**
    * total inbound network traffic.
    */

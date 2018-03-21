@@ -106,10 +106,10 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
     try {
       b = super.readMessage(wrapper);
     } catch(final Exception e) {
-      updateInStats();
+      updateTrafficStats();
       throw e;
     }
-    if (b) updateInStats();
+    if (b) updateTrafficStats();
     return b;
   }
 
@@ -119,30 +119,24 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
     try {
       b = super.writeMessage(wrapper);
     } catch(final Exception e) {
-      updateOutStats();
+      updateTrafficStats();
       throw e;
     }
-    if (b) updateOutStats();
+    if (b) updateTrafficStats();
     return b;
   }
 
   /**
-   * Update the inbound traffic statistics.
+   * Update the inbound and outbound traffic statistics.
    */
-  private void updateInStats() {
+  private void updateTrafficStats() {
     if (message != null) {
-      final long n = message.getChannelCount();
-      if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : (isProvider() ? CLIENT_IN_TRAFFIC : NODE_IN_TRAFFIC), n);
-    }
-  }
-
-  /**
-   * Update the outbound traffic statistics.
-   */
-  private void updateOutStats() {
-    if (message != null) {
-      final long n = message.getChannelCount();
-      if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : (isProvider() ? CLIENT_OUT_TRAFFIC : NODE_OUT_TRAFFIC), n);
+      if (inSnapshot == null) inSnapshot = driver.getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : (isProvider() ? CLIENT_IN_TRAFFIC : NODE_IN_TRAFFIC));
+      if (outSnapshot == null) outSnapshot = driver.getStatistics().getSnapshot(peer ? PEER_OUT_TRAFFIC : (isProvider() ? CLIENT_OUT_TRAFFIC : NODE_OUT_TRAFFIC));
+      double value = message.getChannelReadCount();
+      if (value > 0d) inSnapshot.addValues(value, 1L);
+      value = message.getChannelWriteCount();
+      if (value > 0d) outSnapshot.addValues(value, 1L);
     }
   }
 

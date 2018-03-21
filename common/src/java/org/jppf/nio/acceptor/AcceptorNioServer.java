@@ -300,4 +300,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     }
     if (server != null) server.close();
   }
+
+  /**
+   * @return the statsistics to update, if any.
+   */
+  public JPPFStatistics getStats() {
+    return stats;
+  }
 }

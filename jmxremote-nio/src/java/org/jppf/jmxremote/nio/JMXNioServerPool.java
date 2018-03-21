@@ -20,12 +20,17 @@ package org.jppf.jmxremote.nio;
 
 import org.jppf.JPPFError;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * A pool of {@link JMXNioServer} instances, implemented as a singleton, which allows spreading the I/O operations over multiple NIO selector threads.
  * @author Laurent Cohen
  */
 public class JMXNioServerPool {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JMXNioServerPool.class);
   /**
    * The size of this pool.
    */
@@ -55,6 +60,7 @@ public class JMXNioServerPool {
         servers[i].start();
       }
     } catch (final Exception e) {
+      log.error("can't initialize JMX server pool", e);
       throw new JPPFError("can't initialize JMX server pool", e);
     }
     return servers;

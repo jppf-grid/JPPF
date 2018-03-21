@@ -81,12 +81,12 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
     try {
       b = nioObject.read();
     } catch (final Exception e) {
-      if (stats != null) stats.addValue(JPPFStatisticsHelper.UNIDENTIFIED_IN_TRAFFIC, nioObject.getChannelCount());
+      if (stats != null) stats.addValue(JPPFStatisticsHelper.JMX_IN_TRAFFIC, nioObject.getChannelCount());
       throw e;
     }
     if (b) {
       id = SerializationUtils.readInt(nioObject.getData().getInputStream());
-      if (stats != null) stats.addValue(JPPFStatisticsHelper.UNIDENTIFIED_IN_TRAFFIC, nioObject.getChannelCount());
+      if (stats != null) stats.addValue(JPPFStatisticsHelper.JMX_IN_TRAFFIC, nioObject.getChannelCount());
       nioObject = null;
     }
     return b;

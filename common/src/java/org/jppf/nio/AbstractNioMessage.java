@@ -30,15 +30,11 @@ import org.slf4j.*;
  * A message is the transformation of a sequence of objects into a more easily transportable format.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioMessage implements NioMessage {
+public abstract class AbstractNioMessage extends AbstractNioMessageBase {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractNioMessage.class);
-  /**
-   * The current count of bytes sent or received.
-   */
-  protected int count;
+  private static final Logger log = LoggerFactory.getLogger(AbstractNioMessage.class);
   /**
    * The total length of data to send or receive, used for tracing and debugging purposes only.
    */
@@ -55,53 +51,22 @@ public abstract class AbstractNioMessage implements NioMessage {
    * The number of objects to read or write.
    */
   protected int nbObjects = -1;
+
   /**
-   * The length of the location at the current position.
+   * Initialize this nio message.
+   * @param channel the channel to read from or write to.
+   * @param debug to enable debug-level logging.
    */
-  protected int currentLength = -1;
-  /**
-   * Object storing the length of the object currently being read or written.
-   */
-  protected NioObject currentLengthObject;
-  /**
-   * Object storing the object currently being read or written.
-   */
-  protected NioObject currentObject;
-  /**
-   * <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
-   */
-  protected final boolean ssl;
-  /**
-   * Wraps a channel associated with an <code>SSLEngine</code>.
-   */
-  protected final SSLHandler sslHandler;
-  /**
-   * Determines whteher some low-level traces should be logged.
-   */
-  protected final boolean debug;
-  /**
-   * The channel to read from or write to.
-   */
-  protected final ChannelWrapper<?> channel;
-  /**
-   * Temporary holder used as a local performance optimization for write operations.
-   */
-  private DataLocation currentDataLocation;
-  /**
-   * Actual bytes sent to or received from the underlying channel.
-   */
-  protected long channelCount;
-  /**
-   * Reusable buffer for reading/writing serialized object lengths.
-   */
-  protected final MultipleBuffersLocation lengthBuf = new MultipleBuffersLocation(4);
+  protected AbstractNioMessage(final NioContext<?> channel, final boolean debug) {
+    super(channel, debug);
+  }
 
   /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */
   protected AbstractNioMessage(final ChannelWrapper<?> channel) {
-    this(channel, false);
+    this(channel.getContext(), false);
   }
 
   /**
@@ -110,10 +75,7 @@ public abstract class AbstractNioMessage implements NioMessage {
    * @param debug to enable debug-level logging.
    */
   protected AbstractNioMessage(final ChannelWrapper<?> channel, final boolean debug) {
-    this.channel = channel;
-    this.sslHandler = channel.getContext().getSSLHandler();
-    this.ssl = sslHandler != null;
-    this.debug = debug;
+    this(channel.getContext(), debug);
   }
 
   /**
@@ -165,10 +127,10 @@ public abstract class AbstractNioMessage implements NioMessage {
       try {
         if (!currentLengthObject.read()) return false;
       } catch(final Exception e) {
-        channelCount += currentLengthObject.getChannelCount();
+        updateCounts(currentLengthObject.getChannelCount(), READ);
         throw e;
       }
-      channelCount += currentLengthObject.getChannelCount();
+      updateCounts(currentLengthObject.getChannelCount(), READ);
       try (InputStream is = currentLengthObject.getData().getInputStream()) {
         currentLength = SerializationUtils.readInt(is);
       }
@@ -182,17 +144,17 @@ public abstract class AbstractNioMessage implements NioMessage {
       try {
         if (!currentObject.read()) return false;
       } catch(final Exception e) {
-        channelCount += currentObject.getChannelCount();
+        updateCounts(currentObject.getChannelCount(), READ);
         throw e;
       }
     }
     count += currentLength;
-    if (currentObject != null) channelCount += currentObject.getChannelCount();
+    if (currentObject != null) updateCounts(currentObject.getChannelCount(), READ);
     locations.add(currentObject == null ? null : currentObject.getData());
     currentLengthObject = null;
     currentObject = null;
     currentLength = -1;
-    if (debug) log.debug("channel id={} read object at position {}", channel.getId(), position);
+    if (debug) log.debug("channel id={} read object at position {}", channel.getChannel().getId(), position);
     position++;
     return true;
   }
@@ -212,12 +174,12 @@ public abstract class AbstractNioMessage implements NioMessage {
       try {
         if (!currentLengthObject.write()) return false;
       } catch(final Exception e) {
-        channelCount += currentLengthObject.getChannelCount();
+        updateCounts(currentLengthObject.getChannelCount(), WRITE);
         throw e;
       }
       currentLength = currentDataLocation.getSize();
       count += 4;
-      channelCount += currentLengthObject.getChannelCount();
+      updateCounts(currentLengthObject.getChannelCount(), WRITE);
     }
     if (currentLength > 0) {
       if (currentObject == null) {
@@ -227,13 +189,13 @@ public abstract class AbstractNioMessage implements NioMessage {
       try {
         if (!currentObject.write()) return false;
       } catch(final Exception e) {
-        channelCount += currentObject.getChannelCount();
+        updateCounts(currentObject.getChannelCount(), WRITE);
         throw e;
       }
     }
     count += currentLength;
-    if (currentObject != null) channelCount += currentObject.getChannelCount();
-    if (debug) log.debug("channel id={} wrote object at position {}", channel.getId(), position);
+    if (currentObject != null) updateCounts(currentObject.getChannelCount(), WRITE);
+    if (debug) log.debug("channel id={} wrote object at position {}", channel.getChannel().getId(), position);
     position++;
     currentLengthObject = null;
     currentObject = null;
@@ -283,15 +245,5 @@ public abstract class AbstractNioMessage implements NioMessage {
     sb.append(", currentObject=").append(currentObject);
     sb.append(']');
     return sb.toString();
-  }
-
-  @Override
-  public boolean isSSL() {
-    return ssl;
-  }
-
-  @Override
-  public long getChannelCount() {
-    return channelCount;
   }
 }

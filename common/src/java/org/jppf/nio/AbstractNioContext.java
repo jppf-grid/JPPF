@@ -21,6 +21,7 @@ package org.jppf.nio;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.utils.stats.JPPFSnapshot;
 import org.slf4j.*;
 
 /**
@@ -85,6 +86,14 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * The associated socket channel.
    */
   protected SocketChannel socketChannel;
+  /**
+   * Inbound traffic statistics snapshot.
+   */
+  protected JPPFSnapshot inSnapshot;
+  /**
+   * Outbound traffic statistics snapshot.
+   */
+  protected JPPFSnapshot outSnapshot;
 
   @Override
   public S getState() {
@@ -131,6 +140,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public void setChannel(final ChannelWrapper<?> channel) {
     this.channel = channel;
+    this.socketChannel = channel.getSocketChannel();
   }
 
   /**

@@ -27,56 +27,13 @@ import org.jppf.serialization.SerializationUtils;
  * An {@link NioMessage} that reads or writes a single object.
  * @author Laurent Cohen
  */
-public class SimpleNioMessage implements NioMessage {
-  /**
-   * The current count of bytes sent or received.
-   */
-  protected int count;
-  /**
-   * The data location objects abstracting the data to send or receive.
-   */
-  protected DataLocation location;
-  /**
-   * The length of the location at the current position.
-   */
-  protected int currentLength = -1;
-  /**
-   * Object storing the length of the object currently being read or written.
-   */
-  protected NioObject currentLengthObject;
-  /**
-   * Object storing the object currently being read or written.
-   */
-  protected NioObject currentObject;
-  /**
-   * <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
-   */
-  protected final boolean ssl;
-  /**
-   * Wraps a channel associated with an <code>SSLEngine</code>.
-   */
-  protected final SSLHandler sslHandler;
-  /**
-   * The channel to read from or write to.
-   */
-  protected final NioContext<?> channel;
-  /**
-   * Actual bytes sent to or received from the underlying channel.
-   */
-  public long channelCount;
-  /**
-   * Reusable buffer for reading/writing serialized object lengths.
-   */
-  protected final MultipleBuffersLocation lengthBuf = new MultipleBuffersLocation(4);
-
+public class SimpleNioMessage extends AbstractNioMessageBase {
   /**
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
    */
   public SimpleNioMessage(final NioContext<?> channel) {
-    this.channel = channel;
-    this.sslHandler = channel.getSSLHandler();
-    this.ssl = sslHandler != null;
+    super(channel, false);
   }
 
   /**
@@ -84,17 +41,15 @@ public class SimpleNioMessage implements NioMessage {
    * @param channel the channel to read from or write to.
    */
   public SimpleNioMessage(final ChannelWrapper<?> channel) {
-    this.channel = channel.getContext();
-    this.sslHandler = channel.getContext().getSSLHandler();
-    this.ssl = sslHandler != null;
+    this(channel.getContext());
   }
 
   /**
    * Add a location to the data locations of this message.
    * @param location the location to add.
    */
-  public void setLocation(final DataLocation location) {
-    this.location = location;
+  public void setCurrentDataLocation(final DataLocation location) {
+    this.currentDataLocation = location;
   }
 
   @Override
@@ -107,10 +62,10 @@ public class SimpleNioMessage implements NioMessage {
       try {
         if (!currentLengthObject.read()) return false;
       } catch(final Exception e) {
-        channelCount += currentLengthObject.getChannelCount();
+        updateCounts(currentLengthObject.getChannelCount(), READ);
         throw e;
       }
-      channelCount += currentLengthObject.getChannelCount();
+      if (!ssl) channelReadCount += currentLengthObject.getChannelCount();
       try (InputStream is = currentLengthObject.getData().getInputStream()) {
         currentLength = SerializationUtils.readInt(is);
       }
@@ -118,18 +73,18 @@ public class SimpleNioMessage implements NioMessage {
     }
     if (currentLength > 0) {
       if (currentObject == null) {
-        location = IOHelper.createDataLocationMemorySensitive(currentLength);
-        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
+        currentDataLocation = IOHelper.createDataLocationMemorySensitive(currentLength);
+        currentObject = ssl ? new SSLNioObject(currentDataLocation, sslHandler) : new PlainNioObject(channel.getSocketChannel(), currentDataLocation);
       }
       try {
         if (!currentObject.read()) return false;
       } catch(final Exception e) {
-        channelCount += currentObject.getChannelCount();
+        updateCounts(currentObject.getChannelCount(), READ);
         throw e;
       }
     }
     count += currentLength;
-    if (currentObject != null) channelCount += currentObject.getChannelCount();
+    if (currentObject != null) updateCounts(currentObject.getChannelCount(), READ);
     return true;
   }
 
@@ -137,40 +92,32 @@ public class SimpleNioMessage implements NioMessage {
   public boolean write() throws Exception {
     if (currentLengthObject == null) {
       lengthBuf.reset();
-      SerializationUtils.writeInt(location.getSize(), lengthBuf.getBuffer(0).buffer, 0);
+      SerializationUtils.writeInt(currentDataLocation.getSize(), lengthBuf.getBuffer(0).buffer, 0);
       currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
     }
     if (currentLength < 0) {
       try {
         if (!currentLengthObject.write()) return false;
       } catch(final Exception e) {
-        channelCount += currentLengthObject.getChannelCount();
+        updateCounts(currentLengthObject.getChannelCount(), WRITE);
         throw e;
       }
-      currentLength = location.getSize();
+      currentLength = currentDataLocation.getSize();
       count += 4;
-      channelCount += currentLengthObject.getChannelCount();
+      updateCounts(currentLengthObject.getChannelCount(), WRITE);
     }
     if (currentLength > 0) {
-      if (currentObject == null) currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
+      if (currentObject == null) currentObject = ssl ? new SSLNioObject(currentDataLocation, sslHandler) : new PlainNioObject(channel.getSocketChannel(), currentDataLocation);
       try {
         if (!currentObject.write()) return false;
       } catch(final Exception e) {
-        channelCount += currentObject.getChannelCount();
+        updateCounts(currentObject.getChannelCount(), WRITE);
         throw e;
       }
     }
     count += currentLength;
-    if (currentObject != null) channelCount += currentObject.getChannelCount();
+    if (currentObject != null) updateCounts(currentObject.getChannelCount(), WRITE);
     return true;
-  }
-
-  /**
-   * Get the data location objects abstracting the data to send or receive.
-   * @return a <code>DataLocation</code> object.
-   */
-  public DataLocation getLocation() {
-    return location;
   }
 
   @Override
@@ -180,15 +127,5 @@ public class SimpleNioMessage implements NioMessage {
     sb.append(", currentObject=").append(currentObject);
     sb.append(']');
     return sb.toString();
-  }
-
-  @Override
-  public boolean isSSL() {
-    return ssl;
-  }
-
-  @Override
-  public long getChannelCount() {
-    return channelCount;
   }
 }

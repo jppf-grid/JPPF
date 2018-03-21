@@ -35,9 +35,11 @@ import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.jmxremote.notification.ServerNotificationHandler;
 import org.jppf.management.ObjectNameCache;
 import org.jppf.nio.*;
+import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.ssl.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -48,7 +50,7 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXNioServer.class);
+  private static final Logger log = LoggerFactory.getLogger(JMXNioServer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -89,6 +91,10 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
    * The peak number of connections.
    */
   private int peakConnections;
+  /**
+   * The statsistics to update, if any.
+   */
+  private final JPPFStatistics stats;
 
   /**
    * @throws Exception if any error occurs.
@@ -99,6 +105,9 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     //this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.selectTimeout = 1L;
     registerMBean();
+    final AcceptorNioServer acceptor = (AcceptorNioServer) NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+    this.stats = (acceptor != null) ? acceptor.getStats() : null;
+    if (debugEnabled) log.debug("initialized {}, stats = {}", this, (stats == null ? "null" : stats.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(stats))));
   }
 
   @Override
@@ -484,5 +493,12 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
       key.interestOps(newOps);
       pair.setInterestOps(newOps);
     }
+  }
+
+  /**
+   * @return the statsistics to update, if any.
+   */
+  public JPPFStatistics getStats() {
+    return stats;
   }
 }

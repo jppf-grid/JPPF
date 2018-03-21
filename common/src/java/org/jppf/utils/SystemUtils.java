@@ -21,6 +21,7 @@ package org.jppf.utils;
 import static org.jppf.utils.PropertyType.*;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
@@ -484,5 +485,20 @@ public final class SystemUtils {
     }
     sb.append('}');
     return sb.toString();
+  }
+
+  /**
+   * Determine whether the current JVM is a JPPF driver.
+   * @return {@code true} if the current JVM is a JPPF driver, {@code false} otherwise.
+   */
+  public static boolean isJPPFDriver() {
+    try {
+      final Class<?> c = Class.forName("org.jppf.server.JPPFDriver");
+      final Method m = c.getMethod("getInstance");
+      final Object o = m.invoke(null);
+      return o != null;
+    } catch (@SuppressWarnings("unused") final Exception e) {
+      return false;
+    }
   }
 }

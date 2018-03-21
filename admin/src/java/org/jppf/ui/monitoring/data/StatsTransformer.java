@@ -142,8 +142,8 @@ public class StatsTransformer {
     map.put(NODE_INBOUND_MB, d);
     //sum += (d= stats.getSnapshot(PEER_IN_TRAFFIC).getTotal());
     //map.put(PEER_INBOUND_MB, d);
-    sum += (d = stats.getSnapshot(UNIDENTIFIED_IN_TRAFFIC).getTotal());
-    map.put(UNIDENTIFIED_INBOUND_MB, d);
+    sum += (d = stats.getSnapshot(JMX_IN_TRAFFIC).getTotal());
+    map.put(JMX_INBOUND_MB, d);
     map.put(TOTAL_INBOUND_MB, sum);
     sum = (d = stats.getSnapshot(CLIENT_OUT_TRAFFIC).getTotal());
     map.put(CLIENT_OUTBOUND_MB, d);
@@ -151,8 +151,8 @@ public class StatsTransformer {
     map.put(NODE_OUTBOUND_MB, d);
     //sum += (d = stats.getSnapshot(PEER_OUT_TRAFFIC).getTotal());
     //map.put(PEER_OUTBOUND_MB, d);
-    sum += (d = stats.getSnapshot(UNIDENTIFIED_OUT_TRAFFIC).getTotal());
-    map.put(UNIDENTIFIED_OUTBOUND_MB, d);
+    sum += (d = stats.getSnapshot(JMX_OUT_TRAFFIC).getTotal());
+    map.put(JMX_OUTBOUND_MB, d);
     map.put(TOTAL_OUTBOUND_MB, sum);
   }
 

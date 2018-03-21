@@ -28,39 +28,33 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  * Node message implementation for an in-VM node.
  * @author Laurent Cohen
  */
-public class LocalNodeMessage extends AbstractTaskBundleMessage
-{
+public class LocalNodeMessage extends AbstractTaskBundleMessage {
   /**
    * Build this nio message.
    * @param channel the channel to read from or write to.
    */
-  public LocalNodeMessage(final ChannelWrapper<?> channel)
-  {
+  public LocalNodeMessage(final ChannelWrapper<?> channel) {
     super(channel);
   }
 
   @Override
-  public boolean read() throws Exception
-  {
+  public boolean read() throws Exception {
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), JPPFDriver.getSerializer());
     return true;
   }
 
   @Override
-  protected synchronized boolean readNextObject() throws Exception
-  {
+  protected synchronized boolean readNextObject() throws Exception {
     return true;
   }
 
   @Override
-  public boolean write() throws Exception
-  {
+  public boolean write() throws Exception {
     return true;
   }
 
   @Override
-  protected boolean writeNextObject() throws Exception
-  {
+  protected boolean writeNextObject() throws Exception {
     return true;
   }
 }
