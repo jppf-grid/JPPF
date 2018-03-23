@@ -63,7 +63,7 @@ public class NotifyingTaskListener implements NotificationListener {
   public List<Object> userObjects = new Vector<>();
 
   @Override
-  public void handleNotification(final Notification notification, final Object handback) {
+  public synchronized void handleNotification(final Notification notification, final Object handback) {
     try {
       notifs.add(notification);
       if (notification instanceof JPPFNodeForwardingNotification) {
