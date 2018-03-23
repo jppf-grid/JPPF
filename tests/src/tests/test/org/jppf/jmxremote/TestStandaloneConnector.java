@@ -36,7 +36,7 @@ import org.junit.*;
 import test.org.jppf.test.setup.*;
 
 /**
- *
+ * Tests for the jmxremote-nio connector.
  * @author Laurent Cohen
  */
 public class TestStandaloneConnector extends BaseTest {
@@ -70,7 +70,6 @@ public class TestStandaloneConnector extends BaseTest {
     BaseSetup.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
     BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
     url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
-    //url = new JMXServiceURL("service:jmx:jppf://192.168.1.24:12001");
     connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
     registerMBeans();
   }
@@ -140,7 +139,7 @@ public class TestStandaloneConnector extends BaseTest {
   }
 
   /**
-   * Test getting and setting MBeanattributes.
+   * Test getting and setting MBean attributes.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
@@ -232,8 +231,7 @@ public class TestStandaloneConnector extends BaseTest {
    * Test connector client connection status notifications.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 10000)
-  @Test
+  @Test(timeout = 10000)
   public void testClientConnectionNotifications() throws Exception {
     final MyClientConnectionListener listener = new MyClientConnectionListener();
     print(false, false, "***** closing connector client before testing *****");
