@@ -101,8 +101,8 @@ public class AwaitJobNotificationListener implements NotificationListener {
           notifyAll();
         }
       }
-    } catch (final Exception ignore) {
-      ignore.printStackTrace();
+    } catch (final Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -116,8 +116,13 @@ public class AwaitJobNotificationListener implements NotificationListener {
       while (!eventReceived) wait(100L);
       if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
       listenerRemoved = true;
-      jobManager.removeNotificationListener(this);
-      wait(100L);
+      try {
+        jobManager.removeNotificationListener(this);
+      } catch (final Exception e) {
+        e.printStackTrace();
+      }
+      if (debugEnabled) log.debug("removed notification listener");
+      //wait(100L);
     }
   }
 
