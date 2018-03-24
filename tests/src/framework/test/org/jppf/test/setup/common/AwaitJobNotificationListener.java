@@ -116,12 +116,20 @@ public class AwaitJobNotificationListener implements NotificationListener {
       while (!eventReceived) wait(100L);
       if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
       listenerRemoved = true;
-      try {
-        jobManager.removeNotificationListener(this);
-      } catch (final Exception e) {
-        e.printStackTrace();
-      }
-      if (debugEnabled) log.debug("removed notification listener");
+      final Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            jobManager.removeNotificationListener(AwaitJobNotificationListener.this);
+          } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+            e.printStackTrace();
+          }
+          if (debugEnabled) log.debug("removed notification listener");
+        }
+      });
+      thread.setDaemon(true);
+      thread.start();
       //wait(100L);
     }
   }

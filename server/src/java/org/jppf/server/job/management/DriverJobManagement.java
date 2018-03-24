@@ -323,4 +323,22 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    if (debugEnabled) log.debug(String.format("adding notification listener=%s with filter=%s and handback=%s", listener, filter, handback));
+    super.addNotificationListener(listener, filter, handback);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug(String.format("removing notification listener=%s", listener));
+    super.removeNotificationListener(listener);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug(String.format("removing notification listener=%s with filter=%s and handback=%s", listener, filter, handback));
+    super.removeNotificationListener(listener, filter, handback);
+  }
 }
