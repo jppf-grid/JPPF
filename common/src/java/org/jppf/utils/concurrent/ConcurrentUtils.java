@@ -234,6 +234,27 @@ public final class ConcurrentUtils {
   }
 
   /**
+   * This abstrat class handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
+   */
+  public static abstract class ConditionFalseOnException implements Condition {
+    @Override
+    public boolean evaluate() {
+      try {
+        return evaluateWithException();
+      } catch (@SuppressWarnings("unused") final Exception e) {
+        return false;
+      }
+    }
+
+    /**
+     * Evaluate an arbitrary condition.
+     * @return true if the condition was met, false otherwise.
+     * @throws Exception if any error occurs during the evaluation.
+     */
+    public abstract boolean evaluateWithException() throws Exception;
+  }
+
+  /**
    * Create a pool that directly hands off new tasks, creating new threads as required.
    * @param coreThreads the number of core threads.
    * @param ttl the threads' time-to -live in millis.
