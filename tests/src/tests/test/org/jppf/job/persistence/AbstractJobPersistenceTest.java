@@ -156,7 +156,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-    assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
+    assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L, 500L, false));
     final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
     assertNotNull(persistedUuids);
     assertEquals(1, persistedUuids.size());
@@ -266,7 +266,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
       print(false, false, "got 2nd jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
+      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L, 500L, false));
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
       assertEquals(1, persistedUuids.size());
@@ -317,7 +317,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
       print(false, false, "got jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L));
+      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L, 500L, false));
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
       assertEquals(1, persistedUuids.size());
@@ -363,7 +363,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   };
 
   /** */
-  static class PersistedJobCompletion implements ConcurrentUtils.Condition {
+  static class PersistedJobCompletion extends ConcurrentUtils.ConditionFalseOnException {
     /** */
     final JPPFDriverJobPersistence mgr;
     /** */
@@ -379,12 +379,8 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     }
 
     @Override
-    public boolean evaluate() {
-      try {
-        return mgr.isJobComplete(uuid);
-      } catch (@SuppressWarnings("unused") final Exception e) {
-      }
-      return false;
+    public boolean evaluateWithException() throws Exception {
+      return mgr.isJobComplete(uuid);
     }
-  };
+  }
 }
