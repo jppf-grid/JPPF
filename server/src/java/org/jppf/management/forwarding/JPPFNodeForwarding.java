@@ -21,7 +21,7 @@ package org.jppf.management.forwarding;
 import static org.jppf.utils.collections.CollectionUtils.array;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
@@ -362,7 +362,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
      * @param expectedCount the expected total number of results.
      */
     ForwardCallback(final int expectedCount) {
-      this.resultMap = new ConcurrentHashMap<>(expectedCount, 0.75f, core);
+      this.resultMap = new HashMap<>(expectedCount);
       this.expectedCount = expectedCount;
     }
 
@@ -372,8 +372,8 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
      * @param result the result of exception returned by the JMX call.
      */
     void gotResult(final String uuid, final Object result) {
-      resultMap.put(uuid, result);
       synchronized(this) {
+        resultMap.put(uuid, result);
         if (++count == expectedCount) notify();
       }
     }
