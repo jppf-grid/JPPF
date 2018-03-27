@@ -28,6 +28,7 @@ import org.h2.tools.Script;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.*;
+import org.jppf.job.persistence.PersistedJobsManagerMBean;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.diagnostics.*;
@@ -35,6 +36,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.test.addons.common.AddonSimpleTask;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -75,21 +77,21 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       jmx.connectAndWait(5_000L);
       final boolean b = jmx.isConnected();
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
+      final String[] dirs = { "persistence", "persistence1", "persistence2" };
+      for (String dir: dirs) {
+        final Path dirPath = Paths.get(dir);
+        if (Files.exists(dirPath)) {
+          RetryUtils.runWithRetryTimeout(5_000L, 500L, new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+              Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
+              return null;
+            }
+          });
+        }
+      }
       if (b) {
         final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-        final String[] dirs = { "persistence", "persistence1", "persistence2" };
-        for (String dir: dirs) {
-          final Path dirPath = Paths.get(dir);
-          if (Files.exists(dirPath)) {
-            RetryUtils.runWithRetryTimeout(5_000L, 500L, new Callable<Void>() {
-              @Override
-              public Void call() throws Exception {
-                Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
-                return null;
-              }
-            });
-          }
-        }
         mgr.deleteJobs(JobSelector.ALL_JOBS);
         final DiagnosticsMBean proxy = jmx.getDiagnosticsProxy();
         if (proxy.hasDeadlock()) {
@@ -211,11 +213,20 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     print(false, false, "getting JMX connection");
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
       jmx.setReconnectOnError(false);
+      final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
       print(false, false, "submitting job");
       client.submitJob(job);
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
+      print(false, false, "waiting for job fully persisted");
+      assertTrue(ConcurrentUtils.awaitCondition(new ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
+          final int[][] positions = mgr.getPersistedJobPositions(job.getUuid());
+          return (positions != null) && (positions.length > 0) && (positions[0] != null) && (positions[0].length == nbTasks);
+        }
+      } , 6000L, 500L, false));
       Thread.sleep(500L);
       print(false, false, "about to request driver restart");
       jmx.restartShutdown(100L, 1L);
@@ -251,11 +262,20 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     print(false, false, "getting JMX connection");
     try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
       jmx.setReconnectOnError(false);
+      final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);
       print(false, false, "submitting job");
       client.submitJob(job);
       print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
+      print(false, false, "waiting for job fully persisted");
+      assertTrue(ConcurrentUtils.awaitCondition(new ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
+          final int[][] positions = mgr.getPersistedJobPositions(job.getUuid());
+          return (positions != null) && (positions.length > 0) && (positions[0] != null) && (positions[0].length == nbTasks);
+        }
+      } , 6000L, 500L, false));
       print(false, false, "closing client");
       client.close();
       print(false, false, "requesting driver restart");

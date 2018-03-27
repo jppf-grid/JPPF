@@ -243,7 +243,36 @@
     </junit>
     <antcall target="zip.last.test.logs"/>
     <antcall target="junit.report"/>
-    <fail if="tests.failed">Test failure, aborting build</fail>
+    <fail if="tests.failed" status="1">Test failure, aborting build</fail>
+  </target>
+  
+  <target name="test.pattern2">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
+    <delete dir="${report}" quiet="true"/>
+    <mkdir dir="${report}"/>
+    <junit printsummary="yes" fork="yes" dir="${basedir}" enableTestListenerEvents="true" showoutput="true" logfailedtests="true"
+      failureproperty="tests.failed" errorproperty="tests.failed" >
+      <classpath refid="tests.classpath"/>
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.TestConfigSource"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${report}" skipNonTests="true">
+        <fileset dir="${tests.src}" includes="${pattern}" excludes="**/package-info.java"/>
+      </batchtest>
+    </junit>
+    <antcall target="test.pattern2.failed"/>
+    <antcall target="zip.last.test.logs"/>
+    <antcall target="junit.report"/>
+    <fail if="tests.failed" status="1">Test failure, aborting build</fail>
+  </target>
+  
+  <target name="test.pattern2.failed" if="tests.failed">
+    <echo message="Creating failure file"/>
+    <propertyfile file="failure.log" comment="Test failure"/>
   </target>
   
   <!-- ========================================================================= -->

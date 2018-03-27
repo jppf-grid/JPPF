@@ -20,15 +20,15 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.job.persistence.TestDefaultFilePersistenceAsync;
 import test.org.jppf.test.runner.RepeatingSuite;
+import test.org.jppf.utils.stats.TestJPPFStatistics;
 
 /**
  * A suite of JUnit tests.
  * @author Laurent Cohen
  */
 @RunWith(RepeatingSuite.class)
-@RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes={ TestDefaultFilePersistenceAsync.class })
+@RepeatingSuite.RepeatingSuiteClasses(repeat=500, shuffleClasses=false, shuffleMethods=true,
+  classes={ TestJPPFStatistics.class })
 public class JPPFSuite {
 }
