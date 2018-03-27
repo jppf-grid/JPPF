@@ -357,13 +357,13 @@ public class JPPFProperties {
   /** Size of temporary buffers used in I/O transfers. */
   public static final JPPFProperty<Integer> TEMP_BUFFER_SIZE = new IntProperty("jppf.temp.buffer.size", 32*1024, 1024, 64*1024);
   /** Type of NIO thread pool: either dynamic or fixed. */
-  public static final JPPFProperty<String> NIO_THREAD_POOL_TYPE = new StringProperty("jppf.nio.thread.pool.type", "dynamic").setPossibleValues("dynamic", "fixed", "sync");
+  public static final JPPFProperty<String> NIO_THREAD_POOL_TYPE = new StringProperty("jppf.nio.thread.pool.type", "sync").setPossibleValues("dynamic", "fixed", "sync");
   /** Core number of threads performing network I/O . */
   public static final JPPFProperty<Integer> NIO_THREAD_POOL_SIZE = new IntProperty("jppf.nio.thread.pool.size", Runtime.getRuntime().availableProcessors(), 2, 32*1024, "jppf.transition.thread.pool.size");
   /** Queue size for the pool of threads performing network I/O . */
   public static final JPPFProperty<Integer> NIO_THREAD_QUEUE_SIZE = new IntProperty("jppf.nio.thread.queue.size", 50, 1, Integer.MAX_VALUE);
   /** TTL in milliseconds for threads beyond the core number performing network I/O. */
-  public static final JPPFProperty<Long> NIO_THREAD_TTL = new LongProperty("jppf.nio.thread.ttl", 5000L, 1L, Long.MAX_VALUE);
+  public static final JPPFProperty<Long> NIO_THREAD_TTL = new LongProperty("jppf.nio.thread.ttl", 15_000L, 1L, Long.MAX_VALUE);
   /** Whether to display the animated splash screen at console startup, defaults to false. */
   public static final JPPFProperty<Boolean> UI_SPLASH = new BooleanProperty("jppf.ui.splash", true);
   /** Interval between images in milliseconds. */

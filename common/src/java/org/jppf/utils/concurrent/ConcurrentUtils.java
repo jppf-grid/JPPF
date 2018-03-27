@@ -309,7 +309,6 @@ public final class ConcurrentUtils {
     final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
     executor.setKeepAliveTime(15000L, TimeUnit.MILLISECONDS);
     executor.allowCoreThreadTimeOut(true);
-    //executor.prestartAllCoreThreads();
     return executor;
   }
 

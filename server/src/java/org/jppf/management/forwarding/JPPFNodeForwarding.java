@@ -84,6 +84,10 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   private final NodeSelectionHelper selectionHelper;
   /**
+   * Number of executor threads.
+   */
+  private static final int core = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
+  /**
    * Use to send management/monitoring requests in parallel with regards to the nodes.
    */
   private final ExecutorService executor;
@@ -95,14 +99,8 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     selectionHelper = new NodeSelectionHelper();
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
-    @SuppressWarnings("unused")
-    final int core = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
+    //@SuppressWarnings("unused")
     executor = ConcurrentUtils.newFixedExecutor(core, "NodeForwarding");
-    //executor = ConcurrentUtils.newBoundedQueueExecutor(core, 2500, 15000L, "NodeForwarding");
-    //executor = ConcurrentUtils.newDirectHandoffExecutor(core, 15000L, "NodeForwarding");
-    //executor = ConcurrentUtils.newJPPFFixedThreadPool(50, "NodeForwarding");
-    //executor = ConcurrentUtils.newJPPFDirectHandoffExecutor(core, core, 15000L, "NodeForwarding");
-    //executor = NioHelper.getGlobalexecutor();
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }
 
@@ -332,8 +330,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
         if (debugEnabled) log.debug(String.format("about to forward with type=%d, mbean=%s, member=%s, params=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         executor.execute(task);
       }
-      callback.await();
-      return callback.resultMap;
+      return callback.await();
     } catch (final Exception e) {
       if (debugEnabled) {
         log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
@@ -365,7 +362,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
      * @param expectedCount the expected total number of results.
      */
     ForwardCallback(final int expectedCount) {
-      this.resultMap = new HashMap<>(expectedCount);
+      this.resultMap = new ConcurrentHashMap<>(expectedCount, 0.75f, core);
       this.expectedCount = expectedCount;
     }
 
@@ -375,67 +372,22 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
      * @param result the result of exception returned by the JMX call.
      */
     void gotResult(final String uuid, final Object result) {
+      resultMap.put(uuid, result);
       synchronized(this) {
-        resultMap.put(uuid, result);
         if (++count == expectedCount) notify();
       }
     }
 
     /**
      * Wait until the number of results reaches the expected count.
+     * @return the results map;
      * @throws Exception if any error occurs.
      */
-    void await() throws Exception {
+    Map<String, Object> await() throws Exception {
       synchronized(this) {
         while (count < expectedCount) wait();
       }
-    }
-  }
-
-  /**
-   * Forward the specified operation to the specified nodes.
-   * @param type the type of operation to forward.
-   * @param nodes the nodes to forward to.
-   * @param mbeanName the name of the node MBean to which the request is sent.
-   * @param memberName the name of the method to invoke, or of the attribute to get or set.
-   * @param params additional params to send with the request.
-   * @return a mapping of node uuids to the result of invoking the MBean operation on the corresponding node. Each result may be an exception.
-   * Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
-   * @throws Exception if the invocation failed.
-   */
-  Map<String, Object> forward2(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
-    try {
-      final int size = nodes.size();
-      if (size <= 0) return Collections.<String, Object>emptyMap();
-      final Map<String, Object> map = new HashMap<>(size);
-      final CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
-      for (AbstractNodeContext node: nodes) {
-        AbstractForwardingTask2 task = null;
-        switch(type) {
-          case INVOKE_METHOD:
-            task = new InvokeMethodTask2(node, mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
-            break;
-          case GET_ATTRIBUTE:
-            task = new GetAttributeTask2(node, mbeanName, memberName);
-            break;
-          case SET_ATTRIBUTE:
-            task = new SetAttributeTask2(node, mbeanName, memberName, params[0]);
-            break;
-        }
-        completionService.submit(task);
-      }
-      for (int i=0; i<size; i++) {
-        final Future<Pair<String, Object>> f = completionService.take();
-        final Pair<String, Object> result = f.get();
-        if (result != null) map.put(result.first(), result.second());
-      }
-      return map;
-    } catch (final Exception e) {
-      if (debugEnabled) {
-        log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
-          type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e)));
-      }
-      throw e;
+      return resultMap;
     }
   }
 }
