@@ -124,7 +124,7 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
         }
       }
     };
-    ConcurrentUtils.awaitInterruptibleCondition(cond, 5000L, true);
+    ConcurrentUtils.awaitInterruptibleCondition(cond, 5000L, 500L, true);
     print(false, false, "before job check, number of results = %d", queryNbResults(job.getUuid()));
     for (int i=1; i<=2; i++) {
       try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + i)) {
