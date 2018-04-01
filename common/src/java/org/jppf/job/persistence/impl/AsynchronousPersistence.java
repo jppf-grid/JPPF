@@ -207,7 +207,7 @@ public class AsynchronousPersistence implements JobPersistence {
     } catch (final ClassCastException e) {
       log.error(e.getMessage(), e);
       throw new JobPersistenceException(e);
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (final InterruptedException | ExecutionException e) {
       throw new JobPersistenceException(e);
     }
   }

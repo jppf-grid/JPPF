@@ -54,7 +54,7 @@ public class EnvironmentProviderHandler<T> {
       try {
         if (it.hasNext()) list.add(it.next());
         else end = true;
-      } catch(@SuppressWarnings("unused") Exception|ServiceConfigurationError e) {
+      } catch(@SuppressWarnings("unused") final Exception|ServiceConfigurationError e) {
         end = true;
       }
     }

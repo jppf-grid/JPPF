@@ -65,7 +65,7 @@ public class ServiceFinder {
         list.add(clazz);
         if (single) break;
         alreadyLoaded.add(s);
-      } catch(Exception|NoClassDefFoundError e) {
+      } catch(final Exception|NoClassDefFoundError e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }
@@ -88,7 +88,7 @@ public class ServiceFinder {
       try {
         final T t = c.newInstance();
         list.add(t);
-      } catch(Exception|NoClassDefFoundError e) {
+      } catch(final Exception|NoClassDefFoundError e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }

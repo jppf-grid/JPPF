@@ -141,7 +141,7 @@ public class OffloadableNotification extends Notification {
     if (userDataOffloaded) {
       try {
         dataLocation = IOHelper.readData(new StreamInputSource(in));
-      } catch (IOException|ClassNotFoundException e) {
+      } catch (final IOException|ClassNotFoundException e) {
         throw e;
       } catch (final Exception e) {
         throw new IOException(e);

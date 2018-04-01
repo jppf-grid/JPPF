@@ -116,7 +116,7 @@ public class SocketClient extends AbstractSocketWrapper {
       final String name = "org.jppf.utils.ObjectSerializerImpl";
       try {
         serializer = (ObjectSerializer) Class.forName(name).newInstance();
-      } catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
+      } catch (final InstantiationException|IllegalAccessException|ClassNotFoundException e) {
         log.error(e.getMessage(), e);
       }
     }

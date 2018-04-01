@@ -124,7 +124,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
         if (!(result instanceof Boolean)) throw new JPPFException("result of scripted policy should be a boolean but instead is " + result);
         return (Boolean) result;
       }
-    } catch (Exception|NoClassDefFoundError e) {
+    } catch (final Exception|NoClassDefFoundError e) {
       evaluationError = true;
       log.error("exception occurred evaluating scripted policy: {}\npolicy is\n{}", ExceptionUtils.getStackTrace(e), this);
     } finally {

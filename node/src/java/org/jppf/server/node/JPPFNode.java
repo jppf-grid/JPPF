@@ -134,7 +134,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
           initialized = true;
         }
         perform();
-      } catch(SecurityException|SSLConfigurationException e) {
+      } catch(final SecurityException|SSLConfigurationException e) {
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) reset(true);
         throw new JPPFError(e);
@@ -174,7 +174,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
             initDataChannel();
           }
           processNextJob();
-        } catch (IOException|JPPFSuspendedNodeException e) {
+        } catch (final IOException|JPPFSuspendedNodeException e) {
           if (!isSuspended()) throw e;
           shouldInitDataChannel = true;
         } finally {

@@ -110,7 +110,7 @@ public class JPPFAdminConsole {
     try {
       Class.forName("org.jfree.chart.JFreeChart", true, ReflectionHelper.getCurrentClassLoader());
       return true;
-    } catch(Exception|LinkageError e) {
+    } catch(final Exception|LinkageError e) {
       log.info("The charts library coud not be found in the classpath, starting the console without charts [error message: {}]", ExceptionUtils.getMessage(e));
       return false;
     }

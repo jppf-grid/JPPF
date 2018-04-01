@@ -173,7 +173,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
     } catch (final ClassCastException e) {
       log.error(e.getMessage(), e);
       throw new LoadBalancerPersistenceException(e);
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (final InterruptedException | ExecutionException e) {
       throw new LoadBalancerPersistenceException(e);
     }
   }

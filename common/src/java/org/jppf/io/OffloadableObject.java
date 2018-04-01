@@ -104,7 +104,7 @@ public class OffloadableObject<T> implements JPPFSerializable<T> {
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     try {
       location = IOHelper.readData(new StreamInputSource(in));
-    } catch (IOException | ClassNotFoundException e) {
+    } catch (final IOException | ClassNotFoundException e) {
       throw e;
     } catch (final Exception e) {
       throw new IOException(e);

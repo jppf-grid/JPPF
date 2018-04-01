@@ -42,7 +42,7 @@ public class CustomWrapping implements ObjectWrapping {
   public Object unwrap(final Object wrapped, final ClassLoader cl) throws IOException, ClassNotFoundException {
     try {
       return IOHelper.unwrappedData(new MultipleBuffersLocation((byte[]) wrapped), serializer);
-    } catch (IOException|ClassNotFoundException e) {
+    } catch (final IOException|ClassNotFoundException e) {
       throw e;
     } catch (final Exception e) {
       throw new IOException(e);

@@ -240,7 +240,7 @@ class JMXMessageReader {
     public void run() {
       try {
         JMXMessageReader.handleMessage(context, message);
-      } catch(Exception|Error e) {
+      } catch(final Exception|Error e) {
         try {
           if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
           else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));

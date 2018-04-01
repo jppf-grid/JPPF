@@ -187,7 +187,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
           final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
           slave.addProcessLauncherListener(this);
           new Thread(slave, slaveDirPath).start();
-        } catch(Exception|Error e) {
+        } catch(final Exception|Error e) {
           log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
           if (e instanceof Error) throw (Error) e;
         }

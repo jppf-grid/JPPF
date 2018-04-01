@@ -80,12 +80,12 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
           transition = state.performTransition(channel);
           if (transition != null) transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
           else if (traceEnabled) log.trace("no further transition from {} for {}", s, channel);
-        } catch (Exception|Error  e) {
+        } catch (final Exception|Error  e) {
           ctx.setEnabled(false);
           throw e;
         }
       }
-    } catch(Exception|Error e) {
+    } catch(final Exception|Error e) {
       try {
         if (debugEnabled) log.debug("error on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
         else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));

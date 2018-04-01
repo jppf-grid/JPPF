@@ -118,7 +118,7 @@ public class BaseScriptEvaluator implements Serializable {
         final Object result = runner.evaluate(scriptId, script, variables);
         return result;
       }
-    } catch (Exception|NoClassDefFoundError e) {
+    } catch (final Exception|NoClassDefFoundError e) {
       if (!evaluationError) {
         evaluationError = true;
         log.error(String.format("exception occurred evaluting script: %s%nscript language: %s, script content:%n%s", ExceptionUtils.getStackTrace(e), language, script));

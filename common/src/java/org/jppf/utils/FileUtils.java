@@ -451,7 +451,7 @@ public final class FileUtils {
   public static String getDecodedURLFromFilePath(final File path) {
     try {
       return URLDecoder.decode(path.toURI().toURL().toString(), "UTF-8");
-    } catch (@SuppressWarnings("unused") MalformedURLException|UnsupportedEncodingException ignore) {
+    } catch (@SuppressWarnings("unused") final MalformedURLException|UnsupportedEncodingException ignore) {
       return null;
     }
   }

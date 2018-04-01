@@ -92,11 +92,11 @@ public class JMXTransitionTask implements Runnable {
           if (selecting) server.updateInterestOps(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
           else JMXNioServer.updateInterestOpsNoWakeup(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
         }
-      } catch (Exception|Error  e) {
+      } catch (final Exception|Error  e) {
         context.setEnabled(false);
         throw e;
       }
-    } catch(Exception|Error e) {
+    } catch(final Exception|Error e) {
       try {
         if (debugEnabled) log.debug("error on channel {} :\n{}", context, ExceptionUtils.getStackTrace(e));
         else log.warn("error on channel {} : {}", context, ExceptionUtils.getMessage(e));
