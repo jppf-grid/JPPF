@@ -41,11 +41,11 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ChannelWrapperLocal.class);
+  private final static Logger log = LoggerFactory.getLogger(ChannelWrapperLocal.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private final static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The task execution manager for this wrapper.
    */
@@ -57,7 +57,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * Unique ID for the connection.
    */
-  private final String connectionUuid = UUID.randomUUID().toString();
+  private final String connectionUuid = JPPFUuid.normalUUID();
   /**
    * List of status listeners for this connection.
    */
@@ -78,7 +78,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", "local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);
-    final String s= "client-local-executor";
+    final String s = "client-local-executor";
     channelID = new Pair<>(s, CryptoUtils.computeHash(s, client.getBundlerFactory().getHashAlgorithm()));
   }
 
@@ -102,9 +102,9 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     synchronized(getMonitor()) {
       final ExecutorStatus oldExecutionStatus = getExecutionStatus();
       final JPPFClientConnectionStatus oldValue = this.status;
-      if (oldValue.isTerminatedStatus()) return;
       if (debugEnabled) log.debug(String.format("status changing from %s to %s for %s", oldValue, status, this));
       this.status = status;
+      if (oldValue.isTerminatedStatus()) return;
       fireStatusChanged(oldValue, this.status);
       final ExecutorStatus newExecutionStatus = getExecutionStatus();
       fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
@@ -150,12 +150,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName());
-    sb.append("[status=").append(status);
-    sb.append(", connectionUuid='").append(connectionUuid).append('\'');
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+    .append("status=").append(status)
+    .append(", connectionUuid=").append(connectionUuid)
+    .append(']').toString();
   }
 
   /**
@@ -202,7 +200,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 
   @Override
   public void close() {
-    if (debugEnabled) log.debug("closing " + this);
+    if (debugEnabled) log.debug("closing {}", this);
     super.close();
     try {
       if (!status.isTerminatedStatus()) setStatus(JPPFClientConnectionStatus.CLOSED);
@@ -215,7 +213,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public boolean cancel(final ClientTaskBundle bundle) {
     if (bundle.isCancelled()) return false;
-    if (debugEnabled) log.debug("requesting cancel of jobId=" + bundle.getUuid());
+    if (debugEnabled) log.debug("requesting cancel of jobId={}", bundle.getUuid());
     bundle.cancel();
     try {
       executionManager.cancelAllTasks(true, false);

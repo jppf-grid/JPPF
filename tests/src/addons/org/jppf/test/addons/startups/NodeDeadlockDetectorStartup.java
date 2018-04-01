@@ -19,6 +19,7 @@
 package org.jppf.test.addons.startups;
 
 import org.jppf.startup.JPPFNodeStartupSPI;
+import org.jppf.utils.concurrent.DeadlockDetector;
 
 /**
  * 

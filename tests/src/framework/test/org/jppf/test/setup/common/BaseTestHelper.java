@@ -19,7 +19,7 @@
 package test.org.jppf.test.setup.common;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.jppf.JPPFError;
@@ -234,15 +234,7 @@ public class BaseTestHelper {
     if (!toServers && !toNodes && !toClient) return;
     final List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
-    final String fmt = String.format("%s %s %s", STARS, format, STARS);
-    final String msg = String.format(fmt, params);
-    final StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
-    for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
-    String[] messages = { msg };
-    if (decorate) {
-      final String s = sb.append(' ').append(STARS).toString();
-      messages = new String[] { s, msg, s };
-    }
+    final String[] messages = createMessages(decorate, format, params);
     if (toStdout) {
       for (final String s: messages) System.out.printf("[  client] [%s] %s%n", BaseTest.getFormattedTimestamp(), s);
     }
@@ -254,23 +246,98 @@ public class BaseTestHelper {
       final List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
       if (!jmxConnections.isEmpty()) {
         final JMXDriverConnectionWrapper jmx = jmxConnections.get(0);
-        if (toServers) {
-          try {
-            jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
-          } catch (final Exception e) {
-            System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n", BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
-          }
-        }
-        if (toNodes) {
-          try {
-            final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-            if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
-          } catch (final Exception e) {
-            System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
-              BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), jmx, ExceptionUtils.getStackTrace(e));
-          }
-        }
+        printToRemote(jmx, toServers, toNodes, messages);
       }
     }
+  }
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param drivers a list of jmx connections to one or more drivers.
+   * @param toStdout whether to print to {@code System.out}.
+   * @param toClient whether to log to the client log.
+   * @param toServers whether to log to the discovered servers.
+   * @param toNodes whether to log to the nodes attached to the discovered servers.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToAll(final List<JMXDriverConnectionWrapper> drivers, final boolean toStdout, final boolean toClient, final boolean toServers, final boolean toNodes,
+    final boolean decorate, final String format, final Object...params) {
+    if (drivers == null) return;
+    if (!toServers && !toNodes && !toClient) return;
+    final String[] messages = createMessages(decorate, format, params);
+    if (toStdout) {
+      for (final String s: messages) System.out.printf("[  client] [%s] %s%n", BaseTest.getFormattedTimestamp(), s);
+    }
+    if (toClient) {
+      for (final String s: messages) log.info(s);
+    }
+    if (drivers.isEmpty() || (!toServers && !toNodes)) return;
+    for (final JMXDriverConnectionWrapper driver: drivers) printToRemote(driver, toServers, toNodes, messages);
+  }
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param driver a jmx connection to the driver.
+   * @param toStdout whether to print to {@code System.out}.
+   * @param toClient whether to log to the client log.
+   * @param toServers whether to log to the discovered servers.
+   * @param toNodes whether to log to the nodes attached to the discovered servers.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToAll(final JMXDriverConnectionWrapper driver, final boolean toStdout, final boolean toClient, final boolean toServers, final boolean toNodes,
+    final boolean decorate, final String format, final Object...params) {
+    printToAll(Arrays.asList(driver), toStdout, toClient, toServers, toNodes, decorate, format, params);
+  }
+
+  /**
+   * Print a formatted message to the server log via the server debug mbean on all connected servers.
+   * @param driver a jmx connection to the driver.
+   * @param toServer whether to log to the server.
+   * @param toNodes whether to log to the nodes attached to the server.
+   * @param messages the messages to rint out.
+   */
+  public static void printToRemote(final JMXDriverConnectionWrapper driver, final boolean toServer, final boolean toNodes, final String[] messages) {
+    if (!toServer && !toNodes) return;
+    if ((driver == null) || !driver.isConnected()) return;
+    if (toServer) {
+      try {
+        driver.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
+      } catch (final Exception e) {
+        System.err.printf("[%s][%s] error invoking remote logging on %s:%n%s%n", BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    if (toNodes) {
+      try {
+        final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
+        if (forwarder != null) forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, LOG_METHOD_SIGNATURE);
+      } catch (final Exception e) {
+        System.err.printf("[%s][%s] error invoking remote logging on the nodes of %s:%n%s%n",
+          BaseTest.getFormattedTimestamp(), ReflectionUtils.getCurrentClassAndMethod(), driver, ExceptionUtils.getStackTrace(e));
+      }
+    }
+  }
+
+  /**
+   * Create one or more strings to print out.
+   * @param decorate whether to decorate the message in a very visible fashion.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   * @return an array of strings to print out.
+   */
+  private static String[] createMessages(final boolean decorate, final String format, final Object...params) {
+    final String fmt = String.format("%s %s %s", STARS, format, STARS);
+    final String msg = String.format(fmt, params);
+    final StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
+    for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
+    String[] messages = { msg };
+    if (decorate) {
+      final String s = sb.append(' ').append(STARS).toString();
+      messages = new String[] { s, msg, s };
+    }
+    return messages;
   }
 }

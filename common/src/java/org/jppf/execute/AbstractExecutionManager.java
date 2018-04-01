@@ -222,6 +222,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
 
   @Override
   public void shutdown() {
+    if (debugEnabled) log.debug("closing {}", this);
     getExecutor().shutdownNow();
     timeoutHandler.clear(true);
     taskNotificationDispatcher.close();

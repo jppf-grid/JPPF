@@ -19,8 +19,13 @@
 package test.org.jppf.test.setup;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.*;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.slf4j.*;
+
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 
 /**
@@ -32,6 +37,18 @@ public class Setup1D1N extends BaseTest {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(Setup1D1N.class);
+  /**
+   * 
+   */
+  private static JMXDriverConnectionWrapper jmx;
+  /** */
+  @Rule
+  public TestWatcher setup1D1NInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      if ((jmx != null) && jmx.isConnected()) BaseTestHelper.printToAll(jmx, false, false, true, true, true, "starting method %s()", description.getMethodName());
+    }
+  };
 
   /**
    * Launches a driver and node.
@@ -43,10 +60,10 @@ public class Setup1D1N extends BaseTest {
     BaseSetup.resetClientConfig();
     BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
     // make sure the driver is initialized
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
-      log.info("initializing {}", jmx);
-      Assert.assertTrue(jmx.connectAndWait(5000L));
-    }
+    jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
+    log.info("initializing {}", jmx);
+    Assert.assertTrue(jmx.connectAndWait(5000L));
+    BaseTestHelper.printToAll(jmx, false, false, true, true, true, "starting test of class %s", ReflectionUtils.getCurrentClassName());
     log.info("checked JMX connection");
   }
 
@@ -56,8 +73,14 @@ public class Setup1D1N extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
-      if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
+    try {
+      if (jmx.isConnected()) {
+        BaseSetup.generateDriverThreadDump(jmx);
+        BaseTestHelper.printToAll(jmx, false, false, true, true, true, "ending test of class %s", ReflectionUtils.getCurrentClassName());
+        jmx.close();
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
     try {
       BaseSetup.cleanup();

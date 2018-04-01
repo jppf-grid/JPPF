@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package org.jppf.test.addons.startups;
+package org.jppf.utils.concurrent;
 
+import java.io.*;
+import java.lang.management.*;
 import java.util.*;
 
 import org.jppf.management.*;
@@ -53,10 +55,19 @@ public class DeadlockDetector {
     }
     System.out.println("setting up " + type + " deadlock detector");
     try {
-      @SuppressWarnings("resource")
-      final JMXConnectionWrapper jmx = "driver".equals(type) ? new JMXDriverConnectionWrapper() : new JMXNodeConnectionWrapper();
-      jmx.connect();
-      final DiagnosticsMBean diag = jmx.getDiagnosticsProxy();
+      DiagnosticsMBean dg = null;
+      final String suffix;
+      if ("client".equals(type)) {
+        suffix = type;
+        dg = new Diagnostics("client");
+      } else {
+        @SuppressWarnings("resource")
+        final JMXConnectionWrapper jmx = "driver".equals(type) ? new JMXDriverConnectionWrapper() : new JMXNodeConnectionWrapper();
+        jmx.connect();
+        dg = jmx.getDiagnosticsProxy();
+        suffix = jmx.toString();
+      }
+      final DiagnosticsMBean diag = dg;
       final TimerTask task = new TimerTask() {
         @Override
         public void run() {
@@ -64,7 +75,7 @@ public class DeadlockDetector {
             if (deadlockDetected) cancel();
             else if (diag.hasDeadlock()) {
               deadlockDetected = true;
-              final String title =  "thread dump for " + type + " " + jmx;
+              final String title =  "client".equals(type) ? "thread dump for local JVM" : "thread dump for " + type + " " + suffix;
               final String text = TextThreadDumpWriter.printToString(diag.threadDump(), title);
               log.error("deadlock detected !!!\n{}", text);
               System.err.println("deadlock detected !!!\n" + text);
@@ -79,5 +90,37 @@ public class DeadlockDetector {
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  /**
+   * Get information on the thread that owns the monitor of the specified object.
+   * @param object the object for which to lookup an owning thread.
+   * @return a {@link ThreadInfo} object, or {@code null} if no thread own the object's monitor.
+   */
+  public static ThreadInfo getMonitorOwner(final Object object) {
+    final ThreadInfo[] allThreads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, false);
+    final int idHash = System.identityHashCode(object);
+    for (final ThreadInfo ti: allThreads) {
+      final MonitorInfo[] monitors = ti.getLockedMonitors();
+      for (final MonitorInfo monitor: monitors) {
+        if (monitor.getIdentityHashCode() == idHash) return ti;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 
+   * @param info .
+   * @return .
+   */
+  public static String printThreadInfo(final ThreadInfo info) {
+    final StringWriter sw = new StringWriter();
+    try (ThreadDumpWriter tw = new TextThreadDumpWriter(sw, "PrintThreadInfo")) { 
+      tw.printThread(new ThreadInformation(info));
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return sw.toString();
   }
 }

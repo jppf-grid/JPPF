@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -51,8 +52,8 @@ public class ConnectionInitializer implements Runnable {
   public void run() {
     if (debugEnabled) log.debug("initializing driver connection '" + connection + '\'');
     try {
-    //connection.setStatus(JPPFClientConnectionStatus.NEW);
-    connection.init();
+      ((JobManagerClient) connection.getClient().getJobManager()).addConnection(connection);
+      connection.init();
     } finally {
       connection.initializing.set(false);
     }

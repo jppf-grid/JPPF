@@ -130,7 +130,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
       });
       thread.setDaemon(true);
       thread.start();
-      //wait(100L);
+      wait(100L);
     }
   }
 

@@ -151,7 +151,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     final ExecutorService executor = channel.getClient().getExecutor();
     executor.execute(new RemoteRunnable(bundle, channel));
-    if (debugEnabled) log.debug("end submitting {} to {}", bundle, this);
+    if (debugEnabled) log.debug("submitted {} to {}", bundle, this);
     return null;
   }
 
@@ -188,7 +188,14 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
   @Override
   public String toString() {
-    return new StringBuilder(getClass().getSimpleName()).append("[channel=").append(channel).append(']').toString();
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("[channel=");
+    try {
+      sb.append(channel);
+    } catch (final Exception e) {
+      sb.append(ExceptionUtils.getMessage(e));
+    }
+    sb.append(']');
+    return sb.toString();
   }
 
   /**

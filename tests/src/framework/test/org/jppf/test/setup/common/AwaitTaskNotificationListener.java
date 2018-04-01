@@ -48,7 +48,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
    */
   private boolean receivedMessage;
   /**
-   *
+   * A jmx connection to the driver.
    */
   private final JMXDriverConnectionWrapper jmx;
   /**
@@ -63,8 +63,18 @@ public class AwaitTaskNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public AwaitTaskNotificationListener(final JPPFClient client, final String expectedMessage) throws Exception {
+    this(BaseSetup.getJMXConnection(client), expectedMessage);
+  }
+
+  /**
+   * Intiialize with an expected message.
+   * @param jmx a jmx connection to the driver.
+   * @param expectedMessage a message we expect to receive as a notification.
+   * @throws Exception if any error occurs.
+   */
+  public AwaitTaskNotificationListener(final JMXDriverConnectionWrapper jmx, final String expectedMessage) throws Exception {
     this.expectedMessage = expectedMessage;
-    this.jmx = BaseSetup.getJMXConnection(client);
+    this.jmx = jmx;
     listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, this, null, null);
   }
 
@@ -73,7 +83,7 @@ public class AwaitTaskNotificationListener implements NotificationListener {
     final JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
     final TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
     final Object data = actualNotif.getUserData();
-    if (expectedMessage.equals(data)) {
+    if ((expectedMessage == null) || expectedMessage.equals(data)) {
       if (debugEnabled) log.debug("received expected task notification {}", expectedMessage);
       synchronized(this) {
         receivedMessage = true;

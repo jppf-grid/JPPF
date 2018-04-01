@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 
-import org.jppf.test.addons.startups.DeadlockDetector;
+import org.jppf.utils.concurrent.DeadlockDetector;
 
 /**
  * Implementation of {@link NodeTestMBean}.

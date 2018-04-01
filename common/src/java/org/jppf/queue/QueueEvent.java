@@ -27,8 +27,7 @@ import java.util.EventObject;
  * @param <V> the type of resulting bundles the jobs are split into.
  * @author Laurent Cohen
  */
-public class QueueEvent<T, U, V> extends EventObject
-{
+public class QueueEvent<T, U, V> extends EventObject {
   /**
    * Explicit serialVersionUID.
    */
@@ -36,7 +35,7 @@ public class QueueEvent<T, U, V> extends EventObject
   /**
    * Represents part or the totality of a job that was submitted.
    */
-  private transient T bundleWrapper = null;
+  private transient T job = null;
   /**
    * Determines if the event is a requeued bundle, following a node failure for instance.
    */
@@ -44,14 +43,13 @@ public class QueueEvent<T, U, V> extends EventObject
 
   /**
    * Initialize this event with the specified queue and bundle.
-   * @param queue         the queue this event originates from.
-   * @param bundleWrapper represents part or the totality of a job that was submitted.
-   * @param requeue       determines if the event is a requeued bundle, following a node failure for instance.
+   * @param queue the queue this event originates from.
+   * @param job represents part or the totality of a job that was submitted.
+   * @param requeue determines if the event is a requeued bundle, following a node failure for instance.
    */
-  public QueueEvent(final JPPFQueue<T, U, V> queue, final T bundleWrapper, final boolean requeue)
-  {
+  public QueueEvent(final JPPFQueue<T, U, V> queue, final T job, final boolean requeue) {
     super(queue);
-    this.bundleWrapper = bundleWrapper;
+    this.job = job;
     this.requeued = requeue;
   }
 
@@ -60,8 +58,7 @@ public class QueueEvent<T, U, V> extends EventObject
    * @return an instance of <code>JPPFQueue</code>.
    */
   @SuppressWarnings("unchecked")
-  public JPPFQueue<T, U, V> getQueue()
-  {
+  public JPPFQueue<T, U, V> getQueue() {
     return (AbstractJPPFQueue<T, U, V>) getSource();
   }
 
@@ -69,17 +66,23 @@ public class QueueEvent<T, U, V> extends EventObject
    * Get the task bundle that is the cause of the event.
    * @return an instance of <code>ClientJob</code>.
    */
-  public T getBundleWrapper()
-  {
-    return bundleWrapper;
+  public T getJob() {
+    return job;
   }
 
   /**
    * Determine if this event is a requeued bundle, following a node failure for instance.
    * @return true if a bundle was requeued, false otherwise.
    */
-  public boolean isRequeued()
-  {
+  public boolean isRequeued() {
     return requeued;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("job=").append(job)
+      .append(", requeued=").append(requeued)
+      .append(']').toString();
   }
 }

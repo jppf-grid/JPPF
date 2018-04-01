@@ -329,6 +329,16 @@ public class ReflectionUtils {
   }
 
   /**
+   * Get the name of the current class in the call stack.
+   * @return the name of the invoking method as a string.
+   */
+  public static String getCurrentClassName() {
+    final StackTraceElement[] elts = new Exception().getStackTrace();
+    if (elts.length < 2) return "class and method name not found";
+    return elts[1].getClassName();
+  }
+
+  /**
    * Returns a string in format <i>simple_class_name</i>@<i>identity_hashcode</i> from the specified object.
    * @param o the object to dump.
    * @return a string representing the specified object, or "null" if the object is null.

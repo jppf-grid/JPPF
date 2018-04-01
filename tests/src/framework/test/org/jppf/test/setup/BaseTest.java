@@ -27,6 +27,7 @@ import org.jppf.jmx.JMXHelper;
 import org.jppf.location.FileLocation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.DeadlockDetector;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
@@ -49,6 +50,7 @@ public class BaseTest {
   static {
     System.out.println("Initializing 'TEST' logger");
     log = LoggerFactory.getLogger("TEST");
+    DeadlockDetector.setup("client");
   }
   /** */
   protected static final String JMX_REMOTE_PROTOCOL = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);

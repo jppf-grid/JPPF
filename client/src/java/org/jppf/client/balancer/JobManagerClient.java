@@ -88,7 +88,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     public void statusChanged(final ClientConnectionStatusEvent event) {
       if (event.getSource() instanceof JPPFClientConnection) {
         updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
-      } else if (event.getSource() instanceof ChannelWrapper) {
+      } else if (event.getSource() instanceof ChannelWrapperLocal) {
         updateConnectionStatus((ChannelWrapper) event.getSource(), event.getOldStatus());
       }
     }
@@ -144,11 +144,6 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     this.queue.addQueueListener(client);
     client.addConnectionPoolListener(new ConnectionPoolListenerAdapter() {
       @Override
-      public void connectionAdded(final ConnectionPoolEvent event) {
-        addConnection(event.getConnection());
-      }
-
-      @Override
       public void connectionRemoved(final ConnectionPoolEvent event) {
         removeConnection(event.getConnection());
       }
@@ -191,7 +186,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param cnn the client connection to add.
    * @return wrapper for the added client connection.
    */
-  protected ChannelWrapper addConnection(final JPPFClientConnection cnn) {
+  public ChannelWrapper addConnection(final JPPFClientConnection cnn) {
     if (debugEnabled) log.debug("adding connection " + cnn);
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     ChannelWrapper wrapper = null;
@@ -321,6 +316,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param newStatus the connection status after the change.
    */
   private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
+    if (closed.get()) return;
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (debugEnabled) log.debug(String.format("updating status from %s to %s for %s", oldStatus, newStatus, wrapper));
@@ -347,9 +343,13 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       workingConnections.remove(wrapper.getConnectionUuid());
     }
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) {
+      if (debugEnabled) log.debug("processing active status for {}", wrapper);
       wrapper.initChannelID();
+      if (debugEnabled) log.debug("about to add idle channel {}", wrapper);
+      //taskQueueChecker.addIdleChannelAsync(wrapper);
       taskQueueChecker.addIdleChannel(wrapper);
     } else {
+      //taskQueueChecker.removeIdleChannelAsync(wrapper);
       taskQueueChecker.removeIdleChannel(wrapper);
       if (newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
@@ -363,10 +363,13 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   @Override
   public String submitJob(final JPPFJob job, final JobStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this jobmanager was closed");
-    final List<Task<?>> pendingTasks = new ArrayList<>();
+    if (debugEnabled) log.debug("submitting job {}", job);
     if (listener != null) job.addJobStatusListener(listener);
     final List<Task<?>> tasks = job.getJobTasks();
-    for (final Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
+    final List<Task<?>> pendingTasks = new ArrayList<>(tasks.size());
+    for (final Task<?> task: tasks) {
+      if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
+    }
     queue.addBundle(new ClientJob(job, pendingTasks));
     return job.getUuid();
   }

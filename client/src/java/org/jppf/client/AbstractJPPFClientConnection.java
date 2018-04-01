@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -96,10 +96,12 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
     final JPPFClientConnectionStatus oldStatus = getStatus();
+    if (debugEnabled) log.debug("connection '" + name + "' attempting to change status to " + status);
     if (status != oldStatus) {
       if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
       this.status.set(status);
-      fireStatusChanged(oldStatus);
+      //if (!isClosed())
+        fireStatusChanged(oldStatus);
     }
   }
 
@@ -122,24 +124,9 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
     for (final ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
-  /**
-   * Get a string representation of this client connection.
-   * @return a string representing this connection.
-   */
   @Override
   public String toString() {
-    return displayName + " : " + status;
-  }
-
-  /**
-   * Cancel the job with the specified id.
-   * @param jobId the id of the job to cancel.
-   * @throws Exception if any error occurs.
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
-   * @deprecated this method does not do anything and always returns {@code false}. Use {@link AbstractGenericClient#cancelJob(String)} instead.
-   */
-  public boolean cancelJob(final String jobId) throws Exception {
-    return false;
+    return displayName + " : " + status + " (" + SystemUtils.getSystemIdentityName(this) + ")";
   }
 
   @Override

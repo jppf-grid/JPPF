@@ -152,6 +152,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
+        if (debugEnabled) log.debug("received queue event {}", event);
         wakeUpSelectorIfNeeded();
         taskQueueChecker.wakeUp();
       }

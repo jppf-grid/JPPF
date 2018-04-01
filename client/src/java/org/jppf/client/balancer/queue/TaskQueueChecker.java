@@ -18,6 +18,7 @@
 
 package org.jppf.client.balancer.queue;
 
+import java.lang.management.ThreadInfo;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -33,7 +34,7 @@ import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
- * This class ensures that idle nodes get assigned pending tasks in the queue.
+ * This class ensures that idle nodes get assigned pending tasks from the job queue.
  */
 public class TaskQueueChecker extends ThreadSynchronization implements Runnable {
   /**
@@ -63,7 +64,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * The list of idle node channels.
    */
-  private final AbstractCollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new DescendingIntegerComparator());
+  private final CollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new DescendingIntegerComparator());
   /**
    * Holds information about the execution context.
    */
@@ -87,8 +88,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   private final Object priorityLock = new Object();
 
   /**
-   * Initialize this task queue checker with the specified node server.
-   * @param queue the reference queue to use.
+   * Initialize this task queue checker with the specified queue.
+   * @param queue the job queue to use.
    * @param bundlerFactory the load-balancer factory.
    */
   public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFBundlerFactory bundlerFactory) {
@@ -139,20 +140,86 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
-   */
-  public void addIdleChannel(final ChannelWrapper channel) {
+  public void addIdleChannelAsync(final ChannelWrapper channel) {
+    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
     if (channel == null) throw new IllegalArgumentException("channel is null");
-    if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
+    final ExecutorStatus status = channel.getExecutionStatus();
+    if (status != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active ("+ status + "): " + channel);
+    final CountDownLatch countDown = new CountDownLatch(1);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
-        if (traceEnabled) log.trace("Adding idle channel " + channel);
-        synchronized (idleChannels) {
-          idleChannels.putValue(channel.getPriority(), channel);
-        }
-        wakeUp();
+        addIdleChannel(channel);
+        countDown.countDown();
       }
     });
+    try {
+      countDown.await();
+    } catch (final InterruptedException e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+   */
+
+  /**
+   * Add a channel to the list of idle channels.
+   * @param channel the channel to add to the list.
+   */
+  public void addIdleChannel(final ChannelWrapper channel) {
+    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    final ExecutorStatus status = channel.getExecutionStatus();
+    if (status != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active ("+ status + "): " + channel);
+    if (traceEnabled) {
+      final String idleChannelsName = SystemUtils.getSystemIdentityName(idleChannels);
+      log.trace("Adding idle channel {} to {}", channel, idleChannelsName);
+      final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
+      if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
+    }
+    synchronized (idleChannels) {
+      if (traceEnabled) log.trace("Adding idle channel from synchronized block: " + channel);
+      idleChannels.putValue(channel.getPriority(), channel);
+    }
+    wakeUp();
+  }
+
+  /**
+   * Remove a channel from the list of idle channels.
+   * @param channel the channel to remove from the list.
+  public void removeIdleChannelAsync(final ChannelWrapper channel) {
+    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
+    final CountDownLatch countDown = new CountDownLatch(1);
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        removeIdleChannel(channel);
+        countDown.countDown();
+      }
+    });
+    try {
+      countDown.await();
+    } catch (final InterruptedException e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+   */
+
+  /**
+   * Remove a channel from the list of idle channels.
+   * @param channel the channel to remove from the list.
+   */
+  public void removeIdleChannel(final ChannelWrapper channel) {
+    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
+    if (traceEnabled) {
+      final String idleChannelsName = SystemUtils.getSystemIdentityName(idleChannels);
+      log.trace("Removing idle channel {} from {}", channel, idleChannelsName);
+      final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
+      if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
+    }
+    synchronized (idleChannels) {
+      if (traceEnabled) log.trace("Removing idle channel from synchronized block: " + channel);
+      idleChannels.removeValue(channel.getPriority(), channel);
+    }
   }
 
   /**
@@ -163,24 +230,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     synchronized (idleChannels) {
       return idleChannels.allValues();
     }
-  }
-
-  /**
-   * Remove a channel from the list of idle channels.
-   * @param channel the channel to remove from the list.
-   * @return a reference to the removed channel.
-   */
-  public ChannelWrapper removeIdleChannel(final ChannelWrapper channel) {
-    channelsExecutor.execute(new Runnable() {
-      @Override
-      public void run() {
-        if (traceEnabled) log.trace("Removing idle channel " + channel);
-        synchronized (idleChannels) {
-          idleChannels.removeValue(channel.getPriority(), channel);
-        }
-      }
-    });
-    return channel;
   }
 
   /**
@@ -201,6 +250,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     while (!isStopped()) {
       if (!dispatch()) goToSleep(10L, 10000);
     }
+    if (channelsExecutor != null) channelsExecutor.shutdownNow();
+    clearChannels();
   }
 
   /**

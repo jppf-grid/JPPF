@@ -96,7 +96,7 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
             final JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) owner;
             c.setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-            c.submitInitialization();;
+            c.submitInitialization();
             break;
           }
         }

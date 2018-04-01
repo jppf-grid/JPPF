@@ -188,7 +188,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @exclude
    */
   public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel<ClientTaskBundle> channel, final List<Task<?>> tasks) {
-    if (log.isDebugEnabled()) log.debug(String.format("firing %s event with %d tasks for %s", type, (tasks == null ? 0 : tasks.size()), this));
+    if (log.isDebugEnabled()) log.debug(String.format("firing %s event with %d tasks for %s, connection = %s", type, (tasks == null ? 0 : tasks.size()), this, channel));
     final JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);

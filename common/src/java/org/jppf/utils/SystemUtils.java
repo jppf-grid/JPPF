@@ -501,4 +501,13 @@ public final class SystemUtils {
       return false;
     }
   }
+
+  /**
+   * Get a name for an object in the form simple_class_name@hex_identity_hashcode.
+   * @param o the object for which to get a name.
+   * @return the object's identity name.
+   */
+  public static String getSystemIdentityName(final Object o) {
+    return o.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(o));
+  }
 }

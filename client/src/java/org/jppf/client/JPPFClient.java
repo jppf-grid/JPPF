@@ -338,6 +338,7 @@ public class JPPFClient extends AbstractGenericClient {
 
   @Override
   public void close() {
+    log.info("closing {}", this);
     Debug.unregister(this);
     super.close();
   }

@@ -371,36 +371,40 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void close(final boolean reset) {
-    log.info("closing JPPF client with uuid={}, PID={}", getUuid(), SystemUtils.getPID());
-    if (!closed.compareAndSet(false, true)) return;
-    if (debugEnabled) log.debug("closing discovery handler");
-    discoveryListener.close();
-    discoveryHandler.stop();
-    if (debugEnabled) log.debug("closing broadcast receiver");
-    if (receiverThread != null) {
-      receiverThread.close();
-      receiverThread = null;
-    }
-    if (debugEnabled) log.debug("unregistering startup classes");
-    HookFactory.unregister(JPPFClientStartupSPI.class);
-    if (jobManager != null) {
-      if (reset) {
-        if (debugEnabled) log.debug("resetting job manager");
-        jobManager.reset();
-      } else {
-        if (debugEnabled) log.debug("closing job manager");
-        jobManager.close();
-        jobManager = null;
+    try {
+      log.info("closing JPPF client with uuid={}, PID={}", getUuid(), SystemUtils.getPID());
+      if (!closed.compareAndSet(false, true)) return;
+      if (debugEnabled) log.debug("closing discovery handler");
+      discoveryListener.close();
+      discoveryHandler.stop();
+      if (debugEnabled) log.debug("closing broadcast receiver");
+      if (receiverThread != null) {
+        receiverThread.close();
+        receiverThread = null;
       }
+      if (debugEnabled) log.debug("unregistering startup classes");
+      HookFactory.unregister(JPPFClientStartupSPI.class);
+      if (jobManager != null) {
+        if (reset) {
+          if (debugEnabled) log.debug("resetting job manager");
+          jobManager.reset();
+        } else {
+          if (debugEnabled) log.debug("closing job manager");
+          jobManager.close();
+          jobManager = null;
+        }
+      }
+      if (debugEnabled) log.debug("closing executor");
+      if (executor != null) {
+        executor.shutdownNow();
+        executor = null;
+      }
+      if (debugEnabled) log.debug("clearing registered class loaders");
+      classLoaderRegistrationHandler.close();
+      super.close();
+    } catch(final Throwable t) {
+      log.error(t.getMessage(), t);
     }
-    if (debugEnabled) log.debug("closing executor");
-    if (executor != null) {
-      executor.shutdownNow();
-      executor = null;
-    }
-    if (debugEnabled) log.debug("clearing registered class loaders");
-    classLoaderRegistrationHandler.close();
-    super.close();
   }
 
   /**
@@ -536,7 +540,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void fireQueueEvent(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> qEvent, final boolean jobAdded) {
-    final ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
+    final ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getJob().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
     if (jobAdded) {
       for (final ClientQueueListener listener: queueListeners) listener.jobAdded(event);
     } else {

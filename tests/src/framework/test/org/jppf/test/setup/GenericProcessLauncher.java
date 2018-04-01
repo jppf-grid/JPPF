@@ -349,6 +349,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     builder.command(command);
     if (dir != null) builder.directory(new File(dir));
     wrapper = new ProcessWrapper();
+    wrapper.setName(name + "-pw");
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {

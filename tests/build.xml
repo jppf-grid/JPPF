@@ -248,8 +248,8 @@
   
   <target name="test.pattern2">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}, pattern=${pattern}"/>
-    <delete dir="${report}" quiet="true"/>
     <mkdir dir="${report}"/>
+    <delete dir="${report}" quiet="true" includes="**/*.*"/>
     <junit printsummary="yes" fork="yes" dir="${basedir}" enableTestListenerEvents="true" showoutput="true" logfailedtests="true"
       failureproperty="tests.failed" errorproperty="tests.failed" >
       <classpath refid="tests.classpath"/>

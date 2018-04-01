@@ -36,6 +36,10 @@ public final class ProcessWrapper {
    * The list of registered listeners.
    */
   protected final List<ProcessWrapperEventListener> eventListeners = new CopyOnWriteArrayList<>();
+  /**
+   * A name given to this object.
+   */
+  private String name;
 
   /**
    * Initialize this process handler.
@@ -67,8 +71,13 @@ public final class ProcessWrapper {
   public void setProcess(final Process process) {
     if (this.process == null) {
       this.process = process;
-      new StreamHandler(process.getInputStream(), true).start();
-      new StreamHandler(process.getErrorStream(), false).start();
+      if (name == null) {
+        new StreamHandler(process.getInputStream(), true).start();
+        new StreamHandler(process.getErrorStream(), false).start();
+      } else {
+        new StreamHandler(name + "-out", process.getInputStream(), true).start();
+        new StreamHandler(name + "-err", process.getErrorStream(), false).start();
+      }
     }
   }
 
@@ -102,6 +111,14 @@ public final class ProcessWrapper {
   }
 
   /**
+   * Give a name to this object.
+   * @param name the object's name.
+   */
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  /**
    * Used to empty the standard or error output of a process, so as not to block the process.
    */
   private class StreamHandler extends Thread {
@@ -120,6 +137,18 @@ public final class ProcessWrapper {
      * @param output true if this event is for an output stream, false for an error stream.
      */
     public StreamHandler(final InputStream is, final boolean output) {
+      this.is = is;
+      this.output = output;
+    }
+
+    /**
+     * Initialize this handler with the specified stream and buffer receiving its content.
+     * @param name a name to give tot he thread.
+     * @param is the stream where output is taken from.
+     * @param output true if this event is for an output stream, false for an error stream.
+     */
+    public StreamHandler(final String name, final InputStream is, final boolean output) {
+      super(name);
       this.is = is;
       this.output = output;
     }

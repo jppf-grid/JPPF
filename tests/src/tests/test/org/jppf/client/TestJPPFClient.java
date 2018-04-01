@@ -22,6 +22,7 @@ import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,20 +33,58 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
-import org.jppf.job.JobEventType;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.Setup1D1N;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Unit tests for <code>JPPFClient</code>.
+ * Unit tests for {@code JPPFClient}.
  * @author Laurent Cohen
  */
 public class TestJPPFClient extends Setup1D1N {
+  /**
+   * Setup.
+   * @throws Exception if any error occurs.
+   */
+  @BeforeClass
+  public static void classSetup() throws Exception {
+    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+      @Override
+      public void uncaughtException(final Thread t, final Throwable e) {
+        print(false, false, "Uncaught exception in thread %s%n%s", t, ExceptionUtils.getStackTrace(e));
+      }
+    });
+  }
+
+  /**
+   * Cleanup after each test.
+   * @throws Exception if any error occurs.
+   */
+  @Before
+  public void testJPPFClientCleanup()  throws Exception {
+    final String[] suffixes = { "TaskQUeueChecker", "JPPF Client-", "driver1" };
+    final ThreadMXBean mbean = ManagementFactory.getThreadMXBean();
+    final long[] ids = mbean.getAllThreadIds();
+    final long start = System.currentTimeMillis();
+    boolean ok = false;
+    while (!ok && (System.currentTimeMillis() -start < 5_000L)) {
+      for (final long id: ids) {
+        final ThreadInfo info = mbean.getThreadInfo(id);
+        if ((info == null) || (info.getThreadState() == Thread.State.TERMINATED)) continue;
+        if (StringUtils.startsWithOneOf(info.getThreadName(), false, suffixes)) {
+          Thread.sleep(100L);
+          break;
+        }
+      }
+      ok = true;
+    }
+    if (!ok) throw new IllegalStateException("somme JPPF threads are still alive");
+  }
+ 
   /**
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs.
@@ -79,12 +118,14 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testSubmit() throws Exception {
-    try (final JPPFClient client = BaseSetup.createClient(null)) {
+    try (final JPPFClient client = new JPPFClient()) {
       final int nbTasks = 50;
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (final Task<?> task: job.getJobTasks()) task.setId("" + i++);
+      print(false, false, "submitting job");
       final List<Task<?>> results = client.submitJob(job);
+      print(false, false, "got job results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
@@ -106,14 +147,20 @@ public class TestJPPFClient extends Setup1D1N {
   @Test(timeout=10000)
   public void testCancelJob() throws Exception {
     final String name = ReflectionUtils.getCurrentMethodName();
-    try (final JPPFClient client = BaseSetup.createClient(null)) {
+    try (final JPPFClient client = new JPPFClient()) {
       final int nbTasks = 10;
-      final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
-      final JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L);
+      //final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client, JobEventType.JOB_DISPATCHED);
+      final AwaitTaskNotificationListener listener = new AwaitTaskNotificationListener(client, "start notif");
+      final JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L, true, "start notif");
+      print(false, false, "submitting job 1");
       client.submitJob(job);
+      print(false, false, "awaiting JOB_DISPATCHED notification");
       listener.await();
+      print(false, false, "cancelling job 1");
       client.cancelJob(job.getUuid());
+      print(false, false, "awaiting job 1 results");
       List<Task<?>> results = job.awaitResults();
+      print(false, false, "got job 1 results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       int count = 0;
@@ -122,7 +169,9 @@ public class TestJPPFClient extends Setup1D1N {
       }
       assertTrue(count > 0);
       final JPPFJob job2 = BaseTestHelper.createJob(name + "-2", true, false, nbTasks, LifeCycleTask.class, 1L);
+      print(false, false, "submitting job 2");
       results = client.submitJob(job2);
+      print(false, false, "got job 2 results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       for (final Task<?> task: results) {
