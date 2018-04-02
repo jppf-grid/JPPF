@@ -293,6 +293,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   private Map<String, Object> forward(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...otherParams) throws Exception {
     int size = nodes.size();
+    if (size <= 0) return Collections.EMPTY_MAP;
     final Map<String, Object> resultMap = new HashMap<>(size);
     CompletionService<Pair<String, Object>> completionService = new ExecutorCompletionService<>(executor, new ArrayBlockingQueue<Future<Pair<String, Object>>>(size));
     for (AbstractNodeContext node: nodes) {
