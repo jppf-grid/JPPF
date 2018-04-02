@@ -8,8 +8,8 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
-<listEntry value="org.eclipse.debug.ui.launchGroup.profile"/>
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.profile"/>
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.hyades.trace.ui.ATTR_AUTO_MONITORING" value="true"/>
@@ -39,6 +39,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sample.test.deadlock.DeadlockRunner"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx1g -Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=config/logging-client.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx3g -Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=config/logging-client.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

@@ -25,8 +25,7 @@ import java.util.concurrent.Callable;
  * 
  * @author Laurent Cohen
  */
-public class MyCallable implements Callable<String>, Serializable
-{
+public class MyCallable implements Callable<String>, Serializable {
   /**
    * The id of this task.
    */
@@ -36,8 +35,7 @@ public class MyCallable implements Callable<String>, Serializable
    * Constructor.
    * @param id the id of this task.
    */
-  public MyCallable(final String id)
-  {
+  public MyCallable(final String id) {
     this.id = id;
   }
 
@@ -45,8 +43,7 @@ public class MyCallable implements Callable<String>, Serializable
    * {@inheritDoc}
    */
   @Override
-  public String call() throws Exception
-  {
+  public String call() throws Exception {
     return null;
   }
 }

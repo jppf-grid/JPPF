@@ -126,7 +126,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
     File templateFile = new File(config.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
     File overrideFile = new File(config.getConfigDir(), override);
-    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getPath(), variables);
+    TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getAbsolutePath().replace("\\", "/"), variables);
     if (overrideFile.exists()) ConfigurationHelper.overrideConfig(config, overrideFile);
     String path = ConfigurationHelper.createTempConfigFile(config);
     tempFileCache.add(path);

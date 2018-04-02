@@ -20,7 +20,7 @@ package test;
 
 import org.junit.runner.RunWith;
 
-import test.org.jppf.discovery.TestDriverDiscovery;
+import test.org.jppf.management.TestJPPFDriverAdminMBean2;
 import test.org.jppf.test.runner.RepeatingSuite;
 
 
@@ -30,6 +30,6 @@ import test.org.jppf.test.runner.RepeatingSuite;
  */
 @RunWith(RepeatingSuite.class)
 @RepeatingSuite.RepeatingSuiteClasses(repeat=100, shuffleClasses=false, shuffleMethods=true,
-  classes = { TestDriverDiscovery.class })
+  classes = { TestJPPFDriverAdminMBean2.class })
 public class JPPFSuite {
 }
