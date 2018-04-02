@@ -1,0 +1,203 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2016 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.utils;
+
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.jppf.JPPFTimeoutException;
+import org.slf4j.*;
+
+/**
+ * A set of utility methods to facilitate concurrent and multithreaded rpogramming.
+ * @author Laurent Cohen
+ * @since 5.0
+ */
+public final class ConcurrentUtils {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ConcurrentUtils.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+
+  /**
+   * Instantiation is not permitted.
+   */
+  private ConcurrentUtils() {
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * The specified monitor may be notified at any time during the execution of this method, at which time it will check the condition again.
+   * @param monitor the monitor to wait for.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis or nanos are negative, or if the nanos are greater than 999999.
+   */
+  public static boolean awaitCondition(final ThreadSynchronization monitor, final Condition condition, final long millis) throws IllegalArgumentException {
+    if (monitor == null) throw new IllegalArgumentException("monitor cannot be null");
+    if (condition == null) return true;
+    if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
+    boolean fulfilled = false;
+    long elapsed = 0L;
+    final long start = System.nanoTime();
+    while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
+      monitor.goToSleep(1L);
+    }
+    return fulfilled;
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   */
+  public static boolean awaitCondition(final Condition condition, final long millis) throws IllegalArgumentException {
+    return awaitCondition(condition, millis, false);
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   * @throws JPPFTimeoutException if the timeout expires.
+   */
+  public static boolean awaitCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout) throws IllegalArgumentException, JPPFTimeoutException {
+    if (condition == null) return true;
+    if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    long timeout = millis > 0L ? millis : Long.MAX_VALUE;
+    long start = System.nanoTime();
+    ThreadSynchronization monitor = new ThreadSynchronization() { };
+    boolean fulfilled = false;
+    long elapsed = 0L;
+    while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
+      monitor.goToSleep(1L);
+    }
+    if ((elapsed > timeout) && throwExceptionOnTImeout) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", timeout));
+    return fulfilled;
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   * @throws JPPFTimeoutException if the timeout expires.
+   */
+  public static boolean awaitInterruptibleCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout)
+    throws IllegalArgumentException, JPPFTimeoutException {
+    if (condition == null) return true;
+    if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
+    final long timeout = millis > 0L ? millis : Long.MAX_VALUE;
+    final CountDownLatch countDown = new CountDownLatch(1);
+    final ThreadSynchronization monitor = new ThreadSynchronization() { };
+    final AtomicBoolean fulfilled = new AtomicBoolean(false);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        boolean ok = false;
+        synchronized(monitor) {
+          try {
+            while (!(ok = condition.evaluate())) monitor.wait(1L);
+          } catch (Exception e) {
+            ok = false;
+          }
+          fulfilled.set(ok);
+          countDown.countDown();
+        }
+      }
+    };
+    Thread thread = new Thread(r);
+    thread.start();
+    try {
+      countDown.await(timeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      thread.interrupt();
+      countDown.countDown();
+    }
+    if (fulfilled.get()) return true;
+    if (throwExceptionOnTImeout) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", timeout));
+    return false;
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled.
+   * @param condition the condition to check.
+   * @return true whenever the condition is {@code null} or gets fulfilled, {@code false} otherwise.
+   */
+  public static boolean awaitCondition(final Condition condition) {
+    return awaitCondition(condition, 0L);
+  }
+
+  /**
+   * Execute the specified {@code Callable} in a retry loop.
+   * @param <T> the return type of the {@code Callable}.
+   * @param maxTries the maximum number of attempts to execute the {@code Callable}.
+   * @param retryDelay the delay between two attempts.
+   * @param callable the {@code Callable} to execute.
+   * @return the return value of the first successful execution of the {@code Callable}.
+   * @throws Exception if after maxRetries the {@code Callable} threw an exception.
+   */
+  public static <T> T runWithRetry(final int maxTries, final long retryDelay, final Callable<T> callable) throws Exception {
+    if (maxTries <= 0) throw new IllegalArgumentException("maxTries bust be > 0");
+    if (retryDelay <= 0L) throw new IllegalArgumentException("retryDelay bust be > 0");
+    if (callable == null) return null;
+    int tryCount = 0;
+    Exception lastException = null;
+    while (tryCount < maxTries) {
+      try {
+        return callable.call();
+      } catch (Exception e) {
+        tryCount++;
+        lastException = e;
+        if (tryCount < maxTries) {
+          if (debugEnabled) log.debug(String.format("Got exception at attempt %d/%d, retrying in %d ms: %s", tryCount, maxTries, retryDelay, ExceptionUtils.getMessage(e)));
+          Thread.sleep(retryDelay);
+        }
+      }
+    }
+    throw lastException;
+  }
+
+  /**
+   * This interface represents a condition to evaluate to either {@code true} or {@code false}.
+   */
+  public static interface Condition {
+    /**
+     * Evaluate this condition.
+     * @return {@code true} if the condition is fulfilled, {@code false} otherwise.
+     */
+    boolean evaluate();
+  }
+}

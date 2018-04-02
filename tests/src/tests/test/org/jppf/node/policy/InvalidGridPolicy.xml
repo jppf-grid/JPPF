@@ -1,0 +1,12 @@
+<jppf:ExecutionPolicy xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd">
+  <!--
+    We expect the parsing of this policy to fail, due to the operator="unknown_op" attribute
+    providing an unvalid value that is not in { EQUAL, NOT_EQUAL, AT_LEAST, AT_MOST, GREATER, LESS }
+  -->
+  <NodesMatching operator="unknown_op" expected="1">
+    <AtLeast>
+      <Property>jppf.processing.threads</Property>
+      <Value>1</Value>
+    </AtLeast>
+  </NodesMatching>
+</jppf:ExecutionPolicy>

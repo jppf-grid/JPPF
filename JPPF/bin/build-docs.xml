@@ -1,0 +1,216 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2016 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-docs" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                     Build the web site content                            -->
+  <!-- ========================================================================= -->
+
+  <!--<target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>-->
+  <target name="doc" depends="doc.samples.pack, doc.home" description=""/>
+
+  <target name="doc.home">
+    <doc.gen source="${home}/doc-source/home" dest="${home}/" templates="${home}/doc-source/templates/"/>
+  </target>
+
+  <!--
+    Generate web site pages based on templates.
+    Attributes:
+    - source: the folder where the source documents to convert are located
+    - dest: the destination folder where the generated php and html files are written
+    - templates: the folder where the templates are located
+  -->
+  <macrodef name="doc.gen">
+    <attribute name="source"/>
+    <attribute name="dest"/>
+    <attribute name="templates"/>
+    <attribute name="fi" default="html,php"/>
+    <attribute name="fe" default=""/>
+    <attribute name="di" default=""/>
+    <attribute name="de" default=""/>
+    <sequential>
+      <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+        <jvmarg value="-Xmx128m"/>
+        <arg value="-s"/>
+        <arg value="@{source}"/>
+        <arg value="-d"/>
+        <arg value="@{dest}"/>
+        <arg value="-t"/>
+        <arg value="@{templates}"/>
+        <arg value="-r"/>
+        <arg value="-fi"/>
+        <arg value="html,php"/>
+      </java>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Generate the screenshots thumbnails.
+  -->
+  <target name="doc.screenshots" >
+    <java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
+      <jvmarg value="-Xmx128m" />
+      <arg value="${home}/screenshots"/>
+      <arg value="64"/>
+      <arg value="64"/>
+      <arg value="${home}/doc-source/templates"/>
+      <arg value="10"/>
+    </java>
+  </target>
+
+  <!--
+    samples Generate readme.php files based on the correspondng Readme.html in the samples sources.
+  -->
+  <target name="doc.samples.pack">
+    <java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="run.classpath">
+      <jvmarg value="-Xmx128m" />
+      <arg value="${samples-pack}"/>
+      <arg value="${home}/doc-source/home/samples-pack"/>
+      <arg value="${home}/doc-source/templates/sample-readme.html"/>
+    </java>
+    <copy file="${samples-pack}/index.php" toDir="${home}/doc-source/home/samples-pack"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                 Generate the User Guide redistributable                   -->
+  <!-- ========================================================================= -->
+
+  <target name="user.guide">
+    <property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
+    <delete file="${user.guide.file}" quiet="true"/>
+    <copy tofile="${build}/JPPF-${version.number}-User-Guide.pdf" file="${docs}/manual/JPPF-User-Guide.pdf"/>
+    <zip destfile="${user.guide.file}">
+      <zipfileset dir="${build}" includes="JPPF-${version.number}-User-Guide.pdf"/>
+      <!--<zipfileset dir="${docs}/manual" includes="JPPF-${version.number}-User-Guide.pdf" prefix="JPPF-${version.number}-User-Guide"/>-->
+    </zip>
+    <delete file="${build}/JPPF-${version.number}-User-Guide.pdf" quiet="true"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                        Generate the Javadoc                               -->
+  <!-- ========================================================================= -->
+
+  <target name="javadoc" depends="compile.doclet" description="Generate all javadoc">
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+    <exec executable="java">
+      <arg value="-version"/>
+    </exec>
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath"
+      stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
+      <arg value="-J-Xmx512m"/>
+      <arg value="-linksource"/>
+      <arg value="-quiet"/>
+      <packageset dir="${node}/src/java"/>
+      <packageset dir="${common}/src/java"/>
+      <packageset dir="${client}/src/java"/>
+      <packageset dir="${server}/src/java"/>
+      <packageset dir="${admin}/src/java"/>
+      <packageset dir="${jca-client}/src/java"/>
+      <packageset dir="${jca-client}/src/j2eeclient"/>
+      <packageset dir="${node-android}/events/src/main/java"/>
+      <packageset dir="${jmxremote}/src"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javaee/6/api/"/>
+      <link href="http://junit.sourceforge.net/javadoc"/>
+      <link href="http://x-stream.github.io/javadoc"/>
+      <link offline="true" href="http://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
+      <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
+      <header>
+        <![CDATA[
+          <table><tr>
+            <td valign="center">
+              <a href="http://www.jppf.org" target="_top">
+                <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+              </a>
+            </td>
+          </tr></table>
+        ]]>
+      </header>
+      <bottom>
+        <![CDATA[
+          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2016 JPPF Team.</i></font>
+        ]]>
+      </bottom>
+    </javadoc>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${bin}">
+        <include name="*.gif"/>
+        <include name="*.jpg"/>
+      </fileset>
+    </copy>
+    <favicon javadoc.dir="${javadoc}"/>
+    <!-- create API doc zip -->
+    <property name="javadoc.file" value="${build}/${app.ver}-api.zip"/>
+    <delete file="${javadoc.file}" quiet="true"/>
+    <zip destfile="${javadoc.file}">
+      <zipfileset dir="${javadoc}" includes="**/*.*" prefix="${app.ver}-api"/>
+    </zip>
+  </target>
+
+  <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
+    <code.doc.tgz dir="javadoc" vname="5.2"/>
+    <code.doc.tgz dir="csdoc" vname="5.2"/>
+  </target>
+
+  <macrodef name="code.doc.tgz">
+    <attribute name="dir"/>
+    <attribute name="vname"/>
+    <sequential>
+      <local name="filename"/>
+      <property name="filename" value="@{dir}-@{vname}"/>
+      <delete file="${docs}/${filename}.tar.gz" quiet="true"/>
+      <tar destfile="${docs}/${filename}.tar.gz" compression="gzip">
+        <tarfileset prefix="@{vname}" dir="${home}/@{dir}/@{vname}" includes="**/*.*, package-list"/>
+      </tar>
+    </sequential>
+  </macrodef>
+  
+  <!--
+    Add a link to JPPF favicon in all javadoc HTML pages.
+    Attributes:
+      "javadoc.dir" the root javadoc folder
+  -->
+  <macrodef name="favicon">
+    <attribute name="javadoc.dir"/>
+    <sequential>
+      <replace dir="@{javadoc.dir}">
+        <include name="**/*.html"/>
+        <replacetoken><![CDATA[</head>]]></replacetoken>
+        <replacevalue><![CDATA[<link rel="shortcut icon" href="http://www.jppf.org/images/jppf-icon.ico" type="image/x-icon">
+      </head>]]></replacevalue>
+      </replace>
+    </sequential>
+  </macrodef>
+
+  <path id="doclet.classpath">
+    <pathelement location="${java.home}/lib/tools.jar"/>
+  </path>
+
+  <target name="compile.doclet">
+    <delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
+    <javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
+      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="doclet.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${basedir}/src/java"/>
+    </javac>
+  </target>
+
+</project> 
