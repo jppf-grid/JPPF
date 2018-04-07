@@ -21,6 +21,8 @@ package org.jppf.nio;
 import java.nio.channels.Selector;
 import java.util.concurrent.locks.*;
 
+import org.slf4j.*;
+
 /**
  * Synchronization aid for a {@link Selector}, to prevent {@link java.nio.channels.SelectionKey#interestOps(int) SelectionKey.interestOps(int)} invocations from blocking for too long.
  * <p><b>Usage pattern</b>:
@@ -60,6 +62,14 @@ import java.util.concurrent.locks.*;
  */
 public class SelectorSynchronizerLock implements SelectorSynchronizer {
   /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(SelectorSynchronizerLock.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The selector to wakeup.
    */
   private final Selector selector;
@@ -89,7 +99,8 @@ public class SelectorSynchronizerLock implements SelectorSynchronizer {
     lock.lock();
     try {
       while (count != 0) condition.await();
-    } catch (@SuppressWarnings("unused") final Exception e) {
+    } catch (final Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
     } finally {
       count = -1;
       condition.signal();

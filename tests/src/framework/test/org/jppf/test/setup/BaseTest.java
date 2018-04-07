@@ -42,14 +42,13 @@ import org.slf4j.*;
 public class BaseTest {
   static {
     Locale.setDefault(Locale.US);
+    System.out.println("Initializing 'TEST' logger");
   }
   /**
    * Logger for this class.
    */
-  private static Logger log;
+  private static Logger log = LoggerFactory.getLogger("TEST");
   static {
-    System.out.println("Initializing 'TEST' logger");
-    log = LoggerFactory.getLogger("TEST");
     DeadlockDetector.setup("client");
   }
   /** */
@@ -65,7 +64,7 @@ public class BaseTest {
   /** */
   protected static JPPFClient client;
   /** */
-  private static FileFilter logFileFilter = new FileFilter() {
+  private static final FileFilter logFileFilter = new FileFilter() {
     @Override
     public boolean accept(final File path) {
       if (path.isDirectory()) return false;
@@ -75,10 +74,10 @@ public class BaseTest {
   };
   /** */
   @ClassRule
-  public static TestWatcher classWatcher = new BaseTestClassWatcher();
+  public static final TestWatcher classWatcher = new BaseTestClassWatcher();
   /** */
   @Rule
-  public TestWatcher instanceWatcher = new TestWatcher() {
+  public final TestWatcher instanceWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
       print("***** start of method %s() *****", description.getMethodName());

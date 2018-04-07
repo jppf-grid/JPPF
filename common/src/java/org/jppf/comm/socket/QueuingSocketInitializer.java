@@ -75,11 +75,9 @@ public class QueuingSocketInitializer extends SocketInitializerImpl {
    */
   private static ExecutorService initExecutor() {
     final TypedProperties config = JPPFConfiguration.getProperties();
-    final int core = config.getInt("jppf.socket.initializer.pool.size", 8);
     final long ttl = config.getLong("jppf.socket.initializer.thread.ttl", 5000L);
-    //final ThreadPoolExecutor tpe = new ThreadPoolExecutor(core, core, ttl, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("SocketInitializer"));
-    //tpe.allowCoreThreadTimeOut(true);
-    final ThreadPoolExecutor tpe = new ThreadPoolExecutor(core, core, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory("SocketInitializer"));
+    final ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, Integer.MAX_VALUE, ttl, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory("SocketInitializer"));
+    tpe.allowCoreThreadTimeOut(true);
     return tpe;
   }
 }

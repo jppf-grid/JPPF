@@ -19,6 +19,7 @@
 package org.jppf.server.debug;
 
 import java.io.Serializable;
+import java.util.*;
 
 import org.jppf.scripting.JPPFScriptingException;
 
@@ -115,6 +116,12 @@ public interface ServerDebugMBean extends Serializable {
    * @return the count as an int.
    */
   int getJobNotifPeak();
+
+  /**
+   * Get all the current reservations.
+   * @return an array of job uuids.
+   */
+  Map<String, Set<String>> getAllReservations();
 
   /**
    * Get the jobs for which at least one node is reserved.

@@ -166,6 +166,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @param channel the channel to add to the list.
    */
   public void addIdleChannel(final ChannelWrapper channel) {
+    if (debugEnabled) log.debug("adding chhanel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
     if (channel == null) throw new IllegalArgumentException("channel is null");
     final ExecutorStatus status = channel.getExecutionStatus();
@@ -177,7 +178,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
     synchronized (idleChannels) {
-      if (traceEnabled) log.trace("Adding idle channel from synchronized block: " + channel);
+      if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
       idleChannels.putValue(channel.getPriority(), channel);
     }
     wakeUp();
@@ -209,6 +210,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @param channel the channel to remove from the list.
    */
   public void removeIdleChannel(final ChannelWrapper channel) {
+    if (debugEnabled) log.debug("removing chhanel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
     if (traceEnabled) {
       final String idleChannelsName = SystemUtils.getSystemIdentityName(idleChannels);
@@ -217,7 +219,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
     synchronized (idleChannels) {
-      if (traceEnabled) log.trace("Removing idle channel from synchronized block: " + channel);
+      if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
       idleChannels.removeValue(channel.getPriority(), channel);
     }
   }

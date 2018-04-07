@@ -30,11 +30,10 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class GeneticAlgorithm implements AutoCloseable {
-  
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(GeneticAlgorithm.class);
+  private static final Logger log = LoggerFactory.getLogger(GeneticAlgorithm.class);
   /**
    *
    */
@@ -215,7 +214,7 @@ public class GeneticAlgorithm implements AutoCloseable {
     try {
       for (int i=0; i<totalSUbmitted; i++) cs.take();
     } catch(final Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
     return newPop;
   }
@@ -248,10 +247,10 @@ public class GeneticAlgorithm implements AutoCloseable {
   }
 
   /**
-   * 
-   * @param gen .
-   * @param pop .
-   * @param elapsed .
+   * Displays some statistics on the current state of the algorithm.
+   * @param gen current generation number.
+   * @param pop current population.
+   * @param elapsed elpased time since previous generation.
    */
   public void displayStats(final int gen, final Chromosome[] pop, final long elapsed) {
     double min = Double.MAX_VALUE;
@@ -271,17 +270,15 @@ public class GeneticAlgorithm implements AutoCloseable {
     sb.append(" (").append(StringUtils.toStringDuration(elapsed)).append(")");
     sb.append(", population=").append(pop.length);
     System.out.println(sb.toString());
+    log.info(sb.toString());
   }
 
   /**
-   * 
    * @return whether the population is valid.
    */
   public boolean testValid() {
     for (Chromosome c: population) {
-      if (!((AbstractChromosome) c).isValid()) {
-        return false;
-      }
+      if (!((AbstractChromosome) c).isValid()) return false;
     }
     return true;
   }

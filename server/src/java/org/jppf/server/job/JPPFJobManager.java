@@ -164,7 +164,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       jobMap.removeValues(jobUuid);
     }
     if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
-    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
+    if (serverJob.getSLA().getDesiredNodeConfiguration() != null) JPPFDriver.getInstance().getNodeNioServer().getNodeReservationHandler().removeJobReservations(serverJob.getUuid());
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);

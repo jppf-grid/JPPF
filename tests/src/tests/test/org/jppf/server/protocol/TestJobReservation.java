@@ -21,7 +21,7 @@ package test.org.jppf.server.protocol;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
@@ -29,12 +29,10 @@ import javax.management.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.job.*;
 import org.jppf.management.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -51,6 +49,14 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Listens for and counts nodes connections and disconnections.
    */
   private static final MyNodeConnectionListener myNodeListener = new MyNodeConnectionListener();
+  /**
+   * 
+   */
+  private static final String NODE_RESET_SCRIPT = new StringBuilder()
+    .append("org.jppf.utils.JPPFConfiguration.reset();\n")
+    .append("org.jppf.node.NodeRunner.getNode().triggerConfigChanged();\n")
+    .append("java.lang.System.out.println(\"reset configuration on node \" + org.jppf.node.NodeRunner.getUuid());\n")
+    .toString();
   /**
    * Waits for a JOB_DISPATCHED notification.
    */
@@ -84,16 +90,14 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Before
   public void showIdleNodes() throws Exception {
     BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+    RetryUtils.runWithRetryTimeout(5000L, 500L, new Callable<Boolean>() {
       @Override
-      public boolean evaluate() {
-        try {
-          return jmx.nbIdleNodes() == BaseSetup.nbNodes();
-        } catch(@SuppressWarnings("unused") final Exception e) {
-          return false;
-        }
+      public Boolean call() throws Exception {
+        final int n;
+        if ((n = jmx.nbIdleNodes()) != BaseSetup.nbNodes()) throw new IllegalStateException(String.format("expected <%d> nodes but got <%d>", BaseSetup.nbNodes(), n));
+        return true;
       }
-    }, 5000L, true);
+    });
   }
 
   /**
@@ -114,13 +118,16 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     final  int nbTasks = 5 * BaseSetup.nbNodes();
+    print(false, false, ">>> creating job");
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
+    print(false, false, ">>> submitting job");
     final List<Task<?>> result = client.submitJob(job);
+    print(false, false, ">>> checking job results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
     for (final Task<?> tsk: result) {
@@ -130,11 +137,12 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       assertEquals("n3", task.getNodeUuid());
     }
     Thread.sleep(500L);
-    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
+    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(100L);
     assertEquals(1, myNodeListener.map.size());
     final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertTrue(String.format("expected at least <%d> but was <%d>", BaseSetup.nbNodes(), n.get()), n.get() >= BaseSetup.nbNodes());
+    checkDriverReservations();
   }
 
   /**
@@ -145,6 +153,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   public void testCancelledJobReservationSingleNodeWithRestart() throws Exception {
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
+    print(false, false, ">>> creating job");
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 500L);
     final TypedProperties props = new TypedProperties()
       .setString("reservation.prop.1", "123456")  // node1 : "1" ; node2 : "123" ; node3 : "12345"
@@ -152,10 +161,15 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
     jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
+    print(false, false, ">>> submitting job");
     client.submitJob(job);
+    print(false, false, ">>> awaiting JOB_RETURNED notfication");
     jobNotificationListener.await();
+    print(false, false, ">>> cancelling job");
     job.cancel();
+    print(false, false, ">>> awaiting job results");
     final List<Task<?>> result = job.awaitResults();
+    print(false, false, ">>> checking job results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
     int nbSuccessful = 0;
@@ -176,12 +190,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
-    final String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
-    assertNotNull(reservedJobs);
-    assertEquals(0, reservedJobs.length);
-    final String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
-    assertNotNull(reservedNodes);
-    assertEquals(0, reservedNodes.length);
+    checkDriverReservations();
   }
 
   /**
@@ -190,6 +199,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testExpiredJobReservationSingleNodeWithRestart() throws Exception {
+    print(false, false, ">>> creating job");
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 600L);
@@ -199,11 +209,16 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
     jobNotificationListener = new AwaitJobNotificationListener(client, JobEventType.JOB_RETURNED);
+    print(false, false, ">>> submitting job");
     client.submitJob(job);
+    print(false, false, ">>> awaiting JOB_RETURNED notfication");
     jobNotificationListener.await();
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
+    print(false, false, ">>> updating job sla");
     jmx.getJobManager().updateJobs(new JobUuidSelector(job.getUuid()), job.getSLA(), null);
+    print(false, false, ">>> awaiting job results");
     final List<Task<?>> result = job.awaitResults();
+    print(false, false, ">>> got job results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
     int nbSuccessful = 0;
@@ -224,12 +239,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertTrue(n.get() < BaseSetup.nbNodes());
-    final String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
-    assertNotNull(reservedJobs);
-    assertEquals(0, reservedJobs.length);
-    final String[]  reservedNodes = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedNodes");
-    assertNotNull(reservedNodes);
-    assertEquals(0, reservedNodes.length);
+    checkDriverReservations();
   }
 
   /**
@@ -238,6 +248,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testJobReservationTwoNodesWithRestart() throws Exception {
+    print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();
     final Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
@@ -247,7 +258,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(expectedNodes.size());
+    print(false, false, ">>> submiting job");
     final List<Task<?>> result = client.submitJob(job);
+    print(false, false, ">>> checking results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
     final Set<String> actualNodes = new HashSet<>();
@@ -262,9 +275,11 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     assertFalse(actualNodes.isEmpty());
     assertTrue(expectedNodes.containsAll(actualNodes));
     Thread.sleep(500L);
-    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(10L);
+    print(false, false, ">>> waiting for %d nodes", BaseSetup.nbNodes());
+    while (myNodeListener.total.get() < BaseSetup.nbNodes()) Thread.sleep(100L);
     assertFalse(myNodeListener.map.isEmpty());
     assertTrue(expectedNodes.containsAll(myNodeListener.map.keySet()));
+    checkDriverReservations();
   }
 
   /**
@@ -274,6 +289,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeNoRestart() throws Exception {
+    print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
     final TypedProperties props = new TypedProperties()
@@ -281,7 +297,9 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props, false));
     job.getSLA().setMaxNodes(1);
+    print(false, false, ">>> submiting job");
     final List<Task<?>> result = client.submitJob(job);
+    print(false, false, ">>> checking results");
     assertNotNull(result);
     assertFalse(result.isEmpty());
     for (final Task<?> tsk: result) {
@@ -295,6 +313,23 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
+    checkDriverReservations();
+  }
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  private static void checkDriverReservations() throws Exception {
+    print(false, false, ">>> checking remaining reservations");
+    @SuppressWarnings("unchecked")
+    final Map<String, Set<String>> map = (Map<String, Set<String>>) jmx.getAttribute("org.jppf:name=debug,type=driver", "AllReservations");
+    print(false, false, "reservations map = %s", map);
+    final String[] keys = { "pendingJobs", "readyJobs", "pendingNodes", "readyNodes" };
+    for (final String key: keys) {
+      final Set<String> values = map.get(key);
+      assertNotNull(key + " has null value set", values);
+      assertTrue(key + " should be empty but has " + values.size() + " values", values.isEmpty());
+    }
   }
 
   /**
@@ -320,7 +355,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
           if (n == null) map.put(uuid, n = new AtomicInteger(0));
           n.incrementAndGet();
           total.incrementAndGet();
-          BaseTest.print(false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
+          print(false, "got notification from node %s, timestamp = [%s], current count = %d, total = %d", uuid, BaseTest.getFormattedTimestamp(notif.getTimeStamp()), n.get(), total.get());
         }
       }
     }
@@ -336,26 +371,6 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   }
 
   /**
-   * Task which resets the node configuration.
-   */
-  public static class BroadcastTask extends AbstractTask<String> {
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-    @Override
-    public void run() {
-      try {
-        JPPFConfiguration.reset();
-        ((JPPFNode) NodeRunner.getNode()).triggerConfigChanged();
-        System.out.println("reset configuration on node " + NodeRunner.getUuid());
-      } catch (final Exception e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  /**
    * 
    */
   public class MyWatcher extends TestWatcher {
@@ -363,26 +378,42 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     protected void starting(final Description description) {
       try {
         final int n = BaseSetup.nbNodes();
-        BaseSetup.checkDriverAndNodesInitialized(1, n);
-        final JPPFJob job = new JPPFJob();
-        job.setName("broadcast reset node config");
-        job.getSLA().setBroadcastJob(true);
-        job.add(new BroadcastTask());
-        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** before resetting nodes configurations *****");
-        client.submitJob(job);
-        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "***** after resetting nodes configurations *****");
-        while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
+        //BaseSetup.checkDriverAndNodesInitialized(1, n);
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "checking idle nodes");
+        RetryUtils.runWithRetryTimeout(5000L, 500L, new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            if (jmx.nbIdleNodes() < BaseSetup.nbNodes()) throw new IllegalStateException("not enough idle nodes"); 
+            return null;
+          }
+        });
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "before resetting nodes configurations");
+        final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+        final Map<String, Object> result = forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "executeScript",
+          new Object[] { "javascript", NODE_RESET_SCRIPT }, new String[] { "java.lang.String", "java.lang.String" });
+        assertEquals(n, result.size());
+        final String[] uuids = new String[n];
+        for (int i=0; i<n; i++) uuids[i] = "n" + (i + 1);
+        for (final Map.Entry<String, Object> entry: result.entrySet()) {
+          assertTrue(StringUtils.isOneOf(entry.getKey(), false, uuids));
+          if (entry.getValue() instanceof Throwable) {
+            print(false, false, "throwable raised by node %s: %s", entry.getKey(), ExceptionUtils.getStackTrace((Throwable) entry.getValue()));
+          }
+          assertFalse(entry.getValue() instanceof Throwable);
+        }
+        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "after resetting nodes configurations");
+        //while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
         myNodeListener.map.clear();
       } catch (final Exception e) {
         e.printStackTrace();
-        throw new IllegalStateException(e);
+        throw (e instanceof IllegalStateException) ? (IllegalStateException) e : new IllegalStateException(e);
       }
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
     }
 
     @Override
     protected void finished(final Description description) {
-      BaseTestHelper.printToServersAndNodes(client, true, true, "end of method %s()", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, "end of method %s()", description.getMethodName());
     }
   };
 }

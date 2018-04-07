@@ -43,31 +43,37 @@ public class DeadlockDetector {
    * Whether a deadlock has already been detected.
    */
   private static boolean deadlockDetected = false;
+  /**
+   * 
+   */
+  private static Timer timer;
+  /**
+   * 
+   */
+  private static DiagnosticsMBean diag;
 
   /**
    * 
    * @param type the type of JPPF component, either "driver" or "node".
    */
-  public static void setup(final String type) {
-    synchronized(DeadlockDetector.class) {
-      if (alreadyRun) return;
-      alreadyRun = true;
-    }
+  public synchronized static void setup(final String type) {
+    if (alreadyRun) return;
+    alreadyRun = true;
     System.out.println("setting up " + type + " deadlock detector");
     try {
-      DiagnosticsMBean dg = null;
       final String suffix;
       if ("client".equals(type)) {
         suffix = type;
-        dg = new Diagnostics("client");
+        diag = new Diagnostics("client");
       } else {
         @SuppressWarnings("resource")
         final JMXConnectionWrapper jmx = "driver".equals(type) ? new JMXDriverConnectionWrapper() : new JMXNodeConnectionWrapper();
+        jmx.setReconnectOnError(false);
         jmx.connect();
-        dg = jmx.getDiagnosticsProxy();
+        diag = jmx.getDiagnosticsProxy();
         suffix = jmx.toString();
       }
-      final DiagnosticsMBean diag = dg;
+      timer = new Timer("DeadlockChecker", true);
       final TimerTask task = new TimerTask() {
         @Override
         public void run() {
@@ -83,13 +89,28 @@ public class DeadlockDetector {
             }
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
+            cancel();
+            reset();
           }
         }
       };
-      new Timer("DeadlockChecker", true).schedule(task, 1000L, 2000L);
+      timer.schedule(task, 1000L, 2000L);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  /**
+   * 
+   */
+  private synchronized static void reset() {
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+      timer = null;
+    }
+    diag = null;
+    alreadyRun = false;
   }
 
   /**

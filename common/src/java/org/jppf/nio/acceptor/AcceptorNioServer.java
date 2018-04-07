@@ -43,11 +43,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AcceptorNioServer.class);
+  private static final Logger log = LoggerFactory.getLogger(AcceptorNioServer.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The statsistics to update, if any.
    */
@@ -65,6 +65,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception {
     this(ports, sslPorts, null);
+    if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
   }
 
   /**
@@ -80,6 +81,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     this.selectTimeout = 1L;
     this.stats = stats;
     identifyingState = factory.getState(AcceptorState.IDENTIFYING_PEER);
+    if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
   }
 
   @Override
@@ -275,8 +277,9 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       synchronized(servers) {
         servers.put(port, server);
       }
-      if (debugEnabled) log.debug("registering server {} with selector", server);
+      if (debugEnabled) log.debug("about to register server {} with selector", server);
       sync.wakeUpAndSetOrIncrement();
+      if (debugEnabled) log.debug("registering server {} with selector", server);
       try {
         server.register(selector, SelectionKey.OP_ACCEPT, map);
       } finally {
@@ -294,10 +297,12 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   @Override
   public void removeServer(final int port) throws IOException {
-    ServerSocketChannel server = null;
+    if (debugEnabled) log.debug("removing server on port={}", port);
+    final ServerSocketChannel server;
     synchronized(servers) {
       server = servers.remove(port);
     }
+    if (debugEnabled) log.debug("removed server={} on port={}", server, port);
     if (server != null) server.close();
   }
 

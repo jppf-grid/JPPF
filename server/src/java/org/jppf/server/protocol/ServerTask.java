@@ -310,7 +310,7 @@ public class ServerTask implements Serializable {
     throwable = (Throwable) in.readObject();
     try {
       initialTask = IOHelper.readData(new StreamInputSource(in));
-    } catch(IOException | ClassNotFoundException e) {
+    } catch(final IOException | ClassNotFoundException e) {
       throw  e;
     } catch(final Exception e) {
       throw new IOException(e);

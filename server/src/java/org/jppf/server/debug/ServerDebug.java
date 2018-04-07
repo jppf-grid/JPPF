@@ -256,6 +256,11 @@ public class ServerDebug implements ServerDebugMBean {
   }
 
   @Override
+  public Map<String, Set<String>> getAllReservations() {
+    return driver.getNodeNioServer().getNodeReservationHandler().getReservations();
+  }
+
+  @Override
   public String[] getReservedJobs() {
     final Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
     return set.toArray(new String[set.size()]);

@@ -111,11 +111,15 @@ public class NodeReservationHandler {
     if (node == null) return;
     final String nodeUuid = node.getUuid();
     if (nodeUuid == null) return;
-    if (debugEnabled) log.debug("removing reservation for node {}", node);
+    if (debugEnabled) log.debug("removing reservations for node {}", node);
     String jobUuid = pendingMap.remove(nodeUuid);
-    if (jobUuid != null) jobPendingMap.removeValue(jobUuid, nodeUuid);
+    if (jobUuid != null) {
+      jobPendingMap.removeValue(jobUuid, nodeUuid);
+    }
     jobUuid = readyMap.remove(node.getUuid());
-    if (jobUuid != null) jobReadyMap.removeValue(jobUuid, nodeUuid);
+    if (jobUuid != null) {
+      jobReadyMap.removeValue(jobUuid, nodeUuid);
+    }
     node.reservationTansition = Transition.REMOVE;
   }
 
@@ -125,12 +129,23 @@ public class NodeReservationHandler {
    */
   public synchronized void onJobCancelled(final ServerJob job) {
     if (debugEnabled) log.debug(String.format("job %s cancelled, removing all reservations", job.getUuid()));
-    Collection<String> nodes = jobPendingMap.removeKey(job.getUuid());
+    removeJobReservations(job.getUuid());
+  }
+
+  /**
+   * Remove all the node reservations for the specified job that is being cancelled.
+   * @param jobUuid uuid of the job for which to remove reservations.
+   */
+  public synchronized void removeJobReservations(final String jobUuid) {
+    if (debugEnabled) log.debug("removing all reservations for job {}", jobUuid);
+    Collection<String> nodes = jobPendingMap.removeKey(jobUuid);
     if (nodes != null) {
+      if (debugEnabled) log.debug(String.format("removing %d pending node reservations for cancelled job %s", nodes.size(), jobUuid));
       for (String nodeUuid: nodes) pendingMap.remove(nodeUuid);
     }
-    nodes = jobReadyMap.removeKey(job.getUuid());
+    nodes = jobReadyMap.removeKey(jobUuid);
     if (nodes != null) {
+      if (debugEnabled) log.debug(String.format("removing %d ready node reservations for cancelled job %s", nodes.size(), jobUuid));
       for (String nodeUuid: nodes) readyMap.remove(nodeUuid);
     }
   }
@@ -201,25 +216,45 @@ public class NodeReservationHandler {
    */
   boolean transitionReservation(final AbstractNodeContext node) {
     final TypedProperties config = node.getSystemInformation().getJppf();
-    final String reservedUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
-    if (reservedUuid != null) {
-      if (debugEnabled) log.debug(String.format("node %s is reserved for job %s", node.getUuid(), reservedUuid));
+    final String reservedJobUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
+    if (reservedJobUuid != null) {
+      if (debugEnabled) log.debug(String.format("node %s is reserved for job %s", node.getUuid(), reservedJobUuid));
       final String oldNodeUuid = config.get(JPPFProperties.NODE_RESERVED_UUID);
+      final ServerJob job = server.getTaskQueueChecker().queue.getJob(reservedJobUuid);
+      if (debugEnabled) log.debug("job with uuid={} {} in the queue", reservedJobUuid, (job == null) ? "no longer" : "found");
       synchronized(this) {
+        if ((job != null) && job.isCancelled()) {
+          if (debugEnabled) log.debug("cancelling reservations for job with uuid={}", reservedJobUuid);
+          onJobCancelled(job);
+          return true;
+        }
         final String pendingJobUuid = pendingMap.get(oldNodeUuid);
-        if (debugEnabled) log.debug(String.format("node %s previous uuid was %s and was reserved for job %s", node.getUuid(), oldNodeUuid, pendingJobUuid));
-        if (reservedUuid.equals(pendingJobUuid)) {
+        if (debugEnabled) log.debug(String.format("node %s previous uuid was %s and was reserved for job %s (reservedJobUuid=%s)", node.getUuid(), oldNodeUuid, pendingJobUuid, reservedJobUuid));
+        if (reservedJobUuid.equals(pendingJobUuid)) {
           if (debugEnabled) log.debug(String.format("oldNodeUuid=%s, nodeUuid=%s, jobUuid=%s", oldNodeUuid, node.getUuid(), pendingJobUuid));
           pendingMap.remove(oldNodeUuid);
-          readyMap.put(node.getUuid(), pendingJobUuid);
-          jobPendingMap.removeValue(pendingJobUuid, oldNodeUuid);
-          jobReadyMap.putValue(pendingJobUuid, node.getUuid());
+          if (pendingJobUuid != null) readyMap.put(node.getUuid(), pendingJobUuid);
+          jobPendingMap.removeValue(reservedJobUuid, oldNodeUuid);
+          if (pendingJobUuid != null) jobReadyMap.putValue(pendingJobUuid, node.getUuid());
           node.reservationTansition = Transition.REMOVE;
           return true;
         }
       }
     }
     return false;
+  }
+
+  /**
+   * Get the uuids of the jobs for which at least oone node is reserved.
+   * @return a set of job uuids.
+   */
+  public synchronized Map<String, Set<String>> getReservations() {
+    final Map<String, Set<String>> map = new HashMap<>();
+    map.put("pendingJobs", new HashSet<>(jobPendingMap.keySet()));
+    map.put("readyJobs", new HashSet<>(jobReadyMap.keySet()));
+    map.put("pendingNodes", new HashSet<>(pendingMap.keySet()));
+    map.put("readyNodes", new HashSet<>(readyMap.keySet()));
+    return map;
   }
 
   /**
@@ -279,12 +314,12 @@ public class NodeReservationHandler {
           if (debugEnabled) log.debug(String.format("about to restart node %s reserved for job %s with config=%s", node.getUuid(), job.getUuid(), config));
           final boolean restart =  spec.isForceRestart() || (node.reservationScore > 0);
           node.reservationTansition = Transition.KEEP;
-          jmx.updateConfiguration(config, restart);
           // if node is not restarted, synchronize server version of the node's config
           if (!restart) {
             node.getSystemInformation().getJppf().putAll(config);
             transitionReservation(node);
           }
+          jmx.updateConfiguration(config, restart);
         } catch (@SuppressWarnings("unused") final Exception e) {
           log.error(String.format("error reserving node %s for job %s", node, job));
         }

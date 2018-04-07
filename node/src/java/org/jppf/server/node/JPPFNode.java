@@ -27,6 +27,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.ExecutionManager;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
+import org.jppf.nio.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
@@ -417,6 +418,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       try {
         if (providerManager != null) providerManager.unregisterProviderMBeans();
         if (jmxServer != null) jmxServer.stop();
+        final NioServer<?, ?> acceptor = NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
+        if (acceptor != null) acceptor.shutdown();
       } catch(final Exception e) {
         log.error(e.getMessage(), e);
       }
@@ -444,11 +447,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (debugEnabled) log.debug("starting JMX server");
         final boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
         JPPFProperty<Integer> jmxProp = null;
-        /*
-        final String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
-        if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = SERVER_PORT;
-        else jmxProp = ssl ? MANAGEMENT_SSL_PORT_NODE : MANAGEMENT_PORT_NODE;
-        */
         jmxProp = MANAGEMENT_PORT_NODE;
         jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, jmxProp);
         jmxServer.start(getClass().getClassLoader());

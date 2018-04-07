@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 
 /**
- * An invocation used by MBean proxies created by JPPF.
+ * An invocation handler used by MBean proxies created by JPPF.
  * @author Laurent Cohen
  */
 public class MBeanInvocationHandler implements InvocationHandler {

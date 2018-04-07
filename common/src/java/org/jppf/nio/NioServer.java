@@ -161,6 +161,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
     this(identifier, false);
+    if (debugEnabled) log.debug(String.format("starting %s with ports=%s and sslPorts=%s", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts)));
     this.ports = ports;
     this.sslPorts = sslPorts;
     init();

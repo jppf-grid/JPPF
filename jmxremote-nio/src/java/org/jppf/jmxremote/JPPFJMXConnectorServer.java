@@ -25,8 +25,8 @@ import javax.management.MBeanServer;
 import javax.management.remote.*;
 
 import org.jppf.jmxremote.nio.*;
-import org.jppf.nio.NioHelper;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.nio.*;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -99,7 +99,9 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
       if (!started) return;
       started = false;
       try {
-        for (JMXNioServer server: JMXNioServerPool.getServers()) server.removeAllConnections(address.getPort());
+        for (JMXNioServer server: JMXNioServerPool.getServers()) {
+          server.removeAllConnections(address.getPort());
+        }
       } finally {
         for (JMXNioServer server: JMXNioServerPool.getServers()) server.removeConnectionStatusListener(this);
       }
