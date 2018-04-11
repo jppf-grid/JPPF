@@ -398,6 +398,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
 
   @Override
   public synchronized void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
+    if (debugEnabled) log.debug("setting localExecutionEnabled = {}", localExecutionEnabled);
     if (this.localEnabled == localExecutionEnabled) return;
     this.localEnabled = localExecutionEnabled;
     updateLocalExecution(this.localEnabled);

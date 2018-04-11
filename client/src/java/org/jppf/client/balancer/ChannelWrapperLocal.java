@@ -66,6 +66,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * Reference to the client 's executor.
    */
   private final JPPFClient client;
+  /**
+   * 
+   */
+  private boolean closed;
 
   /**
    * Default initializer for local channel wrapper.
@@ -100,6 +104,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
     synchronized(getMonitor()) {
+      if (closed) return;
       final ExecutorStatus oldExecutionStatus = getExecutionStatus();
       final JPPFClientConnectionStatus oldValue = this.status;
       if (debugEnabled) log.debug(String.format("status changing from %s to %s for %s", oldValue, status, this));
@@ -127,19 +132,21 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @param newStatus the connection status after the change.
    */
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
-    if (oldStatus == newStatus) return;
+    if (isClosed() || (oldStatus == newStatus)) return;
     final ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     for (final ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   @Override
   public Future<?> submit(final ClientTaskBundle bundle) {
-    if (debugEnabled) log.debug("locally submitting {}", bundle);
-    setStatus(JPPFClientConnectionStatus.EXECUTING);
-    final Runnable task = new LocalRunnable(bundle);
-    bundle.jobDispatched(this);
-    client.getExecutor().execute(task);
-    if (debugEnabled) log.debug("end locally submitting {}", bundle);
+    if (!isClosed()) {
+      if (debugEnabled) log.debug("locally submitting {}", bundle);
+      setStatus(JPPFClientConnectionStatus.EXECUTING);
+      final Runnable task = new LocalRunnable(bundle);
+      bundle.jobDispatched(this);
+      client.getExecutor().execute(task);
+      if (debugEnabled) log.debug("end locally submitting {}", bundle);
+    }
     return null;
   }
 
@@ -200,13 +207,18 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 
   @Override
   public void close() {
-    if (debugEnabled) log.debug("closing {}", this);
-    super.close();
-    try {
-      if (!status.isTerminatedStatus()) setStatus(JPPFClientConnectionStatus.CLOSED);
-      executionManager.shutdown();
-    } finally {
-      listeners.clear();
+    synchronized(getMonitor()) {
+      if (closed) return;
+      closed = true;
+      if (debugEnabled) log.debug("closing {}", this);
+      super.close();
+      try {
+        if (!status.isTerminatedStatus()) setStatus(JPPFClientConnectionStatus.CLOSED);
+        executionManager.shutdown();
+      } finally {
+        listenerList.clear();
+        listeners.clear();
+      }
     }
   }
 
@@ -226,5 +238,14 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   LoadBalancerPersistenceManager getLoadBalancerPersistenceManager() {
     return (LoadBalancerPersistenceManager) client.getLoadBalancerPersistenceManagement();
+  }
+
+  /**
+   * @return whether this channel is closed.
+   */
+  public boolean isClosed() {
+    synchronized(getMonitor()) {
+      return closed;
+    }
   }
 }

@@ -60,7 +60,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * List of execution status listeners for this channel.
    */
-  private final List<ExecutorChannelStatusListener> listenerList = new CopyOnWriteArrayList<>();
+  final List<ExecutorChannelStatusListener> listenerList = new CopyOnWriteArrayList<>();
   /**
    * The priority assigned to this channel.
    */
