@@ -101,6 +101,7 @@
     <delete dir="${framework.classes}" quiet="true" includes="**/*.*"/>
     <delete dir="${addons.classes}" quiet="true" includes="**/*.*"/>
     <delete dir="${tests.classes}" quiet="true" includes="**/*.*"/>
+    <mkdir dir="${qddons.classes}"/>
     <mkdir dir="${framework.classes}"/>
     <mkdir dir="${tests.classes}"/>
     <echo message="compiling addons classes: ${addons.classes}"/>
