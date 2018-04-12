@@ -49,7 +49,7 @@
   <!-- ==================================================================== -->
 
   <target name="clean">
-    <delete quiet="false">
+    <delete quiet="true">
       <fileset dir="${classes.dir}" includes="**/*.*"/>
     </delete>
     <delete quiet="true">
