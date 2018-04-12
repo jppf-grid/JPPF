@@ -30,7 +30,7 @@ limitations under the License.
     <compile.module path="${admin}"/>
     <compile.module path="${server}"/>
     <compile.module path="${demo}"/>
-    <compile.module path="${application.template}"/>
+    <compile.module.simple path="${application.template}"/>
     <property name="compile.done" value="true"/>
   </target>
 
@@ -59,6 +59,31 @@ limitations under the License.
       <copy todir="@{path}/classes">
         <fileset dir="@{path}/src/java" excludes="**/*.java,**/package.html"/>
         <fileset dir="@{path}/src/resources" excludes="**/package.html"/>
+      </copy>
+    </sequential>
+  </macrodef>
+  
+  <!--
+    Compile a project/module.
+    Attributes:
+    - path: the root path of the project or module
+  -->
+  <macrodef name="compile.module.simple">
+    <attribute name="path"/>
+    <sequential>
+      <echo message="compiling module '@{path}'"/>
+      <checkstyle  config="${basedir}/CheckStyle_JPPF_config.xml">
+        <fileset dir="@{path}/src" includes="**/*.java"/>
+      </checkstyle>
+      <mkdir dir="@{path}/classes"/>
+      <javac srcdir="" destdir="@{path}/classes" source="1.7" target="1.7"
+        debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+        <classpath refid="project.classpath"/>
+        <compilerarg line=" -Xlint:none"/>
+        <src path="@{path}/src"/>
+      </javac>
+      <copy todir="@{path}/classes">
+        <fileset dir="@{path}/src" excludes="**/*.java,**/package.html"/>
       </copy>
     </sequential>
   </macrodef>
