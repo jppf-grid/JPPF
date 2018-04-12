@@ -1,1 +1,5 @@
 /classes/
+/persistence*/
+*.log
+/report/
+/logs/
