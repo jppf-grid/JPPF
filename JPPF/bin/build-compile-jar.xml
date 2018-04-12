@@ -30,6 +30,7 @@ limitations under the License.
     <compile.module path="${admin}"/>
     <compile.module path="${server}"/>
     <compile.module path="${demo}"/>
+    <compile.module path="${application.template}"/>
     <property name="compile.done" value="true"/>
   </target>
 
