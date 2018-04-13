@@ -205,6 +205,7 @@
 
   <target name="compile.doclet">
     <delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
+    <mkdir dir="${basedir}/classes"/>
     <javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
       debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="doclet.classpath"/>

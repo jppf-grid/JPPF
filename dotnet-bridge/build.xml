@@ -26,6 +26,7 @@
   <property name="classes.dir"       value="${basedir}/classes"/>
 	<property name="classes-node.dir"  value="${basedir}/classes-node"/>
 	<property name="src.dir"           value="${basedir}/src"/>
+  <property name="src-node.dir"      value="${basedir}/src-node"/>
   <property name="build.dir"         value="${basedir}/build"/>
   <property name="lib.dir"           value="${basedir}/lib"/>
   <property name="jni4net.dir"       value="${basedir}/jni4net"/>
@@ -79,11 +80,17 @@
   <!-- ========================================================================= -->
 
   <target name="compile" depends="clean.main, init">
-    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7"
-      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${src.dir}"/>
+    </javac>
+    <mkdir dir="${classes-node.dir}"/>
+    <javac srcdir="" destdir="${classes-node.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${src-node.dir}"/>
     </javac>
   </target>
 
@@ -262,6 +269,7 @@
     <attribute name="outdir"/>
     <attribute name="libname"/>
     <sequential>
+      <mkdir dir="@{outdir}/java/classes"/>
       <javac srcdir="" destdir="@{outdir}/java/classes" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
         <classpath refid="project.classpath"/>
         <compilerarg line="-Xlint:-unchecked"/>
