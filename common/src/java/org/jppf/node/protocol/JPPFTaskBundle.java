@@ -209,9 +209,9 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     sb.append(", uuid=").append(uuid);
     sb.append(", initialTaskCount=").append(initialTaskCount);
     sb.append(", taskCount=").append(taskCount);
-    sb.append(", bundleUuid=").append((String) getParameter("bundle.uuid"));
+    sb.append(", bundleUuid=").append(getParameter("bundle.uuid"));
     sb.append(", uuidPath=").append(uuidPath);
-    if (JPPF_DEBUG) sb.append(", nodeBundleId=").append((String) getParameter("node.bundle.id"));
+    if (JPPF_DEBUG) sb.append(", nodeBundleId=").append(getParameter("node.bundle.id"));
     sb.append(']');
     return sb.toString();
   }

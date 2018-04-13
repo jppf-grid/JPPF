@@ -1,1 +1,4 @@
 /classes/
+/slave_nodes/
+*.log
+*.lck
