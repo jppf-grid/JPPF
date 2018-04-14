@@ -43,6 +43,7 @@ public class JPPFObjectName implements Serializable {
   }
 
   /**
+   * Get the wrapped {@link ObjectName}. 
    * @return an {@code ObjectName}.
    */
   public ObjectName getObjectName() {
