@@ -25,7 +25,7 @@ import javax.management.*;
 import org.jppf.management.ObjectNameCache;
 
 /**
- *
+ * A wrapper for {@link ObjectName} objects to make serialization/serialization faster.
  * @author Laurent Cohen
  */
 public class JPPFObjectName implements Serializable {
