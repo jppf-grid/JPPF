@@ -65,7 +65,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
     // cancel currently executing jobs in all nodes
     forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "cancel");
-    BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
+    print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override
       public boolean evaluate() {
@@ -75,7 +75,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
           return false;
         }
       }
-    }, 5000L, true);
+    }, 5000L, 500L, true);
   }
 
   /**
@@ -295,16 +295,24 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   private static void testJobSelectorAction(final JobSelectorAction action) throws Exception {
     final List<JPPFJob> jobs = action.getJobs();
+    final int n = jobs.size();
+    print(false, false, "waiting for connection pool");
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    print(false, false, "setting pool size to %d", n);
     pool.setSize(jobs.size());
-    pool.awaitWorkingConnections(Operator.EQUAL, jobs.size());
+    print(false, false, "waiting for %d connections in the pool", n);
+    pool.awaitWorkingConnections(Operator.EQUAL, n);
+    print(false, false, "submitting %d jobs", n);
     for (JPPFJob job: jobs) client.submitJob(job);
+    print(false, false, "checking jobs");
     action.call();
-    log.info("waiting for " + jobs.size() + " active connections");
-    pool.awaitActiveConnections(Operator.EQUAL, jobs.size());
+    print(false, false, "waiting for %d active connections", n);
+    pool.awaitActiveConnections(Operator.EQUAL, n);
     log.info("setting pool size to 1");
     pool.setSize(1);
+    print(false, false, "waiting for 1 connection in the pool");
     pool.awaitWorkingConnections(Operator.EQUAL, 1);
+    print(false, false, "got 1 connection in the pool");
   }
 
   /**

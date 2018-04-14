@@ -28,19 +28,14 @@ import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.*;
-import org.slf4j.*;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * @author Laurent Cohen
  */
 abstract class JobSelectorAction implements Callable<Void> {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JobSelectorAction.class);
   /**
    * A "short" duration for this test.
    */
@@ -74,14 +69,15 @@ abstract class JobSelectorAction implements Callable<Void> {
     Thread.sleep(SLEEP_TIME);
     jobManager = BaseSetup.getJobManagementProxy(BaseSetup.getClient());
     assertNotNull(jobManager);
-    performCall();
+    checkResults(performCall());
     return null;
   }
 
   /**
+   * @return true if null results are expected when checking the jobs.
    * @throws Exception .
    */
-  abstract void performCall() throws Exception;
+  abstract boolean performCall() throws Exception;
 
   /**
    * Get the jobs.
@@ -97,9 +93,10 @@ abstract class JobSelectorAction implements Callable<Void> {
    */
   void checkResults(final boolean shouldBeNull) throws Exception {
     for (JPPFJob job: jobs) {
+      BaseTest.print(false, false, "checking job %s", job.getName());
       final int nbTasks = job.getJobTasks().size();
       final List<Task<?>> results = job.awaitResults();
-      log.info("got results for '" + job.getName() + "'");
+      BaseTest.print(false, false, "got %d results for job %s", results.size(), job.getName());
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       for (final Task<?> t : results) {
@@ -120,9 +117,9 @@ abstract class JobSelectorAction implements Callable<Void> {
     }
 
     @Override
-    public void performCall() throws Exception {
+    public boolean performCall() throws Exception {
       jobManager.cancelJobs(selector);
-      checkResults(true);
+      return true;
     }
   }
 
@@ -137,9 +134,9 @@ abstract class JobSelectorAction implements Callable<Void> {
     }
 
     @Override
-    public void performCall() throws Exception {
+    public boolean performCall() throws Exception {
       jobManager.resumeJobs(selector);
-      checkResults(false);
+      return false;
     }
   }
 
@@ -154,7 +151,7 @@ abstract class JobSelectorAction implements Callable<Void> {
     }
 
     @Override
-    public void performCall() throws Exception {
+    public boolean performCall() throws Exception {
       jobManager.suspendJobs(selector, true);
       Thread.sleep(SLEEP_TIME);
       final JobInformation[] jobInfos = jobManager.getJobInformation(selector);
@@ -167,7 +164,7 @@ abstract class JobSelectorAction implements Callable<Void> {
         assertTrue(jobUuids.contains(info.getJobUuid()));
       }
       jobManager.cancelJobs(selector);
-      checkResults(true);
+      return true;
     }
   }
 
@@ -182,7 +179,7 @@ abstract class JobSelectorAction implements Callable<Void> {
     }
 
     @Override
-    public void performCall() throws Exception {
+    public boolean performCall() throws Exception {
       final Map<String, NodeJobInformation[]> infos = jobManager.getNodeInformation(selector);
       assertNotNull(infos);
       assertEquals(jobs.size(), infos.size());
@@ -203,7 +200,7 @@ abstract class JobSelectorAction implements Callable<Void> {
         nodeUuids.add(nodeInfo.getUuid());
       }
       jobManager.cancelJobs(selector);
-      checkResults(true);
+      return true;
     }
   }
 
@@ -218,7 +215,7 @@ abstract class JobSelectorAction implements Callable<Void> {
     }
 
     @Override
-    public void performCall() throws Exception {
+    public boolean performCall() throws Exception {
       JobInformation[] jobInfos = jobManager.getJobInformation(selector);
       assertEquals(jobs.size(), jobInfos.length);
       for (JobInformation info: jobInfos) {
@@ -235,7 +232,7 @@ abstract class JobSelectorAction implements Callable<Void> {
         assertEquals(10, info.getMaxNodes());
       }
       jobManager.cancelJobs(selector);
-      checkResults(true);
+      return true;
     }
   }
 }
