@@ -35,7 +35,7 @@ public class JPPFObjectName implements Serializable {
   private transient ObjectName objectName;
 
   /**
-   *
+   * Initialize this wrapper witht he specified {@link ObjectName}.
    * @param objectName .
    */
   public JPPFObjectName(final ObjectName objectName) {
