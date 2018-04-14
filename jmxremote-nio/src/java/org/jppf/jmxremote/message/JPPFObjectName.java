@@ -30,7 +30,7 @@ import org.jppf.management.ObjectNameCache;
  */
 public class JPPFObjectName implements Serializable {
   /**
-   * 
+   * The wrapped {@link ObjectName}. 
    */
   private transient ObjectName objectName;
 
