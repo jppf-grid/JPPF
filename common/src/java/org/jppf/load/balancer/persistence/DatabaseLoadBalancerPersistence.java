@@ -176,6 +176,7 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
 
   @Override
   public void delete(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    if (debugEnabled) log.debug("deleting {}", info);
     String sql = null;
     String[] args = EMPTY_STRINGS;
     if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {

@@ -229,6 +229,11 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
+  public Integer nbIdleNodes(final NodeSelector selector, final boolean includePeers) throws Exception {
+    return (Integer) invoke(MBEAN_NAME, "nbIdleNodes", new Object[] { selector, includePeers }, new String[] { NodeSelector.class.getName(), boolean.class.getName() });
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation");

@@ -43,7 +43,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes attached to the driver.
    * Note that this method is equivalent to calling {@link #nbNodes(NodeSelector) nbNodes(null)}.
-   * @return the number of nodes, or -1 if information on the nodes could not be retrieved.
+   * @return the number of nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    */
   Integer nbNodes() throws Exception;
@@ -51,7 +51,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes attached to the driver that satisfy the specified selector.
    * @param selector specifies which nodes shouyld be counted. If null, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return the number of nodes, or -1 if information on the nodes could not be retrieved.
+   * @return the number of nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    * @since 5.0
    */
@@ -118,7 +118,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes currently idle.
    * Note that this method is equivalent to calling {@link #nbIdleNodes(NodeSelector) nbIdleNodes(null)}.
-   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved.
+   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    */
   Integer nbIdleNodes() throws Exception;
@@ -126,11 +126,21 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of idle nodes attached to the driver that satisfy the specified selector.
    * @param selector specifies which nodes should be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved.
+   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
    * @throws Exception if any error occurs.
    * @since 5.0
    */
   Integer nbIdleNodes(NodeSelector selector) throws Exception;
+
+  /**
+   * Get the number of idle nodes attached to the driver that satisfy the specified selector.
+   * @param selector specifies which nodes should be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved. The returned number does not include peer drivers.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   */
+  Integer nbIdleNodes(NodeSelector selector, boolean includePeers) throws Exception;
 
   /**
    * Request the JMX connection information for all the idle nodes attached to the server.

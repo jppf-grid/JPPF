@@ -66,6 +66,11 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Integer nbIdleNodes(final NodeSelector param0, final boolean param1) {
+    return (Integer) invoke("nbIdleNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "boolean" });
+  }
+
+  @Override
   public Integer nbNodes() {
     return (Integer) invoke("nbNodes", (Object[]) null, (String[]) null);
   }

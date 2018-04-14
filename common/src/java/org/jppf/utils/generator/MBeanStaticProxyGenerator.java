@@ -223,7 +223,11 @@ public class MBeanStaticProxyGenerator {
    */
   private void generateInvokeMethod(final Method m) throws Exception {
     printIndent();
-    if (m.getReturnType() != void.class) print("return (").print(m.getReturnType().getSimpleName()).print(") ");
+    if (m.getReturnType() != void.class) {
+      // no need to cast to Object
+      if (m.getReturnType() == Object.class) print("return ");
+      else print("return (").print(m.getReturnType().getSimpleName()).print(") ");
+    }
     print("invoke(\"").print(m.getName()).print("\", ");
     final Class<?>[] types = m.getParameterTypes();
     if (types.length > 0) {
