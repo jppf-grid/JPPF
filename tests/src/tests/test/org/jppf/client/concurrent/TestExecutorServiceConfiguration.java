@@ -82,13 +82,48 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * @throws Exception if any error occurs
    */
   @Test(timeout = 5000)
+  public void testSubmitWithClientExecutionPolicy() throws Exception {
+    try {
+      client.setLocalExecutionEnabled(true);
+      print(false, false, ">>> configuring executor");
+      executor.setBatchTimeout(100L);
+      executor.setBatchSize(2);
+      executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
+      final int nbTasks = 10;
+      final List<Future<String>> futures = new ArrayList<>();
+      print(false, false, ">>> submitting tasks");
+      for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
+      assertEquals(nbTasks, futures.size());
+      print(false, false, ">>> getting results");
+      for (final Future<String> future : futures) {
+        final String s = future.get();
+        assertTrue(future.isDone());
+        assertFalse(future.isCancelled());
+        assertNotNull(s);
+        assertEquals("local_client", s);
+      }
+      print(false, false, ">>> results checked");
+    } finally {
+      client.setLocalExecutionEnabled(false);
+    }
+  }
+
+  /**
+   * Submit a Callable task with a timeout.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = 5000)
   public void testSubmitCallableWithTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
+    print(false, false, ">>> configuring executor");
     executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
     executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
     final Callable<String> task = new MyCallableTask(TASK_DURATION);
+    print(false, false, ">>> submitting task");
     final Future<String> future = executor.submit(task);
+    print(false, false, ">>> getting result");
     final String s = future.get();
+    print(false, false, ">>> checking result");
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(s);
@@ -102,11 +137,15 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   @Test(timeout = 15000)
   public void testSubmitCallableWithJobTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
+    print(false, false, ">>> configuring executor");
     executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
     executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
     final Callable<String> task = new MyCallableTask(TASK_DURATION);
+    print(false, false, ">>> submitting task");
     final Future<String> future = executor.submit(task);
+    print(false, false, ">>> getting result");
     final String s = future.get();
+    print(false, false, ">>> checking result");
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNull(s);
@@ -119,14 +158,18 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   @Test(timeout = 10000)
   public void testSubmitWithDataProvider() throws Exception {
     client.setLocalExecutionEnabled(false);
+    print(false, false, ">>> configuring executor");
     final DataProvider dp = new MemoryMapDataProvider();
     final String key = "myKey";
     final String value = "myValue";
     dp.setParameter(key, value);
     executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
     final MyTask task = new MyTask(key);
+    print(false, false, ">>> submitting task");
     final Future<String> future = executor.submit(task);
+    print(false, false, ">>> getting result");
     final String s = future.get();
+    print(false, false, ">>> checking result");
     assertEquals(value, s);
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
@@ -163,56 +206,35 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
-  public void testSubmitWithClientExecutionPolicy() throws Exception {
-    try {
-      client.setLocalExecutionEnabled(true);
-      executor.setBatchTimeout(100L);
-      executor.setBatchSize(2);
-      executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-      final int nbTasks = 10;
-      final List<Future<String>> futures = new ArrayList<>();
-      for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
-      assertEquals(nbTasks, futures.size());
-      for (final Future<String> future : futures) {
-        final String s = future.get();
-        assertTrue(future.isDone());
-        assertFalse(future.isCancelled());
-        assertNotNull(s);
-        assertEquals("local_client", s);
-      }
-    } finally {
-      client.setLocalExecutionEnabled(false);
-    }
-  }
-
-  /**
-   * Submit a Callable task with a timeout.
-   * @throws Exception if any error occurs
-   */
   @Test(timeout = 10000)
   public void testSubmitWithJobListener() throws Exception {
     client.setLocalExecutionEnabled(false);
+    print(false, false, ">>> configuring executor");
     final CountingJobListener listener = new CountingJobListener();
     executor.setBatchTimeout(2000L);
     executor.setBatchSize(10);
     executor.getConfiguration().getJobConfiguration().addJobListener(listener);
     final int nbTasks = 20;
     final List<Future<String>> futures = new ArrayList<>();
+    print(false, false, ">>> submitting tasks");
     for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
     assertEquals(nbTasks, futures.size());
+    print(false, false, ">>> getting results");
     for (final Future<String> future : futures) {
       future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
     }
+    print(false, false, ">>> results checked");
     Thread.sleep(500L);
+    print(false, false, ">>> checking job listener");
     // batch size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
     // driver load-balancing: manual, size=5 ==> 4 job returned notifs
     assertEquals(2, listener.startedCount.get());
     assertEquals(2, listener.endedCount.get());
     assertEquals(2, listener.dispatchedCount.get());
     assertEquals(4, listener.returnedCount.get());
+    print(false, false, ">>> job listener checked");
   }
 
   /**

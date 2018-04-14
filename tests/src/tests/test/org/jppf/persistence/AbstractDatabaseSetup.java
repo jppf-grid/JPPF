@@ -114,19 +114,23 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    */
   @AfterClass
   public static void dbTeardown() throws Exception {
-    BaseSetup.generateClientThreadDump();
-    BaseSetup.generateDriverThreadDump(client);
-    JPPFDatasourceFactory.getInstance().clear();
-    if (h2Server != null) {
-      // generate sql dump file of the database
-      print(false, false, "generating SQL dump");
-      dumpDatabase("h2dump.log");
-      print(false, false, "stopping H2 server");
-      h2Server.stop();
-      print(false, false, "H2 server stopped, deleting database");
-      // delete the entire database
-      FileUtils.deletePath(new File("./root"), true);
-      print(false, false, "database deleted");
+    try {
+      BaseSetup.generateClientThreadDump();
+      BaseSetup.generateDriverThreadDump(client);
+      JPPFDatasourceFactory.getInstance().clear();
+      if (h2Server != null) {
+        // generate sql dump file of the database
+        print(false, false, "generating SQL dump");
+        dumpDatabase("h2dump.log");
+        print(false, false, "stopping H2 server");
+        h2Server.stop();
+        print(false, false, "H2 server stopped, deleting database");
+        // delete the entire database
+        FileUtils.deletePath(new File("./root"), true);
+        print(false, false, "database deleted");
+      }
+    } catch (final Exception e) {
+      e.printStackTrace();
     }
   }
 

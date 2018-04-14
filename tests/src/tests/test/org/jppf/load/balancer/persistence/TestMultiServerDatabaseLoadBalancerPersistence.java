@@ -23,7 +23,7 @@ import org.junit.BeforeClass;
 import test.org.jppf.test.setup.*;
 
 /**
- * Test database load-balancer persistence. 
+ * Test database load-balancer persistence in a multi-server topology. 
  * @author Laurent Cohen
  */
 public class TestMultiServerDatabaseLoadBalancerPersistence extends AbstractMuliServerLoadBalancerPersistenceTest {
@@ -35,8 +35,9 @@ public class TestMultiServerDatabaseLoadBalancerPersistence extends AbstractMuli
   public static void setup() throws Exception {
     final String prefix = "lb_persistence_p2p";
     final TestConfiguration config = dbSetup(prefix, true);
-    config.driverJppf = "classes/tests/config/" + prefix + "/driver_async_db.properties";
+    config.driverJppf = "classes/tests/config/" + prefix + "/driver_db.properties";
     config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
-    client = BaseSetup.setup(2, 2, true, true, config);
+    client = BaseSetup.setup(2, 2, true, false, config);
+    checkPeers(15_000L, false, true);
   }
 }

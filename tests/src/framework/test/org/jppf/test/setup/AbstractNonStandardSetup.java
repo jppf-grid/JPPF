@@ -45,6 +45,8 @@ import test.org.jppf.test.setup.common.*;
 public class AbstractNonStandardSetup extends BaseTest {
   /** */
   protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
+  /** */
+  protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", true));
   /**
    * 
    */
@@ -262,7 +264,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         assertEquals(getNbNodes(), result.size());
         for (final Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
         ready = true;
-      } catch (@SuppressWarnings("unused") Exception|AssertionError e) {
+      } catch (@SuppressWarnings("unused") final Exception|AssertionError e) {
         Thread.sleep(100L);
       }
     }
@@ -307,7 +309,6 @@ public class AbstractNonStandardSetup extends BaseTest {
     }
   }
 
-
   /**
    * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
    * @param maxWait the maximum time to wait for completion of this method.
@@ -315,17 +316,26 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void checkPeers(final long maxWait, final boolean secure) throws Exception {
+  }
+
+  /**
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
+   * @param maxWait the maximum time to wait for completion of this method.
+   * @param secure whether to use SSL connections.
+   * @param checkPeers whether to check peer driver connections.
+   * @throws Exception if any error occurs.
+   */
+  protected static void checkPeers(final long maxWait, final boolean secure, final boolean checkPeers) throws Exception {
     final long start = System.currentTimeMillis();
     long timeout = maxWait;
-    print(false, false, ">>> creating 2 JMX connections");
-    //final JMXDriverConnectionWrapper[] jmxArray = { new JMXDriverConnectionWrapper("localhost", 12101, secure), new JMXDriverConnectionWrapper("localhost", 12102, secure) };
+    print(false, false, "$$ creating 2 JMX connections");
     final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[2];
     final int base = secure ? SSL_DRIVER_MANAGEMENT_PORT_BASE : DRIVER_MANAGEMENT_PORT_BASE;
     for (int i=0; i<2; i++) jmxArray[i] = new JMXDriverConnectionWrapper("localhost", base + i + 1, secure);
     try {
       for (final JMXDriverConnectionWrapper jmx: jmxArray) jmx.connect();
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
-        print(false, false, ">>> awaiting JMX connection for %s", jmx);
+        print(false, false, "$$ awaiting JMX connection for %s", jmx);
         timeout = maxWait - (System.currentTimeMillis() - start);
         if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
         ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
@@ -335,14 +345,23 @@ public class AbstractNonStandardSetup extends BaseTest {
             return b;
           }
         }, timeout, 500L, true);
-        print(false, false, ">>> got JMX connection %s", jmx);
+        print(false, false, "$$ got JMX connection %s", jmx);
       }
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
-        print(false, false, ">>> awaiting 1 idle node for %s", jmx);
+        print(false, false, "$$ awaiting 1 idle node for %s", jmx);
         timeout = maxWait - (System.currentTimeMillis() - start);
         if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
         awaitNbIdleNodes(jmx, Operator.EQUAL, 1, timeout);
-        print(false, false, ">>> got 1 idle node for %s", jmx);
+        print(false, false, "$$ got 1 idle node for %s", jmx);
+      }
+      if (checkPeers) {
+        for (final JMXDriverConnectionWrapper jmx: jmxArray) {
+          print(false, false, ">>> awaiting 1 peer driver for %s", jmx);
+          timeout = maxWait - (System.currentTimeMillis() - start);
+          if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+          awaitNbIdleNodes(jmx, PEER_SELECTOR, checkPeers, Operator.EQUAL, 1, timeout);
+          print(false, false, "$$ got peer driver connection for %s", jmx);
+        }
       }
     } finally {
       BaseSetup.generateDriverThreadDump(jmxArray);
@@ -361,19 +380,32 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs or the tiemout expires.
    */
   protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final Operator operator, final int nbNodes, final long timeout) throws Exception {
+    awaitNbIdleNodes(jmx, NON_PEER_SELECTOR, false, operator, nbNodes, timeout);
+  }
+
+  /**
+   * Wait for the specified driver to have a number of idle peer drivers that satisfy the specified condition.
+   * @param jmx the JMX connection to the driver.
+   * @param selector the node selector to use.
+   * @param includePeers whether to include peers in the query.
+   * @param operator the comparison operator that defines the condition to evaluate.
+   * @param nbNodes the expected number of idle nodes to satisfy the comparison.
+   * @param timeout how long to wait for the condtion to be {@link true}.
+   * @throws Exception if any error occurs or the tiemout expires.
+   */
+  protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final NodeSelector selector, final boolean includePeers,
+    final Operator operator, final int nbNodes, final long timeout) throws Exception {
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {
           try {
-            operator.evaluate(jmx.nbIdleNodes(NON_PEER_SELECTOR), nbNodes);
-            return jmx.nbIdleNodes(NON_PEER_SELECTOR) == 1;
+            return operator.evaluate(jmx.nbIdleNodes(selector, includePeers), nbNodes);
           } catch (@SuppressWarnings("unused") final Exception e) {
             return false;
           }
         }
       }, timeout, 500L, true);
   }
-
   /**
    * @return the number of nodes in the topology.
    */

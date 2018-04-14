@@ -152,7 +152,7 @@ public class BaseTestHelper {
     while (true) {
       try {
         test.call();
-      } catch (Exception|Error e) {
+      } catch (final Exception|Error e) {
         throwable = e;
       }
       if (throwable == null) return;

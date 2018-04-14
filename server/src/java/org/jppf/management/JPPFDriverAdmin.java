@@ -112,7 +112,12 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
-    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
+    return nbIdleNodes(selector, false);
+  }
+
+  @Override
+  public Integer nbIdleNodes(final NodeSelector selector, final boolean includePeers) throws Exception {
+    final Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
     if (nodes == null) return -1;
     int result = 0;
     for (final AbstractNodeContext node: nodes) {

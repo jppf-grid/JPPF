@@ -158,9 +158,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
     if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
-    if (bundler == null || this.bundler.getTimestamp() < factory.getLastUpdateTime()) {
+    if (bundler == null || bundler.getTimestamp() < factory.getLastUpdateTime()) {
       if (bundler != null) {
-        this.bundler.dispose();
+        bundler.dispose();
         if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
       }
       final Pair<String, Bundler<?>> pair = JPPFDriver.getInstance().getNodeNioServer().getBundlerHandler().loadBundler(nodeIdentifier);

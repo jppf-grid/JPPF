@@ -21,12 +21,21 @@ package org.jppf.server.peer;
 import java.util.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.slf4j.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
 public class PeerConnectionPoolHandler {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(PeerConnectionPoolHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The connection pools.
    */
@@ -42,6 +51,8 @@ public class PeerConnectionPoolHandler {
    * @return the newly created pool.
    */
   public PeerConnectionPool newPool(final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
+    if (debugEnabled) log.debug(String.format("creating PeerConnectionPool with peerName=%s, size=%d, connectionInfo=%s, secure=%b, fromDiscovery=%b",
+      peerName, size, connectionInfo, secure, fromDiscovery));
     final PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
     pools.add(pool);
     return pool;

@@ -59,9 +59,10 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
     final TestConfiguration testConfig = createConfig("offline_node");
     testConfig.nodeClasspath.add("../server/classes");
     testConfig.driverLog4j = "classes/tests/config/offline_node/log4j-driver.properties";
+    testConfig.nodeLog4j = "classes/tests/config/offline_node/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, false, testConfig);
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    while (jmx.nbNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
+    while (jmx.nbNodes() < BaseSetup.nbNodes()) Thread.sleep(100L);
   }
 
   /**

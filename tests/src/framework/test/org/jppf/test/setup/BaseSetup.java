@@ -354,13 +354,13 @@ public class BaseSetup {
   protected static void stopProcesses() {
     try {
       if (nodes != null) {
-        for (NodeProcessLauncher n: nodes) {
+        for (final NodeProcessLauncher n: nodes) {
           BaseTest.print(true, false, "stopping %s", n.getName());
           n.stopProcess();
         }
       }
       if (drivers != null) {
-        for (DriverProcessLauncher d: drivers) {
+        for (final DriverProcessLauncher d: drivers) {
           BaseTest.print(true, false, "stopping %s", d.getName());
           d.stopProcess();
         }

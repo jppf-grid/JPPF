@@ -219,7 +219,9 @@ public class DriverInitializer {
     boolean initPeers;
     final TypedProperties props = JPPFConfiguration.getProperties();
     final boolean ssl = props.get(PEER_SSL_ENABLED);
-    if (props.get(PEER_DISCOVERY_ENABLED)) {
+    final boolean enabled = props.get(PEER_DISCOVERY_ENABLED);
+    if (debugEnabled) log.debug("{} = {}", PEER_DISCOVERY_ENABLED.getName(), enabled);
+    if (enabled) {
       if (debugEnabled) log.debug("starting peers discovery");
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
@@ -234,6 +236,7 @@ public class DriverInitializer {
       initPeers = true;
     }
     final String discoveryNames = props.get(PEERS);
+    if (debugEnabled) log.debug("discoveryNames = {}", discoveryNames);
     if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
       final String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);

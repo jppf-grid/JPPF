@@ -110,7 +110,7 @@ class WaitingResultsState extends NodeServerState {
     final TaskBundle newBundle = received.bundle();
     // if an exception prevented the node from executing the tasks or sending back the results
     final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
-    final Bundler<?> bundler = context.getBundler();
+    Bundler<?> bundler = context.getBundler();
     final ServerTaskBundleNode nodeBundle = context.getBundle();
     final Lock lock = nodeBundle.getClientJob().getLock();
     lock.lock();
@@ -150,6 +150,7 @@ class WaitingResultsState extends NodeServerState {
         nodeBundle.resultsReceived(data);
         final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
         updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
+        if (bundler == null) bundler = context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
         if (bundler instanceof BundlerEx) {
           final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
           BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
