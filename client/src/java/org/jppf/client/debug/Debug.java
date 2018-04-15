@@ -25,12 +25,17 @@ import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.management.ObjectNameCache;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class Debug implements DebugMBean {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(Debug.class);
   /**
    * The client to monitor.
    */
@@ -74,9 +79,8 @@ public class Debug implements DebugMBean {
       final ObjectName name = ObjectNameCache.getObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       server.registerMBean(mbean, name);
-      //System.out.println("registered client debug mbean: " + name);
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -90,7 +94,7 @@ public class Debug implements DebugMBean {
       final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       if (server.isRegistered(name)) server.unregisterMBean(name);
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 

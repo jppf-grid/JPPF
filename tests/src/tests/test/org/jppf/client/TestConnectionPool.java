@@ -117,17 +117,23 @@ public class TestConnectionPool extends Setup1D1N {
    * Test a sequence of {@link JPPFConnectionPool#setSize(int)} calls.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 15000)
   public void testSetPoolSizeByAPI() throws Exception {
+    print(false, false, "creating client");
     client = BaseSetup.createClient(null, false);
     for (int i=1; i<=10; i++) {
+      print(false, false, "iteration #%d awaiting working pool", i);
       final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       try {
+        print(false, false, "setting pool size to 2, current size is %d", pool.getSize());
         pool.setSize(2);
+        print(false, false, "waiting for 2 working connections");
         pool.awaitWorkingConnections(Operator.EQUAL, 2);
         assertEquals(2, pool.getSize());
       } finally {
+        print(false, false, "setting pool size to 1, current size is %d", pool.getSize());
         pool.setSize(1);
+        print(false, false, "waiting for 1 working connection");
         pool.awaitWorkingConnections(Operator.EQUAL, 1);
         assertEquals(1, pool.getSize());
       }
