@@ -65,7 +65,7 @@ public class HTMLPrinter {
     for (final Build build: project.getBuilds()) {
       final TestResults res = build.getTestResults();
       sb.append(indent()).append("<tr>\n");
-      final String icon = "http://www.jppf.org/images/icons/" + ("SUCCESS".equals(build.getResult()) ? "default.png" : "bug1.png");
+      final String icon = "https://www.jppf.org/images/icons/" + ("SUCCESS".equals(build.getResult()) ? "default.png" : "bug1.png");
       sb.append(incIndent()).append("<td align='left' valign='bottom' style='" + style2a + "'>").append("<img width='16' height='16' src='" + icon + "'/> ").append(build.getNumber()).append("</td>\n");
       sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(SDF.format(new Date(build.getStartTime()))).append("</td>\n");
       sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(StringUtils.toStringDuration(build.getDuration())).append("</td>\n");
