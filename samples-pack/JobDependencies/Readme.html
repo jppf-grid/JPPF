@@ -8,7 +8,7 @@ It supports any non-cyclic dependency graph and will work even when the jobs in 
 <ul class="samplesList">
   <li>you will first need to build the server extension which manages the job dependencies: start a command prompt in <code>JPPF-x.y.z-samples-pack/JobDependencies</code> then type "ant".
   This will create a file named <b>JobDependencies.jar</b>. Copy this file to your server's /lib folder</li>
-  <li>then start a JPPF server and at least one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>then start a JPPF server and at least one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.</li>
   <li>during the server startup, you should see the following two lines in the console output:
 <pre class="prettyprint lang-regex">[2016-05-09 21:36:13.585] processor: In DependencyProcessor()
 [2016-05-09 21:36:13.585] processor: Initializing DependencyProcessor</pre>
@@ -75,7 +75,7 @@ Job A ==></pre>
 <p>package <b>org.jppf.example.job.dependencies</b>:
 <ul class="samplesList">
   <li><a href="src/org/jppf/example/job/dependencies/JobDependenciesRunner.java.html">JobDependenciesRunner.java</a>: the entry point for the demo, reads the dependency graph and submits multiple jobs accordingly</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencyProcessor.java.html">DependencyProcessor.java<a/>: deployed as a <a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Server_startup_classes">server startup class</a>,
+  <li><a href="src/org/jppf/example/job/dependencies/DependencyProcessor.java.html">DependencyProcessor.java<a/>: deployed as a <a href="https://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Server_startup_classes">server startup class</a>,
   suspends / resumes jobs based on the state of their dependencies</li>
   <li><a href="src/org/jppf/example/job/dependencies/DependencyGraph.java.html">DependencyGraph.java</a>: represents the job dependencies graph</li>
   <li><a href="src/org/jppf/example/job/dependencies/DependencyNode.java.html">DependencyNode.java</a>: represents a node (aka vertex) in the dependency graph</li>
@@ -95,7 +95,7 @@ Job A ==></pre>
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomLoadBalancer/src</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/5.2/">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/doc/5.2/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

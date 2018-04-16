@@ -174,7 +174,7 @@
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
-    <b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
+    <b>Gain insight and provide feedback in the <a href="https://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
     </div><br>
   </div>
   <div class="column_right">
@@ -196,13 +196,13 @@
     ?>
     <div align="left">
       <br><b>Feeds: </b>
-      <a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1"><img src="images/feed-16x16.gif" border="0"/></a>
-      <a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
-      &nbsp;<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1"><img src="images/feed-16x16.gif" border="0"/></a>
-      <a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
+      <a href="https://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1"><img src="images/feed-16x16.gif" border="0"/></a>
+      <a href="https://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
+      &nbsp;<a href="https://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1"><img src="images/feed-16x16.gif" border="0"/></a>
+      <a href="https://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
       &nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
     </div>
-    <p><b>Follow us on <a href="http://www.twitter.com/jppfgrid"><img src="http://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
+    <p><b>Follow us on <a href="https://www.twitter.com/jppfgrid"><img src="https://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
     </div>
     <br><div align="justify" class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Our users say</h3>
@@ -214,7 +214,7 @@
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/help-hint.png" class="titleWithIcon"/>Did you know ...</h3>
     That you can turn JPPF into a full-fledged P2P Grid?
-    Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a><br><br>
+    Read about it <a href="https://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a><br><br>
     </div>
   </div>
 </div>
@@ -225,7 +225,7 @@
       <tr><td colspan="*" style="height: 10px"></td></tr>
       <tr>
         <td align="center" style="font-size: 9pt; color: #6D78B6">
-          <a href="http://www.jppf.org"><img src="/images/jppf_group_large.gif" border="0" alt="JPPF"/></a>
+          <a href="/"><img src="/images/jppf_group_large.gif" border="0" alt="JPPF"/></a>
         </td>
         <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2017 JPPF.org</td>
         <td align="middle" valign="center">
@@ -244,12 +244,12 @@
           <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           <!-- Facebook Like button -->
-          <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.jppf.org&amp;layout=button_count&amp;show_faces=true&amp;width=40&amp;action=like&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0"
+          <iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.jppf.org&amp;layout=button_count&amp;show_faces=true&amp;width=40&amp;action=like&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0"
             class="like" allowTransparency="true"></iframe>
         </td>
         <td align="right">
-          <a href="http://sourceforge.net/projects/jppf-project">
-            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+          <a href="https://sourceforge.net/projects/jppf-project">
+            <img src="https://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
               alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
           </a>
         </td>

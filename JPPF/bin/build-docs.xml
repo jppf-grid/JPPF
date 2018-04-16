@@ -77,7 +77,7 @@
 
   <property name="javadoc.header"><![CDATA[
     <table><tr><td valign="center">
-        <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
+        <a href="https://www.jppf.org" target="_top"><img src="https://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
       </td></tr></table>
   ]]></property>
 
@@ -161,9 +161,9 @@
       <packageset dir="${jmxremote}/src"/>
       <link href="https://docs.oracle.com/javase/7/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
-      <link href="http://junit.sourceforge.net/javadoc"/>
-      <link href="http://x-stream.github.io/javadoc"/>
-      <link offline="true" href="http://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
+      <link href="https://junit.org/junit4/javadoc/latest"/>
+      <link href="https://x-stream.github.io/javadoc"/>
+      <link offline="true" href="https://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>${javadoc.header}</header>
       <bottom>${javadoc.bottom}</bottom>
@@ -197,11 +197,11 @@
       <arg value="-link"/>
       <arg value="https://docs.oracle.com/javaee/6/api/"/>
       <arg value="-link"/>
-      <arg value="http://junit.sourceforge.net/javadoc"/>
+      <arg value="https://junit.org/junit4/javadoc/latest"/>
       <arg value="-link"/>
-      <arg value="http://x-stream.github.io/javadoc"/>
+      <arg value="https://x-stream.github.io/javadoc"/>
       <arg value="-linkoffline"/>
-      <arg value="http://d.android.com/reference"/>
+      <arg value="https://d.android.com/reference"/>
       <arg value="file:${env.ANDROID_HOME}/docs/reference"/>
       <arg value="-doctitle"/>
       <arg value="'JPPF v${version.number}'"/>
@@ -295,7 +295,7 @@
   -->
   <macrodef name="favicon">
     <attribute name="dir"/>
-    <attribute name="icon" default="http://www.jppf.org/images/jppf-icon.ico"/>
+    <attribute name="icon" default="https://www.jppf.org/images/jppf-icon.ico"/>
     <sequential>
       <replace dir="@{dir}">
         <include name="**/*.html"/>

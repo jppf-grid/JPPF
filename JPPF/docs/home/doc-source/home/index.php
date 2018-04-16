@@ -68,7 +68,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
-    <b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
+    <b>Gain insight and provide feedback in the <a href="https://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
     </div><br>
 
   </div>
@@ -93,13 +93,13 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
 
     <div align="left">
       <br><b>Feeds: </b>
-      <a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1"><img src="images/feed-16x16.gif" border="0"/></a>
-      <a href="http://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
-      &nbsp;<a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1"><img src="images/feed-16x16.gif" border="0"/></a>
-      <a href="http://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
+      <a href="https://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1"><img src="images/feed-16x16.gif" border="0"/></a>
+      <a href="https://sourceforge.net/export/projnews.php?group_id=135654&limit=10&flat=1&show_summaries=1">News</a>
+      &nbsp;<a href="https://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1"><img src="images/feed-16x16.gif" border="0"/></a>
+      <a href="https://sourceforge.net/export/rss2_projnews.php?group_id=135654&rss_fulltext=1">Releases</a>
       &nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
     </div>
-    <p><b>Follow us on <a href="http://www.twitter.com/jppfgrid"><img src="http://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
+    <p><b>Follow us on <a href="https://www.twitter.com/jppfgrid"><img src="https://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
     </div>
 
     <br><div align="justify" class="blockWithHighlightedTitle" style="padding-left: 5px">
@@ -113,7 +113,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     $template{name="title-with-icon" img="images/icons/help-hint.png" title="Did you know ..." heading="h3"}$
     That you can turn JPPF into a full-fledged P2P Grid?
-    Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a><br><br>
+    Read about it <a href="https://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a><br><br>
     </div>
 
   </div>
