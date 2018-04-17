@@ -128,16 +128,16 @@
       <packageset dir="${jmxremote}/src"/>
       <link href="https://docs.oracle.com/javase/7/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
-      <link href="http://junit.sourceforge.net/javadoc"/>
-      <link href="http://x-stream.github.io/javadoc"/>
-      <link offline="true" href="http://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
+      <link href="https://junit.org/junit4/javadoc/latest"/>
+      <link href="https://x-stream.github.io/javadoc"/>
+      <link offline="true" href="https://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>
         <![CDATA[
           <table><tr>
             <td valign="center">
-              <a href="http://www.jppf.org" target="_top">
-                <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+              <a href="https://www.jppf.org" target="_top">
+                <img src="https://www.jppf.org/images/jppf_group_large.gif" border="0"/>
               </a>
             </td>
           </tr></table>
@@ -193,7 +193,7 @@
       <replace dir="@{javadoc.dir}">
         <include name="**/*.html"/>
         <replacetoken><![CDATA[</head>]]></replacetoken>
-        <replacevalue><![CDATA[<link rel="shortcut icon" href="http://www.jppf.org/images/jppf-icon.ico" type="image/x-icon">
+        <replacevalue><![CDATA[<link rel="shortcut icon" href="https://www.jppf.org/images/jppf-icon.ico" type="image/x-icon">
       </head>]]></replacevalue>
       </replace>
     </sequential>
