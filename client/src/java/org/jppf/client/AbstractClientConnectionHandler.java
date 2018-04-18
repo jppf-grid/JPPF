@@ -79,8 +79,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     final TypedProperties config = owner.getConnectionPool().getClient().getConfig();
     final long configSocketIdle = config.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
-    //socketInitializer = new SocketInitializerImpl(config);
-    socketInitializer = new QueuingSocketInitializer(config);
+    socketInitializer = SocketInitializer.Factory.newInstance(config);
   }
 
   /**

@@ -18,6 +18,8 @@
 
 package org.jppf.comm.socket;
 
+import org.jppf.utils.*;
+
 /**
  * Common interface for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
@@ -47,4 +49,29 @@ public interface SocketInitializer {
    * @return the last captured exception, if any, otherwise {@code null}.
    */
   Exception getLastException();
+
+  /**
+   * Factory class for {@code SocketInitializer}s.
+   */
+  public static class Factory {
+    /**
+     * The property to use to determine which implementation to use.
+     */
+    private static final String USE_QUEUING_PROP = "jppf.socket.initializer.queuing";
+
+    /**
+     * @return a new {@code SocketInitializer} concrete instance.
+     */
+    public static SocketInitializer newInstance() {
+      return JPPFConfiguration.getProperties().getBoolean(USE_QUEUING_PROP, true) ? new QueuingSocketInitializer() : new SocketInitializerImpl();
+    }
+
+    /**
+     * @param config the configuration to use.
+     * @return a new {@code SocketInitializer} concrete instance.
+     */
+    public static SocketInitializer newInstance(final TypedProperties config) {
+      return config.getBoolean(USE_QUEUING_PROP, true) ? new QueuingSocketInitializer(config) : new SocketInitializerImpl(config);
+    }
+  }
 }

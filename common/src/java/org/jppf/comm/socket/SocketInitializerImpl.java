@@ -28,7 +28,7 @@ import org.slf4j.*;
  * When no attempt succeeded, a <code>JPPFError</code> is thrown, and the application should normally exit.
  * @author Laurent Cohen
  */
-public class SocketInitializerImpl extends ThreadSynchronization implements SocketInitializer {
+class SocketInitializerImpl extends ThreadSynchronization implements SocketInitializer {
   /**
    * Logger for this class.
    */
@@ -61,7 +61,7 @@ public class SocketInitializerImpl extends ThreadSynchronization implements Sock
   /**
    * Instantiate this SocketInitializer with the global JPPF configuration.
    */
-  public SocketInitializerImpl() {
+  SocketInitializerImpl() {
     this.config = JPPFConfiguration.getProperties();
   }
 

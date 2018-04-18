@@ -55,8 +55,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  SocketInitializer socketInitializer = new QueuingSocketInitializer();
-  //SocketInitializer socketInitializer = new SocketInitializerImpl();
+  SocketInitializer socketInitializer = SocketInitializer.Factory.newInstance();
   /**
    * Name of this remote peer connection.
    */

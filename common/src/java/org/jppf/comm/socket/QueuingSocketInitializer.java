@@ -28,7 +28,7 @@ import org.slf4j.*;
  * {@code SockerChannel.open()} and {@code SockerChannel.connect()}, when creating and connecting many channels concurrently.
  * @author Laurent Cohen
  */
-public class QueuingSocketInitializer extends SocketInitializerImpl {
+class QueuingSocketInitializer extends SocketInitializerImpl {
   /**
    * Logger for this class.
    */
@@ -49,7 +49,7 @@ public class QueuingSocketInitializer extends SocketInitializerImpl {
    * Instantiate this SocketInitializer with a specified configuration.
    * @param config the configuration to use.
    */
-  public QueuingSocketInitializer(final TypedProperties config) {
+  QueuingSocketInitializer(final TypedProperties config) {
     super(config);
   }
 
