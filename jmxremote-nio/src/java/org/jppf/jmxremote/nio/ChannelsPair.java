@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.*;
 
-import org.jppf.jmxremote.JPPFMBeanServerConnection;
+import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.utils.Pair;
 
@@ -61,7 +61,7 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
   /**
    * The associated MBeanServerConnection (clientr-side).
    */
-  private JPPFMBeanServerConnection mbeanServerConnection;
+  private JPPFJMXConnector jmxConnector;
   /**
    * Server port on which the connection was established.
    */
@@ -215,18 +215,18 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
   }
 
   /**
-   * @return the associated MBeanServerConnection (client-side).
+   * @return the associated JMXConnector (client-side).
    */
-  public JPPFMBeanServerConnection getMbeanServerConnection() {
-    return mbeanServerConnection;
+  public JPPFJMXConnector getJMXConnector() {
+    return jmxConnector;
   }
 
   /**
-   * Set the associated MBeanServerConnection (client-side).
-   * @param mbeanServerConnection the {@link MBeanServerConnection} to set.
+   * Set the associated JMXConnector (client-side).
+   * @param mbeanServerConnection the {@link JMXConnector} to set.
    */
-  public void setMbeanServerConnection(final JPPFMBeanServerConnection mbeanServerConnection) {
-    this.mbeanServerConnection = mbeanServerConnection;
+  public void setJMXConnector(final JPPFJMXConnector mbeanServerConnection) {
+    this.jmxConnector = mbeanServerConnection;
   }
 
   @Override

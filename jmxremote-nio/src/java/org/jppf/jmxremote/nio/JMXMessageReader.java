@@ -193,7 +193,7 @@ class JMXMessageReader {
    */
   static void handleNotification(final JMXContext context, final JMXNotification jmxNotification) throws Exception {
     if (debugEnabled) log.debug("received notification {} from context = {}", jmxNotification, context);
-    context.getChannels().getMbeanServerConnection().handleNotification(jmxNotification);
+    context.getChannels().getJMXConnector().handleNotification(jmxNotification);
   }
 
   /**

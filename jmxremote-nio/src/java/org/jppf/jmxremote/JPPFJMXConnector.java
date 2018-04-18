@@ -18,6 +18,8 @@
 
 package org.jppf.jmxremote;
 
+import static org.jppf.jmxremote.message.JMXMessageType.*;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.*;
@@ -32,9 +34,10 @@ import org.jppf.JPPFException;
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.jmx.*;
-import org.jppf.jmxremote.message.JMXMessageHandler;
+import org.jppf.jmxremote.message.*;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.jmxremote.nio.ChannelsPair.CloseCallback;
+import org.jppf.jmxremote.notification.ClientListenerInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -79,6 +82,14 @@ public class JPPFJMXConnector implements JMXConnector {
    * A sequence number for connection notifications.
    */
   private final AtomicInteger notificationSequence = new AtomicInteger(0);
+  /**
+   * Mapping of notification listener ids to actual listeners.
+   */
+  private final Map<Integer, ClientListenerInfo> notificationListenerMap = new HashMap<>();
+  /**
+   * The message handler.
+   */
+  private JMXMessageHandler messageHandler;
 
   /**
    *
@@ -195,6 +206,13 @@ public class JPPFJMXConnector implements JMXConnector {
   }
 
   /**
+   * @return the message handler.
+   */
+  JMXMessageHandler getMessageHandler() {
+    return messageHandler;
+  }
+
+  /**
    * Initialize this connector.
    * @throws Exception if an error is raised during initialization.
    */
@@ -219,15 +237,92 @@ public class JPPFJMXConnector implements JMXConnector {
         fireConnectionNotification(true, exception);
       }
     });
-    final JMXMessageHandler messageHandler = pair.getMessageHandler();
-    mbsc = new JPPFMBeanServerConnection(messageHandler);
-    pair.setMbeanServerConnection(mbsc);
+    messageHandler = pair.getMessageHandler();
     if (debugEnabled) log.debug("registering channel");
     server.registerChannel(pair, socketClient.getChannel());
     if (debugEnabled) log.debug("getting connection id");
-    connectionID = mbsc.receiveConnectionID(address);
+    connectionID = messageHandler.receiveConnectionID(address);
     pair.setConnectionID(connectionID);
     if (debugEnabled) log.debug("received connectionId = {}", connectionID);
+    mbsc = new JPPFMBeanServerConnection(this);
+    pair.setJMXConnector(this);
+  }
+
+  /**
+   * Handle a new received notification.
+   * @param jmxNotification the notification message to process.
+   * @throws Exception if any error occurs.
+   */
+  public void handleNotification(final JMXNotification jmxNotification) throws Exception {
+    if (debugEnabled) log.debug("received notification {}", jmxNotification);
+    final List<ClientListenerInfo> infos = new ArrayList<>(jmxNotification.getListenerIDs().length);
+    synchronized(notificationListenerMap) {
+      for (final Integer listenerID: jmxNotification.getListenerIDs()) {
+        final ClientListenerInfo info = notificationListenerMap.get(listenerID);
+        if (info != null) infos.add(info);
+      }
+    }
+    for  (final ClientListenerInfo info: infos) info.getListener().handleNotification(jmxNotification.getNotification(), info.getHandback());
+  }
+
+  /**
+   * Add a notification listener.
+   * @param name the name of the MBean on which the listener should be added.
+   * @param listener the listener object which will handle the notifications emitted by the registered MBean.
+   * @param filter the filter object. If filter is null, no filtering will be performed before handling notifications.
+   * @param handback the context to be sent to the listener when a notification is emitted.
+   * @throws Exception if any error occurs.
+   */
+  void addNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
+    final int listenerID = (Integer) messageHandler.sendRequestWithResponse(ADD_NOTIFICATION_LISTENER, name, filter);
+    synchronized(notificationListenerMap) {
+      notificationListenerMap.put(listenerID, new ClientListenerInfo(listenerID, name, listener, filter, handback));
+    }
+  }
+
+  /**
+   * Removes a listener from a registered MBean.
+   * @param name the name of the MBean on which the listener should be removed.
+   * @param listener the listener to remove.
+   * @throws Exception if any error occurs.
+   */
+  void removeNotificationListener(final ObjectName name, final NotificationListener listener) throws Exception {
+    final List<ClientListenerInfo> toRemove = new ArrayList<>();
+    synchronized(notificationListenerMap) {
+      for (final Map.Entry<Integer, ClientListenerInfo> entry: notificationListenerMap.entrySet()) {
+        final ClientListenerInfo info = entry.getValue();
+        if (info.getMbeanName().equals(name) && (info.getListener() == listener)) toRemove.add(info);
+      }
+      if (toRemove.isEmpty()) throw new ListenerNotFoundException("no matching listener");
+      final int[] ids = new int[toRemove.size()];
+      for (int i=0; i<ids.length; i++) ids[i] = toRemove.get(i).getListenerID();
+      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER, name, ids);
+      for (final int id: ids) notificationListenerMap.remove(id);
+    }
+  }
+
+  /**
+   * Removes a listener from a registered MBean.
+   * @param name the name of the MBean on which the listener should be removed.
+   * @param listener the listener to remove.
+   * @param filter the filter that was specified when the listener was added.
+   * @param handback the handback that was specified when the listener was added.
+   * @throws Exception if any error occurs.
+   */
+  void removeNotificationListener(final ObjectName name, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
+    ClientListenerInfo toRemove = null;
+    synchronized(notificationListenerMap) {
+      for (Map.Entry<Integer, ClientListenerInfo> entry: notificationListenerMap.entrySet()) {
+        final ClientListenerInfo info = entry.getValue();
+        if (info.getMbeanName().equals(name) && (info.getListener() == listener) && (info.getFilter() == filter) && (info.getHandback() == handback)) {
+          toRemove = info;
+          break;
+        }
+      }
+      if (toRemove == null) throw new ListenerNotFoundException("no matching listener");
+      messageHandler.sendRequestWithResponse(REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK, name, toRemove.getListenerID());
+      notificationListenerMap.remove(toRemove.getListenerID());
+    }
   }
 
   /**

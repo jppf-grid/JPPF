@@ -274,7 +274,7 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
   }
 
   /**
-   * Create a new channel wrapper.
+   * Create a new channel context.
    * @param env environment parameters to use for TLS properties.
    * @param channel the associated socket channel.
    * @param ssl whether the connection is secure.
