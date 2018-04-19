@@ -152,6 +152,7 @@
       <arg value="-quiet"/>
       <packageset dir="${node}/src/java"/>
       <packageset dir="${common}/src/java"/>
+      <packageset dir="${jmxremote-nio}/src/java"/>
       <packageset dir="${client}/src/java"/>
       <packageset dir="${server}/src/java"/>
       <packageset dir="${admin}/src/java"/>
