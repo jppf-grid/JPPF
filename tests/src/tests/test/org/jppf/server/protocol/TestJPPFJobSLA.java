@@ -37,7 +37,6 @@ import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 
@@ -65,7 +64,6 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
   /**
-   * 
    * @throws Exception if any error occurs.
    */
   @After
@@ -352,10 +350,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=15000)
   public void testBroadcastJob2() throws Exception {
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     try {
-      client.close();
-      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, 2);
-      client = BaseSetup.createClient(null, false);
+      pool.setSize(2);
+      pool.awaitConnections(Operator.EQUAL, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
       final String methodName = ReflectionUtils.getCurrentMethodName();
       final JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 500L);
       job1.getSLA().setPriority(1000);
@@ -376,8 +374,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
         }
       }
     } finally {
-      client.close();
-      client = BaseSetup.createClient(null, true);
+      pool.setSize(1);
+      pool.awaitConnections(Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     }
   }
 

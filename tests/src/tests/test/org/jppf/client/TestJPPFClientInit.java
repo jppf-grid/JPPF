@@ -30,6 +30,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -39,6 +40,10 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJPPFClientInit extends Setup1D1N {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(TestJPPFClientInit.class);
 
   /**
    * Test the submission of a job.
@@ -75,6 +80,46 @@ public class TestJPPFClientInit extends Setup1D1N {
   }
 
   /**
+   * Test the submission of a job.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=25000)
+  public void testMultipleRestartsInSequence() throws Exception {
+    final TypedProperties config = BaseSetup.resetClientConfig();
+    for (int i=1; i<=20; i++) {
+      print(false, false, "<<< start of iteration #%d >>>", i);
+      try (JPPFClient client = new JPPFClient(config)) {
+        print(false, false, ">>> awaiting connection pool");
+        final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+        print(false, false, ">>> awaiting JJMX connection");
+        pool.awaitWorkingJMXConnection();
+        final List<JPPFJob> jobs = new ArrayList<>();
+        print(false, false, ">>> creating jobs");
+        for (int j=1; j<=2; j++) {
+          final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-" + i + (j == 1 ? "a" : "b"), false, false, 1, LifeCycleTask.class, 0L);
+          job.getSLA().setPriority(10 / j);
+          job.getJobTasks().get(0).setId("task" + i);
+          jobs.add(job);
+        }
+        print(false, false, ">>> submitting jobs");
+        for (JPPFJob job: jobs) client.submitJob(job);
+        for (JPPFJob job: jobs) {
+          print(false, false, ">>> awaiting results for job %s", job.getName());
+          final List<Task<?>> results = job.get(3L, TimeUnit.SECONDS);
+          print(false, false, ">>> checking results for job %s", job.getName());
+          assertNotNull(results);
+          assertEquals(1, results.size());
+          final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+          final Task<?> task = results.get(0);
+          final Throwable t = task.getThrowable();
+          assertNull("task has an exception " + t, t);
+          assertEquals("result of task should be " + msg + " but is " + task.getResult(), msg, task.getResult());
+        }
+      }
+    }
+  }
+
+  /**
    * A simple driver discovery implementation.
    */
   private static class SimpleDiscovery extends ClientDriverDiscovery {
@@ -83,7 +128,8 @@ public class TestJPPFClientInit extends Setup1D1N {
       try {
         newConnection(new ClientConnectionPoolInfo("myDriver", false, "localhost", 11101));
       } catch (final Exception e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
+        System.out.println(ExceptionUtils.getStackTrace(e));
       }
     }
   }
