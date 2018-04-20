@@ -79,7 +79,7 @@ public abstract class AbstractJMXServer implements JMXServer {
   /**
    * An optional {@link MBeanServerForwarder} associated with the {@code JMXConnectorServer}.
    */
-  protected  MBeanServerForwarder forwarder;
+  protected MBeanServerForwarder forwarder;
 
   @Override
   public void stop() throws Exception {
@@ -150,14 +150,14 @@ public abstract class AbstractJMXServer implements JMXServer {
     int nbTries = 0;
     JMXServiceURL url = null;
     if (debugEnabled) log.debug("starting {} for protocol={}", getClass().getSimpleName(), protocol);
-    while (!found)
+    forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
+    while (!found) {
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);
         connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, mbeanServer);
         connectorServer.start();
         found = true;
         managementHost = url.getHost();
-        forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
         if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
       } catch(final Exception e) {
         nbTries++;
@@ -169,6 +169,7 @@ public abstract class AbstractJMXServer implements JMXServer {
         }
         else throw e;
       }
+    }
     stopped = false;
     if (debugEnabled) log.debug(String.format("%s started at URL %s after %d tries", getClass().getSimpleName(), url, nbTries));
   }

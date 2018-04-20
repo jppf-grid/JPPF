@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import javax.management.remote.JMXServiceURL;
-
 import org.jppf.JPPFTimeoutException;
 import org.jppf.jmx.JMXEnvHelper;
 import org.jppf.jmxremote.nio.*;
@@ -77,10 +75,6 @@ public class JMXMessageHandler {
    * The transition manager.
    */
   private final StateTransitionManager<EmptyEnum, EmptyEnum> mgr;
-  /**
-   * The initial connection request, whose expected response is a connection id.
-   */
-  private final JMXRequest connectionRequest;
 
   /**
    * Initialize with the specified pair of reading and writing channels.
@@ -93,8 +87,8 @@ public class JMXMessageHandler {
     this.server = channels.readingContext().getServer();
     this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
-    connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
-    if (connectionRequest != null) putRequest(connectionRequest);
+    //connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
+    //if (connectionRequest != null) putRequest(connectionRequest);
   }
 
   /**
@@ -112,26 +106,7 @@ public class JMXMessageHandler {
    * @throws Exception if any error occurs.
    */
   public Object sendRequestWithResponse(final byte type, final Object...params) throws Exception {
-    return receiveResponse(new JMXRequest(messageSequence.incrementAndGet(), type, params), true);
-  }
-
-  /**
-   * Get the connection ID upon startup of a client connection.
-   * @param url the service url for which to get a connection.
-   * @return the connection ID.
-   * @throws Exception if any error occurs.
-   */
-  public String receiveConnectionID(final JMXServiceURL url) throws Exception {
-    synchronized(connectionRequest) {
-      if (connectionRequest.getResponse() != null) {
-        final JMXResponse response = connectionRequest.getResponse();
-        if (response.getException() != null) throw response.getException();
-        return (String) response.getResult();
-      }
-      final String connectionID = (String) receiveResponse(connectionRequest, true);
-      if (connectionID != null) return connectionID;
-    }
-    throw new IOException("could not establish a connection to " + url);
+    return receiveResponse(new JMXRequest((type == JMXMessageType.CONNECT) ? CONNECTION_MESSAGE_ID: messageSequence.incrementAndGet(), type, params), true);
   }
 
   /**

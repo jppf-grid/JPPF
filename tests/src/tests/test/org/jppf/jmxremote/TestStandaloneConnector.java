@@ -27,62 +27,16 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.jppf.jmxremote.*;
-import org.jppf.management.ObjectNameCache;
 import org.jppf.nio.NioHelper;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.collections.*;
 import org.junit.*;
 
-import test.org.jppf.test.setup.*;
-
 /**
  * Tests for the jmxremote-nio connector.
  * @author Laurent Cohen
  */
-public class TestStandaloneConnector extends BaseTest {
-  /**
-   * Object name of the ConnectorTestMBean.
-   */
-  private static ObjectName connectorTestName;
-  /**
-   * The MBean server used in the tests.
-   */
-  private static MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-  /**
-   * Address of the JMX connector server.
-   */
-  private static JMXServiceURL url;
-  /**
-   * The server-side JMX connector.
-   */
-  private JMXConnectorServer server; 
-  /**
-   * The clientr-side JMX connector.
-   */
-  private JMXConnector clientConnector; 
-
-  /**
-   * @throws Exception  if any error occurs.
-   */
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    BaseSetup.setup(0, 0, false, BaseSetup.DEFAULT_CONFIG);
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.DEBUG, "org.jppf.jmxremote", "org.jppf.nio");
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.nio.PlainNioObject", "org.jppf.serialization");
-    url = new JMXServiceURL("service:jmx:jppf://localhost:12001");
-    connectorTestName = ObjectNameCache.getObjectName(ConnectorTestMBean.MBEAN_NAME);
-    registerMBeans();
-  }
-
-  /**
-   * @throws Exception  if any error occurs.
-   */
-  @AfterClass
-  public static void afterClass() throws Exception {
-    BaseSetup.setLoggerLevel(org.apache.log4j.Level.INFO, "org.jppf.jmxremote", "org.jppf.nio");
-    BaseSetup.cleanup();
-  }
-
+public class TestStandaloneConnector extends AbstractTestStandaloneConnector {
   /**
    * Performs setup before each test.
    * @throws Exception if any error occurs.
@@ -94,22 +48,6 @@ public class TestStandaloneConnector extends BaseTest {
     print(false, false, "***** starting connector client *****");
     clientConnector = createConnectorClient();
     registerMBeans();
-  }
-
-  /**
-   * Performs cleanup after each test.
-   * @throws Exception if any error occurs.
-   */
-  @After
-  public void afterInstance() throws Exception {
-    if (clientConnector != null) {
-      clientConnector.close();
-      clientConnector = null;
-    }
-    if (server != null) {
-      server.stop();
-      server = null;
-    }
   }
 
   /**
@@ -147,7 +85,7 @@ public class TestStandaloneConnector extends BaseTest {
     final MBeanServerConnection mbsc = clientConnector.getMBeanServerConnection();
     print(false, true, "***** testing string attribute *****");
     String s = (String) mbsc.getAttribute(connectorTestName, "StringParam");
-    assertNull(s);
+    assertEquals("initial_value", s);
     mbsc.setAttribute(connectorTestName, new Attribute("StringParam", "string value"));
     s = (String) mbsc.getAttribute(connectorTestName, "StringParam");
     assertNotNull(s);
@@ -294,37 +232,6 @@ public class TestStandaloneConnector extends BaseTest {
       if (name.startsWith(prefix)) count++;
     }
     return count;
-  }
-
-  /**
-   * Register the LBeans used in the tests.
-   * @throws Exception if any error occurs.
-   */
-  static void registerMBeans() throws Exception {
-    if (!mbeanServer.isRegistered(connectorTestName)) mbeanServer.registerMBean(new ConnectorTest(), connectorTestName);
-  }
-
-  /**
-   * Create a connector server.
-   * @return a new started {@link JMXConnectorServer}.
-   * @throws Exception if any error occurs.
-   */
-  static JMXConnectorServer createConnectorServer() throws Exception {
-    final JMXConnectorServer server = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbeanServer);
-    assertTrue(server instanceof JPPFJMXConnectorServer);
-    server.start();
-    return server;
-  }
-
-  /**
-   * Create a connector client.
-   * @return a new connected {@link JMXConnector}.
-   * @throws Exception if any error occurs.
-   */
-  static JMXConnector createConnectorClient() throws Exception {
-    final JMXConnector client = JMXConnectorFactory.connect(url);
-    assertTrue(client instanceof JPPFJMXConnector);
-    return client;
   }
 
   /** */

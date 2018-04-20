@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
 import javax.management.MBeanServer;
+import javax.management.remote.*;
 import javax.net.ssl.*;
 
 import org.jppf.jmx.*;
@@ -221,7 +222,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
       }
       ConnectionEventType.OPENED.fireNotification(connectionStatusListeners, new JMXConnectionStatusEvent(connectionID));
       registerChannel(pair, channel);
-      return null;
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -244,7 +244,9 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     if (channel.isBlocking()) channel.configureBlocking(false);
     final JMXContext readingChannel = createContext(env, channel, ssl, true, null, client);
     final JMXContext writingChannel = createContext(env, channel, ssl, false, readingChannel.getSSLHandler(), client);
-    final ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this);
+    final JMXAuthenticator authenticator = client ? null : (JMXAuthenticator) env.get(JMXConnectorServer.AUTHENTICATOR);
+    final ChannelsPair pair = new ChannelsPair(readingChannel, writingChannel, this, authenticator);
+    if (!client) pair.setAuhtorizationChecker(env.get(JPPFJMXConnectorServer.AUTHORIZATION_CHECKER));
     final JMXMessageHandler handler = new JMXMessageHandler(pair, env);
     final MBeanServer mbeanServer = (MBeanServer) env.get(JPPFJMXConnectorServer.MBEAN_SERVER_KEY);
     pair.setConnectionID(connectionID);

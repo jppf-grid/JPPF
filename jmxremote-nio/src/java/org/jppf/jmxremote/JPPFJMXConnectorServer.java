@@ -43,7 +43,12 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * The environment key for the {@link JMXAuthorizationChecker authorization checker}.
+   */
+  public static final String AUTHORIZATION_CHECKER = "jmx.remote.x.authorization.checker";
+  /**
    * The environment key for the MBean server.
+   * @exclude
    */
   public static final String MBEAN_SERVER_KEY = "jppf.jmxremote.internal.mbeanserver";
   /**
@@ -60,7 +65,7 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   private boolean started = false;
 
   /**
-   *
+   * Initalize this connector server with the specified  service URL, environemnt and MBean server.
    * @param serviceURL the address of this connector.
    * @param environment the environment for this connector.
    * @param mbeanServer .
@@ -76,8 +81,6 @@ public class JPPFJMXConnectorServer extends JMXConnectorServer implements JMXCon
   public void start() throws IOException {
     if (debugEnabled) log.debug("starting server @{}, env={}", address, environment);
     try {
-      //JMXNioServer server = JMXNioServer.getInstance();
-      //if (debugEnabled) log.debug("Got JMXNioServer instance {}", server);
       final int port = address.getPort();
       final Boolean tls = (Boolean) environment.get("jppf.jmx.remote.tls.enabled");
       final boolean secure = (tls == null) ? false : tls;

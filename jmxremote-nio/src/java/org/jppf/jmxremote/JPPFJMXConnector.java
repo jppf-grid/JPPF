@@ -241,7 +241,8 @@ public class JPPFJMXConnector implements JMXConnector {
     if (debugEnabled) log.debug("registering channel");
     server.registerChannel(pair, socketClient.getChannel());
     if (debugEnabled) log.debug("getting connection id");
-    connectionID = messageHandler.receiveConnectionID(address);
+    //connectionID = messageHandler.receiveConnectionID(address);
+    connectionID = (String) messageHandler.sendRequestWithResponse(JMXMessageType.CONNECT, environment.get(JMXConnector.CREDENTIALS));
     pair.setConnectionID(connectionID);
     if (debugEnabled) log.debug("received connectionId = {}", connectionID);
     mbsc = new JPPFMBeanServerConnection(this);

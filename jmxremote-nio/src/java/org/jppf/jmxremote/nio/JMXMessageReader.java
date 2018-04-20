@@ -23,7 +23,10 @@ import static org.jppf.jmxremote.message.JMXMessageType.*;
 import java.io.IOException;
 
 import javax.management.*;
+import javax.management.remote.JMXAuthenticator;
+import javax.security.auth.Subject;
 
+import org.jppf.jmxremote.JMXAuthorizationChecker;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
 import org.jppf.utils.*;
@@ -88,7 +91,7 @@ class JMXMessageReader {
    * @param message the message to handle.
    * @throws Exception if any error occurs.
    */
-  static void handleMessage(final JMXContext context, final SimpleNioMessage message) throws Exception {
+  private static void handleMessage(final JMXContext context, final SimpleNioMessage message) throws Exception {
     final JMXMessage msg = context.deserializeMessage(message);
     if (debugEnabled) log.debug("read message = {} from context = {}", msg, context);
     if (msg instanceof JMXRequest) handleRequest(context, (JMXRequest) msg);
@@ -102,7 +105,7 @@ class JMXMessageReader {
    * @param request the request to process.
    * @throws Exception if any error occurs.
    */
-  static void handleRequest(final JMXContext context, final JMXRequest request) throws Exception {
+  private static void handleRequest(final JMXContext context, final JMXRequest request) throws Exception {
     if (debugEnabled) log.debug("handling request = {} from {}", request, context);
     boolean isException = false;
     Object result = null;
@@ -110,12 +113,11 @@ class JMXMessageReader {
     final MBeanServer mbs = context.getChannels().getMbeanServer();
     final JMXNioServer jmxServer = context.getServer();
     try {
+      checkRequestAuthorization(context, request);
       switch(request.getMessageType()) {
-        case CONNECT: result = context.getConnectionID();
+        case CONNECT: result = handleConnect(context, request);
           break;
-        case CLOSE: context.getChannels().requestClose();
-          context.getChannels().close(null);
-          jmxServer.closeConnection(context.getChannels(), null, true);
+        case CLOSE: handleClose(context);
           break;
         case INVOKE: result = mbs.invoke((ObjectName) p[0], (String) p[1], (Object[]) p[2], (String[]) p[3]);
           break;
@@ -176,12 +178,106 @@ class JMXMessageReader {
   }
 
   /**
+   * Check that a request is authorized for the authenticated subject of the specified context.
+   * @param context the JMX nio context.
+   * @param request the request to check for authorization.
+   * @throws Exception if any error occurs.
+   */
+  private static void checkRequestAuthorization(final JMXContext context, final JMXRequest request) throws Exception {
+    final JMXAuthorizationChecker checker = context.getChannels().getAuhtorizationChecker();
+    if (checker == null) return;
+    if (debugEnabled) log.debug("checking autorization for request = {}, with context {}", request, context);
+    final Object[] p = request.getParams();
+    switch(request.getMessageType()) {
+      case INVOKE: checker.checkInvoke((ObjectName) p[0], (String) p[1], (Object[]) p[2], (String[]) p[3]);
+        break;
+      case GET_ATTRIBUTE: checker.checkGetAttribute((ObjectName) p[0], (String) p[1]);
+        break;
+      case GET_ATTRIBUTES: checker.checkGetAttributes((ObjectName) p[0], (String[]) p[1]);
+        break;
+      case SET_ATTRIBUTE: checker.checkSetAttribute((ObjectName) p[0], (Attribute) p[1]);
+        break;
+      case SET_ATTRIBUTES: checker.checkSetAttributes((ObjectName) p[0], (AttributeList) p[1]);
+        break;
+      case CREATE_MBEAN: checker.checkCreateMBean((String) p[0], (ObjectName) p[1]);
+        break;
+      case CREATE_MBEAN_PARAMS: checker.checkCreateMBean((String) p[0], (ObjectName) p[1], (Object[]) p[2], (String[]) p[3]);
+        break;
+      case CREATE_MBEAN_LOADER: checker.checkCreateMBean((String) p[0], (ObjectName) p[1], (ObjectName) p[2]);
+        break;
+      case CREATE_MBEAN_LOADER_PARAMS: checker.checkCreateMBean((String) p[0], (ObjectName) p[1], (ObjectName) p[2], (Object[]) p[3], (String[]) p[4]);
+        break;
+      case GET_DEFAULT_DOMAIN: checker.checkGetDefaultDomain();
+        break;
+      case GET_DOMAINS: checker.checkGetDomains();
+        break;
+      case GET_MBEAN_COUNT: checker.checkGetMBeanCount();
+        break;
+      case GET_MBEAN_INFO: checker.checkGetMBeanInfo((ObjectName) p[0]);
+        break;
+      case GET_OBJECT_INSTANCE: checker.checkGetObjectInstance((ObjectName) p[0]);
+        break;
+      case IS_INSTANCE_OF: checker.checkIsInstanceOf((ObjectName) p[0], (String) p[1]);
+        break;
+      case IS_REGISTERED: checker.checkIsRegistered((ObjectName) p[0]);
+        break;
+      case QUERY_MBEANS: checker.checkQueryMBeans((ObjectName) p[0], (QueryExp) p[1]);
+        break;
+      case QUERY_NAMES: checker.checkQueryNames((ObjectName) p[0], (QueryExp) p[1]);
+        break;
+      case UNREGISTER_MBEAN: checker.checkUnregisterMBean((ObjectName) p[0]);
+        break;
+      case ADD_NOTIFICATION_LISTENER: checker.checkAddNotificationListener((ObjectName) p[0], (NotificationListener) null, (NotificationFilter) p[2], null);
+        break;
+      case ADD_NOTIFICATION_LISTENER_OBJECTNAME: checker.checkAddNotificationListener((ObjectName) p[0], (ObjectName) p[1], (NotificationFilter) p[2], p[3]);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER: checker.checkRemoveNotificationListener((ObjectName) p[0], (NotificationListener) null);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK: checker.checkRemoveNotificationListener((ObjectName) p[0], (NotificationListener) null, null, null);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME: checker.checkRemoveNotificationListener((ObjectName) p[0], (ObjectName) p[1]);
+        break;
+      case REMOVE_NOTIFICATION_LISTENER_OBJECTNAME_FILTER_HANDBACK: checker.checkRemoveNotificationListener((ObjectName) p[0], (ObjectName) p[1], (NotificationFilter) p[2], p[3]);
+        break;
+    }
+  }
+
+  /**
+   * Handle a connection reqUest.
+   * @param context the JMX nio context.
+   * @param request the connection request to handle.
+   * @return the connection ID.
+   * @throws Exception if any error occurs.
+   */
+  private static String handleConnect(final JMXContext context, final JMXRequest request) throws Exception {
+    final JMXAuthenticator authenticator = context.getChannels().getAuthenticator();
+    if (authenticator != null) {
+      final Subject subject = authenticator.authenticate(request.getParams()[0]);
+      context.getChannels().setSubject(subject);
+      final JMXAuthorizationChecker checker = context.getChannels().getAuhtorizationChecker();
+      if (checker != null) checker.setSubject(subject);
+    }
+    return context.getConnectionID();
+  }
+
+  /**
+   * Handle a connection reqUest.
+   * @param context the JMX nio context.
+   * @throws Exception if any error occurs.
+   */
+  private static void handleClose(final JMXContext context) throws Exception {
+    context.getChannels().requestClose();
+    context.getChannels().close(null);
+    context.getServer().closeConnection(context.getChannels(), null, true);
+  }
+
+  /**
    * Handle a received reqUest.
    * @param context the JMX nio context.
    * @param response the response to handle.
    * @throws Exception if any error occurs.
    */
-  static void handleResponse(final JMXContext context, final JMXResponse response) throws Exception {
+  private static void handleResponse(final JMXContext context, final JMXResponse response) throws Exception {
     context.getMessageHandler().responseReceived(response);
   }
 
@@ -191,7 +287,7 @@ class JMXMessageReader {
    * @param jmxNotification the notification message to process.
    * @throws Exception if any error occurs.
    */
-  static void handleNotification(final JMXContext context, final JMXNotification jmxNotification) throws Exception {
+  private static void handleNotification(final JMXContext context, final JMXNotification jmxNotification) throws Exception {
     if (debugEnabled) log.debug("received notification {} from context = {}", jmxNotification, context);
     context.getChannels().getJMXConnector().handleNotification(jmxNotification);
   }
@@ -204,7 +300,7 @@ class JMXMessageReader {
    * @param isException whether the result is an exception or a normal result.
    * @throws Exception if any error occurs.
    */
-  static void respond(final JMXContext context, final JMXRequest request, final Object result, final boolean isException) throws Exception {
+  private static void respond(final JMXContext context, final JMXRequest request, final Object result, final boolean isException) throws Exception {
     if (request.getMessageType() == JMXMessageType.CLOSE) {
       if (isException) throw (Exception) result;
     } else {

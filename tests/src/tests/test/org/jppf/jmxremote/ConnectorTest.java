@@ -25,7 +25,7 @@ import javax.management.*;
 import org.slf4j.*;
 
 /**
- *
+ * Simple MBean implementation for testing.
  * @author Laurent Cohen
  */
 public class ConnectorTest extends NotificationBroadcasterSupport implements ConnectorTestMBean {
@@ -44,7 +44,7 @@ public class ConnectorTest extends NotificationBroadcasterSupport implements Con
   /**
    *
    */
-  private String stringParam;
+  private String stringParam = "initial_value";
   /**
    *
    */
@@ -53,6 +53,11 @@ public class ConnectorTest extends NotificationBroadcasterSupport implements Con
   @Override
   public String test1(final String stringParam, final int intParam) {
     return "[" + stringParam + " - " + intParam + "]";
+  }
+
+  @Override
+  public String test2(final String stringParam) {
+    return "[" + stringParam + "]";
   }
 
   @Override

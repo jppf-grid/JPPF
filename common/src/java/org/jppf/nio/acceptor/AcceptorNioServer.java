@@ -143,8 +143,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   protected void doAccept(final SelectionKey key) {
     final ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
     @SuppressWarnings("unchecked")
-    final Map<String, ?> map = (Map<String, ?>) key.attachment();
-    final boolean ssl = (Boolean) map.get("jppf.ssl");
+    final Map<String, ?> env = (Map<String, ?>) key.attachment();
+    final boolean ssl = (Boolean) env.get("jppf.ssl");
     final SocketChannel channel;
     try {
       channel = serverSocketChannel.accept();
@@ -162,7 +162,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       channel.setOption(StandardSocketOptions.SO_KEEPALIVE, IO.SOCKET_KEEPALIVE);
       if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
       channel.configureBlocking(false);
-      accept(serverSocketChannel, channel, null, ssl, false);
+      accept(serverSocketChannel, channel, null, ssl, false, env);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
       StreamUtils.close(channel, log);
@@ -182,6 +182,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * @return a wrapper for the newly registered channel.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object...params) throws Exception {

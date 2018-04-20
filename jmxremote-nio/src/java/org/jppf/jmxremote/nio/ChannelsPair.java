@@ -24,10 +24,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.*;
+import javax.management.remote.*;
+import javax.security.auth.Subject;
 
 import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
 import org.jppf.utils.Pair;
+import org.slf4j.*;
 
 /**
  * Convenience class to group a pair of channels respectively reading from and writing to the same socket channel.
@@ -38,6 +41,10 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ChannelsPair.class);
   /**
    * Whether this a close of the channels was request.
    */
@@ -90,6 +97,18 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
    * Callbacks invoked upon {@link #close()}.
    */
   private final List<CloseCallback> closeCallbacks = new CopyOnWriteArrayList<>();
+  /**
+   * The server-side authenticator.
+   */
+  private final JMXAuthenticator authenticator;
+  /**
+   * The seriver-side authorization checker.
+   */
+  private JMXAuthorizationChecker auhtorizationChecker;
+  /**
+   * The authenticated subject, if any.
+   */
+  private Subject subject;
 
   /**
    * @param first the reading channel.
@@ -97,7 +116,18 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
    * @param server the JMX nio server.
    */
   public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server) {
+    this(first, second, server, null);
+  }
+
+  /**
+   * @param first the reading channel.
+   * @param second the writing channel.
+   * @param server the JMX nio server.
+   * @param authenticator an optional {@link JMXAuthenticator} (server-side only).
+   */
+  public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server, final JMXAuthenticator authenticator) {
     super(first, second);
+    this.authenticator = authenticator;
     writingTask = new JMXTransitionTask(second, server, true);
     nonSelectingWritingTask = new JMXTransitionTask(second, server, false);
   }
@@ -326,5 +356,51 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
      * @param exception an optional exception that may have cause the close, may be null.
      */
     void onClose(final Exception exception);
+  }
+
+  /**
+   * @return the server-side authenticator, if any.
+   */
+  JMXAuthenticator getAuthenticator() {
+    return authenticator;
+  }
+
+  /**
+   * @return the authenticated subject, if any.
+   */
+  Subject getSubject() {
+    return subject;
+  }
+
+  /**
+   * Set the subjerct.
+   * @param subject the authenticated subject.
+   */
+  void setSubject(final Subject subject) {
+    this.subject = subject;
+  }
+
+  /**
+   * @return the seriver-side authorization checker.
+   */
+  JMXAuthorizationChecker getAuhtorizationChecker() {
+    return auhtorizationChecker;
+  }
+
+  /**
+   * Set the seriver-side authorization checker.
+   * @param checker either the class object or the class name of the autorization checker to set.
+   */
+  void setAuhtorizationChecker(final Object checker) {
+    if (checker == null) return;
+    try {
+      Class<?> c = null;
+      if (checker instanceof Class) c = (Class<?>) checker;
+      else if (checker instanceof String) c = Class.forName((String) checker, false, Thread.currentThread().getContextClassLoader());
+      else throw new JMException("unable to interpret authorization checker parameter " + checker);
+      auhtorizationChecker = (JMXAuthorizationChecker) c.newInstance();
+    } catch (final Exception e) {
+      log.error("error setting the authorization checker, ACL disabled for this connection", e);
+    }
   }
 }

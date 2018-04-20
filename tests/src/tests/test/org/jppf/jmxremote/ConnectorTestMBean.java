@@ -41,6 +41,13 @@ public interface ConnectorTestMBean extends Serializable, NotificationEmitter {
   String test1(String stringParam, int intParam);
 
   /**
+   * Test method.
+   * @param stringParam .
+   * @return .
+   */
+  String test2(String stringParam);
+
+  /**
    * @return a string.
    */
   String getStringParam();

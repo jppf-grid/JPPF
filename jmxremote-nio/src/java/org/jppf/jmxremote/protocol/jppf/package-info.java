@@ -19,6 +19,6 @@
 /**
  * Implementation of a JMX remote connector based on Java NIO.
  * <p>Found in: <b>jppf-jmxremote-nio.jar</b> 
+ * @exclude
  */
 package org.jppf.jmxremote.protocol.jppf;
-
