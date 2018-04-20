@@ -44,7 +44,7 @@ public class MyAuthenticator implements JMXAuthenticator {
     if (user == null) throw new SecurityException("null user is not allowed");
     if (!authorizedUsers.contains(user)) throw new SecurityException("user '" + user + "' is not allowed");
     final String pwd = cred[1];
-    if (pwd == null) new SecurityException("null password for user '" + user + "'");
+    if (pwd == null) throw new SecurityException("null password for user '" + user + "'");
     if (!("pwd_" + user).equals(pwd)) throw new SecurityException("wrong password for user '" + user + "'");
     final Set<Principal> principals = new HashSet<>();
     principals.add(new JMXPrincipal(user));

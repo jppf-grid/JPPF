@@ -118,6 +118,19 @@ public class TestStandaloneConnectorAuth extends AbstractTestStandaloneConnector
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
+  public void testAuthenticationFailureNullPassword() throws Exception {
+    final Exception ex = initConnector("jppf1", null);
+    assertNotNull(ex);
+    final Throwable cause = ex.getCause();
+    assertTrue("cause = " + ExceptionUtils.getStackTrace(cause), cause instanceof SecurityException);
+    assertEquals("null password for user 'jppf1'", cause.getMessage());
+  }
+
+  /**
+   * Test connection.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
   public void testAuthenticationSuccess() throws Exception {
     final Exception ex = initConnector("jppf1", "pwd_jppf1");
     assertNull(ex);
