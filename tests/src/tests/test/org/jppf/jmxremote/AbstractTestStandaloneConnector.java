@@ -72,6 +72,7 @@ public abstract class AbstractTestStandaloneConnector extends BaseTest {
       server.stop();
       server = null;
     }
+    if (mbeanServer.isRegistered(connectorTestName)) mbeanServer.unregisterMBean(connectorTestName);
   }
 
   /**
