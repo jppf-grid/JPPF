@@ -1,12 +1,12 @@
-#JPPF JMX remote connector.
+# JPPF JMX remote connector.
 
 List of available environment properties:
 
-##Misc:
+## Misc:
 
 * `jppf.jmxremote.request.timeout`: Maximum time in milliseconds to wait for a JMX request to succeed, default to 15,000 ms
 
-##TLS properties:
+## TLS properties:
 
 * `jppf.jmx.remote.tls.enabled`:
   whether to use secure connections via TLS protocol, defaults to false 
@@ -51,14 +51,13 @@ List of available environment properties:
 * `jppf.jmx.remote.tls.keystore.type`:
   Key store format, defaults to 'jks'
 
-##Authentication and authorization
+## Authentication and authorization
 
-Authentication is provided as an instance of `javax.management.remote.JMXAuthenticator`, passed on via the server environment property
-`jmx.remote.authenticator` (also the constant `javax.management.remote.JMXConnectorServer.AUTHENTICATOR`).
+Authentication is provided as an instance of [JMXAuthenticator](https://docs.oracle.com/javase/7/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), passed on via the server environment property `jmx.remote.authenticator` (also Java the constant [JMXConnectorServer.AUTHENTICATOR](https://docs.oracle.com/javase/7/docs/api/javax/management/remote/JMXConnectorServer.html#AUTHENTICATOR)).
 
-On the client side, credentials are passed via the connector environment property `jmx.remote.credentials` (also the Java constant
-`javax.management.remote.JMXConnector.CREDENTIALS`).
+On the client side, credentials are passed as a user-defined object via the connector environment property `jmx.remote.credentials` (also the Java constant
+[javax.management.remote.JMXConnector.CREDENTIALS](https://docs.oracle.com/javase/7/docs/api/javax/management/remote/JMXConnector.html#CREDENTIALS)).
 
 Authorization or ACL is provided via the server-side environment property `jmx.remote.x.authorization.checker` (also the Java constant
-`org.jppf.jmxremote.JPPFJMXConnectorServer.AUTHORIZATION_CHECKER`). The value can be either a `Class` object, representing an implementation
-of the interface `org.jppf.jmxremote.JMXAuthorizationChecker`, or a string that contains the fully qualified name of the class.
+[JPPFJMXConnectorServer.AUTHORIZATION_CHECKER](https://www.jppf.org/javadoc/6.0/org/jppf/jmxremote/JPPFJMXConnectorServer.html#AUTHORIZATION_CHECKER)). The value can be either a `Class` object, representing an implementation
+of the interface [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html), or a string that contains the fully qualified name of the class.
