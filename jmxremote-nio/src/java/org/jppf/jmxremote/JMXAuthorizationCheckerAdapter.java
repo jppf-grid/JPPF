@@ -23,7 +23,7 @@ import javax.security.auth.Subject;
 
 /**
  * An adapter for the {@link JMXAuthorizationChecker} interface, to subclass when not all methods need be implemented.
- * The subject is available as a {@code protected} instance variable, as well as via its accessors {@link #getSubject()} and {@link #setSubject(Subject)}.
+ * The subject is available as a {@code protected} instance variable, as well as via its accessors {@link #getSubject() getSubject()} and {@link #setSubject(Subject) setSubject(Subject)}.
  * @author Laurent Cohen
  */
 public class JMXAuthorizationCheckerAdapter implements JMXAuthorizationChecker {
