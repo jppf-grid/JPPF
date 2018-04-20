@@ -140,14 +140,6 @@ public class JMXMessageType {
    */
   public static final byte NOTIFICATION = 28;
   /**
-   * Identifier for a notification.
-   */
-  public static final byte LOGIN = 29;
-  /**
-   * Identifier for a notification.
-   */
-  public static final byte LOGOUT = 30;
-  /**
    * A non-modifiable mapping of type values to readable names.
    */
   private static final Map<Byte, String> TYPE_NAMES = Collections.unmodifiableMap(initTypeNames());
@@ -195,8 +187,6 @@ public class JMXMessageType {
     map.put(SET_ATTRIBUTES, "SET_ATTRIBUTES");
     map.put(UNREGISTER_MBEAN, "UNREGISTER_MBEAN");
     map.put(NOTIFICATION, "NOTIFICATION");
-    map.put(LOGIN, "LOGIN");
-    map.put(LOGOUT, "LOGOUT");
     return map;
   }
 }

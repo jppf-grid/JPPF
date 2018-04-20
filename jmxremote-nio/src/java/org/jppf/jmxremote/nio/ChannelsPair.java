@@ -114,15 +114,6 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
    * @param first the reading channel.
    * @param second the writing channel.
    * @param server the JMX nio server.
-   */
-  public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server) {
-    this(first, second, server, null);
-  }
-
-  /**
-   * @param first the reading channel.
-   * @param second the writing channel.
-   * @param server the JMX nio server.
    * @param authenticator an optional {@link JMXAuthenticator} (server-side only).
    */
   public ChannelsPair(final JMXContext first, final JMXContext second, final JMXNioServer server, final JMXAuthenticator authenticator) {

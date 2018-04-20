@@ -87,8 +87,6 @@ public class JMXMessageHandler {
     this.server = channels.readingContext().getServer();
     this.mgr = this.server.getTransitionManager();
     this.requestTimeout = JMXEnvHelper.getLong(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT, env, JPPFConfiguration.getProperties());
-    //connectionRequest = channels.isServerSide() ? null : new JMXRequest(CONNECTION_MESSAGE_ID, JMXMessageType.CONNECT);
-    //if (connectionRequest != null) putRequest(connectionRequest);
   }
 
   /**
