@@ -1,12 +1,18 @@
 # JPPF JMX remote connector.
 
-List of available environment properties:
 
-## Misc:
+This is a full-fledged, fast and scalable implementation of a JMX remote connector, with Java NIO-based networking on both client and server sides.
+
+JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
+
+
+## Environment properties
+
+#### Misc:
 
 * `jppf.jmxremote.request.timeout`: Maximum time in milliseconds to wait for a JMX request to succeed, default to 15,000 ms
 
-## TLS properties:
+#### TLS properties:
 
 * `jppf.jmx.remote.tls.enabled`:
   whether to use secure connections via TLS protocol, defaults to false 
@@ -51,7 +57,7 @@ List of available environment properties:
 * `jppf.jmx.remote.tls.keystore.type`:
   Key store format, defaults to 'jks'
 
-## Authentication and authorization
+#### Authentication and authorization
 
 Authentication is provided as an instance of [JMXAuthenticator](https://docs.oracle.com/javase/7/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), passed on via the server environment property `jmx.remote.authenticator` (also Java the constant [JMXConnectorServer.AUTHENTICATOR](https://docs.oracle.com/javase/7/docs/api/javax/management/remote/JMXConnectorServer.html#AUTHENTICATOR)).
 
