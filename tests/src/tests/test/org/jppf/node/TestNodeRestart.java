@@ -29,7 +29,9 @@ import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -38,7 +40,37 @@ import test.org.jppf.test.setup.common.*;
  * Tests node restart operations.
  * @author Laurent Cohen
  */
-public class TestNodeRestart extends Setup1D1N1C {
+public class TestNodeRestart extends BaseTest {
+  /** */
+  @Rule
+  public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
+
+  /**
+   * Launches a driver and node and start the client.
+   * @throws Exception if a process could not be started.
+   */
+  @BeforeClass
+  public static void setup() throws Exception {
+    final TestConfiguration config = BaseSetup.DEFAULT_CONFIG.copy();
+    config.driverLog4j = "classes/tests/config/log4j-driver.TestNodeRestart.properties";
+    config.nodeLog4j = "classes/tests/config/log4j-node.TestNodeRestart.properties";
+    client = BaseSetup.setup(1, 1, true, config);
+  }
+
+  /**
+   * Stops the driver and node and close the client.
+   * @throws Exception if a process could not be stopped.
+   */
+  @AfterClass
+  public static void cleanup() throws Exception {
+    BaseSetup.cleanup();
+  }
+
   /**
    * Test that a node can be restarted multiple times in a row without problems.
    * @throws Exception if any error occurs.
@@ -53,7 +85,7 @@ public class TestNodeRestart extends Setup1D1N1C {
     RetryUtils.runWithRetryTimeout(5000L, 500L, new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
-        if (driver.nbNodes() != 1) throw new IllegalStateException("number of nodes should be 1");
+        if (driver.nbIdleNodes() != 1) throw new IllegalStateException("number of nodes should be 1");
         return true;
       }
     });
@@ -63,28 +95,25 @@ public class TestNodeRestart extends Setup1D1N1C {
     final JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
     print(false, false, ">>> got JPPFNodeForwardingMBean");
     for (int i=0; i<nbRestarts; i++) {
-      assertEquals(i, myListener.disconnectedCount);
-      assertEquals(i, myListener.connectedCount);
-      print(false, false, ">>> restart #%d of the node", i + 1);
+      myListener.reset();
+      print(false, false, "<<< restart #%d of the node >>>", i + 1);
       forwarder.restart(NodeSelector.ALL_NODES, true);
+      print(false, false, ">>> awaiting CONNECTED state for node");
       myListener.await();
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       client.submitJob(job);
       print(false, false, ">>> got job results");
+      assertEquals(1, myListener.disconnectedCount);
+      assertEquals(1, myListener.connectedCount);
     }
+    driver.removeNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myListener);
   }
 
-  /**
-   * 
-   */
+  /** */
   public class MyNodeConnectionListener implements NotificationListener {
-    /**
-     * 
-     */
+    /** */
     private String state = JPPFNodeConnectionNotifierMBean.DISCONNECTED;
-    /**
-     * 
-     */
+    /** */
     private int connectedCount, disconnectedCount;
 
     @Override
@@ -98,10 +127,19 @@ public class TestNodeRestart extends Setup1D1N1C {
 
     /**
      * Wait for the node to be connected to the driver.
-   * @throws Exception if any error occurs.
+     * @throws Exception if any error occurs.
      */
-    public synchronized void await() throws Exception {
+    synchronized void await() throws Exception {
       while (!JPPFNodeConnectionNotifierMBean.CONNECTED.equals(state)) wait();
+    }
+
+    /**
+     * Reset this listener's state.
+     */
+    synchronized void reset() {
+      state = JPPFNodeConnectionNotifierMBean.DISCONNECTED;
+      connectedCount = 0;
+      disconnectedCount = 0;
     }
   }
 }
