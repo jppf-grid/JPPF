@@ -158,7 +158,7 @@ public class AbstractNonStandardSetup extends BaseTest {
     try {
       pool.setSize(2);
       pool.awaitConnections(Operator.EQUAL, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
-      assertEquals(2, pool.getConnections(JPPFClientConnectionStatus.workingStatuses())); 
+      assertEquals(2, pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size()); 
       final String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
@@ -178,7 +178,7 @@ public class AbstractNonStandardSetup extends BaseTest {
     } finally {
       pool.setSize(1);
       pool.awaitConnections(Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
-      assertEquals(1, pool.getConnections(JPPFClientConnectionStatus.workingStatuses())); 
+      assertEquals(1, pool.getConnections(JPPFClientConnectionStatus.workingStatuses()).size()); 
     }
   }
 
