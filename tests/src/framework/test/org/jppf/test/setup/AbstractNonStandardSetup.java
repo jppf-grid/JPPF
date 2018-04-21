@@ -33,7 +33,6 @@ import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.common.*;
@@ -155,10 +154,11 @@ public class AbstractNonStandardSetup extends BaseTest {
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
     final int nbJobs = 3;
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     try {
-      if (client != null) client.close();
-      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, 2);
-      client = BaseSetup.createClient(null, false);
+      pool.setSize(2);
+      pool.awaitConnections(Operator.EQUAL, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
+      assertEquals(2, pool.getConnections(JPPFClientConnectionStatus.workingStatuses())); 
       final String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
@@ -176,8 +176,9 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }
     } finally {
-      if (client != null) client.close();
-      client = BaseSetup.createClient(null, true, testConfig);
+      pool.setSize(1);
+      pool.awaitConnections(Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+      assertEquals(1, pool.getConnections(JPPFClientConnectionStatus.workingStatuses())); 
     }
   }
 
