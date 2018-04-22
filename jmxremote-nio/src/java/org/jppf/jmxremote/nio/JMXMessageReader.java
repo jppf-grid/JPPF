@@ -18,7 +18,7 @@
 
 package org.jppf.jmxremote.nio;
 
-import static org.jppf.jmxremote.message.JMXMessageType.*;
+import static org.jppf.jmx.JMXHelper.*;
 
 import java.io.IOException;
 
@@ -26,6 +26,7 @@ import javax.management.*;
 import javax.management.remote.JMXAuthenticator;
 import javax.security.auth.Subject;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.jmxremote.JMXAuthorizationChecker;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
@@ -301,7 +302,7 @@ class JMXMessageReader {
    * @throws Exception if any error occurs.
    */
   private static void respond(final JMXContext context, final JMXRequest request, final Object result, final boolean isException) throws Exception {
-    if (request.getMessageType() == JMXMessageType.CLOSE) {
+    if (request.getMessageType() == JMXHelper.CLOSE) {
       if (isException) throw (Exception) result;
     } else {
       final JMXResponse response = new JMXResponse(request.getMessageID(), request.getMessageType(), result, isException);

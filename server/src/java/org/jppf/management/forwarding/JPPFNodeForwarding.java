@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
+import org.jppf.jmx.JMXHelper;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
@@ -55,18 +56,6 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * Determines whether debug log statements are enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Flag to indicate a task which invokes an MBean method.
-   */
-  private static final int INVOKE_METHOD = 1;
-  /**
-   * Flag to indicate a task which gets an MBean attribute value.
-   */
-  private static final int GET_ATTRIBUTE = 2;
-  /**
-   * Flag to indicate a task which sets an MBean attribute value.
-   */
-  private static final int SET_ATTRIBUTE = 3;
   /**
    * Used to generate listener IDs.
    */
@@ -108,7 +97,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
     final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     if (debugEnabled) log.debug("invoking {}() on mbean={} for selector={} ({} channels)", new Object[] {methodName, name, selector, channels.size()});
-    return forward(INVOKE_METHOD, channels, name, methodName, params, signature);
+    return forward(JMXHelper.INVOKE, channels, name, methodName, params, signature);
   }
 
   @Override
@@ -119,13 +108,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
     final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
-    return forward(GET_ATTRIBUTE, channels, name, attribute);
+    return forward(JMXHelper.GET_ATTRIBUTE, channels, name, attribute);
   }
 
   @Override
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
     final Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
-    return forward(SET_ATTRIBUTE, channels, name, attribute, value);
+    return forward(JMXHelper.SET_ATTRIBUTE, channels, name, attribute, value);
   }
 
   @Override
@@ -306,26 +295,43 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forward(final int type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
+  Map<String, Object> forward(final byte type, final Set<AbstractNodeContext> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
     try {
       final int size = nodes.size();
       if (size <= 0) return Collections.<String, Object>emptyMap();
       final ForwardCallback callback = new ForwardCallback(size);
       AbstractForwardingTask task;
       for (final AbstractNodeContext node: nodes) {
+        final JMXConnectionWrapper jmx = node.getJmxConnection();
         switch(type) {
-          case INVOKE_METHOD:
-            task = new InvokeMethodTask(node, callback, mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
+          case JMXHelper.INVOKE:
+            task = new AbstractForwardingTask(node.getUuid(), callback) {
+              @Override
+              Object execute() throws Exception {
+                return jmx.invoke(mbeanName, memberName, (Object[]) params[0], (String[]) params[1]);
+              }
+            };
             break;
-          case GET_ATTRIBUTE:
-            task = new GetAttributeTask(node, callback, mbeanName, memberName);
+          case JMXHelper.GET_ATTRIBUTE:
+            task = new AbstractForwardingTask(node.getUuid(), callback) {
+              @Override
+              Object execute() throws Exception {
+                return jmx.getAttribute(mbeanName, memberName);
+              }
+            };
             break;
-          case SET_ATTRIBUTE:
-            task = new SetAttributeTask(node, callback, mbeanName, memberName, params[0]);
+          case JMXHelper.SET_ATTRIBUTE:
+            task = new AbstractForwardingTask(node.getUuid(), callback) {
+              @Override
+              Object execute() throws Exception {
+                jmx.setAttribute(mbeanName, memberName, params[0]);
+                return null;
+              }
+            };
             break;
           default:
-            throw new IllegalArgumentException(
-              String.format("unknown type of operation %d for mbean=%s, memeber=%s, param=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
+            throw new IllegalArgumentException(String.format(
+              "unknown type of operation %d for mbean=%s, memeber=%s, param=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         }
         if (debugEnabled) log.debug(String.format("about to forward with type=%d, mbean=%s, member=%s, params=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         executor.execute(task);
@@ -337,57 +343,6 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
           type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e)));
       }
       throw e;
-    }
-  }
-
-  /**
-   * A callback invoked by each submitted forwarding task to notify that results have arrived from a node.
-   */
-  static class ForwardCallback {
-    /**
-     * The map holding the results from all nodes.
-     */
-    private final Map<String, Object> resultMap;
-    /**
-     * The expected total number of results.
-     */
-    private final int expectedCount;
-    /**
-     * The current count of received results.
-     */
-    private int count;
-
-    /**
-     * Initialize with the specified expected total number of results.
-     * @param expectedCount the expected total number of results.
-     */
-    ForwardCallback(final int expectedCount) {
-      this.resultMap = new HashMap<>(expectedCount);
-      this.expectedCount = expectedCount;
-    }
-
-    /**
-     * Called when a result is received from a node.
-     * @param uuid the uuid of the node.
-     * @param result the result of exception returned by the JMX call.
-     */
-    void gotResult(final String uuid, final Object result) {
-      synchronized(this) {
-        resultMap.put(uuid, result);
-        if (++count == expectedCount) notify();
-      }
-    }
-
-    /**
-     * Wait until the number of results reaches the expected count.
-     * @return the results map;
-     * @throws Exception if any error occurs.
-     */
-    Map<String, Object> await() throws Exception {
-      synchronized(this) {
-        while (count < expectedCount) wait();
-      }
-      return resultMap;
     }
   }
 }

@@ -20,6 +20,7 @@ package org.jppf.jmxremote.message;
 
 import javax.management.Notification;
 
+import org.jppf.jmx.JMXHelper;
 import org.jppf.utils.StringUtils;
 
 /**
@@ -47,7 +48,7 @@ public class JMXNotification extends AbstractJMXMessage {
    * @param listenerIDs ids of the listeners to dispatch the notification to.
    */
   public JMXNotification(final long messageID, final Notification notification, final Integer[] listenerIDs) {
-    super(messageID, JMXMessageType.NOTIFICATION);
+    super(messageID, JMXHelper.NOTIFICATION);
     this.notification = notification;
     this.listenerIDs = listenerIDs;
   }
@@ -70,7 +71,7 @@ public class JMXNotification extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
+      .append(", messageType=").append(JMXHelper.name(getMessageType()))
       .append(", listenerIDs=").append(StringUtils.arrayToString(", ", "[", "]", listenerIDs))
       .append(", notification=").append(notification)
       .append(']').toString();

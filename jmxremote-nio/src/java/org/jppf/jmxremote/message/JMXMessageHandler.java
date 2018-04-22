@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFTimeoutException;
-import org.jppf.jmx.JMXEnvHelper;
+import org.jppf.jmx.*;
 import org.jppf.jmxremote.nio.*;
 import org.jppf.nio.StateTransitionManager;
 import org.jppf.utils.*;
@@ -104,7 +104,7 @@ public class JMXMessageHandler {
    * @throws Exception if any error occurs.
    */
   public Object sendRequestWithResponse(final byte type, final Object...params) throws Exception {
-    return receiveResponse(new JMXRequest((type == JMXMessageType.CONNECT) ? CONNECTION_MESSAGE_ID: messageSequence.incrementAndGet(), type, params), true);
+    return receiveResponse(new JMXRequest((type == JMXHelper.CONNECT) ? CONNECTION_MESSAGE_ID: messageSequence.incrementAndGet(), type, params), true);
   }
 
   /**

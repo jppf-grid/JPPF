@@ -18,6 +18,8 @@
 
 package org.jppf.jmxremote.message;
 
+import org.jppf.jmx.JMXHelper;
+
 /**
  * A specialized message that represents a repsponse to a previous request.
  * The correlation between request and response is realized via the {@link JMXMessage#getMessageID() messageID}.
@@ -88,7 +90,7 @@ public class JMXResponse extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
+      .append(", messageType=").append(JMXHelper.name(getMessageType()))
       .append(", result=").append(checkLengthAndTruncateIfNeed(result))
       .append(", isException=").append(isException)
       .append(']').toString();

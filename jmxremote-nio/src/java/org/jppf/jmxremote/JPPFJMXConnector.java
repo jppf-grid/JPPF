@@ -18,7 +18,7 @@
 
 package org.jppf.jmxremote;
 
-import static org.jppf.jmxremote.message.JMXMessageType.*;
+import static org.jppf.jmx.JMXHelper.*;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -242,7 +242,7 @@ public class JPPFJMXConnector implements JMXConnector {
     server.registerChannel(pair, socketClient.getChannel());
     if (debugEnabled) log.debug("getting connection id");
     //connectionID = messageHandler.receiveConnectionID(address);
-    connectionID = (String) messageHandler.sendRequestWithResponse(JMXMessageType.CONNECT, environment.get(JMXConnector.CREDENTIALS));
+    connectionID = (String) messageHandler.sendRequestWithResponse(JMXHelper.CONNECT, environment.get(JMXConnector.CREDENTIALS));
     pair.setConnectionID(connectionID);
     if (debugEnabled) log.debug("received connectionId = {}", connectionID);
     mbsc = new JPPFMBeanServerConnection(this);

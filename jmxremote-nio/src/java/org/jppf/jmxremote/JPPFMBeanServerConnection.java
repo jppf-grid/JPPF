@@ -18,7 +18,7 @@
 
 package org.jppf.jmxremote;
 
-import static org.jppf.jmxremote.message.JMXMessageType.*;
+import static org.jppf.jmx.JMXHelper.*;
 
 import java.io.*;
 import java.nio.channels.*;

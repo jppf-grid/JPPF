@@ -18,8 +18,8 @@
 
 package org.jppf.jmxremote.nio;
 
-import org.jppf.jmx.JMXEnvHelper;
-import org.jppf.jmxremote.message.*;
+import org.jppf.jmx.*;
+import org.jppf.jmxremote.message.JMXRequest;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.Logger;
 
@@ -74,7 +74,7 @@ public class JMXMessageWriter {
           if (debugEnabled) log.debug("fully sent message {} from context {}", msg, context);
           context.setMessage(null);
           context.setCurrentMessageWrapper(null);
-          if (msg.jmxMessage.getMessageType() == JMXMessageType.CLOSE) {
+          if (msg.jmxMessage.getMessageType() == JMXHelper.CLOSE) {
             if (debugEnabled) log.debug("handling CLOSE for context {}", context);
             context.getMessageHandler().messageSent(msg.jmxMessage);
             return false;

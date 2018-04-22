@@ -23,6 +23,8 @@ import java.util.Arrays;
 
 import javax.management.ObjectName;
 
+import org.jppf.jmx.JMXHelper;
+
 /**
  * A specialized message that represents a request to the server.
  * @author Laurent Cohen
@@ -82,7 +84,7 @@ public class JMXRequest extends AbstractJMXMessage {
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[')
       .append("messageID=").append(getMessageID())
-      .append(", messageType=").append(JMXMessageType.name(getMessageType()))
+      .append(", messageType=").append(JMXHelper.name(getMessageType()))
       .append(", params=").append(Arrays.deepToString(params))
       .append(']').toString();
   }

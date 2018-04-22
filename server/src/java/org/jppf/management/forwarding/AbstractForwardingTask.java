@@ -18,9 +18,6 @@
 
 package org.jppf.management.forwarding;
 
-import org.jppf.management.forwarding.JPPFNodeForwarding.ForwardCallback;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-
 /**
  * Common super class for all forwrding tasks.
  */
@@ -28,15 +25,7 @@ abstract class AbstractForwardingTask implements Runnable {
   /**
    * Represents the node to which a request is sent.
    */
-  final AbstractNodeContext context;
-  /**
-   * The name of the node MBean to which the request is sent.
-   */
-  final String mbeanName;
-  /**
-   * The name of the method to invoke, or the attribute to get or set.
-   */
-  final String memberName;
+  final String uuid;
   /**
    * The result.
    */
@@ -48,16 +37,12 @@ abstract class AbstractForwardingTask implements Runnable {
 
   /**
    * Initialize this task.
-   * @param context represents the node to which a request is sent.
+   * @param uuid represents the node to which a request is sent.
    * @param callback .
-   * @param mbeanName the name of the node MBean to which the request is sent.
-   * @param memberName the name of the method to invoke, or the attribute to get or set.
    */
-  AbstractForwardingTask(final AbstractNodeContext context, final ForwardCallback callback, final String mbeanName, final String memberName) {
-    this.context = context;
+  AbstractForwardingTask(final String uuid, final ForwardCallback callback) {
+    this.uuid = uuid;
     this.callback = callback;
-    this.mbeanName = mbeanName;
-    this.memberName = memberName;
   }
 
   @Override
@@ -67,7 +52,7 @@ abstract class AbstractForwardingTask implements Runnable {
     } catch (final Exception e) {
       result = e;
     } finally {
-      callback.gotResult(context.getUuid(), result);
+      callback.gotResult(uuid, result);
     }
   }
 

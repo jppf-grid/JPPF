@@ -20,6 +20,8 @@ package org.jppf.jmxremote.message;
 
 import java.io.*;
 
+import org.jppf.jmx.JMXHelper;
+
 /**
  * Abstract superclass for all JMX messages.
  * @author Laurent Cohen
@@ -65,7 +67,7 @@ abstract class AbstractJMXMessage implements JMXMessage {
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.writeByte(messageType);
-    if (messageType != JMXMessageType.CONNECT) out.writeLong(messageID);
+    if (messageType != JMXHelper.CONNECT) out.writeLong(messageID);
   }
 
   /**
@@ -76,6 +78,6 @@ abstract class AbstractJMXMessage implements JMXMessage {
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     messageType = in.readByte();
-    messageID = (messageType == JMXMessageType.CONNECT) ? JMXMessageHandler.CONNECTION_MESSAGE_ID : in.readLong();
+    messageID = (messageType == JMXHelper.CONNECT) ? JMXMessageHandler.CONNECTION_MESSAGE_ID : in.readLong();
   }
 }
