@@ -44,7 +44,7 @@ public class NioHelper {
   /**
    * Prefix for the NIO thread names.
    */
-  public static final String NIO_THREAD_NAME_PREFIX = "JPPF";
+  public static final String NIO_THREAD_NAME_PREFIX = JPPFConfiguration.getProperties().getString("jppf.nio.thread.name.prefix", "JPPF");
   /**
    * Mapping of NIO servers to their identifier.
    */
