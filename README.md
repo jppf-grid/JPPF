@@ -1,4 +1,4 @@
-<img src="http://www.jppf.org/screenshots/gallery-images/Other/logo_large.gif"/>
+<img src="https://www.jppf.org/images/logo3.gif"/>
 
 # The open source grid computing solution
 
@@ -6,9 +6,9 @@ This is the home for the JPPF source code. Other services can be found at the fo
 
 * **[JPPF web site](https://www.jppf.org)**
 * **[Downloads](https://www.jppf.org/downloads.php)**
-* **[Documentation](http://www.jppf.org/doc/)**
-* **[User forums](http://www.jppf.org/forums)**
-* **[Issue tracker](http://www.jppf.org/tracker/tbg)**
+* **[Documentation](https://www.jppf.org/doc/)**
+* **[User forums](https://www.jppf.org/forums)**
+* **[Issue tracker](https://www.jppf.org/tracker/tbg)**
 
 JPPF includes the following modules:
 
@@ -17,7 +17,7 @@ JPPF includes the following modules:
 * **[admin-web](admin-web)**: the code and resources for the web admin console
 * **[application-template](application-template)**: source code for the JPPF client application template 
 * **[client](client)**: source code for the JPPF client APIs
-* **[common](common)**: utilities and classes common tot he other modules
+* **[common](common)**: utilities and classes common to the other modules
 * **[demo](demo)**: some demos and tests of JPPF features, which may be useful as code samples
 * **[dotnet-bridge](dotnet-bridge)**: source code and resources for the .Net bridge
 * **[jca-client](jca-client)**: source code for the J2EE connector
