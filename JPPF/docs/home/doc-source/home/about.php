@@ -22,6 +22,13 @@ $template{name="about-page-header" title="About JPPF"}$
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
+    $template{name="title-with-icon" img="images/icons/network-local.png" title="Extreme scalability" heading="h3"}$
+    <p>JPPF can easily and seamlessly scale from a standalone application on a single machine, to a massively distributed grid of machines comprising thousands of compute nodes.
+    Always using the same API, you can scale up your JPPF grid at any level, without ever changing a single line of code.
+    <p>Not only does JPPF take advantage of multiple machines, it also uses multiple cores on each machine whenever possible.
+    <br></div>
+
+    <br><div class="blockWithHighlightedTitle">
     $template{name="title-with-icon" img="images/icons/personal2.png" title="Powered by the community" heading="h3"}$
     <p>With over 10 years of active development, JPPF boasts an architecture with a proven record of reliability, performance and scalability.
     A project committed to its community, it demonstrates an outstanding support to its users and engages in a continuous conversation with them.
@@ -48,7 +55,7 @@ $template{name="about-page-header" title="About JPPF"}$
     <p>There is a lot more to JPPF than running and deploying your applications on the grid: scalability, security, fault tolerance, load-balancing, job scheduling, monitoring and management of the grid, integration with popular platforms and frameworks,
     extensions and customization, etc. The <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.
 
-    <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc/v5">full fledged documentation</a>.
+    <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc">full fledged documentation</a>.
     <br></div>
 
 	</div>

@@ -1,7 +1,7 @@
 <?php $currentPage="Download" ?>
 $template{name="about-page-header" title="Downloads"}$
   <table style="width: 100%"><tr>
-    <td style="width: 59%""><h1 align="right">Downloads</h1></td>
+    <td style="width: 59%"><h1 align="right">Downloads</h1></td>
     <td style="font-size: 10pt"><div align="right">Powered by<a href="https://www.ej-technologies.com/products/jprofiler/overview.html"> <img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"/><br>Java profiler</a></div></td>
   </tr></table>
 

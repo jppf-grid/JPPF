@@ -128,6 +128,12 @@
     In JPPF terms, a unit of work is called a "job", and its constituting "tasks" are distributed by the server among the nodes for parallel execution.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
+    <h3><img src="images/icons/network-local.png" class="titleWithIcon"/>Extreme scalability</h3>
+    <p>JPPF can easily and seamlessly scale from a standalone application on a single machine, to a massively distributed grid of machines comprising thousands of compute nodes.
+    Always using the same API, you can scale up your JPPF grid at any level, without ever changing a single line of code.
+    <p>Not only does JPPF take advantage of multiple machines, it also uses multiple cores on each machine whenever possible.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Powered by the community</h3>
     <p>With over 10 years of active development, JPPF boasts an architecture with a proven record of reliability, performance and scalability.
     A project committed to its community, it demonstrates an outstanding support to its users and engages in a continuous conversation with them.
@@ -149,7 +155,7 @@
     <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Outstanding features</h3>
     <p>There is a lot more to JPPF than running and deploying your applications on the grid: scalability, security, fault tolerance, load-balancing, job scheduling, monitoring and management of the grid, integration with popular platforms and frameworks,
     extensions and customization, etc. The <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.
-    <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc/v5">full fledged documentation</a>.
+    <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc">full fledged documentation</a>.
     <br></div>
 	</div>
 	<br>
@@ -177,7 +183,7 @@
           </script>
           -->
           <!-- Twitter share button -->
-          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           <!-- Facebook Like button -->
           <iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.jppf.org&amp;layout=button_count&amp;show_faces=true&amp;width=40&amp;action=like&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0"

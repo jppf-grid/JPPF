@@ -110,7 +110,7 @@
 				</div>
 				<div class="jppf_content">
   <table style="width: 100%"><tr>
-    <td style="width: 59%""><h1 align="right">Downloads</h1></td>
+    <td style="width: 59%"><h1 align="right">Downloads</h1></td>
     <td style="font-size: 10pt"><div align="right">Powered by<a href="https://www.ej-technologies.com/products/jprofiler/overview.html"> <img src="https://www.ej-technologies.com/images/product_banners/jprofiler_small.png"/><br>Java profiler</a></div></td>
   </tr></table>
   <div class="column_left" style="text-align: justify; padding: 0px">
@@ -282,7 +282,7 @@
           </script>
           -->
           <!-- Twitter share button -->
-          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           <!-- Facebook Like button -->
           <iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.jppf.org&amp;layout=button_count&amp;show_faces=true&amp;width=40&amp;action=like&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0"

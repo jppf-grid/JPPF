@@ -148,57 +148,57 @@
 <h3><img src="images/icons/news.png" class="titleWithIcon"/>Press release: JPPF <?php echo $jppfVersion ?></h3>
 <p><b>Administration console:</b>
 <ul class="samplesList">
-  <li><a href="http://www.jppf.org/screenshots/gallery-images/NodeFiltering-Active.gif">node filtering</a> with an execution policy editor with import/export capabilities</li>
-  <li>ability to <a href="http://www.jppf.org/screenshots/gallery-images/VisibleServerStatistics.png">select the visible statistics</a> in the server statiscs view</li>
+  <li><a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/NodeFiltering-Active.gif">node filtering</a> with an execution policy editor with import/export capabilities</li>
+  <li>ability to <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/VisibleServerStatistics.png">select the visible statistics</a> in the server statiscs view</li>
   <li>syntax hihghlighting in all the editors: properties/node filtering</li>
-  <li>the admin console splash screen is now <a href="http://www.jppf.org/doc/5.2/index.php?title=Client_and_administration_console_configuration#Customizing_the_administration_console.27s_splash_screen">customizable</a> via the configuration</li>
-  <li>The administration console is now fully localized, with full <a href="http://www.jppf.org/screenshots/gallery-images/UpdateNodeConfiguration.gif">English</a> and <a href="http://www.jppf.org/screenshots/gallery-images/UpdateNodeConfigurationFrench.gif">French</a> translations available
+  <li>the admin console splash screen is now <a href="/doc/5.2/index.php?title=Client_and_administration_console_configuration#Customizing_the_administration_console.27s_splash_screen">customizable</a> via the configuration</li>
+  <li>the administration console is now fully localized, with full <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/UpdateNodeConfiguration.gif">English</a> and <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/UpdateNodeConfigurationFrench.gif">French</a> translations available
 </ul>
 <p><b>Configuration:</b>
 <ul class="samplesList">
-  <li>all documented properties are now defined as <a href="http://www.jppf.org/javadoc/5.2/index.html?org/jppf/utils/configuration/JPPFProperties.html">constants</a></li>
-  <li>a new and elegant <a href="http://www.jppf.org/doc/5.2/index.php?title=The_JPPF_configuration_API#Predefined_JPPF_properties">API</a> was created to handle them easily</li>
+  <li>all documented properties are now defined as <a href="/javadoc/5.2/index.html?org/jppf/utils/configuration/JPPFProperties.html">constants</a></li>
+  <li>a new and elegant <a href="/doc/5.2/index.php?title=The_JPPF_configuration_API#Predefined_JPPF_properties">API</a> was created to handle them easily</li>
   <li>it is now possible to specify in the configuration which JVM to use for the nodes and servers. This also applies to master and slave nodes when they are (re)started</li>
 </ul>
 <p><b>Customization/extension:</b>
 <ul class="samplesList">
-  <li>ability to <a href="http://www.jppf.org/doc/5.2/index.php?title=Composite_serialization">chain serialization schemes</a> to provide compression or encryption over actual serialization</li>
-  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Specifying_alternate_serialization_schemes#Generic_JPPF_serialization">the JPPF serialization</a> scheme was thouroughly optimized and is now faster than the Java serialization</li>
-  <li>it is now possible to register for <a href="http://www.jppf.org/doc/5.2/index.php?title=Receiving_server_statistics_events">statistics change events</a> in the server</li>
-  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Network_interceptors">Network communication interceptors</a> enable user-defined code to be executed on both sides of each new connection</li>
-  <li>A <a href="http://www.jppf.org/doc/5.2/index.php?title=Pluggable_MBeanServerForwarder">pluggable MBeanServerForwarder</a> can now be associated to the JMX remote connector servers created by JPPF drivers and nodes</li>
-  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Environment_providers_for_JMX_remote_connections">Pluggable environment providers</a> for JMX remote connector clients and servers</li>
+  <li>ability to <a href="/doc/5.2/index.php?title=Composite_serialization">chain serialization schemes</a> to provide compression or encryption over actual serialization</li>
+  <li><a href="/doc/5.2/index.php?title=Specifying_alternate_serialization_schemes#Generic_JPPF_serialization">the JPPF serialization</a> scheme was thouroughly optimized and is now faster than the Java serialization</li>
+  <li>it is now possible to register for <a href="/doc/5.2/index.php?title=Receiving_server_statistics_events">statistics change events</a> in the server</li>
+  <li><a href="/doc/5.2/index.php?title=Network_interceptors">Network communication interceptors</a> enable user-defined code to be executed on both sides of each new connection</li>
+  <li>A <a href="/doc/5.2/index.php?title=Pluggable_MBeanServerForwarder">pluggable MBeanServerForwarder</a> can now be associated to the JMX remote connector servers created by JPPF drivers and nodes</li>
+  <li><a href="/doc/5.2/index.php?title=Environment_providers_for_JMX_remote_connections">Pluggable environment providers</a> for JMX remote connector clients and servers</li>
 </ul>
 <p><b>Android node:</b>
 <ul class="samplesList">
-  <li>It is now possible to configure the node to stop working or terminate <a href="http://www.jppf.org/doc/5.2/index.php?title=Android_Node#Battery_state_monitoring">when the device's battery is low</a></li></li>
-  <li>Improved the <a href="http://www.jppf.org/screenshots/gallery-images/AndroidMainScreenBusy.gif">default feedback screen</a></li>
+  <li>It is now possible to configure the node to stop working or terminate <a href="/doc/5.2/index.php?title=Android_Node#Battery_state_monitoring">when the device's battery is low</a></li></li>
+  <li>Improved the <a href="/screenshots/gallery-images/Android/AndroidMainScreenBusy.gif">default feedback screen</a></li>
 </ul>
 <p><b>Job SLA:</b>
 <ul class="samplesList">
-  <li>The job SLA can now specifiy <a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Grid_policy">filtering rules</a> based on the server properties and the number of nodes satisfying one or more conditions<br>
+  <li>The job SLA can now specifiy <a href="/doc/5.2/index.php?title=Job_Service_Level_Agreement#Grid_policy">filtering rules</a> based on the server properties and the number of nodes satisfying one or more conditions<br>
   Example: "execute when the server has at least 2 GB of heap memory and at least 3 nodes with more than 4 cores each"</li>
-  <li>The job SLA can <a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Specifying_the_desired_node_configuration">specify the desired configuration</a>
+  <li>The job SLA can <a href="/doc/5.2/index.php?title=Job_Service_Level_Agreement#Specifying_the_desired_node_configuration">specify the desired configuration</a>
   of the nodes on which it will execute and force the nodes to reconfigure themselves accordingly</li>
-  <li>execution policies based on server properties now have <a href="http://www.jppf.org/doc/5.2/index.php?title=Execution_policy_properties#Server_statistics">access to the server statistics</a>
+  <li>execution policies based on server properties now have <a href="/doc/5.2/index.php?title=Execution_policy_properties#Server_statistics">access to the server statistics</a>
 </ul>
 <p><b>Management and Monitoring</b>
-<p>Two new types of node selectors are now available: <a href="http://www.jppf.org/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Scripted_node_selector">scripted node selector</a> and <a href="http://www.jppf.org/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Custom_node_selector">custom node selector</a>
+<p>Two new types of node selectors are now available: <a href="/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Scripted_node_selector">scripted node selector</a> and <a href="/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Custom_node_selector">custom node selector</a>
 <p><b>Load-balancing</b>
-<p>A <a href="http://www.jppf.org/doc/5.2/index.php?title=Built-in_algorithms#.22rl2.22">new load-balancing algorithm</a>, named "rl2", was implemented
+<p>A <a href="/doc/5.2/index.php?title=Built-in_algorithms#.22rl2.22">new load-balancing algorithm</a>, named "rl2", was implemented
 <p><b>Documentation</b>
-<p>Added a complete section on <a href="http://www.jppf.org/doc/5.2/index.php?title=Load_Balancing">load balancing</a>
+<p>Added a complete section on <a href="/doc/5.2/index.php?title=Load_Balancing">load balancing</a>
 <p><b>Samples</b>
 <ul class="samplesList">
-  <li>A new sample was added, illustrating a full-fledged management of <a href="http://www.jppf.org/samples-pack/JobDependencies">dependencies between jobs</a></li>
-  <li>The <a href="http://www.jppf.org/samples-pack/NetworkInterceptor">Network Interceptor sample</a> shows how a network connection interceptor can be used to implement a simple authentication mechanism with symetric encryption</li>
+  <li>A new sample was added, illustrating a full-fledged management of <a href="/samples-pack/JobDependencies">dependencies between jobs</a></li>
+  <li>The <a href="/samples-pack/NetworkInterceptor">Network Interceptor sample</a> shows how a network connection interceptor can be used to implement a simple authentication mechanism with symetric encryption</li>
 </ul>
 <p><b>Packaging</b>
 <p>The JPPF jar files now include the version number in their name, e.g. jppf-common-5.2.jar
 <p><b>Continuous Integration</b>
 <ul class="samplesList">
   <li>A large amount of time and effort was invested in setting up a continuous integration environment based on Jenkins</li>
-  <li>Automated builds are now in place with <a href="http://www.jppf.org/ci.php">results</a> automatically published to the JPPF web site</li>
+  <li>Automated builds are now in place with <a href="/ci.php">results</a> automatically published to the JPPF web site</li>
   <li>Automated tests coverage was largely improved</li>
 </ul>
 <!-- ============================== -->
@@ -272,7 +272,7 @@
           </script>
           -->
           <!-- Twitter share button -->
-          <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
           <!-- Facebook Like button -->
           <iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.jppf.org&amp;layout=button_count&amp;show_faces=true&amp;width=40&amp;action=like&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0"

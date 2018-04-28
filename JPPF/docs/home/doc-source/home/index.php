@@ -1,6 +1,7 @@
 <?php
   require_once("db_settings.inc.php");
   $currentPage="Home";
+  $jppf_version = "6.0";
 ?>
 $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script src="scripts/jquery.js"></script>
@@ -32,7 +33,10 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <div align="center">
     <br/>
     <h2><i>New</i>: JPPF 5.2 is here, <a href='/release_notes.php?version=5.2'>check it out!</a></h2>
-    <p style="font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
+  </div>
+  <br><div class="blockWithHighlightedTitle" style="padding-left: 25px">
+    <p style="font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
+    This is done by splitting an application into smaller parts that can be executed simultaneously on different machines and multiple cores on each machine.
   </div>
 
   <div class="column_left">
@@ -51,13 +55,13 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
       <li>ready for the Cloud, a natural medium for JPPF</li>
       <li>fully secure SSL / TLS communications</li>
       <li>full volunteer computing support</li>
-      <li>integration with leading J2EE application servers</li>
+      <li>integration with leading <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=J2EE_Connector">J2EE servers</a>, <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=Android_Node">Android</a>, <a href="/doc/<?php echo $jppf_version; ?>/index.php?title=.Net_Bridge">.Net</a></li>
       <li>easy programming model</li>
       <li>fine-grained monitoring and administration</li>
       <li>fault-tolerance and self-repair capabilities</li>
       <li>exceptional level of service and reliability</li>
       <li>full, comprehensive documentation</li>
-      <li>broad set of fully documented end-to-end demos</li>
+      <li>broad set of fully documented end-to-end <a href="/samples-pack">samples and demos</a></li>
       <li>flexible licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
     </ul>
     </div>
@@ -68,7 +72,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
-    <b>Gain insight and provide feedback in the <a href="https://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
+    <b>Explore the <a href="https://github.com/lolocohen/JPPF">source code</a> on <a href="https://github.com/lolocohen/JPPF">Github</a></b><br><br>
     </div><br>
 
   </div>
@@ -81,7 +85,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
       $result = mysql_query($query) or die('Query failed: ' . mysql_error());
     ?>
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
-    $template{name="title-with-icon" img="images/icons/news.png" title="Latest Releases" heading="h3"}$
+    $template{name="title-with-icon" img="images/icons/news.png" title="Latest News" heading="h3"}$
     <?php
       for ($i=1; $i<=3; $i++) {
         $line = mysql_fetch_array($result, MYSQL_ASSOC);
