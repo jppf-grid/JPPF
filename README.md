@@ -10,7 +10,7 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[User forums](https://www.jppf.org/forums)**
 * **[Issue tracker](https://www.jppf.org/tracker/tbg)**
 
-JPPF includes the following modules:
+## JPPF modules:
 
 * **[JPPF](JPPF)**: contains the build scripts, web site and associated templates, documentation as LibreOffice text documents
 * **[admin](admin)**: the code and resources for the desktop (Swing-based) admin console
