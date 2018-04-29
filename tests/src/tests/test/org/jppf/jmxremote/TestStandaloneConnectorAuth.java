@@ -339,23 +339,4 @@ public class TestStandaloneConnectorAuth extends AbstractTestStandaloneConnector
   static <T> T[] arrayOf(@SuppressWarnings("unchecked") final T...array) {
     return array;
   }
-
-  /** */
-  public static class UserPwd extends Pair<String, String> {
-    /**
-     * @param user .
-     * @param pwd .
-     */
-    public UserPwd(final String user, final String pwd) { super(user, pwd); }
-
-    /**
-     * @return the user.
-     */
-    public String user() { return first(); }
-
-    /**
-     * @return the passord.
-     */
-    public String pwd() { return second(); }
-  }
 }

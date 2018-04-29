@@ -24,7 +24,7 @@ import java.util.*;
 import javax.management.remote.*;
 import javax.security.auth.Subject;
 
-import test.org.jppf.jmxremote.TestStandaloneConnectorAuth.UserPwd;
+import org.jppf.utils.Pair;
 
 /**
  * A simple authenticator for testing.
@@ -51,5 +51,24 @@ public class MyAuthenticator implements JMXAuthenticator {
     final Set<Object> privateCredentials = new HashSet<>();
     privateCredentials.add(new UserPwd(user, pwd));
     return new Subject(true, principals, new HashSet<>(), privateCredentials);
+  }
+
+  /** */
+  public static class UserPwd extends Pair<String, String> {
+    /**
+     * @param user .
+     * @param pwd .
+     */
+    public UserPwd(final String user, final String pwd) { super(user, pwd); }
+  
+    /**
+     * @return the user.
+     */
+    public String user() { return first(); }
+  
+    /**
+     * @return the passord.
+     */
+    public String pwd() { return second(); }
   }
 }
