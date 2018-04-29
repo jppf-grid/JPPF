@@ -25,7 +25,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- * 
+ * Extract JPPF properties defined as public constants in a given class.
  * @author Laurent Cohen
  */
 public class ConfigurationUtils {
@@ -35,18 +35,19 @@ public class ConfigurationUtils {
   private static Logger log = LoggerFactory.getLogger(ConfigurationUtils.class);
 
   /**
-   * Get the list of all predefined configuration properties.
+   * Get the list of all predefined configuration properties in the specified class.
    * @param c the class containing the proeprties constants.
    * @return A list of {@link JPPFProperty} instances.
   */
   public synchronized static List<JPPFProperty<?>> allProperties(final Class<?> c) {
     final List<JPPFProperty<?>> properties = new ArrayList<>();
     try {
+      // compute the base loalisation bundle name
       final String i18nBase = c.getPackage().getName() + ".i18n." + c.getSimpleName();
       final Field[] fields = c.getDeclaredFields();
       for (Field field: fields) {
         final int mod = field.getModifiers();
-        if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && (JPPFProperty.class == field.getType())) {
+        if (Modifier.isStatic(mod) && Modifier.isPublic(mod) && Modifier.isFinal(mod) && JPPFProperty.class.isAssignableFrom(field.getType())) {
           if (!field.isAccessible()) field.setAccessible(true);
           final JPPFProperty<?> prop = (JPPFProperty<?>) field.get(null);
           if (prop instanceof AbstractJPPFProperty) ((AbstractJPPFProperty<?>) prop).setI18nBase(i18nBase);
