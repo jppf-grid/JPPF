@@ -23,6 +23,7 @@ import java.util.List;
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.slf4j.*;
 
 /**
@@ -115,7 +116,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JPPFClientConnection awaitActiveConnection() {
-    return awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, 1).get(0);
+    return awaitActiveConnections(Operator.AT_LEAST, 1).get(0);
   }
 
   /**
@@ -137,7 +138,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.0
    */
   public JPPFClientConnection awaitWorkingConnection() {
-    return awaitWorkingConnections(org.jppf.utils.Operator.AT_LEAST, 1).get(0);
+    return awaitWorkingConnections(Operator.AT_LEAST, 1).get(0);
   }
 
   /**
@@ -161,7 +162,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JPPFClientConnection awaitConnection(final JPPFClientConnectionStatus...statuses) {
-    return awaitConnections(org.jppf.utils.Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
+    return awaitConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
   }
 
   /**
@@ -197,7 +198,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JMXDriverConnectionWrapper awaitJMXConnection(final boolean connectedOnly) {
-    return awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, connectedOnly).get(0);
+    return awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0);
   }
 
   /**
@@ -206,6 +207,6 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
-    return awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+    return awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 }

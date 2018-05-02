@@ -26,6 +26,7 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 
 /**
@@ -127,7 +128,7 @@ public class Runner {
    */
   private static int configureDriver() throws Exception {
     // get a connection to the driver's JMX server
-    final JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     // obtain the current load-balancing settings
     final LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
     if (lbi == null) return 1;

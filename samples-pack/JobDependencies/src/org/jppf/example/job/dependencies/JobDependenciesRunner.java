@@ -24,6 +24,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.Operator;
 
 /**
  * Run the dependencies managment sample.
@@ -54,7 +55,7 @@ public class JobDependenciesRunner {
       final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
       // wait until all connections are initialized
-      pool.awaitWorkingConnections(org.jppf.utils.Operator.AT_LEAST, n);
+      pool.awaitWorkingConnections(Operator.AT_LEAST, n);
 
       // Create the jobs according to the dependency graph
       final List<JPPFJob> jobs = new ArrayList<>();

@@ -26,6 +26,7 @@ import org.jppf.client.event.*;
 import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.Operator;
 
 /**
  * An illustration of the patterns for submitting multiple jobs in parallel.
@@ -253,7 +254,7 @@ public class ConcurrentJobs {
     // wait until a connection pool is available
     final JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
     // make sure the pool has enough connections and wait until all connections are active
-    pool.awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, nbConnections);
+    pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
     // alternatively with a single method call: wait until there is a connection pool with at least <nbConnections> active connections, for as long as it takes
     //jppfClient.awaitConnectionPools(Operator.AT_LEAST, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
   }

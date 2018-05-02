@@ -26,6 +26,7 @@ import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.slf4j.*;
 
 /**
@@ -150,7 +151,7 @@ public class DeadlockRunner {
     printf("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
     printf("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
-    pool.awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, nbConnections);
+    pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
     printf("***** ensuring %d connections, after pool.await()", nbConnections);
   }
 

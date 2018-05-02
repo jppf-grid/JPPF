@@ -27,6 +27,7 @@ import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.Operator;
 
 /**
  * 
@@ -79,7 +80,7 @@ public class TestDriverRestart {
    */
   public static JMXDriverConnectionWrapper getJmxWrapper() {
     try {
-      return client.awaitActiveConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+      return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     } catch(final Exception e) {
       e.printStackTrace();
       return null;

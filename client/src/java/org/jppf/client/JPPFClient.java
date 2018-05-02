@@ -27,6 +27,7 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
@@ -274,7 +275,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final ComparisonOperator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    return awaitConnectionPools(org.jppf.utils.Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
+    return awaitConnectionPools(Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
   }
 
   /**

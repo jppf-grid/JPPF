@@ -29,6 +29,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
@@ -139,7 +140,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
    * @throws Exception if any error occurs.
    */
   protected List<String> getNodeIds() throws Exception {
-    final JMXDriverConnectionWrapper driver = jppfClient.awaitWorkingConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper driver = jppfClient.awaitWorkingConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     final Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
     final List<String> idList = new ArrayList<>(nodesInfo.size());
     for (JPPFManagementInfo info: nodesInfo) idList.add(info.getUuid());

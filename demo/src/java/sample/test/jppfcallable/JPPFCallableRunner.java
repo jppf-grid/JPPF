@@ -23,6 +23,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.Operator;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -154,7 +155,7 @@ public class JPPFCallableRunner {
    * @throws Exception if any error occurs.
    */
   private static JMXDriverConnectionWrapper getDriverJmx() throws Exception {
-    return jppfClient.awaitActiveConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+    return jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
   /**

@@ -29,6 +29,7 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.utils.Operator;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -58,7 +59,7 @@ public class TestJMX {
   public static void main(final String... args) {
     try {
       client = new JPPFClient();
-      driverJmx = client.awaitActiveConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+      driverJmx = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       System.out.println("waiting till jmx is connected ...");
       while (!driverJmx.isConnected()) Thread.sleep(10L);
       perform3();

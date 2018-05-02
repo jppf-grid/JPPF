@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.*;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
@@ -265,7 +266,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * @since 5.0
    */
   public List<JPPFClientConnection> awaitConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    final ComparisonOperator op = operator == null ? org.jppf.utils.Operator.EQUAL : operator;
+    final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
     if (debugEnabled) log.debug(String.format("awaiting %d connections with operator=%s and status in %s", nbConnections, op, Arrays.asList(statuses)));
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {

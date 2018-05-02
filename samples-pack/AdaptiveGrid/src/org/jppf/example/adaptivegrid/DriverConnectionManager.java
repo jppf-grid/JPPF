@@ -22,6 +22,7 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -67,7 +68,7 @@ public class DriverConnectionManager {
     // wait until there is a connection pool with the at least one active connection to the driver
     connectionPool = client.awaitActiveConnectionPool();
     // wait until at least one JMX connection wrapper is established
-    final JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
     final ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
@@ -91,7 +92,7 @@ public class DriverConnectionManager {
       AdaptiveGridDemo.print("%screasing the number of server connections to %d", (newPoolSize > currentPoolSize) ? "in" : "de", newPoolSize);
       connectionPool.setSize(newPoolSize);
       // wait until all requested connections are established
-      connectionPool.awaitWorkingConnections(org.jppf.utils.Operator.EQUAL, newPoolSize);
+      connectionPool.awaitWorkingConnections(Operator.EQUAL, newPoolSize);
     }
 
     // Adjust the number of nodes

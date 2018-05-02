@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
@@ -175,7 +176,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * @since 5.0
    */
   List<JMXDriverConnectionWrapper> awaitJMXConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final boolean connected) {
-    final ComparisonOperator op = operator == null ? org.jppf.utils.Operator.EQUAL : operator;
+    final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
     //setSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
