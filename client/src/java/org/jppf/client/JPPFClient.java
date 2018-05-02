@@ -273,8 +273,8 @@ public class JPPFClient extends AbstractGenericClient {
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 5.0
    */
-  public List<JPPFConnectionPool> awaitConnectionPools(final Operator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    return awaitConnectionPools(Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
+  public List<JPPFConnectionPool> awaitConnectionPools(final ComparisonOperator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    return awaitConnectionPools(org.jppf.utils.Operator.AT_LEAST, 1, operator, expectedConnections, timeout, statuses);
   }
 
   /**
@@ -295,7 +295,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 6.0
    */
-  public List<JPPFConnectionPool> awaitConnectionPools(final Operator poolOperator, final int expectedPools, final Operator connectionOperator, final int expectedConnections,
+  public List<JPPFConnectionPool> awaitConnectionPools(final ComparisonOperator poolOperator, final int expectedPools, final ComparisonOperator connectionOperator, final int expectedConnections,
     final long timeout, final JPPFClientConnectionStatus...statuses) {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {

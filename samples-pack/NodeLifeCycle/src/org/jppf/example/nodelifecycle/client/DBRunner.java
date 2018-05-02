@@ -106,7 +106,7 @@ public class DBRunner {
    */
   private static JMXNodeConnectionWrapper getNode() throws Exception {
     if (jmxNode == null) {
-      final JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+      final JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
       final Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
       final JPPFManagementInfo info = nodesInfo.iterator().next();
       jmxNode = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());

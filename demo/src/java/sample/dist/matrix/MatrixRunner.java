@@ -104,7 +104,7 @@ public class MatrixRunner {
       else jppfClient = new JPPFClient();
       final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
       pool.setSize(nbChannels);
-      pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
+      pool.awaitWorkingConnections(org.jppf.utils.Operator.AT_LEAST, nbChannels);
       // initialize the 2 matrices to multiply
       final Matrix a = new Matrix(size).assignRandomValues();
       final Matrix b = new Matrix(size).assignRandomValues();

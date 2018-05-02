@@ -150,7 +150,7 @@ public class DeadlockRunner {
     printf("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
     printf("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
-    pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
+    pool.awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, nbConnections);
     printf("***** ensuring %d connections, after pool.await()", nbConnections);
   }
 

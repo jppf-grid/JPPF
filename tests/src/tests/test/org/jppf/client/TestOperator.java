@@ -20,7 +20,7 @@ package test.org.jppf.client;
 
 import static org.junit.Assert.*;
 
-import org.jppf.client.Operator;
+import org.jppf.utils.Operator;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;

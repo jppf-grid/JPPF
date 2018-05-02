@@ -25,6 +25,7 @@ import javax.management.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class JMXHelper {
   /**

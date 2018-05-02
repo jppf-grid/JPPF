@@ -20,7 +20,6 @@ package org.jppf.jmxremote.nio;
 
 import java.nio.channels.SelectionKey;
 
-import org.jppf.client.Operator;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.SynchronizedInteger;
 import org.slf4j.*;

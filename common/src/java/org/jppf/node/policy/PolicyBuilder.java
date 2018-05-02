@@ -20,7 +20,8 @@ package org.jppf.node.policy;
 
 import java.util.*;
 
-import org.jppf.client.Operator;
+import org.jppf.utils.Operator;
+
 
 /**
  * Instances of this class build an execution policy graph, based on a policy

@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -104,7 +104,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitActiveConnections(final Operator operator, final int nbConnections) {
+  public List<JPPFClientConnection> awaitActiveConnections(final ComparisonOperator operator, final int nbConnections) {
     return awaitConnections(operator, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
   }
 
@@ -115,7 +115,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JPPFClientConnection awaitActiveConnection() {
-    return awaitActiveConnections(Operator.AT_LEAST, 1).get(0);
+    return awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, 1).get(0);
   }
 
   /**
@@ -126,7 +126,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitWorkingConnections(final Operator operator, final int nbConnections) {
+  public List<JPPFClientConnection> awaitWorkingConnections(final ComparisonOperator operator, final int nbConnections) {
     return awaitConnections(operator, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
   }
 
@@ -137,7 +137,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.0
    */
   public JPPFClientConnection awaitWorkingConnection() {
-    return awaitWorkingConnections(Operator.AT_LEAST, 1).get(0);
+    return awaitWorkingConnections(org.jppf.utils.Operator.AT_LEAST, 1).get(0);
   }
 
   /**
@@ -149,7 +149,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final JPPFClientConnectionStatus...statuses) {
+  public List<JPPFClientConnection> awaitConnections(final ComparisonOperator operator, final int nbConnections, final JPPFClientConnectionStatus...statuses) {
     return awaitConnections(operator, nbConnections, Long.MAX_VALUE, statuses);
   }
 
@@ -161,7 +161,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JPPFClientConnection awaitConnection(final JPPFClientConnectionStatus...statuses) {
-    return awaitConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
+    return awaitConnections(org.jppf.utils.Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
   }
 
   /**
@@ -173,7 +173,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @return a list of at least {@code nbConnections} {@link JMXDriverConnectionWrapper} instances.
    * @since 5.0
    */
-  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final boolean connectedOnly) {
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final ComparisonOperator operator, final int nbConnections, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(operator, nbConnections, Long.MAX_VALUE, connectedOnly);
   }
 
@@ -186,7 +186,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(operator, nbConnections, timeout, connectedOnly);
   }
 
@@ -197,7 +197,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JMXDriverConnectionWrapper awaitJMXConnection(final boolean connectedOnly) {
-    return awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0);
+    return awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, connectedOnly).get(0);
   }
 
   /**
@@ -206,6 +206,6 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @since 5.1
    */
   public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
-    return awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    return awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
   }
 }

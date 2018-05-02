@@ -37,6 +37,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 

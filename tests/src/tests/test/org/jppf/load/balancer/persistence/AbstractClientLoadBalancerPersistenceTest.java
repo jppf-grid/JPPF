@@ -29,6 +29,7 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManagement;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.Operator;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;

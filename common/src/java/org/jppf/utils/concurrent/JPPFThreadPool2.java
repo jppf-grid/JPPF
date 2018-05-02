@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
-import org.jppf.client.Operator;
 import org.jppf.utils.*;
 import org.slf4j.Logger;
 

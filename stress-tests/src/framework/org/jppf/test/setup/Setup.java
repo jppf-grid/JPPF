@@ -26,6 +26,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.Operator;
 
 import test.org.jppf.test.setup.ConfigurationHelper;
 

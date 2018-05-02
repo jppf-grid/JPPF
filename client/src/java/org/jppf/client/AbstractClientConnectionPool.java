@@ -264,8 +264,8 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    final Operator op = operator == null ? Operator.EQUAL : operator;
+  public List<JPPFClientConnection> awaitConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final ComparisonOperator op = operator == null ? org.jppf.utils.Operator.EQUAL : operator;
     if (debugEnabled) log.debug(String.format("awaiting %d connections with operator=%s and status in %s", nbConnections, op, Arrays.asList(statuses)));
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {

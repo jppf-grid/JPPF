@@ -26,8 +26,7 @@ import org.jppf.utils.collections.Metadata;
  * @author Laurent Cohen
  * @exclude
  */
-public interface TaskBundle extends JPPFDistributedJob, Metadata
-{
+public interface TaskBundle extends JPPFDistributedJob, Metadata {
   /**
    * Get the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
    * @return the uuid path as a list of string elements.
@@ -165,5 +164,4 @@ public interface TaskBundle extends JPPFDistributedJob, Metadata
    * @param handshake <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
    */
   void setHandshake(boolean handshake);
-
 }

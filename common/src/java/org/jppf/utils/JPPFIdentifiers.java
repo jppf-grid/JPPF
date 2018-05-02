@@ -33,6 +33,18 @@ public final class JPPFIdentifiers {
    */
   public static final int UNKNOWN = 0;
   /**
+   * Identifier for a driver-tot-driver heartbeat connection.
+   */
+  public static final int PEER_HEARTBEAT_CHANNEL = 0xFFF5;
+  /**
+   * Identifier for a client-driver heartbeat connection.
+   */
+  public static final int CLIENT_HEARTBEAT_CHANNEL = 0xFFF6;
+  /**
+   * Identifier for a nodet-driver heartbeat connection.
+   */
+  public static final int NODE_HEARTBEAT_CHANNEL = 0xFFF7;
+  /**
    * Identifier for a JMX remote channel.
    */
   public static final int JMX_REMOTE_CHANNEL = 0xFFF8;

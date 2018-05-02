@@ -53,7 +53,7 @@ public class CancelJobRunner {
       final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
       print("waiting for " + n + " client connections ...");
-      client.awaitConnectionPools(Operator.EQUAL, n, 100_000L, JPPFClientConnectionStatus.workingStatuses());
+      client.awaitConnectionPools(org.jppf.utils.Operator.EQUAL, n, 100_000L, JPPFClientConnectionStatus.workingStatuses());
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
       final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
       final DriverJobManagementMBean jobManager = jmx.getJobManager();

@@ -31,6 +31,7 @@ import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
 import org.junit.AfterClass;
@@ -46,9 +47,7 @@ public class AbstractNonStandardSetup extends BaseTest {
   protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
   /** */
   protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", true));
-  /**
-   * 
-   */
+  /** */
   protected static TestConfiguration testConfig = null;
 
   /**
@@ -380,7 +379,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @param timeout how long to wait for the condtion to be {@link true}.
    * @throws Exception if any error occurs or the tiemout expires.
    */
-  protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final Operator operator, final int nbNodes, final long timeout) throws Exception {
+  protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int nbNodes, final long timeout) throws Exception {
     awaitNbIdleNodes(jmx, NON_PEER_SELECTOR, false, operator, nbNodes, timeout);
   }
 
@@ -395,7 +394,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs or the tiemout expires.
    */
   protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final NodeSelector selector, final boolean includePeers,
-    final Operator operator, final int nbNodes, final long timeout) throws Exception {
+    final ComparisonOperator operator, final int nbNodes, final long timeout) throws Exception {
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
         @Override
         public boolean evaluate() {

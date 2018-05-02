@@ -54,7 +54,7 @@ public class JobDependenciesRunner {
       final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
       // wait until all connections are initialized
-      pool.awaitWorkingConnections(Operator.AT_LEAST, n);
+      pool.awaitWorkingConnections(org.jppf.utils.Operator.AT_LEAST, n);
 
       // Create the jobs according to the dependency graph
       final List<JPPFJob> jobs = new ArrayList<>();

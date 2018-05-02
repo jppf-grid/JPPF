@@ -28,6 +28,7 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseTest;

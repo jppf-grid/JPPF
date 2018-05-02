@@ -29,6 +29,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;

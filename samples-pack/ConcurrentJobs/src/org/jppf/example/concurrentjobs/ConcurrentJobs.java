@@ -253,7 +253,7 @@ public class ConcurrentJobs {
     // wait until a connection pool is available
     final JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
     // make sure the pool has enough connections and wait until all connections are active
-    pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
+    pool.awaitActiveConnections(org.jppf.utils.Operator.AT_LEAST, nbConnections);
     // alternatively with a single method call: wait until there is a connection pool with at least <nbConnections> active connections, for as long as it takes
     //jppfClient.awaitConnectionPools(Operator.AT_LEAST, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
   }

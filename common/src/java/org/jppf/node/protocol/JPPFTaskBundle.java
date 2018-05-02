@@ -42,11 +42,11 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   /**
    * The unique identifier for the request (the job) this task bundle is a part of.
    */
-  private String uuid = null;
+  private String uuid;
   /**
    * The user-defined display name for this job.
    */
-  private String name = null;
+  private String name;
   /**
    * The unique identifier for the submitting application.
    */
@@ -54,27 +54,27 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   /**
    * The number of tasks in this bundle at the time it is received by a driver.
    */
-  protected int driverQueueTaskCount = 0;
+  protected int driverQueueTaskCount;
   /**
    * The number of tasks in this bundle.
    */
-  protected int taskCount = 0;
+  protected int taskCount;
   /**
    * The current number of tasks in this bundle.
    */
-  protected int currentTaskCount = 0;
+  protected int currentTaskCount;
   /**
    * The initial number of tasks in this bundle.
    */
-  protected int initialTaskCount = 0;
+  protected int initialTaskCount;
   /**
    * The time it took a node to execute this task.
    */
-  private long nodeExecutionTime = 0L;
+  private long nodeExecutionTime;
   /**
    * The time at which the bundle is taken out of the queue for sending to a node.
    */
-  private long executionStartTime = 0L;
+  private long executionStartTime;
   /**
    * Indicates whether this object is used for handshake instead of execution.
    */

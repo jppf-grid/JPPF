@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.Operator;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;

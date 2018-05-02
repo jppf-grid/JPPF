@@ -24,6 +24,7 @@ import java.util.*;
  * Instances of this class load and provide access to environment proivders.
  * @param <T> the type of the providers to load.
  * @author Laurent Cohen
+ * @exclude
  */
 public class EnvironmentProviderHandler<T> {
   /**

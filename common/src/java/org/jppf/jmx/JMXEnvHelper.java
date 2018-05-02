@@ -26,6 +26,7 @@ import org.jppf.utils.configuration.*;
 /**
  *
  * @author Laurent Cohen
+ * @exclude
  */
 public class JMXEnvHelper {
   /**

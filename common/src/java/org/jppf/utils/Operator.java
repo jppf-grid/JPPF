@@ -16,14 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
-
-import org.jppf.utils.ComparisonOperator;
+package org.jppf.utils;
 
 /**
  * Enumeration of the possible boolean operators that can be used as a comparison predicates for integer/long values.
  * @author Laurent Cohen
- * @deprecated use {@link org.jppf.utils.Operator} instead.
  */
 public enum Operator implements ComparisonOperator {
   /**

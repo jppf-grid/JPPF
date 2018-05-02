@@ -174,8 +174,8 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connected) {
-    final Operator op = operator == null ? Operator.EQUAL : operator;
+  List<JMXDriverConnectionWrapper> awaitJMXConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final boolean connected) {
+    final ComparisonOperator op = operator == null ? org.jppf.utils.Operator.EQUAL : operator;
     //setSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {

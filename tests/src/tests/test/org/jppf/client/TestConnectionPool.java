@@ -30,6 +30,7 @@ import org.jppf.client.event.*;
 import org.jppf.discovery.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -241,7 +242,7 @@ public class TestConnectionPool extends Setup1D1N {
    * @param nbPools the number of pools on which to apply the condition.
    * @throws Exception if any error occurs.
    */
-  private static void awaitConnections(final JPPFClient client, final Operator operator, final int nbPools) throws Exception {
+  private static void awaitConnections(final JPPFClient client, final ComparisonOperator operator, final int nbPools) throws Exception {
     BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
     final JobManagerClient mgr = (JobManagerClient) client.getJobManager();

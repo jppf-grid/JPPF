@@ -18,7 +18,7 @@
 
 package org.jppf.utils.concurrent;
 
-import org.jppf.client.Operator;
+import org.jppf.utils.ComparisonOperator;
 
 /**
  * A long value on which a set of operations can be performed atomically.
@@ -118,7 +118,7 @@ public class SynchronizedLong {
    * @param update the new value to set to if the comparison succeeds.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndSet(final Operator operator, final long expected, final long update) {
+  public synchronized boolean compareAndSet(final ComparisonOperator operator, final long expected, final long update) {
     if (operator.evaluate(value, expected)) {
       value = update;
       return true;
@@ -132,7 +132,7 @@ public class SynchronizedLong {
    * @param expectedUpdate the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndSet(final Operator operator, final long expectedUpdate) {
+  public synchronized boolean compareAndSet(final ComparisonOperator operator, final long expectedUpdate) {
     if (operator.evaluate(value, expectedUpdate)) {
       value = expectedUpdate;
       return true;
@@ -147,7 +147,7 @@ public class SynchronizedLong {
    * @param action the action to run if the comparison succeeds.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized boolean compareAndRun(final Operator operator, final long expected, final Runnable action) {
+  public synchronized boolean compareAndRun(final ComparisonOperator operator, final long expected, final Runnable action) {
     if (operator.evaluate(value, expected)) {
       if (action != null) action.run();
       return true;

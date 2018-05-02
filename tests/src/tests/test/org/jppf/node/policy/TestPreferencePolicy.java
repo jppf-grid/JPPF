@@ -27,6 +27,7 @@ import org.jppf.client.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.utils.Operator;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
 

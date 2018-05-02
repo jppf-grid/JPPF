@@ -18,7 +18,7 @@
 
 package org.jppf.utils.concurrent;
 
-import org.jppf.client.Operator;
+import org.jppf.utils.ComparisonOperator;
 
 /**
  * An integer value on which a set of operations can be performed atomically.
@@ -158,7 +158,7 @@ public class SynchronizedInteger {
    * @param update the new value to set to if the comparison succeeds.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public boolean compareAndSet(final Operator operator, final int expected, final int update) {
+  public boolean compareAndSet(final ComparisonOperator operator, final int expected, final int update) {
     synchronized(this) {
       if (operator.evaluate(value, expected)) {
         value = update;
@@ -174,7 +174,7 @@ public class SynchronizedInteger {
    * @param expectedUpdate the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public boolean compareAndSet(final Operator operator, final int expectedUpdate) {
+  public boolean compareAndSet(final ComparisonOperator operator, final int expectedUpdate) {
     synchronized(this) {
       if (operator.evaluate(value, expectedUpdate)) {
         value = expectedUpdate;
@@ -190,7 +190,7 @@ public class SynchronizedInteger {
    * @param expected the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public boolean compareAndIncrement(final Operator operator, final int expected) {
+  public boolean compareAndIncrement(final ComparisonOperator operator, final int expected) {
     synchronized(this) {
       if (operator.evaluate(value, expected)) {
         value++;
@@ -206,7 +206,7 @@ public class SynchronizedInteger {
    * @param expected the expected value.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public boolean compareAndDecrement(final Operator operator, final int expected) {
+  public boolean compareAndDecrement(final ComparisonOperator operator, final int expected) {
     synchronized(this) {
       if (operator.evaluate(value, expected)) {
         value--;

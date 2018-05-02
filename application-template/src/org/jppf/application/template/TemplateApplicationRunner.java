@@ -17,10 +17,14 @@
  */
 package org.jppf.application.template;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFConnectionPool;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.Operator;
 
 /**
  * This is a template JPPF application runner.

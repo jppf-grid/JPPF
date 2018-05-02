@@ -60,7 +60,7 @@ public class NodeProvisioningRunner {
   @SuppressWarnings("unused")
   private static void perform1(final JPPFClient client) throws Exception {
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-    final JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    final JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(org.jppf.utils.Operator.AT_LEAST, 1, true).get(0);
     final JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
     
     final int nbSlaves = 3;

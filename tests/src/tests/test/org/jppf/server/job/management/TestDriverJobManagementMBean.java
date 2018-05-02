@@ -34,6 +34,7 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.slf4j.*;

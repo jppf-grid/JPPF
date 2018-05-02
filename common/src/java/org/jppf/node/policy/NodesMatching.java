@@ -19,9 +19,8 @@
 package org.jppf.node.policy;
 
 import org.jppf.JPPFRuntimeException;
-import org.jppf.client.Operator;
 import org.jppf.management.*;
-import org.jppf.utils.PropertiesCollection;
+import org.jppf.utils.*;
 
 /**
  * An execution policy rule that checks whether a specified number of nodes match a node execution policy.
