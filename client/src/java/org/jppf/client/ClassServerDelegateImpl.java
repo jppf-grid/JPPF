@@ -77,6 +77,7 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
         System.out.println(msg);
         log.info(msg);
       }
+      if (!handshakeDone) handshake();
   }
 
   /**
