@@ -46,12 +46,6 @@ interface ClientConnectionHandler extends AutoCloseable {
   SocketWrapper getSocketClient() throws Exception;
 
   /**
-   * Close and cleanup this connection handler.
-   */
-  @Override
-  void close();
-
-  /**
    * Determine whether this connection handler is closed.
    * @return <code>true</code> if this connection handler is closed, <code>false</code> otherwise.
    */

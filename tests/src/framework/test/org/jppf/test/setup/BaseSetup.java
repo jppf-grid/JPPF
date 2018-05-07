@@ -31,6 +31,7 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.common.TestUtils;
@@ -146,13 +147,13 @@ public class BaseSetup {
     for (int i=0; i<nbDrivers; i++) {
       drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", drivers[i].getName());
-      new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
+      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName() + "process launcher");
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++) {
       nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", nodes[i].getName());
-      new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
+      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName() + "process launcher");
     }
     if (createClient) {
       client = createClient(null, true, config, listeners);

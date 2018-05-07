@@ -24,6 +24,7 @@ import org.jppf.client.JPPFClient;
 import org.jppf.job.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.BaseSetup;
@@ -116,7 +117,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
       while (!eventReceived) wait(100L);
       if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
       listenerRemoved = true;
-      final Thread thread = new Thread(new Runnable() {
+      ThreadUtils.startDaemonThread(new Runnable() {
         @Override
         public void run() {
           try {
@@ -127,9 +128,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
           }
           if (debugEnabled) log.debug("removed notification listener");
         }
-      });
-      thread.setDaemon(true);
-      thread.start();
+      }, "remove AwaitJobNotificationListener");
       wait(100L);
     }
   }

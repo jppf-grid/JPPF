@@ -40,6 +40,7 @@ import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -159,7 +160,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     });
     initialServerJob = createInitialServerJob();
     nodeReservationHandler = new NodeReservationHandler(this);
-    new Thread(taskQueueChecker, "TaskQueueChecker").start();
+    ThreadUtils.startDaemonThread(taskQueueChecker, "TaskQueueChecker");
   }
 
   /**
@@ -257,7 +258,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     localChannel.setSelector(channelSelector);
     selectorThread = new ChannelSelectorThread(channelSelector, this, 1L);
     localChannel.setInterestOps(0);
-    new Thread(selectorThread, "NodeChannelSelector").start();
+    ThreadUtils.startThread(selectorThread, "NodeChannelSelector");
     postAccept(localChannel);
   }
 

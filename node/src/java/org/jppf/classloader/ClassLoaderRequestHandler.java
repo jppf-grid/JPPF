@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -79,8 +79,7 @@ public class ClassLoaderRequestHandler {
   public ClassLoaderRequestHandler(final ResourceRequestRunner requestRunner) {
     this.nextRequest = new CompositeResourceWrapper();
     this.requestRunner = requestRunner;
-    periodicThread = new Thread(periodicTask, "PeriodicTask");
-    periodicThread.start();
+    periodicThread = ThreadUtils.startDaemonThread(periodicTask, "PeriodicTask");
   }
 
   /**

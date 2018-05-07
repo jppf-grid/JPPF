@@ -31,6 +31,7 @@ import org.jppf.management.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -328,7 +329,7 @@ public final class GuiUtils {
    * @param name the thread name.
    */
   public static void runAction(final Runnable r, final String name) {
-    new Thread(r, name).start();
+    ThreadUtils.startThread(r, name);
   }
 
   /**

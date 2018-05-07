@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -87,7 +87,7 @@ public class Reaper {
         if (connection.isOk()) server.addConnection(connection);
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startDaemonThread(r, connection.toString());
   }
 
   /**

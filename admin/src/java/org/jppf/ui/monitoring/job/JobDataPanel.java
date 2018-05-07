@@ -31,6 +31,7 @@ import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -163,7 +164,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
           }
         }
       };
-      new Thread(r, "Job tree expansion").start();
+      ThreadUtils.startThread(r, "Job tree expansion");
     } else {
       if (debugEnabled) log.debug("additional driver: {}", driver.getDisplayName());
       final JPPFTreeTable treeTable = getTreeTable();
@@ -254,7 +255,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     }
     treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));
     final Runnable r = new ActionsInitializer(this, "/job.toolbar");
-    new Thread(r).start();
+    ThreadUtils.startThread(r, "/job.toolbar");
   }
 
   @Override

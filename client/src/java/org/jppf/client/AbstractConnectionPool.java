@@ -19,6 +19,7 @@
 package org.jppf.client;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -50,6 +51,10 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
    * List of connection objects handled by this poool.
    */
   final List<E> connections = new ArrayList<>();
+  /**
+   * Whether this pool is closed.
+   */
+  final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Initialize this pool with the specfiied core size.
@@ -132,18 +137,20 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
 
   @Override
   public void close() {
-    final List<E> connections = getConnections();
-    for (final E connection: connections) {
-      try {
-        connection.close();
-      } catch(final Exception e) {
-        final String format = "error while closing connection {} : {}";
-        if (debugEnabled) log.debug(format, connection, ExceptionUtils.getMessage(e));
-        else log.warn(format, connection, ExceptionUtils.getStackTrace(e));
+    if (closed.compareAndSet(false, true)) {
+      final List<E> connections = getConnections();
+      for (final E connection: connections) {
+        try {
+          connection.close();
+        } catch(final Exception e) {
+          final String format = "error while closing connection {} : {}";
+          if (debugEnabled) log.debug(format, connection, ExceptionUtils.getMessage(e));
+          else log.warn(format, connection, ExceptionUtils.getStackTrace(e));
+        }
       }
-    }
-    synchronized(this) {
-      this.connections.clear();
+      synchronized(this) {
+        this.connections.clear();
+      }
     }
   }
 

@@ -48,6 +48,7 @@ import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -207,7 +208,7 @@ public class JPPFDriver {
       localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
       nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
-      new Thread(localNode, "Local node").start();
+      ThreadUtils.startDaemonThread(localNode, "Local node");
     }
     initializer.initBroadcaster();
     initializer.initPeers(clientClassServer);

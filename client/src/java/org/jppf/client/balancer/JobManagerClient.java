@@ -31,7 +31,7 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -138,9 +138,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         taskQueueChecker.wakeUp();
       }
     });
-    final Thread thread = new Thread(taskQueueChecker, "TaskQueueChecker");
-    thread.setDaemon(true);
-    thread.start();
+    ThreadUtils.startDaemonThread(taskQueueChecker, "TaskQueueChecker");
     this.queue.addQueueListener(client);
     client.addConnectionPoolListener(new ConnectionPoolListenerAdapter() {
       @Override
@@ -284,7 +282,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       wrapper = wrapperMap.get(connection);
     }
     if (wrapper != null) {
-      if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
+      if ((oldStatus == JPPFClientConnectionStatus.CONNECTING) && (wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE)) {
         final JPPFSystemInformation systemInfo = connection.getSystemInfo();
         final JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
         wrapper.setSystemInformation(systemInfo);
@@ -320,7 +318,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (debugEnabled) log.debug(String.format("updating status from %s to %s for %s", oldStatus, newStatus, wrapper));
-    if (wrapper == null || oldStatus == newStatus) return;
+    if ((wrapper == null) || (oldStatus == newStatus)) return;
     final boolean bNew = newStatus.isWorkingStatus();
     final boolean bOld = oldStatus.isWorkingStatus();
     final int priority = wrapper.getPriority();
@@ -346,10 +344,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       if (debugEnabled) log.debug("processing active status for {}", wrapper);
       wrapper.initChannelID();
       if (debugEnabled) log.debug("about to add idle channel {}", wrapper);
-      //taskQueueChecker.addIdleChannelAsync(wrapper);
       taskQueueChecker.addIdleChannel(wrapper);
     } else {
-      //taskQueueChecker.removeIdleChannelAsync(wrapper);
       taskQueueChecker.removeIdleChannel(wrapper);
       if (newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }

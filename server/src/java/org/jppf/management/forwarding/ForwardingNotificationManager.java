@@ -28,6 +28,7 @@ import org.jppf.server.event.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -170,7 +171,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
         }
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startThread(r, "removeNotificationListener(" + wrapper + ")");
   }
 
   /**
@@ -235,7 +236,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
         }
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startThread(r, event.toString());
   }
 
   @Override

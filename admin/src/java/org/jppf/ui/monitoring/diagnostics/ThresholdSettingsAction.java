@@ -29,6 +29,7 @@ import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -166,6 +167,6 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
         }
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startThread(r, "ThresholdsPanelOK");
   }
 }

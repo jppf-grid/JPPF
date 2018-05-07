@@ -28,6 +28,7 @@ import org.slf4j.*;
  * Common abstract superclass for client connections to a server.
  * @author Laurent Cohen
  * @author Jeff Rosen
+ * @exclude
  */
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler {
   /**

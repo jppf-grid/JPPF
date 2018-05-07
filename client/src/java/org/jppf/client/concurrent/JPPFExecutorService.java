@@ -26,6 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -101,7 +102,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
     if (debugEnabled) log.debug(String.format("new %s with batchSize=%d, batchTimeout=%d, client=%s", getClass().getSimpleName(), batchSize, batchTimeout, client));
     this.client = client;
     batchHandler = new BatchHandler(this, batchSize, batchTimeout);
-    new Thread(batchHandler, "BatchHandler").start();
+    ThreadUtils.startThread(batchHandler, "BatchHandler");
   }
 
   /**

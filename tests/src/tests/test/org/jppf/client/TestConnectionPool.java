@@ -25,9 +25,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
-import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.discovery.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
@@ -172,7 +172,7 @@ public class TestConnectionPool extends Setup1D1N {
       client.addDriverDiscovery(discovery);
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
-      awaitConnections(client, Operator.AT_LEAST, 2);
+      awaitConnections(client, null, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
       // trigger close of pool1
@@ -182,17 +182,47 @@ public class TestConnectionPool extends Setup1D1N {
       final AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
       csd.getSocketInitializer().close();
       csd.getSocketClient().close();
-      awaitConnections(client, Operator.AT_MOST, 1);
+      awaitConnections(client, null, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
-      awaitConnections(client, Operator.AT_LEAST, 2);
+      awaitConnections(client, null, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
     }
   }
 
   /**
-   *
+   * Test a sequence of {@link JPPFConnectionPool#setSize(int)} calls.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = 50000)
+  public void testPoolPriority2() throws Exception {
+    final String methodName = ReflectionUtils.getCurrentMethodName();
+    BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", methodName);
+    JPPFConfiguration.set(DISCOVERY_ENABLED, false).set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, false);
+    try (final JPPFClient client = new JPPFClient()) {
+      final SimpleDiscovery discovery = new SimpleDiscovery();
+      client.addDriverDiscovery(discovery);
+      discovery.emitPool("pool1", 10);
+      discovery.emitPool("pool2", 1);
+      awaitConnections(client, null, Operator.AT_LEAST, 2);
+      final JMXDriverConnectionWrapper jmx = client.findConnectionPool("pool2").awaitWorkingJMXConnection();
+      for (int i=1; i<=50; i++) {
+        BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> start of iteration #%d", i);
+        while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
+        final JPPFConnectionPool pool = client.findConnectionPool("pool1");
+        assertNotNull(pool);
+        BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> closing pool1");
+        pool.close();
+        awaitConnections(client, jmx, Operator.AT_MOST, 1);
+        while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
+        discovery.emitPool("pool1", 10);
+        awaitConnections(client, jmx, Operator.AT_LEAST, 2);
+      }
+    }
+  }
+
+  /**
    * @param client .
    * @param poolName .
    * @param prefix .
@@ -238,15 +268,21 @@ public class TestConnectionPool extends Setup1D1N {
   /**
    * Await for the specified number of pools to be working and avaialble.
    * @param client the client used to lookup the pools.
+   * @param jmx jmx connection to the driver.
    * @param operator a condition on the number of pools to wait for.
    * @param nbPools the number of pools on which to apply the condition.
    * @throws Exception if any error occurs.
    */
-  private static void awaitConnections(final JPPFClient client, final ComparisonOperator operator, final int nbPools) throws Exception {
-    BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
+  private static void awaitConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int nbPools) throws Exception {
+    if (jmx == null) BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
+    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
+    final List<JPPFConnectionPool> list = client.awaitConnectionPools(operator, nbPools, Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    if (!operator.evaluate(list.size(), nbPools)) throw new IllegalStateException(String.format("failed to obtain %s %d pools (got %d)", operator, nbPools, list.size()));
+    /*
     while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
     final JobManagerClient mgr = (JobManagerClient) client.getJobManager();
     while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
+    */
   }
 
   /** */
@@ -288,7 +324,7 @@ public class TestConnectionPool extends Setup1D1N {
      * @param priority the connection pool priority.
      */
     public synchronized void emitPool(final String name, final int priority) {
-      BaseTest.print(false, false, "emitting %s with priority %d", name, priority);
+      print(false, false, ">>> emitting %s with priority %d", name, priority);
       queue.offer(new ClientConnectionPoolInfo(name, false, "localhost", 11101, priority, 1, 1));
       notifyAll();
     }

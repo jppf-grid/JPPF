@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -98,9 +98,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
     this.delegate = ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, getClass().getSimpleName(), forwardParams);
     if (delegate == null) throw new LoadBalancerPersistenceException("could not create load-balancer persistence " + Arrays.asList(params));
     executor = createExecutor(nbThreads);
-    final Thread thread = new Thread(new PendingTasksThread(), "PendingTasksThread");
-    thread.setDaemon(true);
-    thread.start();
+    ThreadUtils.startDaemonThread(new PendingTasksThread(), "PendingTasksThread");
   }
 
   @Override

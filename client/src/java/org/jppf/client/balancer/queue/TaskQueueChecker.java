@@ -86,6 +86,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Used to synchronize on the highestPriority.
    */
   private final Object priorityLock = new Object();
+  /**
+   * 
+   */
+  private final BlockingQueue<Runnable> pendingActions = new LinkedBlockingQueue<>();
 
   /**
    * Initialize this task queue checker with the specified queue.
@@ -140,42 +144,16 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
-  public void addIdleChannelAsync(final ChannelWrapper channel) {
-    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
-    if (channel == null) throw new IllegalArgumentException("channel is null");
-    final ExecutorStatus status = channel.getExecutionStatus();
-    if (status != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active ("+ status + "): " + channel);
-    final CountDownLatch countDown = new CountDownLatch(1);
-    channelsExecutor.execute(new Runnable() {
-      @Override
-      public void run() {
-        addIdleChannel(channel);
-        countDown.countDown();
-      }
-    });
-    try {
-      countDown.await();
-    } catch (final InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-   */
-
-  /**
-   * Add a channel to the list of idle channels.
-   * @param channel the channel to add to the list.
    */
   public void addIdleChannel(final ChannelWrapper channel) {
-    if (debugEnabled) log.debug("adding chhanel {}", channel);
+    if (debugEnabled) log.debug("adding channel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
     if (channel == null) {
-      //throw new IllegalArgumentException("channel is null");
       log.warn("channel is null\n{}", ExceptionUtils.getCallStack());
       return;
     }
     final ExecutorStatus status = channel.getExecutionStatus();
     if (status != ExecutorStatus.ACTIVE) {
-      //throw new IllegalStateException("channel is not active ("+ status + "): " + channel);
       log.warn("channel is not active ({})\n{}", channel, ExceptionUtils.getCallStack());
       return;
     }
@@ -185,33 +163,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
-    synchronized (idleChannels) {
-      if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
-      idleChannels.putValue(channel.getPriority(), channel);
-    }
-    wakeUp();
-  }
-
-  /**
-   * Remove a channel from the list of idle channels.
-   * @param channel the channel to remove from the list.
-  public void removeIdleChannelAsync(final ChannelWrapper channel) {
-    if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
-    final CountDownLatch countDown = new CountDownLatch(1);
-    channelsExecutor.execute(new Runnable() {
+    pendingActions.offer(new Runnable() {
       @Override
       public void run() {
-        removeIdleChannel(channel);
-        countDown.countDown();
+        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
+        idleChannels.putValue(channel.getPriority(), channel);
       }
     });
-    try {
-      countDown.await();
-    } catch (final InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
+    wakeUp();
   }
-   */
 
   /**
    * Remove a channel from the list of idle channels.
@@ -226,10 +186,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
-    synchronized (idleChannels) {
-      if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
-      idleChannels.removeValue(channel.getPriority(), channel);
-    }
+    pendingActions.offer(new Runnable() {
+      @Override
+      public void run() {
+        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
+        idleChannels.removeValue(channel.getPriority(), channel);
+      }
+    });
+    wakeUp();
   }
 
   /**
@@ -253,6 +217,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   }
 
   /**
+   * Clear all channels from this task queue checker.
+   */
+  public void clearChannels() {
+    synchronized (idleChannels) {
+      idleChannels.clear();
+    }
+  }
+
+  /**
    * Perform the assignment of tasks.
    */
   @Override
@@ -265,15 +238,25 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   }
 
   /**
+   * 
+   */
+  private void processPendingActions() {
+    if (!pendingActions.isEmpty()) {
+      Runnable r;
+      while ((r = pendingActions.poll()) != null) r.run();
+    }
+  }
+
+  /**
    * Perform the assignment of tasks.
    * @return true if a job was dispatched, false otherwise.
-   * @see Runnable#run()
    */
   public boolean dispatch() {
     boolean dispatched = false;
     try {
       queue.processPendingBroadcasts();
       synchronized (idleChannels) {
+        processPendingActions();
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) {
           final int size = idleChannels.size();
@@ -286,9 +269,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         try {
           final Iterator<ClientJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
-            final ClientJob bundleWrapper = it.next();
-            channel = findIdleChannelIndex(bundleWrapper);
-            if (channel != null) selectedBundle = bundleWrapper;
+            final ClientJob job = it.next();
+            channel = findIdleChannel(job);
+            if (channel != null) selectedBundle = job;
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
           if (channel != null) {
@@ -309,10 +292,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
 
   /**
    * Find a channel that can send the specified task bundle for execution.
-   * @param bundle the bundle to execute.
+   * @param job the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private ChannelWrapper findIdleChannelIndex(final ClientJob bundle) {
+  private ChannelWrapper findIdleChannel(final ClientJob job) {
     final int idleChannelsSize = idleChannels.size();
     final List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
     final int highestPriority = getHighestPriority();
@@ -327,12 +310,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         channelsToRemove.offer(ch);
         continue;
       }
-      if (!bundle.acceptsChannel(ch)) continue;
-      if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
+      if (!job.acceptsChannel(ch)) continue;
+      if(job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(ch.getUuid())) continue;
       acceptableChannels.add(ch);
     }
-    if (!channelsToRemove.isEmpty()){
-      ChannelWrapper ch = null;
+    processPendingActions();
+    if (!channelsToRemove.isEmpty()) {
+      ChannelWrapper ch;
       while ((ch = channelsToRemove.poll()) != null) idleChannels.removeValue(ch.getPriority(), ch);
     }
     final int size = acceptableChannels.size();
@@ -343,44 +327,35 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
    * @param channel the driver channel to dispatch the job to.
-   * @param selectedBundle the job to dispatch.
+   * @param job the job to dispatch.
    * @throws Exception if any error occurs.
    */
-  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)  throws Exception {
-    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
+  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob job)  throws Exception {
+    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {job.getJob().getUuid(), channel, channel.getConnectionUuid()});
     synchronized (channel.getMonitor()) {
       int size = 1;
       try {
-        updateBundler(selectedBundle.getJob(), channel);
+        updateBundler(job.getJob(), channel);
         size = channel.getBundler().getBundleSize();
       } catch (final Exception e) {
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
         size = bundlerFactory.getFallbackBundler().getBundleSize();
       }
-      final ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
-      selectedBundle.addChannel(channel);
-      channel.submit(bundleWrapper);
+      final ClientTaskBundle jobDispatch = queue.nextBundle(job, size);
+      job.addChannel(channel);
+      channel.submit(jobDispatch);
     }
   }
 
   /**
    * Perform the checks on the bundler before submitting a job.
-   * @param taskBundle the job.
-   * @param channel    the current node context.
+   * @param job the job.
+   * @param channel the channel to which the job is submitted.
    */
-  private void updateBundler(final JPPFJob taskBundle, final ChannelWrapper channel) {
+  private void updateBundler(final JPPFJob job, final ChannelWrapper channel) {
     channel.checkBundler(bundlerFactory, jppfContext);
     if (channel.getBundler() instanceof JobAwareness) {
-      ((JobAwareness) channel.getBundler()).setJob(taskBundle);
-    }
-  }
-
-  /**
-   * Clear all channels from this task queue checker.
-   */
-  public void clearChannels() {
-    synchronized (idleChannels) {
-      idleChannels.clear();
+      ((JobAwareness) channel.getBundler()).setJob(job);
     }
   }
 }

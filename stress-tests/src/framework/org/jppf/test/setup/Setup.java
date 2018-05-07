@@ -27,6 +27,7 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ThreadUtils;
 
 import test.org.jppf.test.setup.ConfigurationHelper;
 
@@ -104,12 +105,12 @@ public class Setup {
     drivers = new RestartableDriverProcessLauncher[nbDrivers];
     for (int i = 0; i < nbDrivers; i++) {
       drivers[i] = new RestartableDriverProcessLauncher(i + 1, config);
-      new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
+      ThreadUtils.startThread(drivers[i], drivers[i].getName() + "process launcher");
     }
     nodes = new RestartableNodeProcessLauncher[nbNodes];
     for (int i = 0; i < nbNodes; i++) {
       nodes[i] = new RestartableNodeProcessLauncher(i + 1, config);
-      new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
+      ThreadUtils.startThread(nodes[i], nodes[i].getName() + "process launcher");
     }
     if (config.isStartClient()) {
       client = createClient("c" + clientCount.incrementAndGet(), true);

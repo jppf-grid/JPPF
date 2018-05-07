@@ -25,6 +25,7 @@ import javax.management.*;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -91,9 +92,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       }
       if (!osMXBeanAvailable) {
         cpuTimeCollector = new CPUTimeCollector();
-        final Thread thread = new Thread(cpuTimeCollector, "CPUTimeCollector");
-        thread.setDaemon(true);
-        thread.start();
+        ThreadUtils.startDaemonThread(cpuTimeCollector, "CPUTimeCollector");
       }
     } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
     if (threadsMXBean.isThreadContentionMonitoringSupported()) {

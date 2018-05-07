@@ -21,6 +21,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -72,7 +73,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
         if (debugEnabled) log.debug("Initializing recovery");
         recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getRecoveryPort());
         recoveryConnection.addClientConnectionListener(this);
-        new Thread(recoveryConnection, "reaper client connection").start();
+        ThreadUtils.startThread(recoveryConnection, "reaper client connection");
       }
     }
   }

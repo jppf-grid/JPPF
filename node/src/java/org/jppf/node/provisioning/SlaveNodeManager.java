@@ -186,7 +186,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
           final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
           slave.addProcessLauncherListener(this);
-          new Thread(slave, slaveDirPath).start();
+          ThreadUtils.startDaemonThread(slave, slaveDirPath);
         } catch(final Exception|Error e) {
           log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
           if (e instanceof Error) throw (Error) e;
@@ -266,7 +266,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     final SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     if (debugEnabled) log.debug("received processStopped() for slave id = {}, exitCode = {}", slave.getId(), slave.exitCode);
     if (slave.exitCode != 2) removeSlave(slave);
-    else new Thread(slave, slave.getName()).start();
+    else ThreadUtils.startDaemonThread(slave, slave.getName());
   }
 
   /**

@@ -148,7 +148,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         initPools(config);
       }
     };
-    new Thread(r, "InitPools").start();
+    ThreadUtils.startThread(r, "InitPools");
   }
 
   /**
@@ -201,7 +201,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             }
           }
         }, new IPFilter(config), acceptMultipleInterfaces);
-        new Thread(receiverThread).start();
+        ThreadUtils.startDaemonThread(receiverThread, "ReceiverThread");
         initPeers = false;
       } else {
         receiverThread = null;

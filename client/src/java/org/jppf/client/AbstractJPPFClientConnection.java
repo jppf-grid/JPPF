@@ -22,7 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.event.*;
 import org.jppf.management.*;
@@ -44,6 +44,10 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * Count of instnces of this class.
+   */
+  private static AtomicLong instanceCount = new AtomicLong(0L);
+  /**
    * List of status listeners for this connection.
    */
   private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
@@ -59,6 +63,10 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
    * Whether this connection is initializing.
    */
   final AtomicBoolean initializing = new AtomicBoolean(false);
+  /**
+   * Instance number for this instance.
+   */
+  final long instanceNumber = instanceCount.incrementAndGet();
 
   /**
    * Initialize this connection with a parent pool.
@@ -100,8 +108,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
     if (status != oldStatus) {
       if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
       this.status.set(status);
-      //if (!isClosed())
-        fireStatusChanged(oldStatus);
+      fireStatusChanged(oldStatus);
     }
   }
 
@@ -177,7 +184,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
 
   @Override
   public boolean isClosed() {
-    return pool.getClient().isClosed() || closed.get();
+    return pool.closed.get() || pool.getClient().isClosed() || closed.get();
   }
 
   @Override

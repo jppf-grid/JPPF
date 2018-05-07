@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.server.node.AbstractNodeConnectionChecker;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -72,7 +72,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
     stopped.set(false);
     suspended.set(true);
     checkerThread = new CheckerThread();
-    new Thread(checkerThread, "NodeConnectionChecker").start();
+    ThreadUtils.startThread(checkerThread, "NodeConnectionChecker");
   }
 
   @Override

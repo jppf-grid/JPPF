@@ -23,6 +23,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import org.jppf.JPPFError;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -54,7 +55,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
     }
     this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();
     configure(pool.getDriverUuid(), name);
-    displayName = name + '[' + getHost() + ':' + getPort() + ']';
+    displayName = name + '[' + getHost() + ':' + getPort() + "] (id=" + instanceNumber + ")";
     pool.add(this);
   }
 
@@ -90,16 +91,16 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
    * Connect to the driver.
    * @throws Exception if connection failed.
    */
-  void connect() throws Exception {
+  private void connect() throws Exception {
     delegate.init();
     if (!delegate.isClosed()) {
-      new Thread(delegate, delegate.getName()).start();
+      ThreadUtils.startThread(delegate, delegate.getName());
       taskServerConnection.init();
     }
   }
 
   @Override
   SocketInitializer createSocketInitializer() {
-    return SocketInitializer.Factory.newInstance(getPool().getClient().getConfig());
+    return SocketInitializer.Factory.newInstance(pool.getClient().getConfig());
   }
 }

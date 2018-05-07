@@ -36,6 +36,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -383,14 +384,14 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     jmxConnection = null;
     peerJmxConnection = null;
     if (jmx != null) {
-      new Thread(new Runnable() {
+      ThreadUtils.startThread(new Runnable() {
         @Override public void run() {
           try {
             jmx.close();
           } catch (@SuppressWarnings("unused") final Exception ignore) {
           }
         }
-      }).start();
+      }, "closing " + getChannel());
     }
   }
 

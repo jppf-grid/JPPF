@@ -25,6 +25,7 @@ import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.ConfigurationOverridesHandler;
 import org.slf4j.*;
 
@@ -174,7 +175,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
             }
           }
         };
-        new Thread(r, "Node " + s).start();
+        ThreadUtils.startThread(r, "Node " + s);
       }
     } else {
       node.requestShutdown(restart);

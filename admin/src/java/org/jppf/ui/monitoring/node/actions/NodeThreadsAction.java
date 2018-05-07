@@ -30,6 +30,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -154,6 +155,6 @@ public class NodeThreadsAction extends AbstractTopologyAction {
         }
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startThread(r, "NodeThreadsOK");
   }
 }

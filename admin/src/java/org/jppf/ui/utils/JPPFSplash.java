@@ -26,6 +26,7 @@ import java.util.Timer;
 import javax.swing.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -144,7 +145,7 @@ public class JPPFSplash extends Window {
         dispose();
       }
     };
-    new Thread(r).start();
+    ThreadUtils.startThread(r, "StopSplash");
   }
 
   /**

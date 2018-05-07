@@ -27,6 +27,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -78,7 +79,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
       localChannel.setInterestOps(0);
-      new Thread(selectorThread, "ClassChannelSelector").start();
+      ThreadUtils.startThread(selectorThread, "ClassChannelSelector");
       postAccept(localChannel);
     }
   }

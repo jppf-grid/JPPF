@@ -33,6 +33,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -150,7 +151,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     actionHandler.putAction("health.show.hide", new ShowHideColumnsAction(this));
     actionHandler.updateActions();
     treeTable.addMouseListener(new JVMHealthTreeTableMouseListener(actionHandler));
-    new Thread(new ActionsInitializer(this, "/health.toolbar")).start();
+    ThreadUtils.startThread(new ActionsInitializer(this, "/health.toolbar"), "/health.toolbar");
   }
 
   @Override

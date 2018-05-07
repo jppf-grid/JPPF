@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -289,7 +290,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
       }
     };
     if (resolveInetAddressesNow) r.run();
-    else new Thread(r).start();
+    else ThreadUtils.startThread(r, "InetAddressResolver");
     addProperties("storage", SystemUtils.getStorageInformation());
     if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
     addProperties("os", SystemUtils.getOS());

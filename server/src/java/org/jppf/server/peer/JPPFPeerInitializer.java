@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 
@@ -148,7 +149,7 @@ public class JPPFPeerInitializer implements Runnable, AutoCloseable {
    * Start a thread running this initializer.
    */
   public void start() {
-    new Thread(this, String.format("%s[%s]", getClass().getSimpleName(), peerName)).start();
+    ThreadUtils.startThread(this, String.format("%s[%s]", getClass().getSimpleName(), peerName));
   }
 
   @Override

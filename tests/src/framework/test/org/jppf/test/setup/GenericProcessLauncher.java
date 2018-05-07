@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.comm.socket.*;
 import org.jppf.process.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -438,9 +438,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
         }
       };
       final MyRunnable r = new MyRunnable();
-      final Thread thread = new Thread(r, name + "ServerSocket");
-      thread.setDaemon(true);
-      thread.start();
+      ThreadUtils.startDaemonThread(r, name + "ServerSocket");
       r.await();
     } catch(@SuppressWarnings("unused") final Exception e) {
       if (processServer != null) {

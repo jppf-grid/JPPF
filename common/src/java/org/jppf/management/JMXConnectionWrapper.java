@@ -28,7 +28,7 @@ import javax.management.remote.*;
 import org.jppf.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.DebuggableThread;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -142,7 +142,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
             }
           }
         };
-        new Thread(r, getDisplayName() + " closing").start();
+        ThreadUtils.startThread(r, getDisplayName() + " closing");
       }
     }
   }

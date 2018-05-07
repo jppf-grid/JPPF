@@ -457,8 +457,9 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
 
   @Override
   public void close() {
-    jmxPool.close();
+    if (debugEnabled) log.debug("closing {}", this);
     super.close();
+    jmxPool.close();
   }
 
   /**

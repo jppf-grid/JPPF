@@ -33,6 +33,7 @@ import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -231,8 +232,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     }
     final Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
     final Runnable r2 = new ActionsInitializer(this, "/graph.topology.toolbar.bottom");
-    new Thread(r).start();
-    new Thread(r2).start();
+    ThreadUtils.startThread(r, "/graph.topology.toolbar");
+    ThreadUtils.startThread(r2, "/graph.topology.toolbar.bottom");
   }
 
   /**

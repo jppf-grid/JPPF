@@ -125,7 +125,7 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
       synchronized(initializerMap) {
         initializerMap.put(driver.getUuid(), jinit);
       }
-      new Thread(jinit).start();
+      ThreadUtils.startDaemonThread(jinit, driver.toString());
     }
 
     @Override

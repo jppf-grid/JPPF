@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.jppf.comm.interceptor.*;
 import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.junit.Test;
 import org.slf4j.*;
 
@@ -63,8 +64,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       assertTrue(interceptor instanceof TestInterceptor);
       TestInterceptor.active = true;
       server = new SocketServer();
-      final Thread serverThread = new Thread(server, "socket server thread");
-      serverThread.start();
+      ThreadUtils.startThread(server, "socket server thread");
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());
@@ -102,8 +102,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new ChannelServer();
-      final Thread serverThread = new Thread(server, "socket channel server thread");
-      serverThread.start();
+      ThreadUtils.startThread(server, "socket channel server thread");
       Thread.sleep(250L);
       client = SocketChannel.open(new InetSocketAddress("localhost", PORT));
       client.finishConnect();
@@ -142,8 +141,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new SocketServer();
-      final Thread serverThread = new Thread(server, "socket server thread");
-      serverThread.start();
+      ThreadUtils.startThread(server, "socket server thread");
       Thread.sleep(250L);
       client = SocketChannel.open(new InetSocketAddress("localhost", PORT));
       client.finishConnect();
@@ -182,8 +180,7 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     try {
       TestInterceptor.active = true;
       server = new ChannelServer();
-      final Thread serverThread = new Thread(server, "socket channel server thread");
-      serverThread.start();
+      ThreadUtils.startThread(server, "socket channel server thread");
       Thread.sleep(250L);
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());

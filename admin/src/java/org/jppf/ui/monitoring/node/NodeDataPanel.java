@@ -29,6 +29,7 @@ import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -153,8 +154,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     actionHandler.putAction("cancel.deferred.action", new CancelDeferredAction());
     actionHandler.updateActions();
     treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
-    new Thread(new ActionsInitializer(this, "/topology.toolbar")).start();
-    new Thread(new ActionsInitializer(this, "/topology.toolbar.bottom")).start();
+    ThreadUtils.startThread(new ActionsInitializer(this, "/topology.toolbar"), "/topology.toolbar");
+    ThreadUtils.startThread(new ActionsInitializer(this, "/topology.toolbar.bottom"), "/topology.toolbar.bottom");
   }
 
   /**

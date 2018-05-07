@@ -25,7 +25,7 @@ import java.util.regex.*;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -161,9 +161,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         processPort = processServer.getLocalPort();
       }
       slaveSocketWrapper = new SlaveSocketWrapper();
-      final Thread thread = new Thread(slaveSocketWrapper, getName() + "ServerSocket");
-      thread.setDaemon(true);
-      thread.start();
+      ThreadUtils.startDaemonThread(slaveSocketWrapper, getName() + "ServerSocket");
     } catch(@SuppressWarnings("unused") final Exception e) {
       if (processServer != null) StreamUtils.closeSilent(processServer);
       if (slaveSocketWrapper != null) StreamUtils.closeSilent(slaveSocketWrapper);
@@ -183,7 +181,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         tearDown();
       }
     };
-    final Thread hookThread = new Thread(hook);
+    final Thread hookThread = new Thread(hook, getName());
     Runtime.getRuntime().addShutdownHook(hookThread);
     return hookThread;
   }

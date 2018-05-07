@@ -85,14 +85,14 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     if (systemInfo == null) return;
     if (uuid == null) {
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
-      if (uuid != null && uuid.isEmpty()) uuid = null;
+      if ((uuid != null) && uuid.isEmpty()) uuid = null;
     }
     try {
       final TaskServerConnectionHandler handler = channel.getTaskServerConnection();
       final SocketWrapper socketClient = handler.getSocketClient();
       if (socketClient != null) {
         final StringBuilder sb = new StringBuilder();
-        final String ip = NetworkUtils.getNonLocalHostAddress();
+        final String ip = channel.getPool().getDriverIPAddress();
         sb.append(channel.getName());
         sb.append('[').append(ip == null ? "localhost" : ip).append(']');
         final InetSocketAddress sa = (InetSocketAddress) socketClient.getSocket().getRemoteSocketAddress();

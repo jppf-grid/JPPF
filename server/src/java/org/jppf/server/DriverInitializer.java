@@ -42,6 +42,7 @@ import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
@@ -187,7 +188,7 @@ public class DriverInitializer {
     if (config.get(DISCOVERY_ENABLED)) {
       if (debugEnabled) log.debug("initializing broadcaster");
       broadcaster = new JPPFBroadcaster(getConnectionInformation());
-      new Thread(broadcaster, "JPPF Broadcaster").start();
+      ThreadUtils.startThread(broadcaster, "JPPF Broadcaster");
     }
   }
 
@@ -259,7 +260,7 @@ public class DriverInitializer {
         }
       }
     }
-    if (peerDiscoveryThread != null) new Thread(peerDiscoveryThread, "PeerDiscovery").start();
+    if (peerDiscoveryThread != null) ThreadUtils.startThread(peerDiscoveryThread, "PeerDiscovery");
     discoveryListener = new PeerDriverDiscoveryListener();
     discoveryHandler.register(discoveryListener.open()).start();
   }
@@ -360,7 +361,7 @@ public class DriverInitializer {
     if (config.get(RECOVERY_ENABLED)) {
       if (debugEnabled) log.debug("initializing recovery server");
       recoveryServer = new RecoveryServer();
-      new Thread(recoveryServer, "RecoveryServer thread").start();
+      ThreadUtils.startThread(recoveryServer, "RecoveryServer thread");
     }
   }
 
