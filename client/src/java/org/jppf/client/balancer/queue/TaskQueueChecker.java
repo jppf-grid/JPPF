@@ -87,9 +87,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   private final Object priorityLock = new Object();
   /**
-   * 
+   * Queue of channels to add to the set of idle channels.
    */
-  private final BlockingQueue<Runnable> pendingActions = new LinkedBlockingQueue<>();
+  private final BlockingQueue<ChannelWrapper> pendingAdditions = new LinkedBlockingQueue<>();
+  /**
+   * Queue of channels to remove from the set of idle channels.
+   */
+  private final BlockingQueue<ChannelWrapper> pendingRemovals = new LinkedBlockingQueue<>();
 
   /**
    * Initialize this task queue checker with the specified queue.
@@ -163,13 +167,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
-    pendingActions.offer(new Runnable() {
-      @Override
-      public void run() {
-        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
-        idleChannels.putValue(channel.getPriority(), channel);
-      }
-    });
+    pendingAdditions.offer(channel);
     wakeUp();
   }
 
@@ -186,13 +184,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
       if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
     }
-    pendingActions.offer(new Runnable() {
-      @Override
-      public void run() {
-        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
-        idleChannels.removeValue(channel.getPriority(), channel);
-      }
-    });
+    pendingRemovals.offer(channel);
     wakeUp();
   }
 
@@ -238,12 +230,21 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   }
 
   /**
-   * 
+   * Process the pending channels to add to or remove from the idle channels.
    */
   private void processPendingActions() {
-    if (!pendingActions.isEmpty()) {
-      Runnable r;
-      while ((r = pendingActions.poll()) != null) r.run();
+    ChannelWrapper channel;
+    if (!pendingAdditions.isEmpty()) {
+      while ((channel = pendingAdditions.poll()) != null) {
+        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
+        idleChannels.putValue(channel.getPriority(), channel);
+      }
+    }
+    if (!pendingRemovals.isEmpty()) {
+      while ((channel = pendingRemovals.poll()) != null) {
+        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
+        idleChannels.removeValue(channel.getPriority(), channel);
+      }
     }
   }
 
