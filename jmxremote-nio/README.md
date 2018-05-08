@@ -5,6 +5,19 @@ This is a full-fledged, fast and scalable implementation of a JMX remote connect
 
 JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
+## How to get it
+
+**Direct download**: from the [nightly build](https://sourceforge.net/projects/jppf-project/files/jppf-project/nightly/), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
+
+**Maven**: currently in the Sonatype snapshots repository at https://oss.sonatype.org/content/repositories/snapshots:
+
+~~~xml
+<dependency>
+  <groupId>org.jppf</groupId>
+  <artifactId>jppf-jmxremote-nio</artifactId>
+  <version>6.0-alpha-4-SNAPSHOT</version>
+</dependency>
+~~~
 
 ## Environment properties
 
