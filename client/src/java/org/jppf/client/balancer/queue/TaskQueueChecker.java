@@ -18,7 +18,6 @@
 
 package org.jppf.client.balancer.queue;
 
-import java.lang.management.ThreadInfo;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -45,10 +44,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Determines whether DEBUG logging level is enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Random number generator used to randomize the choice of idle channel.
    */
@@ -87,13 +82,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   private final Object priorityLock = new Object();
   /**
-   * Queue of channels to add to the set of idle channels.
+   * Queue of actions to remove or add a channel from/to the set of idle channels.
    */
-  private final BlockingQueue<ChannelWrapper> pendingAdditions = new LinkedBlockingQueue<>();
-  /**
-   * Queue of channels to remove from the set of idle channels.
-   */
-  private final BlockingQueue<ChannelWrapper> pendingRemovals = new LinkedBlockingQueue<>();
+  private final BlockingQueue<Runnable> pendingActions = new LinkedBlockingQueue<>();
 
   /**
    * Initialize this task queue checker with the specified queue.
@@ -161,13 +152,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       log.warn("channel is not active ({})\n{}", channel, ExceptionUtils.getCallStack());
       return;
     }
-    if (traceEnabled) {
-      final String idleChannelsName = SystemUtils.getSystemIdentityName(idleChannels);
-      log.trace("Adding idle channel {} to {}", channel, idleChannelsName);
-      final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
-      if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
-    }
-    pendingAdditions.offer(channel);
+    pendingActions.offer(new Runnable() {
+      @Override
+      public void run() {
+        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
+        idleChannels.putValue(channel.getPriority(), channel);
+      }
+    });
     wakeUp();
   }
 
@@ -178,13 +169,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   public void removeIdleChannel(final ChannelWrapper channel) {
     if (debugEnabled) log.debug("removing chhanel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
-    if (traceEnabled) {
-      final String idleChannelsName = SystemUtils.getSystemIdentityName(idleChannels);
-      log.trace("Removing idle channel {} from {}", channel, idleChannelsName);
-      final ThreadInfo info = DeadlockDetector.getMonitorOwner(idleChannels);
-      if (info != null) log.trace("information on owner of idleChannels {}:\n{}", idleChannelsName, DeadlockDetector.printThreadInfo(info));
-    }
-    pendingRemovals.offer(channel);
+    pendingActions.offer(new Runnable() {
+      @Override
+      public void run() {
+        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
+        idleChannels.removeValue(channel.getPriority(), channel);
+      }
+    });
     wakeUp();
   }
 
@@ -233,19 +224,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Process the pending channels to add to or remove from the idle channels.
    */
   private void processPendingActions() {
-    ChannelWrapper channel;
-    if (!pendingAdditions.isEmpty()) {
-      while ((channel = pendingAdditions.poll()) != null) {
-        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
-        idleChannels.putValue(channel.getPriority(), channel);
-      }
-    }
-    if (!pendingRemovals.isEmpty()) {
-      while ((channel = pendingRemovals.poll()) != null) {
-        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
-        idleChannels.removeValue(channel.getPriority(), channel);
-      }
-    }
+    Runnable r;
+    while ((r = pendingActions.poll()) != null) r.run();
   }
 
   /**
