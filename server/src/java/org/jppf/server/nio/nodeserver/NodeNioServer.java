@@ -296,6 +296,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
     //statsManager.newNodeConnection();
+    if (debugEnabled) log.debug("performing post-accept for {}", channel);
     driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
     final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     try {
@@ -306,6 +307,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       else log.warn(ExceptionUtils.getMessage(e));
       closeNode(context);
     }
+    if (debugEnabled) log.debug("end of post-accept for {}", channel);
   }
 
   @Override

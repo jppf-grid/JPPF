@@ -353,14 +353,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     context.setPeer(peer);
     SelectionKey selKey = null;
     if (sslHandler != null) context.setSSLHandler(sslHandler);
+    if (debugEnabled) log.debug("before registration of {}", channel);
+    if (channel.isBlocking()) channel.configureBlocking(false);
     lock.lock();
     try {
       wakeUpSelectorIfNeeded();
-      if (channel.isBlocking()) channel.configureBlocking(false);
       selKey = channel.register(selector, 0, context);
     } finally {
       lock.unlock();
     }
+    if (debugEnabled) log.debug("after registration of {}", channel);
     final SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
     context.setChannel(wrapper);
     context.setSsl(ssl);
