@@ -24,7 +24,6 @@ import java.util.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.jmx.JMXHelper;
-import org.jppf.location.FileLocation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.DeadlockDetector;
@@ -93,12 +92,6 @@ public class BaseTest {
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
-    final FileLocation src = new FileLocation("jppf-client.log");
-    try {
-      src.copyTo(new FileLocation(new File("client.log")));
-    } catch (final Exception e) {
-      e.printStackTrace();
-    }
     final File dir = new File(System.getProperty("user.dir"));
     final File[] logFiles = dir.listFiles(logFileFilter);
     if ((logFiles == null) || (logFiles.length <= 0)) return;
