@@ -90,8 +90,13 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    * @param closeableType the name of the type of closeable to use.
    */
   public Diagnostics(final String closeableType) {
-    init();
-    CloseableHandler.addResetCloseable(closeableType, this);
+    try {
+      init();
+      CloseableHandler.addResetCloseable(closeableType, this);
+    } catch (final RuntimeException e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    }
   }
 
   /**

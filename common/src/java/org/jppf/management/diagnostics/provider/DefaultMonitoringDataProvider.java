@@ -110,7 +110,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     props.setBoolean("deadlocked", (ids != null) && (ids.length > 0));
     props.setInt("liveThreads", threadsMXBean.getThreadCount());
     props.setDouble("processCpuLoad", 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
-    props.setDouble("srocessCpuLoad", 100d * osMXBeanDoubleValue("SystemCpuLoad"));
+    props.setDouble("systemCpuLoad", 100d * osMXBeanDoubleValue("SystemCpuLoad"));
     final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
     if (freeRam >= 0L) {
       final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
