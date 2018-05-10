@@ -394,7 +394,7 @@ public class TypedProperties extends AbstractTypedProperties {
 
   /**
    * Extract the properties that pass the specified filter.
-   * @param filter the filter to use, if {@code null} then all properties are retruned.
+   * @param filter the filter to use, if {@code null} then all properties are returned.
    * @return a new {@code TypedProperties} object containing only the properties matching the filter.
    */
   public TypedProperties filter(final Filter filter) {

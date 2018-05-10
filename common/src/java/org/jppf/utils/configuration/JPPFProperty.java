@@ -67,6 +67,12 @@ public interface JPPFProperty<T> extends Serializable {
   Class<T> valueType();
 
   /**
+   * Get a short label for this property.
+   * @return the label as a string.
+   */
+  String getShortLabel();
+
+  /**
    * Get a description of this property.
    * @return the description as a string.
    */

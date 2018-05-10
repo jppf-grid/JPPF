@@ -24,6 +24,7 @@ import java.lang.management.*;
 import javax.management.*;
 
 import org.jppf.JPPFException;
+import org.jppf.management.diagnostics.provider.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
@@ -44,7 +45,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * Reference to the platform's {@link ThreadMXBean} instance.
    */
-  private final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
+  private static final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
   /**
    * Collects regular snapshots of the total CPU time.
    */
@@ -56,15 +57,33 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * Whether the full operating system MXBean features are available or not.
    */
-  private boolean osMXBeanAvailable = true;
+  private static boolean osMXBeanAvailable = true;
   /**
    * The object name of the operating system MXBean.
    */
-  private ObjectName osMXBeanName = null;
+  private static ObjectName osMXBeanName = null;
   /**
    * The platform MBean server.
    */
   private static final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+  static {
+    if (threadsMXBean.isThreadCpuTimeSupported()) {
+      if (!threadsMXBean.isThreadCpuTimeEnabled()) threadsMXBean.setThreadCpuTimeEnabled(true);
+      try {
+        Class.forName("com.sun.management.OperatingSystemMXBean");
+        osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
+        if (debugEnabled) log.debug("CPU load collection from OperatingSystemMXBean is enabled");
+      } catch (@SuppressWarnings("unused") final Exception e) {
+        osMXBeanAvailable = false;
+        log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
+      }
+    } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
+    if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
+  }
+  /**
+   * The monitoring data provider handler.
+   */
+  private final MonitoringDataProviderHandler dataProvidersHandler = new MonitoringDataProviderHandler();
 
   /**
    * Initialize this MBean implementation.
@@ -80,28 +99,18 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    */
   private void init() {
     if (debugEnabled) log.debug("initializing " + getClass().getSimpleName());
-    if (threadsMXBean.isThreadCpuTimeSupported()) {
+    if (!osMXBeanAvailable) {
       if (debugEnabled) log.debug("Starting CPU time collector thread");
-      if (!threadsMXBean.isThreadCpuTimeEnabled()) threadsMXBean.setThreadCpuTimeEnabled(true);
-      try {
-        Class.forName("com.sun.management.OperatingSystemMXBean");
-        osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
-      } catch (@SuppressWarnings("unused") final Exception e) {
-        osMXBeanAvailable = false;
-        log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
-      }
-      if (!osMXBeanAvailable) {
-        cpuTimeCollector = new CPUTimeCollector();
-        ThreadUtils.startDaemonThread(cpuTimeCollector, "CPUTimeCollector");
-      }
-    } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
-    if (threadsMXBean.isThreadContentionMonitoringSupported()) {
-      if (!threadsMXBean.isThreadContentionMonitoringEnabled()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
+      cpuTimeCollector = new CPUTimeCollector();
+      ThreadUtils.startDaemonThread(cpuTimeCollector, "CPUTimeCollector");
     }
     heapDumpCollector = HeapDumpCollector.Factory.newInstance();
     if (heapDumpCollector == null) {
       if (debugEnabled) log.debug("a heap dump collector could not be created for this JVM - no heap dumps will be available");
     }
+    dataProvidersHandler.loadProviders();
+    dataProvidersHandler.initProviders();
+    dataProvidersHandler.defineProperties();
   }
 
   @Override
@@ -132,7 +141,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
    * Ensure that thread contention monitoring is enabled, if it is supported.
    */
-  private void checkThreadCapabilities() {
+  private static void checkThreadCapabilities() {
     if (threadsMXBean.isThreadContentionMonitoringSupported() && !threadsMXBean.isThreadContentionMonitoringEnabled())
       threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
@@ -146,25 +155,8 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   @Override
   public HealthSnapshot healthSnapshot() throws Exception {
     final HealthSnapshot snapshot = new HealthSnapshot();
-    final MemoryInformation memInfo = memoryInformation();
-    MemoryUsageInformation mem = memInfo.getHeapMemoryUsage();
-    snapshot.heapUsedRatio = mem.getUsedRatio();
-    snapshot.heapUsed = mem.getUsed();
-    mem = memInfo.getNonHeapMemoryUsage();
-    snapshot.nonheapUsedRatio = mem.getUsedRatio();
-    snapshot.nonheapUsed = mem.getUsed();
-    snapshot.deadlocked = hasDeadlock();
-    snapshot.liveThreads = threadsMXBean.getThreadCount();
-    snapshot.processCpuLoad = cpuLoad();
-    snapshot.systemCpuLoad = osMXBeanDoubleValue("SystemCpuLoad");
-    final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
-    if (freeRam >= 0L) {
-      final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
-      snapshot.ramUsed = totalRam - freeRam;
-      snapshot.ramUsedRatio = (double) snapshot.ramUsed / (double) totalRam;
-    } else {
-      snapshot.ramUsed = -1L;
-      snapshot.ramUsedRatio = -1d;
+    for (final MonitoringDataProvider provider: dataProvidersHandler.getProviders()) {
+      snapshot.putProperties(provider.getValues());
     }
     return snapshot;
   }
@@ -177,7 +169,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
 
   @Override
   public Double cpuLoad() {
-    if (osMXBeanAvailable) return osMXBeanDoubleValue("ProcessCpuLoad");
+    if (osMXBeanAvailable) return 100d * osMXBeanDoubleValue("ProcessCpuLoad");
     return cpuTimeCollector == null ? -1d : cpuTimeCollector.getLoad();
   }
 
@@ -191,7 +183,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    * @param attribute the name of the attribute to get the value from.
    * @return the attribute value as a double.
    */
-  private double osMXBeanDoubleValue(final String attribute) {
+  private static double osMXBeanDoubleValue(final String attribute) {
     if (osMXBeanAvailable) {
       try {
         return (Double) mbeanServer.getAttribute(osMXBeanName, attribute);
@@ -200,21 +192,5 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       }
     }
     return -1d;
-  }
-
-  /**
-   * Get the value of a double attribute from the OS mxbean.
-   * @param attribute the name of the attribute to get the value from.
-   * @return the attribute value as a double.
-   */
-  private long osMXBeanLongValue(final String attribute) {
-    if (osMXBeanAvailable) {
-      try {
-        return (long) mbeanServer.getAttribute(osMXBeanName, attribute);
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
-      }
-    }
-    return -1L;
   }
 }

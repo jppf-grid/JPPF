@@ -88,7 +88,8 @@ public class StatisticsTablePanel extends Panel {
       final Locale locale = JPPFWebSession.get().getLocale();
       String value = null;
       if (index == 0) {
-        value = LocalizationUtils.getLocalized(FIELDS_BASE, field.name(), locale);
+        //value = LocalizationUtils.getLocalized(FIELDS_BASE, field.getName(), locale);
+        value = field.getLocalizedName();
       } else {
         final StatsUpdater updater = JPPFWebConsoleApplication.get().getStatsUpdater();
         value = updater.formatLatestValue(locale, JPPFWebSession.get().getCurrentDriver(), field);

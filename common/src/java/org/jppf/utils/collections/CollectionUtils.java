@@ -46,6 +46,20 @@ public final class CollectionUtils {
   }
 
   /**
+   * Convert an array into a <code>Set</code>.
+   * @param <T> the type of the elements in the array.
+   * @param clazz the class of the elements of the set to produce.
+   * @param array the array to convert.
+   * @return a set of elements with the same type as that of the array element type.
+   */
+  @SafeVarargs
+  public static <T> Set<T> setOf(@SuppressWarnings("unused") final Class<T> clazz, final T... array) {
+    final Set<T> newSet = new HashSet<>(array.length);
+    for (final T element : array) newSet.add(element);
+    return newSet;
+  }
+
+  /**
    * Convert an array into a <code>List</code>.
    * @param <T> the type of the elements in the array.
    * @param array the array to convert.
@@ -62,15 +76,13 @@ public final class CollectionUtils {
    * Concatenate a set of array into a single array.
    * @param <T> the element type of the arrays to concatenate.
    * @param arrays the arrays to concatenate.
-   * @return an array whose size is the sum of the sizes of all the input arrays, and whose elements are all the
-   *         elements found in all the input arrays.
+   * @return an array whose size is the sum of the sizes of all the input arrays, and whose elements are all the elements found in all the input arrays.
    */
   @SuppressWarnings("unchecked")
   public static <T> T[] concatArrays(final T[]... arrays) {
     if (arrays == null) return null;
     int size = 0;
-    for (T[] array : arrays)
-      size += array.length;
+    for (T[] array : arrays) size += array.length;
     final List<T> result = new ArrayList<>(size);
     T[] tmp = null;
     for (final T[] array : arrays) {
@@ -84,6 +96,33 @@ public final class CollectionUtils {
       for (T t : array) result.add(t);
     }
     return result.toArray((T[]) Array.newInstance(tmp[0].getClass(), 0));
+  }
+
+  /**
+   * Concatenate a set of array into a single array.
+   * @param <T> the element type of the arrays to concatenate.
+   * @param clazz the class of the elements of the array.
+   * @param arrays the arrays to concatenate.
+   * @return an array whose size is the sum of the sizes of all the input arrays, and whose elements are all the elements found in all the input arrays.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] concatArrays(final Class<T> clazz, final T[]... arrays) {
+    if (arrays == null) return null;
+    int size = 0;
+    for (T[] array : arrays) size += array.length;
+    final List<T> result = new ArrayList<>(size);
+    T[] tmp = null;
+    for (final T[] array : arrays) {
+      if (array.length > 0) {
+        tmp = array;
+        break;
+      }
+    }
+    if (tmp == null) return Arrays.copyOf(arrays[0], 0);
+    for (T[] array : arrays) {
+      for (T t : array) result.add(t);
+    }
+    return result.toArray((T[]) Array.newInstance(clazz, 0));
   }
 
   /**

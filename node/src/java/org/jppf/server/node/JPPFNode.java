@@ -339,12 +339,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @exclude
    */
   public void initHelper() throws Exception {
-    if (debugEnabled) log.debug("Initializing serializer");
-    Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
-    if (debugEnabled) log.debug("Loaded serializer class " + c);
+    final AbstractJPPFClassLoader cl = getClassLoader();
+    if (debugEnabled) log.debug("Initializing serializer using {}", cl);
+    Class<?> c = cl.loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+    if (debugEnabled) log.debug("Loaded serializer class {}", c);
     serializer = (ObjectSerializer) c.newInstance();
-    c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
-    if (debugEnabled) log.debug("Loaded helper class " + c);
+    c = cl.loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
+    if (debugEnabled) log.debug("Loaded helper class {}", c);
     helper = (SerializationHelper) c.newInstance();
     if (debugEnabled) log.debug("Serializer initialized");
   }

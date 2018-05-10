@@ -151,13 +151,13 @@ public class Scenario {
         out.println(rule);
         out.println("results for driver " + entry.getKey().getJmxId());
         out.println(rule);
-        out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo().toFormattedString(null));
-        out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
+        out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo());
+        out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC());
         for (final JMXResult<DiagnosticsResult> dr: entry.getValue()) {
           out.println(rule);
           out.println("results for node " + dr.getJmxId());
-          out.println("before GC: " + dr.getResult().getDiagnosticsInfo().toFormattedString(null));
-          out.println("after GC:  " + dr.getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
+          out.println("before GC: " + dr.getResult().getDiagnosticsInfo());
+          out.println("after GC:  " + dr.getResult().getDiagnosticsInfoAfterGC());
         }
       }
     } finally {
