@@ -173,7 +173,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   public boolean refreshLoadBalancer() {
     final OptionElement option = OptionsHandler.getPage("JPPFAdminTool");
     if (option == null) {
-      log.debug("JPPFAdminTool element is null");
+      if (debugEnabled) log.debug("JPPFAdminTool element is null");
       return false;
     }
     final OptionElement lbOption = OptionsHandler.findOptionWithName(option, "LoadBalancingPanel");
@@ -191,7 +191,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     messageArea.setValue("");
     try {
       final LoadBalancingInformation info = jmx.loadBalancerInformation();
-      log.debug("info = {}", info);
+      if (debugEnabled) log.debug("info = {}", info);
       if (info != null) {
         final ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
         final List<? extends Object> items = combo.getItems();
@@ -276,13 +276,13 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   public Object[] getMeterIntervals(final Fields field) {
     if (traceEnabled) log.trace("getting intervals for {}", field);
-    switch(field) {
-      case HEALTH_HEAP_PCT:
-      case HEALTH_NON_HEAP_PCT:
-      case HEALTH_RAM_PCT:
+    switch(field.getName()) {
+      case "heapUsedRatio":
+      case "nonheapUsedRatio":
+      case "ramUsedRatio":
         return getMeterIntervals(Thresholds.Name.MEMORY_WARNING, Thresholds.Name.MEMORY_CRITICAL);
-      case HEALTH_CPU:
-      case HEALTH_SYSTEM_CPU:
+      case "processCpuLoad":
+      case "systemCpuLoad":
         return getMeterIntervals(Thresholds.Name.CPU_WARNING, Thresholds.Name.CPU_CRITICAL);
     }
     return StringUtils.ZERO_OBJECT;

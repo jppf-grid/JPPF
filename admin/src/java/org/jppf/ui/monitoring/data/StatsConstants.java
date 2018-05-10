@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.ui.monitoring.data.Fields.*;
+import static org.jppf.ui.monitoring.data.FieldsEnum.*;
 
 import java.util.*;
 
+import org.jppf.management.diagnostics.MonitoringDataProviderHandler;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.utils.collections.CollectionUtils;
+import org.jppf.utils.configuration.*;
 
 /**
  * Constants for the JPPF statistics collected from the servers.
@@ -87,7 +89,21 @@ public class StatsConstants {
    * List of properties for health snapshots.
    * @since 5.0
    */
-  public static final Fields[] HEALTH_FIELDS = { HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_RAM, HEALTH_RAM_PCT, HEALTH_THREADS, HEALTH_CPU, HEALTH_SYSTEM_CPU };
+  public static Fields[] HEALTH_FIELDS;
+  static {
+    try {
+      final MonitoringDataProviderHandler handler = StatsHandler.getInstance().getMonitoringDataHandler();
+      final Map<Fields, Boolean> map = new LinkedHashMap<>();
+      for (final JPPFProperty<?> prop: handler.getAllProperties()) {
+        if (!(prop instanceof NumberProperty)) continue;
+        map.put(new PropertyFields(prop), Boolean.TRUE);
+      }
+      HEALTH_FIELDS = map.keySet().toArray(new Fields[map.size()]);
+    } catch (final Exception e) {
+      e.printStackTrace();
+      HEALTH_FIELDS = new Fields[] { HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_RAM, HEALTH_RAM_PCT, HEALTH_THREADS, HEALTH_CPU, HEALTH_SYSTEM_CPU };
+    }
+  }
   /**
    * List of all fields displayed in the server stats view.
    */
@@ -97,8 +113,19 @@ public class StatsConstants {
    * List of all fields available in the charts.
    * @since 5.0
    */
-  public static final Fields[] ALL_CHART_FIELDS = CollectionUtils.concatArrays(EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
+  public static final Fields[] ALL_CHART_FIELDS = CollectionUtils.concatArrays(Fields.class, EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
     NODE_CL_REQUEST_TIME_FIELDS, INBOUND_NETWORK_TRAFFIC_FIELDS, OUTBOUND_NETWORK_TRAFFIC_FIELDS, HEALTH_FIELDS);
+  /**
+   * Mapping of fields to their name.
+   */
+  private static final Map<String, Fields> nameToFieldMap = new HashMap<>();
+  static {
+    try {
+      for (final Fields field: ALL_CHART_FIELDS) nameToFieldMap.put(field.getName(), field);
+    } catch (final Exception e) {
+      e.printStackTrace();
+    }
+  }
   /**
    * Name of the execution table.
    */
@@ -173,5 +200,14 @@ public class StatsConstants {
     int i = 0;
     for (final String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
     return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * Get the  field with the specified name.
+   * @param name the name of the field to lookup.
+   * @return the field, if there is one with that name, {@code null} otherwise.
+   */
+  public static Fields getFieldForName(final String name) {
+    return nameToFieldMap.get(name);
   }
 }

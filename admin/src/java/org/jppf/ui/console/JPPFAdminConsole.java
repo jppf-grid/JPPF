@@ -60,6 +60,7 @@ public class JPPFAdminConsole {
    * @param args the command-line arguments are not used.
    */
   public static void main(final String[] args) {
+    Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     ConsoleLauncher.main(HAS_CHARTS ? CONSOLE_WITH_CHARTS : CONSOLE_WITHOUT_CHARTS, "file");
   }
 

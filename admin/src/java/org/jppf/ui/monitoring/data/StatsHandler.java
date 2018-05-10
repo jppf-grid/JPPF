@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.MonitoringDataProviderHandler;
 import org.jppf.ui.monitoring.event.StatsHandlerEvent;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
@@ -47,11 +48,11 @@ public final class StatsHandler extends BaseStatsHandler {
   /**
    * Singleton instance of this class.
    */
-  private static StatsHandler instance = null;
+  private static StatsHandler instance;
   /**
    * Timer used to query the stats from the server.
    */
-  protected java.util.Timer timer = null;
+  protected java.util.Timer timer;
   /**
    * The client handler.
    */
@@ -68,6 +69,10 @@ public final class StatsHandler extends BaseStatsHandler {
    * Localized formatter for stats values.
    */
   private final StatsFormatter formatter = new StatsFormatter(Locale.getDefault());
+  /**
+   * The monitoring data handler.
+   */
+  private final MonitoringDataProviderHandler monitoringDataHandler = new MonitoringDataProviderHandler();
 
   /**
    * Get the singleton instance of this class.
@@ -91,6 +96,8 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   private StatsHandler() {
     if (debugEnabled) log.debug("initializing StatsHandler");
+    monitoringDataHandler.loadProviders();
+    monitoringDataHandler.defineProperties();
     refreshInterval = JPPFConfiguration.getProperties().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_STATS);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     if (debugEnabled) log.debug("initializing TopologyManager");
@@ -256,5 +263,12 @@ public final class StatsHandler extends BaseStatsHandler {
   @Override
   protected StatsFormatter getFormatter(final Locale locale) {
     return formatter;
+  }
+
+  /**
+   * @return the monitoring data handler.
+   */
+  public MonitoringDataProviderHandler getMonitoringDataHandler() {
+    return monitoringDataHandler;
   }
 }

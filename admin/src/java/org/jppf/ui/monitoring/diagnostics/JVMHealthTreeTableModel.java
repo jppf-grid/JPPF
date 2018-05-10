@@ -18,22 +18,20 @@
 
 package org.jppf.ui.monitoring.diagnostics;
 
-import java.util.Locale;
+import java.util.*;
 
 import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
+import org.jppf.utils.configuration.*;
 
 /**
  * Tree table model for the tree table.
  */
 public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
-  /**
-   * Value of one megabyte.
-   */
-  private static final long MB = 1024L * 1024L;
   /**
    * Value of one megabyte.
    */
@@ -78,14 +76,17 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    * Column number for the process CPU load.
    */
   public static final int SYSTEM_CPU_LOAD = 9;
+  /**
+   * Properties representing the columns definitions.
+   */
+  private final List<JPPFProperty<?>> properties;
 
   /**
    * Initialize this model with the specified tree.
    * @param node the root of the tree.
    */
   public JVMHealthTreeTableModel(final TreeNode node) {
-    super(node);
-    i18nBase = "org.jppf.ui.i18n.NodeDataPage";
+    this(node, Locale.getDefault());
   }
 
   /**
@@ -96,11 +97,12 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   public JVMHealthTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);
     i18nBase = "org.jppf.ui.i18n.NodeDataPage";
+    properties = StatsHandler.getInstance().getMonitoringDataHandler().getAllProperties();
   }
 
   @Override
   public int getColumnCount() {
-    return 10;
+    return 1 + properties.size();
   }
 
   @Override
@@ -113,78 +115,44 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
         final HealthSnapshot health = info.getHealthSnapshot();
         double d = -1d;
         if (health == null) return res;
-        switch (column) {
-          case URL:
-            res = info.toString();
-            break;
-          case HEAP_MEM_PCT:
-            d = health.getHeapUsedRatio();
-            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
-            break;
-          case HEAP_MEM_MB:
-            d = health.getHeapUsed();
-            res = d < 0d ? NA : nfDec.format(d / MB);
-            break;
-          case NON_HEAP_MEM_PCT:
-            d = health.getNonheapUsedRatio();
-            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
-            break;
-          case NON_HEAP_MEM_MB:
-            d = health.getNonheapUsed();
-            res = d < 0d ? NA : nfDec.format(d / MB);
-            break;
-          case RAM_PCT:
-            d = health.getRamUsedRatio();
-            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
-            break;
-          case RAM_MB:
-            d = health.getRamUsed();
-            res = d < 0d ? NA : nfInt.format(d / MB);
-            break;
-          case THREADS:
-            final int n = health.getLiveThreads();
-            res = n < 0 ? NA : nfInt.format(n);
-            break;
-          case CPU_LOAD:
-            d = health.getCpuLoad();
-            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
-            break;
-          case SYSTEM_CPU_LOAD:
-            d = health.getSystemCpuLoad();
-            res = d < 0d ? NA : nfDec.format(d * 100d) + " %";
-            break;
+        if (column == URL) res = info.toString();
+        else {
+          final JPPFProperty<?> prop = properties.get(column - 1);
+          if (prop instanceof NumberProperty) {
+            d = health.getDouble(prop.getName());
+            res = d < 0d ? NA : nfDec.format(d);
+          } else res = health.getString(prop.getName());
         }
-      } else {
-        if (column == 0) res = defNode.getUserObject().toString();
-      }
+      } else if (column == 0) res = defNode.getUserObject().toString();
     }
     return res;
   }
 
   @Override
   public String getBaseColumnName(final int column) {
-    switch (column) {
-      case URL:
-        return "column.health.url";
-      case HEAP_MEM_PCT:
-        return "column.health.heap.pct";
-      case HEAP_MEM_MB:
-        return "column.health.heap.mb";
-      case NON_HEAP_MEM_PCT:
-        return "column.health.nonheap.pct";
-      case NON_HEAP_MEM_MB:
-        return "column.health.nonheap.mb";
-      case RAM_PCT:
-        return "column.health.ram.pct";
-      case RAM_MB:
-        return "column.health.ram.mb";
-      case THREADS:
-        return "column.health.livethreads";
-      case CPU_LOAD:
-        return "column.health.cpuload";
-      case SYSTEM_CPU_LOAD:
-        return "column.health.systemCpuload";
-    }
-    return "";
+    if (column == URL) return "column.health.url";
+    return properties.get(column - 1).getName();
+  }
+
+  /**
+   * @return the properties representing the columns definitions.
+   */
+  public List<JPPFProperty<?>> getProperties() {
+    return properties;
+  }
+
+  @Override
+  public String getColumnName(final int column) {
+    if ((column < 0) && (column > getColumnCount())) return "";
+    if (column == URL) return localize(getBaseColumnName(column) + ".label");
+    return properties.get(column - 1).getShortLabel();
+  }
+
+  @Override
+  public String getColumnTooltip(final int column) {
+    if ((column < 0) && (column > getColumnCount())) return "";
+    if (column == URL) return localize(getBaseColumnName(column) + ".label");
+    final String s = properties.get(column - 1).getDocumentation();
+    return (s == null) ? "" : s;
   }
 }

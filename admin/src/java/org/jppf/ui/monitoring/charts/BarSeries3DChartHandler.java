@@ -19,7 +19,7 @@ package org.jppf.ui.monitoring.charts;
 
 import static org.jppf.utils.ReflectionHelper.*;
 
-import java.util.Map;
+import java.util.*;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
@@ -34,11 +34,11 @@ public class BarSeries3DChartHandler implements ChartHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(BarSeries3DChartHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(BarSeries3DChartHandler.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The stats formatter that provides the data.
    */
@@ -127,9 +127,13 @@ public class BarSeries3DChartHandler implements ChartHandler {
     if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentDriver(), statsCount);
     final int start = Math.max(0, statsHandler.getTickCount() - statsCount);
     int count = 0;
-    for (final Map<Fields, Double> valueMap: cdh.getDoubleValuesMaps()) {
+    final List<Map<Fields, Double>> list = cdh.getDoubleValuesMaps();
+    if (debugEnabled && !list.isEmpty()) log.debug("last values map = {}", list.get(list.size() - 1)); 
+    for (final Map<Fields, Double> valueMap: list) {
       count++;
       for (Fields key: config.fields) {
+        if (log.isTraceEnabled() && "Heap vs. non-heap usage".equals(config.name))
+          log.trace(String.format("setting value=%s, rowKey=%s, colKey=%s", valueMap.get(key), key.getLocalizedName(), Integer.valueOf(count + start)));
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(count + start));
       }

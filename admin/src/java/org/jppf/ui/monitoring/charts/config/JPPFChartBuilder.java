@@ -29,6 +29,7 @@ import org.jppf.ui.monitoring.charts.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * This class is used as a factory to create different charts, as well as for propagating the data updates
@@ -36,6 +37,10 @@ import org.jppf.ui.utils.GuiUtils;
  * @author Laurent Cohen
  */
 public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListener {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JPPFChartBuilder.class);
   /**
    * Mapping of chart types to the chart handler used to create and update them.
    */
@@ -195,10 +200,14 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            if (event.getType() == StatsHandlerEvent.Type.UPDATE) {
-              handlerMap.get(config.type).updateDataset(config);
-            } else {
-              handlerMap.get(config.type).populateDataset(config);
+            try {
+              if (event.getType() == StatsHandlerEvent.Type.UPDATE) {
+                handlerMap.get(config.type).updateDataset(config);
+              } else {
+                handlerMap.get(config.type).populateDataset(config);
+              }
+            } catch (final Exception e) {
+              log.error(e.getMessage(), e);
             }
           }
         });

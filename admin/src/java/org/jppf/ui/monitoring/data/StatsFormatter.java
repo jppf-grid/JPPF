@@ -17,12 +17,13 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.ui.monitoring.data.Fields.*;
+import static org.jppf.ui.monitoring.data.FieldsEnum.*;
 
 import java.text.NumberFormat;
 import java.util.*;
 
 import org.jppf.utils.StringUtils;
+import org.jppf.utils.collections.CollectionUtils;
 import org.slf4j.*;
 
 /**
@@ -45,25 +46,25 @@ public final class StatsFormatter {
   /**
    * The set of fields formated as int.
    */
-  private static final Set<Fields> INT_FORMATTED = EnumSet.of(TOTAL_TASKS_EXECUTED, TOTAL_QUEUED, QUEUE_SIZE, MAX_QUEUE_SIZE, NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_BUSY_NODES,
-    NB_CLIENTS, MAX_CLIENTS, JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_MIN_TASKS, JOBS_MAX_TASKS, NODE_TOTAL_CL_REQUEST_COUNT, CLIENT_TOTAL_CL_REQUEST_COUNT, HEALTH_HEAP,
+  private static final Set<Fields> INT_FORMATTED = CollectionUtils.setOf(Fields.class, TOTAL_TASKS_EXECUTED, TOTAL_QUEUED, QUEUE_SIZE, MAX_QUEUE_SIZE, NB_NODES, MAX_NODES, NB_IDLE_NODES,
+    NB_BUSY_NODES, NB_CLIENTS, MAX_CLIENTS, JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_MIN_TASKS, JOBS_MAX_TASKS, NODE_TOTAL_CL_REQUEST_COUNT, CLIENT_TOTAL_CL_REQUEST_COUNT, HEALTH_HEAP,
     HEALTH_NON_HEAP, HEALTH_RAM, HEALTH_THREADS);
   /**
    * The set of fields formated as int.
    */
-  private static final Set<Fields> DOUBLE_FORMATTED = EnumSet.of(LATEST_EXECUTION_TIME, MIN_EXECUTION_TIME, MAX_EXECUTION_TIME, AVG_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME,
-    MIN_NODE_EXECUTION_TIME, MAX_NODE_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME, LATEST_QUEUE_TIME,
-    MIN_QUEUE_TIME, MAX_QUEUE_TIME, AVG_QUEUE_TIME, JOBS_LATEST_TIME, JOBS_MIN_TIME, JOBS_MAX_TIME, JOBS_AVG_TIME, JOBS_AVG_TASKS, NODE_AVG_CL_REQUEST_TIME, NODE_MIN_CL_REQUEST_TIME,
-    NODE_MAX_CL_REQUEST_TIME, NODE_LATEST_CL_REQUEST_TIME, CLIENT_AVG_CL_REQUEST_TIME, CLIENT_MIN_CL_REQUEST_TIME, CLIENT_MAX_CL_REQUEST_TIME, CLIENT_LATEST_CL_REQUEST_TIME,
-    HEALTH_HEAP_PCT, HEALTH_NON_HEAP_PCT, HEALTH_RAM_PCT, HEALTH_CPU, HEALTH_SYSTEM_CPU);
+  private static final Set<Fields> DOUBLE_FORMATTED = CollectionUtils.setOf(Fields.class, LATEST_EXECUTION_TIME, MIN_EXECUTION_TIME, MAX_EXECUTION_TIME, AVG_EXECUTION_TIME,
+    LATEST_NODE_EXECUTION_TIME, MIN_NODE_EXECUTION_TIME, MAX_NODE_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_TRANSPORT_TIME, MIN_TRANSPORT_TIME, MAX_TRANSPORT_TIME, AVG_TRANSPORT_TIME,
+    LATEST_QUEUE_TIME, MIN_QUEUE_TIME, MAX_QUEUE_TIME, AVG_QUEUE_TIME, JOBS_LATEST_TIME, JOBS_MIN_TIME, JOBS_MAX_TIME, JOBS_AVG_TIME, JOBS_AVG_TASKS, NODE_AVG_CL_REQUEST_TIME,
+    NODE_MIN_CL_REQUEST_TIME, NODE_MAX_CL_REQUEST_TIME, NODE_LATEST_CL_REQUEST_TIME, CLIENT_AVG_CL_REQUEST_TIME, CLIENT_MIN_CL_REQUEST_TIME, CLIENT_MAX_CL_REQUEST_TIME,
+    CLIENT_LATEST_CL_REQUEST_TIME, HEALTH_HEAP_PCT, HEALTH_NON_HEAP_PCT, HEALTH_RAM_PCT, HEALTH_CPU, HEALTH_SYSTEM_CPU);
   /**
    * The set of fields formated as int.
    */
-  private static final Set<Fields> TIME_FORMATTED = EnumSet.of(TOTAL_EXECUTION_TIME, TOTAL_NODE_EXECUTION_TIME, TOTAL_TRANSPORT_TIME, TOTAL_QUEUE_TIME);
+  private static final Set<Fields> TIME_FORMATTED = CollectionUtils.setOf(Fields.class, TOTAL_EXECUTION_TIME, TOTAL_NODE_EXECUTION_TIME, TOTAL_TRANSPORT_TIME, TOTAL_QUEUE_TIME);
   /**
    * The set of fields formated as int.
    */
-  private static final Set<Fields> MB_FORMATTED = EnumSet.of(CLIENT_INBOUND_MB, NODE_INBOUND_MB, JMX_INBOUND_MB, TOTAL_INBOUND_MB, CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB,
+  private static final Set<Fields> MB_FORMATTED = CollectionUtils.setOf(Fields.class, CLIENT_INBOUND_MB, NODE_INBOUND_MB, JMX_INBOUND_MB, TOTAL_INBOUND_MB, CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB,
     JMX_OUTBOUND_MB, TOTAL_OUTBOUND_MB);
   /**
    * Formatter for integer values.
@@ -124,7 +125,7 @@ public final class StatsFormatter {
     final Map<Fields, String> map = new HashMap<>();
     for (final Map.Entry<Fields, Double> entry: values.entrySet()) {
       final Fields field = entry.getKey();
-      map.put(field, formatValue(field, entry.getValue()));
+      if (field != null) map.put(field, formatValue(field, entry.getValue()));
     }
     return map;
   }
@@ -143,7 +144,7 @@ public final class StatsFormatter {
     else if (DOUBLE_FORMATTED.contains(field)) strValue = formatDouble(value);
     else {
       strValue = formatDouble(value);
-      if (debugEnabled) log.debug("field {} is not part of a formatting set, formatting as double (value = {}))", field.name(), value);
+      if (debugEnabled) log.debug("field {} is not part of a formatting set, formatting as double (value = {}))", field.getLocalizedName(), value);
     }
     return strValue;
   }

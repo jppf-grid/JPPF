@@ -35,10 +35,6 @@ public class TextStatsExporter implements StatsExporter {
    */
   private static final String BASE = "org.jppf.ui.i18n.StatsPage";
   /**
-   * Base name for localization bundle lookups.
-   */
-  private static final String FIELD_BASE = "org.jppf.ui.i18n.StatFields";
-  /**
    * A map of the longest field name per locale.
    */
   private final static Map<Locale, Integer> maxNameLengthMap  = new HashMap<>();
@@ -109,7 +105,8 @@ public class TextStatsExporter implements StatsExporter {
     sb.append(StringUtils.padRight("", '-', title.length())).append("\n\n");
     for (final Fields field : fields) {
       final String value = map.get(field);
-      final String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
+      //final String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
+      final String name = field.getLocalizedName();
       sb.append(StringUtils.padRight(name, ' ', maxNameLength));
       sb.append(" = ");
       sb.append(StringUtils.padLeft(value, ' ', maxValueLength));
@@ -125,7 +122,7 @@ public class TextStatsExporter implements StatsExporter {
    * @param fieldsArrays the labels for the values.
    */
   private void updateMaxLengths(final Map<Fields, String> map, final Fields[]... fieldsArrays) {
-    maxNameLength = getMaxLength(locale);
+    maxNameLength = getMaxLength(map, locale);
     for (final Fields[] fields : fieldsArrays) {
       for (final Fields field : fields) {
         final String value = map.get(field);
@@ -135,16 +132,17 @@ public class TextStatsExporter implements StatsExporter {
   }
 
   /**
-   * 
+   * @param map a mapping of fiels to their value.
    * @param locale the locale for which to retrieve or compute the length.
    * @return the length of the longest field name in the specified locale.
    */
-  private static int getMaxLength(final Locale locale) {
+  private static int getMaxLength(final Map<Fields, String> map, final Locale locale) {
     synchronized(maxNameLengthMap) {
       if (maxNameLengthMap.containsKey(locale)) return maxNameLengthMap.get(locale);
       int max = 0;
-      for (final Fields field: Fields.values()) {
-        final String name = LocalizationUtils.getLocalized(FIELD_BASE, field.name(), locale);
+      //for (final Fields field: Fields.values()) {
+      for (final Map.Entry<Fields, String> entry: map.entrySet()) {
+        final String name = entry.getKey().getLocalizedName();
         if (name != null) max = Math.max(max, name.length());
       }
       maxNameLengthMap.put(locale, max);

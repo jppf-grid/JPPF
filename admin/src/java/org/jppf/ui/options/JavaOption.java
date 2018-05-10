@@ -21,6 +21,8 @@ import java.awt.event.MouseAdapter;
 
 import javax.swing.*;
 
+import org.slf4j.*;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -28,6 +30,10 @@ import net.miginfocom.swing.MigLayout;
  * @author Laurent Cohen
  */
 public class JavaOption extends AbstractOption {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JavaOption.class);
   /**
    * The fully qualified class name of the UI component to instantiate.
    */
@@ -66,8 +72,8 @@ public class JavaOption extends AbstractOption {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         UIComponent = scrollPane;
       } else UIComponent = comp;
-    } catch (final Exception e) {
-      e.printStackTrace();
+    } catch (final Throwable e) {
+      log.error(e.getMessage(), e);
     }
   }
 

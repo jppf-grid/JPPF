@@ -32,17 +32,21 @@ import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.diagnostics.Thresholds.Name;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * Table cell renderer used to render the alignment of cell values in the table.
  * @author Laurent Cohen
  */
-public class HealthTableCellRenderer extends DefaultTableCellRenderer
-{
+public class HealthTableCellRenderer extends DefaultTableCellRenderer {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(HealthTableCellRenderer.class);
   /**
    * The insets for this renderer.
    */
-  private Border border = BorderFactory.createEmptyBorder(0, 2, 0, 2);
+  private final Border border = BorderFactory.createEmptyBorder(0, 2, 0, 2);
   /**
    * The JVM Health Panel option.
    */
@@ -52,40 +56,17 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    * Initialize this renderer.
    * @param healthPanel the JVM Health Panel option.
    */
-  public HealthTableCellRenderer(final JVMHealthPanel healthPanel)
-  {
+  public HealthTableCellRenderer(final JVMHealthPanel healthPanel) {
     this.healthPanel = healthPanel;
   }
 
-  /**
-   * Returns the default table cell renderer.
-   * @param table the JTable to which this renderer applies.
-   * @param value the value of the rendered cell.
-   * @param selected determines whether the cell is selected.
-   * @param hasFocus determines whether the cell has the focus.
-   * @param row the row of the rendered cell.
-   * @param column the column of the rendered cell.
-   * @return the default table cell renderer.
-   */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean selected, final boolean hasFocus, final int row, final int column) {
     final DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
+    try {
     final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
     if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return renderer;
-    int alignment = SwingConstants.LEFT;
-    switch(actualCol) {
-      case JVMHealthTreeTableModel.HEAP_MEM_MB:
-      case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
-      case JVMHealthTreeTableModel.RAM_MB:
-      case JVMHealthTreeTableModel.THREADS:
-      case JVMHealthTreeTableModel.CPU_LOAD:
-      case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
-      case JVMHealthTreeTableModel.HEAP_MEM_PCT:
-      case JVMHealthTreeTableModel.RAM_PCT:
-      case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
-        alignment = SwingConstants.RIGHT;
-        break;
-    }
+    final int alignment = (actualCol == 0) ? SwingConstants.LEFT : SwingConstants.RIGHT;
     final JPPFTreeTable treeTable = (JPPFTreeTable) table;
     final TreePath path = treeTable.getPathForRow(row);
     String iconPath = null;
@@ -96,9 +77,12 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
       if (o instanceof AbstractTopologyComponent) {
         final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
         final HealthSnapshot health = data.getHealthSnapshot();
-        switch(actualCol) {
-          case JVMHealthTreeTableModel.THREADS:
-            if (health.isDeadlocked()) {
+        final JVMHealthTreeTableModel model = (JVMHealthTreeTableModel) healthPanel.getModel();
+        final String name = model.getBaseColumnName(actualCol);
+        switch(name) {
+          case "liveThreads":
+          case "deadlocked":
+            if (health.getBoolean("deadlocked")) {
               renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
               iconPath = CRITICAL_ICON;
               final Rectangle r = table.getCellRect(row, column, false);
@@ -108,23 +92,23 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
               renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
             }
             break;
-          case JVMHealthTreeTableModel.HEAP_MEM_MB:
-          case JVMHealthTreeTableModel.HEAP_MEM_PCT:
-            computeColor(renderer, table, health.getHeapUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+          case "heapUsed":
+          case "heapUsedRatio":
+            computeColor(renderer, table, health.getDouble("heapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
             break;
-          case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
-          case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
-            computeColor(renderer, table, health.getNonheapUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+          case "nonheapUsed":
+          case "nonheapUsedRatio":
+            computeColor(renderer, table, health.getDouble("nonheapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
             break;
-          case JVMHealthTreeTableModel.RAM_MB:
-          case JVMHealthTreeTableModel.RAM_PCT:
-            computeColor(renderer, table, health.getRamUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+          case "ramUsed":
+          case "ramUsedRatio":
+            computeColor(renderer, table, health.getDouble("ramUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
             break;
-          case JVMHealthTreeTableModel.CPU_LOAD:
-            computeColor(renderer, table, health.getCpuLoad(), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+          case "processCpuLoad":
+            computeColor(renderer, table, health.getDouble("processCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
             break;
-          case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
-            computeColor(renderer, table, health.getSystemCpuLoad(), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+          case "systemCpuLoad":
+            computeColor(renderer, table, health.getDouble("systemCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
             break;
           default:
             renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
@@ -136,6 +120,9 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
     renderer.setIcon(icon);
     renderer.setHorizontalAlignment(alignment);
     renderer.setBorder(border);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
     return renderer;
   }
 
@@ -150,8 +137,8 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    */
   private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final double value, final boolean selected, final Name warning, final Name critical) {
     final Thresholds thr = healthPanel.getThresholds();
-    if (value < thr.getValue(warning)) renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
-    else if (value < thr.getValue(critical)) renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
+    if (value < 100d * thr.getValue(warning)) renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
+    else if (value < 100d * thr.getValue(critical)) renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
     else renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
   }
 }

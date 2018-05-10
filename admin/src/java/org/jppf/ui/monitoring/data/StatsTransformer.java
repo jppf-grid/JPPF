@@ -17,13 +17,15 @@
  */
 package org.jppf.ui.monitoring.data;
 
-import static org.jppf.ui.monitoring.data.Fields.*;
+import static org.jppf.ui.monitoring.data.FieldsEnum.*;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 
 import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.stats.*;
+import org.slf4j.*;
 
 /**
  * This class provides a set of methods to format the statistics data received from the server.
@@ -31,9 +33,9 @@ import org.jppf.utils.stats.*;
  */
 public class StatsTransformer {
   /**
-   * Value of 1 megabyte.
+   * Logger for this class.
    */
-  private static final long MB = 1024L * 1024L;
+  private static final Logger log = LoggerFactory.getLogger(StatsTransformer.class);
 
   /**
    * Instantiation of this class is not allowed.
@@ -162,6 +164,20 @@ public class StatsTransformer {
    * @param snapshot the data snapshot to map.
    */
   private static void formatDoubleStatsValues(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
+    try {
+      final List<JPPFProperty<?>> properties = StatsHandler.getInstance().getMonitoringDataHandler().getAllProperties();
+      for (final JPPFProperty<?> prop: properties) {
+        if (prop instanceof NumberProperty) {
+          final String name = prop.getName();
+          final double d = snapshot.getDouble(name);
+          final Fields field = StatsConstants.getFieldForName(name);
+          map.put(field, d >= 0d ? d : 0d);
+        }
+      }
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    /*
     map.put(HEALTH_HEAP, (double) snapshot.getHeapUsed() / MB);
     double d = snapshot.getHeapUsedRatio();
     if (d < 0d) d = 0d;
@@ -177,5 +193,6 @@ public class StatsTransformer {
     map.put(HEALTH_CPU, d < 0d ? 0d : 100d * d);
     d = snapshot.getSystemCpuLoad();
     map.put(HEALTH_SYSTEM_CPU, d < 0d ? 0d : 100d * d);
+    */
   }
 }

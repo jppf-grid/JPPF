@@ -249,7 +249,13 @@ public class BaseStatsHandler {
   public void fireStatsHandlerEvent(final StatsHandlerEvent.Type type) {
     if (log.isTraceEnabled()) log.trace("firing stats handler event of type {}", type);
     final StatsHandlerEvent event = new StatsHandlerEvent(this, type);
-    for (StatsHandlerListener listener: listeners) listener.dataUpdated(event);
+    for (StatsHandlerListener listener: listeners) {
+      try {
+        listener.dataUpdated(event);
+      } catch (final Exception e) {
+        log.error(e.getMessage(), e);
+      }
+    }
   }
 
   /**
