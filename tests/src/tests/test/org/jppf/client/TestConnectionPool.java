@@ -175,18 +175,16 @@ public class TestConnectionPool extends Setup1D1N {
       awaitConnections(client, null, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
-      // trigger close of pool1
+      final JMXDriverConnectionWrapper jmx = client.findConnectionPool("pool2").awaitWorkingJMXConnection();
       final JPPFConnectionPool pool = client.findConnectionPool("pool1");
       assertNotNull(pool);
-      final JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) pool.awaitWorkingConnection();
-      final AbstractClassServerDelegate csd = (AbstractClassServerDelegate) c.getDelegate();
-      csd.getSocketInitializer().close();
-      csd.getSocketClient().close();
-      awaitConnections(client, null, Operator.AT_MOST, 1);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> closing pool1");
+      pool.close();
+      awaitConnections(client, jmx, Operator.AT_MOST, 1);
       testJobsInPool(client, "pool2", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
-      awaitConnections(client, null, Operator.AT_LEAST, 2);
+      awaitConnections(client, jmx, Operator.AT_LEAST, 2);
       testJobsInPool(client, "pool1", methodName);
     }
   }
