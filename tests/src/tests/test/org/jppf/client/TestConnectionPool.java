@@ -173,6 +173,7 @@ public class TestConnectionPool extends Setup1D1N {
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
       awaitConnections(client, null, Operator.AT_LEAST, 2);
+      print(false, false, ">>> testing jobs with pool1");
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
       final JMXDriverConnectionWrapper jmx = client.findConnectionPool("pool2").awaitWorkingJMXConnection();
@@ -181,10 +182,12 @@ public class TestConnectionPool extends Setup1D1N {
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> closing pool1");
       pool.close();
       awaitConnections(client, jmx, Operator.AT_MOST, 1);
+      print(false, false, ">>> testing jobs with pool2");
       testJobsInPool(client, "pool2", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
       awaitConnections(client, jmx, Operator.AT_LEAST, 2);
+      print(false, false, ">>> testing jobs with pool1 (again)");
       testJobsInPool(client, "pool1", methodName);
     }
   }
@@ -272,7 +275,7 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private static void awaitConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int nbPools) throws Exception {
-    if (jmx == null) BaseTest.print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
+    if (jmx == null) print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     final List<JPPFConnectionPool> list = client.awaitConnectionPools(operator, nbPools, Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     if (!operator.evaluate(list.size(), nbPools)) throw new IllegalStateException(String.format("failed to obtain %s %d pools (got %d)", operator, nbPools, list.size()));

@@ -172,6 +172,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     try {
       final JPPFClientConnectionStatus status = wrapper.getStatus();
       if (!status.isTerminatedStatus()) updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
+      else updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, wrapper.getStatus());
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);

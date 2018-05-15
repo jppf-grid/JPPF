@@ -375,8 +375,16 @@ public abstract class AbstractClientJob {
    * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
    */
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
-    if (traceEnabled) log.trace(String.format("job '%s' : pending=%b, expired=%b, nb channels=%d, max channels=%d", job.getName(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
-    if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
+    if (traceEnabled) log.trace(String.format("job '%s' : pending=%b, expired=%b, nb channels=%d, max channels=%d",
+      job.getName(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
+    if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) {
+      if (traceEnabled) {
+        if (isPending()) log.trace("job {} is still pending", job.getName());
+        if (isJobExpired()) log.trace("job {} is has expired", job.getName());
+        else log.trace("job {} has reached maxchannels={}", job.getName(), clientSla.getMaxChannels());
+      }
+      return false;
+    }
     final ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;
     if (policy != null) {

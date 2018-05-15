@@ -45,6 +45,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Random number generator used to randomize the choice of idle channel.
    */
   private final Random random = new Random(System.nanoTime());
@@ -241,18 +245,23 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) {
           final int size = idleChannels.size();
-          if (size == 1) log.debug("1 channel idle: {}", idleChannels.getValues(idleChannels.firstKey()));
-          else log.debug("{} channels idle", size);
+          final Integer firstKey = idleChannels.firstKey();
+          final int highestPriority = getHighestPriority();
+          final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
+          if (size <= 5) log.debug(String.format("nb idle channels = %d, firstKey = %s, highestPriority = %d ==> %d channels: %s",
+            size, firstKey, highestPriority, channels == null ? 0 : channels.size(), channels));
+          else log.debug(String.format("nb idle channels = %d, firstKey = %s, highestPriority = %d ==> %d channels", size, firstKey, highestPriority, channels == null ? 0 : channels.size()));
         }
         ChannelWrapper channel = null;
         ClientJob selectedBundle = null;
         queueLock.lock();
         try {
-          final Iterator<ClientJob> it = queue.iterator();
-          while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
-            final ClientJob job = it.next();
+          final Iterator<ClientJob> jobIterator = queue.iterator();
+          while ((channel == null) && jobIterator.hasNext() && !idleChannels.isEmpty()) {
+            final ClientJob job = jobIterator.next();
             channel = findIdleChannel(job);
             if (channel != null) selectedBundle = job;
+            else if (traceEnabled) log.trace("no channel found for job {}", job);
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
           if (channel != null) {
@@ -280,26 +289,31 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     final int idleChannelsSize = idleChannels.size();
     final List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
     final int highestPriority = getHighestPriority();
+    //final Integer highestPriority = idleChannels.firstKey();
+    //if (highestPriority == null) return null;
     final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
     if (channels == null) return null;
-    final Iterator<ChannelWrapper> iterator = channels.iterator();
-    final Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
-    while (iterator.hasNext()) {
-      final ChannelWrapper ch = iterator.next();
+    //final Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
+    for (final ChannelWrapper ch: channels) {
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
-        channelsToRemove.offer(ch);
+        //channelsToRemove.offer(ch);
         continue;
       }
       if (!job.acceptsChannel(ch)) continue;
-      if(job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(ch.getUuid())) continue;
+      if(job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(ch.getUuid())) {
+        if (traceEnabled) log.trace("broadcast job {} not matching channel", job);
+        continue;
+      }
       acceptableChannels.add(ch);
     }
     processPendingActions();
+    /*
     if (!channelsToRemove.isEmpty()) {
       ChannelWrapper ch;
       while ((ch = channelsToRemove.poll()) != null) idleChannels.removeValue(ch.getPriority(), ch);
     }
+    */
     final int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
     return (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
