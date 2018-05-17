@@ -69,7 +69,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
    */
   private void createTreeTableModel() {
     treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
-    model = new JVMHealthTreeTableModel(treeTableRoot);
+    model = new JVMHealthTreeTableModel(treeTableRoot, Locale.getDefault(), StatsHandler.getInstance().getMonitoringDataHandler());
   }
 
   /**

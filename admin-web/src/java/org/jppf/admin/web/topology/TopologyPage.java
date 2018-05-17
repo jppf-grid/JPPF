@@ -80,7 +80,7 @@ public class TopologyPage extends AbstractTableTreePage {
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new TopologyTreeColumn(Model.of("Tree")));
-    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new TopologyColumn(item.index));
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new TopologyColumn(item.getIndex()));
     return columns;
   }
 

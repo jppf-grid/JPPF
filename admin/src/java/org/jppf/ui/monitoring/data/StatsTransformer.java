@@ -165,7 +165,7 @@ public class StatsTransformer {
    */
   private static void formatDoubleStatsValues(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
     try {
-      final List<JPPFProperty<?>> properties = StatsHandler.getInstance().getMonitoringDataHandler().getAllProperties();
+      final List<JPPFProperty<?>> properties = StatsHandler.getInstance().getMonitoringDataHandler().getPropertyList();
       for (final JPPFProperty<?> prop: properties) {
         if (prop instanceof NumberProperty) {
           final String name = prop.getName();

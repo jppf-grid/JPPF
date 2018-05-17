@@ -34,6 +34,7 @@ import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.TopologyManager;
+import org.jppf.management.diagnostics.MonitoringDataProviderHandler;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -76,6 +77,10 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    * The persistence for this web application.
    */
   private Persistence persistence;
+  /**
+   * The monitoring data handler.
+   */
+  private MonitoringDataProviderHandler monitoringDataHandler;
 
   /**
    * Default constructor.
@@ -115,6 +120,9 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
     this.setPageManagerProvider(new MyPageManagerProvider(this));
     final TypedProperties config = getConfig(ConfigType.CLIENT).getProperties();
     JPPFConfiguration.reset(config);
+    this.monitoringDataHandler = new MonitoringDataProviderHandler();
+    monitoringDataHandler.loadProviders();
+    monitoringDataHandler.defineProperties();
     this.topologyManager = new TopologyManager(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), null, true);
     this.jobMonitor = new JobMonitor(JobMonitorUpdateMode.POLLING, 3000L, topologyManager);
     this.statsUpdater = new StatsUpdater(topologyManager);
@@ -191,6 +199,13 @@ public class JPPFWebConsoleApplication extends ServletContainerAuthenticatedWebA
    */
   public int getRefreshInterval() {
     return getClientConfig().get(JPPFProperties.WEB_ADMIN_REFRESH_INTERVAL);
+  }
+
+  /**
+   * @return the monitoring data handler.
+   */
+  public MonitoringDataProviderHandler getMonitoringDataHandler() {
+    return monitoringDataHandler;
   }
 
   @Override

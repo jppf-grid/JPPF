@@ -80,7 +80,7 @@ public class JobsPage extends AbstractTableTreePage {
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new JobTreeColumn(Model.of("Tree")));
-    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new JobColumn(item.index));
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new JobColumn(item.getIndex()));
     return columns;
   }
 

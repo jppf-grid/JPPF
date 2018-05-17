@@ -26,22 +26,22 @@ import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
- * File-based persistence, using an asynchronous write-behind mechanism.
+ * File-based persistence, using an asynchronous write-behind mechanism for save operations.
  * @author Laurent Cohen
  */
 public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFAsyncFilePersistence.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFAsyncFilePersistence.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used to sequentialize the file wwrites from a single queue.
    */
-  private final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(new JPPFThreadFactory(JPPFAsyncFilePersistence.class.getSimpleName()));
+  private final ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory(JPPFAsyncFilePersistence.class.getSimpleName()));
 
   /**
    * 
@@ -51,19 +51,21 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
 
   @Override
   public void saveString(final String name, final String settings) throws Exception {
-    if (settings == null) {
-      if (debugEnabled) log.debug(String.format("attempting to write null string to '%s', call stack:%n%s%n", name, ExceptionUtils.getCallStack()));
-      return;
-    }
-    EXECUTOR.execute(new Runnable() {
+    executor.execute(new Runnable() {
       @Override
       public void run() {
         final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
-        try {
-          FileUtils.writeTextFile(file, settings);
-        } catch (final Exception e) {
-          if (debugEnabled) log.debug("error writing to file '{}' : {}", file, settings);
-          else log.error("error writing settings to file", e);
+        if (settings == null) {
+          //if (debugEnabled) log.debug(String.format("attempting to write null string to '%s', call stack:%n%s", name, ExceptionUtils.getCallStack()));
+          if (debugEnabled) log.debug(String.format("attempting to write null string to '%s'", name));
+          if (file.exists() && !file.delete()) log.debug("could not delete file %s", file);
+        } else {
+          try {
+            FileUtils.writeTextFile(file, settings);
+          } catch (final Exception e) {
+            if (debugEnabled) log.debug("error writing to file '{}' : {}", file, settings);
+            else log.error("error writing settings to file", e);
+          }
         }
       }
     });
@@ -71,6 +73,6 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
 
   @Override
   public void close() {
-    if (EXECUTOR != null) EXECUTOR.shutdownNow();
+    if (executor != null) executor.shutdownNow();
   }
 }

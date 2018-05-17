@@ -31,18 +31,18 @@ import org.jppf.ui.monitoring.LocalizedListItem;
 public class LocalizedListItemRenderer implements IChoiceRenderer<LocalizedListItem> {
   @Override
   public Object getDisplayValue(final LocalizedListItem item) {
-    return item.label;
+    return item.getLabel();
   }
 
   @Override
   public String getIdValue(final LocalizedListItem item, final int index) {
-    return item.name;
+    return item.getName();
   }
 
   @Override
   public LocalizedListItem getObject(final String id, final IModel<? extends List<? extends LocalizedListItem>> choices) {
     for (LocalizedListItem item: choices.getObject()) {
-      if (id.equals(item.name)) return item;
+      if (id.equals(item.getName())) return item;
     }
     return null;
   }

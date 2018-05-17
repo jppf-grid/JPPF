@@ -63,7 +63,7 @@ public class SelectableLayoutImpl implements SelectableLayout {
           visibleItems = new ArrayList<>(indices.length);
           for (int i=0; i<indices.length; i++) {
             for (final LocalizedListItem item: getAllItems()) {
-              if (item.index == indices[i]) {
+              if (item.getIndex() == indices[i]) {
                 visibleItems.add(item);
                 break;
               }
@@ -85,7 +85,7 @@ public class SelectableLayoutImpl implements SelectableLayout {
   public void setVisibleItems(final List<LocalizedListItem> items) {
     if (items == null) return;
     final int[] indices = new int[items.size()];
-    for (int i=0; i<indices.length; i++) indices[i] = items.get(i).index;
+    for (int i=0; i<indices.length; i++) indices[i] = items.get(i).getIndex();
     final UserSettings settings = JPPFWebSession.get().getUserSettings();
     settings.getProperties().setString(propertyName, StringUtils.buildString(indices));
     settings.save();

@@ -94,7 +94,7 @@ public class StatsConstants {
     try {
       final MonitoringDataProviderHandler handler = StatsHandler.getInstance().getMonitoringDataHandler();
       final Map<Fields, Boolean> map = new LinkedHashMap<>();
-      for (final JPPFProperty<?> prop: handler.getAllProperties()) {
+      for (final JPPFProperty<?> prop: handler.getPropertyList()) {
         if (!(prop instanceof NumberProperty)) continue;
         map.put(new PropertyFields(prop), Boolean.TRUE);
       }

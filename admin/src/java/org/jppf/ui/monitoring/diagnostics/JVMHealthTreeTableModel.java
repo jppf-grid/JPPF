@@ -23,8 +23,7 @@ import java.util.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
-import org.jppf.management.diagnostics.HealthSnapshot;
-import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.management.diagnostics.*;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 import org.jppf.utils.configuration.*;
 
@@ -82,22 +81,15 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   private final List<JPPFProperty<?>> properties;
 
   /**
-   * Initialize this model with the specified tree.
-   * @param node the root of the tree.
-   */
-  public JVMHealthTreeTableModel(final TreeNode node) {
-    this(node, Locale.getDefault());
-  }
-
-  /**
    * Initialize this model with the specified tree and locale.
    * @param node the root of the tree.
    * @param locale the locale to use for translation.
+   * @param handler holds the defintions of the data rendered in the view.
    */
-  public JVMHealthTreeTableModel(final TreeNode node, final Locale locale) {
+  public JVMHealthTreeTableModel(final TreeNode node, final Locale locale, final MonitoringDataProviderHandler handler) {
     super(node, locale);
     i18nBase = "org.jppf.ui.i18n.NodeDataPage";
-    properties = StatsHandler.getInstance().getMonitoringDataHandler().getAllProperties();
+    properties = handler.getPropertyList();
   }
 
   @Override

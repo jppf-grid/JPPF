@@ -110,7 +110,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * Add all visible tables to the view.
    */
   private void addTables() {
-    for (LocalizedListItem item: visibleItems) addTablePanel(StatsConstants.ALL_TABLES_MAP.get(item.name), item.name);
+    for (LocalizedListItem item: visibleItems) addTablePanel(StatsConstants.ALL_TABLES_MAP.get(item.getName()), item.getName());
   }
 
   /**
@@ -129,8 +129,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    */
   private void addTablePanel(final Fields[] fields, final String title) {
     final LocalizedListItem item = allItems.get(title);
-    final JComponent comp = makeTablePanel(fields, item.label);
-    comp.setToolTipText(item.tooltip);
+    final JComponent comp = makeTablePanel(fields, item.getLabel());
+    comp.setToolTipText(item.getTooltip());
     add(comp);
     visibleTableComps.add(comp);
   }
@@ -262,7 +262,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
     int count  = 0;
     for (final LocalizedListItem item: visibleItems) {
       if (count > 0) sb.append(' ');
-      sb.append(item.name);
+      sb.append(item.getName());
       count++;
     }
     pref.put(VISIBLE_STATS_KEY, sb.toString());

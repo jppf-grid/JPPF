@@ -1,6 +1,6 @@
 /*
   JPPF
-  Copyright (C) 2005-2016 JPPF Team. 
+  Copyright (C) 2005-2018 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License
@@ -40,11 +40,12 @@ a { text-decoration: none; font-weight: normal; }
 a:hover { text-decoration: none; color: red; }
 div { margin: 0px; padding; 0px; }
 
-.gwrapper { width: 900px; max-width: 900px; background: white; }
+/*.gwrapper { width: 900px; max-width: 900px; background: white; }*/
+.gwrapper { width: 100%; background: white; }
 .sidebar  { width:  90px; float: left; padding-left: 0px; background-color: white; }
 
 .jppf_content {
-  width: 766px;
+  /*width: 766px;*/
   float: right;
   padding-left: 10px;
   padding-right: 10px;
@@ -377,11 +378,14 @@ textarea {
 
 .default_cursor {
   cusor: default;
+  white-space: nowrap;
+  min-height: 16px;
 }
 
 td.default_cursor div {
   cursor: default;
 }
+
 .peer {
   font-weight: bold;
   font-style: italic;
@@ -445,13 +449,27 @@ td.default_cursor div {
   background-color: lightcoral;
 }
  
+.health_deadlocked {
+  color: black;
+  background-color: lightcoral;
+  background-image: url("images/tree/critical.gif");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: left;
+}
+ 
 .main_border {
   border: 1px solid #6D78B6;
   border-top: 10px solid #6D78B6;
   border-bottom: 10px solid #6D78B6;
   border-radius: 10px;
-  max-width: 1000px;
+  /*max-width: 1000px;*/
+  max-width: 100%;
   padding: 0px;
+}
+
+.main_border_login {
+  max-width: 1000px;
 }
 
 .layout_cell {
@@ -468,7 +486,8 @@ td.default_cursor div {
 }
 
 .layout_cell_right {
-  width: calc(100% - 120px);
+  /*width: calc(100% - 120px);*/
+  overflow: scroll;
 }
 
 .button_link {
@@ -611,4 +630,10 @@ p { font-size: 10pt; }
   border: none;
   box-shadow: -1px -1px 2px #4D5896;
   padding: 0px 4px;
+}
+
+scrollable, div.scrollable {
+  white-space: nowrap;
+  width: 100%;
+  overflow: scroll;
 }

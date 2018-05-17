@@ -33,13 +33,14 @@ import org.apache.wicket.model.*;
 import org.jppf.admin.web.*;
 import org.jppf.admin.web.health.threaddump.ThreadDumpLink;
 import org.jppf.admin.web.health.thresholds.ThresholdsLink;
+import org.jppf.admin.web.layout.SelectableLayoutImpl;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.management.diagnostics.*;
 import org.jppf.ui.monitoring.LocalizedListItem;
-import org.jppf.ui.monitoring.diagnostics.JVMHealthTreeTableModel;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
@@ -77,7 +78,7 @@ public class HealthPage extends AbstractTableTreePage {
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new HealthTreeColumn(Model.of("Tree")));
-    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new HealthColumn(item.index));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new HealthColumn(item.getIndex()));
     return columns;
   }
 
@@ -93,6 +94,30 @@ public class HealthPage extends AbstractTableTreePage {
     actionHandler.addActionLink(toolbar, new SelectDriversLink(HealthConstants.SELECT_DRIVERS_ACTION, viewType));
     actionHandler.addActionLink(toolbar, new SelectNodesLink(HealthConstants.SELECT_NODES_ACTION, viewType));
     actionHandler.addActionLink(toolbar, new SelectAllLink(HealthConstants.SELECT_ALL_ACTION, viewType));
+  }
+
+  @Override
+  protected void createSelectableLayout(final String propertyName) {
+    final Locale locale = JPPFWebSession.get().getLocale();
+    final MonitoringDataProviderHandler handler = JPPFWebConsoleApplication.get().getMonitoringDataHandler();
+    final List<JPPFProperty<?>> properties = handler.getPropertyList();
+    final List<LocalizedListItem> allItems = new ArrayList<>();
+    for (int i=0; i<properties.size(); i++) {
+      final JPPFProperty<?> prop = properties.get(i);
+      allItems.add(new LocalizedListItem(prop.getName(), i + 1, prop.getShortLabel(locale), prop.getDocumentation(locale)));
+    }
+    selectableLayout = new SelectableLayoutImpl(allItems, propertyName);
+  }
+
+  /**
+   * 
+   * @param index the index of the rpoperty to retrieve.
+   * @return the property.
+   */
+  private static JPPFProperty<?> getProperty(final int index) {
+    final MonitoringDataProviderHandler handler = JPPFWebConsoleApplication.get().getMonitoringDataHandler();
+    final List<JPPFProperty<?>> properties = handler.getPropertyList();
+    return properties.get(index);
   }
 
   /**
@@ -121,7 +146,6 @@ public class HealthPage extends AbstractTableTreePage {
       if (comp.isPeer()) cssClass += "peer ";
       else if (comp.isNode()) {
         final TopologyNode data = (TopologyNode) node.getUserObject();
-        //if (traceEnabled) log.trace("node status: {}", data.getStatus());
         inactive = !data.getManagementInfo().isActive();
         if (data.getStatus() == TopologyNodeStatus.UP) {
           if (inactive) cssClass += selected ? "tree_inactive_selected " : "tree_inactive ";
@@ -153,7 +177,8 @@ public class HealthPage extends AbstractTableTreePage {
      * @param index the column index.
      */
     public HealthColumn(final int index) {
-      super(Model.of(treeModel.getColumnName(index)));
+      //super(Model.of(treeModel.getColumnName(index)));
+      super(Model.of(getProperty(index - 1).getShortLabel(JPPFWebSession.get().getLocale())));
       this.index = index;
       if (debugEnabled) log.debug("adding column index {}", index);
     }
@@ -165,27 +190,23 @@ public class HealthPage extends AbstractTableTreePage {
       final AbstractTopologyComponent comp = (AbstractTopologyComponent) treeNode.getUserObject();
       final String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
-      String css = "default_cursor ";
       final boolean selected = selectionHandler.isSelected(comp.getUuid());
-      if (!comp.isPeer()) css += (selected ? "tree_selected" : getThresholdCssClass(comp)) + " " + getCssClass();
+      /*
+      String css = getCssClass();
+      if (!comp.isPeer()) css += " " + (selected ? "tree_selected" : getThresholdCssClass(comp));
+      */
+      //String css = getCssClass();
+      String css = "";
+      if (!comp.isPeer()) css += (selected ? "tree_selected" : getThresholdCssClass(comp));
+      css += " " + getCssClass();
       cellItem.add(new AttributeModifier("class", css));
       if (traceEnabled && (index == 1)) log.trace(String.format("index=%d, value=%s, css=%s, comp=%s", index, value, css, comp));
     }
 
     @Override
     public String getCssClass() {
-      switch (index) {
-        case JVMHealthTreeTableModel.CPU_LOAD:
-        case JVMHealthTreeTableModel.HEAP_MEM_MB:
-        case JVMHealthTreeTableModel.HEAP_MEM_PCT:
-        case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
-        case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
-        case JVMHealthTreeTableModel.RAM_MB:
-        case JVMHealthTreeTableModel.RAM_PCT:
-        case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
-        case JVMHealthTreeTableModel.THREADS:
-          return "default_cursor number";
-      }
+      final JPPFProperty<?> prop = getProperty(index - 1);
+      if (prop instanceof NumberProperty) return "default_cursor number";
       return "default_cursor string";
     }
 
@@ -198,40 +219,42 @@ public class HealthPage extends AbstractTableTreePage {
       final HealthSnapshot snapshot = comp.getHealthSnapshot();
       double value = -1d;
       String css = "health_tree";
+      final JPPFProperty<?> prop = getProperty(index - 1);
       AlertThresholds thresholds = null;
-      if (SystemUtils.isOneOf(index, JVMHealthTreeTableModel.CPU_LOAD, JVMHealthTreeTableModel.SYSTEM_CPU_LOAD)) {
-        thresholds = data.getCpuThresholds();
-        switch (index) {
-          case JVMHealthTreeTableModel.CPU_LOAD:
-            value = snapshot.getCpuLoad();
-            break;
-          case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
-            value = snapshot.getSystemCpuLoad();
-            break;
-        }
-      } else if (!SystemUtils.isOneOf(index, JVMHealthTreeTableModel.THREADS, JVMHealthTreeTableModel.URL)) {
-        thresholds = data.getMemoryThresholds();
-        switch (index) {
-          case JVMHealthTreeTableModel.HEAP_MEM_PCT:
-          case JVMHealthTreeTableModel.HEAP_MEM_MB:
-            value = snapshot.getHeapUsedRatio();
-            break;
-          case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
-          case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
-            value = snapshot.getNonheapUsedRatio();
-            break;
-          case JVMHealthTreeTableModel.RAM_PCT:
-          case JVMHealthTreeTableModel.RAM_MB:
-            value = snapshot.getRamUsedRatio();
-            break;
-        }
+      boolean deadlocked = false;
+      switch(prop.getName()) {
+        case "liveThreads":
+        case "deadlocked":
+          deadlocked = snapshot.getBoolean("deadlocked");
+          break;
+        case "heapUsed":
+        case "heapUsedRatio":
+          value = snapshot.getDouble("heapUsedRatio");
+          thresholds = data.getMemoryThresholds();
+          break;
+        case "nonheapUsed":
+        case "nonheapUsedRatio":
+          value = snapshot.getDouble("nonheapUsedRatio");
+          thresholds = data.getMemoryThresholds();
+          break;
+        case "ramUsed":
+        case "ramUsedRatio":
+          value = snapshot.getDouble("ramUsedRatio");
+          thresholds = data.getMemoryThresholds();
+          break;
+        case "processCpuLoad":
+          value = snapshot.getDouble("processCpuLoad");
+          thresholds = data.getCpuThresholds();
+          break;
+        case "systemCpuLoad":
+          value = snapshot.getDouble("systemCpuLoad");
+          thresholds = data.getCpuThresholds();
+          break;
       }
       if ((thresholds != null) && (value >= 0d)) {
-        value *= 100d;
         if (value >= thresholds.getCritical()) css = "health_critical";
         else if (value >= thresholds.getWarning()) css = "health_warning";
-      }
-      //if (traceEnabled) log.trace(String.format(""));
+      } else if (deadlocked) css = "health_deadlocked";
       return css;
     }
   }

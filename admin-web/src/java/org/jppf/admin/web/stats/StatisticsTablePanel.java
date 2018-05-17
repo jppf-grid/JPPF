@@ -41,10 +41,6 @@ public class StatisticsTablePanel extends Panel {
    * Localization base for the stats page.
    */
   private static final String STATS_BASE = "org.jppf.ui.i18n.StatsPage";
-  /**
-   * Localization base for the stats page.
-   */
-  private static final String FIELDS_BASE = "org.jppf.ui.i18n.StatFields";
 
   /**
    *

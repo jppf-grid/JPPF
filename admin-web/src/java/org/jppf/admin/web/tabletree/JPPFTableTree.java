@@ -83,6 +83,7 @@ public class JPPFTableTree extends TableTree<DefaultMutableTreeNode, String> {
     this.nodeRenderer = nodeRenderer;
     this.nodeTreeModel = nodeTreeModel;
     //if (selectionHandler instanceof AbstractSelectionHandler) ((AbstractSelectionHandler) selectionHandler).setTableTree(this);
+    getTable().setTableBodyCss("scrollable");
   }
 
   @Override

@@ -30,19 +30,19 @@ public class LocalizedListItem {
   /**
    * The non-localized name of this item.
    */
-  public final String name;
+  private final String name;
   /**
    * The localized name of this item.
    */
-  public final String label;
+  private final String label;
   /**
    * The localized tooltip of this item.
    */
-  public final String tooltip;
+  private final String tooltip;
   /**
    * Unique index for this item.
    */
-  public final int index;
+  private final int index;
 
   /**
    * Initialize this item.
@@ -58,8 +58,50 @@ public class LocalizedListItem {
     this.tooltip = LocalizationUtils.getLocalized(base, name + ".tooltip", locale);
   }
 
+  /**
+   * Initialize this item.
+   * @param name the non-localized name of this item.
+   * @param index unique index for this item.
+   * @param label a displayable short label describing the field.
+   * @param tooltip a tooltip associated with the field.
+   */
+  public LocalizedListItem(final String name, final int index, final String label, final String tooltip) {
+    this.name = name;
+    this.index = index;
+    this.label = label;
+    this.tooltip = tooltip;
+  }
+
   @Override
   public String toString() {
+    return getLabel();
+  }
+
+  /**
+   * @return the unique index for this item.
+   */
+  public int getIndex() {
+    return index;
+  }
+
+  /**
+   * @return the non-localized name of this item.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * @return the localized name of this item.
+   */
+  public String getLabel() {
     return label;
+  }
+
+  /**
+   * @return the localized tooltip of this item.
+   */
+  public String getTooltip() {
+    return tooltip;
   }
 }

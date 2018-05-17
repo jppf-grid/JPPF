@@ -32,7 +32,7 @@ import org.jppf.admin.web.jobs.JobsPage;
 import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.stats.StatisticsPage;
 import org.jppf.admin.web.topology.TopologyPage;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 
 /**
  * SUperclass for all pages in the web admin console (except the login page).
@@ -65,7 +65,8 @@ public class TemplatePage extends AbstractJPPFPage {
     nodeFilterLink =  addWithRoles("jppf.filter.link", NodeFilterPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     final UserSettings settings = session.getUserSettings();
     if (getClass() != NodeFilterPage.class) {
-      final boolean active = settings.getProperties().getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
+      final TypedProperties props = settings.getProperties();
+      final boolean active = (props == null) ? false : props.getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
       nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
     }
   }

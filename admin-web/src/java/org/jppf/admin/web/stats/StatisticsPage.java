@@ -90,7 +90,7 @@ public class StatisticsPage extends TemplatePage implements RefreshTimerHolder {
     });
     tablesContainer = new WebMarkupContainer("stats.tables.container");
     final List<StatsTableData> tables = new ArrayList<>();
-    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) tables.add(new StatsTableData(item.name, StatsConstants.ALL_TABLES_MAP.get(item.name)));
+    for (final LocalizedListItem item: selectableLayout.getVisibleItems()) tables.add(new StatsTableData(item.getName(), StatsConstants.ALL_TABLES_MAP.get(item.getName())));
     //for (Map.Entry<String, Fields[]> entry: StatsConstants.ALL_TABLES_MAP.entrySet()) tables.add(new StatsTableData(entry.getKey(), entry.getValue()));
     final ListView<StatsTableData> listView = new ListView<StatsTableData>("stats.visible.tables", tables) {
       @Override
