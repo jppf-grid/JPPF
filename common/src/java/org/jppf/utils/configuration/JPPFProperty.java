@@ -19,7 +19,7 @@
 package org.jppf.utils.configuration;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Interface for predefined JPPF properties expected to handle a specific value type.
@@ -71,6 +71,20 @@ public interface JPPFProperty<T> extends Serializable {
    * @return the label as a string.
    */
   String getShortLabel();
+
+  /**
+   * Get a short label for this property.
+   * @param locale the locale in which the short label of this property should be retruned.
+   * @return the label as a string.
+   */
+  String getShortLabel(Locale locale);
+
+  /**
+   * Get a description of this property.
+   * @param locale the locale in which the documentation of this property should be retruned.
+   * @return the description as a string.
+   */
+  String getDocumentation(Locale locale);
 
   /**
    * Get a description of this property.

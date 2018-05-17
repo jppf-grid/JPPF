@@ -44,7 +44,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    */
   private static final String I18N_BASE = "org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider";
   /**
-   * 
+   * Convenience constants.
    */
   private static final long KB = 1024L, MB = KB * 1024L;
   /**

@@ -71,10 +71,6 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * Names of the parmaters used in the property's name, if any.
    */
   private final String[] paramNames;
-  /**
-   * The doc and short label for this property. Used for caching ot avoid localization lookups after the 1st time.
-   */
-  private String doc, label;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -142,14 +138,22 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
 
   @Override
   public String getDocumentation() {
-    if (doc == null) doc = LocalizationUtils.getLocalized(i18nBase, name + ".doc");
-    return doc;
+    return getDocumentation(Locale.getDefault());
+  }
+
+  @Override
+  public String getDocumentation(final Locale locale) {
+    return LocalizationUtils.getLocalized(i18nBase, name + ".doc", locale);
   }
 
   @Override
   public String getShortLabel() {
-    if (label == null) label = LocalizationUtils.getLocalized(i18nBase, name);
-    return label;
+    return getShortLabel(Locale.getDefault());
+  }
+
+  @Override
+  public String getShortLabel(final Locale locale) {
+    return LocalizationUtils.getLocalized(i18nBase, name, locale);
   }
 
   @Override

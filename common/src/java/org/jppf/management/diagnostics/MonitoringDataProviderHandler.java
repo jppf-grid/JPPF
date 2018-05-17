@@ -37,7 +37,11 @@ public class MonitoringDataProviderHandler {
   /**
    * The list of properties of all providers.
    */
-  private List<JPPFProperty<?>> properties;
+  private Map<String, JPPFProperty<?>> properties;
+  /**
+   * The list of properties of all providers.
+   */
+  private List<JPPFProperty<?>> propertyList;
 
   /**
    * Load the providers found via SPI.
@@ -72,15 +76,25 @@ public class MonitoringDataProviderHandler {
       provider.defineProperties();
       size += provider.getProperties().size();
     }
-    properties = new ArrayList<>(size);
-    for (final MonitoringDataProvider provider: providers) properties.addAll(provider.getProperties());
-    return properties;
+    properties = new LinkedHashMap<>(size);
+    for (final MonitoringDataProvider provider: providers) {
+      for (final JPPFProperty<?> property: provider.getProperties()) properties.put(property.getName(), property);
+    }
+    propertyList = Collections.unmodifiableList(new ArrayList<>(properties.values()));
+    return propertyList;
   }
 
   /**
    * @return the list of properties of all providers.
    */
-  public List<JPPFProperty<?>> getAllProperties() {
+  public List<JPPFProperty<?>> getPropertyList() {
+    return propertyList;
+  }
+
+  /**
+   * @return the map list of properties of all providers.
+   */
+  public Map<String, JPPFProperty<?>> getPropertyMap() {
     return properties;
   }
 }
