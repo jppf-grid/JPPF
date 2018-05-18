@@ -46,6 +46,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    */
   private static final Pattern JVM_OPTIONS_PATTERN = Pattern.compile("([^\"\\s]*\"[^\"]*\"[^\"\\s]*|[^\"\\s]*)\\s*");
   /**
+   * Constant for no JVM options.
+   */
+  private static final Pair<List<String>, List<String>> NO_OPTIONS = new Pair<List<String>, List<String>>(new ArrayList<String>(), new ArrayList<String>());
+  /**
    * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
    */
   protected Process process = null;
@@ -81,6 +85,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * @return A list of jvm options.
    */
   protected Pair<List<String>, List<String>> parseJvmOptions(final String source) {
+    if (source == null) return NO_OPTIONS;
     final List<String> options = new ArrayList<>();
     final Matcher matcher = JVM_OPTIONS_PATTERN.matcher(source);
     while (matcher.find()) {
