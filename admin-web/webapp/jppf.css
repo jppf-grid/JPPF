@@ -452,7 +452,7 @@ td.default_cursor div {
 .health_deadlocked {
   color: black;
   background-color: lightcoral;
-  background-image: url("https://www.jppf.org/images/tree/critical.gif");
+  background-image: url("images/tree/critical.gif");
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: left center;
