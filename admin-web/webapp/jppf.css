@@ -452,12 +452,12 @@ td.default_cursor div {
 .health_deadlocked {
   color: black;
   background-color: lightcoral;
-  background-image: url("images/tree/critical.gif");
+  background-image: url("https://www.jppf.org/images/tree/critical.gif");
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: left;
+  background-attachment: scroll;
+  background-position: left center;
 }
- 
+
 .main_border {
   border: 1px solid #6D78B6;
   border-top: 10px solid #6D78B6;
@@ -601,7 +601,7 @@ p { font-size: 10pt; }
   display: inline-block;
 }
 
- .editor_container {
+.editor_container {
   width: 100%;
   height: 100%;
   /*
