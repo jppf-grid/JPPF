@@ -4,7 +4,7 @@
   <dependencies>
     <dependency>
       <groupId>org.jppf</groupId>
-      <artifactId>jppf-jmxremote-nio-</artifactId>
+      <artifactId>jppf-jmxremote-nio</artifactId>
       <version>@version@</version>
     </dependency>
   </dependencies>
