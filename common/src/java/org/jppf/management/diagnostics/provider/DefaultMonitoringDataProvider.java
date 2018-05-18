@@ -113,8 +113,9 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     props.setDouble("systemCpuLoad", 100d * osMXBeanDoubleValue("SystemCpuLoad"));
     final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
     if (freeRam >= 0L) {
+      final long committedVirtualMemory = osMXBeanLongValue("CommittedVirtualMemorySize");
       final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
-      final long ramUsed = totalRam - freeRam;
+      final long ramUsed = totalRam - (freeRam + committedVirtualMemory);
       props.setDouble("ramUsed", (double) ramUsed / (double) MB);
       props.setDouble("ramUsedRatio", 100d * ramUsed / totalRam);
     }
