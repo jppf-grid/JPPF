@@ -64,62 +64,59 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean selected, final boolean hasFocus, final int row, final int column) {
     final DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, selected, hasFocus, row, column);
     try {
-    final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
-    if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return renderer;
-    final int alignment = (actualCol == 0) ? SwingConstants.LEFT : SwingConstants.RIGHT;
-    final JPPFTreeTable treeTable = (JPPFTreeTable) table;
-    final TreePath path = treeTable.getPathForRow(row);
-    String iconPath = null;
-    if (path != null) {
-      final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-      renderer.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
-      final Object o = node.getUserObject();
-      if (o instanceof AbstractTopologyComponent) {
-        final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
-        final HealthSnapshot health = data.getHealthSnapshot();
-        final JVMHealthTreeTableModel model = (JVMHealthTreeTableModel) healthPanel.getModel();
-        final String name = model.getBaseColumnName(actualCol);
-        switch(name) {
-          case "liveThreads":
-          case "deadlocked":
-            if (health.getBoolean("deadlocked")) {
-              renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
-              iconPath = CRITICAL_ICON;
-              final Rectangle r = table.getCellRect(row, column, false);
-              final int n = r == null ? 4 : r.width - 36;
-              renderer.setIconTextGap(n < 4 ? 4 : n);
-            } else {
-              renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
-            }
-            break;
-          case "heapUsed":
-          case "heapUsedRatio":
-            computeColor(renderer, table, health.getDouble("heapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
-            break;
-          case "nonheapUsed":
-          case "nonheapUsedRatio":
-            computeColor(renderer, table, health.getDouble("nonheapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
-            break;
-          case "ramUsed":
-          case "ramUsedRatio":
-            computeColor(renderer, table, health.getDouble("ramUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
-            break;
-          case "processCpuLoad":
-            computeColor(renderer, table, health.getDouble("processCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
-            break;
-          case "systemCpuLoad":
-            computeColor(renderer, table, health.getDouble("systemCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
-            break;
-          default:
-            renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
-            break;
+      final int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
+      if ((actualCol < 0) || healthPanel.isColumnHidden(actualCol)) return renderer;
+      final int alignment = (actualCol == 0) ? SwingConstants.LEFT : SwingConstants.RIGHT;
+      final JPPFTreeTable treeTable = (JPPFTreeTable) table;
+      final TreePath path = treeTable.getPathForRow(row);
+      String iconPath = null;
+      if (path != null) {
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        renderer.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
+        final Object o = node.getUserObject();
+        if (o instanceof AbstractTopologyComponent) {
+          final AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+          final HealthSnapshot health = data.getHealthSnapshot();
+          final JVMHealthTreeTableModel model = (JVMHealthTreeTableModel) healthPanel.getModel();
+          final String name = model.getBaseColumnName(actualCol);
+          switch(name) {
+            case "liveThreads":
+            case "deadlocked":
+              if (health.getBoolean("deadlocked")) {
+                renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
+                iconPath = CRITICAL_ICON;
+                renderer.setIconTextGap(5);
+              } else {
+                renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
+              }
+              break;
+            case "heapUsed":
+            case "heapUsedRatio":
+              computeColor(renderer, table, health.getDouble("heapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              break;
+            case "nonheapUsed":
+            case "nonheapUsedRatio":
+              computeColor(renderer, table, health.getDouble("nonheapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              break;
+            case "ramUsed":
+            case "ramUsedRatio":
+              computeColor(renderer, table, health.getDouble("ramUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              break;
+            case "processCpuLoad":
+              computeColor(renderer, table, health.getDouble("processCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+              break;
+            case "systemCpuLoad":
+              computeColor(renderer, table, health.getDouble("systemCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+              break;
+            default:
+              renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
+              break;
+          }
         }
       }
-    }
-    final ImageIcon icon = iconPath != null ? GuiUtils.loadIcon(iconPath) : null;
-    renderer.setIcon(icon);
-    renderer.setHorizontalAlignment(alignment);
-    renderer.setBorder(border);
+      renderer.setIcon((iconPath != null) ? GuiUtils.loadIcon(iconPath) : null);
+      renderer.setHorizontalAlignment(alignment);
+      renderer.setBorder(border);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
