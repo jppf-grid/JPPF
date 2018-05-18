@@ -115,7 +115,7 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     if (freeRam >= 0L) {
       final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
       final long ramUsed = totalRam - freeRam;
-      props.setDouble("ramUsed", (double) ramUsed / MB);
+      props.setDouble("ramUsed", (double) ramUsed / (double) MB);
       props.setDouble("ramUsedRatio", 100d * ramUsed / totalRam);
     }
     return props;
