@@ -20,7 +20,7 @@ package org.jppf.admin.web;
 
 import java.util.Set;
 
-import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.*;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.head.*;
 import org.apache.wicket.markup.html.link.*;
@@ -33,13 +33,22 @@ import org.jppf.admin.web.settings.UserSettings;
 import org.jppf.admin.web.stats.StatisticsPage;
 import org.jppf.admin.web.topology.TopologyPage;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
- * SUperclass for all pages in the web admin console (except the login page).
+ * Superclass for all pages in the web admin console (except the login page).
  * Its associated html file provides the basic layout for all other pages.
  * @author Laurent Cohen
  */
 public class TemplatePage extends AbstractJPPFPage {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(TemplatePage.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Link to the node filter. Its color changes based on whether it is active (green) or inactive (red).
    */
@@ -49,12 +58,15 @@ public class TemplatePage extends AbstractJPPFPage {
    *
    */
   public TemplatePage() {
+    final JPPFWebSession session = JPPFWebSession.get();
+    final String user = session.getSignedInUser();
+    if (debugEnabled) log.debug("user = {}", user);
+    if ((user == null) || (!session.isSignedIn())) throw new RestartResponseAtInterceptPageException(LoginPage.class);
     setVersioned(false);
     final HeaderPanel hp = new HeaderPanel();
     add(hp);
     setTooltip(hp.getShowIPCheckBox(), HeaderPanel.class.getName());
     add(new FooterPanel());
-    final JPPFWebSession session = JPPFWebSession.get();
     final Roles roles = session.getRoles();
     final Set<String> set = JPPFRole.getRoles(roles);
     addWithRoles("jppf.admin.link", AdminPage.class, set, JPPFRoles.ADMIN);
@@ -65,7 +77,7 @@ public class TemplatePage extends AbstractJPPFPage {
     nodeFilterLink =  addWithRoles("jppf.filter.link", NodeFilterPage.class, set, JPPFRoles.MONITOR, JPPFRoles.MANAGER);
     final UserSettings settings = session.getUserSettings();
     if (getClass() != NodeFilterPage.class) {
-      final TypedProperties props = settings.getProperties();
+      final TypedProperties props = (settings == null) ? null : settings.getProperties();
       final boolean active = (props == null) ? false : props.getBoolean(JPPFWebSession.NODE_FILTER_ACTIVE_PROP, false);
       nodeFilterLink.add(new AttributeModifier("style", "color: " + (active ? "green" : "red")));
     }
