@@ -25,13 +25,11 @@ import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
 
 /**
- * SUperclass for all pages in the web admin console.
- * Its associated html file provides the basic layout for all other pages.
+ * Login page class.
  * @author Laurent Cohen
  */
 @MountPath("login.html")
 public class LoginPage extends WebPage {
-  
   /**
    * Logger for this class.
    */
@@ -50,7 +48,6 @@ public class LoginPage extends WebPage {
     add(new LoginForm());
     add(new FooterPanel());
   }
-
 
   @Override
   protected void onConfigure() {
