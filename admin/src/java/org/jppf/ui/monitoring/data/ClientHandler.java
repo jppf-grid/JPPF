@@ -28,6 +28,7 @@ import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
+import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
 import org.jppf.ui.monitoring.diagnostics.Thresholds;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.*;
@@ -277,12 +278,12 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   public Object[] getMeterIntervals(final Fields field) {
     if (traceEnabled) log.trace("getting intervals for {}", field);
     switch(field.getName()) {
-      case "heapUsedRatio":
-      case "nonheapUsedRatio":
-      case "ramUsedRatio":
+      case DefaultMonitoringDataProvider.HEAP_USAGE_RATIO:
+      case DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO:
+      case DefaultMonitoringDataProvider.RAM_USAGE_RATIO:
         return getMeterIntervals(Thresholds.Name.MEMORY_WARNING, Thresholds.Name.MEMORY_CRITICAL);
-      case "processCpuLoad":
-      case "systemCpuLoad":
+      case DefaultMonitoringDataProvider.PROCESS_CPU_LOAD:
+      case DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD:
         return getMeterIntervals(Thresholds.Name.CPU_WARNING, Thresholds.Name.CPU_CRITICAL);
     }
     return StringUtils.ZERO_OBJECT;

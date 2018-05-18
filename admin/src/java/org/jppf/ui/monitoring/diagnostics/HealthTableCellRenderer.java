@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.diagnostics;
 
 import static org.jppf.ui.treetable.AbstractTreeCellRenderer.*;
 
-import java.awt.*;
+import java.awt.Component;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -29,6 +29,7 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
 import org.jppf.ui.monitoring.diagnostics.Thresholds.Name;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
@@ -80,9 +81,9 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
           final JVMHealthTreeTableModel model = (JVMHealthTreeTableModel) healthPanel.getModel();
           final String name = model.getBaseColumnName(actualCol);
           switch(name) {
-            case "liveThreads":
-            case "deadlocked":
-              if (health.getBoolean("deadlocked")) {
+            case DefaultMonitoringDataProvider.LIVE_THREADS_COUNT:
+            case DefaultMonitoringDataProvider.DEADLOCKED:
+              if (health.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED)) {
                 renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
                 iconPath = CRITICAL_ICON;
                 renderer.setIconTextGap(5);
@@ -90,23 +91,23 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
                 renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               }
               break;
-            case "heapUsed":
-            case "heapUsedRatio":
-              computeColor(renderer, table, health.getDouble("heapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case DefaultMonitoringDataProvider.HEAP_USAGE_MB:
+            case DefaultMonitoringDataProvider.HEAP_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case "nonheapUsed":
-            case "nonheapUsedRatio":
-              computeColor(renderer, table, health.getDouble("nonheapUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB:
+            case DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case "ramUsed":
-            case "ramUsedRatio":
-              computeColor(renderer, table, health.getDouble("ramUsedRatio"), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case DefaultMonitoringDataProvider.RAM_USAGE_MB:
+            case DefaultMonitoringDataProvider.RAM_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case "processCpuLoad":
-              computeColor(renderer, table, health.getDouble("processCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+            case DefaultMonitoringDataProvider.PROCESS_CPU_LOAD:
+              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
-            case "systemCpuLoad":
-              computeColor(renderer, table, health.getDouble("systemCpuLoad"), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+            case DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD:
+              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
               renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());

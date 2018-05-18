@@ -37,6 +37,7 @@ import org.jppf.admin.web.layout.SelectableLayoutImpl;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.diagnostics.*;
+import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.treetable.TreeViewType;
 import org.jppf.utils.LoggingUtils;
@@ -223,31 +224,31 @@ public class HealthPage extends AbstractTableTreePage {
       AlertThresholds thresholds = null;
       boolean deadlocked = false;
       switch(prop.getName()) {
-        case "liveThreads":
-        case "deadlocked":
-          deadlocked = snapshot.getBoolean("deadlocked");
+        case DefaultMonitoringDataProvider.LIVE_THREADS_COUNT:
+        case DefaultMonitoringDataProvider.DEADLOCKED:
+          deadlocked = snapshot.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED);
           break;
-        case "heapUsed":
-        case "heapUsedRatio":
-          value = snapshot.getDouble("heapUsedRatio");
+        case DefaultMonitoringDataProvider.HEAP_USAGE_MB:
+        case DefaultMonitoringDataProvider.HEAP_USAGE_RATIO:
+          value = snapshot.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case "nonheapUsed":
-        case "nonheapUsedRatio":
-          value = snapshot.getDouble("nonheapUsedRatio");
+        case DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB:
+        case DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO:
+          value = snapshot.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case "ramUsed":
-        case "ramUsedRatio":
-          value = snapshot.getDouble("ramUsedRatio");
+        case DefaultMonitoringDataProvider.RAM_USAGE_MB:
+        case DefaultMonitoringDataProvider.RAM_USAGE_RATIO:
+          value = snapshot.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case "processCpuLoad":
-          value = snapshot.getDouble("processCpuLoad");
+        case DefaultMonitoringDataProvider.PROCESS_CPU_LOAD:
+          value = snapshot.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD);
           thresholds = data.getCpuThresholds();
           break;
-        case "systemCpuLoad":
-          value = snapshot.getDouble("systemCpuLoad");
+        case DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD:
+          value = snapshot.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD);
           thresholds = data.getCpuThresholds();
           break;
       }

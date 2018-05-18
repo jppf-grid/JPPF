@@ -27,7 +27,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class is the built-in JPPF monitoring data provider.
  * @author Laurent Cohen
  */
 public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
@@ -39,6 +39,46 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Constant for the name of the heap usage ratio property.
+   */
+  public static final String HEAP_USAGE_RATIO = "heapUsedRatio";
+  /**
+   * Constant for the name of the heap usage in MB property.
+   */
+  public static final String HEAP_USAGE_MB = "heapUsed";
+  /**
+   * Constant for the name of the non-heap usage ratio property.
+   */
+  public static final String NON_HEAP_USAGE_RATIO = "nonheapUsedRatio";
+  /**
+   * Constant for the name of the non-heap usage in MB property.
+   */
+  public static final String NON_HEAP_USAGE_MB = "nonheapUsed";
+  /**
+   * Constant for the name of the deadlock indicator property.
+   */
+  public static final String DEADLOCKED = "deadlocked";
+  /**
+   * Constant for the name of the live threads count property.
+   */
+  public static final String LIVE_THREADS_COUNT = "liveThreads";
+  /**
+   * Constant for the name of the current process cpu load in % property.
+   */
+  public static final String PROCESS_CPU_LOAD = "processCpuLoad";
+  /**
+   * Constant for the name of the system cpu load in % property.
+   */
+  public static final String SYSTEM_CPU_LOAD = "systemCpuLoad";
+  /**
+   * Constant for the name of the ram usage ratio property.
+   */
+  public static final String RAM_USAGE_RATIO = "ramUsedRatio";
+  /**
+   * Constant for the name of the ram usage in MB property.
+   */
+  public static final String RAM_USAGE_MB = "ramUsed";
   /**
    * Base path for localzation bundles.
    */
@@ -80,16 +120,16 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
 
   @Override
   public void defineProperties() {
-    setDoubleProperty("heapUsedRatio", -1d);
-    setDoubleProperty("heapUsed", -1d);
-    setDoubleProperty("nonheapUsedRatio", -1d);
-    setDoubleProperty("nonheapUsed", -1d);
-    setBooleanProperty("deadlocked", false);
-    setIntProperty("liveThreads", -1);
-    setDoubleProperty("processCpuLoad", -1d);
-    setDoubleProperty("systemCpuLoad", -1d);
-    setDoubleProperty("ramUsedRatio", -1d);
-    setDoubleProperty("ramUsed", -1d);
+    setDoubleProperty(HEAP_USAGE_RATIO, -1d);
+    setDoubleProperty(HEAP_USAGE_MB, -1d);
+    setDoubleProperty(NON_HEAP_USAGE_RATIO, -1d);
+    setDoubleProperty(NON_HEAP_USAGE_MB, -1d);
+    setBooleanProperty(DEADLOCKED, false);
+    setIntProperty(LIVE_THREADS_COUNT, -1);
+    setDoubleProperty(PROCESS_CPU_LOAD, -1d);
+    setDoubleProperty(SYSTEM_CPU_LOAD, -1d);
+    setDoubleProperty(RAM_USAGE_RATIO, -1d);
+    setDoubleProperty(RAM_USAGE_MB, -1d);
   }
 
   @Override
@@ -101,23 +141,23 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     final TypedProperties props = new TypedProperties();
     final MemoryInformation memInfo = memoryInformation();
     MemoryUsageInformation mem = memInfo.getHeapMemoryUsage();
-    props.setDouble("heapUsedRatio", 100d * mem.getUsedRatio());
-    props.setDouble("heapUsed", (double) mem.getUsed() / MB);
+    props.setDouble(HEAP_USAGE_RATIO, 100d * mem.getUsedRatio());
+    props.setDouble(HEAP_USAGE_MB, (double) mem.getUsed() / MB);
     mem = memInfo.getNonHeapMemoryUsage();
-    props.setDouble("nonheapUsedRatio", 100d * mem.getUsedRatio());
-    props.setDouble("nonheapUsed", (double) mem.getUsed() / MB);
+    props.setDouble(NON_HEAP_USAGE_RATIO, 100d * mem.getUsedRatio());
+    props.setDouble(NON_HEAP_USAGE_MB, (double) mem.getUsed() / MB);
     final long[] ids = threadsMXBean.findDeadlockedThreads();
-    props.setBoolean("deadlocked", (ids != null) && (ids.length > 0));
-    props.setInt("liveThreads", threadsMXBean.getThreadCount());
-    props.setDouble("processCpuLoad", 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
-    props.setDouble("systemCpuLoad", 100d * osMXBeanDoubleValue("SystemCpuLoad"));
+    props.setBoolean(DEADLOCKED, (ids != null) && (ids.length > 0));
+    props.setInt(LIVE_THREADS_COUNT, threadsMXBean.getThreadCount());
+    props.setDouble(PROCESS_CPU_LOAD, 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
+    props.setDouble(SYSTEM_CPU_LOAD, 100d * osMXBeanDoubleValue("SystemCpuLoad"));
     final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
     if (freeRam >= 0L) {
       final long committedVirtualMemory = osMXBeanLongValue("CommittedVirtualMemorySize");
       final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
       final long ramUsed = totalRam - (freeRam + committedVirtualMemory);
-      props.setDouble("ramUsed", (double) ramUsed / (double) MB);
-      props.setDouble("ramUsedRatio", 100d * ramUsed / totalRam);
+      props.setDouble(RAM_USAGE_MB, (double) ramUsed / (double) MB);
+      props.setDouble(RAM_USAGE_RATIO, 100d * ramUsed / totalRam);
     }
     return props;
   }

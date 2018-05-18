@@ -25,6 +25,7 @@ import org.jppf.utils.configuration.*;
 
 /**
  * Base class for pluggable providers of monitoring data.
+ * Concrete implementations must have a no-args constructor.
  * @author Laurent Cohen
  */
 public abstract class MonitoringDataProvider {
@@ -35,19 +36,20 @@ public abstract class MonitoringDataProvider {
 
   /**
    * Perform the definition of the properties supplied by this provider.
-   * This method is called extactly once in both server (where the data comes from) and client (where the data is rendered, e.g. admin console) sides.
+   * This method is called extactly once in both producer (where the data comes from) and consumer (where the data is rendered, e.g. admin console) sides.
    */
   public abstract void defineProperties();
 
   /**
    * Perform the initialization of this provider.
-   * This method is called extactly once on the server (where the data comes from) side only.
+   * This method is called extactly once on the producer (where the data comes from) side only.
    */
   public abstract void init();
 
   /**
    * Get the values for the defined properties.
-   * @return the values as a TypedProperties object, mapping the properties names to their value as a {@code String}.
+   * <p>This method is expected to be called repeatedly on the producer side (where the data comes from).
+   * @return the values as a {@link TypedProperties} object, mapping the properties names to their value as a {@code String}.
    */
   public abstract TypedProperties getValues();
 
@@ -55,7 +57,7 @@ public abstract class MonitoringDataProvider {
    * Get the base path to the localization bundles for this provider.
    * For exemple, if the base path is {@code mypackage.MyProps}, then the packahe {@code mypackage} should at least contain the file {@code MyProps.properties},
    * along with other localized bundles such as {@code MyProps_fr.properties}, {@code MyProps_en_GB.properties}, etc.
-   * <p>This default implementation returns {@code null}. It should be overriden to provide different value.
+   * <p>This default implementation returns {@code null}. It should be overriden to provide a different value.
    * @return the base path to the localization bundles for this provider.
    * @see java.util.ResourceBundle
    * @see java.util.PropertyResourceBundle

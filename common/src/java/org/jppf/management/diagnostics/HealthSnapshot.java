@@ -21,6 +21,7 @@ package org.jppf.management.diagnostics;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -33,49 +34,9 @@ public class HealthSnapshot implements Serializable {
    */
   private static final long serialVersionUID = 1L;
   /**
-   * 
+   * Contains the attributes of this snapshot with their values.
    */
   private final TypedProperties properties = new TypedProperties();
-  /**
-   * Ratio of used / max for heap memory.
-   */
-  //double heapUsedRatio = -1d;
-  /**
-   * Used heap memory in bytes.
-   */
-  //long heapUsed = -1L;
-  /**
-   * Ratio of used / max for non-heap memory.
-   */
-  //double nonheapUsedRatio = -1d;
-  /**
-   * Used non-heap memory in bytes.
-   */
-  //long nonheapUsed = -1L;
-  /**
-   * Determines whether a deadlock was detected.
-   */
-  //boolean deadlocked = false;
-  /**
-   * Number of live threads in the JVM.
-   */
-  //int liveThreads = -1;
-  /**
-   * The process cpu load.
-   */
-  //double processCpuLoad = -1d;
-  /**
-   * The system cpu load.
-   */
-  //double systemCpuLoad = -1d;
-  /**
-   * Ratio of used / max for physical memory.
-   */
-  //double ramUsedRatio = -1d;
-  /**
-   * Used physical memory in bytes.
-   */
-  //long ramUsed = -1L;
 
   /**
    * Initialize this snapshot with default values.
@@ -148,91 +109,91 @@ public class HealthSnapshot implements Serializable {
   /**
    * Get the ratio of used / max for heap memory.
    * @return the ratio as a double value in the range [0, 1].
-   * @deprecated use {@code getDouble("heapUsedRatio")} instead.
+   * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO)} instead.
    */
   public double getHeapUsedRatio() {
-    return properties.getDouble("heapUsedRatio");
+    return properties.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO);
   }
 
   /**
    * Get the ratio of used / max for non-heap memory.
    * @return the ratio as a double value in the range [0, 1].
-   * @deprecated use {@code getDouble("nonheapUsedRatio")} instead.
+   * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO)} instead.
    */
   public double getNonheapUsedRatio() {
-    return properties.getDouble("nonheapUsedRatio");
+    return properties.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO);
   }
 
   /**
    * Determine whether a deadlock was detected.
-   * @return {@code true} if a deadlock was dertected, <code>false</code> otherwise.
-   * @deprecated use {@code getBoolean("deadlocked")} instead.
+   * @return {@code true} if a deadlock was dertected, {@code false} otherwise.
+   * @deprecated use {@code getBoolean(DefaultMonitoringDataProvider.DEADLOCKED)} instead.
    */
   public boolean isDeadlocked() {
-    return properties.getBoolean("deadlocked");
+    return properties.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED);
   }
 
   /**
    * Get the used heap memory in bytes.
    * @return the heap used as a long.
-   * @deprecated use {@code getLong("heapUsed")} instead.
+   * @deprecated use {@code getLong(DefaultMonitoringDataProvider.HEAP_USAGE_MB)} instead.
    */
   public long getHeapUsed() {
-    return properties.getLong("heapUsed");
+    return properties.getLong(DefaultMonitoringDataProvider.HEAP_USAGE_MB);
   }
 
   /**
    * Get the used non-heap memory in bytes.
    * @return the non-heap used as a long.
-   * @deprecated use {@code getLong("nonheapUsed")} instead.
+   * @deprecated use {@code getLong(DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB)} instead.
    */
   public long getNonheapUsed() {
-    return properties.getLong("nonheapUsed");
+    return properties.getLong(DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB);
   }
 
   /**
    * Get the number of live threads in the JVM.
    * @return the number of threads as an int.
-   * @deprecated use {@code getInt("liveThreads")} instead.
+   * @deprecated use {@code getInt(DefaultMonitoringDataProvider.LIVE_THREADS_COUNT)} instead.
    */
   public int getLiveThreads() {
-    return properties.getInt("liveThreads");
+    return properties.getInt(DefaultMonitoringDataProvider.LIVE_THREADS_COUNT);
   }
 
   /**
    * Get the cpu load of the current process.
    * @return the cpu load as a double in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
-   * @deprecated use {@code getDouble("processCpuLoad")} instead.
+   * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD)} instead.
    */
   public double getCpuLoad() {
-    return properties.getDouble("processCpuLoad");
+    return properties.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD);
   }
 
   /**
    * Get the cpu load of the system.
    * @return the cpu load as a double in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
-   * @deprecated use {@code getDouble("systemCpuLoad")} instead.
+   * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD)} instead.
    */
   public double getSystemCpuLoad() {
-    return properties.getDouble("systemCpuLoad");
+    return properties.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD);
   }
 
   /**
    * Get the ratio of used / max for physical memory.
    * @return the percentage of used RAM in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
-   * @deprecated use {@code getDouble("ramUsedRatio")} instead.
+   * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO)} instead.
    */
   public double getRamUsedRatio() {
-    return properties.getDouble("ramUsedRatio");
+    return properties.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO);
   }
 
   /**
    * Get the amount of used physical memory in bytes.
    * @return the amount of used RAM in bytes, or {@code -1L} if it is unknown.
-   * @deprecated use {@code getLong("ramUsed")} instead.
+   * @deprecated use {@code getLong(DefaultMonitoringDataProvider.RAM_USAGE_MB)} instead.
    */
   public long getRamUsed() {
-    return properties.getLong("ramUsed");
+    return properties.getLong(DefaultMonitoringDataProvider.RAM_USAGE_MB);
   }
 
   @Override
