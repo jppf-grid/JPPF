@@ -278,7 +278,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    * @param dispatch the job dispatch to add.
    */
   void dispatchAdded(final JobDriver driver, final Job job, final JobDispatch dispatch) {
-    if (debugEnabled) log.debug("adding dispatch {} to job '{}'", dispatch.getDisplayName(), job.getDisplayName());
+    if (debugEnabled) log.debug("adding dispatch {} to job {}", dispatch, job);
     if (job != null) {
       job.add(dispatch);
       dispatchEvent(DISPATCH_ADDED, new JobMonitoringEvent(this, driver, job, dispatch));
