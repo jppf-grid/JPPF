@@ -58,10 +58,10 @@ public class GCLink extends AbstractActionLink {
 
   @Override
   public void onClick(final AjaxRequestTarget target) {
-    if (debugEnabled) log.debug("clicked on gc");
     final JPPFWebSession session = JPPFWebSession.get();
     final TableTreeData data = session.getTopologyData();
     final List<DefaultMutableTreeNode> selected = data.getSelectedTreeNodes();
+    if (debugEnabled) log.debug("clicked on gc: {} selected tree nodes", selected.size());
     if (!selected.isEmpty()) {
       final List<TopologyDriver> drivers = TopologyTreeData.getSelectedDrivers(selected);
       for (final TopologyDriver driver: drivers) {

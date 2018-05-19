@@ -466,6 +466,7 @@ td.default_cursor div {
   /*max-width: 1000px;*/
   max-width: 100%;
   padding: 0px;
+  overflow: auto;
 }
 
 .main_border_login {
@@ -483,11 +484,12 @@ td.default_cursor div {
   color: #6D78B6;
   font-size: 9pt;
   padding: 5px;
+  white-space: nowrap;
 }
 
 .layout_cell_right {
   /*width: calc(100% - 120px);*/
-  overflow: scroll;
+  overflow: auto;
 }
 
 .button_link {

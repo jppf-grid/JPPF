@@ -144,7 +144,7 @@ public abstract class TableTreeData implements SelectionListener {
    * @param currentNode the node current being explored.
    * @param treeNodes the selected tree nodes.
    */
-  void exploreTreeSelection(final SelectionHandler handler, final DefaultMutableTreeNode currentNode, final List<DefaultMutableTreeNode> treeNodes) {
+  private void exploreTreeSelection(final SelectionHandler handler, final DefaultMutableTreeNode currentNode, final List<DefaultMutableTreeNode> treeNodes) {
     if (!currentNode.isRoot()) {
       final AbstractComponent<?> data = (AbstractComponent<?>) currentNode.getUserObject();
       if (handler.isSelected(data.getUuid())) treeNodes.add(currentNode);
