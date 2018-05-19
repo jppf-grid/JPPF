@@ -40,42 +40,6 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   public static final int URL = 0;
   /**
-   * Column number for the heap memory usage in percentage.
-   */
-  public static final int HEAP_MEM_PCT = 1;
-  /**
-   * Column number for the heap usage in MB.
-   */
-  public static final int HEAP_MEM_MB = 2;
-  /**
-   * Column number for the non-heap memory usage in percentage.
-   */
-  public static final int NON_HEAP_MEM_PCT = 3;
-  /**
-   * Column number for the non-heap memory usage in percentage.
-   */
-  public static final int NON_HEAP_MEM_MB = 4;
-  /**
-   * Column number for the RAM usage in percentage.
-   */
-  public static final int RAM_PCT = 5;
-  /**
-   * Column number for the RAM usage in MB.
-   */
-  public static final int RAM_MB = 6;
-  /**
-   * Column number for the node's last event.
-   */
-  public static final int THREADS = 7;
-  /**
-   * Column number for the process CPU load.
-   */
-  public static final int CPU_LOAD = 8;
-  /**
-   * Column number for the process CPU load.
-   */
-  public static final int SYSTEM_CPU_LOAD = 9;
-  /**
    * Properties representing the columns definitions.
    */
   private final List<JPPFProperty<?>> properties;
