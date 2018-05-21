@@ -1,0 +1,40 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  <groupId>org.jppf</groupId>
+  <artifactId>jppf-admin-web</artifactId>
+  <packaging>war</packaging>
+  <name>JPPF Web Administration Console</name>
+  <version>@version@</version>
+  <description>A web-based administration and monitoring console for JPPF grids</description>
+  <url>https://www.jppf.org</url>
+  <issueManagement>
+    <system>The Bug Genie</system>
+    <url>https://www.jppf.org/tracker/tbg</url>
+  </issueManagement>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:https://github.com/lolocohen/JPPF</connection>
+    <developerConnection>scm:git:https://github.com/lolocohen/JPPF</developerConnection>
+    <url>https://github.com/lolocohen/JPPF</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>lolocohen</id>
+      <name>Laurent Cohen</name>
+      <email>laurent.cohen@jppf.org</email>
+    </developer>
+  </developers>
+  <dependencies>
+  </dependencies>
+</project>

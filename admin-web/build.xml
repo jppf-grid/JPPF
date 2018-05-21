@@ -16,12 +16,15 @@
   limitations under the License.
 -->
 
-<project name="WebAdminConsole" default="build" basedir=".">
+<project name="WebAdminConsole" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
   <!-- ==================================================================== -->
   <!-- Property definitions                                                 -->
   <!-- ==================================================================== -->
 
+  <property file="${basedir}/bin/build.properties"/>
+  <property file="${basedir}/build.properties"/>
+  <property file="${basedir}/bin/build.number"/>
   <property name="build.sysclasspath" value="last" />
   <property name="config.dir"         value="${basedir}/config"/>
   <property name="classes.dir"        value="${basedir}/classes"/>
@@ -29,11 +32,10 @@
   <property name="build.dir"          value="${basedir}/build"/>
   <property name="lib.dir"            value="${basedir}/lib"/>
   <property name="web.dir"            value="${basedir}/webapp"/>
-  <property name="war.name"           value="JPPFWebAdmin"/>
-  <property file="${basedir}/bin/build.properties"/>
-  <property file="${basedir}/build.properties"/>
-  <property file="${basedir}/bin/build.number"/>
-
+  <property name="javadoc"            value="${build.dir}/javadoc"/>
+  <property name="maven.dist"         value="${build.dir}"/>
+  <property name="module.name"        value="jppf-admin-web"/>
+  <property name="war.name"           value="${module.name}-${version.number}"/>
 
   <!-- ==================================================================== -->
   <!-- Classpath definitions                                                -->
@@ -130,10 +132,160 @@
         <exclude name="*atmosphere*.jar"/>
         <exclude name="*guice*.jar"/>
         <exclude name="javax.servlet*.jar"/>
+        <exclude name="maven*.jar"/>
       </lib>
       <fileset dir="${basedir}/webapp" excludes="WEB-INF/web.xml"/>
     </war>
     <echo message="${war.name}.war file created in '${build.dir}' directory"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the Maven artifacts                                              -->
+  <!-- ========================================================================= -->
+
+  <path id="maven-ant-tasks.classpath" path="${lib.dir}/maven-ant-tasks-2.1.3.jar"/>
+  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath"/>
+
+  <target name="maven" depends="maven.init, jar, maven.generate" description=""/>
+  
+  <target name="maven.init" depends="">
+    <delete dir="${maven.dist}" quiet="true" includes="*.jar,pom.xml"/>
+    <mkdir dir="${maven.dist}"/>
+    <property file="../gpg-passphrase.txt"/>
+    <!-- defined maven snapshots and staging repository id and url -->
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+    <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+    <property name="pom.file" value="${maven.dist}/pom.xml"/>
+    <condition property="maven.snapshot">
+      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
+    </condition>
+  </target>
+  
+  <target name="maven.generate" depends="">
+    <property name="artifactId" value="${module.name}"/>
+    <property name="artifact.prefix" value="${artifactId}-${version.number}"/>
+    <copy file="${basedir}/pom.xml" toFile="${pom.file}"/>
+    <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
+    <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
+    <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+    <antcall target="maven.staging"> <param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+  </target>
+  
+  <target name="maven.snapshot" depends="" if="maven.snapshot">
+    <echo message="deploying to SNAPSHOT repository !!!"/>
+    <copy file="${maven-jar}.war" toFile="${maven-jar}-SNAPSHOT.war"/>
+    <copy file="${maven-jar}-sources.jar" toFile="${maven-jar}-SNAPSHOT-sources.jar"/>
+    <copy file="${maven-jar}-javadoc.jar" toFile="${maven-jar}-SNAPSHOT-javadoc.jar"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-snapshots-repository-url}" />
+      <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.war"/>
+      <arg value="-Dpackaging=war"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+    <delete dir="${maven.dist}" quiet="true" includes="**/*SNAPSHOT*.*"/>
+  </target>
+  
+  <target name="maven.staging" depends="" unless="maven.snapshot">
+    <echo message="deploying to STAGING repository !!!"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-staging-repository-url}" />
+      <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.war"/>
+      <arg value="-Dpackaging=war"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+  </target>
+  
+  <target name="gpg.sign" depends="">
+    <exec executable="gpg">
+      <arg value="--yes"/>
+      <arg value="--passphrase"/>
+      <arg value="${gpg.pass}"/>
+      <arg value="--armor"/>
+      <arg value="--detach-sign"/>
+      <arg value="${file.sign}"/>
+    </exec>
+  </target>
+  
+  <!-- ========================================================================= -->
+  <!-- Jar                                                                       -->
+  <!-- ========================================================================= -->
+  
+  <target name="jar" depends="war, javadoc">
+    <tstamp><format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/></tstamp>
+    <jar.all type="-sources" dir="${src.dir}"/>
+    <jar.all type="-javadoc" dir="${javadoc}"/>
+  </target>
+  
+  <macrodef name="jar.all">
+    <attribute name="type"/>
+    <attribute name="dir"/>
+    <sequential>
+      <jar jarfile="${build.dir}/${war.name}@{type}.jar" index="true">
+        <fileset dir="@{dir}"/>
+        <manifest>
+          <attribute name="Version" value="${version.number}"/>
+          <attribute name="BuildDate" value="${readable.now}"/>
+        </manifest>
+      </jar>
+      <echo message="*** ${build.dir}/${war.name}@{type}.jar ready ***"/>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the Javadoc                                                      -->
+  <!-- ========================================================================= -->
+  
+  <target name="javadoc">
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF-JMX-Remote"
+      packagenames="**/*.*" classpathref="project.classpath" stylesheetfile="${basedir}/bin/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
+    >
+      <arg value="-J-Xmx512m"/>
+      <packageset dir="${src.dir}/java"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://ci.apache.org/projects/wicket/apidocs/7.x/"/>
+      <link href="https://docs.oracle.com/javaee/6/api/"/>
+      <doctitle><![CDATA[JPPF Web Administration Console v${version.number}]]></doctitle>
+      <header>
+        <![CDATA[
+          <table>
+          <tr>
+            <td valign="center">
+              <a href="https://www.jppf.org" target="_top">
+                <img src="https://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+              </a>
+            </td>
+          </tr>
+          </table>
+        ]]>
+      </header>
+      <bottom>
+        <![CDATA[
+          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2018 JPPF Team.</i></font>
+        ]]>
+      </bottom>
+    </javadoc>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${basedir}/bin">
+        <include name="*.gif"/>
+        <include name="*.jpg"/>
+      </fileset>
+    </copy>
+    <property name="javadoc.file" value="${jppf}/build/JPPFWebAdmin-${version.number}-javadoc.jar"/>
+    <delete file="${javadoc.file}" quiet="true"/>
   </target>
 
   <!-- ==================================================================== -->
