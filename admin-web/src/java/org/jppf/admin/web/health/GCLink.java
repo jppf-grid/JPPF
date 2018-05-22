@@ -59,7 +59,7 @@ public class GCLink extends AbstractActionLink {
   @Override
   public void onClick(final AjaxRequestTarget target) {
     final JPPFWebSession session = JPPFWebSession.get();
-    final TableTreeData data = session.getTopologyData();
+    final TableTreeData data = session.getHealthData();
     final List<DefaultMutableTreeNode> selected = data.getSelectedTreeNodes();
     if (debugEnabled) log.debug("clicked on gc: {} selected tree nodes", selected.size());
     if (!selected.isEmpty()) {

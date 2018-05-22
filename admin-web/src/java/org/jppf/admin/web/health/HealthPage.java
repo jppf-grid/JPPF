@@ -192,11 +192,6 @@ public class HealthPage extends AbstractTableTreePage {
       final String value = (String) treeModel.getValueAt(treeNode, index);
       cellItem.add(new Label(componentId, value));
       final boolean selected = selectionHandler.isSelected(comp.getUuid());
-      /*
-      String css = getCssClass();
-      if (!comp.isPeer()) css += " " + (selected ? "tree_selected" : getThresholdCssClass(comp));
-      */
-      //String css = getCssClass();
       String css = "";
       if (!comp.isPeer()) css += (selected ? "tree_selected" : getThresholdCssClass(comp));
       css += " " + getCssClass();
