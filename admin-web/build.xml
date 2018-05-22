@@ -151,7 +151,7 @@
   <target name="maven.init" depends="">
     <delete dir="${maven.dist}" quiet="true" includes="*.jar,pom.xml"/>
     <mkdir dir="${maven.dist}"/>
-    <property file="../gpg-passphrase.txt"/>
+    <property file="${user.home}/gpg-passphrase.txt"/>
     <!-- defined maven snapshots and staging repository id and url -->
     <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
     <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />

@@ -173,7 +173,7 @@
 
   <target name="maven.init" depends="">
     <property name="maven.dist" value="${build}"/>
-    <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
+    <property file="${user.home}/gpg-passphrase.txt"/>
     <!-- defined maven snapshots and staging repository id and url -->
     <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
     <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
