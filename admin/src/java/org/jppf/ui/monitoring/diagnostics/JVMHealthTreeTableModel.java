@@ -69,14 +69,16 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
       if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
         final AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
         final HealthSnapshot health = info.getHealthSnapshot();
-        double d = -1d;
         if (health == null) return res;
         if (column == URL) res = info.toString();
         else {
           final JPPFProperty<?> prop = properties.get(column - 1);
-          if (prop instanceof NumberProperty) {
-            d = health.getDouble(prop.getName());
+          if ((prop instanceof FloatProperty) || (prop instanceof DoubleProperty)) {
+            final double d = health.getDouble(prop.getName());
             res = d < 0d ? NA : nfDec.format(d);
+          } else if ((prop instanceof IntProperty) || (prop instanceof LongProperty)) {
+            final long l = health.getLong(prop.getName());
+            res = l < 0L ? NA : nfInt.format(l);
           } else res = health.getString(prop.getName());
         }
       } else if (column == 0) res = defNode.getUserObject().toString();

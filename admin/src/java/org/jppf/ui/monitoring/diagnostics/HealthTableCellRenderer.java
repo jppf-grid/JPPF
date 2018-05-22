@@ -110,7 +110,7 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
               computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
-              renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
+              renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               break;
           }
         }
