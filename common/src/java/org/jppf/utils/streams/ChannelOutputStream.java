@@ -44,7 +44,6 @@ public class ChannelOutputStream extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    
     write(new byte[] { (byte) b }, 0, 1);
   }
 

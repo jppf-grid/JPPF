@@ -19,5 +19,6 @@
 /**
  * Utility and helper classes for command-line arguments processing.
  * <p>Found in: <b>jppf-common.jar</b>
+ * @exclude
  */
 package org.jppf.utils.cli;

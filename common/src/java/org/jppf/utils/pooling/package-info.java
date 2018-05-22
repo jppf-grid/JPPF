@@ -19,5 +19,6 @@
 /**
  * Support for dyynamic object pooling in JPPF.
  * <p>Found in: <b>jppf-common.jar</b>
+ * @exclude
  */
 package org.jppf.utils.pooling;

@@ -21,25 +21,26 @@ package org.jppf.jmxremote;
 import java.util.EventListener;
 
 /**
- * Listener interface for receiving connection JMX connection events on the server side.
+ * Listener interface for receiving JMX connection events on the server side.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface JMXConnectionStatusListener extends EventListener {
   /**
    * Called when a connection is opened.
-   * @param event encasulates the connection ID and Throwable information.
+   * @param event encapsulates the connection ID and Throwable information.
    */
   void connectionOpened(JMXConnectionStatusEvent event);
 
   /**
    * Called when a connection is closed.
-   * @param event encasulates the connection ID and Throwable information.
+   * @param event encapsulates the connection ID and Throwable information.
    */
   void connectionClosed(JMXConnectionStatusEvent event);
 
   /**
    * Called when a connection fails.
-   * @param event encasulates the connection ID and Throwable information.
+   * @param event encapsulates the connection ID and Throwable information.
    */
   void connectionFailed(JMXConnectionStatusEvent event);
 }

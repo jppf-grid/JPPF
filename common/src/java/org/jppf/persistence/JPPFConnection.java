@@ -25,6 +25,7 @@ import java.util.concurrent.Executor;
 /**
  *
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFConnection implements Connection {
   /**

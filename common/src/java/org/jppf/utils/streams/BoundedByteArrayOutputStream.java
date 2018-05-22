@@ -23,6 +23,7 @@ import java.io.*;
 /**
  * A byte ArrayOutputStream with a maximum size of data that can be written into it.
  * @author Laurent Cohen
+ * @exclude
  */
 public class BoundedByteArrayOutputStream extends OutputStream {
   /**
