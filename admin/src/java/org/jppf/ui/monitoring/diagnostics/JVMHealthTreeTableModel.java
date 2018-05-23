@@ -103,14 +103,16 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   public String getColumnName(final int column) {
     if ((column < 0) && (column > getColumnCount())) return "";
     if (column == URL) return localize(getBaseColumnName(column) + ".label");
-    return properties.get(column - 1).getShortLabel();
+    return properties.get(column - 1).getShortLabel(locale);
   }
 
   @Override
   public String getColumnTooltip(final int column) {
     if ((column < 0) && (column > getColumnCount())) return "";
     if (column == URL) return localize(getBaseColumnName(column) + ".label");
-    final String s = properties.get(column - 1).getDocumentation();
-    return (s == null) ? "" : s;
+    String s = properties.get(column - 1).getDocumentation(locale);
+    if (s == null) s = "";
+    if (s.contains("\n")) s = "<html>" + s.replace("\n", "<br>") + "</html>";
+    return s;
   }
 }

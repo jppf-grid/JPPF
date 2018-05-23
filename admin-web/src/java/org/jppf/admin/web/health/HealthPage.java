@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.*;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
@@ -37,10 +37,10 @@ import org.jppf.admin.web.layout.SelectableLayoutImpl;
 import org.jppf.admin.web.tabletree.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.diagnostics.*;
-import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
@@ -79,7 +79,11 @@ public class HealthPage extends AbstractTableTreePage {
   protected List<? extends IColumn<DefaultMutableTreeNode, String>> createColumns() {
     final List<IColumn<DefaultMutableTreeNode, String>> columns = new ArrayList<>();
     columns.add(new HealthTreeColumn(Model.of("Tree")));
-    for (LocalizedListItem item: selectableLayout.getVisibleItems()) columns.add(new HealthColumn(item.getIndex()));
+    for (LocalizedListItem item: selectableLayout.getVisibleItems()) {
+      final HealthColumn column = new HealthColumn(item.getIndex());
+      //column.getHeader().add(new AttributeModifier("title", LocalizationUtils.getLocalized(base, key, JPPFWebSession.get().getLocale())));
+      columns.add(column);
+    }
     return columns;
   }
 
@@ -172,6 +176,10 @@ public class HealthPage extends AbstractTableTreePage {
      * The column index.
      */
     private final int index;
+    /**
+     * The column header tooltip.
+     */
+    private final String tooltip;
 
     /**
      * Initialize this column.
@@ -180,6 +188,7 @@ public class HealthPage extends AbstractTableTreePage {
     public HealthColumn(final int index) {
       //super(Model.of(treeModel.getColumnName(index)));
       super(Model.of(getProperty(index - 1).getShortLabel(JPPFWebSession.get().getLocale())));
+      this.tooltip = getProperty(index - 1).getDocumentation(JPPFWebSession.get().getLocale());
       this.index = index;
       if (debugEnabled) log.debug("adding column index {}", index);
     }
@@ -219,31 +228,31 @@ public class HealthPage extends AbstractTableTreePage {
       AlertThresholds thresholds = null;
       boolean deadlocked = false;
       switch(prop.getName()) {
-        case DefaultMonitoringDataProvider.LIVE_THREADS_COUNT:
-        case DefaultMonitoringDataProvider.DEADLOCKED:
-          deadlocked = snapshot.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED);
+        case MonitoringConstants.LIVE_THREADS_COUNT:
+        case MonitoringConstants.DEADLOCKED:
+          deadlocked = snapshot.getBoolean(MonitoringConstants.DEADLOCKED);
           break;
-        case DefaultMonitoringDataProvider.HEAP_USAGE_MB:
-        case DefaultMonitoringDataProvider.HEAP_USAGE_RATIO:
-          value = snapshot.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO);
+        case MonitoringConstants.HEAP_USAGE_MB:
+        case MonitoringConstants.HEAP_USAGE_RATIO:
+          value = snapshot.getDouble(MonitoringConstants.HEAP_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB:
-        case DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO:
-          value = snapshot.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO);
+        case MonitoringConstants.NON_HEAP_USAGE_MB:
+        case MonitoringConstants.NON_HEAP_USAGE_RATIO:
+          value = snapshot.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case DefaultMonitoringDataProvider.RAM_USAGE_MB:
-        case DefaultMonitoringDataProvider.RAM_USAGE_RATIO:
-          value = snapshot.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO);
+        case MonitoringConstants.RAM_USAGE_MB:
+        case MonitoringConstants.RAM_USAGE_RATIO:
+          value = snapshot.getDouble(MonitoringConstants.RAM_USAGE_RATIO);
           thresholds = data.getMemoryThresholds();
           break;
-        case DefaultMonitoringDataProvider.PROCESS_CPU_LOAD:
-          value = snapshot.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD);
+        case MonitoringConstants.PROCESS_CPU_LOAD:
+          value = snapshot.getDouble(MonitoringConstants.PROCESS_CPU_LOAD);
           thresholds = data.getCpuThresholds();
           break;
-        case DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD:
-          value = snapshot.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD);
+        case MonitoringConstants.SYSTEM_CPU_LOAD:
+          value = snapshot.getDouble(MonitoringConstants.SYSTEM_CPU_LOAD);
           thresholds = data.getCpuThresholds();
           break;
       }
@@ -252,6 +261,13 @@ public class HealthPage extends AbstractTableTreePage {
         else if (value >= thresholds.getWarning()) css = "health_warning";
       } else if (deadlocked) css = "health_deadlocked";
       return css;
+    }
+
+    @Override
+    public Component getHeader(final String componentId) {
+      final Component comp = super.getHeader(componentId);
+      comp.add(new AttributeModifier("class", "default_cursor"));
+      return comp.add(new AttributeModifier("title", tooltip));
     }
   }
 }

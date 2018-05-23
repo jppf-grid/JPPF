@@ -186,7 +186,9 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   @Override
   public String getColumnTooltip(final int column) {
     if ((column >= 0) && (column <= getColumnCount())) {
-      return localize(getBaseColumnName(column) + ".tooltip");
+      String s = localize(getBaseColumnName(column) + ".tooltip");
+      if (s.contains("\n")) s = "<html>" + s.replace("\n", "<br>") + "</html>";
+      return s;
     }
     return "";
   }
