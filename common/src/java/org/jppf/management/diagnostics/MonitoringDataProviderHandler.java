@@ -25,7 +25,7 @@ import org.jppf.utils.ServiceFinder;
 import org.jppf.utils.configuration.JPPFProperty;
 
 /**
- * 
+ * This class provides methods to find, load and access {@link MonitoringDataProvider}s.
  * @author Laurent Cohen
  * @exclude
  */

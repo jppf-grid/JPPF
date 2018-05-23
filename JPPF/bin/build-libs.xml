@@ -23,8 +23,11 @@
   <!-- ========================================================================= -->
 
   <!--
-  <property name="lib"                   value="${basedir}/lib"/>
+    Definition of include patterns for the external libs used in the build.
+    This allows to make the patterns version-indepedent with regards to the libs
+    and facilitates their upgrade.
   -->
+
   <property name="ApacheCommons.inc"    value="*.jar"/>
   <property name="BouncyCastle.inc"     value="*.jar"/>
   <property name="Checkstyle.inc"       value="*.jar"/>
@@ -35,13 +38,14 @@
   <property name="JFreeChart.inc"       value="*.jar"/>
   <property name="JGoodies.inc"         value="*.jar"/>
   <property name="jmxremote.inc"        value="*.jar"/>
-  <property name="JNA.inc"              value="jna-4.4.0.jar,jna-platform-4.4.0.jar"/>
+  <property name="JNA.inc"              value="*.jar"/>
+  <property name="oshi.inc"             value="*.jar"/>
   <property name="Jung.inc"             value="*.jar"/>
   <property name="JUnit.inc"            value="*.jar"/>
   <property name="log4j.inc"            value="*.jar"/>
   <property name="LZ4.inc"              value="*.jar"/>
   <property name="MigLayout.inc"        value="*.jar"/>
   <property name="RSyntaxTextArea.inc"  value="*.jar"/>
-  <property name="slf4j.inc"            value="slf4j-api-1.6.1.jar,slf4j-log4j12-1.6.1.jar"/>
+  <property name="slf4j.inc"            value="slf4j-api-*.jar,slf4j-log4j12-*.jar"/>
 
 </project> 

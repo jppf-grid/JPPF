@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.Operator;
@@ -170,7 +171,7 @@ public class TestDriverRestart {
 
       final HealthSnapshot healthSnapshot = diagnostics.healthSnapshot();
       System.out.println("health snapshot = " + healthSnapshot);
-      if (healthSnapshot.getHeapUsedRatio() >= 0.6 || healthSnapshot.getNonheapUsedRatio() >= 0.6) {
+      if (healthSnapshot.getDouble(MonitoringConstants.HEAP_USAGE_RATIO) >= 0.6 || healthSnapshot.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO) >= 0.6) {
         diagnostics.gc();
       }
     } catch (final IOException ex) {

@@ -18,6 +18,8 @@
 
 package org.jppf.management.diagnostics.provider;
 
+import static org.jppf.management.diagnostics.provider.MonitoringConstants.*;
+
 import java.lang.management.*;
 
 import javax.management.*;
@@ -40,53 +42,9 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Constant for the name of the heap usage ratio property.
-   */
-  public static final String HEAP_USAGE_RATIO = "heapUsedRatio";
-  /**
-   * Constant for the name of the heap usage in MB property.
-   */
-  public static final String HEAP_USAGE_MB = "heapUsed";
-  /**
-   * Constant for the name of the non-heap usage ratio property.
-   */
-  public static final String NON_HEAP_USAGE_RATIO = "nonheapUsedRatio";
-  /**
-   * Constant for the name of the non-heap usage in MB property.
-   */
-  public static final String NON_HEAP_USAGE_MB = "nonheapUsed";
-  /**
-   * Constant for the name of the deadlock indicator property.
-   */
-  public static final String DEADLOCKED = "deadlocked";
-  /**
-   * Constant for the name of the live threads count property.
-   */
-  public static final String LIVE_THREADS_COUNT = "liveThreads";
-  /**
-   * Constant for the name of the current process cpu load in % property.
-   */
-  public static final String PROCESS_CPU_LOAD = "processCpuLoad";
-  /**
-   * Constant for the name of the system cpu load in % property.
-   */
-  public static final String SYSTEM_CPU_LOAD = "systemCpuLoad";
-  /**
-   * Constant for the name of the ram usage ratio property.
-   */
-  public static final String RAM_USAGE_RATIO = "ramUsedRatio";
-  /**
-   * Constant for the name of the ram usage in MB property.
-   */
-  public static final String RAM_USAGE_MB = "ramUsed";
-  /**
    * Base path for localzation bundles.
    */
   private static final String I18N_BASE = "org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider";
-  /**
-   * Convenience constants.
-   */
-  private static final long KB = 1024L, MB = KB * 1024L;
   /**
    * Reference to the platform's {@link ThreadMXBean} instance.
    */
@@ -117,6 +75,10 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
+  /**
+   * 
+   */
+  private Oshi oshi;
 
   @Override
   public void defineProperties() {
@@ -128,17 +90,26 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     setIntProperty(LIVE_THREADS_COUNT, -1);
     setDoubleProperty(PROCESS_CPU_LOAD, -1d);
     setDoubleProperty(SYSTEM_CPU_LOAD, -1d);
+    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
+    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d);
     setDoubleProperty(RAM_USAGE_RATIO, -1d);
     setDoubleProperty(RAM_USAGE_MB, -1d);
+    setDoubleProperty(SWAP_USAGE_RATIO, -1d);
+    setDoubleProperty(SWAP_USAGE_MB, -1d);
+    setDoubleProperty(CPU_TEMPERATURE, -1d);
+    setStringProperty(OS_NAME, "n/a");
+    setDoubleProperty(PROCESS_RESIDENT_SET_SIZE, -1d);
+    setDoubleProperty(PROCESS_VIRTUAL_SIZE, -1d);
   }
 
   @Override
   public void init() {
+    oshi = new Oshi().init();
   }
 
   @Override
   public TypedProperties getValues() {
-    final TypedProperties props = new TypedProperties();
+    final TypedProperties props = oshi.getValues();
     final MemoryInformation memInfo = memoryInformation();
     MemoryUsageInformation mem = memInfo.getHeapMemoryUsage();
     props.setDouble(HEAP_USAGE_RATIO, 100d * mem.getUsedRatio());
@@ -151,14 +122,6 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     props.setInt(LIVE_THREADS_COUNT, threadsMXBean.getThreadCount());
     props.setDouble(PROCESS_CPU_LOAD, 100d * osMXBeanDoubleValue("ProcessCpuLoad"));
     props.setDouble(SYSTEM_CPU_LOAD, 100d * osMXBeanDoubleValue("SystemCpuLoad"));
-    final long freeRam = osMXBeanLongValue("FreePhysicalMemorySize");
-    if (freeRam >= 0L) {
-      final long committedVirtualMemory = osMXBeanLongValue("CommittedVirtualMemorySize");
-      final long totalRam = osMXBeanLongValue("TotalPhysicalMemorySize");
-      final long ramUsed = totalRam - (freeRam + committedVirtualMemory);
-      props.setDouble(RAM_USAGE_MB, (double) ramUsed / (double) MB);
-      props.setDouble(RAM_USAGE_RATIO, 100d * ramUsed / totalRam);
-    }
     return props;
   }
 
@@ -189,21 +152,5 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
       }
     }
     return -1d;
-  }
-
-  /**
-   * Get the value of a double attribute from the OS mxbean.
-   * @param attribute the name of the attribute to get the value from.
-   * @return the attribute value as a double.
-   */
-  private static long osMXBeanLongValue(final String attribute) {
-    if (osMXBeanAvailable) {
-      try {
-        return ((Number) mbeanServer.getAttribute(osMXBeanName, attribute)).longValue();
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug("error getting attribute '{}': {}", attribute, ExceptionUtils.getMessage(e));
-      }
-    }
-    return -1L;
   }
 }

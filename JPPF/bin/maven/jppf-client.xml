@@ -6,6 +6,12 @@
       <groupId>org.jppf</groupId>
       <artifactId>jppf-jmxremote-nio</artifactId>
       <version>@version@</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.github.oshi</groupId>
+          <artifactId>oshi-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

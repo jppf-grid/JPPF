@@ -98,6 +98,7 @@
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node-${version.number}.jar,jppf-server-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar,jppf-server-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
+        <zipfileset dir="${lib}/oshi" prefix="${@{module}.prefix}/lib" includes="${oshi.inc}"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>
@@ -111,6 +112,7 @@
         <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${node.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="${JNA.inc}"/>
+        <zipfileset dir="${lib}/oshi" prefix="${@{module}.prefix}/lib" includes="${oshi.inc}"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       </module-elements>
     </package-module>

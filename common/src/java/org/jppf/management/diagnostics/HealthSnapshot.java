@@ -21,7 +21,7 @@ package org.jppf.management.diagnostics;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -112,7 +112,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO)} instead.
    */
   public double getHeapUsedRatio() {
-    return properties.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO);
+    return properties.getDouble(MonitoringConstants.HEAP_USAGE_RATIO);
   }
 
   /**
@@ -121,7 +121,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO)} instead.
    */
   public double getNonheapUsedRatio() {
-    return properties.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO);
+    return properties.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO);
   }
 
   /**
@@ -130,7 +130,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getBoolean(DefaultMonitoringDataProvider.DEADLOCKED)} instead.
    */
   public boolean isDeadlocked() {
-    return properties.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED);
+    return properties.getBoolean(MonitoringConstants.DEADLOCKED);
   }
 
   /**
@@ -139,7 +139,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getLong(DefaultMonitoringDataProvider.HEAP_USAGE_MB)} instead.
    */
   public long getHeapUsed() {
-    return properties.getLong(DefaultMonitoringDataProvider.HEAP_USAGE_MB);
+    return properties.getLong(MonitoringConstants.HEAP_USAGE_MB);
   }
 
   /**
@@ -148,7 +148,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getLong(DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB)} instead.
    */
   public long getNonheapUsed() {
-    return properties.getLong(DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB);
+    return properties.getLong(MonitoringConstants.NON_HEAP_USAGE_MB);
   }
 
   /**
@@ -157,7 +157,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getInt(DefaultMonitoringDataProvider.LIVE_THREADS_COUNT)} instead.
    */
   public int getLiveThreads() {
-    return properties.getInt(DefaultMonitoringDataProvider.LIVE_THREADS_COUNT);
+    return properties.getInt(MonitoringConstants.LIVE_THREADS_COUNT);
   }
 
   /**
@@ -166,7 +166,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD)} instead.
    */
   public double getCpuLoad() {
-    return properties.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD);
+    return properties.getDouble(MonitoringConstants.PROCESS_CPU_LOAD);
   }
 
   /**
@@ -175,7 +175,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD)} instead.
    */
   public double getSystemCpuLoad() {
-    return properties.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD);
+    return properties.getDouble(MonitoringConstants.SYSTEM_CPU_LOAD);
   }
 
   /**
@@ -184,7 +184,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO)} instead.
    */
   public double getRamUsedRatio() {
-    return properties.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO);
+    return properties.getDouble(MonitoringConstants.RAM_USAGE_RATIO);
   }
 
   /**
@@ -193,7 +193,7 @@ public class HealthSnapshot implements Serializable {
    * @deprecated use {@code getLong(DefaultMonitoringDataProvider.RAM_USAGE_MB)} instead.
    */
   public long getRamUsed() {
-    return properties.getLong(DefaultMonitoringDataProvider.RAM_USAGE_MB);
+    return properties.getLong(MonitoringConstants.RAM_USAGE_MB);
   }
 
   @Override

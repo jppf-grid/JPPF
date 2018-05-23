@@ -29,7 +29,7 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.HealthSnapshot;
-import org.jppf.management.diagnostics.provider.DefaultMonitoringDataProvider;
+import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.ui.monitoring.diagnostics.Thresholds.Name;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
@@ -81,9 +81,9 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
           final JVMHealthTreeTableModel model = (JVMHealthTreeTableModel) healthPanel.getModel();
           final String name = model.getBaseColumnName(actualCol);
           switch(name) {
-            case DefaultMonitoringDataProvider.LIVE_THREADS_COUNT:
-            case DefaultMonitoringDataProvider.DEADLOCKED:
-              if (health.getBoolean(DefaultMonitoringDataProvider.DEADLOCKED)) {
+            case MonitoringConstants.LIVE_THREADS_COUNT:
+            case MonitoringConstants.DEADLOCKED:
+              if (health.getBoolean(MonitoringConstants.DEADLOCKED)) {
                 renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
                 iconPath = CRITICAL_ICON;
                 renderer.setIconTextGap(5);
@@ -91,23 +91,23 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer {
                 renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               }
               break;
-            case DefaultMonitoringDataProvider.HEAP_USAGE_MB:
-            case DefaultMonitoringDataProvider.HEAP_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case MonitoringConstants.HEAP_USAGE_MB:
+            case MonitoringConstants.HEAP_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(MonitoringConstants.HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case DefaultMonitoringDataProvider.NON_HEAP_USAGE_MB:
-            case DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.NON_HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case MonitoringConstants.NON_HEAP_USAGE_MB:
+            case MonitoringConstants.NON_HEAP_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(MonitoringConstants.NON_HEAP_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case DefaultMonitoringDataProvider.RAM_USAGE_MB:
-            case DefaultMonitoringDataProvider.RAM_USAGE_RATIO:
-              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.RAM_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+            case MonitoringConstants.RAM_USAGE_MB:
+            case MonitoringConstants.RAM_USAGE_RATIO:
+              computeColor(renderer, table, health.getDouble(MonitoringConstants.RAM_USAGE_RATIO), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
-            case DefaultMonitoringDataProvider.PROCESS_CPU_LOAD:
-              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.PROCESS_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+            case MonitoringConstants.PROCESS_CPU_LOAD:
+              computeColor(renderer, table, health.getDouble(MonitoringConstants.PROCESS_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
-            case DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD:
-              computeColor(renderer, table, health.getDouble(DefaultMonitoringDataProvider.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+            case MonitoringConstants.SYSTEM_CPU_LOAD:
+              computeColor(renderer, table, health.getDouble(MonitoringConstants.SYSTEM_CPU_LOAD), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
               renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);

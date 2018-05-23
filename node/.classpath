@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="/JPPF/lib/ApacheCommons/commons-io-2.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
-	<classpathentry kind="lib" path="/JPPF/lib/JNA/jna-4.4.0.jar"/>
-	<classpathentry kind="lib" path="/JPPF/lib/JNA/jna-platform-4.4.0.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/JNA/jna-4.5.1.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/JNA/jna-platform-4.5.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

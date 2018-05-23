@@ -17,9 +17,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://svn.code.sf.net/p/jppf-project/code/trunk</connection>
-    <developerConnection>scm:svn:https://svn.code.sf.net/p/jppf-project/code/trunk</developerConnection>
-    <url>http://svn.code.sf.net/p/jppf-project/code/trunk</url>
+    <connection>scm:git:https://github.com/lolocohen/JPPF</connection>
+    <developerConnection>scm:git:https://github.com/lolocohen/JPPF</developerConnection>
+    <url>https://github.com/lolocohen/JPPF</url>
   </scm>
   <developers>
     <developer>
