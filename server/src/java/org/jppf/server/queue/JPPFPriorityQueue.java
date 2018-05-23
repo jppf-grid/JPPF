@@ -125,7 +125,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           queued = false;
           if (debugEnabled) log.debug("job already queued");
         }
-        if (serverJob.addBundle(clientBundle)) {
+        final boolean added;
+        if (!queued) {
+          lock.unlock();
+          serverJob.getLock().lock();
+        }
+        try {
+          added = serverJob.addBundle(clientBundle);
+        } finally {
+          if (!queued) {
+            serverJob.getLock().unlock();
+            lock.lock();
+          }
+        }
+        if (added) {
           if (!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return serverJob;
 
