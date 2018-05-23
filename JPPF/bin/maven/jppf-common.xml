@@ -52,5 +52,6 @@
       <groupId>com.github.oshi</groupId>
       <artifactId>oshi-core</artifactId>
       <version>3.5.0</version>
-    </dependency></project>
+    </dependency>
   </dependencies>
+</project>
