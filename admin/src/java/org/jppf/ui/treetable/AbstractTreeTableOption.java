@@ -42,27 +42,31 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
   /**
    * Base name for localization bundle lookups.
    */
-  protected String BASE = null;
+  protected String BASE;
   /**
    * The tree table model associated with the tree table.
    */
-  protected transient AbstractJPPFTreeTableModel model = null;
+  protected transient AbstractJPPFTreeTableModel model;
   /**
    * The root of the tree model.
    */
-  protected DefaultMutableTreeNode treeTableRoot = null;
+  protected DefaultMutableTreeNode treeTableRoot;
   /**
    * A tree table component displaying the driver and nodes information.
    */
-  protected JPPFTreeTable treeTable = null;
+  protected JPPFTreeTable treeTable;
   /**
    * Handles all actions in toolbars or popup menus.
    */
-  protected JTreeTableActionHandler actionHandler = null;
+  protected JTreeTableActionHandler actionHandler;
   /**
    * Mapping of hidden columns to their position in the tree table model.
    */
-  private final Map<Integer, TableColumn> hiddenColumns = new TreeMap<>();
+  private final Map<Integer, TableColumn> columnsMap = new TreeMap<>();
+  /**
+   * 
+   */
+  private final List<Integer> visibleColumnIndexes = new ArrayList<>();
 
   /**
    * Get the object that handles all actions in toolbars or popup menus.
@@ -121,6 +125,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * Set the columns width based on values stored as preferences.
    */
   public void setupTableColumns() {
+    for (int i=1; i<treeTable.getColumnCount(); i++) columnsMap.put(i, treeTable.getColumnModel().getColumn(i)); 
     final Preferences pref = OptionsHandler.getPreferences();
     String key = getName() + "_column_widths";
     String s = pref.get(key, null);
@@ -136,6 +141,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
         treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
       }
     }
+    /*
     key = getName() + "_hidden_columns";
     s = pref.get(key, null);
     if (s != null) {
@@ -150,6 +156,24 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
         if (pos > 0) hideColumn(pos);
       }
     }
+    */
+    key = getName() + "_visible_columns";
+    s = pref.get(key, null);
+    final List<Integer> visibleIndexes = new ArrayList<>();
+    if (s != null) {
+      final String[] posStr = RegexUtils.SPACES_PATTERN.split(s);
+      for (String str: posStr) {
+        int pos = -1;
+        try {
+          pos = Integer.valueOf(str);
+        } catch(final NumberFormatException e) {
+          log.debug(e.getMessage(), e);
+        }
+        if (pos > 0) visibleIndexes.add(pos);
+      }
+    }
+    if (!visibleIndexes.isEmpty()) restoreColumns(visibleIndexes);
+    else visibleColumnIndexes.addAll(columnsMap.keySet());
   }
 
   /**
@@ -165,12 +189,23 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
       sb.append(width);
     }
     pref.put(key, sb.toString());
+    /*
     key = getName() + "_hidden_columns";
     sb = new StringBuilder();
     int count = 0;
     for (int i=1; i<treeTable.getModel().getColumnCount(); i++) {
       if (count > 0) sb.append(' ');
       if (isColumnHidden(i)) sb.append(i);
+      count++;
+    }
+    pref.put(key, sb.toString());
+    */
+    key = getName() + "_visible_columns";
+    sb = new StringBuilder();
+    int count = 0;
+    for (final int index: visibleColumnIndexes) {
+      if (count > 0) sb.append(' ');
+      sb.append(index);
       count++;
     }
     pref.put(key, sb.toString());
@@ -193,56 +228,22 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
   }
 
   /**
-   * Hide the column with the specified position in the tree table model.
-   * @param pos the column position in the tree table model (<i>not</i> the table column model).
-   */
-  public void hideColumn(final int pos) {
-    if ((pos < 0) || (pos >= model.getColumnCount()) || hiddenColumns.containsKey(pos)) return;
-    final TableColumn col = treeTable.getColumn(pos);
-    if (col == null) return;
-    treeTable.removeColumn(col);
-    hiddenColumns.put(pos, col);
-  }
-
-  /**
-   * Restore the previously hidden columns with the specified positions in the tree table model.
-   * @param positions the positions of the columns position in the tree table model (<i>not</i> the table column model).
-   */
-  public void hideColumns(final Collection<Integer> positions) {
-    for (int n: positions) hideColumn(n);
-  }
-
-  /**
-   * Restore the previously hidden column with the specified position in the tree table model.
-   * @param pos the column position in the tree table model (<i>not</i> the table column model).
-   */
-  public void restoreColumn(final int pos) {
-    final TableColumn col = hiddenColumns.remove(pos);
-    if (col == null) return;
-    treeTable.addColumn(col);
-    final TableColumnModel tcm = treeTable.getColumnModel();
-    if (pos <= tcm.getColumnCount()) {
-      final int idx = tcm.getColumnIndex(pos);
-      tcm.moveColumn(idx, pos);
-    }
-  }
-
-  /**
-   * Restore the previously hidden columns with the specified positions in the tree table model.
-   * @param positions the positions of the columns position in the tree table model (<i>not</i> the table column model).
-   */
-  public void restoreColumns(final int[] positions) {
-    Arrays.sort(positions);
-    for (int n: positions) restoreColumn(n);
-  }
-
-  /**
    * Restore the previously hidden columns with the specified positions in the tree table model.
    * @param positions the positions of the columns position in the tree table model (<i>not</i> the table column model).
    */
   public void restoreColumns(final Collection<Integer> positions) {
-    final Set<Integer> set = new TreeSet<>(positions);
-    for (final int n: set) restoreColumn(n);
+    final TableColumnModel tcm = treeTable.getColumnModel();
+    final List<TableColumn> columns = new ArrayList<>();
+    for (int i=1; i<tcm.getColumnCount(); i++) columns.add(tcm.getColumn(i));
+    for (final TableColumn column: columns) tcm.removeColumn(column);
+    visibleColumnIndexes.clear();
+    for (final int index: positions) {
+      final TableColumn column = columnsMap.get(index);
+      if (column != null) {
+        tcm.addColumn(column);
+        visibleColumnIndexes.add(index);
+      }
+    }
   }
 
   /**
@@ -251,6 +252,6 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * @return {@code true} if the column is hidden, {@code false} otherwise.
    */
   public boolean isColumnHidden(final int pos) {
-    return hiddenColumns.containsKey(pos);
+    return !visibleColumnIndexes.contains(pos);
   }
 }

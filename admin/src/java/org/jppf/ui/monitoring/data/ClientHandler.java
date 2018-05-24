@@ -154,7 +154,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
             if (currentDriverNull) {
               final Runnable r = new Runnable() {
                 @Override public void run() {
-                  log.debug("first refreshLoadBalancer()");
+                  if (traceEnabled) log.trace("first refreshLoadBalancer()");
                   // to cancel the task
                   if (refreshLoadBalancer()) throw new IllegalStateException("");
                 }
@@ -179,7 +179,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     }
     final OptionElement lbOption = OptionsHandler.findOptionWithName(option, "LoadBalancingPanel");
     if (lbOption == null) {
-      log.debug("LoadBalancingPanel element is null");
+      if (traceEnabled) log.trace("LoadBalancingPanel element is null");
       return false;
     }
     log.debug("LoadBalancingPanel = " + lbOption);

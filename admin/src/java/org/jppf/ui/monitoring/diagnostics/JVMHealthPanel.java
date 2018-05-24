@@ -250,20 +250,4 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   public Thresholds getThresholds() {
     return StatsHandler.getInstance().getClientHandler().getThresholds();
   }
-
-  /**
-   * Hide the columns.
-   */
-  public void hideColumns() {
-    hideColumn(3);
-    hideColumn(4);
-  }
-
-  /**
-   * Restore the hidden columns.
-   */
-  public void restoreColumns() {
-    restoreColumn(3);
-    restoreColumn(4);
-  }
 }

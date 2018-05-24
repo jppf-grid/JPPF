@@ -42,7 +42,7 @@ public class PickList<T> extends JPanel {
   /**
    * Base name for the localization resource bundle.
    */
-  private static final String I18N_BASE = "org.jppf.ui.i18n.PickedList";
+  private static final String I18N_BASE = "org.jppf.ui.i18n.PickList";
   /**
    * Indicates an event for when items are added to the list of picked items.
    */
@@ -172,7 +172,7 @@ public class PickList<T> extends JPanel {
    */
   private static JButton createButton(final String name, final String iconPath, final ActionListener listener) {
     final JButton btn = new JButton();
-    final String text = LocalizationUtils.getLocalized(I18N_BASE, name);
+    final String text = LocalizationUtils.getLocalized(I18N_BASE, name + ".tooltip");
     final ImageIcon icon = GuiUtils.loadIcon(iconPath);
     if (icon != null) btn.setIcon(icon);
     if (text != null) btn.setToolTipText(text);
@@ -309,8 +309,25 @@ public class PickList<T> extends JPanel {
    * @return a list of items in the same order as in the corresponding {@link JList}.
    */
   public List<T> getPickedItems() {
+    return getItems(pickedList);
+  }
+
+  /**
+   * Get the items that were picked.
+   * @return a list of items in the same order as in the corresponding {@link JList}.
+   */
+  public List<T> getAvailableItems() {
+    return getItems(availableList);
+  }
+
+  /**
+   * Get the items from the specified JList.
+   * @param jlist the {@code JList} from which to extract the items.
+   * @return a list of items.
+   */
+  private List<T> getItems(final JList<T> jlist) {
     final List<T> list = new ArrayList<>();
-    final DefaultListModel<T> model = (DefaultListModel<T>) pickedList.getModel();
+    final DefaultListModel<T> model = (DefaultListModel<T>) jlist.getModel();
     final Enumeration<T> en = model.elements();
     while (en.hasMoreElements()) list.add(en.nextElement());
     return list;

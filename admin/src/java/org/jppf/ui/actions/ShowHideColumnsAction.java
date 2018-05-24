@@ -18,15 +18,18 @@
 
 package org.jppf.ui.actions;
 
-import java.awt.event.*;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.ui.options.OptionElement;
+import org.jppf.ui.monitoring.LocalizedListItem;
+import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.picklist.PickList;
 import org.jppf.ui.treetable.*;
-import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * Abstract superclass for all actions in the topology panel.
@@ -41,10 +44,6 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
    * Panel containing the dialog for entering the number of threads and their priority.
    */
   private OptionElement thisPanel = null;
-  /**
-   * Contains all the checkboxes for the oclumns to hide or show.
-   */
-  private final List<JCheckBox> checkboxes = new ArrayList<>();
 
   /**
    * Initialize this action.
@@ -60,58 +59,41 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     final AbstractButton btn = (AbstractButton) event.getSource();
-    if (btn.isShowing()) location = btn.getLocationOnScreen();
-    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleColumnsPanel.xml");
-    
-    JComponent columnsPanel = null;
-    final JComponent comp = OptionsHandler.findOptionWithName(thisPanel, "/show.hide.columns").getUIComponent();
-    if (comp instanceof JScrollPane) columnsPanel = (JComponent) ((JScrollPane) comp).getViewport().getView();
-    else columnsPanel = comp;
-    final TreeTableModel model = treeTableOption.getModel();
-    checkboxes.clear();
-    for (int i=0; i<model.getColumnCount(); i++) {
-      final JCheckBox checkbox = new JCheckBox(model.getColumnName(i));
-      if (i == 0) {
-        checkbox.setSelected(true);
-        checkbox.setEnabled(false);
-      } else checkbox.setSelected(!treeTableOption.isColumnHidden(i));
-      checkboxes.add(checkbox);
-      columnsPanel.add(checkbox);
+    location = ((btn != null) && btn.isShowing()) ? location = btn.getLocationOnScreen() : new Point(0, 0);
+    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), LocalizationUtils.getLocalized(BASE, "visible.columns.panel.label"), false);
+    final PickListOption option = (PickListOption) thisPanel.findFirstWithName("visible.stats.selection");
+    final PickList<Object> pickList = option.getPickList();
+    pickList.setLeftTitle(LocalizationUtils.getLocalized(BASE, "visible.columns.left.title"));
+    pickList.setRightTitle(LocalizationUtils.getLocalized(BASE, "visible.columns.right.title"));
+    final AbstractJPPFTreeTableModel model = treeTableOption.getModel();
+    final List<LocalizedListItem> allItems = new ArrayList<>();
+    final List<LocalizedListItem> visibleItems = new ArrayList<>();
+    for (int i=1; i<model.getColumnCount(); i++) {
+      final LocalizedListItem item = new LocalizedListItem(model.getBaseColumnName(i), i, model.getColumnName(i), model.getColumnTooltip(i));
+      allItems.add(item);
+      if (!treeTableOption.isColumnHidden(i)) visibleItems.add(item);
     }
-
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("show.hide.label"), false);
-    dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
-    final JButton applyBtn = (JButton) thisPanel.findFirstWithName("/show.hide.apply").getUIComponent();
+    option.populate(new ArrayList<Object>(allItems), new ArrayList<Object>(visibleItems));
+    final JButton applyBtn = (JButton) thisPanel.findFirstWithName("/visible.stats.apply").getUIComponent();
     final AbstractAction applyAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        doApply();
+        final List<Object> picked = pickList.getPickedItems();
+        final List<LocalizedListItem> visibleItems = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
+        for (final Object o: picked) visibleItems.add((LocalizedListItem) o);
+        applyVisibleColumns(visibleItems);
       }
     };
     applyBtn.addActionListener(applyAction);
-    final JButton closeBtn = (JButton) thisPanel.findFirstWithName("/show.hide.close").getUIComponent();
+    final JButton closeBtn = (JButton) thisPanel.findFirstWithName("/visible.stats.close").getUIComponent();
     final AbstractAction closeAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
-        checkboxes.clear();
       }
     };
     closeBtn.addActionListener(closeAction);
-    setOkCancelKeys(thisPanel, applyAction, closeAction);
-    final JButton selectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.select.all").getUIComponent();
-    selectAllBtn.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        for (JCheckBox checkbox: checkboxes) if (checkbox.isEnabled()) checkbox.setSelected(true);
-      }
-    });
-    final JButton unselectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.unselect.all").getUIComponent();
-    unselectAllBtn.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        for (JCheckBox checkbox: checkboxes) if (checkbox.isEnabled()) checkbox.setSelected(false);
-      }
-    });
+    AbstractUpdatableAction.setOkCancelKeys(thisPanel, applyAction, closeAction);
     dialog.getContentPane().add(thisPanel.getUIComponent());
     dialog.pack();
     dialog.setLocationRelativeTo(null);
@@ -120,16 +102,12 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
   }
 
   /**
-   * Perform the apply action.
+   * 
+   * @param visibleItems the items selected in the pick list.
    */
-  private void doApply() {
-    for (int i=1; i<checkboxes.size(); i++) {
-      final JCheckBox checkbox = checkboxes.get(i);
-      if (checkbox.isSelected()) {
-        if (treeTableOption.isColumnHidden(i)) treeTableOption.restoreColumn(i);
-      } else {
-        if (!treeTableOption.isColumnHidden(i)) treeTableOption.hideColumn(i);
-      }
-    }
+  private void applyVisibleColumns(final List<LocalizedListItem> visibleItems) {
+    final List<Integer> visiblePositions = new ArrayList<>(visibleItems.size());
+    for (final LocalizedListItem item: visibleItems) visiblePositions.add(item.getIndex());
+    treeTableOption.restoreColumns(visiblePositions);
   }
 }
