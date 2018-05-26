@@ -64,6 +64,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    */
   public ClientClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, driver, useSSL);
+    if (debugEnabled) log.debug("created {}", this);
   }
 
   @Override
@@ -78,6 +79,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
 
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
+    if (debugEnabled) log.debug("performing postAccept of {}", channel);
     try {
       if (!channel.getContext().isPeer()) {
         synchronized(channel) {
@@ -90,6 +92,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
       else log.warn(ExceptionUtils.getMessage(e));
       closeConnection(channel);
     }
+    if (debugEnabled) log.debug("finished postAccept of {}", channel);
   }
 
   /**

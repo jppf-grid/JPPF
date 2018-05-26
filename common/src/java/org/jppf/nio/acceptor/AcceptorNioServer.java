@@ -186,7 +186,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   @Override
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object...params) throws Exception {
-    if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
+    if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", this, channel, ssl);
     final AcceptorContext context = (AcceptorContext) createNioContext(serverSocketChannel);
     context.setPeer(peer);
     context.setState(AcceptorState.IDENTIFYING_PEER);

@@ -27,7 +27,8 @@ import org.jppf.management.diagnostics.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class performs periodic deadlock checks and prints detailed deadlock information,
+ * along with a thread dump, to the log, the first time a deadlock is detetced.
  * @author Laurent Cohen
  */
 public class DeadlockDetector {
@@ -44,19 +45,28 @@ public class DeadlockDetector {
    */
   private static boolean deadlockDetected = false;
   /**
-   * 
+   * This timer periodically executes a task that checks whether a deadlock has occurred.
    */
   private static Timer timer;
   /**
-   * 
+   * The diagnostics MBean proxy.
    */
   private static DiagnosticsMBean diag;
 
   /**
-   * 
+   * Start the periodic deadlock checks.
    * @param type the type of JPPF component, either "driver" or "node".
    */
-  public synchronized static void setup(final String type) {
+  public static void setup(final String type) {
+    setup(type, 2000L);
+  }
+
+  /**
+   * Start the periodic deadlock checks.
+   * @param type the type of JPPF component, either "driver" or "node".
+   * @param interval interval between 2 checks in millis.
+   */
+  public synchronized static void setup(final String type, final long interval) {
     if (alreadyRun) return;
     alreadyRun = true;
     System.out.println("setting up " + type + " deadlock detector");
@@ -101,7 +111,7 @@ public class DeadlockDetector {
   }
 
   /**
-   * 
+   * Cancel and clear the timer.
    */
   private synchronized static void reset() {
     if (timer != null) {
@@ -131,9 +141,9 @@ public class DeadlockDetector {
   }
 
   /**
-   * 
-   * @param info .
-   * @return .
+   * Print details of the specified thread, including monitors and locks, into a string.
+   * @param info the thread info to print.
+   * @return a formatted plain text string with the thread details.
    */
   public static String printThreadInfo(final ThreadInfo info) {
     final StringWriter sw = new StringWriter();

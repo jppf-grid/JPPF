@@ -37,7 +37,10 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(2, 2, true, false, createConfig("ssl2_p2p"));
+    final TestConfiguration config = createConfig("ssl2_p2p");
+    config.driverLog4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
+    config.nodeLog4j = "classes/tests/config/ssl2_p2p/log4j-node.template.properties";
+    client = BaseSetup.setup(2, 2, true, false, config);
   }
 
   /**

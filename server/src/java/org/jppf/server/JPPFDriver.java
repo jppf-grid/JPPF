@@ -179,7 +179,7 @@ public class JPPFDriver {
   public void run() throws Exception {
     if (debugEnabled) log.debug("starting JPPF driver");
     final JPPFConnectionInformation info = initializer.getConnectionInformation();
-    initializer.registerDebugMBean();
+    initializer.handleDebugActions();
     initializer.initRecoveryServer();
 
     final RecoveryServer recoveryServer = initializer.getRecoveryServer();

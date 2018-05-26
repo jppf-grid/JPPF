@@ -348,7 +348,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object...params) throws Exception {
-    if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
+    if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", this, channel, ssl);
     final NioContext<?> context = createNioContext(params);
     context.setPeer(peer);
     SelectionKey selKey = null;
@@ -369,9 +369,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     if (ssl && (sslHandler == null) && (sslContext != null)) {
       if (debugEnabled) log.debug("creating SSLEngine for  {}", wrapper);
       final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
+      if (debugEnabled) log.debug("configuring SSLEngine");
       configureSSLEngine(engine);
+      if (debugEnabled) log.debug("setting SSLHandler");
       context.setSSLHandler(new SSLHandlerImpl(wrapper, engine));
     }
+    if (debugEnabled) log.debug("{} calling postAccept()", this);
     postAccept(wrapper);
     return wrapper;
   }

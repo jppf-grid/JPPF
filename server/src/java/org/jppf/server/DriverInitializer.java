@@ -42,7 +42,7 @@ import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
@@ -135,8 +135,10 @@ public class DriverInitializer {
   /**
    * Register the MBean that collects debug/troubleshooting information.
    */
-  void registerDebugMBean() {
+  void handleDebugActions() {
     if (JPPFDriver.JPPF_DEBUG) {
+      if (debugEnabled) log.debug("registering deadlock detector");
+      DeadlockDetector.setup("driver");
       if (debugEnabled) log.debug("registering debug mbean");
       try {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
