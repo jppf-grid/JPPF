@@ -28,8 +28,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
 	<classpathentry kind="lib" path="/JPPF/lib/log4j/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/LZ4/lz4-1.3.0.jar"/>
-	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
-	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/javax.servlet-3.0.0.v201112011016.jar">
@@ -42,5 +40,7 @@
 	<classpathentry kind="lib" path="lib/wicket-jquery-ui-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-jquery-ui-core-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-jquery-ui-theme-start-7.4.0.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-log4j12-1.7.25.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

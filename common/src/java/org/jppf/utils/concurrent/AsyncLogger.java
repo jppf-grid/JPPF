@@ -68,7 +68,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void debug(final Marker arg0, final String arg1, final Object[] arg2) {
+  public void debug(final Marker arg0, final String arg1, final Object...arg2) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.debug(arg0, arg1, arg2);
@@ -113,7 +113,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void debug(final String arg0, final Object[] arg1) {
+  public void debug(final String arg0, final Object...arg1) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.debug(arg0, arg1);
@@ -158,7 +158,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void error(final Marker arg0, final String arg1, final Object[] arg2) {
+  public void error(final Marker arg0, final String arg1, final Object...arg2) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.error(arg0, arg1, arg2);
@@ -203,7 +203,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void error(final String arg0, final Object[] arg1) {
+  public void error(final String arg0, final Object...arg1) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.error(arg0, arg1);
@@ -253,7 +253,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void info(final Marker arg0, final String arg1, final Object[] arg2) {
+  public void info(final Marker arg0, final String arg1, final Object...arg2) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.info(arg0, arg1, arg2);
@@ -298,7 +298,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void info(final String arg0, final Object[] arg1) {
+  public void info(final String arg0, final Object...arg1) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.info(arg0, arg1);
@@ -393,7 +393,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void trace(final Marker arg0, final String arg1, final Object[] arg2) {
+  public void trace(final Marker arg0, final String arg1, final Object...arg2) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.trace(arg0, arg1, arg2);
@@ -438,7 +438,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void trace(final String arg0, final Object[] arg1) {
+  public void trace(final String arg0, final Object...arg1) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.trace(arg0, arg1);
@@ -483,7 +483,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void warn(final Marker arg0, final String arg1, final Object[] arg2) {
+  public void warn(final Marker arg0, final String arg1, final Object...arg2) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.warn(arg0, arg1, arg2);
@@ -528,7 +528,7 @@ public class AsyncLogger implements Logger {
   }
 
   @Override
-  public void warn(final String arg0, final Object[] arg1) {
+  public void warn(final String arg0, final Object...arg1) {
     executor.execute(new Runnable() {
       @Override public void run() {
         delegate.warn(arg0, arg1);

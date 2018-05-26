@@ -40,7 +40,7 @@
     <pathelement location="${config.dir}"/>
     <fileset dir="${basedir}/lib" includes="*.jar"/>
     <fileset dir="${shared.lib}" includes="jppf-common*.jar"/>
-    <pathelement location="${shared.lib}/slf4j-api-1.6.1-.jar"/>
+    <pathelement location="${shared.lib}/slf4j-api-1.7.25.jar"/>
   </path>
 
   <path id="javadoc.classpath">

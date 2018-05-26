@@ -339,8 +339,8 @@
           <include name="jppf-jmxremote-nio-${version.number}.jar" />
           <include name="jppf-jmxremote_optional-1.2.jar" />
           <include name="lz4-1.3.0.jar" />
-          <include name="slf4j-api-1.6.1.jar" />
-          <include name="slf4j-${logging}-1.6.1.jar" />
+          <include name="slf4j-api-1.7.25.jar" />
+          <include name="slf4j-${logging}-1.7.25.jar" />
           <jppflibs-patterns/>
         </zipfileset>
       </jar>

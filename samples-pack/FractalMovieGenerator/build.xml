@@ -128,8 +128,8 @@
         <include name="jppf-common*.jar"/>
         <include name="jppf-server*.jar"/>
         <include name="log4j-1.2.15.jar"/>
-        <include name="slf4j-api-1.6.1.jar"/>
-        <include name="slf4j-log4j12-1.6.1.jar"/>
+        <include name="slf4j-api-1.7.25.jar"/>
+        <include name="slf4j-log4j12-1.7.25.jar"/>
         <include name="jppf-jmxremote_optional-1.2.jar"/>
     	</zipfileset>
       <zipfileset dir="${basedir}" includes="MandelbrotMovieGenerator.jar" prefix="${prefix}/lib"/>
@@ -152,8 +152,8 @@
         <include name="jppf-common*.jar"/>
         <include name="jppf-server*.jar"/>
         <include name="log4j-1.2.15.jar"/>
-        <include name="slf4j-api-1.6.1.jar"/>
-        <include name="slf4j-log4j12-1.6.1.jar"/>
+        <include name="slf4j-api-1.7.25.jar"/>
+        <include name="slf4j-log4j12-1.7.25.jar"/>
         <include name="jppf-jmxremote_optional-1.2.jar"/>
       </tarfileset>
       <tarfileset dir="${basedir}" includes="MandelbrotMovieGenerator.jar" prefix="${prefix}/lib"/>

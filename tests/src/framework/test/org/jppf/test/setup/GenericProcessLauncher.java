@@ -134,8 +134,8 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
     addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     final String libDir = "../JPPF/lib/";
-    addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
-    addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
+    addClasspathElement(libDir + "slf4j/slf4j-api-1.7.25.jar");
+    addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.7.25.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "LZ4/lz4-1.3.0.jar");
     addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");

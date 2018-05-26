@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <ClassPath Path="../client/classes"/>
   <ClassPath Path="../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
   <ClassPath Path="../JPPF/lib/LZ4/lz4-1.3.0.jar"/>
-  <ClassPath Path="../JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
+  <ClassPath Path="../JPPF/lib/slf4j/slf4j-api-1.7.25.jar"/>
   <ClassPath Path="@jni4net.home@/lib/jni4net.j-@jni4net.version@.jar"/>
     
   <!-- List of Java classes which should have proxy generated -->

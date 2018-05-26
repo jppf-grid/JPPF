@@ -44,8 +44,6 @@
 	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
-	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
-	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/transactions-essentials-all.jar" sourcepath="C:/ftp/dev/Database/Atomikos/AtomikosTransactionsEssentials-3.7.0M5/sources"/>
@@ -71,5 +69,7 @@
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.22-all.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.26.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote-nio"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.7.25.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

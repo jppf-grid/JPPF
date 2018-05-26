@@ -67,8 +67,8 @@
     <pathelement location="${lib}/Groovy/groovy-all-1.6.5.jar"/>
     <pathelement location="${lib}/LZ4/lz4-1.3.0.jar"/>
     <pathelement location="${lib}/HikariCP/HikariCP-java7-2.4.11.jar"/>
-    <pathelement location="${lib}/slf4j/slf4j-api-1.6.1.jar"/>
-    <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-log4j12-1.7.25.jar"/>
     <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
     <pathelement location="${lib}/JUnit/junit-4.10.jar"/>
     <fileset dir="${lib}/JNA" includes="*.jar"/>
