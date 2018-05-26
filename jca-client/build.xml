@@ -46,6 +46,7 @@
   <property name="wildfly8" value="Wildfly-8" />
   <property name="sunas" value="Glassfish" />
   <property name="weblogic" value="Weblogic" />
+  <property name="openliberty" value="OpenLiberty" />
 
   <!-- ==================================================================== -->
   <!--                           Classpath definitions                      -->
@@ -191,6 +192,7 @@
     <build.ear appserver="${sunas}" />
     <build.ear appserver="${was}" />
     <build.ear appserver="${weblogic}" />
+    <build.ear appserver="${openliberty}" />
     <!-- ***** add EAR generation for other application servers here  ***** -->
     <!-- ***** end of add other                                       ***** -->
     <echo message="EAR files created" />
@@ -280,6 +282,11 @@
     <rar appserver="${sunas}"/>
     <rar appserver="${was}"/>
     <rar appserver="${weblogic}"/>
+    <rar appserver="${openliberty}" logging="log4j12">
+      <jppflibs-patterns>
+        <include name="log4j*.jar" />
+      </jppflibs-patterns>
+    </rar>
     <!-- ***** add RAR generation for other application servers here  ***** -->
     <!-- ***** end of add other                                       ***** -->
     <echo message="RAR files created" />
@@ -337,10 +344,10 @@
           <include name="jppf-common-${version.number}.jar" />
           <include name="jppf-client-${version.number}.jar" />
           <include name="jppf-jmxremote-nio-${version.number}.jar" />
-          <include name="jppf-jmxremote_optional-1.2.jar" />
+          <include name="jppf-jmxremote_optional-1.2.1.jar" />
           <include name="lz4-1.3.0.jar" />
-          <include name="slf4j-api-1.7.25.jar" />
-          <include name="slf4j-${logging}-1.7.25.jar" />
+          <include name="slf4j-api-*.jar" />
+          <include name="slf4j-@{logging}-*.jar" />
           <jppflibs-patterns/>
         </zipfileset>
       </jar>

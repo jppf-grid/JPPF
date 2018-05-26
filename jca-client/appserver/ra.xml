@@ -20,17 +20,18 @@
 
         <!-- JPPF Client Configuration -->
         <config-property>
-          <description>Defines how the JPPF configuration is to be located.
-            This property is defined in the format "type|path", where "type" can be one of:
-            - "classpath": in this case "path" is a path to a properties file in one of the jars of the .rar file
-              example: "classpath|resources/config/jppf.properties"
-            - "url": "path" is a url that points to a properties file
-              example: "url|file:///home/me/jppf/jppf.properties" (could be a http:// or ftp:// url as well)
-            - "file": "path" is considered a path on the file system
-              example: "file|/home/me/jppf/config/jppf.properties"
-            When an invalid value, or a value that points to a non-existent configuration file, is specified for this,
-            "classpath|jppf.properties" is used, to specify the jppf.properties file at the root of jppf-jca.jar in the rar file. 
-          </description>
+          <description>Defines how the JPPF configuration is to be located.</description>
+          <!--
+          This property is defined in the format "type|path", where "type" can be one of:
+          - "classpath": in this case "path" is a path to a properties file in one of the jars of the .rar file
+            example: "classpath|resources/config/jppf.properties"
+          - "url": "path" is a url that points to a properties file
+            example: "url|file:///home/me/jppf/jppf.properties" (could be a http:// or ftp:// url as well)
+          - "file": "path" is considered a path on the file system
+            example: "file|/home/me/jppf/config/jppf.properties"
+          When an invalid value, or a value that points to a non-existent configuration file, is specified for this,
+          "classpath|jppf.properties" is used, to specify the jppf.properties file at the root of jppf-jca.jar in the rar file.
+          --> 
           <config-property-name>ConfigurationSource</config-property-name>
           <config-property-type>java.lang.String</config-property-type>
           <config-property-value>classpath|jppf.properties</config-property-value>
