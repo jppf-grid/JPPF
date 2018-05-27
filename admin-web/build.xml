@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="WebAdminConsole" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="WebAdminConsole" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant" xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ==================================================================== -->
   <!-- Property definitions                                                 -->
@@ -149,6 +149,8 @@
   <target name="maven" depends="maven.init, jar, maven.generate" description=""/>
   
   <target name="maven.init" depends="">
+    <echoprop name="maven.staging"/>
+    <echoprop name="maven.nopublish"/>
     <delete dir="${maven.dist}" quiet="true" includes="*.jar,pom.xml"/>
     <mkdir dir="${maven.dist}"/>
     <property file="${user.home}/gpg-passphrase.txt"/>
@@ -158,27 +160,29 @@
     <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
     <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
     <property name="pom.file" value="${maven.dist}/pom.xml"/>
-    <condition property="maven.snapshot">
-      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
-    </condition>
   </target>
   
   <target name="maven.generate" depends="">
     <property name="artifactId" value="${module.name}"/>
+    <local name="artifact.prefix"/>
     <property name="artifact.prefix" value="${artifactId}-${version.number}"/>
+    <echoprop name="artifact.prefix"/>
     <copy file="${basedir}/pom.xml" toFile="${pom.file}"/>
+    <local name="maven.version"/>
+    <property name="maven.version" value="${version.number}-SNAPSHOT" unless:true="${maven.staging}"/>
+    <property name="maven.version" value="${version.number}" if:true="${maven.staging}"/>
     <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
     <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
-    <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
-    <antcall target="maven.staging"> <param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+    <antcall target="publish.maven.snapshot" unless:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+    <antcall target="publish.maven.staging" if:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
   </target>
   
-  <target name="maven.snapshot" depends="" if="maven.snapshot">
-    <echo message="deploying to SNAPSHOT repository !!!"/>
+  <target name="publish.maven.snapshot" depends="">
+    <echo message="deploying ${maven-jar} to SNAPSHOT repository !!!"/>
     <copy file="${maven-jar}.war" toFile="${maven-jar}-SNAPSHOT.war"/>
     <copy file="${maven-jar}-sources.jar" toFile="${maven-jar}-SNAPSHOT-sources.jar"/>
     <copy file="${maven-jar}-javadoc.jar" toFile="${maven-jar}-SNAPSHOT-javadoc.jar"/>
-    <artifact:mvn failonerror="true">
+    <artifact:mvn failonerror="true" unless:true="${maven.nopublish}">
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
       <arg value="-Durl=${maven-snapshots-repository-url}" />
       <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
@@ -192,9 +196,9 @@
     <delete dir="${maven.dist}" quiet="true" includes="**/*SNAPSHOT*.*"/>
   </target>
   
-  <target name="maven.staging" depends="" unless="maven.snapshot">
-    <echo message="deploying to STAGING repository !!!"/>
-    <artifact:mvn failonerror="true">
+  <target name="publish.maven.staging" depends="">
+    <echo message="deploying ${maven-jar} to STAGING repository !!!"/>
+    <artifact:mvn failonerror="true" unless:true="${maven.nopublish}">
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
       <arg value="-Durl=${maven-staging-repository-url}" />
       <arg value="-DrepositoryId=${maven-staging-repository-id}" />
@@ -299,6 +303,22 @@
   <target name="glassfish.build.deploy.start" depends="build, glassfish.start, glassfish.deploy" description="generate and deploy the war file and start Glassfish"/>
   <target name="liberty.build.deploy.start" depends="build, liberty.deploy, liberty.start" description="generate and deploy the war file and start Liberty"/>
   <target name="weblogic.build.deploy.start" depends="build, weblogic.deploy, weblogic.start" description="generate and deploy the war file and start Weblogic"/>
+
+  <!-- ========================================================================= -->
+  <!--  Macrodef utilities                                                       -->
+  <!-- ========================================================================= -->
+  
+  <!--
+    Display the name and value of a property in the form "name = value".
+    Parameters:
+      - propname: the name of the property to display to the output console
+  -->
+  <macrodef name="echoprop">
+  <attribute name="name"/>
+    <sequential>
+      <echo message="@{name} = ${@{name}}"/>
+    </sequential>
+  </macrodef>
 
   <!-- =====================================================================-->
   <!-- Deployment and start/stop of various servers                         -->

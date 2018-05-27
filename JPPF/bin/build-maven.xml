@@ -19,7 +19,7 @@
 <!--
 <project name="JPPF-Maven" basedir="..">
 -->
-<project name="JPPF-Maven" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="JPPF-Maven" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant" xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <path id="maven-ant-tasks.classpath" path="${lib}/maven/maven-ant-tasks-2.1.3.jar"/>
   <echo message="maven tasks classpath = ${lib}/maven/maven-ant-tasks-2.1.3.jar"/>
@@ -37,6 +37,8 @@
     The passphrase itself is defined as a property: gpg.pass = <passphrase>
   -->
   <target name="maven.init" depends="">
+    <echoprop name="maven.staging"/>
+    <echoprop name="maven.nopublish"/>
     <property name="maven.dist" value="${build}/maven"/>
     <echoprop name="maven.dist"/>
     <delete dir="${maven.dist}" quiet="true"/>
@@ -50,14 +52,11 @@
     <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
     <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
     <property name="pom.file" value="${maven.dist}/pom.xml"/>
-    <condition property="maven.snapshot">
-      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
-    </condition>
   </target>
 
   <target name="maven.generate" depends="maven.init">
-    <maven.artifacts.module module="${node}" file="node"/>
     <maven.artifacts.module module="${common}" file="common"/>
+    <maven.artifacts.module module="${node}" file="node"/>
     <maven.artifacts.module module="${jmxremote-nio}" file="jmxremote-nio"/>
     <maven.artifacts.module module="${client}" file="client"/>
     <maven.artifacts.module module="${server}" file="server"/>
@@ -83,8 +82,12 @@
         <not><available file="${maven.dist.javadoc}" type="dir"/></not>
       </waitfor>
       <mkdir dir="${maven.dist.javadoc}"/>
+      <local name="maven.version"/>
+      <property name="maven.version" value="${version.number}-SNAPSHOT" unless:true="${maven.staging}"/>
+      <property name="maven.version" value="${version.number}" if:true="${maven.staging}"/>
       <local name="artifact.prefix"/>
       <property name="artifact.prefix" value="${artifactId}-${maven.version}"/>
+      <echoprop name="artifact.prefix"/>
       <!-- generate the javadoc -->
       <javadoc destdir="${maven.dist.javadoc}" access="protected" Windowtitle="JPPF"
         packagenames="**/*.*" classpathref="javadoc.classpath" stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
@@ -127,15 +130,15 @@
       <jar jarfile="${maven.dist}/@{file}-bundle.jar">
         <fileset dir="${maven.dist}" includes="jppf-@{file}*.*,pom.xml"/>
       </jar>
-      <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
-      <antcall target="maven.staging"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+      <antcall target="publish.maven.snapshot" unless:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+      <antcall target="publish.maven.staging" if:true="${maven.staging}"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
       <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
     </sequential>
   </macrodef>
 
-  <target name="maven.snapshot" depends="" if="maven.snapshot">
-    <echo message="deploying to SNAPSHOT repository !!!"/>
-    <artifact:mvn failonerror="true">
+  <target name="publish.maven.snapshot" depends="">
+    <echo message="deploying ${maven-jar} to SNAPSHOT repository !!!"/>
+    <artifact:mvn failonerror="true" unless:true="${maven.nopublish}">
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
       <arg value="-Durl=${maven-snapshots-repository-url}" />
       <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
@@ -147,9 +150,9 @@
     </artifact:mvn>
   </target>
 
-  <target name="maven.staging" depends="" unless="maven.snapshot">
-    <echo message="deploying to STAGING repository !!!"/>
-    <artifact:mvn failonerror="true">
+  <target name="publish.maven.staging" depends="">
+    <echo message="deploying ${maven-jar} to STAGING repository !!!"/>
+    <artifact:mvn failonerror="true" unless:true="${maven.nopublish}">
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
       <arg value="-Durl=${maven-staging-repository-url}" />
       <arg value="-DrepositoryId=${maven-staging-repository-id}" />

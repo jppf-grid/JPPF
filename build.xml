@@ -40,9 +40,17 @@
 
   <target name="maven" description="publish all maven artifacts">
     <echo message="Publishing JPPF maven artifacts"/>
-    <ant dir="JPPF/bin" target="maven.artifacts" useNativeBasedir="true"/>
+    <ant dir="JPPF/bin" target="maven.artifacts" useNativeBasedir="true">
+      <property name="maven.staging" value="${staging}"/>
+      <property name="maven.nopublish" value="${maven.test}"/>
+    </ant>
+    <!--
     <ant dir="jmxremote" target="maven" useNativeBasedir="true"/>
-    <ant dir="admin-web" target="maven" useNativeBasedir="true"/>
+    -->
+    <ant dir="admin-web" target="maven" useNativeBasedir="true">
+      <property name="maven.staging" value="${staging}"/>
+      <property name="maven.nopublish" value="${maven.test}"/>
+    </ant>
   </target>
 
   <target name="test" description="run all tests">
