@@ -32,9 +32,9 @@ import oshi.software.os.*;
  */
 public class Oshi {
   /**
-   * Entry point to Oshi.
+   * Entry point to Oshi API.
    */
-  private SystemInfo si;
+  private static SystemInfo si;
   /**
    * Provides access to hardware components.
    */
@@ -61,7 +61,7 @@ public class Oshi {
    * @return this object, for method call chaining.
    */
   public Oshi init() {
-    si = new SystemInfo();
+    final SystemInfo si = getSystemInfo();
     hal = si.getHardware();
     os = si.getOperatingSystem();
     sensors = hal.getSensors();
@@ -88,5 +88,13 @@ public class Oshi {
     props.setDouble(PROCESS_RESIDENT_SET_SIZE, (double) process.getResidentSetSize() / MB);
     props.setDouble(PROCESS_VIRTUAL_SIZE, (double) process.getVirtualSize() / MB);
     return props;
+  }
+
+  /**
+   * @return the entry point to Oshi API.
+   */
+  public static synchronized SystemInfo getSystemInfo() {
+    if (si == null) si = new SystemInfo();
+    return si;
   }
 }
