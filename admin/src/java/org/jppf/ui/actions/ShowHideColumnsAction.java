@@ -72,7 +72,13 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     for (int i=1; i<model.getColumnCount(); i++) {
       final LocalizedListItem item = new LocalizedListItem(model.getBaseColumnName(i), i, model.getColumnName(i), model.getColumnTooltip(i));
       allItems.add(item);
-      if (!treeTableOption.isColumnHidden(i)) visibleItems.add(item);
+    }
+    final List<Integer> visibleIndexes = treeTableOption.getVisibleColumnIndexes();
+    for (int i=0; i<visibleIndexes.size(); i++) {
+      final int index = visibleIndexes.get(i);
+      //final LocalizedListItem item = new LocalizedListItem(model.getBaseColumnName(index), index, model.getColumnName(index), model.getColumnTooltip(index));
+      final LocalizedListItem item = allItems.get(index - 1);
+      visibleItems.add(item);
     }
     option.populate(new ArrayList<Object>(allItems), new ArrayList<Object>(visibleItems));
     final JButton applyBtn = (JButton) thisPanel.findFirstWithName("/visible.stats.apply").getUIComponent();

@@ -111,7 +111,7 @@
 				</script>
 			</initializer>
 			<finalizer type="script">
-				<script language="groovy">option.saveTableColumnsWidth();</script>
+				<script language="groovy">option.saveTableColumnsSettings();</script>
 			</finalizer>
 		</child>
 

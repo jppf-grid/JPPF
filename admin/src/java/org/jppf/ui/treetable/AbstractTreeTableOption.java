@@ -64,7 +64,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    */
   private final Map<Integer, TableColumn> columnsMap = new TreeMap<>();
   /**
-   * 
+   * Positions of the visible table columns represented by their index in the tree table model.
    */
   private final List<Integer> visibleColumnIndexes = new ArrayList<>();
 
@@ -141,22 +141,6 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
         treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
       }
     }
-    /*
-    key = getName() + "_hidden_columns";
-    s = pref.get(key, null);
-    if (s != null) {
-      final String[] posStr = RegexUtils.SPACES_PATTERN.split(s);
-      for (String str: posStr) {
-        int pos = -1;
-        try {
-          pos = Integer.valueOf(str);
-        } catch(final NumberFormatException e) {
-          log.debug(e.getMessage(), e);
-        }
-        if (pos > 0) hideColumn(pos);
-      }
-    }
-    */
     key = getName() + "_visible_columns";
     s = pref.get(key, null);
     final List<Integer> visibleIndexes = new ArrayList<>();
@@ -179,7 +163,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
   /**
    * Set the columns width based on values stored as preferences.
    */
-  public void saveTableColumnsWidth() {
+  public void saveTableColumnsSettings() {
     final Preferences pref = OptionsHandler.getPreferences();
     String key = getName() + "_column_widths";
     StringBuilder sb = new StringBuilder();
@@ -189,17 +173,6 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
       sb.append(width);
     }
     pref.put(key, sb.toString());
-    /*
-    key = getName() + "_hidden_columns";
-    sb = new StringBuilder();
-    int count = 0;
-    for (int i=1; i<treeTable.getModel().getColumnCount(); i++) {
-      if (count > 0) sb.append(' ');
-      if (isColumnHidden(i)) sb.append(i);
-      count++;
-    }
-    pref.put(key, sb.toString());
-    */
     key = getName() + "_visible_columns";
     sb = new StringBuilder();
     int count = 0;
@@ -253,5 +226,12 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    */
   public boolean isColumnHidden(final int pos) {
     return !visibleColumnIndexes.contains(pos);
+  }
+
+  /**
+   * @return the positions of the visible table columns represented by their index in the tree table model.
+   */
+  public List<Integer> getVisibleColumnIndexes() {
+    return visibleColumnIndexes;
   }
 }

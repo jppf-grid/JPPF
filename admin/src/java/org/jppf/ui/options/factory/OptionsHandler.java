@@ -423,7 +423,7 @@ public final class OptionsHandler {
       JVMHealthPanel panel = null;
       for (final String name: names) {
         final AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
-        if (option != null) option.saveTableColumnsWidth();
+        if (option != null) option.saveTableColumnsSettings();
         if ("/health.treetable".equals(name)) panel = (JVMHealthPanel) option;
       }
       if (panel != null) panel.saveThresholds();
