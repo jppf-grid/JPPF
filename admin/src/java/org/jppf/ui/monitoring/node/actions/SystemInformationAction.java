@@ -51,7 +51,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
   public SystemInformationAction() {
     BASE = "org.jppf.ui.i18n.SystemInfoPage";
     setupIcon("/org/jppf/ui/resources/info.gif");
-    setupNameAndTooltip("show.information");
+    setupNameAndTooltip("system.show.information");
   }
 
   /**
