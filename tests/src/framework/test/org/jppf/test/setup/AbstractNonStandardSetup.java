@@ -81,11 +81,11 @@ public class AbstractNonStandardSetup extends BaseTest {
     testConfig.driverJppf = dir + "/driver.properties";
     testConfig.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     testConfig.driverClasspath = driverCP;
-    testConfig.driverJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-driver.properties");
+    testConfig.driverJvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-driver.properties");
     testConfig.nodeJppf = dir + "/node.properties";
     testConfig.nodeLog4j = "classes/tests/config/log4j-node.template.properties";
     testConfig.nodeClasspath = commonCP;
-    testConfig.nodeJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-node1.properties");
+    testConfig.nodeJvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-node1.properties");
     testConfig.clientConfig = dir + "/client.properties";
     return testConfig;
   }
