@@ -1,5 +1,12 @@
 @echo off
 
+:: Repeat the specified tests a specified number of times
+:: and stop at the first failure, if any
+::
+:: Parameters:
+:: %1 is an Ant fileset pattern for the tests to execute
+:: %2 is the number of repeats
+
 echo start time: %TIME% > time.tmp
 
 del /F /Q logs\*.zip > nul
