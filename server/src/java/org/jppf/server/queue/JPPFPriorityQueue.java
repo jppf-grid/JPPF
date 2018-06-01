@@ -102,44 +102,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (sla.isBroadcastJob()) {
         if (debugEnabled) log.debug("before processing broadcast job {}", header);
         broadcastManager.processBroadcastJob(clientBundle);
-      } else {
-        final boolean queued;
+      } else {  
+        final boolean newJob;
         serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
-          final int n = header.getTaskCount();
-          header.setDriverQueueTaskCount(n);
-          queued = true;
-          serverJob = new ServerJob(new ReentrantLock(), jobManager, header, clientBundle.getDataProvider());
-          jobManager.jobQueued(serverJob);
-          serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
-          serverJob.setQueueEntryTime(System.currentTimeMillis());
-          serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
-          serverJob.addOnDone(new RemoveBundleAction(this, serverJob));
-          if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
-            if (debugEnabled) log.debug("adding bundle with {}", clientBundle);
-            scheduleManager.handleStartJobSchedule(serverJob);
-            scheduleManager.handleExpirationJobSchedule(serverJob);
-          }
+          newJob = true;
+          serverJob = createServerJob(clientBundle);
           jobMap.put(jobUuid, serverJob);
+          jobManager.jobQueued(serverJob);
         } else  {
-          queued = false;
+          newJob = false;
           if (debugEnabled) log.debug("job already queued");
         }
-        final boolean added;
-        if (!queued) {
-          lock.unlock();
-          serverJob.getLock().lock();
-        }
-        try {
-          added = serverJob.addBundle(clientBundle);
-        } finally {
-          if (!queued) {
-            serverJob.getLock().unlock();
-            lock.lock();
-          }
-        }
-        if (added) {
-          if (!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
+        if (serverJob.addBundle(clientBundle)) {
+          if (!newJob) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return serverJob;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
@@ -147,12 +123,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           incrementSizeCount(getSize(serverJob));
         }
         updateLatestMaxSize();
-        if (!queued) {
+        if (!newJob) {
           driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         }
         if (!header.getParameter(BundleParameter.FROM_PERSISTENCE, false) && !header.getParameter(BundleParameter.ALREADY_PERSISTED, false)) {
           header.setParameter(BundleParameter.ALREADY_PERSISTED, true);
-          persistenceHandler.storeJob(serverJob, clientBundle, !queued);
+          persistenceHandler.storeJob(serverJob, clientBundle, !newJob);
         }
         fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
@@ -162,6 +138,27 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
+    return serverJob;
+  }
+
+  /**
+   * Create a {@link ServerJob} object from the specified client bundle.
+   * @param clientBundle the bundle to create the job from.
+   * @return a newly created job.
+   */
+  private ServerJob createServerJob(final ServerTaskBundleClient clientBundle) {
+    final TaskBundle header = clientBundle.getJob();
+    header.setDriverQueueTaskCount(header.getTaskCount());
+    final ServerJob serverJob = new ServerJob(new ReentrantLock(), jobManager, header, clientBundle.getDataProvider());
+    serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
+    serverJob.setQueueEntryTime(System.currentTimeMillis());
+    serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
+    serverJob.addOnDone(new RemoveBundleAction(this, serverJob));
+    if (!clientBundle.getSLA().isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
+      if (debugEnabled) log.debug("adding bundle with {}", clientBundle);
+      scheduleManager.handleStartJobSchedule(serverJob);
+      scheduleManager.handleExpirationJobSchedule(serverJob);
+    }
     return serverJob;
   }
 

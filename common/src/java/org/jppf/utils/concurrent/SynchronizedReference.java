@@ -60,6 +60,17 @@ public class SynchronizedReference<T> {
   }
 
   /**
+   * Set a new value if it is different from the current vakue.
+   * @param newValue the value to set.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public synchronized boolean setIfDifferent(final T newValue) {
+    if (newValue == value) return false;
+    value = newValue;
+    return true;
+  }
+
+  /**
    * Compare the value with the expected value, and set it to the update value if they are equal.
    * @param expected the expected value.
    * @param update the new value to set to if the comparison succeeds.

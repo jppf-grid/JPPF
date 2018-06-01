@@ -27,6 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.concurrent.SynchronizedReference;
 import org.slf4j.*;
 
 /**
@@ -61,11 +62,11 @@ public abstract class AbstractServerJob {
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
-  protected long jobReceivedTime = 0L;
+  protected long jobReceivedTime;
   /**
    * The time at which this wrapper was added to the queue.
    */
-  protected transient long queueEntryTime = 0L;
+  protected transient long queueEntryTime;
   /**
    * The underlying task bundle.
    */
@@ -73,27 +74,27 @@ public abstract class AbstractServerJob {
   /**
    * The universal unique id for this job.
    */
-  protected String uuid = null;
+  protected String uuid;
   /**
    * The user-defined display name for this job.
    */
-  protected String name = null;
+  protected String name;
   /**
    * The service level agreement between the job and the server.
    */
-  protected JobSLA sla = null;
+  protected JobSLA sla;
   /**
    * The job metadata.
    */
-  protected JobMetadata metadata = null;
+  protected JobMetadata metadata;
   /**
    * Job expired indicator, determines whether the job is should be cancelled.
    */
-  protected boolean jobExpired = false;
+  protected boolean jobExpired;
   /**
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
-  protected boolean pending = false;
+  protected boolean pending;
   /**
    * Used for synchronized access to job.
    */
@@ -101,7 +102,7 @@ public abstract class AbstractServerJob {
   /**
    * The status of this submission.
    */
-  protected SubmissionStatus submissionStatus;
+  protected final SynchronizedReference<SubmissionStatus> submissionStatus = new SynchronizedReference<>(SubmissionStatus.SUBMITTED);
   /**
    * Handler for job state notifications.
    */
@@ -109,7 +110,7 @@ public abstract class AbstractServerJob {
   /**
    * List of bundles added after submission status set to <code>COMPLETE</code>.
    */
-  protected List<ServerTaskBundleClient> completionBundles = null;
+  protected List<ServerTaskBundleClient> completionBundles;
   /**
    * The serialized job header.
    */
@@ -130,12 +131,11 @@ public abstract class AbstractServerJob {
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
     this.metadata = this.job.getMetadata();
-    this.submissionStatus = SubmissionStatus.SUBMITTED;
   }
 
   /**
    * Get the underlying task bundle.
-   * @return a <code>ClientTaskBundle</code> instance.
+   * @return a {@code ClientTaskBundle} instance.
    */
   public TaskBundle getJob() {
     return job;
@@ -402,29 +402,21 @@ public abstract class AbstractServerJob {
    * @return a {@link SubmissionStatus} enumerated value.
    */
   public SubmissionStatus getSubmissionStatus() {
-    lock.lock();
-    try {
-      return submissionStatus;
-    } finally {
-      lock.unlock();
-    }
+    return submissionStatus.get();
   }
 
   /**
    * Set the status of this submission.
-   * @param submissionStatus a {@link SubmissionStatus} enumerated value.
+   * @param newStatus a {@link SubmissionStatus} enumerated value.
    */
-  public void setSubmissionStatus(final SubmissionStatus submissionStatus) {
-    lock.lock();
-    try {
-      if (this.submissionStatus == submissionStatus) return;
-      final SubmissionStatus oldValue = this.submissionStatus;
-      this.submissionStatus = submissionStatus;
-      fireStatusChanged(oldValue, this.submissionStatus);
-      if (submissionStatus == SubmissionStatus.ENDED) done();
-    } finally {
-      lock.unlock();
+  public void setSubmissionStatus(final SubmissionStatus newStatus) {
+    final SubmissionStatus oldstatus;
+    synchronized(this.submissionStatus) {
+      oldstatus = this.submissionStatus.get();
+      if (!this.submissionStatus.setIfDifferent(newStatus)) return;
     }
+    fireStatusChanged(oldstatus, newStatus);
+    if (newStatus == SubmissionStatus.ENDED) done();
   }
 
   /**
