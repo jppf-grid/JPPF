@@ -63,7 +63,7 @@ public abstract class AbstractTypedProperties extends Properties {
       store(writer, null);
       result = writer.toString();
     } catch(final Exception e) {
-      return String.format("error converting properties to string: %s: %s", e.getClass().getName(), e.getMessage());
+      return String.format("error converting properties to string: %s", e);
     }
     return result;
   }
