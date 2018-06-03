@@ -145,6 +145,7 @@
   </target>
 
   <target name="javadoc.anttask">
+    <echo message="Generating javadoc in ${javadoc}"/>
     <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.7"
       stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
@@ -170,6 +171,7 @@
       <header>${javadoc.header}</header>
       <bottom>${javadoc.bottom}</bottom>
     </javadoc>
+    <echo message="Javadoc generated in ${javadoc}"/>
   </target>
   
   <target name="javadoc.external">

@@ -58,4 +58,8 @@
     <ant dir="tests" target="run.junit" useNativeBasedir="true"/>
   </target>
 
+  <target name="javadoc" description="generate the JPPF javadoc">
+    <ant dir="JPPF/bin" target="javadoc" useNativeBasedir="true"/>
+  </target>
+
 </project> 
