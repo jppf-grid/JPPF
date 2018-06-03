@@ -163,7 +163,8 @@
       <link href="https://docs.oracle.com/javase/7/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <link href="https://junit.org/junit4/javadoc/latest"/>
-      <link href="https://x-stream.github.io/javadoc"/>
+      <link href="http://x-stream.github.io/javadoc"/>
+      <link href="http://oshi.github.io/oshi/apidocs/"/>
       <link offline="true" href="https://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>${javadoc.header}</header>
@@ -199,6 +200,8 @@
       <arg value="https://docs.oracle.com/javaee/6/api/"/>
       <arg value="-link"/>
       <arg value="https://junit.org/junit4/javadoc/latest"/>
+      <arg value="-link"/>
+      <arg value="http://oshi.github.io/oshi/apidocs/"/>
       <arg value="-link"/>
       <arg value="https://x-stream.github.io/javadoc"/>
       <arg value="-linkoffline"/>
