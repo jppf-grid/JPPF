@@ -23,12 +23,11 @@ import org.jppf.management.spi.JPPFMBeanProvider;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
-public abstract class AbstractDiagnosticsMBeanProvider implements JPPFMBeanProvider
-{
+public abstract class AbstractDiagnosticsMBeanProvider implements JPPFMBeanProvider {
   @Override
-  public String getMBeanInterfaceName()
-  {
+  public String getMBeanInterfaceName() {
     return DiagnosticsMBean.class.getName();
   }
 }

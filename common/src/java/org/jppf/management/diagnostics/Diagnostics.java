@@ -32,6 +32,7 @@ import org.slf4j.*;
 /**
  * Implementation of the {@link DiagnosticsMBean} interface.
  * @author Laurent Cohen
+ * @exclude
  */
 public class Diagnostics implements DiagnosticsMBean, Closeable {
   /**
@@ -160,6 +161,11 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       snapshot.putProperties(provider.getValues());
     }
     return snapshot;
+  }
+
+  @Override
+  public String healthSnapshotAsString() throws Exception {
+    return healthSnapshot().getProperties().asString();
   }
 
   @Override

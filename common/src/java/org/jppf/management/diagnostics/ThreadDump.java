@@ -75,4 +75,24 @@ public class ThreadDump implements Serializable {
   public String toString() {
     return TextThreadDumpWriter.printToString(this, "ThreadDump");
   }
+
+  /**
+   * Print this thread dump to a plain text formatted string.
+   * @param title the title given to the thread dump.
+   * @return the thread dump printed to a plain test formatted string, or null if it could not be printed.
+   */
+  public String toPlainTextString(final String title) {
+    return TextThreadDumpWriter.printToString(this, title);
+  }
+
+  /**
+   * Print this thread dump to an HTML formatted string.
+   * @param title the title given to the thread dump.
+   * @param includeBody whether to add the &lt;html&gt; and &lt;body&gt; tags.
+   * @param fontSize the size of the font used to write the thread dump.
+   * @return the thread dump printed to an HTML string, or null if it could not be printed.
+   */
+  public String toHTMLString(final String title, final boolean includeBody, final int fontSize) {
+    return HTMLThreadDumpWriter.printToString(this, title, includeBody, fontSize);
+  }
 }

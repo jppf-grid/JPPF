@@ -18,13 +18,11 @@
 
 package org.jppf.management.diagnostics;
 
-
 /**
  * Interface for the diagnostics MBean.
  * @author Laurent Cohen
  */
-public interface DiagnosticsMBean
-{
+public interface DiagnosticsMBean {
   /**
    * The name of this MBean in a driver.
    */
@@ -74,6 +72,15 @@ public interface DiagnosticsMBean
    * @throws Exception if any error occurs.
    */
   HealthSnapshot healthSnapshot() throws Exception;
+
+  /**
+   * Get a a string representation of a JVM health snapshot. The returned string contains a set of key / value pairs separated by new lines.
+   * As such, it can be loaded directly into a {@link java.util.Properties Properties} or {@link org.jppf.utils.TypedProperties TypedProperties}
+   * object via their {@code load(Reader)} method, using a {@link java.io.StringReader StringReader}.
+   * @return a {@link java.util.Properties Properties}-compatible string representation of a JVM health snapshot.
+   * @throws Exception if any error occurs.
+   */
+  String healthSnapshotAsString() throws Exception;
 
   /**
    * Trigger a heap dump of the JVM. This will not work with all JVM implementations.

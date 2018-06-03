@@ -21,22 +21,23 @@ package org.jppf.management.diagnostics;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.utils.streams.StreamUtils;
+import org.slf4j.*;
 
 /**
  * This class prints a thread dump nicely formatted as HTML to a character stream.
  * <br/>This is used by the adminsitration console to display a thread dump for a selected driver or node.
  * @author Laurent Cohen
+ * @exclude
  */
 public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(HTMLThreadDumpWriter.class);
   /**
    * End of line character sequence.
    */
   private static final String BR = "<br/>\n";
-  /**
-   * The title given to the printed thread dump.
-   */
-  private final String title;
   /**
    * The font size used in the html rendering of the thread dump.
    */
@@ -63,8 +64,7 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
    * @param includeBody whether to add the html and body tags.
    */
   public HTMLThreadDumpWriter(final Writer writer, final String title, final int fontSize, final boolean includeBody) {
-    super(writer, "&nbsp;&nbsp;");
-    this.title = title;
+    super(writer, title, "&nbsp;&nbsp;");
     this.fontSize = fontSize;
     this.includeBody = includeBody;
   }
@@ -156,11 +156,6 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
     }
   }
 
-  @Override
-  public void close() throws IOException {
-    out.close();
-  }
-
   /**
    * Compute a CSS class from a thread state.
    * @param state the state to use.
@@ -188,20 +183,17 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter {
    * Print the specified thread dump directly to a string.
    * @param dump the thread dump to print.
    * @param title title given to the dump.
-   * @param includeBody whether to add the html and body tags.
+   * @param includeBody whether to add the &lt;html&gt; and &lt;body&gt; tags.
    * @param fontSize the size of the font used to write the thread dump.
    * @return the thread dump printed to an HTML string, or null if it could not be printed.
    */
   public static String printToString(final ThreadDump dump, final String title, final boolean includeBody, final int fontSize) {
     String result = null;
-    HTMLThreadDumpWriter writer = null;
-    try {
-      final StringWriter sw = new StringWriter();
-      writer = new HTMLThreadDumpWriter(sw, title, fontSize, includeBody);
+    try (final StringWriter sw = new StringWriter(); final HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, title, fontSize, includeBody)) {
       writer.printThreadDump(dump);
       result = sw.toString();
-    } finally {
-      if (writer != null) StreamUtils.closeSilent(writer);
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
     }
     return result;
   }

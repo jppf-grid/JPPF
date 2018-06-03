@@ -58,6 +58,11 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   }
 
   @Override
+  public String healthSnapshotAsString() {
+    return (String) invoke("healthSnapshotAsString", (Object[]) null, (String[]) null);
+  }
+
+  @Override
   public String heapDump() {
     return (String) invoke("heapDump", (Object[]) null, (String[]) null);
   }

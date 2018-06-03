@@ -23,14 +23,9 @@ import java.io.Closeable;
 /**
  * Interface for printing a {@link ThreadDump}.
  * @author Laurent Cohen
+ * @exclude
  */
-public interface ThreadDumpWriter extends Closeable
-{
-  /**
-   * Print the specified string without line terminator.
-   * @param message th string to print.
-   */
-  void printString(String message);
+public interface ThreadDumpWriter extends Closeable {
   /**
    * Print the deadlocked threads information.
    * @param threadDump the thread dump which provides the information to print.

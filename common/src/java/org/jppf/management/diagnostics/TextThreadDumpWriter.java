@@ -22,21 +22,22 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.utils.StringUtils;
-import org.jppf.utils.streams.StreamUtils;
+import org.slf4j.*;
 
 /**
  * This class prints a thread dump nicely formatted as plain text to a character stream.
  * @author Laurent Cohen
+ * @exclude
  */
 public class TextThreadDumpWriter extends AbstractThreadDumpWriter {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(TextThreadDumpWriter.class);
   /**
    * The new line sequence.
    */
   private static final String BR = "\n";
-  /**
-   * Title to print for the thread dump.
-   */
-  private final String title;
 
   /**
    * Intiialize this printer with the specified writer.
@@ -44,8 +45,7 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter {
    * @param title the tittle given for the output.
    */
   public TextThreadDumpWriter(final Writer writer, final String title) {
-    super(writer, "  ");
-    this.title = title == null ? "Thread dump" : title;
+    super(writer, title, "  ");
   }
 
   @Override
@@ -111,11 +111,6 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter {
     super.printThreadDump(threadDump);
   }
 
-  @Override
-  public void close() throws IOException {
-    out.close();
-  }
-
   /**
    * Print the specified thread dump directly to a plain text string.
    * @param dump the thread dump to print.
@@ -124,14 +119,11 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter {
    */
   public static String printToString(final ThreadDump dump, final String title) {
     String result = null;
-    ThreadDumpWriter writer = null;
-    try {
-      final StringWriter sw = new StringWriter();
-      writer = new TextThreadDumpWriter(sw, title);
+    try (final StringWriter sw = new StringWriter(); final ThreadDumpWriter writer = new TextThreadDumpWriter(sw, title)) {
       writer.printThreadDump(dump);
       result = sw.toString();
-    } finally {
-      if (writer != null) StreamUtils.closeSilent(writer);
+    } catch(final Exception e) {
+      log.error(e.getMessage(), e);
     }
     return result;
   }

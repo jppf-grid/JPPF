@@ -24,9 +24,9 @@ import java.util.Map;
 /**
  * Abstract implementation of a {@link ThreadDumpWriter}.
  * @author Laurent Cohen
+ * @exclude
  */
-public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
-{
+public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter {
   /**
    * The underlying print writer.
    */
@@ -38,32 +38,33 @@ public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
   /**
    * The current identation level of the output.
    */
-  protected int indentLevel = 0;
+  protected int indentLevel;
   /**
    * The current identation to use before writing each line of the output.
    */
   protected StringBuilder indent = new StringBuilder();
+  /**
+   * The title given to the printed thread dump.
+   */
+  protected final String title;
 
   /**
    * Intiialize this printer with the specified writer.
    * @param writer the writer to print to.
    * @param indentString the string to use as indentation.
+   * @param title the title given to the printed thread dump.
    */
-  public AbstractThreadDumpWriter(final Writer writer, final String indentString)
-  {
+  public AbstractThreadDumpWriter(final Writer writer, final String title, final String indentString) {
     if (writer == null) throw new IllegalArgumentException("writer cannot be null");
     this.out = (writer instanceof PrintWriter) ? (PrintWriter) writer : new PrintWriter(writer);
+    this.title = (title == null) ? "Thread dump" : title;
     this.indentString = indentString;
   }
 
   @Override
-  public void printThreadDump(final ThreadDump threadDump)
-  {
+  public void printThreadDump(final ThreadDump threadDump) {
     printDeadlocks(threadDump);
-    for (Map.Entry<Long, ThreadInformation> entry: threadDump.getThreads().entrySet())
-    {
-      printThread(entry.getValue());
-    }
+    for (final Map.Entry<Long, ThreadInformation> entry: threadDump.getThreads().entrySet()) printThread(entry.getValue());
   }
 
   /**
@@ -71,8 +72,7 @@ public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
    * @param ti the thread information to use.
    * @return a string in format <code>thread id thread_id "thread_name"</code>.
    */
-  protected String simpleName(final ThreadInformation ti)
-  {
+  protected String simpleName(final ThreadInformation ti) {
     return new StringBuilder().append("thread id ").append(ti.getId()).append(" \"").append(ti.getName()).append('"').toString();
   }
 
@@ -81,43 +81,46 @@ public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
    * @param li the lock information to use.
    * @return a string in format <code>lock_class_name@lock_hashcode</code>.
    */
-  protected String simpleName(final LockInformation li)
-  {
+  protected String simpleName(final LockInformation li) {
     return new StringBuilder().append(li.getClassName()).append('@').append(Integer.toHexString(li.getIdentityHashcode())).toString();
   }
 
-  @Override
-  public void printString(final String message)
-  {
+  /**
+   * Print the stpecified string.
+   * @param message the string to print.
+   */
+  public void printString(final String message) {
     out.print(message);
   }
 
   /**
    * Increment the current indentation level.
    */
-  protected void incIndent()
-  {
+  protected void incIndent() {
     indentLevel++;
     indent = new StringBuilder();
-    for (int i=0; i<indentLevel; i++) indent.append(indentString);
+    for (int i = 0; i < indentLevel; i++) indent.append(indentString);
   }
 
   /**
    * Decrement the current indentation level.
    */
-  protected void decIndent()
-  {
+  protected void decIndent() {
     indentLevel--;
     indent = new StringBuilder();
-    for (int i=0; i<indentLevel; i++) indent.append(indentString);
+    for (int i = 0; i < indentLevel; i++) indent.append(indentString);
   }
 
   /**
    * Get the current indentation.
    * @return the indentation as a string.
    */
-  protected String getIndent()
-  {
+  protected String getIndent() {
     return indent.toString();
+  }
+
+  @Override
+  public void close() throws IOException {
+    out.close();
   }
 }
