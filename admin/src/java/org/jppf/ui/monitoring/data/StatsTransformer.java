@@ -22,7 +22,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 
-import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.management.diagnostics.*;
 import org.jppf.utils.configuration.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -165,7 +165,7 @@ public class StatsTransformer {
    */
   private static void formatDoubleStatsValues(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
     try {
-      final List<JPPFProperty<?>> properties = StatsHandler.getInstance().getMonitoringDataHandler().getPropertyList();
+      final List<JPPFProperty<?>> properties = MonitoringDataProviderHandler.getAllProperties();
       for (final JPPFProperty<?> prop: properties) {
         if (prop instanceof NumberProperty) {
           final String name = prop.getName();
@@ -177,22 +177,5 @@ public class StatsTransformer {
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    /*
-    map.put(HEALTH_HEAP, (double) snapshot.getHeapUsed() / MB);
-    double d = snapshot.getHeapUsedRatio();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_HEAP_PCT, 100d * d);
-    map.put(HEALTH_NON_HEAP, (double) snapshot.getNonheapUsed() / MB);
-    d = snapshot.getNonheapUsedRatio();
-    map.put(HEALTH_NON_HEAP_PCT, d < 0d ? 0d : 100d * d);
-    map.put(HEALTH_RAM, (double) snapshot.getRamUsed() / MB);
-    d = snapshot.getRamUsedRatio();
-    map.put(HEALTH_RAM_PCT, d < 0d ? 0d : 100d * d);
-    map.put(HEALTH_THREADS, (double) snapshot.getLiveThreads());
-    d = snapshot.getCpuLoad();
-    map.put(HEALTH_CPU, d < 0d ? 0d : 100d * d);
-    d = snapshot.getSystemCpuLoad();
-    map.put(HEALTH_SYSTEM_CPU, d < 0d ? 0d : 100d * d);
-    */
   }
 }

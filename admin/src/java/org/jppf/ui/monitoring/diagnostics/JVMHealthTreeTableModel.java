@@ -48,12 +48,11 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    * Initialize this model with the specified tree and locale.
    * @param node the root of the tree.
    * @param locale the locale to use for translation.
-   * @param handler holds the defintions of the data rendered in the view.
    */
-  public JVMHealthTreeTableModel(final TreeNode node, final Locale locale, final MonitoringDataProviderHandler handler) {
+  public JVMHealthTreeTableModel(final TreeNode node, final Locale locale) {
     super(node, locale);
     i18nBase = "org.jppf.ui.i18n.NodeDataPage";
-    properties = handler.getPropertyList();
+    properties = MonitoringDataProviderHandler.getAllProperties();
   }
 
   @Override

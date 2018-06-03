@@ -69,10 +69,6 @@ public final class StatsHandler extends BaseStatsHandler {
    * Localized formatter for stats values.
    */
   private final StatsFormatter formatter = new StatsFormatter(Locale.getDefault());
-  /**
-   * The monitoring data handler.
-   */
-  private final MonitoringDataProviderHandler monitoringDataHandler = new MonitoringDataProviderHandler();
 
   /**
    * Get the singleton instance of this class.
@@ -96,8 +92,8 @@ public final class StatsHandler extends BaseStatsHandler {
    */
   private StatsHandler() {
     if (debugEnabled) log.debug("initializing StatsHandler");
-    monitoringDataHandler.loadProviders();
-    monitoringDataHandler.defineProperties();
+    MonitoringDataProviderHandler.getProviders();
+    MonitoringDataProviderHandler.getAllProperties();
     refreshInterval = JPPFConfiguration.getProperties().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_STATS);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     if (debugEnabled) log.debug("initializing TopologyManager");
@@ -263,12 +259,5 @@ public final class StatsHandler extends BaseStatsHandler {
   @Override
   protected StatsFormatter getFormatter(final Locale locale) {
     return formatter;
-  }
-
-  /**
-   * @return the monitoring data handler.
-   */
-  public MonitoringDataProviderHandler getMonitoringDataHandler() {
-    return monitoringDataHandler;
   }
 }

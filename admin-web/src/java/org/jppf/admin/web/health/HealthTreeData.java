@@ -121,7 +121,7 @@ public class HealthTreeData extends TableTreeData {
   @Override
   protected void createTreeTableModel() {
     final JPPFWebSession session = JPPFWebSession.get();
-    model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale(), JPPFWebConsoleApplication.get().getMonitoringDataHandler());
+    model = new JVMHealthTreeTableModel(new DefaultMutableTreeNode("topology.tree.root"), session.getLocale());
     final TopologyFilter filter = session.getNodeFilter();
     for (final TopologyDriver driver : JPPFWebConsoleApplication.get().getTopologyManager().getDrivers()) {
       TopologyUtils.addDriver(model, driver);

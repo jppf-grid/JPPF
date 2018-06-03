@@ -21,80 +21,103 @@ package org.jppf.management.diagnostics;
 import java.util.*;
 
 import org.jppf.management.diagnostics.provider.MonitoringDataProvider;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperty;
+import org.slf4j.*;
 
 /**
  * This class provides methods to find, load and access {@link MonitoringDataProvider}s.
+ * It is implemented as a singleton.
  * @author Laurent Cohen
- * @exclude
  */
-public class MonitoringDataProviderHandler {
+public final class MonitoringDataProviderHandler {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(MonitoringDataProviderHandler.class);
   /**
    * The providers discovered via SPI.
    */
-  private final List<MonitoringDataProvider> providers = new ArrayList<>();
+  private static final List<MonitoringDataProvider> providers = new ArrayList<>();
   /**
    * The list of properties of all providers.
    */
-  private Map<String, JPPFProperty<?>> properties;
+  private static List<JPPFProperty<?>> propertyList;
   /**
-   * The list of properties of all providers.
+   * Whether the providers have already been loaded.
    */
-  private List<JPPFProperty<?>> propertyList;
+  private static boolean loaded;
+  /**
+   * Whether the providers have already been initalized.
+   */
+  private static boolean initalized;
+  /**
+   * Whether the properties of the providers have already been defined.
+   */
+  private static boolean defined;
 
   /**
-   * Load the providers found via SPI.
-   * @return the list of providers discovered via SPI.
+   * Instantiation is not permitted.
    */
-  public List<MonitoringDataProvider> loadProviders() {
-    final List<MonitoringDataProvider> list = new ServiceFinder().findProviders(MonitoringDataProvider.class);
-    if (list != null) providers.addAll(list);
-    return providers;
+  private MonitoringDataProviderHandler() {
   }
 
   /**
    * Initialize the providers found via SPI.
    */
-  public void initProviders() {
-    for (final MonitoringDataProvider provider: providers) provider.init();
+  static synchronized void initProviders() {
+    if (!initalized) {
+      initalized = true;
+      for (final MonitoringDataProvider provider: getProviders()) {
+        try {
+          provider.init();
+        } catch (final Exception e) {
+          log.error("error initializing provider {}\n{}", provider, ExceptionUtils.getStackTrace(e));
+        }
+      }
+    }
   }
 
   /**
+   * Get a list of all the {@link MonitoringDataProvider}s that were found in the classpath.
    * @return the list of providers discovered via SPI.
    */
-  public List<MonitoringDataProvider> getProviders() {
+  public static synchronized List<MonitoringDataProvider> getProviders() {
+    if (!loaded) {
+      loaded = true;
+      try {
+        final List<MonitoringDataProvider> list = new ServiceFinder().findProviders(MonitoringDataProvider.class);
+        if (list != null) providers.addAll(list);
+      } catch (final Exception e) {
+        log.error("error loading providers: {}", ExceptionUtils.getStackTrace(e));
+      }
+    }
     return providers;
   }
 
   /**
+   * Get a consolidated list of all properties defined by all {@link MonitoringDataProvider}s.
    * @return the list of properties of all providers.
    */
-  public List<JPPFProperty<?>> defineProperties() {
-    int size = 0;
-    for (final MonitoringDataProvider provider: providers) {
-      provider.defineProperties();
-      size += provider.getProperties().size();
+  public static synchronized List<JPPFProperty<?>> getAllProperties() {
+    if (!defined) {
+      defined = true;
+      final List<MonitoringDataProvider> providers = getProviders();
+      int size = 0;
+      for (final MonitoringDataProvider provider: providers) {
+        try {
+          provider.defineProperties();
+          size += provider.getProperties().size();
+        } catch (final Exception e) {
+          log.error("error defining properties for provider {}\n{}", provider, ExceptionUtils.getStackTrace(e));
+        }
+      }
+      final List<JPPFProperty<?>> list = new ArrayList<>(size);
+      for (final MonitoringDataProvider provider: providers) {
+        for (final JPPFProperty<?> property: provider.getProperties()) list.add(property);
+      }
+      propertyList = Collections.unmodifiableList(list);
     }
-    properties = new LinkedHashMap<>(size);
-    for (final MonitoringDataProvider provider: providers) {
-      for (final JPPFProperty<?> property: provider.getProperties()) properties.put(property.getName(), property);
-    }
-    propertyList = Collections.unmodifiableList(new ArrayList<>(properties.values()));
     return propertyList;
-  }
-
-  /**
-   * @return the list of properties of all providers.
-   */
-  public List<JPPFProperty<?>> getPropertyList() {
-    return propertyList;
-  }
-
-  /**
-   * @return the map list of properties of all providers.
-   */
-  public Map<String, JPPFProperty<?>> getPropertyMap() {
-    return properties;
   }
 }

@@ -40,7 +40,7 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.management.diagnostics.provider.MonitoringConstants;
 import org.jppf.ui.monitoring.LocalizedListItem;
 import org.jppf.ui.treetable.TreeViewType;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 import org.wicketstuff.wicket.mount.core.annotation.MountPath;
@@ -104,8 +104,7 @@ public class HealthPage extends AbstractTableTreePage {
   @Override
   protected void createSelectableLayout(final String propertyName) {
     final Locale locale = JPPFWebSession.get().getLocale();
-    final MonitoringDataProviderHandler handler = JPPFWebConsoleApplication.get().getMonitoringDataHandler();
-    final List<JPPFProperty<?>> properties = handler.getPropertyList();
+    final List<JPPFProperty<?>> properties = MonitoringDataProviderHandler.getAllProperties();
     final List<LocalizedListItem> allItems = new ArrayList<>();
     for (int i=0; i<properties.size(); i++) {
       final JPPFProperty<?> prop = properties.get(i);
@@ -120,8 +119,7 @@ public class HealthPage extends AbstractTableTreePage {
    * @return the property.
    */
   private static JPPFProperty<?> getProperty(final int index) {
-    final MonitoringDataProviderHandler handler = JPPFWebConsoleApplication.get().getMonitoringDataHandler();
-    final List<JPPFProperty<?>> properties = handler.getPropertyList();
+    final List<JPPFProperty<?>> properties = MonitoringDataProviderHandler.getAllProperties();
     return properties.get(index);
   }
 

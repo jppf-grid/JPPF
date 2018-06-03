@@ -80,10 +80,6 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     } else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
-  /**
-   * The monitoring data provider handler.
-   */
-  private final MonitoringDataProviderHandler dataProvidersHandler = new MonitoringDataProviderHandler();
 
   /**
    * Initialize this MBean implementation.
@@ -113,9 +109,9 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     if (heapDumpCollector == null) {
       if (debugEnabled) log.debug("a heap dump collector could not be created for this JVM - no heap dumps will be available");
     }
-    dataProvidersHandler.loadProviders();
-    dataProvidersHandler.initProviders();
-    dataProvidersHandler.defineProperties();
+    MonitoringDataProviderHandler.getProviders();
+    MonitoringDataProviderHandler.initProviders();
+    MonitoringDataProviderHandler.getAllProperties();
   }
 
   @Override
@@ -160,7 +156,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   @Override
   public HealthSnapshot healthSnapshot() throws Exception {
     final HealthSnapshot snapshot = new HealthSnapshot();
-    for (final MonitoringDataProvider provider: dataProvidersHandler.getProviders()) {
+    for (final MonitoringDataProvider provider: MonitoringDataProviderHandler.getProviders()) {
       snapshot.putProperties(provider.getValues());
     }
     return snapshot;

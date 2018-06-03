@@ -76,7 +76,8 @@ public class DefaultMonitoringDataProvider extends MonitoringDataProvider {
     if (threadsMXBean.isThreadContentionMonitoringSupported()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
   }
   /**
-   * 
+   * Object that holds all references to Oshi API objects.
+   * This allows using this built-in provider on the console side without needing OShi classes in the classpath.
    */
   private Oshi oshi;
 

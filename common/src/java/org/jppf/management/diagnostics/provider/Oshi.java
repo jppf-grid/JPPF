@@ -27,7 +27,8 @@ import oshi.hardware.*;
 import oshi.software.os.*;
 
 /**
- * 
+ * Instances of this class wrap a singleton {@link SystemInfo} object, which is the entry point for the
+ * <a href="https://github.com/oshi/oshi">Oshi</a> API.
  * @author Laurent Cohen
  */
 public class Oshi {
@@ -52,7 +53,7 @@ public class Oshi {
    */
   private GlobalMemory memory;
   /**
-   * 
+   * Represents the current process (i.e. JVM).
    */
   private OSProcess process;
 
@@ -60,7 +61,7 @@ public class Oshi {
    * Initialize the Oshi API.
    * @return this object, for method call chaining.
    */
-  public Oshi init() {
+  Oshi init() {
     final SystemInfo si = getSystemInfo();
     hal = si.getHardware();
     os = si.getOperatingSystem();
@@ -73,7 +74,7 @@ public class Oshi {
   /**
    * @return the values.
    */
-  public TypedProperties getValues() {
+  TypedProperties getValues() {
     final TypedProperties props = new TypedProperties();
     props.setDouble(CPU_TEMPERATURE, sensors.getCpuTemperature());
     props.setString(OS_NAME, os.getFamily() + " " + os.getVersion().getVersion());
@@ -91,7 +92,7 @@ public class Oshi {
   }
 
   /**
-   * @return the entry point to Oshi API.
+   * @return the entry point to the Oshi API.
    */
   public static synchronized SystemInfo getSystemInfo() {
     if (si == null) si = new SystemInfo();

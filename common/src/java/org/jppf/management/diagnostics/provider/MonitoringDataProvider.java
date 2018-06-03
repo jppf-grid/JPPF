@@ -42,7 +42,7 @@ public abstract class MonitoringDataProvider {
 
   /**
    * Perform the initialization of this provider.
-   * This method is called extactly once on the producer (where the data comes from) side only.
+   * This method is called exactly once on the producer (where the data comes from) side only.
    */
   public abstract void init();
 

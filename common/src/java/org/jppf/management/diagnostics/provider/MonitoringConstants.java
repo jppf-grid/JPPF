@@ -19,7 +19,7 @@
 package org.jppf.management.diagnostics.provider;
 
 /**
- * 
+ * ENumeration of the built-in monitoring data fields.
  * @author Laurent Cohen
  */
 public class MonitoringConstants {
