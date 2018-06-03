@@ -34,7 +34,7 @@ class QueuingSocketInitializer extends SocketInitializerImpl {
    */
   private static final Logger log = LoggerFactory.getLogger(QueuingSocketInitializer.class);
   /**
-   * 
+   * Performs connection initializations asynchronously using threads with TTL.
    */
   private static final ExecutorService executor = initExecutor();
 
@@ -65,7 +65,8 @@ class QueuingSocketInitializer extends SocketInitializerImpl {
       return f.get();
     } catch (final Exception e) {
       if (lastException == null) lastException = e;
-      log.error(e.getMessage(), e);
+      if (e instanceof InterruptedException) log.warn(e.toString());
+      else log.error(e.getMessage(), e);
     }
     return false;
   }
