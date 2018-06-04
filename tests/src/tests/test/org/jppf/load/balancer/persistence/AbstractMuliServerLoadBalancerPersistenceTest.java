@@ -35,7 +35,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import test.org.jppf.persistence.AbstractDatabaseSetup;
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -45,6 +45,21 @@ import test.org.jppf.test.setup.common.*;
 public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends AbstractDatabaseSetup {
   /** */
   private final static int NB_TASKS = 2 * 50;
+
+  /**
+   * Start the DB server and JPPF grid.
+   * @param driverConfigFile the name of the driver configuration fie to use.
+   * @param useDB whether to start the database server.
+   * @throws Exception if any error occurs.
+   */
+  static void setupConfig(final String driverConfigFile, final boolean useDB) throws Exception {
+    final String prefix = "lb_persistence_p2p";
+    final TestConfiguration config = dbSetup(prefix, useDB);
+    config.driverJppf = "classes/tests/config/" + prefix + "/" + driverConfigFile;
+    config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
+    client = BaseSetup.setup(2, 2, true, false, config);
+    checkPeers(15_000L, false, true);
+  }
 
   /** */
   @Rule

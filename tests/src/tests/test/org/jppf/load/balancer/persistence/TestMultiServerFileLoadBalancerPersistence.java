@@ -20,8 +20,6 @@ package test.org.jppf.load.balancer.persistence;
 
 import org.junit.BeforeClass;
 
-import test.org.jppf.test.setup.*;
-
 /**
  * Test database load-balancer persistence. 
  * @author Laurent Cohen
@@ -33,10 +31,6 @@ public class TestMultiServerFileLoadBalancerPersistence extends AbstractMuliServ
    */
   @BeforeClass
   public static void setup() throws Exception {
-    final String prefix = "lb_persistence_p2p";
-    final TestConfiguration config = dbSetup(prefix, false);
-    config.driverJppf = "classes/tests/config/" + prefix + "/driver_file.properties";
-    config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
-    client = BaseSetup.setup(2, 2, true, true, config);
+    setupConfig("driver_file.properties", false);
   }
 }
