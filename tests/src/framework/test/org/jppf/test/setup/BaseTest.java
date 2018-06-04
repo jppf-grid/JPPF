@@ -41,15 +41,12 @@ import org.slf4j.*;
 public class BaseTest {
   static {
     Locale.setDefault(Locale.US);
-    System.out.println("Initializing 'TEST' logger");
+    DeadlockDetector.setup("client");
   }
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger("TEST");
-  static {
-    DeadlockDetector.setup("client");
-  }
   /** */
   protected static final String JMX_REMOTE_PROTOCOL = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
   /** */
@@ -238,17 +235,17 @@ public class BaseTest {
       if (logFiles != null) {
         for (final File file: logFiles) {
           if (file.exists()) {
-            log.info("deleting file {}", file);
+            //log.info("deleting file {}", file);
             if (!file.delete()) {
-              System.err.printf("[%s] Could not delete %s%n", getFormattedTimestamp(), file);
-              log.error("could not delete {}", file);
+              print(true, true, "Could not delete %s%n", file);
+              //log.error("could not delete {}", file);
             }
           }
         }
       }
       final File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists()) {
-        if (!FileUtils.deletePath(slavesDir)) print("Could not delete '%s'", slavesDir);
+        if (!FileUtils.deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
       }
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
       // redirect System.out and System.err to files
