@@ -60,7 +60,7 @@ public class SynchronizedReference<T> {
   }
 
   /**
-   * Set a new value if it is different from the current vakue.
+   * Set a new value if it is different from the current value.
    * @param newValue the value to set.
    * @return {@code true} if the value was changed, {@code false} otherwise.
    */
@@ -101,7 +101,7 @@ public class SynchronizedReference<T> {
    * @param action the aciton to run.
    * @return {@code true} if the update was performed, {@code false} otherwise.
    */
-  public synchronized Object compareAndRun(final T expected, final Runnable action) {
+  public synchronized boolean compareAndRun(final T expected, final Runnable action) {
     if (value == expected) {
       if (action != null) action.run();
       return true;

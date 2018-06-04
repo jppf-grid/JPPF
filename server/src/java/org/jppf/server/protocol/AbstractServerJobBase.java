@@ -228,11 +228,12 @@ public class AbstractServerJobBase extends AbstractServerJob {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     lock.lock();
     try {
-      if (getSubmissionStatus() == SubmissionStatus.COMPLETE) {
+      final SubmissionStatus submissionStatus = getSubmissionStatus();
+      if (submissionStatus == SubmissionStatus.COMPLETE) {
         if (completionBundles == null) completionBundles = new ArrayList<>();
         completionBundles.add(bundle);
         return false;
-      } else if (getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
+      } else if (submissionStatus == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
       else {
         clientBundles.add(bundle);
         this.tasks.addAll(bundle.getTaskList());

@@ -410,22 +410,8 @@ public abstract class AbstractServerJob {
    * @param newStatus a {@link SubmissionStatus} enumerated value.
    */
   public void setSubmissionStatus(final SubmissionStatus newStatus) {
-    final SubmissionStatus oldstatus;
-    synchronized(this.submissionStatus) {
-      oldstatus = this.submissionStatus.get();
-      if (!this.submissionStatus.setIfDifferent(newStatus)) return;
-    }
-    fireStatusChanged(oldstatus, newStatus);
+    if (!submissionStatus.setIfDifferent(newStatus)) return;
     if (newStatus == SubmissionStatus.ENDED) done();
-  }
-
-  /**
-   * Notify that job submission status has changed.
-   * @param oldValue value before change.
-   * @param newValue value after change.
-   */
-  protected void fireStatusChanged(final SubmissionStatus oldValue, final SubmissionStatus newValue) {
-    if (notificationEmitter != null) notificationEmitter.jobStatusChanged(this, oldValue, newValue);
   }
 
   /**

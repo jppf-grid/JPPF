@@ -209,11 +209,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     return result;
   }
 
-  /**
-   * Remove the specified bundle from the queue.
-   * @param serverJob the bundle to remove.
-   * @return the removed bundle.
-   */
   @Override
   public ServerJob removeBundle(final ServerJob serverJob) {
     return removeBundle(serverJob, true);
