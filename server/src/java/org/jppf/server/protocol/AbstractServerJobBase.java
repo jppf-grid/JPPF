@@ -246,6 +246,34 @@ public class AbstractServerJobBase extends AbstractServerJob {
     }
   }
 
+  /**
+   * Add received bundle to this server job.
+   * @param bundle the bundle to add.
+   * @param actionIfEnded an action to run if the job status is {@code ENDED}.
+   * @return {@code true} when bundle was added to job. {@code false} when job is {@code COMPLETE}.
+   */
+  public boolean addBundle(final ServerTaskBundleClient bundle, final Runnable actionIfEnded) {
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    lock.lock();
+    try {
+      final SubmissionStatus submissionStatus = getSubmissionStatus();
+      if (submissionStatus == SubmissionStatus.COMPLETE) {
+        if (completionBundles == null) completionBundles = new ArrayList<>();
+        completionBundles.add(bundle);
+        return false;
+      } else if (submissionStatus == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
+      else {
+        clientBundles.add(bundle);
+        this.tasks.addAll(bundle.getTaskList());
+        bundle.addCompletionListener(bundleCompletionListener);
+        fireJobUpdated(false);
+        return true;
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();

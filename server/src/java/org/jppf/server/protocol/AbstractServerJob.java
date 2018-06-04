@@ -19,7 +19,7 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.*;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.*;
@@ -100,6 +100,10 @@ public abstract class AbstractServerJob {
    */
   protected final Lock lock;
   /**
+   * Condition signalled when this job is removed from the queue.
+   */
+  protected final Condition removalCondition;
+  /**
    * The status of this submission.
    */
   protected final SynchronizedReference<SubmissionStatus> submissionStatus = new SynchronizedReference<>(SubmissionStatus.SUBMITTED);
@@ -126,6 +130,7 @@ public abstract class AbstractServerJob {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + id);
     this.lock = lock;
+    this.removalCondition= lock.newCondition();
     this.job = job;
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
@@ -499,5 +504,12 @@ public abstract class AbstractServerJob {
    */
   public boolean isPersistent() {
     return sla.getPersistenceSpec().isPersistent();
+  }
+
+  /**
+   * @return a Condition that is signalled when this job is removed from the queue
+   */
+  public Condition getRemovalCondition() {
+    return removalCondition;
   }
 }

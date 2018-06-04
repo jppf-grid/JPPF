@@ -21,9 +21,10 @@ package org.jppf.server.queue;
 import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
 import org.jppf.node.protocol.*;
@@ -103,8 +104,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (debugEnabled) log.debug("before processing broadcast job {}", header);
         broadcastManager.processBroadcastJob(clientBundle);
       } else {  
-        final boolean newJob;
         serverJob = jobMap.get(jobUuid);
+        if ((serverJob != null) && (serverJob.getSubmissionStatus() == SubmissionStatus.ENDED)) {
+          waitForJobRemoved(serverJob);
+          serverJob = jobMap.get(jobUuid);
+        }
+        final boolean newJob;
         if (serverJob == null) {
           newJob = true;
           serverJob = createServerJob(clientBundle);
@@ -139,6 +144,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
     return serverJob;
+  }
+
+  /**
+   * Wait until the specified job has been removed from the queue.
+   * @param job the job whose removal to wait for.
+   */
+  private void waitForJobRemoved(final ServerJob job) {
+    while (jobMap.get(job.getUuid()) != null) {
+      try {
+        job.getRemovalCondition().await(100L, TimeUnit.MILLISECONDS);
+      } catch (final InterruptedException e) {
+        throw new JPPFRuntimeException(e);
+      }
+    }
   }
 
   /**
