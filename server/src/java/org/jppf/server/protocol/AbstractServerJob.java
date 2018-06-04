@@ -27,7 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
-import org.jppf.utils.concurrent.SynchronizedReference;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -102,7 +102,7 @@ public abstract class AbstractServerJob {
   /**
    * Condition signalled when this job is removed from the queue.
    */
-  protected final Condition removalCondition;
+  protected final ThreadSynchronization removalCondition = new ThreadSynchronization();
   /**
    * The status of this submission.
    */
@@ -130,7 +130,6 @@ public abstract class AbstractServerJob {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + id);
     this.lock = lock;
-    this.removalCondition= lock.newCondition();
     this.job = job;
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
@@ -509,7 +508,7 @@ public abstract class AbstractServerJob {
   /**
    * @return a Condition that is signalled when this job is removed from the queue
    */
-  public Condition getRemovalCondition() {
+  public ThreadSynchronization getRemovalCondition() {
     return removalCondition;
   }
 }

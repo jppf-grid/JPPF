@@ -21,10 +21,9 @@ package org.jppf.server.queue;
 import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.JPPFRuntimeException;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
 import org.jppf.node.protocol.*;
@@ -151,13 +150,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @param job the job whose removal to wait for.
    */
   private void waitForJobRemoved(final ServerJob job) {
-    while (jobMap.get(job.getUuid()) != null) {
-      try {
-        job.getRemovalCondition().await(100L, TimeUnit.MILLISECONDS);
-      } catch (final InterruptedException e) {
-        throw new JPPFRuntimeException(e);
-      }
-    }
+    while (jobMap.get(job.getUuid()) != null)  job.getRemovalCondition().goToSleep(100L);
   }
 
   /**
