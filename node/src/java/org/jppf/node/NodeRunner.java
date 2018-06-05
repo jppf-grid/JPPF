@@ -121,11 +121,13 @@ public class NodeRunner {
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if (debugEnabled) log.debug("launching the JPPF node");
       VersionUtils.logVersionInformation("node", uuid);
+      if (debugEnabled) log.debug("registering hooks");
       HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
       HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
+        if (debugEnabled) log.debug("setting up connection with parent process");
         final int port = Integer.parseInt(args[0]);
         (launcherListener = new LauncherListener(port)).start();
       }
@@ -134,13 +136,17 @@ public class NodeRunner {
       System.exit(1);
     }
     try {
+      if (debugEnabled) log.debug("node startup main loop");
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
       while (!getShuttingDown().get()) {
         try {
+          if (debugEnabled) log.debug("initializing configuration");
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
+          if (debugEnabled) log.debug("creating node");
           node = createNode(context);
           if (launcherListener != null) launcherListener.setActionHandler(new ShutdownRestartNodeProtocolHandler(node));
+          if (debugEnabled) log.debug("running node");
           node.run();
         } catch(final JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));
@@ -154,6 +160,7 @@ public class NodeRunner {
     } catch(final Exception e) {
       e.printStackTrace();
     }
+    if (debugEnabled) log.debug("node exiting");
   }
 
   /**
