@@ -150,7 +150,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @param job the job whose removal to wait for.
    */
   private void waitForJobRemoved(final ServerJob job) {
+    if (debugEnabled) log.debug("awaiting removal of {}", job);
+    long time = System.nanoTime();
     while (jobMap.get(job.getUuid()) != null)  job.getRemovalCondition().goToSleep(100L);
+    time = (System.nanoTime() - time) / 1_000_000L;
+    if (debugEnabled) log.debug("waited {} ms for {}", time, job);
   }
 
   /**

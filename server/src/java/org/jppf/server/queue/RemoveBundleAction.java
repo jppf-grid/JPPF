@@ -57,7 +57,7 @@ class RemoveBundleAction implements Runnable {
 
   @Override
   public void run() {
-    if (debugEnabled) log.debug("removing job {}", serverJob);
+    if (debugEnabled) log.debug("removing {}", serverJob);
     queue.removeBundle(serverJob, true);
     if (serverJob.getSLA().getPersistenceSpec().isDeleteOnCompletion()) queue.getPersistenceHandler().deleteJob(serverJob);
     serverJob.getRemovalCondition().wakeUp();
