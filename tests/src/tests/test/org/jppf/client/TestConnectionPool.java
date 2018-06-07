@@ -147,7 +147,6 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   private static void configure(final int localThreads) throws Exception {
-    //final TypedProperties config = JPPFConfiguration.getProperties();
     final TypedProperties config = BaseSetup.resetClientConfig();
     config.set(DISCOVERY_ENABLED, false)
       .set(LOAD_BALANCING_ALGORITHM, "proportional")
@@ -279,11 +278,6 @@ public class TestConnectionPool extends Setup1D1N {
     else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
     final List<JPPFConnectionPool> list = client.awaitConnectionPools(operator, nbPools, Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     if (!operator.evaluate(list.size(), nbPools)) throw new IllegalStateException(String.format("failed to obtain %s %d pools (got %d)", operator, nbPools, list.size()));
-    /*
-    while (!operator.evaluate(client.awaitWorkingConnectionPools().size(), nbPools)) Thread.sleep(10L);
-    final JobManagerClient mgr = (JobManagerClient) client.getJobManager();
-    while (!operator.evaluate(mgr.nbAvailableConnections(), nbPools)) Thread.sleep(10L);
-    */
   }
 
   /** */

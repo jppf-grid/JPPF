@@ -67,6 +67,7 @@ public class RetryUtils {
     }
     throw lastException;
   }
+
   /**
    * Execute the specified {@code Callable} in a retry loop.
    * @param <T> the return type of the {@code Callable}.
@@ -87,6 +88,38 @@ public class RetryUtils {
     while ((elapsed = System.currentTimeMillis() - start) < timeout) {
       try {
         return callable.call();
+      } catch (final Exception e) {
+        tryCount++;
+        lastException = e;
+        if (elapsed < timeout) {
+          if (debugEnabled) log.debug(String.format("Got exception at attempt %,d, after %,d ms, retrying in %,d ms: %s", tryCount, elapsed, retryDelay, ExceptionUtils.getMessage(e)));
+          Thread.sleep(retryDelay);
+        }
+      }
+    }
+    throw lastException;
+  }
+
+  /**
+   * Execute the specified {@code Runnable} in a retry loop.
+   * @param <T> the return type of the {@code Callable}.
+   * @param timeout the maximum tim during which to attempt, in millis.
+   * @param retryDelay the delay between two attempts.
+   * @param runnable the {@code Runnable} to execute.
+   * @return the return value of the first successful execution of the {@code Callable}.
+   * @throws Exception if after maxRetries the {@code Callable} threw an exception.
+   */
+  public static <T> T runWithRetryTimeout(final long timeout, final long retryDelay, final Runnable runnable) throws Exception {
+    if (timeout <= 0L) throw new IllegalArgumentException("timeout must be > 0");
+    if (retryDelay <= 0L) throw new IllegalArgumentException("retryDelay must be > 0");
+    if (runnable == null) return null;
+    int tryCount = 0;
+    Exception lastException = null;
+    final long start = System.currentTimeMillis();
+    long elapsed;
+    while ((elapsed = System.currentTimeMillis() - start) < timeout) {
+      try {
+        runnable.run();
       } catch (final Exception e) {
         tryCount++;
         lastException = e;

@@ -81,6 +81,7 @@ class WaitingJobState extends ClientServerState {
       context.setBundle(null);
 
       if (clientBundle.isDone()) {
+        if (debugEnabled) log.debug("client bundle done: {}", clientBundle);
         context.jobEnded();
         return TO_WAITING_JOB;
       }

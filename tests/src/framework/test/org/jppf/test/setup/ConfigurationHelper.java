@@ -33,7 +33,11 @@ public class ConfigurationHelper {
   /**
    * Cache of the created temp files, so they can be deleted upon cleanup.
    */
-  private static List<File> tempFiles = new Vector<>();
+  private static final List<File> tempFiles = new Vector<>();
+  /**
+   * 
+   */
+  private static final String FOR ="$for{";
 
   /**
    * Create a temporary file containing the specified configuration.
@@ -82,15 +86,12 @@ public class ConfigurationHelper {
    */
   public static TypedProperties createConfigFromTemplate(final String templatePath, final Map<String, Object> variables) {
     final TypedProperties result = new TypedProperties();
-    Reader reader = null;
-    try {
+    try (Reader reader = FileUtils.getFileReader(templatePath)) {
       final TypedProperties props = new TypedProperties();
-      reader = FileUtils.getFileReader(templatePath);
-      if (reader == null) throw new FileNotFoundException("could not load config file '" + templatePath + '\'');
-      //props.load(reader);
       props.loadAndResolve(reader);
-      for (final Map.Entry<Object, Object> entry : props.entrySet()) {
+      for (final Map.Entry<Object, Object> entry: props.entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
+          /*
           final String key = (String) entry.getKey();
           String value = (String) entry.getValue();
           try {
@@ -100,19 +101,65 @@ public class ConfigurationHelper {
             throw new RuntimeException("Invalid expression for template file: '" + templatePath + "', property: '" + key + " = " + value + '\'', e);
           }
           result.setProperty(key, value);
+          */
+          parseProperty(result, (String) entry.getKey(), (String) entry.getValue(), variables);
         }
       }
     } catch (final Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
-    } finally {
-      if (reader != null) StreamUtils.closeSilent(reader);
     }
     return result;
   }
 
   /**
-   * Parse the specified property value, performinig templates substitutions where eneded.
+   * Parse the specified property value, performinig templates substitutions where needed.
+   * <p>format: {@code name = $for{start; end; condition} value}
+   * <p>example: prop_name$i = $for{1, $n, $n != $i} expr: prop_value$i
+   * @param result the resulting properties.
+   * @param key a key used to cache the compiled groovy expression.
+   * @param source the string to parse.
+   * @param variables a map of variable names to their value, which can be used in a groovy expression.
+   * @throws Exception if any error occurs.
+   */
+  static void parseProperty(final TypedProperties result, final String key, final String source, final Map<String, Object> variables) throws Exception {
+    String value = source.trim();
+    if (value.startsWith(FOR)) {
+      final int idx = value.indexOf("}", FOR.length());
+      final String paramsStr = value.substring(FOR.length(), idx);
+      value = value.substring(idx + 1).trim();
+      final String[] params = paramsStr.split(";");
+      for (int i=0; i<params.length; i++) params[i] = "return " + params[i].trim();
+      ScriptRunner runner = null;
+      try {
+        runner = ScriptRunnerFactory.getScriptRunner("groovy");
+        final int start = (Integer) runner.evaluate(params[0], variables);
+        final int end = (Integer) runner.evaluate(params[1], variables);
+        for (int i=start; i<= end; i++) {
+          final String iStr = Integer.toString(i);
+          final boolean proceed = (Boolean) runner.evaluate(params[2].replace("$i", iStr), variables);
+          if (proceed) {
+            String v = value;
+            if (v.startsWith("expr:")) {
+              final String expr = v.substring("expr:".length()).trim().replace("$i", iStr);
+              final Object o = runner.evaluate(expr, variables);
+              if (o != null) v = o.toString();
+            }
+            final String actualKey = key.replace("$i", iStr);
+            result.setProperty(actualKey, v);
+          }
+        }
+      } finally {
+        ScriptRunnerFactory.releaseScriptRunner(runner);
+      }
+    } else {
+      value = parseValue(key, source, variables);
+      result.setProperty(key, value);
+    }
+ }
+
+  /**
+   * Parse the specified property value, performinig templates substitutions where needed.
    * @param key a key used to cache the compiled groovy expression.
    * @param source the string to parse.
    * @param variables a map of variable names to their value, which can be used in a groovy expression.

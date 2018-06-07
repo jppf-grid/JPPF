@@ -320,6 +320,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void checkPeers(final long maxWait, final boolean secure) throws Exception {
+    checkPeers(maxWait, secure, false);
   }
 
   /**
@@ -330,18 +331,30 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void checkPeers(final long maxWait, final boolean secure, final boolean checkPeers) throws Exception {
+    checkPeers(2, maxWait, secure, checkPeers);
+  }
+
+  /**
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
+   * @param nbDrivers the number of peer drivers to check.
+   * @param maxWait the maximum time to wait for completion of this method.
+   * @param secure whether to use SSL connections.
+   * @param checkPeers whether to check peer driver connections.
+   * @throws Exception if any error occurs.
+   */
+  protected static void checkPeers(final int nbDrivers, final long maxWait, final boolean secure, final boolean checkPeers) throws Exception {
     final long start = System.currentTimeMillis();
     long timeout = maxWait;
-    print(false, false, "$$ creating 2 JMX connections");
-    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[2];
+    print(false, false, "$$ creating %d JMX connections", nbDrivers);
+    final JMXDriverConnectionWrapper[] jmxArray = new JMXDriverConnectionWrapper[nbDrivers];
     final int base = secure ? SSL_DRIVER_MANAGEMENT_PORT_BASE : DRIVER_MANAGEMENT_PORT_BASE;
-    for (int i=0; i<2; i++) jmxArray[i] = new JMXDriverConnectionWrapper("localhost", base + i + 1, secure);
+    for (int i=0; i<nbDrivers; i++) jmxArray[i] = new JMXDriverConnectionWrapper("localhost", base + i + 1, secure);
     try {
       for (final JMXDriverConnectionWrapper jmx: jmxArray) jmx.connect();
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
         print(false, false, "$$ awaiting JMX connection for %s", jmx);
         timeout = maxWait - (System.currentTimeMillis() - start);
-        if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+        if (timeout <= 0L) throw new JPPFTimeoutException("exceeded timeout of " + maxWait + " ms");
         ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
           @Override
           public boolean evaluate() {
@@ -354,17 +367,17 @@ public class AbstractNonStandardSetup extends BaseTest {
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
         print(false, false, "$$ awaiting 1 idle node for %s", jmx);
         timeout = maxWait - (System.currentTimeMillis() - start);
-        if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
+        if (timeout <= 0L) throw new JPPFTimeoutException("exceeded timeout of " + maxWait + " ms");
         awaitNbIdleNodes(jmx, Operator.EQUAL, 1, timeout);
         print(false, false, "$$ got 1 idle node for %s", jmx);
       }
       if (checkPeers) {
         for (final JMXDriverConnectionWrapper jmx: jmxArray) {
-          print(false, false, ">>> awaiting 1 peer driver for %s", jmx);
+          print(false, false, "$$ awaiting %d peer drivers for %s", nbDrivers - 1, jmx);
           timeout = maxWait - (System.currentTimeMillis() - start);
-          if (timeout <= 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
-          awaitNbIdleNodes(jmx, PEER_SELECTOR, checkPeers, Operator.EQUAL, 1, timeout);
-          print(false, false, "$$ got peer driver connection for %s", jmx);
+          if (timeout <= 0L) throw new JPPFTimeoutException("exceeded timeout of " + maxWait + " ms");
+          awaitNbIdleNodes(jmx, PEER_SELECTOR, checkPeers, Operator.EQUAL, nbDrivers - 1, timeout);
+          print(false, false, "$$ got %d peer driver connections for %s", nbDrivers - 1, jmx);
         }
       }
     } finally {
@@ -410,6 +423,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }, timeout, 500L, true);
   }
+
   /**
    * @return the number of nodes in the topology.
    */
