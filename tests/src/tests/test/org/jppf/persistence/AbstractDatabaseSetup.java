@@ -104,7 +104,7 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
       print(false, false, "table created");
     }
     final TestConfiguration config = createConfig(prefix);
-    config.driverClasspath.add("lib/h2.jar");
+    config.driver.classpath.add("lib/h2.jar");
     return config;
   }
 

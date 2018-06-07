@@ -41,8 +41,8 @@ public class TestMultiServerSetup extends AbstractNonStandardSetup {
   public void testSetup() throws Exception {
     try {
       final TestConfiguration cfg = createConfig("p2p");
-      cfg.driverLog4j = "classes/tests/config/p2p/log4j-driver.properties";
-      cfg.nodeLog4j = "classes/tests/config/p2p/log4j-node.properties";
+      cfg.driver.log4j = "classes/tests/config/p2p/log4j-driver.properties";
+      cfg.node.log4j = "classes/tests/config/p2p/log4j-node.properties";
       print(false, false, ">>> setting up");
       TestConfigSource.setClientConfig(cfg.clientConfig);
       BaseSetup.setup(2, 2, false, false, cfg);

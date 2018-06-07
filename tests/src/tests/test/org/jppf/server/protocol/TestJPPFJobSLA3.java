@@ -48,7 +48,7 @@ public class TestJPPFJobSLA3 extends BaseTest {
     final List<String> cp = new ArrayList<>();
     cp.add("../common/classes");
     cp.add("../server/classes");
-    config.nodeClasspath.addAll(cp);
+    config.node.classpath.addAll(cp);
     client = BaseSetup.setup(1, 1, true, config);
   }
 

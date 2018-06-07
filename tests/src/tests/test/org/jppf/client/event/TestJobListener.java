@@ -50,7 +50,7 @@ public class TestJobListener extends BaseTest {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
-    cfg.driverLog4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
+    cfg.driver.log4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
     BaseSetup.setup(1, 1, false, cfg);
   }
 

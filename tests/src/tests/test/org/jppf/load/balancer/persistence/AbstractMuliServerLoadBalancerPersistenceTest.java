@@ -55,8 +55,8 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
   static void setupConfig(final String driverConfigFile, final boolean useDB) throws Exception {
     final String prefix = "lb_persistence_p2p";
     final TestConfiguration config = dbSetup(prefix, useDB);
-    config.driverJppf = "classes/tests/config/" + prefix + "/" + driverConfigFile;
-    config.driverLog4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
+    config.driver.jppf = "classes/tests/config/" + prefix + "/" + driverConfigFile;
+    config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, false, config);
     checkPeers(15_000L, false, true);
   }

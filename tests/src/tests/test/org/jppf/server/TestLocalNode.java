@@ -44,7 +44,7 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("localnode");
-    config.driverLog4j = "classes/tests/config/localnode/log4j-driver.properties";
+    config.driver.log4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     final AtomicReference<Exception> ref = new AtomicReference<>(null);
     final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {

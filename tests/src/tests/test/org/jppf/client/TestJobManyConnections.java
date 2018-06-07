@@ -43,8 +43,8 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     final int nbDrivers = 3;
     final TestConfiguration config = createConfig("p2p");
-    config.driverJppf = "classes/tests/config/p2p/driver2.properties";
-    config.driverLog4j = "classes/tests/config/p2p/log4j-driver2.properties";
+    config.driver.jppf = "classes/tests/config/p2p/driver2.properties";
+    config.driver.log4j = "classes/tests/config/p2p/log4j-driver2.properties";
     client = BaseSetup.setup(nbDrivers, nbDrivers, true, false, config);
     checkPeers(nbDrivers, 10_000L, false, true);
     client.setLoadBalancerSettings("proportional", new TypedProperties().setInt("InitialiSize", 10));

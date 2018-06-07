@@ -35,7 +35,7 @@ public class TestSSL3 extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("ssl3");
-    config.driverLog4j = "classes/tests/config/ssl3/log4j-driver.properties";
+    config.driver.log4j = "classes/tests/config/ssl3/log4j-driver.properties";
     client = BaseSetup.setup(1, 1, true, config);
   }
 

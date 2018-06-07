@@ -23,38 +23,16 @@ import java.util.*;
 /** */
 public class TestConfiguration {
   /**
-   * Path to the driver JPPF config.
+   * The driver configuration.
    */
-  public String driverJppf = "";
+  public ProcessConfig driver = new ProcessConfig();
   /**
-   * Path to the driver log4j config.
+   * The node configuration.
    */
-  public String driverLog4j = "";
+  public ProcessConfig node = new ProcessConfig();
   /**
-   * Driver classpath elements.
+   * Path to the client config file.
    */
-  public List<String> driverClasspath = new ArrayList<>();
-  /**
-   * Driver JVM options.
-   */
-  public List<String> driverJvmOptions = new ArrayList<>();
-  /**
-   * Path to the node JPPF config.
-   */
-  public String nodeJppf = "";
-  /**
-   * Path to the node log4j config.
-   */
-  public String nodeLog4j = "";
-  /**
-   * Node classpath elements.
-   */
-  public List<String> nodeClasspath = new ArrayList<>();
-  /**
-   * Node JVM options.
-   */
-  public List<String> nodeJvmOptions = new ArrayList<>();
-  /** */
   public String clientConfig = "classes/tests/config/client.properties";
 
   /**
@@ -63,15 +41,61 @@ public class TestConfiguration {
    */
   public TestConfiguration copy() {
     final TestConfiguration copy = new TestConfiguration();
-    copy.driverJppf = driverJppf;
-    copy.driverLog4j = driverLog4j;
-    copy.driverClasspath = new ArrayList<>(driverClasspath);
-    copy.driverJvmOptions = new ArrayList<>(driverJvmOptions);
-    copy.nodeJppf = nodeJppf;
-    copy.nodeLog4j = nodeLog4j;
-    copy.nodeClasspath = new ArrayList<>(nodeClasspath);
-    copy.nodeJvmOptions = new ArrayList<>(nodeJvmOptions);
+    copy.driver = driver.copy();
+    copy.node = node.copy();
     copy.clientConfig = clientConfig;
     return copy;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("clientConfig=").append(clientConfig)
+      .append(", driver=[").append(driver).append(']')
+      .append(", node=[").append(node).append(']')
+      .toString();
+  }
+
+  /**
+   * Config for the drivers or nodes.
+   */
+  public static class ProcessConfig {
+    /**
+     * Path to the JPPF config.
+     */
+    public String jppf = "";
+    /**
+     * Path to the log4j config.
+     */
+    public String log4j = "";
+    /**
+     * Classpath elements.
+     */
+    public List<String> classpath = new ArrayList<>();
+    /**
+     * JVM options.
+     */
+    public List<String> jvmOptions = new ArrayList<>();
+
+    /**
+     * Copy this configuration to a new instance.
+     * @return a new {@link ProcessConfig} instance.
+     */
+    public ProcessConfig copy() {
+      final ProcessConfig copy = new ProcessConfig();
+      copy.jppf = jppf;
+      copy.log4j = log4j;
+      copy.classpath = new ArrayList<>(classpath);
+      copy.jvmOptions = new ArrayList<>(jvmOptions);
+      return copy;
+    }
+
+    @Override
+    public String toString() {
+      return new StringBuilder().append("jppf=").append(jppf)
+        .append(", log4j=").append(log4j)
+        .append(", classpath=").append(classpath)
+        .append(", jvmOptions=").append(jvmOptions)
+        .toString();
+    }
   }
 }

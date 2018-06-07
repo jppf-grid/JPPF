@@ -36,6 +36,12 @@ public class Setup1D2N1C extends BaseTest {
     protected void starting(final Description description) {
       BaseTestHelper.printToAll(client, false, false, true, true, true, "start of method %s()", description.getMethodName());
     }
+
+    @Override
+    protected void finished(final Description description) {
+      boolean breakpoint = true;
+      breakpoint = !breakpoint;
+    }
   };
 
   /**

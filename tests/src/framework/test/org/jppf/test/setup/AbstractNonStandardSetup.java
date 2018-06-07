@@ -78,14 +78,14 @@ public class AbstractNonStandardSetup extends BaseTest {
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     final String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
-    testConfig.driverJppf = dir + "/driver.properties";
-    testConfig.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
-    testConfig.driverClasspath = driverCP;
-    testConfig.driverJvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-driver.properties");
-    testConfig.nodeJppf = dir + "/node.properties";
-    testConfig.nodeLog4j = "classes/tests/config/log4j-node.template.properties";
-    testConfig.nodeClasspath = commonCP;
-    testConfig.nodeJvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-node1.properties");
+    testConfig.driver.jppf = dir + "/driver.properties";
+    testConfig.driver.log4j = "classes/tests/config/log4j-driver.template.properties";
+    testConfig.driver.classpath = driverCP;
+    testConfig.driver.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-driver.properties");
+    testConfig.node.jppf = dir + "/node.properties";
+    testConfig.node.log4j = "classes/tests/config/log4j-node.template.properties";
+    testConfig.node.classpath = commonCP;
+    testConfig.node.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-node1.properties");
     testConfig.clientConfig = dir + "/client.properties";
     return testConfig;
   }

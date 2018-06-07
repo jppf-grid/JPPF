@@ -52,7 +52,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = dbSetup("persistence");
-    config.nodeLog4j = "classes/tests/config/persistence/log4j-node.properties";
+    config.node.log4j = "classes/tests/config/persistence/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
   }
 

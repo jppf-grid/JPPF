@@ -28,14 +28,11 @@ public class NodeProcessLauncher extends GenericProcessLauncher {
   /**
    * Initialize the node launcher.
    * @param n the id of the driver, used to determine which configuration files to use.
-   * @param driverConfig the path to the JPPF configuration template file.
-   * @param log4jConfig the path to the log4j template file.
-   * @param classpath the classpath elements for the node.
-   * @param jvmOptions additional JVM options for the node.
+   * @param config the process configuration.
    * @param bindings variable bindings used in 'expr:' script expressions.
    */
-  public NodeProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions, final Map<String, Object> bindings) {
-    super(n, "  node", driverConfig, log4jConfig, classpath, jvmOptions, bindings);
+  public NodeProcessLauncher(final int n, final TestConfiguration.ProcessConfig config, final Map<String, Object> bindings) {
+    super(n, "  node", config, bindings);
     setMainClass("org.jppf.node.NodeRunner");
   }
 }

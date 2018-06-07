@@ -145,15 +145,15 @@ public class BaseSetup {
     bindings.put("$nbNodes", nbNodes);
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++) {
-      drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions, new HashMap<>(bindings));
+      drivers[i] = new DriverProcessLauncher(i + 1, config.driver, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", drivers[i].getName());
-      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName() + "process launcher");
+      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName() + "-processLauncher");
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++) {
-      nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions, new HashMap<>(bindings));
+      nodes[i] = new NodeProcessLauncher(i + 1, config.node, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", nodes[i].getName());
-      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName() + "process launcher");
+      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName() + "-processLauncher");
     }
     if (createClient) {
       client = createClient(null, true, config, listeners);
@@ -235,9 +235,7 @@ public class BaseSetup {
         generateDriverThreadDump(client);
         client.close();
         client = null;
-        //Thread.sleep(500L);
       }
-      //System.gc();
       stopProcesses();
       ConfigurationHelper.cleanup();
     } catch (final Exception e) {
@@ -355,6 +353,7 @@ public class BaseSetup {
    */
   protected static void stopProcesses() {
     try {
+      //StreamUtils.waitKeyPressed("Press a key to stop all proccesses");
       if (nodes != null) {
         for (final NodeProcessLauncher n: nodes) {
           BaseTest.print(true, false, "stopping %s", n.getName());
@@ -431,15 +430,12 @@ public class BaseSetup {
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
-    config.driverJppf = dir + "/driver.template.properties";
-    config.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
-    config.driverClasspath = driverCP;
-    config.driverJvmOptions.add("-Xmx128m");
-    config.driverJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-driver.properties");
-    config.nodeJppf = dir + "/node.template.properties";
-    config.nodeLog4j = "classes/tests/config/log4j-node.template.properties";
-    config.nodeClasspath = commonCP;
-    config.nodeJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-node1.properties");
+    config.driver.jppf = dir + "/driver.template.properties";
+    config.driver.log4j = dir + "/log4j-driver.template.properties";
+    config.driver.classpath = driverCP;
+    config.node.jppf = dir + "/node.template.properties";
+    config.node.log4j = dir + "/log4j-node.template.properties";
+    config.node.classpath = commonCP;
     config.clientConfig = dir + "/client.properties";
     return config;
   }

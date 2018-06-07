@@ -72,7 +72,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("discovery");
-    config.driverLog4j = "classes/tests/config/discovery/log4j-driver.properties";
+    config.driver.log4j = "classes/tests/config/discovery/log4j-driver.properties";
     BaseSetup.setup(2, 2, false, true, config);
     final long start = System.currentTimeMillis();
     final long timeout = 60_000L;

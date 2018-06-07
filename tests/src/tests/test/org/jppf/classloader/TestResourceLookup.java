@@ -42,7 +42,7 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("classloader");
-    config.driverClasspath.add("test-resources/driver1");
+    config.driver.classpath.add("test-resources/driver1");
     client = BaseSetup.setup(1, 1, true, config);
   }
 

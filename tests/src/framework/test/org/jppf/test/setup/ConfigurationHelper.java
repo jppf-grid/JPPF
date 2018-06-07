@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.jppf.scripting.*;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 
 /**
  * 
@@ -47,15 +46,10 @@ public class ConfigurationHelper {
   public static String createTempConfigFile(final TypedProperties config) {
     String path = null;
     try {
-      //System.err.println("jppf temp dir: " + FileUtils.getJPPFTempDir());
       final File file = File.createTempFile("config", ".properties", FileUtils.getJPPFTempDir());
       file.deleteOnExit();
-      Writer writer = null;
-      try {
-        writer = new BufferedWriter(new FileWriter(file));
+      try (Writer writer = new BufferedWriter(new FileWriter(file))) {
         config.store(writer, null);
-      } finally {
-        if (writer != null) StreamUtils.closeSilent(writer);
       }
       path = file.getCanonicalPath().replace('\\', '/');
       tempFiles.add(file);
@@ -91,17 +85,6 @@ public class ConfigurationHelper {
       props.loadAndResolve(reader);
       for (final Map.Entry<Object, Object> entry: props.entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-          /*
-          final String key = (String) entry.getKey();
-          String value = (String) entry.getValue();
-          try {
-            final String s = "[" + templatePath + ", " + key + "]";
-            value = parseValue(s, value, variables);
-          } catch (final Exception e) {
-            throw new RuntimeException("Invalid expression for template file: '" + templatePath + "', property: '" + key + " = " + value + '\'', e);
-          }
-          result.setProperty(key, value);
-          */
           parseProperty(result, (String) entry.getKey(), (String) entry.getValue(), variables);
         }
       }
@@ -115,7 +98,7 @@ public class ConfigurationHelper {
   /**
    * Parse the specified property value, performinig templates substitutions where needed.
    * <p>format: {@code name = $for{start; end; condition} value}
-   * <p>example: prop_name$i = $for{1, $n, $n != $i} expr: prop_value$i
+   * <p>example: driver$i.jppf.server.port = $for{1; $nbDrivers; $n != $i} expr: 11100 + $i
    * @param result the resulting properties.
    * @param key a key used to cache the compiled groovy expression.
    * @param source the string to parse.
@@ -153,10 +136,10 @@ public class ConfigurationHelper {
         ScriptRunnerFactory.releaseScriptRunner(runner);
       }
     } else {
-      value = parseValue(key, source, variables);
+      value = parseValue(key, value, variables);
       result.setProperty(key, value);
     }
- }
+  }
 
   /**
    * Parse the specified property value, performinig templates substitutions where needed.
@@ -173,7 +156,7 @@ public class ConfigurationHelper {
       ScriptRunner runner = null;
       try {
         runner = ScriptRunnerFactory.getScriptRunner("groovy");
-        final Object o = runner.evaluate(key, expr, variables);
+        final Object o = runner.evaluate(expr, variables);
         if (o != null) value = o.toString();
       } finally {
         ScriptRunnerFactory.releaseScriptRunner(runner);
@@ -198,16 +181,11 @@ public class ConfigurationHelper {
    * @return a {@link TypedProperties} with the properties of the specified file.
    */
   public static TypedProperties loadProperties(final TypedProperties properties, final File path) {
-    Reader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(path));
-      //properties.load(reader);
+    try (Reader reader = new BufferedReader(new FileReader(path))) {
       properties.loadAndResolve(reader);
     } catch (final Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
-    } finally {
-      if (reader != null) StreamUtils.closeSilent(reader);
     }
     return properties;
   }
@@ -227,7 +205,7 @@ public class ConfigurationHelper {
    * @param override the properties that will override those in the configuration.
    */
   public static void overrideConfig(final TypedProperties config, final TypedProperties override) {
-    for (Map.Entry<Object, Object> entry : override.entrySet()) {
+    for (final Map.Entry<Object, Object> entry : override.entrySet()) {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         config.put(entry.getKey(), entry.getValue());
       }

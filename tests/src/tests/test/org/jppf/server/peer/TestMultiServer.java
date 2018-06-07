@@ -49,7 +49,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration config = createConfig("p2p");
-    config.driverLog4j = "classes/tests/config/p2p/log4j-driver.properties";
+    config.driver.log4j = "classes/tests/config/p2p/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, true, config);
   }
 

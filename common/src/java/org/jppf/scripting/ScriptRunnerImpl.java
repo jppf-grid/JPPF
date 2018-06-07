@@ -90,7 +90,7 @@ class ScriptRunnerImpl implements ScriptRunner {
     final ScriptEngine engine = new ScriptEngineManager().getEngineByName(language);
     if (engine == null) {
       engineNotFound = true;
-      throw new JPPFScriptingException("an engine could not be instanciated for script language '" + language + "'");
+      throw new JPPFScriptingException("an engine could not be instantiated for script language '" + language + "'");
     }
     return engine;
   }

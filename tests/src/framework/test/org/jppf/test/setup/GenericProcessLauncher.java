@@ -145,29 +145,24 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
    * Default constructor.
    * @param n a number ssigned to this process.
    * @param processType the type of process (node or driver).
-   * @param jppfTemplate the path to the JPPF configuration template file.
-   * @param log4jTemplate the path to the log4j template file.
-   * @param classpath the classpath elements for the driver.
-   * @param jvmOptions additional JVM options for the driver.
+   * @param config the process configuration.
    * @param bindings variable bindings used in 'expr:' script expressions.
    */
-  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions,
-    final Map<String, Object> bindings) {
+  public GenericProcessLauncher(final int n, final String processType, final TestConfiguration.ProcessConfig config, final Map<String, Object> bindings) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
-    if (bindings == null) {
-      jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
-      log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
-    } else {
-      bindings.put("$n", n);
-      jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, bindings));
-      log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, bindings)));
-    }
-    for (String elt: classpath) addClasspathElement(elt);
-    for (String option: jvmOptions) addJvmOption(option);
+    if (debugEnabled) log.debug("creating {} with config=[{}]", name, config);
+    bindings.put("$n", n);
+    final TypedProperties props = ConfigurationHelper.createConfigFromTemplate(config.jppf, bindings);
+    if (debugEnabled) log.debug("{} properties={}", name, props);
+    jppfConfig = ConfigurationHelper.createTempConfigFile(props);
+    log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(config.log4j, bindings)));
+    for (final String elt: config.classpath) addClasspathElement(elt);
+    for (final String option: config.jvmOptions) addJvmOption(option);
     updateJvmOptionsFromConfig();
+    if (debugEnabled) log.debug("{} jppfConfig={}, log4j={}, jvmOptions={}, classpath={}, bindings={}", name, jppfConfig, log4j, jvmOptions, classpath, bindings);
   }
-
+    
   /**
    * 
    */

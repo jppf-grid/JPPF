@@ -73,8 +73,8 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration cfg = createConfig("job_reservation");
-    cfg.driverLog4j = "classes/tests/config/job_reservation/log4j-driver.properties";
-    cfg.nodeLog4j = "classes/tests/config/job_reservation/log4j-node.properties";
+    cfg.driver.log4j = "classes/tests/config/job_reservation/log4j-driver.properties";
+    cfg.node.log4j = "classes/tests/config/job_reservation/log4j-node.properties";
     client = BaseSetup.setup(1, 3, true, cfg);
     jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     jmx.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myNodeListener);

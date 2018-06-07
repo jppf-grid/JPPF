@@ -52,7 +52,6 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     final int nbTasks = 10;
     final long duration = 100L;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    //waitKeyPressed();
     driver.resetStatistics();
     JPPFStatistics stats = driver.statistics();
     assertNotNull(stats);
@@ -71,7 +70,6 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     assertTrue(serverAvgTime >= nodeAvgTime);
     final double serverMaxTime = stats.getSnapshot(EXECUTION).getMax();
     assertTrue(serverMaxTime >= stats.getSnapshot(NODE_EXECUTION).getMax());
-    //assertTrue(stats.getNodeExecution().getMax() >= nodeAvgTime);
     assertTrue(nbTasks == stats.getSnapshot(TASK_DISPATCH).getTotal());
   }
 

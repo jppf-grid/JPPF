@@ -28,14 +28,11 @@ public class DriverProcessLauncher extends GenericProcessLauncher {
   /**
    * Initialize the driver launcher.
    * @param n the id of the driver, used to determine which configuration files to use.
-   * @param driverConfig the path to the JPPF configuration template file.
-   * @param log4jConfig the path to the log4j template file.
-   * @param classpath the classpath elements for the driver.
-   * @param jvmOptions additional JVM options for the driver.
+   * @param config the process configuration.
    * @param bindings variable bindings used in 'expr:' script expressions.
    */
-  public DriverProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions, final Map<String, Object> bindings) {
-    super(n, "driver", driverConfig, log4jConfig, classpath, jvmOptions, bindings);
+  public DriverProcessLauncher(final int n, final TestConfiguration.ProcessConfig config, final Map<String, Object> bindings) {
+    super(n, "driver", config, bindings);
     addClasspathElement("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
     setMainClass("org.jppf.server.JPPFDriver");
   }

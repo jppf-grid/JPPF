@@ -44,8 +44,8 @@ public class TestKryo extends AbstractTestSerialization {
     commonCP.add("../samples-pack/KryoSerializer/classes");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar");
     commonCP.add("../samples-pack/KryoSerializer/lib/kryo-2.22-all.jar");
-    config.driverClasspath.addAll(commonCP);
-    config.nodeClasspath.addAll(commonCP);
+    config.driver.classpath.addAll(commonCP);
+    config.node.classpath.addAll(commonCP);
     client = BaseSetup.setup(1, 1, true, config);
     printOut("----- serialization class = %s -----", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
   }
