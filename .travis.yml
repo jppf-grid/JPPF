@@ -1,0 +1,10 @@
+language: java
+
+install: true
+
+script:
+- ant build
+- ant test
+
+jdk:
+  - oraclejdk7
