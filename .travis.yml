@@ -7,4 +7,4 @@ script:
 - ant test
 
 jdk:
-  - oraclejdk7
+  - openjdk7
