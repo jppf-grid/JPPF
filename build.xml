@@ -30,6 +30,7 @@
 
   <target name="build" description="build JPPF">
     <echo message="Building JPPF (without installer)"/>
+    <ant dir="jmxremote" target="compile" useNativeBasedir="true"/>
     <ant dir="JPPF/bin" target="deploy.noinstaller" useNativeBasedir="true"/>
   </target>
 
