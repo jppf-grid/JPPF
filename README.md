@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lolocohen/JPPF.svg?branch=master)](https://travis-ci.org/lolocohen/JPPF)
+
 <img src="https://www.jppf.org/images/logo3.gif"/>
 
 # The open source grid computing solution
