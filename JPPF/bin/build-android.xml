@@ -18,13 +18,22 @@
 
 <project name="JPPF-android" basedir="..">
 
-  <target name="build.android" depends="build.android.apk, package.android.source" description="build.android"/>
+  <target name="build.android" depends="detect.sdk, build.android.apk, package.android.source" description="build.android"/>
+
+  <target name="detect.sdk">
+    <condition property="android.sdk.installed">
+      <and>
+        <isset property="env.ANDROID_HOME"/>
+        <available file="${env.ANDROID_HOME}" type="dir"/>
+      </and>
+    </condition>
+  </target>
 
   <!-- ========================================================================= -->
   <!-- update the dependencies of the Android project                            -->
   <!-- ========================================================================= -->
   
-  <target name="update.android.dependencies" depends="build" description="update dependencies of the android projects">
+  <target name="update.android.dependencies" depends="build" description="update dependencies of the android projects" if="android.sdk.installed">
     <jar destfile="${build}/jppf-node-android.jar">
       <zipfileset src="${build}/jppf-node-${version.number}.jar">
         <exclude name="**/screensaver/**/*.*"/>
@@ -44,7 +53,7 @@
   <!-- Build the Android project                                                 -->
   <!-- ========================================================================= -->
   
-  <target name="build.android.apk" depends="update.android.dependencies" description="">
+  <target name="build.android.apk" depends="update.android.dependencies" description="" if="android.sdk.installed">
     <local name="cmdname"/>
     <condition property="cmdname" value="gradlew.bat" else="gradlew">
       <os family="windows"/>
@@ -72,7 +81,7 @@
   <!-- Package the Android project source                                        -->
   <!-- ========================================================================= -->
   
-  <target name="package.android.source" depends="" description="pkg src">
+  <target name="package.android.source" depends="" description="pkg src" if="android.sdk.installed">
     <property name="android.prefix" value="JPPF-${version.number}-node-android-src"/>
     <delete file="${build}/${android.prefix}.zip" quiet="true"/>
     <zip destfile="${build}/${android.prefix}.zip">
