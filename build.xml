@@ -56,6 +56,7 @@
 
   <target name="test" description="run all tests">
     <echo message="Running JUnit tests"/>
+    <ant dir="samples-pack/KryoSerializer" target="compile" useNativeBasedir="true"/>
     <ant dir="tests" target="run.junit" useNativeBasedir="true"/>
   </target>
 
