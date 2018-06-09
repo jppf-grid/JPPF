@@ -105,13 +105,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       } else {  
         serverJob = jobMap.get(jobUuid);
         if ((serverJob != null) && (serverJob.getSubmissionStatus() == SubmissionStatus.ENDED)) {
-          try {
-            lock.unlock();
-            waitForJobRemoved(serverJob);
-            serverJob = jobMap.get(jobUuid);
-          } finally {
-            lock.lock();
-          }
+          waitForJobRemoved(serverJob);
+          serverJob = jobMap.get(jobUuid);
         }
         final boolean newJob;
         if (serverJob == null) {
@@ -157,7 +152,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   private void waitForJobRemoved(final ServerJob job) {
     if (debugEnabled) log.debug("awaiting removal of {}", job);
     long time = System.nanoTime();
-    while (jobMap.get(job.getUuid()) != null) job.getRemovalCondition().goToSleep(100L);
+    while (jobMap.get(job.getUuid()) != null) {
+      try {
+        lock.unlock();
+        job.getRemovalCondition().goToSleep(100L);
+      } finally {
+        lock.lock();
+      }
+    }
     time = (System.nanoTime() - time) / 1_000_000L;
     if (debugEnabled) log.debug("waited {} ms for {}", time, job);
   }

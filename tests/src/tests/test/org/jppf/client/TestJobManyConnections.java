@@ -36,7 +36,7 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJobManyConnections extends AbstractNonStandardSetup {
   /**
-   * Launches 2 drivers connected to each other,  with 1 node attached to each and start the client.
+   * Launches 3 drivers connected to each other,  with 1 node attached to each and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
