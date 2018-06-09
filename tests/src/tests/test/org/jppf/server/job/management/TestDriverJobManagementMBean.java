@@ -56,6 +56,10 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * A "short" duration for this test.
    */
   private static final long TIME_SHORT = 1000L;
+  /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 20_000L;
 
   /**
    * @throws Exception if any error occurs.
@@ -83,7 +87,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * We test a job with 1 task, and attempt to cancel it before completion.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJob() throws Exception {
     final int nbTasks = 10;
     final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
@@ -103,7 +107,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to cancel them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJobsWithAllJobsSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, JobSelector.ALL_JOBS));
@@ -113,7 +117,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to cancel them using a job uuid selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJobsWithJobUuidSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
     final List<String> uuids = new ArrayList<>();
@@ -125,7 +129,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to cancel them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJobsWithScriptedJobSelector() throws Exception {
     final String prefix = ReflectionUtils.getCurrentMethodName();
     final List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, prefix, false);
@@ -137,7 +141,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 suspended jobs jobs and attempt to resume them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testResumeJobsWithAllJobsSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, JobSelector.ALL_JOBS));
@@ -147,7 +151,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 suspended jobs jobs and attempt to resume them using a job uuid selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testResumeJobsWithJobUuidSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     final List<String> uuids = new ArrayList<>();
@@ -159,7 +163,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 suspended jobs jobs and attempt to resume them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testResumeJobsWithScriptedJobSelector() throws Exception {
     final String prefix = ReflectionUtils.getCurrentMethodName();
     final List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, prefix, true);
@@ -171,7 +175,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to suspend them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testSuspendJobsWithAllJobsSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, JobSelector.ALL_JOBS));
@@ -181,7 +185,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to suspend them using a job uuid selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testSuspendJobsWithJobUuidSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     final List<String> uuids = new ArrayList<>();
@@ -193,7 +197,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and attempt to suspend them using an all jobs selector.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testSuspendJobsWithScriptedJobSelector() throws Exception {
     final String prefix = ReflectionUtils.getCurrentMethodName();
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
@@ -205,7 +209,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testGetNodeInfoWithAllJobsSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, JobSelector.ALL_JOBS));
@@ -215,7 +219,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testGetNodeInfoWithJobUuidSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     final List<String> uuids = new ArrayList<>();
@@ -227,7 +231,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testGetNodeInfoWithScriptedJobSelector() throws Exception {
     final String prefix = ReflectionUtils.getCurrentMethodName();
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 5000L, prefix, false);
@@ -239,7 +243,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testUpdatePriorityAndMaxNodesWithAllJobsSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new AllJobsSelector()));
@@ -249,7 +253,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testUpdatePriorityAndMaxNodesWithJobUuidSelector() throws Exception {
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
     final List<String> uuids = new ArrayList<>();
@@ -261,7 +265,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test 2 jobs and check their node dispatches.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testUpdatePriorityAndMaxNodesWithScriptedJobSelector() throws Exception {
     final String prefix = ReflectionUtils.getCurrentMethodName();
     final List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, prefix, true);
@@ -320,7 +324,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJobAfterCompletion() throws Exception {
     final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
     final List<Task<?>> results = client.submitJob(job);
@@ -337,7 +341,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126">JPPF-126 Job cancelled from the admin console may get stuck in the server queue</a>.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testResumeAndCancelSuspendedJob() throws Exception {
     final int nbTasks = 2;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
@@ -359,7 +363,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * Test that a dynamic update of the job SLA is taken into account.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000L)
+  @Test(timeout = TEST_TIMEOUT)
   public void testUpdateJobSLAAndMetadata() throws Exception {
     final int nbTasks = 2;
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();

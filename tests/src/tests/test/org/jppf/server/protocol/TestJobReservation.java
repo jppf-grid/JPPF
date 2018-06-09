@@ -50,6 +50,10 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   private static final MyNodeConnectionListener myNodeListener = new MyNodeConnectionListener();
   /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 20_000L;
+  /**
    * 
    */
   private static final String NODE_RESET_SCRIPT = new StringBuilder()
@@ -115,7 +119,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that a job is executed on the node closest ot its desired node config spec after restart of this node.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     final  int nbTasks = 5 * BaseSetup.nbNodes();
     print(false, false, ">>> creating job");
@@ -149,7 +153,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that when a job with reservation is cancelled, all node reservations are removed.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelledJobReservationSingleNodeWithRestart() throws Exception {
     final int nbTasksPerNode = 5;
     final int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
@@ -197,7 +201,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that when a job with reservation expires, all node reservations are removed.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testExpiredJobReservationSingleNodeWithRestart() throws Exception {
     print(false, false, ">>> creating job");
     final int nbTasksPerNode = 5;
@@ -246,7 +250,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that a job is executed on the 2 nodes closest to its desired node config spec after restart of these nodes.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testJobReservationTwoNodesWithRestart() throws Exception {
     print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();
@@ -287,7 +291,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * with this node being restarted only when its configuration does not match the desired one.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testJobReservationSingleNodeNoRestart() throws Exception {
     print(false, false, ">>> creating job");
     final int nbTasks = 5 * BaseSetup.nbNodes();

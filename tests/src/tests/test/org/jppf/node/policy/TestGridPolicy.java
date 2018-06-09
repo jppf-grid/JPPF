@@ -49,12 +49,16 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Job expiration timeout.
    */
   private static final long JOB_TIMEOUT = 3_000L;
+  /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 20_000L;
 
   /**
    * Test that an XML representation of a scripted policy is valid according to the ExecutionPolicy schema.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testValidXML() throws Exception {
     final String validTrueXML = FileUtils.readTextFile(RESOURCES_DIR + "/ValidTrueGridPolicy.xml");
     final String validFalseXML = FileUtils.readTextFile(RESOURCES_DIR + "/ValidFalseGridPolicy.xml");
@@ -66,7 +70,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test that an XML representation of a scripted policy is valid according to the ExecutionPolicy.xsd schema.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testInvalidXML() throws Exception {
     try {
       final String invalidXML = FileUtils.readTextFile(RESOURCES_DIR + "/InvalidGridPolicy.xml");
@@ -81,7 +85,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test the results of an XML grid policy expected to let the job execute.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testTrueXmlPolicy() throws Exception {
     final int nbTasks = 5;
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/ValidTrueGridPolicy.xml");
@@ -105,7 +109,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test the results of an XML grid policy, where the number of expected nodes is definedas an scripted expression with property substitutions.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void tesGridPolicyWithExpression() throws Exception {
     final int nbTasks = 5;
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/GridPolicyWithExpression.xml");
@@ -129,7 +133,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test the results of an XML grid policy expected to prevent the job from executing.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testFalseXmlPolicy() throws Exception {
     final int nbTasks = 5;
     final String xml = FileUtils.readTextFile(RESOURCES_DIR + "/ValidFalseGridPolicy.xml");
@@ -150,7 +154,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test the results of a grid policy expected to let the job execute.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testTrueJavaPolicy() throws Exception {
     final int nbTasks = 5;
     final String name = ReflectionUtils.getCurrentClassAndMethod();
@@ -174,7 +178,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Test the results of a grid policy expected to prevent the job from executing.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testFalseJavaPolicy() throws Exception {
     final int nbTasks = 5;
     // at least 4 nodes with at least 1 processing thread
@@ -196,7 +200,7 @@ public class TestGridPolicy extends Setup1D2N1C {
    * Then, two additional nodes are started after the job is submitted, making the global policy a working one.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testWorkingFalseJavaPolicy() throws Exception {
     final int nbTasks = 5;
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
