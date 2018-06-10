@@ -39,6 +39,7 @@
     <ant dir="JPPF/bin" target="deploy" useNativeBasedir="true"/>
   </target>
 
+  <!-- to publish to staging repository, use the cmd "ant -Dstaging=true maven" -->
   <target name="maven" description="publish all maven artifacts">
     <echo message="Publishing JPPF maven artifacts"/>
     <ant dir="JPPF/bin" target="maven.artifacts" useNativeBasedir="true">

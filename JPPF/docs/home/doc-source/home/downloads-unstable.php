@@ -1,10 +1,10 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "6.0-alpha-3";
-  $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
+  $ver1 = "6.0-alpha-4";
+  $base = "https://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 6.0 alpha 3 preview</h1>
+  <h1 align="center">Downloads - JPPF 6.0 alpha 4 preview</h1>
 
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
@@ -53,6 +53,7 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a></li>
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-web.zip/download'; ?>">Web administration console</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-jmxremote-nio.zip/download'; ?>">Nio-based JMX remote connector</a></li>
       </ul>
 
       <h3>Samples and tutorials</h3>
@@ -65,13 +66,13 @@ $template{name="about-page-header" title="Downloads - unstable"}$
   </div>
 
   <div class="column_right" style="text-align: justify; padding: 0px;">
-    <div class="blockWithHighlightedTitle">
+    <div class="blockWithHighlightedTitle" style="padding-right: 10px">
       $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note" heading="h2"}$
       <p style="font-style: italic; font-weight: bold">JPPF <?php echo $ver1 ?> is a preview release and is not intended for deployment in production.
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
-    <br>
+    <br><br>
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/documentation.png" title="Documentation preview" heading="h3"}$
       <p>Doc preview for the major new features:
@@ -81,10 +82,19 @@ $template{name="about-page-header" title="Downloads - unstable"}$
         <li><a href="/csdoc/6.0">JPPF 6.0 C-Sharp Doc</a></li>
       </ul>
     </div>
-    <br>
+    <br><br>
+    <div class="blockWithHighlightedTitle">
+      $template{name="highlighted-title-with-icon" img="images/icons/folder-download.png" title="JPPF 6.0 roadmap" heading="h3"}$
+      <ul class="samplesList">
+        <li>The current state of the 6.0 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">Closed issues</a></li>
+      </ul>
+    </div>
+    <br style="margin-top: 15px">
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/folder-download.png" title="All JPPF releases" heading="h3"}$
-      <br>All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
+      <br>All JPPF files can be found from <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
     </div>
     <br>
   </div>

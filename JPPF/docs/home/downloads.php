@@ -73,6 +73,7 @@
         <?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
         <?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
         <?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
+        <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/lolocohen/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
         <?php if ($currentPage == "v6.0 (alpha)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0 (alpha)</a><br></div>
@@ -252,7 +253,7 @@
   <h2 style="${style}">&nbsp;<img src="images/icons/emblem-what.png" class="titleWithIcon"/>Curious or adventurous?</h2>
 </div>
       <div style="height: 5px"></div>
-      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha 3</a>.<br>
+      <b>Try our latest (unstable) version</b>: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 6.0 alpha 4</a>.<br>
       <div style="height: 5px"></div>
       <p align="left"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>

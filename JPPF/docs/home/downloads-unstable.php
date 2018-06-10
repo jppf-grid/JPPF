@@ -1,7 +1,7 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "6.0-alpha-3";
-  $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
+  $ver1 = "6.0-alpha-4";
+  $base = "https://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	  <head>
@@ -77,6 +77,7 @@
         <?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
         <?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
         <?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
+        <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/lolocohen/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
         <?php if ($currentPage == "v6.0 (alpha)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0 (alpha)</a><br></div>
@@ -113,7 +114,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.0 alpha 3 preview</h1>
+  <h1 align="center">Downloads - JPPF 6.0 alpha 4 preview</h1>
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
@@ -159,6 +160,7 @@
       <ul class="list_nomargin">
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a></li>
         <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-web.zip/download'; ?>">Web administration console</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver1 . '-jmxremote-nio.zip/download'; ?>">Nio-based JMX remote connector</a></li>
       </ul>
       <h3>Samples and tutorials</h3>
       <ul class="list_nomargin">
@@ -169,7 +171,7 @@
     <br>
   </div>
   <div class="column_right" style="text-align: justify; padding: 0px;">
-    <div class="blockWithHighlightedTitle">
+    <div class="blockWithHighlightedTitle" style="padding-right: 10px">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h2 style="${style}">&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Please note</h2>
 </div>
@@ -177,7 +179,7 @@
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
-    <br>
+    <br><br>
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3 style="${style}">&nbsp;<img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation preview</h3>
@@ -189,12 +191,23 @@
         <li><a href="/csdoc/6.0">JPPF 6.0 C-Sharp Doc</a></li>
       </ul>
     </div>
-    <br>
+    <br><br>
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>JPPF 6.0 roadmap</h3>
+</div>
+      <ul class="samplesList">
+        <li>The current state of the 6.0 milestone can be found <a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/8/search/1"><b>here</b></a>.<br/></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/18/search/1">Open issues</a></li>
+        <li><a href="https://www.jppf.org/tracker/tbg/jppf/issues/find/saved_search/7/search/1">Closed issues</a></li>
+      </ul>
+    </div>
+    <br style="margin-top: 15px">
     <div class="blockWithHighlightedTitle">
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3 style="${style}">&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>All JPPF releases</h3>
 </div>
-      <br>All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
+      <br>All JPPF files can be found from <a href="https://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
     </div>
     <br>
   </div>
