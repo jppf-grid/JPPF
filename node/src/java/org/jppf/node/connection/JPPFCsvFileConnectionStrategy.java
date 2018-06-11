@@ -20,7 +20,6 @@ package org.jppf.node.connection;
 
 import java.io.Reader;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,96 +45,30 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 4.1
  */
-public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
+public class JPPFCsvFileConnectionStrategy extends AbstractCsvConnectionStrategy {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFCsvFileConnectionStrategy.class);
-  /**
-   * The queue in which {@code DriverConnectionInfo} objects are stored.
-   */
-  private final Queue<DriverConnectionInfo> queue = new LinkedBlockingQueue<>();
-  /**
-   * The fallback strategy to use in case the CSV file is not found or none of the driver defintions it contains is valid. 
-   */
-  private final DriverConnectionStrategy fallbackStrategy;
 
   /**
    * Find and read the CSV file.
    */
   public JPPFCsvFileConnectionStrategy() {
-    readCsvFile();
-    fallbackStrategy = queue.isEmpty() ? new JPPFDefaultConnectionStrategy() : null;
-    if (log.isDebugEnabled()) {
-      if (queue.isEmpty()) log.debug("no valid driver definition found, falling back to default strategy");
-      else {
-        final StringBuilder sb = new StringBuilder("driver definitions:");
-        for (final DriverConnectionInfo info: queue) sb.append('\n').append(info);
-        log.debug(sb.toString());
-      }
-    }
+    super();
   }
 
   @Override
-  public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
-    if (fallbackStrategy != null) return fallbackStrategy.nextConnectionInfo(currentInfo, context);
-    if (log.isDebugEnabled()) log.debug("new connection request with prevInfo={} and context={}", currentInfo, context);
-    if ((currentInfo != null) && (context.getReason() == ConnectionReason.MANAGEMENT_REQUEST)) {
-      return currentInfo;
-    }
-    final DriverConnectionInfo info = queue.poll();
-    queue.offer(info);
-    return info;
-  }
-
-  /**
-   * Parse the CSV file specified in the configuration and convert each line
-   * into a {@link DriverConnectionInfo} which is then added to the queue.
-   */
-  private void readCsvFile() {
+  List<String> getConnectionInfoAsLines() {
     try {
       String path = JPPFConfiguration.getProperties().getString("jppf.server.connection.strategy.file");
       if ((path != null) && !(path = path.trim()).isEmpty()) {
         final Reader reader = FileUtils.getFileReader(path);
-        if (reader != null) {
-          final List<String> lines = FileUtils.textFileAsLines(reader);
-          for (final String line: lines) {
-            final DriverConnectionInfo info = parseLine(line.trim());
-            if (info != null) queue.offer(info);
-          }
-        }
+        if (reader != null) return FileUtils.textFileAsLines(reader);
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-  }
-
-  /**
-   * Parse a CSV line to generate a driver connection info.
-   * @param csv the csv line to parse.
-   * @return a {@link DriverConnectionInfo} instance, or {@code null} if the CSV is not valid or a comment.
-   */
-  private static DriverConnectionInfo parseLine(final String csv) {
-    if (csv.startsWith("#")) return null;
-    final String[] tokens = RegexUtils.COMMA_PATTERN.split(csv);
-    if ((tokens != null) && (tokens.length == 4)) {
-      for (int i=0; i<tokens.length; i++) tokens[i] = tokens[i].trim();
-      final boolean secure = "true".equalsIgnoreCase(tokens[0]);
-      final String host = tokens[1];
-      final int port;
-      try {
-        port = Integer.valueOf(tokens[2]);
-      } catch(@SuppressWarnings("unused") final Exception e) {
-        return null;
-      }
-      int recoveryPort;
-      try {
-        recoveryPort = Integer.valueOf(tokens[3]);
-      } catch(@SuppressWarnings("unused") final Exception e) {
-        recoveryPort = -1;
-      }
-      return new JPPFDriverConnectionInfo(secure, host, port, recoveryPort);
-    }
-    return null;
+    return Collections.emptyList();
   }
 }
