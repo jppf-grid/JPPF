@@ -192,7 +192,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   }
 
   /**
-   * Get the drivers currently handled.
+   * Get the nodes currently handled.
    * @return a list of {@link TopologyNode} instances.
    */
   public List<TopologyNode> getNodes() {
@@ -202,7 +202,27 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   }
 
   /**
-   * Get the driver with the specified uuid.
+   * Get the nodes that are slaves of the specified master node.
+   * @param masterNodeUuid the UUID of the master node whose slaves to lookup.
+   * @return a list of {@link TopologyNode} instances, possibly empty but never {@code null}.
+   * @since 6.0
+   */
+  public List<TopologyNode> getSlaveNodes(final String masterNodeUuid) {
+    final List<TopologyNode> result = new ArrayList<>(getNodeCount());
+    if (masterNodeUuid != null) {
+      synchronized(nodeMap) {
+        for (final Map.Entry<String, TopologyNode> entry: nodeMap.entrySet()) {
+          final TopologyNode node = entry.getValue();
+          final String uuid = node.getMasterUuid();
+          if ((uuid != null) && uuid.equals(masterNodeUuid)) result.add(node);
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Get the node with the specified uuid.
    * @param uuid the uuid of the driver to lookup.
    * @return a {@link TopologyNode} instance.
    */
@@ -269,8 +289,8 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @return a {@link TopologyNode} instance.
    */
   public TopologyNode getNodeOrPeer(final String uuid) {
-    TopologyNode node = nodeMap.get(uuid);
-    if (node == null) node = peerMap.get(uuid);
+    TopologyNode node = getNode(uuid);
+    if (node == null) node = getPeer(uuid);
     return node;
   }
 
@@ -389,8 +409,15 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
       if (other != null) nodeRemoved((TopologyDriver) other.getParent(), other);
     }
     driver.add(node);
-    if (node.isNode()) nodeMap.put(node.getUuid(), node);
-    else peerMap.put(node.getUuid(), (TopologyPeer) node);
+    if (node.isNode()) {
+      synchronized(nodeMap) {
+        nodeMap.put(node.getUuid(), node);
+      }
+    } else {
+      synchronized(peerMap) {
+        peerMap.put(node.getUuid(), (TopologyPeer) node);
+      }
+    }
     final TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_ADDED);
   }
@@ -403,8 +430,15 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
   void nodeRemoved(final TopologyDriver driver, final TopologyNode node) {
     if (debugEnabled) log.debug(String.format("removing %s %s from driver %s", (node.isNode() ? "node" : "peer"), node, driver));
     driver.remove(node);
-    if (node.isNode()) nodeMap.remove(node.getUuid());
-    else peerMap.remove(node.getUuid());
+    if (node.isNode()) {
+      synchronized(nodeMap) {
+        nodeMap.remove(node.getUuid());
+      }
+    } else {
+      synchronized(peerMap) {
+        peerMap.remove(node.getUuid());
+      }
+    }
     final TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_REMOVED);
   }

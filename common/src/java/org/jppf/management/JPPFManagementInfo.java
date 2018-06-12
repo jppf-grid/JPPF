@@ -21,11 +21,9 @@ package org.jppf.management;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.utils.*;
-
 
 /**
- * Instances of this class encapsulate the information required to access the JMX server of a node.
+ * Instances of this class encapsulate the information required to access the JMX server of a node or a driver.
  * @author Laurent Cohen
  */
 public class JPPFManagementInfo implements Serializable, Comparable<JPPFManagementInfo> {
@@ -119,20 +117,10 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * Determines whether the node is active or inactive.
    */
   private boolean active = true;
-
   /**
-   * Initialize this information with the specified parameters.
-   * <br>Warning: this constructor performs a DNS lookup to find the IP address, so there is a performance overhead.
-   * @param host the host on which the node or driver is running.
-   * @param port the port on which the node's or driver's JMX server is listening.
-   * @param uuid unique id of the node or driver.
-   * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
-   * @param secure specifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
-   * @exclude
+   * The uuid of the node of which this node is a slave, if any.
    */
-  public JPPFManagementInfo(final String host, final int port, final String uuid, final int type, final boolean secure) {
-    this(NetworkUtils.getHostIP(host), port, uuid, type, secure);
-  }
+  private final String masterUuid;
 
   /**
    * Initialize this information with the specified parameters.
@@ -146,26 +134,29 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @exclude
    */
   public JPPFManagementInfo(final String host, final String ip, final int port, final String uuid, final int type, final boolean secure) {
-    this(new HostIP(host, ip), port, uuid, type, secure);
+    this(host, ip, port, uuid, type, secure, null);
   }
 
   /**
    * Initialize this information with the specified parameters.
-   * @param hostIP encapsulates the host name and ip address of host on which the driver or node is running.
+   * @param host the name of the host on which the node or driver is running.
+   * @param ip the ip address of the host on which the node is running.
    * @param port the port on which the node's or driver's JMX server is listening.
    * @param uuid unique id of the node or driver.
    * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
    * @param secure specifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
+   * @param masterUuid uuid of the node of which this node is a slave, if any.
    * @since 5.0
    * @exclude
    */
-  public JPPFManagementInfo(final HostIP hostIP, final int port, final String uuid, final int type, final boolean secure) {
-    this.host = hostIP.hostName();
-    this.ipAddress = hostIP.ipAddress();
+  public JPPFManagementInfo(final String host, final String ip, final int port, final String uuid, final int type, final boolean secure, final String masterUuid) {
+    this.host = host;
+    this.ipAddress = ip;
     this.port = port;
     this.uuid = uuid;
     this.type = type;
     this.secure = secure;
+    this.masterUuid = masterUuid;
   }
 
   /**
@@ -373,5 +364,13 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public String getIpAddress() {
     return ipAddress;
+  }
+
+  /**
+   * Get the uuid of the master node that providioned this node.
+   * @return the uuid of the node of which this node is a slave, if any, or {@code null} if this object doesn't represent a node, or if it represents a node that is not a slave.
+   */
+  public String getMasterUuid() {
+    return masterUuid;
   }
 }

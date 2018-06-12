@@ -69,6 +69,13 @@ public interface Node extends Runnable {
   boolean isSlaveNode();
 
   /**
+   * Get the uuid of the node who this node is a slave of.
+   * @return the uuid of this node's master node, or {@code null} if this node is not a slave.
+   * @since 6.0
+   */
+  public String getMasterNodeUuid();
+
+  /**
    * Determine whether this node can execute .Net tasks.
    * @return {@code true} if this node can execute .Net tasks, {@code false} otherwise.
    */

@@ -154,7 +154,7 @@ public class TestNodeSelector extends BaseTest {
     final String uuid = "node" + index;
     final HostIP hostIP = new HostIP("www" + index + ".jppf.org", "1.1.1." + index);
     final int port = 12000 + index;
-    final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, false);
+    final JPPFManagementInfo info = new JPPFManagementInfo(hostIP.hostName(), hostIP.ipAddress(), port, uuid, type, false);
     info.setSystemInfo(new MySystemInfo(uuid));
     return info;
   }

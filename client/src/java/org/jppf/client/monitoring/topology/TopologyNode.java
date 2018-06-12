@@ -119,8 +119,7 @@ public class TopologyNode extends AbstractTopologyComponent {
    * @exclude
    */
   public void setStatus(final TopologyNodeStatus status) {
-    if (status == TopologyNodeStatus.DOWN)
-      this.status = status;
+    if (status == TopologyNodeStatus.DOWN) this.status = status;
   }
 
   /**
@@ -138,6 +137,15 @@ public class TopologyNode extends AbstractTopologyComponent {
    */
   public void setNbSlaveNodes(final int nbSlaveNodes) {
     this.nbSlaveNodes = nbSlaveNodes;
+  }
+
+  /**
+   * Get the uuid of the node who this node is a slave of.
+   * @return the uuid of this node's master node, or {@code null} if this node is not a slave.
+   * @since 6.0
+   */
+  public String getMasterUuid() {
+    return (managementInfo == null) ? null : managementInfo.getMasterUuid();
   }
 
   @Override

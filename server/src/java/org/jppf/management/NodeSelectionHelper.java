@@ -24,7 +24,6 @@ import org.jppf.management.forwarding.NodeSelectionProvider;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
-import org.jppf.utils.HostIP;
 import org.slf4j.*;
 
 /**
@@ -131,7 +130,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     if (info == null) {
       final JPPFSystemInformation sysInfo = context.getSystemInformation();
       if (sysInfo != null) {
-        info = new JPPFManagementInfo(new HostIP("", ""), -1, context.getUuid(), -1, false);
+        info = new JPPFManagementInfo("", "", -1, context.getUuid(), -1, false);
         info.setSystemInfo(sysInfo);
       }
     }

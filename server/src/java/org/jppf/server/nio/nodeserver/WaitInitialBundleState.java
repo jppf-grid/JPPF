@@ -96,6 +96,7 @@ class WaitInitialBundleState extends NodeServerState {
       final HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
       final boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
       final boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+      final String masterUuid = bundle.getParameter(NODE_PROVISIONING_MASTER_UUID);
       int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
         if (channel.isLocal()) {
@@ -108,13 +109,13 @@ class WaitInitialBundleState extends NodeServerState {
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
         if ((systemInfo != null) && (systemInfo.getJppf().get(JPPFProperties.NODE_ANDROID))) type |= JPPFManagementInfo.ANDROID;
-        final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
+        final JPPFManagementInfo info = new JPPFManagementInfo(hostIP.hostName(), hostIP.ipAddress(), port, uuid, type, sslEnabled, masterUuid);
         if (debugEnabled) log.debug(String.format("configuring management for node %s", info));
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
       } else {
         if (offline || (port < 0)) {
-          final JPPFManagementInfo info = new JPPFManagementInfo(hostIP, -1, context.getUuid(), type, sslEnabled);
+          final JPPFManagementInfo info = new JPPFManagementInfo(hostIP.hostName(), hostIP.ipAddress(), -1, context.getUuid(), type, sslEnabled, masterUuid);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           context.setManagementInfo(info);
         }

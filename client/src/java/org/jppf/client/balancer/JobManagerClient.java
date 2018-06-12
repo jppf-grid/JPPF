@@ -198,7 +198,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         final JPPFConnectionPool pool = cnn.getConnectionPool();
         final JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
-        final JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), pool.getJmxPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
+        final JPPFManagementInfo info = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       } catch (final Throwable e) {
@@ -290,8 +290,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         if (!wrapper.isLocal()) {
           final String driverUuid = connection.getDriverUuid();
           JPPFManagementInfo info = null;
-          if (jmx != null) info = new JPPFManagementInfo(connection.getHost(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
-          else info = new JPPFManagementInfo(connection.getHost(), -1, driverUuid != null ? driverUuid : "?", JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+          final JPPFConnectionPool pool = connection.getConnectionPool();
+          if (jmx != null) info = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+          else info = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), -1, driverUuid != null ? driverUuid : "?", JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
           info.setSystemInfo(systemInfo);
           wrapper.setManagementInfo(info);
         }

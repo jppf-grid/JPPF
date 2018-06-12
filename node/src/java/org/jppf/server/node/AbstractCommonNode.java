@@ -94,6 +94,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER, isMasterNode());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_SLAVE, isSlaveNode());
       bundle.setParameter(BundleParameter.NODE_DOTNET_CAPABLE, isDotnetCapable());
+      if (isSlaveNode()) bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER_UUID, getMasterNodeUuid());
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));

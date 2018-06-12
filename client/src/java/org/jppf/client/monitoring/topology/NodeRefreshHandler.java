@@ -79,7 +79,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    */
   @Override
   protected synchronized void performRefresh() {
-    for (TopologyDriver driver: manager.getDrivers()) {
+    for (final TopologyDriver driver: manager.getDrivers()) {
       refreshNodes(driver);
       if (driver.getChildCount() > 0) refreshNodeStates(driver);
     }
@@ -112,9 +112,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (!actualMap.containsKey(uuid)) nodesToProcess.add(uuid);
     }
     for (final String uuid: nodesToProcess) {
-      //TopologyNode node = manager.getNodeOrPeer(uuid);
       final TopologyNode node = (TopologyNode) driver.getChild(uuid);
-      //if (node == null) node = new TopologyNode(uuid);
       if (debugEnabled) log.debug("removing node " + node);
       if (node != null) manager.nodeRemoved(driver, node);
     }

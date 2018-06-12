@@ -143,5 +143,9 @@ public enum BundleParameter {
   /**
    * UUID of a connection to a driver.
    */
-  CONNECTION_UUID
+  CONNECTION_UUID,
+  /**
+   * UUID of the master node if the current node is a slave.
+   */
+  NODE_PROVISIONING_MASTER_UUID
 }

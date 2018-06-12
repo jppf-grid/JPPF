@@ -528,6 +528,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     return (systemInformation != null) && systemInformation.getJppf().get(JPPFProperties.PROVISIONING_SLAVE);
   }
 
+  @Override
+  public String getMasterNodeUuid() {
+    if (systemInformation == null) return null;
+    return systemInformation.getJppf().get(JPPFProperties.PROVISIONING_MASTER_UUID);
+  }
+
   /**
    * Check whether this node is stopped or shutting down.
    * If not, an unchecked {@code IllegalStateException} is thrown.
