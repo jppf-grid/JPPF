@@ -265,6 +265,7 @@ public class NodeRunner {
           }
         };
         classLoader = AccessController.doPrivileged(pa);
+        if (debugEnabled) log.debug("created new class loader {}", classLoader);
         Thread.currentThread().setContextClassLoader(classLoader);
       }
       return classLoader;

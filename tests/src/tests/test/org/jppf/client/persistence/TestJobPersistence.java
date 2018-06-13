@@ -77,12 +77,17 @@ public class TestJobPersistence extends Setup1D1N {
       job.setPersistenceManager(pm);
       job.addJobListener(new JobListenerAdapter() {
         @Override
-        public synchronized void jobReturned(final JobEvent event) {
-          resultsReceived.set(true);
+        public void jobReturned(final JobEvent event) {
+          synchronized(resultsReceived) {
+            resultsReceived.set(true);
+            resultsReceived.notifyAll();
+          }
         }
       });
       client.submitJob(job);
-      while (!resultsReceived.get()) Thread.sleep(100L);
+      synchronized(resultsReceived) {
+        while (!resultsReceived.get()) resultsReceived.wait(100L);
+      }
       client.close();
       final int n = job.getResults().size();
       assertTrue(n < nbTasks);

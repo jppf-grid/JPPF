@@ -63,9 +63,20 @@ public class NioHelper {
    * @param identifier the JPPF identifier to mao to.
    * @param server the server to map.
    */
-  public static synchronized void putServer(final int identifier, final NioServer<?, ?> server) {
+  public static void putServer(final int identifier, final NioServer<?, ?> server) {
     synchronized(identifiedServers) {
       identifiedServers.put(identifier, server);
+    }
+  }
+
+  /**
+   * Map the specified server tot he specified identifier.
+   * @param identifier the JPPF identifier to mao to.
+   * @return the server that was removed, or {@code null} if there was no server for the specified identifier.
+   */
+  public static NioServer<?, ?> removeServer(final int identifier) {
+    synchronized(identifiedServers) {
+      return identifiedServers.remove(identifier);
     }
   }
 
@@ -75,7 +86,7 @@ public class NioHelper {
    * @return a {@link NioServer} instance.
    * @throws Exception if any error occurs.
    */
-  public static synchronized NioServer<?, ?> getServer(final int identifier) throws Exception {
+  public static NioServer<?, ?> getServer(final int identifier) throws Exception {
     synchronized(identifiedServers) {
       if (identifier == JPPFIdentifiers.JMX_REMOTE_CHANNEL) {
         if (getJMXServerMethod == null) initializeJMXServerPool();
