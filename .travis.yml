@@ -12,4 +12,4 @@ jdk:
 after_script:
 - curl --ftp-create-dirs
        -T tests/all_results.zip
-       $CURL_URL_BASE/build/all_results.zip
+       ${CURL_URL_BASE}/build/all_results.zip
