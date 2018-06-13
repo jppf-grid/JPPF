@@ -301,11 +301,11 @@
   <target name="zip.results">
     <delete file="${basedir}/all_results.zip" quiet="true"/>
     <zip destfile="${basedir}/all_results.zip">
-      <zipfileset dir="${basedir}/logs/" prefix="logs">
+      <zipfileset dir="${basedir}/logs" prefix="logs">
         <include name="*.zip"/>
         <exclude name="all_logs.zip"/>
       </zipfileset>
-      <zipfileset dir="${basedir}/report/" prefix="report">
+      <zipfileset dir="${basedir}/report" prefix="report">
         <exclude name="*.xml"/>
       </zipfileset>
     </zip>
@@ -322,7 +322,8 @@
       </fileset>
       <report format="frames" todir="${report}" styledir="${tests.classes}"/>
     </junitreport>
-    <!--<copy todir="${report}" file="${basedir}/stylesheet.css"/>-->
+    <!--<copy todir="${report}" file="${basedir}/stylesheet.css"/>
     <fail if="tests.failed">Test failure, aborting build</fail>
+    -->
   </target>
 </project> 
