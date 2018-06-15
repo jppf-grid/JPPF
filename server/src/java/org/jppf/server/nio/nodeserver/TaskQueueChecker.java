@@ -80,7 +80,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @return true if a job was dispatched, false otherwise.
    */
   private boolean dispatch() {
-    final boolean dispatched = false;
     try {
       queue.getBroadcastManager().processPendingBroadcasts();
       C channel = null;
@@ -89,8 +88,15 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
         queueLock.lock();
+        final List<ServerJob> allJobs;
         try {
-          final Iterator<ServerJob> it = queue.iterator();
+          allJobs = queue.getAllJobsFromPriorityMap();
+        } finally {
+          queueLock.unlock();
+        }
+        try {
+          //final Iterator<ServerJob> it = queue.iterator();
+          final Iterator<ServerJob> it = allJobs.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
             final ServerJob job = it.next();
             final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
@@ -135,13 +141,13 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
         } catch(final Exception e) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", e);
         } finally {
-          queueLock.unlock();
+          //queueLock.unlock();
         }
       }
     } catch (final Exception e) {
       log.error("An error occurred while preparing for bundle creation and dispatching.", e);
     }
-    return dispatched;
+    return false;
   }
 
   /**

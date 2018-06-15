@@ -156,13 +156,14 @@ public class TestJobListener extends BaseTest {
    * @throws Exception if any error occurs
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
+    print(false, false, ">>> creating client");
     jppfClient = BaseSetup.createClient(null, false);
-    BaseTestHelper.printToAll(jppfClient, false, false, true, false, false, "start of %s()", name);
+    print(false, false, ">>> creating job");
     final JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
-    print(false, false, "submitting job %s", job.getName());
+    print(false, false, ">>> submitting job %s", job.getName());
     final List<Task<?>> results = jppfClient.submitJob(job);
-    print(false, false, "got job results");
+    print(false, false, ">>> got job results");
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     Thread.sleep(250L);

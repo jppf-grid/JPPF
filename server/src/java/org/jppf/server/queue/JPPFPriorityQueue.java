@@ -91,6 +91,21 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
   @Override
   public ServerJob addBundle(final ServerTaskBundleClient clientBundle) {
+    final ServerJob job = getJob(clientBundle.getUuid());
+    try {
+      if (job != null) job.getLock().lock();
+      return addBundle0(clientBundle);
+    } finally {
+      if (job != null) job.getLock().unlock();
+    }
+  }
+
+  /**
+   * Add a client bundle.
+   * @param clientBundle the client bundle to add.
+   * @return the server job to which the client bundle was added.
+   */
+  public ServerJob addBundle0(final ServerTaskBundleClient clientBundle) {
     if (debugEnabled) log.debug("adding bundle=" + clientBundle);
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
     final JobSLA sla = clientBundle.getSLA();
@@ -155,8 +170,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     while (jobMap.get(job.getUuid()) != null) {
       try {
         lock.unlock();
+        job.getLock().unlock();
         job.getRemovalCondition().goToSleep(100L);
       } finally {
+        job.getLock().lock();
         lock.lock();
       }
     }
@@ -205,6 +222,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks) {
     final ServerTaskBundleNode result;
+    serverJob.getLock().lock();
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, serverJob.getTaskCount());
@@ -225,6 +243,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
       lock.unlock();
+      serverJob.getLock().unlock();
     }
     if (debugEnabled) log.debug("found {} tasks in the job, result={}", result.getTaskCount(), result);
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -result.getTaskCount());
@@ -386,6 +405,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       final Set<String> set = new HashSet<>();
       for (ServerJob job: priorityMap.allValues()) set.add(job.getUuid());
       return set;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get all the jobs in the queue, ordered by priority.
+   * @return a list of server-side jobs. The returned list is completely independant from this queue
+   * and can be modified without affecting this queue.
+   */
+  public List<ServerJob> getAllJobsFromPriorityMap() {
+    lock.lock();
+    try {
+      return priorityMap.allValues();
     } finally {
       lock.unlock();
     }

@@ -271,7 +271,7 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 
   @Override
   public List<V> allValues() {
-    final List<V> list = new ArrayList<>();
+    final List<V> list = new ArrayList<>(size());
     for (final Map.Entry<K, Collection<V>> entry: map.entrySet()) {
       if (!entry.getValue().isEmpty()) list.addAll(entry.getValue());
     }
