@@ -2,6 +2,9 @@ language: java
 
 install: true
 
+before_script:
+  - _JAVA_OPTIONS=
+
 script:
 - ant build
 - ant test
