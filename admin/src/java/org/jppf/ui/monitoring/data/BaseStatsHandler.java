@@ -25,7 +25,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.ShowIPHandler;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -49,7 +49,7 @@ public class BaseStatsHandler {
   /**
    * Number of data snapshots kept in memory.
    */
-  protected int rolloverPosition = 200;
+  protected final int rolloverPosition = JPPFConfiguration.getProperties().getInt("jppf.admin.charts.rollover", 200);
   /**
    * Contains all the data and its converted values received from the server.
    */
@@ -127,19 +127,8 @@ public class BaseStatsHandler {
    * Get the number of data snapshots kept in memory.
    * @return the rollover position as an int value.
    */
-  public synchronized int getRolloverPosition() {
+  public int getRolloverPosition() {
     return rolloverPosition;
-  }
-
-  /**
-   * Set the number of data snapshots kept in memory. If the value if less than the former values, the corresponding
-   * older data snapshots will be deleted.
-   * @param rolloverPosition the rollover position as an int value.
-   */
-  public synchronized void setRolloverPosition(final int rolloverPosition) {
-    if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: " + rolloverPosition);
-    for (ConnectionDataHolder dataHolder: dataHolderMap.values()) dataHolder.setCapacity(rolloverPosition);
-    this.rolloverPosition = rolloverPosition;
   }
 
   /**

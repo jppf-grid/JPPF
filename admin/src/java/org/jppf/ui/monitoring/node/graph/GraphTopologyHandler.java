@@ -24,11 +24,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.SwingUtilities;
 
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
 
 /**
  * This class handles operations on the graph.
@@ -51,11 +53,11 @@ public class GraphTopologyHandler implements TopologyListener {
   /**
    * The underlying graph that keeps track of all drivers and nodes.
    */
-  private SparseMultigraph<AbstractTopologyComponent, Number> fullGraph = null;
+  private SparseMultigraph<AbstractTopologyComponent, Number> fullGraph;
   /**
    * The graph that is actually displayed and accounts for collapsed vertices.
    */
-  private SparseMultigraph<AbstractTopologyComponent, Number> displayGraph = null;
+  private SparseMultigraph<AbstractTopologyComponent, Number> displayGraph;
   /**
    * Edge objects as numbers from a sequence.
    */
@@ -65,7 +67,7 @@ public class GraphTopologyHandler implements TopologyListener {
    */
   private final GraphOption graphOption;
   /**
-   * 
+   * Mapping of drivers to their uuid.
    */
   private Map<String, TopologyDriver> drivers = new HashMap<>();
   /**
@@ -189,10 +191,6 @@ public class GraphTopologyHandler implements TopologyListener {
     SwingUtilities.invokeLater(r);
   }
 
-  /**
-   * Called when the state information of a driver has changed.
-   * {@inheritDoc}
-   */
   @Override
   public void driverUpdated(final TopologyEvent event) {
   }
@@ -271,12 +269,32 @@ public class GraphTopologyHandler implements TopologyListener {
 
   /**
    * Insert a new vertex for a newly added node.
+   * @param master vertex representing the driver to which the node is attached.
+   * @param slave data for the newly added node.
+   * @return the new vertex object.
+   */
+  TopologyNode insertMasterSlaveVertex(final TopologyNode master, final TopologyNode slave) {
+    //fullGraph.addVertex(slave);
+    Number edge = null;
+    if ((edge = fullGraph.findEdge(slave, master)) == null) {
+      edge = edgeCount.incrementAndGet();
+      fullGraph.addEdge(edge, slave, master, EdgeType.DIRECTED);
+    }
+    if (graphOption.isShowMasterSlaveRelationShip()) {
+      if (isExpanded(master.getDriver()) && isExpanded(slave.getDriver())) {
+        if (displayGraph.findEdge(slave, master) == null) displayGraph.addEdge(edge, slave, master, EdgeType.DIRECTED);
+      }
+    }
+    return slave;
+  }
+
+  /**
+   * Insert a new vertex for a newly added node.
    * @param driver vertex representing the driver to which the node is attached.
    * @param peer data for the newly added node.
    * @return the new vertex object.
    */
   TopologyDriver insertPeerVertex(final TopologyDriver driver, final TopologyDriver peer) {
-    //fullGraph.addVertex(peer);
     Number edge = null;
     if (fullGraph.findEdge(driver, peer) == null) {
       edge = edgeCount.incrementAndGet();
@@ -301,7 +319,6 @@ public class GraphTopologyHandler implements TopologyListener {
    */
   public void collapse(final TopologyDriver driver) {
     if (!isCollapsed(driver) && !driver.isNode()) {
-      //driver.setCollapsed(true);
       synchronized(collapsedMap) {
         collapsedMap.put(driver.getUuid(),  CollapsedState.COLLAPSED);
       }
@@ -318,7 +335,6 @@ public class GraphTopologyHandler implements TopologyListener {
    */
   public void expand(final TopologyDriver driver) {
     if (!isExpanded(driver) && !driver.isNode()) {
-      //driver.setCollapsed(false);
       synchronized(collapsedMap) {
         collapsedMap.put(driver.getUuid(),  CollapsedState.EXPANDED);
       }
@@ -328,6 +344,14 @@ public class GraphTopologyHandler implements TopologyListener {
           displayGraph.addVertex(data);
           final Number edge = fullGraph.findEdge(driver, data);
           if (edge != null) displayGraph.addEdge(edge, driver, data);
+          final JPPFManagementInfo info = data.getManagementInfo();
+          if (info.isMasterNode()) {
+            final List<TopologyNode> slaves = manager.getSlaveNodes(data.getUuid());
+            for (final TopologyNode slave: slaves) insertMasterSlaveVertex((TopologyNode) data, slave);
+          } else if (info.isSlaveNode() && (info.getMasterUuid() != null)) {
+            final TopologyNode master = manager.getNode(info.getMasterUuid());
+            insertMasterSlaveVertex(master, (TopologyNode) data);
+          }
         }
       }
     }
@@ -352,6 +376,41 @@ public class GraphTopologyHandler implements TopologyListener {
   public boolean isExpanded(final AbstractTopologyComponent comp) {
     synchronized(collapsedMap) {
       return collapsedMap.get(comp.getUuid()) == CollapsedState.EXPANDED;
+    }
+  }
+
+  /**
+   * Get the vertices that are the endpoints of the specified edge.
+   * @param edge the edge number.
+   * @return a pair of endpoints.
+   */
+  public Pair<AbstractTopologyComponent, AbstractTopologyComponent> getVertices(final Number edge) {
+    final edu.uci.ics.jung.graph.util.Pair<AbstractTopologyComponent> pair = fullGraph.getEndpoints(edge);
+    return new Pair<>(pair.getFirst(), pair.getSecond());
+  }
+
+  /**
+   * Add the edges that represent master/slave node relationships.
+   */
+  void addMasterSlaveEdges() {
+    final TopologyManager manager = StatsHandler.getInstance().getTopologyManager();
+    for (TopologyNode node: manager.getNodes()) {
+      if (node.getManagementInfo().isMasterNode()) {
+        final List<TopologyNode> slaves = manager.getSlaveNodes(node.getUuid());
+        for (final TopologyNode slave: slaves) insertMasterSlaveVertex(node, slave);
+      }
+    }
+  }
+
+  /**
+   * Remove the edges that represent master/slave node relationships.
+   */
+  void removeMasterSlaveEdges() {
+    try {
+      final List<Number> edges = new ArrayList<>(displayGraph.getEdges(EdgeType.DIRECTED));
+      for (final Number edge: edges) displayGraph.removeEdge(edge);
+    } catch(final Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -389,10 +448,20 @@ public class GraphTopologyHandler implements TopologyListener {
             }
             list.add(driver);
           }
-        } else  insertNodeVertex(driver, node);
+        } else {
+          insertNodeVertex(driver, node);
+          final JPPFManagementInfo info = node.getManagementInfo();
+          if (info.isMasterNode()) {
+            final List<TopologyNode> slaves = event.getTopologyManager().getSlaveNodes(node.getUuid());
+            for (final TopologyNode slave: slaves) insertMasterSlaveVertex(node, slave);
+          } else if (info.isSlaveNode() && (info.getMasterUuid() != null)) {
+            final TopologyNode master = event.getTopologyManager().getNode(info.getMasterUuid());
+            insertMasterSlaveVertex(master, node);
+          }
+        }
       }
       synchronized(collapsedMap) {
-        collapsedMap.put(node.getUuid(),  CollapsedState.EXPANDED);
+        collapsedMap.put(node.getUuid(), CollapsedState.EXPANDED);
       }
       graphOption.repaintGraph(graphOption.isAutoLayout());
       if (debugEnabled) log.debug(String.format("added %s %s to driver %s ", (node.isNode() ? "node" : "peer"), node, driver));

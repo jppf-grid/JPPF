@@ -22,39 +22,48 @@ import java.awt.event.*;
 
 import javax.swing.AbstractButton;
 
+import org.jppf.ui.monitoring.node.MasterSlaveRelationShipsHandler;
+import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
+import org.jppf.ui.options.OptionElement;
+
 /**
  * Action performed to toggle the auto-layout on the graph graph.
  * @author Laurent Cohen
  */
-public class ToggleLayoutAction extends AbstractGraphSelectionAction {
+public class ToggleMasterSlaveRelationShipsAction extends AbstractTopologyAction {
+  /**
+   * 
+   */
+  private static final String BTN_NAME = "toggle.master.slave";
   /**
    * The toggle button.
    */
   private AbstractButton button = null;
+  /**
+   * 
+   */
+  private final MasterSlaveRelationShipsHandler panel;
 
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the graph panel to which this action applies.
    */
-  public ToggleLayoutAction(final GraphOption panel) {
-    super(panel);
-    setupIcon("/org/jppf/ui/resources/layout.gif");
-    setupNameAndTooltip("graph.toggle.layout.on");
-    //setupTooltip("graph.toggle.layout.on");
-    button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
+  public ToggleMasterSlaveRelationShipsAction(final MasterSlaveRelationShipsHandler panel) {
+    this.panel = panel;
+    setupIcon("/org/jppf/ui/resources/sparkle.png");
+    setupNameAndTooltip(BTN_NAME + ".on");
+    //setupTooltip(BTN_NAME + ".on");
+    button = (AbstractButton) ((OptionElement) panel).findFirstWithName("/" + BTN_NAME).getUIComponent();
     button.setSelected(true);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void actionPerformed(final ActionEvent e) {
     synchronized (panel) {
-      final AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
+      final AbstractButton button = (AbstractButton) ((OptionElement) panel).findFirstWithName("/" + BTN_NAME).getUIComponent();
       final boolean selected = button.isSelected();
-      panel.setAutoLayout(selected);
-      setupNameAndTooltip("graph.toggle.layout." + (selected ? "on" : "off"));
+      panel.setShowMasterSlaveRelationShip(selected);
+      setupNameAndTooltip(BTN_NAME + "." + (selected ? "on" : "off"));
     }
   }
 }

@@ -72,6 +72,12 @@
     <child name="graph.toggle.active" type="Button"/>
     <child name="graph.node.provisioning" type="Button"/>
 
+    <child name="sep6" type="ToolbarSeparator"/>
+    <child name="toggle.master.slave" type="Button">
+      <property name="persistent" value="true"/>
+      <property name="toggle" value="true"/>
+    </child>
+
   </child>
   
   <child name="graph.topology.toolbar.bottom" type="page">
@@ -91,11 +97,14 @@
 
     <child name="graph.toggle.layout" type="Button">
       <property name="toggle" value="true"/>
+      <initializer type="script">
+        <script language="groovy">option.setValue(true)</script>
+      </initializer>
     </child>
 
     <child name="Layout" type="ComboBox">
       <property name="label" value="Layout"/>
-      <property name="tooltip" value="choose a graph layout form the list"/>
+      <property name="tooltip" value="choose a graph layout from the list"/>
       <property name="value" value="Radial"/>
       <property name="persistent" value="true"/>
       <listener type="script">
@@ -110,15 +119,15 @@
       <item name="Spring-2" selected="false"/>
     </child>
 
-    <child name="sep6" type="ToolbarSeparator"/>
+    <child name="sep10" type="ToolbarSeparator"/>
     <child name="graph.button.expand" type="Button"/>
     <child name="graph.button.collapse" type="Button"/>
 
-    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="sep11" type="ToolbarSeparator"/>
     <child name="graph.select.drivers" type="Button"/>
     <child name="graph.select.nodes" type="Button"/>
 
-    <child name="sep8" type="ToolbarSeparator"/>
+    <child name="sep12" type="ToolbarSeparator"/>
     <child name="graph.toggle.mode" type="Button">
       <property name="toggle" value="true"/>
     </child>

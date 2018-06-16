@@ -65,9 +65,6 @@ public class ActionsInitializer implements Runnable {
     this.btnContainerName = btnContainerName;
   }
 
-  /**
-   * Execute this task.
-   */
   @Override
   public void run() {
     OptionContainer page = null;
@@ -91,7 +88,7 @@ public class ActionsInitializer implements Runnable {
           }
           button.setAction(action);
           button.setText("");
-          button.setToolTipText((String) action.getValue(Action.NAME));
+          button.setToolTipText((String) action.getValue(Action.SHORT_DESCRIPTION));
         }
         page.getUIComponent().invalidate();
         page.getUIComponent().repaint();

@@ -33,15 +33,6 @@ import edu.uci.ics.jung.visualization.control.*;
  */
 public class ToggleModeAction extends AbstractGraphSelectionAction {
   /**
-   * Listens to state changes for the toggle button.
-   */
-  private ItemListener itemListener = null;
-  /**
-   * The toggle button.
-   */
-  private AbstractButton button = null;
-
-  /**
    * Initialize this action with the specified tree table panel.
    * @param panel the graph panel to which this action applies.
    */
@@ -49,14 +40,6 @@ public class ToggleModeAction extends AbstractGraphSelectionAction {
     super(panel);
     setupIcon("/org/jppf/ui/resources/task-active.gif");
     setupNameAndTooltip("graph.toggle.mode");
-    button = (AbstractButton) panel.findFirstWithName("/graph.toggle.mode").getUIComponent();
-    itemListener = new ItemListener() {
-      @Override
-      public void itemStateChanged(final ItemEvent e) {
-        actionPerformed(null);
-      }
-    };
-    button.addItemListener(itemListener);
   }
 
   @Override

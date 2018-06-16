@@ -24,15 +24,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
 
+import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
+import org.jppf.ui.monitoring.node.MasterSlaveRelationShipsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
@@ -42,13 +44,13 @@ import edu.uci.ics.jung.visualization.control.*;
 import edu.uci.ics.jung.visualization.decorators.*;
 import edu.uci.ics.jung.visualization.picking.*;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
-import edu.uci.ics.jung.visualization.renderers.*;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 
 /**
  * Displays and updates the graph view of the grid topology.
  * @author Laurent Cohen
  */
-public class GraphOption extends AbstractOption implements ActionHolder {
+public class GraphOption extends AbstractOption implements ActionHolder, MasterSlaveRelationShipsHandler {
   /**
    * Explicit serialVersionUID.
    */
@@ -61,6 +63,22 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Default stroke for node to driver or peer to driver relationships.
+   */
+  private static final Stroke DEFAULT_STROKE = new BasicStroke(1f);
+  /**
+   * Default stroke for master/slave node relationships.
+   */
+  private static final Stroke MASTER_SLAVE_STROKE = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[] { 10f } , 0f);
+  /**
+   * Color for node to driver or peer to driver relationships.
+   */
+  private static final Paint DEFAULT_EDGE_PAINT = Color.BLACK;
+  /**
+   * Color for master/slave node relationships.
+   */
+  private static final Paint MASTER_SLAVE_PAINT = Color.BLUE;
   /**
    * The graph visualization component.
    */
@@ -93,6 +111,10 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * Determines whether to automatically layout the graph upon topology changes.
    */
   private AtomicBoolean autoLayout = new AtomicBoolean(true);
+  /**
+   * 
+   */
+  private boolean showMasterSlaveRelationships = true;
 
   /**
    * Default constructor.
@@ -128,8 +150,10 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.getRenderer().getVertexLabelRenderer().setPosition(Position.AUTO);
       viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
       viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
-      viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(1f)));
-      //viewer.getRenderContext().setEdgeShapeTransformer(new EdgeShape.SimpleLoop());
+      viewer.getRenderContext().setEdgeStrokeTransformer(new CustomEdgeStrokeTransformer());
+      viewer.getRenderContext().setEdgeDrawPaintTransformer(new CustomEdgePaintTransformer());
+      viewer.getRenderContext().setArrowDrawPaintTransformer(new ConstantTransformer(MASTER_SLAVE_PAINT));
+      viewer.getRenderContext().setEdgeShapeTransformer(new EdgeShape.CubicCurve());
       //viewer.getRenderContext().setEdgeArrowTransformer();
       viewer.setVertexToolTipTransformer(new ToStringLabeller<AbstractTopologyComponent>() {
         @Override
@@ -228,6 +252,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.putAction("graph.button.expand", new ExpandOrCollapseGraphAction(this, false));
       actionHandler.putAction("graph.toggle.mode", new ToggleModeAction(this));
       actionHandler.putAction("graph.toggle.layout", new ToggleLayoutAction(this));
+      actionHandler.putAction("toggle.master.slave", new ToggleMasterSlaveRelationShipsAction(this));
       actionHandler.updateActions();
     }
     final Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
@@ -352,5 +377,42 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     @Override
     public void componentHidden(final ComponentEvent e) {
     }
+  }
+
+  /**
+   * 
+   */
+  public class CustomEdgeStrokeTransformer implements Transformer<Number, Stroke> {
+    @Override
+    public Stroke transform(final Number input) {
+      final Pair<AbstractTopologyComponent, AbstractTopologyComponent> pair = graphHandler.getVertices(input);
+      if ((pair == null) || !pair.first().isNode()) return DEFAULT_STROKE;
+      return MASTER_SLAVE_STROKE;
+    }
+  }
+
+  /**
+   * 
+   */
+  public class CustomEdgePaintTransformer implements Transformer<Number, Paint> {
+    @Override
+    public Paint transform(final Number input) {
+      final Pair<AbstractTopologyComponent, AbstractTopologyComponent> pair = graphHandler.getVertices(input);
+      if ((pair == null) || !pair.first().isNode()) return DEFAULT_EDGE_PAINT;
+      return MASTER_SLAVE_PAINT;
+    }
+  }
+
+  @Override
+  public boolean isShowMasterSlaveRelationShip() {
+    return showMasterSlaveRelationships;
+  }
+
+  @Override
+  public void setShowMasterSlaveRelationShip(final boolean show) {
+    this.showMasterSlaveRelationships = show;
+    if (!show) graphHandler.removeMasterSlaveEdges();
+    else graphHandler.addMasterSlaveEdges();
+    repaintGraph(false);
   }
 }
