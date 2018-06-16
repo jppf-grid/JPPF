@@ -30,10 +30,14 @@ import test.org.jppf.test.setup.*;
 //@Ignore
 public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
   /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 50_000L;
+  /**
    * Test a simple job.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testSetup() throws Exception {
     final TestConfiguration cfg = createConfig("ssl2_p2p");
     cfg.driver.log4j = "classes/tests/config/ssl2_p2p/log4j-driver.template.properties";
@@ -45,7 +49,7 @@ public class TestMultiServerWithSSLSetup extends AbstractNonStandardSetup {
     //JPPFConfiguration.reset();
     //print(false, false, ">>> setup complete, awaiting peers initialized; configuration:%n%s", JPPFConfiguration.getProperties().asString());
     //awaitPeersInitialized(15_000L);
-    checkPeers(15_000L, true);
+    checkPeers(TEST_TIMEOUT, true);
     print(false, false, ">>> initialization complete");
   }
 }

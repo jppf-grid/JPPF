@@ -35,6 +35,10 @@ import test.org.jppf.test.setup.AbstractNonStandardSetup;
  */
 public abstract class AbstractTestSerialization extends AbstractNonStandardSetup {
   /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 15_000L;
+  /**
    * WHtehr the serialization scheme allows non-serializable classes.
    */
   static boolean allowsNonSerializable = true;
@@ -43,31 +47,31 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test a simple job.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testSimpleJob() throws Exception {
     super.testSimpleJob(null);
   }
 
   @Override
-  @Test(timeout = 15000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
-  @Test(timeout = 10000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testNotSerializableWorkingInNode() throws Exception {
     if (allowsNonSerializable) super.testNotSerializableWorkingInNode();
   }
 
   @Override
-  @Test(timeout = 8000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
   }
@@ -76,7 +80,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of primitive values.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testPrimitives() throws Exception {
     try {
       final PrimitiveStruct ps1 = new PrimitiveStruct();
@@ -142,7 +146,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * <br>See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-470">JPPF-470</a>.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testByte() throws Exception {
     testObject(new Byte((byte) -65));
     testObject(new Byte((byte) 65));
@@ -179,7 +183,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a single Long.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testLong() throws Exception {
     testObject(new Long(-1234567890123456789L));
     testObject(new Long(1234567890123456789L));
@@ -191,7 +195,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a single Float.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testFloat() throws Exception {
     testObject(new Float(-123.455e-14f));
     testObject(new Float(123.455e14f));
@@ -206,7 +210,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a single Double.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testDouble() throws Exception {
     testObject(new Double(-4.025e-203d));
     testObject(new Double(4.025e203d));
@@ -221,7 +225,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a single Boolean.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testBoolean() throws Exception {
     testObject(new Boolean(true));
     testObject(new Boolean(false));
@@ -232,7 +236,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * <br>See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-470">JPPF-470</a>.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testCharArray() throws Exception {
     final char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
       Character.MIN_LOW_SURROGATE, Character.MAX_LOW_SURROGATE, Character.MIN_SURROGATE, Character.MAX_SURROGATE, Character.MIN_VALUE, Character.MAX_VALUE };
@@ -245,7 +249,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * <br>See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-470">JPPF-470</a>.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testByteArray() throws Exception {
     final byte[] array1 = { -65, 65, Byte.MIN_VALUE, Byte.MAX_VALUE};
     final byte[] array2 = (byte[]) copyBySerialization(array1);
@@ -256,7 +260,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a short array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testShortArray() throws Exception {
     final short[] array1 = { -12389, 12389, Short.MIN_VALUE, Short.MAX_VALUE};
     final short[] array2 = (short[]) copyBySerialization(array1);
@@ -267,7 +271,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of an int array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testIntArray() throws Exception {
     final int[] array1 = { -1234567890, 1234567890, Integer.MIN_VALUE, Integer.MAX_VALUE};
     final int[] array2 = (int[]) copyBySerialization(array1);
@@ -278,7 +282,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a long array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testLongArray() throws Exception {
     final long[] array1 = { -1234567890123456789L, 1234567890123456789L, Long.MIN_VALUE, Long.MAX_VALUE};
     final long[] array2 = (long[]) copyBySerialization(array1);
@@ -289,7 +293,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a float array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testFloatArray() throws Exception {
     final float[] array1 = { -123.455e-14f, 123.455e-14f, Float.MIN_VALUE, Float.MAX_VALUE, Float.NaN, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY};
     final float[] array2 = (float[]) copyBySerialization(array1);
@@ -300,7 +304,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a double array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testDoubleArray() throws Exception {
     final double[] array1 = { -123.455e-14f, 123.455e-14f, Double.MIN_VALUE, Double.MAX_VALUE, Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
     final double[] array2 = (double[]) copyBySerialization(array1);
@@ -311,7 +315,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * Test the serialization and deseralization of a boolean array.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testBooleanArray() throws Exception {
     final boolean[] array1 = {true, false};
     final boolean[] array2 = (boolean[]) copyBySerialization(array1);

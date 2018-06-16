@@ -40,11 +40,16 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  */
 public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
   /**
+   * Test timeout.
+   */
+  private static final long TEST_TIMEOUT = 10_000L;
+
+  /**
    * Test that no exception is raised upon calling AbstractJPPFClassloader.getResources() from 2 jobs in sequence.
    * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-116">JPPF-116 NPE in AbstractJPPFClassLoader.findResources()</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testGetResources() throws Exception {
     final String name = ReflectionUtils.getCurrentMethodName();
     final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
@@ -63,7 +68,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-203">JPPF-203 Class loader resource cache generates duplicate resources</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testGetResourcesNoDuplicate() throws Exception {
     final int nbLookups = 3;
     final String name = ReflectionUtils.getCurrentMethodName();
@@ -94,7 +99,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution)</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 5000)
+  @Test(timeout = TEST_TIMEOUT)
   public void testClassLoadersMatch() throws Exception {
     final String name = ReflectionUtils.getCurrentMethodName();
     final String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
@@ -117,7 +122,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * than the job expiration timeout. 
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testClassLoadingInterruptionWithTask() throws Exception {
     testInterruption(false);
   }
@@ -128,7 +133,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C {
    * with a total loading time larger than the job expiration timeout. 
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=TEST_TIMEOUT)
   public void testClassLoadingInterruptionWithCallable() throws Exception {
     testInterruption(true);
   }
