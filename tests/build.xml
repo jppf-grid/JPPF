@@ -299,11 +299,15 @@
   <!-- ========================================================================= -->
   
   <target name="zip.results">
-    <delete file="${basedir}/all_results.zip" quiet="true"/>
-    <zip destfile="${basedir}/all_results.zip">
+    <property name="results.file" value="all_results.zip"/>
+    <delete file="${basedir}/${results.file}" quiet="true"/>
+    <zip destfile="${basedir}/${results.file}">
       <zipfileset dir="${basedir}/logs" prefix="logs">
         <include name="*.zip"/>
-        <exclude name="all_logs.zip"/>
+        <exclude name="${results.file}"/>
+      </zipfileset>
+      <zipfileset dir="${basedir}" prefix="logs">
+        <include name="*.log"/>
       </zipfileset>
       <zipfileset dir="${basedir}/report" prefix="report">
         <exclude name="*.xml"/>

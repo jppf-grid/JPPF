@@ -303,10 +303,12 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
   @Test(timeout = 10000L)
   public void testGetAndSetActiveState() throws Exception {
     final int nbTasks = 10;
+    print(false, false, ">>> checking driver JMX connection");
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     String[] nodeUuids = null;
     assertNotNull(driver);
     try {
+      print(false, false, ">>> checking number of nodes = 2");
       final Set<String> executedOnUuids = new HashSet<>();
       final Collection<JPPFManagementInfo> nodesList = driver.nodesInformation();
       assertEquals(2, nodesList.size());
@@ -315,7 +317,9 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       for (final JPPFManagementInfo info : nodesList) nodeUuids[i++] = info.getUuid();
       // deactivate one node and make sure the job is only executed on the other node
       final NodeSelector selector = new UuidSelector(nodeUuids[0]);
+      print(false, false, ">>> setting active state of node %s to false", nodeUuids[0]);
       driver.setActiveState(selector, false);
+      waitForNodeInState(driver, nodeUuids[0], false);
       final Map<String, Boolean> map = driver.getActiveState(null);
       assertEquals(nodeUuids.length, map.size());
       assertTrue(map.containsKey(nodeUuids[0]));
@@ -323,19 +327,26 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       assertTrue(map.containsKey(nodeUuids[1]));
       assertTrue(map.get(nodeUuids[1]));
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-1", true, false, nbTasks, LifeCycleTask.class, 0L);
+      print(false, false, ">>> executing job %s", job.getName());
       List<Task<?>> results = client.submitJob(job);
+      print(false, false, ">>> checking results for job %s", job.getName());
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
       }
+      print(false, false, ">>> executedOnUuids = %s", executedOnUuids);
       assertTrue(executedOnUuids.contains(nodeUuids[1]));
       assertFalse(executedOnUuids.contains(nodeUuids[0]));
       assertEquals(1, executedOnUuids.size());
       // re-activate the node and check that the job is executed on all nodes
       executedOnUuids.clear();
+      print(false, false, ">>> setting active state of node %s to true", nodeUuids[0]);
       driver.setActiveState(selector, true);
+      waitForNodeInState(driver, nodeUuids[0], true);
       job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
+      print(false, false, ">>> executing job %s", job.getName());
       results = client.submitJob(job);
+      print(false, false, ">>> checking results for job %s", job.getName());
       for (final Task<?> t : results) {
         final LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
@@ -344,6 +355,23 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       for (String uuid: nodeUuids) assertTrue(executedOnUuids.contains(uuid));
     } finally {
        driver.setActiveState(null, true);
+    }
+  }
+
+  /**
+   * 
+   * @param driver .
+   * @param nodeUuid .
+   * @param active .
+   * @throws Exception .
+   */
+  private static void waitForNodeInState(final JMXDriverConnectionWrapper driver, final String nodeUuid, final boolean active) throws Exception {
+    final NodeSelector selector = new UuidSelector(nodeUuid);
+    while (true) {
+      final Map<String, Boolean> map = driver.getActiveState(selector);
+      final Boolean result = map.get(nodeUuid);
+      if ((result != null) && (result.booleanValue() == active)) break;
+      Thread.sleep(100L);
     }
   }
 }
