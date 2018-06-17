@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jppf.comm.recovery.*;
 import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.JPPFContext;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.JPPFManagementInfo;
@@ -443,7 +443,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel) {
-    return NodeState.IDLE == channel.getContext().getState();
+    return ((AbstractNodeContext) channel.getContext()).idle.get();
   }
 
   @Override
