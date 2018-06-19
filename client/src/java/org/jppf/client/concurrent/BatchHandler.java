@@ -37,9 +37,8 @@ import org.slf4j.*;
  * It handles both normal mode and batching mode, where the tasks throughput is streamlined
  * by specifying how many tasks should be sent to the grid, and a which intervals.
  * @author Laurent Cohen
- * @exclude
  */
-public class BatchHandler extends ThreadSynchronization implements Runnable {
+class BatchHandler extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -69,8 +68,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private final AtomicReference<JPPFJob> currentJobRef = new AtomicReference<>(null);
   /**
-   * The next job being prepared. It will be assigned to <code>currentJobRef</code> when it is ready for execution,
-   * depending on the batching parameters.
+   * The next job being prepared. It will be assigned to <code>currentJobRef</code> when it is ready for execution, depending on the batching parameters.
    */
   private final AtomicReference<JPPFJob> nextJobRef = new AtomicReference<>(null);
   /**
@@ -93,7 +91,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
    */
   private final Condition submittingJob = lock.newCondition();
-  /**Size
+  /**
    * The configuration for this batch handler.
    */
   private ExecutorServiceConfiguration config = new ExecutorServiceConfigurationImpl();
@@ -139,6 +137,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   void setBatchSize(final int batchSize) {
     lock.lock();
     try {
+      if (debugEnabled) log.debug("setting batchSize = {}", batchSize);
       this.batchSize = batchSize;
       jobReady.signal();
     } finally {
@@ -166,6 +165,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   void setBatchTimeout(final long batchTimeout) {
     lock.lock();
     try {
+      if (debugEnabled) log.debug("setting batchTimeout = {}", batchTimeout);
       this.batchTimeout = batchTimeout;
       jobReady.signal();
     } finally {
@@ -173,9 +173,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run() {
     start = System.nanoTime();
@@ -183,7 +180,8 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
       try {
         lock.lock();
         try {
-          while (!isStopped() && (currentJobRef.get() == null)) {
+          JPPFJob job = null;
+          while (!isStopped() && ((job = currentJobRef.get()) == null)) {
             final long batchTimeout = getBatchTimeout();
             if (batchTimeout > 0) {
               final long n = batchTimeout - elapsed;
@@ -193,8 +191,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
             updateNextJob(false);
           }
           if (isStopped()) break;
-          final JPPFJob job = currentJobRef.get();
-          if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getJobTasks().size() + " tasks");
+          if (debugEnabled) log.debug("submitting job {} with {} tasks", job.getName(), job.getJobTasks().size());
           configureJob(job);
           executor.submitJob(job);
           currentJobRef.set(null);
@@ -226,6 +223,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
     if (((batchTimeout > 0L) && (elapsed >= batchTimeout)) ||
         ((batchSize > 0) && (size >= batchSize)) ||
         ((batchSize <= 0) && (batchTimeout <= 0L))) {
+      if (debugEnabled) log.debug("preparing job {} for submission, batchTimeout={}, elapsed={}, batchSize={}, size={}", job.getName(), batchTimeout, elapsed, batchSize, size);
       currentJobRef.set(job);
       nextJobRef.set(createJob());
       resetTimeout();
@@ -258,7 +256,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   <T> Future<T> addTask(final Task<?> task, final T result) {
     lock.lock();
     try {
-      if (debugEnabled) log.debug("submitting one JPPFTask");
+      if (debugEnabled) log.debug("submitting JPPF task");
       Future<T> future = null;
       final JPPFJob job = nextJobRef.get();
       try {
@@ -285,7 +283,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   <T> Future<T> addTask(final Runnable task, final T result) {
     lock.lock();
     try {
-      if (debugEnabled) log.debug("submitting one Runnable task with result");
+      if (debugEnabled) log.debug("submitting Runnable task with result");
       Future<T> future = null;
       final JPPFJob job = nextJobRef.get();
       try {
@@ -313,7 +311,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   <T> Future<T> addTask(final Callable<T> task) {
     lock.lock();
     try {
-      if (debugEnabled) log.debug("submitting one Callable Task");
+      if (debugEnabled) log.debug("submitting Callable task");
       Future<T> future = null;
       final JPPFJob job = nextJobRef.get();
       try {
@@ -340,7 +338,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   <T> Pair<JPPFJob, Integer> addTasks(final Collection<? extends Callable<T>> tasks) {
     lock.lock();
     try {
-      if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable Tasks");
+      if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable tasks");
       Pair<JPPFJob, Integer> pair = null;
       final JPPFJob job = nextJobRef.get();
       int start = 0;

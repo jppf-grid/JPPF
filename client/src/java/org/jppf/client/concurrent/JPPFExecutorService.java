@@ -20,7 +20,7 @@ package org.jppf.client.concurrent;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -64,6 +64,10 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * Count of instances of this class, use to name the batch handler thread.
+   */
+  private static final AtomicInteger instanceCount = new AtomicInteger(0);
+  /**
    * The {@link JPPFClient} to which tasks executions are delegated.
    */
   JPPFClient client = null;
@@ -102,7 +106,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
     if (debugEnabled) log.debug(String.format("new %s with batchSize=%d, batchTimeout=%d, client=%s", getClass().getSimpleName(), batchSize, batchTimeout, client));
     this.client = client;
     batchHandler = new BatchHandler(this, batchSize, batchTimeout);
-    ThreadUtils.startThread(batchHandler, "BatchHandler");
+    ThreadUtils.startThread(batchHandler, "BatchHandler-" + instanceCount.incrementAndGet());
   }
 
   /**
