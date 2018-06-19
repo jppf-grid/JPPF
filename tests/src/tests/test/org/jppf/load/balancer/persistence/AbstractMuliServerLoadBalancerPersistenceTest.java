@@ -21,6 +21,7 @@ package test.org.jppf.load.balancer.persistence;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import org.jppf.client.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
@@ -140,15 +141,19 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
         assertFalse(channels.isEmpty());
         //assertTrue(channels.size() >= 3);
         for (final String channel: channels) {
-          List<String> channelAlgos = mgt.listAlgorithms(channel);
+          final List<String> channelAlgos = mgt.listAlgorithms(channel);
           BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> algo = %-12s, list of algos for channel %s = %s", algo, channel, channelAlgos);
           assertNotNull(channelAlgos);
           assertEquals(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), 1, channelAlgos.size());
           assertEquals(algo, channelAlgos.get(0));
           mgt.deleteChannel(channel);
-          channelAlgos = mgt.listAlgorithms(channel);
-          assertNotNull(channelAlgos);
-          assertTrue(channelAlgos.isEmpty());
+          assertTrue(RetryUtils.runWithRetryTimeout(5000L, 100L, new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+              if (mgt.listAlgorithms(channel).isEmpty()) return true;
+              throw new IllegalStateException("list of algos for channel "  + channel + " is not empty");
+            }
+          }));
         }
         if (channels.size() <= 3) mgt.deleteAlgorithm(algo);
       }
