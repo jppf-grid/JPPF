@@ -114,6 +114,7 @@ class BatchHandler extends ThreadSynchronization implements Runnable {
     this.executor = executor;
     this.batchSize = batchSize;
     this.batchTimeout = batchTimeout;
+    resetTimeout();
     nextJobRef.set(createJob());
   }
 
@@ -166,6 +167,7 @@ class BatchHandler extends ThreadSynchronization implements Runnable {
     lock.lock();
     try {
       if (debugEnabled) log.debug("setting batchTimeout = {}", batchTimeout);
+      if (this.batchTimeout <=0L) resetTimeout();
       this.batchTimeout = batchTimeout;
       jobReady.signal();
     } finally {
