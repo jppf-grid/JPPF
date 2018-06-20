@@ -22,7 +22,7 @@ import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
@@ -113,6 +113,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     ServerJob serverJob = null;
     final TaskBundle header = clientBundle.getJob();
     lock.lock();
+    Lock jobLock = null;
     try {
       if (sla.isBroadcastJob()) {
         if (debugEnabled) log.debug("before processing broadcast job {}", header);
@@ -127,6 +128,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (serverJob == null) {
           newJob = true;
           serverJob = createServerJob(clientBundle);
+          (jobLock = serverJob.getLock()).lock();
           jobMap.put(jobUuid, serverJob);
           jobManager.jobQueued(serverJob);
         } else  {
@@ -153,6 +155,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       }
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
+      if (jobLock != null) jobLock.unlock();
       lock.unlock();
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
