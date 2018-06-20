@@ -287,7 +287,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
       print(false, false, "got 2nd jmx connection");
       final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 6000L, 500L, false));
+      assertTrue(ConcurrentUtils.awaitCondition(new PersistedJobCompletion(mgr, job.getUuid()), 10_000L, 500L, false));
       final List<String> persistedUuids = mgr.listJobs(JobSelector.ALL_JOBS);
       assertNotNull(persistedUuids);
       assertEquals(1, persistedUuids.size());

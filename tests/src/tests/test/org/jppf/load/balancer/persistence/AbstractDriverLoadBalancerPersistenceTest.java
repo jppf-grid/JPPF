@@ -29,6 +29,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -117,14 +118,18 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         assertNotNull(nodes);
         assertEquals(BaseSetup.nbNodes(), nodes.size());
         for (final String node: nodes) {
-          List<String> nodeAlgos = mgt.listAlgorithms(node);
+          final List<String> nodeAlgos = mgt.listAlgorithms(node);
           assertNotNull(nodeAlgos);
           assertEquals(String.format("algo=%s, node=%s", algo, node), 1, nodeAlgos.size());
           assertEquals(algo, nodeAlgos.get(0));
           mgt.deleteChannel(node);
-          nodeAlgos = mgt.listAlgorithms(node);
-          assertNotNull(nodeAlgos);
-          assertTrue(nodeAlgos.isEmpty());
+          assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+            @Override
+            public boolean evaluateWithException() throws Exception {
+              final List<String> nodeAlgos = mgt.listAlgorithms(node);
+              return (nodeAlgos != null) && nodeAlgos.isEmpty();
+            }
+          }, 5000L, 500L, false));
         }
       }
       Thread.sleep(500L);
