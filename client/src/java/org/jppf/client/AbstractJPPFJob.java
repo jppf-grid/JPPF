@@ -99,7 +99,11 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Whether this job has been cancelled.
    */
-  transient final AtomicBoolean cancelled = new AtomicBoolean(false);
+  transient AtomicBoolean cancelled = new AtomicBoolean(false);
+  /**
+   * Whether this job is being cancelled.
+   */
+  transient AtomicBoolean cancelling = new AtomicBoolean(false);
   /**
    * The status of this job.
    */
@@ -361,6 +365,15 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   }
 
   /**
+   * Get the flag that determines whether this job is being cancelled.
+   * @return an {@code AtomicBoolean} instance.
+   * @exclude
+   */
+  public AtomicBoolean getCancellingFlag() {
+    return cancelling;
+  }
+
+  /**
    * Save the state of the {@code AbstractJPPFJob} instance to a stream (i.e.,serialize it).
    * @param out the output stream to which to write the job. 
    * @throws IOException if any I/O error occurs.
@@ -380,5 +393,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
     in.defaultReadObject();
     statusListeners = new ArrayList<>();
     listeners = new CopyOnWriteArrayList<>();
+    cancelled = new AtomicBoolean(false);
+    cancelling = new AtomicBoolean(false);
   }
 }
