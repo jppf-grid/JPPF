@@ -135,6 +135,32 @@ public class TestJPPFJob extends Setup1D1N {
   }
 
   /**
+   * Test the cancellation of a job immediately after it is submitted.
+   * @throws Exception if any error occurs
+   */
+  @SuppressWarnings("deprecation")
+  @Test(timeout=10000)
+  public void testCancelImmediately() throws Exception {
+    try (JPPFClient client = BaseSetup.createClient(null, true)) {
+      int nbTasks = 1;
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 1L);
+      client.submitJob(job);
+      boolean cancelled = job.cancel(true);
+      assertTrue(cancelled);
+      List<Task<?>> results = job.awaitResults();
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      int count = 0;
+      for (Task<?> task: results) {
+        if (task.getResult() == null) count++;
+      }
+      assertTrue(count > 0);
+      assertTrue(job.isCancelled());
+      assertTrue(job.isDone());
+    }
+  }
+
+  /**
    * Test that when {@code JPPFJob.get(timeout)} expires, a {@link TimeoutException} is raised.
    * @throws Exception if any error occurs.
    */

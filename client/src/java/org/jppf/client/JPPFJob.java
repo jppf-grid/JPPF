@@ -371,11 +371,17 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (log.isDebugEnabled()) log.debug("request to cancel {}, client={}", this, client);
-    if (mayInterruptIfRunning || (getStatus() != JobStatus.EXECUTING)) {
+    if (getCancellingFlag().compareAndSet(false, true)) {
       try {
-        if (client != null) return client.cancelJob(uuid);
-      } catch(Exception e) {
-        log.error("error cancelling job {} : {}", this, ExceptionUtils.getStackTrace(e));
+        if (mayInterruptIfRunning || (getStatus() != JobStatus.EXECUTING)) {
+          try {
+            if (client != null) return client.cancelJob(uuid);
+          } catch(Exception e) {
+            log.error("error cancelling job {} : {}", this, ExceptionUtils.getStackTrace(e));
+          }
+        }
+      } finally {
+        getCancellingFlag().set(false);
       }
     }
     return false;
