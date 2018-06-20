@@ -25,21 +25,11 @@ package org.jppf.utils.stats;
  * serialization and deserialization.
  * @author Laurent Cohen
  */
-public class SingleValueSnapshot implements JPPFSnapshot {
+public class SingleValueSnapshot extends AbstractBaseJPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Label for this snapshot, used in the {@link #toString()} method.
-   * @exclude
-   */
-  protected final String label;
-  /**
-   * The total cumulated values.
-   * @exclude
-   */
-  protected double total = 0d;
 
   /**
    * Initialize this time snapshot with a specified title.
@@ -47,7 +37,7 @@ public class SingleValueSnapshot implements JPPFSnapshot {
    * @exclude
    */
   public SingleValueSnapshot(final String label) {
-    this.label = label;
+    super(label);
   }
 
   /**
@@ -56,6 +46,7 @@ public class SingleValueSnapshot implements JPPFSnapshot {
    */
   @Override
   public synchronized void addValues(final double accumulatedValues, final long count) {
+    computeUpdateNanos();
     total += accumulatedValues;
   }
 
@@ -76,17 +67,8 @@ public class SingleValueSnapshot implements JPPFSnapshot {
    */
   @Override
   public synchronized void reset() {
+    computeUpdateNanos();
     total = 0d;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
-  }
-
-  @Override
-  public synchronized double getTotal() {
-    return total;
   }
 
   @Override

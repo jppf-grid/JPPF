@@ -21,63 +21,46 @@ package org.jppf.utils.stats;
  * Convenience class for collecting time or size statistics.
  * Instances of this class are thread-safe.
  */
-public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
+public abstract class AbstractJPPFSnapshot extends AbstractBaseJPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Label for this snapshot, used in the {@link #toString()} method.
-   * @exclude
-   */
-  protected final String label;
-  /**
-   * The total cumulated values.
-   * @exclude
-   */
-  protected double total = 0d;
-  /**
    * The most recent value.
-   * @exclude
    */
-  protected double latest = 0d;
+  double latest;
   /**
    * The minimum value.
-   * @exclude
    */
-  protected double min = Double.POSITIVE_INFINITY;
+  double min = Double.POSITIVE_INFINITY;
   /**
    * The maximum value.
-   * @exclude
    */
-  protected double max = 0d;
+  double max;
   /**
    * The average value.
-   * @exclude
    */
-  protected double avg = 0d;
+  double avg;
   /**
    * Count of values added to this snapshot.
-   * @exclude
    */
-  protected long valueCount = 0L;
+  long valueCount;
 
   /**
    * Initialize this time snapshot with a specified title.
    * @param label the title for this snapshot.
-   * @exclude
    */
-  public AbstractJPPFSnapshot(final String label) {
-    this.label = label;
+  AbstractJPPFSnapshot(final String label) {
+    super(label);
   }
 
   /**
    * Make a copy of this time snapshot object.
    * @param ts a new snapshot into which values will be copied
    * @return a <code>TimeSnapshot</code> instance.
-   * @exclude
    */
-  public synchronized AbstractJPPFSnapshot copy(final AbstractJPPFSnapshot ts) {
+  synchronized AbstractJPPFSnapshot copy(final AbstractJPPFSnapshot ts) {
     ts.total = total;
     ts.latest = latest;
     ts.min = min;
@@ -93,6 +76,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
    */
   @Override
   public synchronized void reset() {
+    computeUpdateNanos();
     total = 0d;
     latest = 0d;
     min = Double.POSITIVE_INFINITY;
@@ -121,11 +105,6 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
   }
 
   @Override
-  public synchronized double getTotal() {
-    return total;
-  }
-
-  @Override
   public synchronized double getLatest() {
     return latest;
   }
@@ -144,11 +123,6 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
   @Override
   public synchronized double getAvg() {
     return avg;
-  }
-
-  @Override
-  public synchronized String getLabel() {
-    return label;
   }
 
   @Override

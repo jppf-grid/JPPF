@@ -91,6 +91,12 @@ public interface JPPFSnapshot extends Serializable {
   long getValueCount();
 
   /**
+   * Get the time elapsed between the creation of this snapshot and its last update, expresseed in nanos.
+   * @return the last update time of this snapshot, as the result of calling {@code System.nanoTime() - creationTimeNanos}.
+   */
+  long getLastUpdateNanos();
+
+  /**
    * Base class for filters including or excluding snpashots based on a provided set of labels.
    * @exclude
    */

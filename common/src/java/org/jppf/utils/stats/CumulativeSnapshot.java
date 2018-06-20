@@ -55,6 +55,7 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
    */
   @Override
   public synchronized void addValues(final double accumulatedValues, final long count) {
+    computeUpdateNanos();
     total += accumulatedValues;
     if (count > 0L) {
       valueCount += count;
@@ -76,6 +77,7 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
    */
   @Override
   public synchronized void assignLatestToMax() {
+    computeUpdateNanos();
     max = latest;
     total = latest;
     valueCount = 1L;
