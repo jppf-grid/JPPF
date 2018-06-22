@@ -20,6 +20,7 @@ package test.org.jppf.test.setup;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -63,6 +64,12 @@ public class Setup1D1N extends BaseTest {
     jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
     log.info("initializing {}", jmx);
     Assert.assertTrue(jmx.connectAndWait(5000L));
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+      @Override
+      public boolean evaluateWithException() throws Exception {
+        return jmx.nbIdleNodes() >= 1;
+      }
+    }, 5000L, 250L, false);
     BaseTestHelper.printToAll(jmx, false, false, true, true, true, "starting test of class %s", ReflectionUtils.getCurrentClassName());
     log.info("checked JMX connection");
   }

@@ -152,7 +152,7 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancelImmediately() throws Exception {
     try (final JPPFClient client = BaseSetup.createClient(null, true)) {
       final int nbTasks = 1;
-      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 1L);
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 1000L);
       client.submitJob(job);
       final boolean cancelled = job.cancel(true);
       assertTrue(cancelled);
