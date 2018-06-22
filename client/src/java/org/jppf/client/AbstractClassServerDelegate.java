@@ -132,7 +132,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @throws Exception if any error occurs.
    */
   protected void handshake() throws Exception {
-    if (debugEnabled) log.debug(formattedName + " : sending channel identifier");
+    if (debugEnabled) log.debug(formattedName + " : sending channel identifier {}", JPPFIdentifiers.asString(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL));
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
     if (owner.isSSLEnabled()) createSSLConnection();
     if (debugEnabled) log.debug(formattedName + " : sending initial resource");

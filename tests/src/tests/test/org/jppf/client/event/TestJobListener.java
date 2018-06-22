@@ -28,6 +28,8 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -42,6 +44,18 @@ public class TestJobListener extends BaseTest {
    * The JPPF client.
    */
   private JPPFClient jppfClient = null;
+  /**
+   * 
+   */
+  private static JMXDriverConnectionWrapper jmx;
+  /** */
+  @Rule
+  public TestWatcher setup1D1NInstanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      if ((jmx != null) && jmx.isConnected()) BaseTestHelper.printToAll(jmx, false, false, true, true, true, "starting method %s()", description.getMethodName());
+    }
+  };
 
   /**
    * Launches 1 driver with 1 node.
@@ -52,6 +66,8 @@ public class TestJobListener extends BaseTest {
     final TestConfiguration cfg = BaseSetup.DEFAULT_CONFIG.copy();
     cfg.driver.log4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
     BaseSetup.setup(1, 1, false, cfg);
+    jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
+    assertTrue(jmx.connectAndWait(5000L));
   }
 
   /**
@@ -60,12 +76,14 @@ public class TestJobListener extends BaseTest {
    */
   @AfterClass
   public static void cleanup() throws Exception {
-    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1)) {
-      if (jmx.connectAndWait(5000L)) BaseSetup.generateDriverThreadDump(jmx);
+    try {
+      if ((jmx != null) && jmx.isConnected()) BaseSetup.generateDriverThreadDump(jmx);
     } catch(final Exception e) {
-      e.printStackTrace();
+      print(false, false, "error generating driver thread dump:\n%s", ExceptionUtils.getStackTrace(e));
+      throw e;
+    } finally {
+      BaseSetup.cleanup();
     }
-    BaseSetup.cleanup();
   }
 
   /**
