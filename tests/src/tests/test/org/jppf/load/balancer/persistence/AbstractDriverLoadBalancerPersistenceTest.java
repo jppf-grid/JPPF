@@ -60,7 +60,15 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
     try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
       final boolean b = jmx.connectAndWait(5_000L);
       print(false, false, "tearDownInstance() : jmx connected = %b", b);
-      if (b) jmx.getLoadBalancerPersistenceManagement().deleteAll();
+      assertTrue(b);
+      final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
+      if (b) mgt.deleteAll();
+      assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
+          return mgt.listAllChannels().isEmpty();
+        }
+      }, 5000L, 250L, false));
     }
   }
 
@@ -120,7 +128,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         for (final String node: nodes) {
           final List<String> nodeAlgos = mgt.listAlgorithms(node);
           assertNotNull(nodeAlgos);
-          assertEquals(String.format("algo=%s, node=%s", algo, node), 1, nodeAlgos.size());
+          assertEquals(String.format("algo=%s, node=%s, nodeAlgos=%s", algo, node, nodeAlgos), 1, nodeAlgos.size());
           assertEquals(algo, nodeAlgos.get(0));
           mgt.deleteChannel(node);
           assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
@@ -129,7 +137,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
               final List<String> nodeAlgos = mgt.listAlgorithms(node);
               return (nodeAlgos != null) && nodeAlgos.isEmpty();
             }
-          }, 5000L, 500L, false));
+          }, 5000L, 250L, false));
         }
       }
       Thread.sleep(500L);
