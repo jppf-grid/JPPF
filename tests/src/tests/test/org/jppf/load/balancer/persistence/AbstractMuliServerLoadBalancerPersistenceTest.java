@@ -241,7 +241,7 @@ public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends Abst
     final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String algo = "proportional";
-      for (int j=0; j<jmxList.size(); j++) jmxList.get(j).changeLoadBalancerSettings(algo, lbi[j].getParameters());
+      for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbi[i].getParameters());
       final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
       job.getClientSLA().setMaxChannels(2);
       final List<Task<?>> results = client.submitJob(job);

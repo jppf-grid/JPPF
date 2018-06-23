@@ -82,20 +82,14 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
   private boolean dispatch() {
     try {
       queue.getBroadcastManager().processPendingBroadcasts();
+      if (queue.isEmpty()) return false;
       C channel = null;
       ServerTaskBundleNode nodeBundle = null;
       synchronized(idleChannels) {
-        if (idleChannels.isEmpty() || queue.isEmpty()) return false;
-        if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
-        queueLock.lock();
-        final List<ServerJob> allJobs;
+        if (idleChannels.isEmpty()) return false;
+        final List<ServerJob> allJobs = queue.getAllJobsFromPriorityMap();
+        if (debugEnabled) log.debug("there are {} idle channels and {} jobs in the queue", idleChannels.size(), allJobs.size());
         try {
-          allJobs = queue.getAllJobsFromPriorityMap();
-        } finally {
-          queueLock.unlock();
-        }
-        try {
-          //final Iterator<ServerJob> it = queue.iterator();
           final Iterator<ServerJob> it = allJobs.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
             final ServerJob job = it.next();
@@ -140,8 +134,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle " : "channel found for bundle " + channel);
         } catch(final Exception e) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", e);
-        } finally {
-          //queueLock.unlock();
         }
       }
     } catch (final Exception e) {
