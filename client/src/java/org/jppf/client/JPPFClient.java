@@ -390,4 +390,13 @@ public class JPPFClient extends AbstractGenericClient {
   public JPPFBundlerFactory getBundlerFactory() {
     return bundlerFactory;
   }
+
+  /**
+   * @return the number of idle connections in this client.
+   * @exclude
+   */
+  public int nbIdleCOnnections() {
+    final JobManagerClient manager = (JobManagerClient) getJobManager();
+    return (manager == null) ? -1 : manager.nbAvailableConnections();
+  }
 }

@@ -31,6 +31,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -172,6 +173,7 @@ public class TestConnectionPool extends Setup1D1N {
       discovery.emitPool("pool1", 10);
       discovery.emitPool("pool2", 1);
       awaitConnections(client, null, Operator.AT_LEAST, 2);
+      awaitIdleConnections(client, null, Operator.AT_LEAST, 2);
       print(false, false, ">>> testing jobs with pool1");
       testJobsInPool(client, "pool1", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 2) Thread.sleep(10L);
@@ -181,11 +183,13 @@ public class TestConnectionPool extends Setup1D1N {
       BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> closing pool1");
       pool.close();
       awaitConnections(client, jmx, Operator.AT_MOST, 1);
+      awaitIdleConnections(client, jmx, Operator.AT_MOST, 1);
       print(false, false, ">>> testing jobs with pool2");
       testJobsInPool(client, "pool2", methodName);
       while (client.awaitConnectionPools(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE).size() < 1) Thread.sleep(10L);
       discovery.emitPool("pool1", 10);
       awaitConnections(client, jmx, Operator.AT_LEAST, 2);
+      awaitIdleConnections(client, null, Operator.AT_LEAST, 2);
       print(false, false, ">>> testing jobs with pool1 (again)");
       testJobsInPool(client, "pool1", methodName);
     }
@@ -266,7 +270,7 @@ public class TestConnectionPool extends Setup1D1N {
   }
 
   /**
-   * Await for the specified number of pools to be working and avaialble.
+   * Await for the specified number of pools to be working and available.
    * @param client the client used to lookup the pools.
    * @param jmx jmx connection to the driver.
    * @param operator a condition on the number of pools to wait for.
@@ -274,10 +278,29 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private static void awaitConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int nbPools) throws Exception {
-    if (jmx == null) print(false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
-    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for nbAvailableConnections %s %d", operator, nbPools);
+    if (jmx == null) print(false, false, "waiting for working pools %s %d", operator, nbPools);
+    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for working pools %s %d", operator, nbPools);
     final List<JPPFConnectionPool> list = client.awaitConnectionPools(operator, nbPools, Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     if (!operator.evaluate(list.size(), nbPools)) throw new IllegalStateException(String.format("failed to obtain %s %d pools (got %d)", operator, nbPools, list.size()));
+  }
+
+  /**
+   * Await for the specified number of connections to be idle.
+   * @param client the client used to lookup the pools.
+   * @param jmx jmx connection to the driver.
+   * @param operator a condition on the number of pools to wait for.
+   * @param expected the expected number of idle connections on which to apply the condition.
+   * @throws Exception if any error occurs.
+   */
+  private static void awaitIdleConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int expected) throws Exception {
+    if (jmx == null) print(false, false, "waiting for idle conenctions %s %d", operator, expected);
+    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for idle conenctions %s %d", operator, expected);
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override
+      public boolean evaluate() {
+        return operator.evaluate(client.nbIdleCOnnections(), expected);
+      }
+    }, 5000L, 100L, true);
   }
 
   /** */
