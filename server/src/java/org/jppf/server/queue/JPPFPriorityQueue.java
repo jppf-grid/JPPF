@@ -105,7 +105,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @param clientBundle the client bundle to add.
    * @return the server job to which the client bundle was added.
    */
-  public ServerJob addBundle0(final ServerTaskBundleClient clientBundle) {
+  private ServerJob addBundle0(final ServerTaskBundleClient clientBundle) {
     if (debugEnabled) log.debug("adding bundle=" + clientBundle);
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
     final JobSLA sla = clientBundle.getSLA();
@@ -128,7 +128,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (serverJob == null) {
           newJob = true;
           serverJob = createServerJob(clientBundle);
-          (jobLock = serverJob.getLock()).lock();
+          try {
+            lock.unlock();
+            (jobLock = serverJob.getLock()).lock();
+          } finally {
+            lock.lock();
+          }
           jobMap.put(jobUuid, serverJob);
           jobManager.jobQueued(serverJob);
         } else  {
@@ -155,8 +160,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       }
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
-      if (jobLock != null) jobLock.unlock();
       lock.unlock();
+      if (jobLock != null) jobLock.unlock();
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
