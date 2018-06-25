@@ -20,9 +20,10 @@ package org.jppf.queue;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.utils.collections.*;
+import org.jppf.utils.concurrent.JPPFQueueLock;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -36,7 +37,8 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    * Used for synchronized access to the queue.
    */
-  protected final Lock lock = new ReentrantLock();
+  protected final Lock lock = new JPPFQueueLock();
+  //protected final Lock lock = ConcurrentUtils.newLock("JPPFQueue");
   /**
    * An ordered map of bundle sizes, mapping to a count of bundles of this size.
    */

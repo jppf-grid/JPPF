@@ -20,11 +20,12 @@ package org.jppf.utils.concurrent;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFTimeoutException;
 
 /**
- * A set of utility methods to facilitate concurrent and multithreaded rpogramming.
+ * A set of utility methods to facilitate concurrent and multithreaded programming.
  * @author Laurent Cohen
  * @since 5.0
  */
@@ -346,5 +347,26 @@ public final class ConcurrentUtils {
    */
   public static ExecutorService newJPPFDirectHandoffExecutor(final int coreThreads, final int maxThreads, final long ttl, final String threadNamePrefix) {
     return new JPPFThreadPool(coreThreads, maxThreads, ttl, new JPPFThreadFactory(threadNamePrefix), new SynchronousQueue<Runnable>());
+  }
+
+  /**
+   * Factory method that allows changing the lock implementation without refactoring the code that uses it.
+   * This method effectively calls {@link #newLock(String) newLock(null)}.
+   * @return a new {@link Lock} instance.
+   */
+  public static Lock newLock() {
+    return newLock(null);
+  }
+
+  /**
+   * Factory method that allows changing the lock implementation without refactoring the code that uses it.
+   * This method provides a name for the lock and will set it onto the lock if the implementation allows it, otherwise the name is just discarded.
+   * @param name a name given to the created lock.
+   * @return a new {@link Lock} instance.
+   */
+  public static Lock newLock(final String name) {
+    return new ReentrantLock();
+    //return new SynchronizedLock(name);
+    //return new JPPFReentrantLock(name);
   }
 }
