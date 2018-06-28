@@ -432,7 +432,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if(jobManager != null) {
       ClientConnectionStatusListener listener = jobManager.getClientConnectionStatusListener();
       if (listener != null) listener.statusChanged(event);
-      if (jobManager instanceof ThreadSynchronization) ((ThreadSynchronization) jobManager).wakeUp();
     }
   }
 
