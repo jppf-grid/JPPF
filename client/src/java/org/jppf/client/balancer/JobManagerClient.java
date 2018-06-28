@@ -385,8 +385,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   }
 
   @Override
-  public synchronized boolean hasAvailableConnection() {
-    return taskQueueChecker.hasIdleChannel() || ((wrapperLocal != null) && (wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE));
+  public boolean hasAvailableConnection() {
+    final boolean localConnectionavailable;
+    synchronized(this) {
+      localConnectionavailable = (wrapperLocal != null) && (wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE);
+    }
+    return taskQueueChecker.hasIdleChannel() || localConnectionavailable;
   }
 
   @Override
