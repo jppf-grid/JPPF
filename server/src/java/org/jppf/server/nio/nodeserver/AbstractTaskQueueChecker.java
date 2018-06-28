@@ -20,7 +20,6 @@ package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.JPPFContext;
@@ -64,10 +63,6 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    */
   final JPPFPriorityQueue queue;
   /**
-   * Lock on the job queue.
-   */
-  final Lock queueLock;
-  /**
    * The list of idle node channels.
    */
   final Set<C> idleChannels = new LinkedHashSet<>();
@@ -110,7 +105,6 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
     this.bundlerFactory = bundlerFactory;
-    this.queueLock = queue.getLock();
     this.driverInfo = JPPFDriver.getInstance().getSystemInformation();
   }
 

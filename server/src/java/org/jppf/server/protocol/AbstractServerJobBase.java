@@ -222,47 +222,18 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * Add received bundle to this server job.
    * @param bundle the bundle to add.
-   * @return <code>true</code> when bundle was added to job. <code>false</code> when job is <code>COMPLETE</code>.
-   */
-  public boolean addBundle(final ServerTaskBundleClient bundle) {
-    if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    lock.lock();
-    try {
-      final SubmissionStatus submissionStatus = getSubmissionStatus();
-      if (submissionStatus == SubmissionStatus.COMPLETE) {
-        if (completionBundles == null) completionBundles = new ArrayList<>();
-        completionBundles.add(bundle);
-        return false;
-      } else if (submissionStatus == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
-      else {
-        clientBundles.add(bundle);
-        this.tasks.addAll(bundle.getTaskList());
-        bundle.addCompletionListener(bundleCompletionListener);
-        fireJobUpdated(false);
-        return true;
-      }
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * Add received bundle to this server job.
-   * @param bundle the bundle to add.
-   * @param actionIfEnded an action to run if the job status is {@code ENDED}.
    * @return {@code true} when bundle was added to job. {@code false} when job is {@code COMPLETE}.
+   * @throws JPPFJobEndedException if the job is already {@code ENDED}.
    */
-  public boolean addBundle(final ServerTaskBundleClient bundle, final Runnable actionIfEnded) {
+  public boolean addBundle(final ServerTaskBundleClient bundle) throws JPPFJobEndedException {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     lock.lock();
     try {
       final SubmissionStatus submissionStatus = getSubmissionStatus();
-      if (submissionStatus == SubmissionStatus.COMPLETE) {
-        if (completionBundles == null) completionBundles = new ArrayList<>();
-        completionBundles.add(bundle);
-        return false;
-      } else if (submissionStatus == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
-      else {
+      if (debugEnabled) log.debug("submissionStatus={}, adding {} to {}", submissionStatus, bundle, this);
+      if ((submissionStatus == SubmissionStatus.COMPLETE) || (submissionStatus == SubmissionStatus.ENDED)) {
+        throw new JPPFJobEndedException("Job " + submissionStatus);
+      } else {
         clientBundles.add(bundle);
         this.tasks.addAll(bundle.getTaskList());
         bundle.addCompletionListener(bundleCompletionListener);

@@ -37,7 +37,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    * Used for synchronized access to the queue.
    */
-  protected final Lock lock = new JPPFQueueLock();
+  protected final Lock lock = new JPPFQueueLock("JPPFQueue");
   //protected final Lock lock = ConcurrentUtils.newLock("JPPFQueue");
   /**
    * An ordered map of bundle sizes, mapping to a count of bundles of this size.

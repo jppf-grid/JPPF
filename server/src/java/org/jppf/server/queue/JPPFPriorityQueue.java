@@ -22,7 +22,7 @@ import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
@@ -33,9 +33,9 @@ import org.jppf.server.job.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.LinkedListSortedMap;
-import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.JPPFQueueLock;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -92,59 +92,40 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
   @Override
   public ServerJob addBundle(final ServerTaskBundleClient clientBundle) {
-    final ServerJob job = getJob(clientBundle.getUuid());
-    try {
-      if (job != null) job.getLock().lock();
-      return addBundle0(clientBundle);
-    } finally {
-      if (job != null) job.getLock().unlock();
-    }
-  }
-
-  /**
-   * Add a client bundle.
-   * @param clientBundle the client bundle to add.
-   * @return the server job to which the client bundle was added.
-   */
-  private ServerJob addBundle0(final ServerTaskBundleClient clientBundle) {
     if (debugEnabled) log.debug("adding bundle=" + clientBundle);
-    if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (clientBundle == null) throw new IllegalArgumentException("clientBundle is null");
     final JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
     ServerJob serverJob = null;
-    final TaskBundle header = clientBundle.getJob();
     lock.lock();
-    Lock jobLock = null;
     try {
       if (sla.isBroadcastJob()) {
-        if (debugEnabled) log.debug("before processing broadcast job {}", header);
+        if (debugEnabled) log.debug("before processing broadcast job {}", clientBundle.getJob());
         broadcastManager.processBroadcastJob(clientBundle);
       } else {  
-        serverJob = jobMap.get(jobUuid);
-        if ((serverJob != null) && (serverJob.getSubmissionStatus() == SubmissionStatus.ENDED)) {
-          waitForJobRemoved(serverJob);
+        boolean newJob = false;
+        boolean done = false;
+        boolean added = false;
+        while (!done) {
           serverJob = jobMap.get(jobUuid);
-        }
-        final boolean newJob;
-        if (serverJob == null) {
-          newJob = true;
-          serverJob = createServerJob(clientBundle);
+          if (serverJob == null) {
+            newJob = true;
+            serverJob = createServerJob(clientBundle);
+            if (debugEnabled) log.debug("created new {}", serverJob);
+            jobMap.put(jobUuid, serverJob);
+            jobManager.jobQueued(serverJob);
+          } else if (debugEnabled) log.debug("job already queued");
           try {
-            lock.unlock();
-            (jobLock = serverJob.getLock()).lock();
-          } finally {
-            lock.lock();
+            added = serverJob.addBundle(clientBundle);
+            done = true;
+          } catch (final JPPFJobEndedException e) {
+            if (debugEnabled) log.debug("caught {}, awaiting removal of {}", ExceptionUtils.getMessage(e), serverJob);
+            awaitJobRemoved(serverJob, true);
           }
-          jobMap.put(jobUuid, serverJob);
-          jobManager.jobQueued(serverJob);
-        } else  {
-          newJob = false;
-          if (debugEnabled) log.debug("job already queued");
         }
-        if (serverJob.addBundle(clientBundle)) {
+        if (added) {
           if (!newJob) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return serverJob;
-
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           priorityMap.putValue(sla.getPriority(), serverJob);
           incrementSizeCount(getSize(serverJob));
@@ -153,6 +134,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (!newJob) {
           driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         }
+        final TaskBundle header = clientBundle.getJob();
         if (!header.getParameter(BundleParameter.FROM_PERSISTENCE, false) && !header.getParameter(BundleParameter.ALREADY_PERSISTED, false)) {
           header.setParameter(BundleParameter.ALREADY_PERSISTED, true);
           persistenceHandler.storeJob(serverJob, clientBundle, !newJob);
@@ -162,7 +144,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
       lock.unlock();
-      if (jobLock != null) jobLock.unlock();
     }
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
@@ -170,24 +151,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * Wait until the specified job has been removed from the queue.
-   * @param job the job whose removal to wait for.
+   * 
+   * @param serverJob the job to remove.
+   * @param handleLock whther o handle the queue lock.
    */
-  private void waitForJobRemoved(final ServerJob job) {
-    if (debugEnabled) log.debug("awaiting removal of {}", job);
-    long time = System.nanoTime();
-    while (jobMap.get(job.getUuid()) != null) {
+  void awaitJobRemoved(final ServerJob serverJob, final boolean handleLock) {
+    if (debugEnabled) log.debug("awaiting removal of {}", serverJob);
+    while (jobMap.get(serverJob.getUuid()) != null) {
       try {
-        lock.unlock();
-        job.getLock().unlock();
-        job.getRemovalCondition().goToSleep(100L);
+        if (handleLock) lock.unlock();
+        serverJob.getRemovalCondition().goToSleep(100L);
       } finally {
-        job.getLock().lock();
-        lock.lock();
+        if (handleLock) lock.lock();
       }
     }
-    time = (System.nanoTime() - time) / 1_000_000L;
-    if (debugEnabled) log.debug("waited {} ms for {}", time, job);
   }
 
   /**
@@ -199,7 +176,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     final TaskBundle header = clientBundle.getJob();
     header.setDriverQueueTaskCount(header.getTaskCount());
     //final Lock jobLock = ConcurrentUtils.newLock("ServerJob[name=" + header.getName() + ", uuid=" + header.getUuid() + "]");
-    final Lock jobLock = ConcurrentUtils.newLock();
+    //final Lock jobLock = ConcurrentUtils.newLock();
+    final Lock jobLock = new JPPFQueueLock("job-" + header.getName());
     final ServerJob serverJob = new ServerJob(jobLock, jobManager, header, clientBundle.getDataProvider());
     serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
     serverJob.setQueueEntryTime(System.currentTimeMillis());
@@ -233,7 +211,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks) {
     final ServerTaskBundleNode result;
-    serverJob.getLock().lock();
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with {} tasks, next bundle has {} tasks", nbTasks, serverJob.getTaskCount());
@@ -254,7 +231,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (debugEnabled) log.debug("Maps size information: {}", formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
       lock.unlock();
-      serverJob.getLock().unlock();
     }
     if (debugEnabled) log.debug("found {} tasks in the job, result={}", result.getTaskCount(), result);
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -result.getTaskCount());
@@ -274,7 +250,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @return the removed bundle.
    */
   public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap) {
-    if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
     lock.lock();
     try {
       if (removeFromJobMap) {
@@ -284,13 +260,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
         serverJob.getRemovalCondition().wakeUp();
       }
-      if (debugEnabled) log.debug("removing bundle from queue, jobName= {}, removeFromJobMap={}", serverJob.getName(), removeFromJobMap);
-      priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob);
-      for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) {
-        if (debugEnabled) log.debug("adding completion bundle for jobId={} : {}", serverJob.getName(), clientBundle);
-        addBundle(clientBundle);
+      if (debugEnabled) log.debug("removing job from queue, jobName= {}, removeFromJobMap={}", serverJob.getName(), removeFromJobMap);
+      if (priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob)) {
+        for (final ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) {
+          if (debugEnabled) log.debug("adding completion bundle for job={} : {}", serverJob.getName(), clientBundle);
+          addBundle(clientBundle);
+        }
+        fireBundleRemoved(new QueueEvent<>(this, serverJob, false));
       }
-      fireBundleRemoved(new QueueEvent<>(this, serverJob, false));
     } finally {
       lock.unlock();
     }
