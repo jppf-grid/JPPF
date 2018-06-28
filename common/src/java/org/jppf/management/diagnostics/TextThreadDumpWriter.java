@@ -66,7 +66,7 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
       ThreadInformation owner = threadsMap.get(ti.getLockOwnerId());
       out.println("- " + simpleName(ti) + " is waiting to lock " + simpleName(li) + " which is held by " + simpleName(owner));
     }
-    out.println("Stack trace information for the threads listed above" + BR);
+    out.println(BR + "Stack trace information for the threads listed above" + BR);
     for (long id: ids) printThread(threadsMap.get(id));
     out.println(hr + BR);
   }
