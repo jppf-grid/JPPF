@@ -1,6 +1,6 @@
 /.metadata/
 /x-*/
 *.txt
-*.bat
+/*.bat
 *.zip
 /.recommenders/

@@ -139,6 +139,40 @@
     <echo message="${war.name}.war file created in '${build.dir}' directory"/>
   </target>
 
+  <!-- =====================================================================-->
+  <!-- Repackage the WAR file by adding jar files to its WEB-INF/lib folder -->
+  <!-- =====================================================================-->
+  
+  <!--
+    Usage: ant -Ddir=<root_jars_directory> -Djars="<include_patterns>" war.update
+  -->
+  <target name="war.update" depends="">
+    <echo message="creating the ${war.name}.war WAR file..."/>
+    <update.war srcdir="${dir}" includes="${jars}"/>
+    <echo message="${war.name}.war file updated in '${build.dir}' directory"/>
+  </target>
+
+  <!--
+    Add one or more jars in the .war file's WEB-INF/lib directory.
+    Parameters:
+      - dest: the war file to update, defaults to './build/jppf-admin-web-<jppf-version>.war'
+      - srcdir: the root directory from which to get the jars, defaults to '.'
+      - includes: one or more comma-spearted Ant include patterns, relative to srcdir
+        example: "lib1/*.jar,**/my*.jar"
+  -->
+  <macrodef name="update.war">
+    <attribute name="dest" default="${build.dir}/${war.name}.war"/>
+    <attribute name="srcdir" default="${basedir}"/>
+    <attribute name="includes"/>
+    <sequential>
+      <echo message="updating war with dest=@{dest}, dir=@{srcdir}, includes=@{includes}"/>
+      <war warfile="@{dest}" update="true" needxmlfile="false">
+        <lib dir="@{srcdir}" includes="@{includes}"/>
+      </war>
+    </sequential>
+  </macrodef>
+
+  
   <!-- ========================================================================= -->
   <!-- Generate the Maven artifacts                                              -->
   <!-- ========================================================================= -->
