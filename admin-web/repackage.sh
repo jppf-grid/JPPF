@@ -14,21 +14,24 @@
 # ./repackage.sh build/jppf-admin-web-6.0.war ~/jppf/lib/mylib.jar ~/jppf/lib2/*.jar 
 #-----------------------------------------------------------------------------------
 
-current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# compute the directory of this script
+SCRIPT=$(readlink -f "$0")
+SCRIPT_PATH=$(dirname "$SCRIPT")
+echo script dir = $SCRIPT_PATH
 
-rm -rf "$current_dir"
-mkdir -p "$current_dir"/tmp/WEB-INF/lib
+rm -rf "$SCRIPT_PATH"/tmp
+mkdir -p "$SCRIPT_PATH"/tmp/WEB-INF/lib
 
-echo copying jar files to $current_dir/tmp/WEB-INF/lib
+echo copying jar files to $SCRIPT_PATH/tmp/WEB-INF/lib
 
 for p in $*; do
-  if "$p" != $1
-    cp $p "$current_dir"/tmp/WEB-INF/lib
+  if [ "$p" != "$1" ]; then
+    cp $p "$SCRIPT_PATH"/tmp/WEB-INF/lib
   fi
 done
 
 echo updating $1
 
-jar uf $1 -C $current_dir/tmp .
+jar uf $1 -C $SCRIPT_PATH/tmp .
 
-rm -rf $current_dir
+rm -rf $SCRIPT_PATH/tmp
