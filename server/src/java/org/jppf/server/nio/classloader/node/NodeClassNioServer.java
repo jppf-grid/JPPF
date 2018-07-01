@@ -114,7 +114,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    * @param uuid the uuid key to look up in the the map.
    * @return channel the corresponding channel.
    */
-  protected ChannelWrapper<?> getNodeConnection(final String uuid) {
+  public ChannelWrapper<?> getNodeConnection(final String uuid) {
     return nodeConnections.get(uuid);
   }
 
@@ -172,10 +172,16 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   @Override
   public void connectionFailed(final ReaperEvent event) {
     final ServerConnection c = event.getConnection();
-    if (!c.isOk()) {
-      final String uuid = c.getUuid();
-      final ChannelWrapper<?> channel = getNodeConnection(uuid);
-      if (debugEnabled) log.debug("about to close channel = " + channel + " with uuid = " + uuid);
+    if (!c.isOk()) connectionFailed(getNodeConnection(c.getUuid()));
+  }
+
+  /**
+   * Called when the node failed to respond to a heartbeat message.
+   * @param channel the channel to close.
+   */
+  public void connectionFailed(final ChannelWrapper<?> channel) {
+    if (channel != null) {
+      if (debugEnabled) log.debug("about to close channel = " + channel + " with uuid = " + channel.getContext().getUuid());
       closeConnection(channel);
     }
   }

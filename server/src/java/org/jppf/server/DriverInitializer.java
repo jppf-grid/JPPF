@@ -27,14 +27,13 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.comm.recovery.RecoveryServer;
 import org.jppf.discovery.*;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.load.balancer.ChannelAwareness;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.management.spi.*;
-import org.jppf.persistence.*;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.classloader.ClassCache;
@@ -97,10 +96,6 @@ public class DriverInitializer {
    */
   private ServerDebug serverDebug = null;
   /**
-   * The server used to detect that individual connections are broken due to hardware failures.
-   */
-  private RecoveryServer recoveryServer = null;
-  /**
    * Handles listeners to node connection events.
    */
   private final NodeConnectionEventHandler nodeConnectionEventHandler = new NodeConnectionEventHandler();
@@ -137,8 +132,10 @@ public class DriverInitializer {
    */
   void handleDebugActions() {
     if (JPPFDriver.JPPF_DEBUG) {
-      if (debugEnabled) log.debug("registering deadlock detector");
-      DeadlockDetector.setup("driver");
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.deadlock.detector.enabled", true)) {
+        if (debugEnabled) log.debug("registering deadlock detector");
+        DeadlockDetector.setup("driver");
+      }
       if (debugEnabled) log.debug("registering debug mbean");
       try {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -349,32 +346,6 @@ public class DriverInitializer {
   }
 
   /**
-   * The server used to detect that individual connections are broken due to hardware failures.
-   * @return a {@link RecoveryServer} instance.
-   */
-  public RecoveryServer getRecoveryServer() {
-    return recoveryServer;
-  }
-
-  /**
-   * Initialize the recovery server.
-   */
-  public void initRecoveryServer() {
-    if (config.get(RECOVERY_ENABLED)) {
-      if (debugEnabled) log.debug("initializing recovery server");
-      recoveryServer = new RecoveryServer();
-      ThreadUtils.startThread(recoveryServer, "RecoveryServer thread");
-    }
-  }
-
-  /**
-   * Stop the recovery server.
-   */
-  public void stopRecoveryServer() {
-    if (recoveryServer != null) recoveryServer.close();
-  }
-
-  /**
    * Get the object that collects debug information.
    * @return a {@link ServerDebug} instance.
    */
@@ -468,6 +439,5 @@ public class DriverInitializer {
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     final TypedProperties config = JPPFConfiguration.getProperties();
     factory.configure(config, JPPFDatasourceFactory.Scope.LOCAL);
-    //factory.configure(config, JPPFDatasourceFactory.Scope.ANY);
   }
 }

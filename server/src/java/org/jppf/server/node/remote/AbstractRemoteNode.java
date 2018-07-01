@@ -71,7 +71,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getRecoveryPort());
+        recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
         recoveryConnection.addClientConnectionListener(this);
         ThreadUtils.startThread(recoveryConnection, "reaper client connection");
       }

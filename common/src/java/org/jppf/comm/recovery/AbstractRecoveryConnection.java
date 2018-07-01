@@ -80,7 +80,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @return the message that was received.
    * @throws Exception if any error occurs.
    */
-  protected String receiveMessage() throws Exception {
+  protected HeartbeatMessage receiveMessage() throws Exception {
     return receiveMessage(this.maxRetries, this.socketReadTimeout);
   }
 
@@ -94,16 +94,14 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @return the message that was received.
    * @throws Exception if any error occurs.
    */
-  protected String receiveMessage(final int maxRetries, final int socketReadTimeout) throws Exception {
-    String message = null;
-    JPPFBuffer buffer = null;
+  protected HeartbeatMessage receiveMessage(final int maxRetries, final int socketReadTimeout) throws Exception {
+    HeartbeatMessage message = null;
     int retries = 0;
     boolean success = false;
     while ((retries < maxRetries) && !success) {
       try {
-        buffer = socketWrapper.receiveBytes(socketReadTimeout);
+        message = (HeartbeatMessage) socketWrapper.receive(socketReadTimeout);
         success = true;
-        message = buffer.asString();
         if (traceEnabled) log.trace("received '{}' for {}", message, this);
       } catch (@SuppressWarnings("unused") final SocketTimeoutException e) {
         retries++;
@@ -119,9 +117,8 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @param message the message to send.
    * @throws Exception if any error occurs while sending the message.
    */
-  public void sendMessage(final String message) throws Exception {
-    final JPPFBuffer buffer = new JPPFBuffer(message);
-    socketWrapper.sendBytes(buffer);
+  public void sendMessage(final HeartbeatMessage message) throws Exception {
+    socketWrapper.send(message);
     if (traceEnabled) log.trace("sent '{}' from {}", message, this);
   }
 

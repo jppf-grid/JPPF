@@ -58,9 +58,6 @@ public class ServerConnection extends AbstractRecoveryConnection {
     socketWrapper = new BootstrapSocketClient(socket);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void run() {
     if (!isOk()) return;
@@ -97,11 +94,11 @@ public class ServerConnection extends AbstractRecoveryConnection {
    * @return the response as a string.
    */
   private String doSendReceive(final String message) {
-    String response = null;
+    final String response = null;
     try {
       if (socketWrapper == null) return null;
-      sendMessage(message);
-      response = receiveMessage();
+      //sendMessage(message);
+      //response = receiveMessage();
       //sendMessage("final");
     } catch (final Exception e) {
       close();
@@ -110,9 +107,6 @@ public class ServerConnection extends AbstractRecoveryConnection {
     return response;
   }
 
-  /**
-   * Close this server connection and release the resources it is using.
-   */
   @Override
   public synchronized void close() {
     try {
@@ -127,9 +121,6 @@ public class ServerConnection extends AbstractRecoveryConnection {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return StringUtils.build("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");

@@ -25,13 +25,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.recovery.*;
 import org.jppf.discovery.PeerDriverDiscovery;
 import org.jppf.job.JobTasksListenerManager;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
 import org.jppf.nio.*;
-import org.jppf.nio.acceptor.*;
+import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.process.LauncherListener;
@@ -41,6 +40,7 @@ import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
+import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
@@ -83,7 +83,7 @@ public class JPPFDriver {
   /**
    * Singleton instance of the JPPFDriver.
    */
-  private static JPPFDriver instance = null;
+  private static JPPFDriver instance;
   /**
    * Used for serialization / deserialization.
    */
@@ -91,7 +91,7 @@ public class JPPFDriver {
   /**
    * Reference to the local node if it is enabled.
    */
-  private JPPFNode localNode = null;
+  private JPPFNode localNode;
   /**
    * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
    */
@@ -99,23 +99,27 @@ public class JPPFDriver {
   /**
    * Serves the execution requests coming from client applications.
    */
-  private ClientNioServer clientNioServer = null;
+  private ClientNioServer clientNioServer;
   /**
    * Serves the JPPF nodes.
    */
-  private NodeNioServer nodeNioServer = null;
+  private NodeNioServer nodeNioServer;
   /**
    * Serves class loading requests from the JPPF nodes.
    */
-  private ClientClassNioServer clientClassServer = null;
+  private ClientClassNioServer clientClassServer;
   /**
    * Serves class loading requests from the JPPF nodes.
    */
-  private NodeClassNioServer nodeClassServer = null;
+  private NodeClassNioServer nodeClassServer;
   /**
    * Handles the initial handshake and peer channel identification.
    */
-  private AcceptorNioServer acceptorServer = null;
+  private AcceptorNioServer acceptorServer;
+  /**
+   * Handles the heartbeat messages with the nodes.
+   */
+  private HeartbeatNioServer heartbeatServer;
   /**
    * Determines whether this server has scheduled a shutdown.
    */
@@ -131,7 +135,7 @@ public class JPPFDriver {
   /**
    * Manages and monitors the jobs throughout their processing within this driver.
    */
-  private JPPFJobManager jobManager = null;
+  private JPPFJobManager jobManager;
   /**
    * Uuid for this driver.
    */
@@ -139,7 +143,7 @@ public class JPPFDriver {
   /**
    * Performs initialization of the driver's components.
    */
-  private DriverInitializer initializer = null;
+  private DriverInitializer initializer;
   /**
    * Configuration for this driver.
    */
@@ -147,7 +151,7 @@ public class JPPFDriver {
   /**
    * System ibnformation for this driver.
    */
-  private JPPFSystemInformation systemInformation = null;
+  private JPPFSystemInformation systemInformation;
 
   /**
    * Initialize this JPPFDriver.
@@ -180,16 +184,15 @@ public class JPPFDriver {
     if (debugEnabled) log.debug("starting JPPF driver");
     final JPPFConnectionInformation info = initializer.getConnectionInformation();
     initializer.handleDebugActions();
-    initializer.initRecoveryServer();
 
-    final RecoveryServer recoveryServer = initializer.getRecoveryServer();
     final int[] sslPorts = extractValidPorts(info.sslServerPorts);
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, heartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(new NodeNioServer(this, taskQueue, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
     jobManager.loadTaskReturnListeners();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
@@ -197,7 +200,7 @@ public class JPPFDriver {
     HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
     initializer.getNodeConnectionEventHandler().loadListeners();
 
-    startServer(recoveryServer, acceptorServer);
+    startServer(acceptorServer);
 
     if (config.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
@@ -327,6 +330,7 @@ public class JPPFDriver {
   public void shutdown() {
     log.info("Shutting down");
     if (acceptorServer != null) acceptorServer.shutdown();
+    if (heartbeatServer != null) heartbeatServer.shutdown();
     if (clientClassServer != null) clientClassServer.shutdown();
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
@@ -336,7 +340,6 @@ public class JPPFDriver {
     initializer.stopPeerDiscoveryThread();
     initializer.stopJmxServer();
     jobManager.close();
-    initializer.stopRecoveryServer();
   }
 
   /**
@@ -392,18 +395,13 @@ public class JPPFDriver {
 
   /**
    * Start server, register it to recovery server if requested and print initialization message.
-   * @param recoveryServer Recovery server for nioServers that implements ReaperListener
    * @param nioServer starting nio server
    * @param <T> the type of the server to start
    * @return started nioServer
    */
-  private static <T extends NioServer<?, ?>> T startServer(final RecoveryServer recoveryServer, final T nioServer) {
+  private static <T extends NioServer<?, ?>> T startServer(final T nioServer) {
     if (nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if (debugEnabled) log.debug("starting nio server {}", nioServer);
-    if (recoveryServer != null && nioServer instanceof ReaperListener) {
-      final Reaper reaper = recoveryServer.getReaper();
-      reaper.addReaperListener((ReaperListener) nioServer);
-    }
     nioServer.start();
     printInitializedMessage(nioServer.getPorts(), nioServer.getSSLPorts(), nioServer.getName());
     return nioServer;
@@ -516,5 +514,13 @@ public class JPPFDriver {
    */
   public boolean isShuttingDown() {
     return shuttingDown.get();
+  }
+
+  /**
+   * 
+   * @return the heartbeat server.
+   */
+  public HeartbeatNioServer getHeartbeatServer() {
+    return heartbeatServer;
   }
 }

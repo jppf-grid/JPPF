@@ -16,13 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.comm.recovery;
-
-import java.io.Serializable;
-
 /**
- * Instances of this class represent heartbeat data exchanged between a driver and a node, client or peer driver. 
- * @author Laurent Cohen
+ * Support for heartbeat messages betwen server and nodes.
+ * @exclude
  */
-public class HeartbeatData implements Serializable {
-}
+package org.jppf.server.nio.heartbeat;

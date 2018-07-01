@@ -222,6 +222,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
   private AbstractNodeContext removeConnection(final String uuid) {
+    if (uuid == null) return null;
     final AbstractNodeContext nodeContext = getConnection(uuid);
     if (nodeContext != null) removeConnection(nodeContext);
     return nodeContext;
@@ -428,16 +429,25 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   @Override
   public void connectionFailed(final ReaperEvent event) {
     final ServerConnection c = event.getConnection();
-    AbstractNodeContext context = null;
     if (!c.isOk()) {
-      final String uuid = c.getUuid();
-      if (uuid != null) context = removeConnection(uuid);
+      final AbstractNodeContext context = removeConnection(c.getUuid());
       if (context != null) {
-        if (debugEnabled) log.debug("about to close channel={} with uuid={}", (context.getChannel().isOpen() ? context : context.getClass().getSimpleName()), uuid);
+        if (debugEnabled) log.debug("about to close channel={} with uuid={}", (context.getChannel().isOpen() ? context : context.getClass().getSimpleName()), c.getUuid());
         context.handleException(context.getChannel(), null);
-      } else {
-        log.warn("found null context - a job may be stuck!");
-      }
+      } else log.warn("found null context - a job may be stuck!");
+    }
+  }
+
+  /**
+   * Called when the node failed to respond to a heartbeat message.
+   * @param channel the channel to close.
+   */
+  public void connectionFailed(final ChannelWrapper<?> channel) {
+    if (channel != null) {
+      final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+      if (debugEnabled) log.debug("about to close channel = {} with uuid = {}", channel, context.getUuid());
+      removeConnection(context.getUuid());
+      context.handleException(context.getChannel(), null);
     }
   }
 

@@ -307,8 +307,19 @@ public final class ConcurrentUtils {
    * @return a new {@link ThreadPoolExecutor} instance.
    */
   public static ThreadPoolExecutor newFixedExecutor(final int coreThreads, final String threadNamePrefix) {
+    return newFixedExecutor(coreThreads, 15000L, threadNamePrefix);
+  }
+
+  /**
+   * Create a fixed-size pool.
+   * @param coreThreads the number of core threads.
+   * @param ttl the threads' time-to -live in millis.
+   * @param threadNamePrefix name prefix for created threads.
+   * @return a new {@link ThreadPoolExecutor} instance.
+   */
+  public static ThreadPoolExecutor newFixedExecutor(final int coreThreads, final long ttl, final String threadNamePrefix) {
     final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(coreThreads, new JPPFThreadFactory(threadNamePrefix));
-    executor.setKeepAliveTime(15000L, TimeUnit.MILLISECONDS);
+    executor.setKeepAliveTime(ttl, TimeUnit.MILLISECONDS);
     executor.allowCoreThreadTimeOut(true);
     return executor;
   }

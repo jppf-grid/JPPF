@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -35,11 +36,11 @@ public class ClientConnection extends AbstractRecoveryConnection {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ClientConnection.class);
+  private static final Logger log = LoggerFactory.getLogger(ClientConnection.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -51,30 +52,28 @@ public class ClientConnection extends AbstractRecoveryConnection {
   /**
    * 
    */
-  private String host = null;
+  private String host;
   /**
    * 
    */
   private int port = -1;
-
   /**
-   * Initialize this client connection with the specified uuid.
-   * @param uuid the JPPF node or client uuid.
+   * Whether secure connectivity is enabled.
    */
-  public ClientConnection(final String uuid) {
-    this.uuid = uuid;
-  }
+  private final boolean sslEnabled;
 
   /**
    * Initialize this client connection with the specified uuid.
    * @param uuid the JPPF node or client uuid.
    * @param host the host ot which to connect.
    * @param port the port number to connect to on the host.
+   * @param sslEnabled whether secure connectivity is enabled.
    */
-  public ClientConnection(final String uuid, final String host, final int port) {
+  public ClientConnection(final String uuid, final String host, final int port, final boolean sslEnabled) {
     this.uuid = uuid;
     this.host = host;
     this.port = port;
+    this.sslEnabled = sslEnabled;
   }
 
   @Override
@@ -83,7 +82,6 @@ public class ClientConnection extends AbstractRecoveryConnection {
     try {
       configure();
       if (debugEnabled) log.debug("initializing recovery client connection {}", socketWrapper);
-      //socketInitializer = new SocketInitializerImpl();
       socketInitializer = SocketInitializer.Factory.newInstance();
       if (!socketInitializer.initialize(socketWrapper)) {
         log.error("Could not initialize recovery client connection: {}", socketWrapper);
@@ -95,10 +93,23 @@ public class ClientConnection extends AbstractRecoveryConnection {
         close();
         return;
       }
+      if (debugEnabled) log.debug("senidng channel identifier NODE_HEARTBEAT_CHANNEL");
+      socketWrapper.writeInt(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
+      socketWrapper.flush();
+      if (sslEnabled) socketWrapper = SSLHelper.createSSLClientConnection(socketWrapper);
       while (!isStopped()) {
-        final String message = receiveMessage(maxRetries, socketReadTimeout);
-        if ((message != null) && message.startsWith("handshake")) setInitialized(true);
-        final String response = "checked;" + uuid;
+        final HeartbeatMessage message = receiveMessage(maxRetries, socketReadTimeout);
+        if (debugEnabled) log.debug("received {}", message);
+        final HeartbeatMessage response = new HeartbeatMessage(message.getMessageID());
+        if (!isInitialized()) {
+          setInitialized(true);
+          final int timeout = message.getProperties().get(JPPFProperties.RECOVERY_READ_TIMEOUT);
+          maxRetries = message.getProperties().get(JPPFProperties.RECOVERY_MAX_RETRIES);
+          socketReadTimeout = maxRetries * timeout;
+          response.setUuid(uuid);
+          if (debugEnabled) log.debug("initialized with timeout={}, maxRetries={}, socketReadTimeout={}, response={}", timeout, maxRetries, socketReadTimeout, response);
+        }
+        if (debugEnabled) log.debug("sending {}", response);
         sendMessage(response);
       }
     } catch (final Exception e) {
@@ -117,8 +128,10 @@ public class ClientConnection extends AbstractRecoveryConnection {
     final TypedProperties config = JPPFConfiguration.getProperties();
     if (host == null) host = config.get(JPPFProperties.SERVER_HOST);
     if (port < 0) port = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
-    maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
-    socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
+    //maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
+    //socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
+    maxRetries = 1;
+    socketReadTimeout = 0;
     socketWrapper = new BootstrapSocketClient();
     socketWrapper.setHost(host);
     socketWrapper.setPort(port);

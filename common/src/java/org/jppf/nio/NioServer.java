@@ -122,7 +122,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   protected final SelectorSynchronizer sync;
 
   /**
-   * Initialize this server with a specified port number and name.
+   * Initialize this server with a specified identifier and name.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.

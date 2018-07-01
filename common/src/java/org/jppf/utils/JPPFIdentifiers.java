@@ -79,6 +79,9 @@ public final class JPPFIdentifiers {
     idMap.put(NODE_JOB_DATA_CHANNEL, "NODE_JOB_DATA_CHANNEL");
     idMap.put(NODE_CLASSLOADER_CHANNEL, "NODE_CLASSLOADER_CHANNEL");
     idMap.put(JMX_REMOTE_CHANNEL, "JMX_REMOTE_CHANNEL");
+    idMap.put(NODE_HEARTBEAT_CHANNEL, "NODE_HEARTBEAT_CHANNEL");
+    idMap.put(CLIENT_HEARTBEAT_CHANNEL, "CLIENT_HEARTBEAT_CHANNEL");
+    idMap.put(PEER_HEARTBEAT_CHANNEL, "PEER_HEARTBEAT_CHANNEL");
   }
   /**
    * Mapping of ids to server names.
@@ -91,6 +94,9 @@ public final class JPPFIdentifiers {
     serverMap.put(NODE_JOB_DATA_CHANNEL, NioConstants.NODE_SERVER);
     serverMap.put(NODE_CLASSLOADER_CHANNEL, NioConstants.NODE_CLASS_SERVER);
     serverMap.put(JMX_REMOTE_CHANNEL, NioConstants.JMX_REMOTE);
+    serverMap.put(NODE_HEARTBEAT_CHANNEL, "HeartBeatServer");
+    serverMap.put(CLIENT_HEARTBEAT_CHANNEL, "HeartBeatServer");
+    serverMap.put(PEER_HEARTBEAT_CHANNEL, "HeartBeatServer");
   }
 
   /**
