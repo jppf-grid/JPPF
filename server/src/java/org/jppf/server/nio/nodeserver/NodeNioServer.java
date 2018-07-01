@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.comm.recovery.*;
 import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.load.balancer.JPPFContext;
@@ -48,7 +47,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener {
+public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
   /**
    * Logger for this class.
    */
@@ -424,18 +423,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public List<AbstractNodeContext> getIdleChannels() {
     return taskQueueChecker.getIdleChannels();
-  }
-
-  @Override
-  public void connectionFailed(final ReaperEvent event) {
-    final ServerConnection c = event.getConnection();
-    if (!c.isOk()) {
-      final AbstractNodeContext context = removeConnection(c.getUuid());
-      if (context != null) {
-        if (debugEnabled) log.debug("about to close channel={} with uuid={}", (context.getChannel().isOpen() ? context : context.getClass().getSimpleName()), c.getUuid());
-        context.handleException(context.getChannel(), null);
-      } else log.warn("found null context - a job may be stuck!");
-    }
   }
 
   /**

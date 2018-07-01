@@ -21,7 +21,6 @@ package org.jppf.server.nio.classloader.node;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.jppf.comm.recovery.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassNioServer;
@@ -35,7 +34,7 @@ import org.slf4j.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClassTransition> implements ReaperListener {
+public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClassTransition> {
   /**
    * Logger for this class.
    */
@@ -167,12 +166,6 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
         else log.warn(e.getMessage());
       }
     }
-  }
-
-  @Override
-  public void connectionFailed(final ReaperEvent event) {
-    final ServerConnection c = event.getConnection();
-    if (!c.isOk()) connectionFailed(getNodeConnection(c.getUuid()));
   }
 
   /**
