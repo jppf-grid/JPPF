@@ -21,11 +21,10 @@ package test.org.jppf.server;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.*;
+import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 
@@ -46,24 +45,16 @@ public class TestLocalNode extends AbstractNonStandardSetup {
     final TestConfiguration config = createConfig("localnode");
     config.driver.log4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
-    final AtomicReference<Exception> ref = new AtomicReference<>(null);
-    final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
-      @Override
-      public boolean evaluate() {
-        try {
-          final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
+      jmx.connectAndWait(5_000L);
+      final ConcurrentUtils.Condition cond = new ConcurrentUtils.ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
           return jmx.nbNodes() > 0;
-        } catch (@SuppressWarnings("unused") final Exception e) {
         }
-        return false;
-      }
-    };
-    try {
+      };
       print(false, false, "before wait for interruptible condition");
-      assertTrue(ConcurrentUtils.awaitInterruptibleCondition(cond, 10_000L, true));
-    } finally {
-      if (ref.get() != null) print(false, false, "last exception from condition: %s", ExceptionUtils.getStackTrace(ref.get()));
-      else print(false, false, "wait for interruptible condition successful");
+      assertTrue(ConcurrentUtils.awaitCondition(cond, 10_000L, 100L, true));
     }
   }
 
