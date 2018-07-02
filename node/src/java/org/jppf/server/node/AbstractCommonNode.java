@@ -21,6 +21,7 @@ package org.jppf.server.node;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.JPPFReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
@@ -81,6 +82,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * @since 5.2
    */
   final AtomicBoolean reading = new AtomicBoolean(false);
+  /**
+   * @exclude
+   */
+  protected JPPFReconnectionNotification reconnectionNotification;
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.

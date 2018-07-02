@@ -144,7 +144,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) {
           reset(true);
-          throw new JPPFNodeReconnectionNotification("I/O exception occurred during node processing", e, ConnectionReason.JOB_CHANNEL_PROCESSING_ERROR);
+          if (reconnectionNotification != null) {
+            final JPPFReconnectionNotification tmp = reconnectionNotification;
+            reconnectionNotification = null;
+            throw tmp;
+          }
+          else throw new JPPFNodeReconnectionNotification("I/O exception occurred during node processing", e, ConnectionReason.JOB_CHANNEL_PROCESSING_ERROR);
         }
       } catch(final Exception e) {
         log.error(e.getMessage(), e);

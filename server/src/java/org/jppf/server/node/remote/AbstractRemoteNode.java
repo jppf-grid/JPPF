@@ -94,13 +94,14 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
 
   @Override
   public void clientConnectionFailed(final ClientConnectionEvent event) {
+    reconnectionNotification = new JPPFNodeReconnectionNotification("The heartbeat mechanism failed to receive a message from the server", null, ConnectionReason.HEARTBEAT_FAILURE);
+    executionManager.cancelAllTasks(false, false);
     try {
       if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
       closeDataChannel();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    throw new JPPFNodeReconnectionNotification("The heartbeat mechanism failed to receive a message from the server", null, ConnectionReason.HEARTBEAT_FAILURE);
   }
 
   @Override
