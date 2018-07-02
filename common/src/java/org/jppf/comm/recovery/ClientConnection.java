@@ -128,8 +128,6 @@ public class ClientConnection extends AbstractRecoveryConnection {
     final TypedProperties config = JPPFConfiguration.getProperties();
     if (host == null) host = config.get(JPPFProperties.SERVER_HOST);
     if (port < 0) port = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
-    //maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
-    //socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
     maxRetries = 1;
     socketReadTimeout = 0;
     socketWrapper = new BootstrapSocketClient();

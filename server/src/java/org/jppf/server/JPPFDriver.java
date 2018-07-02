@@ -188,7 +188,8 @@ public class JPPFDriver {
     final int[] sslPorts = extractValidPorts(info.sslServerPorts);
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
-    NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, heartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
+    if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED))
+      NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, heartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));

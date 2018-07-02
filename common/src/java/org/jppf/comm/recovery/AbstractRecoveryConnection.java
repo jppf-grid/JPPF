@@ -46,7 +46,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
   /**
    * Connection to a client.
    */
-  protected SocketWrapper socketWrapper = null;
+  protected SocketWrapper socketWrapper;
   /**
    * Maximum number of failed write/read attempts on a connection before the remote peer is considered dead.
    */
@@ -58,7 +58,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
   /**
    * The JPPF node or client uuid.
    */
-  protected String uuid = null;
+  protected String uuid;
   /**
    * Determines whether this connection is ok after is has been checked.
    */
@@ -70,7 +70,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
   /**
    * 
    */
-  protected Thread runThread = null;
+  protected Thread runThread;
 
   /**
    * Read a message form the remote peer.
