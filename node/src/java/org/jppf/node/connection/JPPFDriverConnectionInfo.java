@@ -29,29 +29,19 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
   /**
    * Whether SSL/TLS should be used.
    */
-  protected boolean secure;
+  protected final boolean secure;
   /**
    * The driver host name or IP address.
    */
-  protected String host;
+  protected final String host;
   /**
    * The driver port to connect to.
    */
-  protected int port;
+  protected final int port;
   /**
-   * The driver recovery port to connect to.
+   * Whether recovery is enabled.
    */
-  protected int recoveryPort;
-
-  /**
-   * Default constructor which initializes the parameters to default values.
-   */
-  public JPPFDriverConnectionInfo() {
-    secure = false;
-    host = "localhost";
-    port = 11111;
-    recoveryPort = -1;
-  }
+  protected final boolean recoveryEnabled;
 
   /**
    * Initialize the parameters with the specified values.
@@ -59,12 +49,25 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    * @param host the driver host name or IP address.
    * @param port the driver port to connect to.
    * @param recoveryPort the driver recovery port to connect to.
+   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.
+   * This constructor assumes recovery is enabled if {@code recoveryPort > 0}, and disabled otherwise.
    */
   public JPPFDriverConnectionInfo(final boolean secure, final String host, final int port, final int recoveryPort) {
+    this(secure, host, port, recoveryPort > 0);
+  }
+
+  /**
+   * Initialize the parameters with the specified values.
+   * @param secure whether SSL/TLS should be used.
+   * @param host the driver host name or IP address.
+   * @param port the driver port to connect to.
+   * @param recoveryEnabled whether recovery is enabled..
+   */
+  public JPPFDriverConnectionInfo(final boolean secure, final String host, final int port, final boolean recoveryEnabled) {
     this.secure = secure;
     this.host = host;
     this.port = port;
-    this.recoveryPort = recoveryPort;
+    this.recoveryEnabled = recoveryEnabled;
   }
 
   @Override
@@ -72,25 +75,9 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     return secure;
   }
 
-  /**
-   * Specify whether SSL/TLS should be used.
-   * @param secure {@code true} for a secure connection, {@code false} otherwise.
-   */
-  public void setSecure(final boolean secure) {
-    this.secure = secure;
-  }
-
   @Override
   public String getHost() {
     return host;
-  }
-
-  /**
-   * Set the driver host name or IP address.
-   * @param host the host as a string.
-   */
-  public void setHost(final String host) {
-    this.host = host;
   }
 
   @Override
@@ -99,24 +86,17 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
   }
 
   /**
-   * Set the driver port to connect to.
-   * @param port the port as an int value.
+   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.
+   * This method will return {@code -1} if recovery is disabled, or the value of {@link #getPort()} if it is enabled.
    */
-  public void setPort(final int port) {
-    this.port = port;
+  @Override
+  public int getRecoveryPort() {
+    return recoveryEnabled ? port : -1;
   }
 
   @Override
-  public int getRecoveryPort() {
-    return recoveryPort;
-  }
-
-  /**
-   * Set the driver recovery port to connect to.
-   * @param recoveryPort the recovery port as an int value.
-   */
-  public void setRecoveryPort(final int recoveryPort) {
-    this.recoveryPort = recoveryPort;
+  public boolean isRecoveryEnabled() {
+    return recoveryEnabled;
   }
 
   @Override
@@ -125,7 +105,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     int result = 1;
     result = prime * result + ((host == null) ? 0 : host.hashCode());
     result = prime * result + port;
-    result = prime * result + recoveryPort;
+    result = prime * result + (recoveryEnabled ? 1 : 0);
     result = prime * result + (secure ? 1231 : 1237);
     return result;
   }
@@ -140,7 +120,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
       if (other.host != null) return false;
     } else if (!host.equals(other.host)) return false;
     if (port != other.port) return false;
-    if (recoveryPort != other.recoveryPort) return false;
+    if (recoveryEnabled != other.recoveryEnabled) return false;
     if (secure != other.secure) return false;
     return true;
   }
@@ -151,7 +131,7 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     sb.append("secure=").append(secure);
     sb.append(", host=").append(host);
     sb.append(", port=").append(port);
-    sb.append(", recoveryPort=").append(recoveryPort);
+    sb.append(", recoveryEnabled=").append(recoveryEnabled);
     sb.append(']');
     return sb.toString();
   }
@@ -165,7 +145,6 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
    */
   public static DriverConnectionInfo fromJPPFConnectionInformation(final JPPFConnectionInformation ci, final boolean ssl, final boolean recovery) {
     final int port = ssl ? ci.sslServerPorts[0] : ci.serverPorts[0];
-    final boolean recoveryEnabled = recovery && (ci.recoveryPort >= 0);
-    return new JPPFDriverConnectionInfo(ssl, ci.host, port, recoveryEnabled ? ci.recoveryPort : -1);
+    return new JPPFDriverConnectionInfo(ssl, ci.host, port, ci.recoveryEnabled);
   }
 }

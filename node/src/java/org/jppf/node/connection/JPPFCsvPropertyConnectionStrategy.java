@@ -25,7 +25,7 @@ import org.slf4j.*;
 
 /**
  * This implementation of {@link DriverConnectionStrategy} reads a list of drivers from a configuration property with the following format:
- * <p><code>jppf.server.connection.strategy.definitions = secure1, host1, port1, recovery_port1 | ... | secureN, hostN, portN, recovery_portN</code>
+ * <p><code>jppf.server.connection.strategy.definitions = secure1, host1, port1, recovery_enabled1 | ... | secureN, hostN, portN, recovery_enabledN</code>
  * <p>where:
  * <ul>
  *   <li>each connection definition is represented as a group of comma-separated values</li>
@@ -36,7 +36,7 @@ import org.slf4j.*;
  *         any value that is not 'true' will be interpreted as 'false'.</li>
  *     <li><i>host<sub>i</sub></i> is the host name or ip address of the driver to connect to</li>
  *     <li><i>port<sub>i</sub></i> is the port to connect to on the driver host</li>
- *     <li><i>recovery_port<sub>i</sub></i> is a valid port number for the recovery heartbeat mechanism, or a negative value to disable recovery for the node</li>
+ *     <li><i>recovery_enabled<sub>i</sub></i> is a boolean value (either 'true' or 'false', case-insenssitive) indicating whether the recovery (or heartbeat) mechanism is enabled for the node</li>
  *   </ul>
  * </ul>
  * <p>Additionally, any group of comma-separated values starting with a '#' (after trimming) will be considered a comment and ignored.

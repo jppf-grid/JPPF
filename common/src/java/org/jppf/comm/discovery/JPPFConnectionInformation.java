@@ -45,13 +45,13 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   public int[] sslServerPorts = null;
   /**
-   * Port number for recovery from hardware failures.
-   */
-  public int recoveryPort = -1;
-  /**
    * Identifier for this object.
    */
   public String uuid = null;
+  /**
+   * Whether the recovery (aka heartbeat) mechanism is enabled.
+   */
+  public boolean recoveryEnabled;
 
   /**
    * Default constructor.
@@ -150,7 +150,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (!ComparisonUtils.equalStrings(host, other.host)) return false;
     if (!ComparisonUtils.equalIntArrays(serverPorts, other.serverPorts)) return false;
     if (!ComparisonUtils.equalIntArrays(sslServerPorts, other.sslServerPorts)) return false;
-    if (recoveryPort != other.recoveryPort) return false;
+    if (recoveryEnabled != other.recoveryEnabled) return false;
     if (compareUuid) {
       if (uuid == null) return other.uuid == null;
       return uuid.equals(other.uuid);
@@ -163,7 +163,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     final JPPFConnectionInformation ci = new JPPFConnectionInformation();
     ci.uuid = uuid;
     ci.host = host;
-    ci.recoveryPort = recoveryPort;
+    ci.recoveryEnabled = recoveryEnabled;
     if (serverPorts != null) {
       ci.serverPorts = new int[serverPorts.length];
       System.arraycopy(serverPorts, 0, ci.serverPorts, 0, serverPorts.length);
@@ -185,7 +185,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", host=").append(host);
-    sb.append(", recoveryPort=").append(recoveryPort);
+    sb.append(", recoveryEnabled=").append(recoveryEnabled);
     sb.append(", serverPorts=").append(StringUtils.buildString(serverPorts));
     sb.append(", sslServerPorts=").append(StringUtils.buildString(sslServerPorts));
     sb.append(']');

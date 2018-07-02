@@ -58,7 +58,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     }
     if (log.isDebugEnabled()) log.debug("Discovered driver: " + info);
     final boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
-    final boolean recovery = config.get(JPPFProperties.RECOVERY_ENABLED) && (info.recoveryPort >= 0);
+    final boolean recovery = config.get(JPPFProperties.RECOVERY_ENABLED);
     return JPPFDriverConnectionInfo.fromJPPFConnectionInformation(info, ssl, recovery);
   }
 
@@ -71,7 +71,6 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     final boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
     final String host = config.get(JPPFProperties.SERVER_HOST);
     final int port = config.get(ssl ? JPPFProperties.SERVER_SSL_PORT_NODE : JPPFProperties.SERVER_PORT);
-    final int recoveryPort  = config.get(JPPFProperties.RECOVERY_ENABLED) ? config.get(JPPFProperties.RECOVERY_SERVER_PORT) : -1; 
-    return new JPPFDriverConnectionInfo(ssl, host, port, recoveryPort);
+    return new JPPFDriverConnectionInfo(ssl, host, port, config.get(JPPFProperties.RECOVERY_ENABLED));
   }
 }

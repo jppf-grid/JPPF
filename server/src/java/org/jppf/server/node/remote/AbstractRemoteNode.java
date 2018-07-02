@@ -17,8 +17,9 @@
  */
 package org.jppf.server.node.remote;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.recovery.*;
-import org.jppf.node.connection.DriverConnectionInfo;
+import org.jppf.node.connection.*;
 import org.jppf.server.node.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
@@ -99,6 +100,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
+    throw new JPPFNodeReconnectionNotification("The heartbeat mechanism failed to receive a message from the server", null, ConnectionReason.HEARTBEAT_FAILURE);
   }
 
   @Override

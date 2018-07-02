@@ -108,18 +108,19 @@ public abstract class AbstractCsvConnectionStrategy implements DriverConnectionS
       final boolean secure = "true".equalsIgnoreCase(tokens[0]);
       final String host = tokens[1];
       final int port;
+      boolean recoveryEnabled = false;
       try {
         port = Integer.valueOf(tokens[2]);
       } catch(@SuppressWarnings("unused") final Exception e) {
         return null;
       }
-      int recoveryPort;
       try {
-        recoveryPort = Integer.valueOf(tokens[3]);
+        final int recoveryPort = Integer.valueOf(tokens[3]);
+        recoveryEnabled = recoveryPort > 0;
       } catch(@SuppressWarnings("unused") final Exception e) {
-        recoveryPort = -1;
+        recoveryEnabled = Boolean.valueOf(tokens[3]);
       }
-      return new JPPFDriverConnectionInfo(secure, host, port, recoveryPort);
+      return new JPPFDriverConnectionInfo(secure, host, port, recoveryEnabled);
     }
     return null;
   }

@@ -23,8 +23,7 @@ package org.jppf.node.connection;
  * @author Laurent Cohen
  * @since 4.1
  */
-public enum ConnectionReason
-{
+public enum ConnectionReason {
   /**
    * Indicates the first connection attempt when the node starts up.
    */
@@ -48,5 +47,9 @@ public enum ConnectionReason
   /**
    * An error occurred on the job channel while processing a job.
    */
-  JOB_CHANNEL_PROCESSING_ERROR
+  JOB_CHANNEL_PROCESSING_ERROR,
+  /**
+   * The heartbeat mechanism failed to receive a message from the server in a configured time frame.
+   */
+  HEARTBEAT_FAILURE
 }

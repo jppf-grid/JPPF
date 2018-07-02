@@ -175,7 +175,7 @@ public class DriverInitializer {
       } catch(@SuppressWarnings("unused") final UnknownHostException e) {
         connectionInfo.host = "localhost";
       }
-      if (config.get(RECOVERY_ENABLED)) connectionInfo.recoveryPort = config.get(RECOVERY_SERVER_PORT);
+      connectionInfo.recoveryEnabled = config.get(RECOVERY_ENABLED);
     }
     return connectionInfo;
   }

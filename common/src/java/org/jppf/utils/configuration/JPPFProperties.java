@@ -237,13 +237,9 @@ public class JPPFProperties {
   /** Maximum number of pings to the node before the connection is considered broken. */
   public static final JPPFProperty<Integer> RECOVERY_MAX_RETRIES = new IntProperty("jppf.recovery.max.retries", 3);
   /** Maximum ping response time from the node. */
-  public static final JPPFProperty<Integer> RECOVERY_READ_TIMEOUT = new IntProperty("jppf.recovery.read.timeout", 6000);
+  public static final JPPFProperty<Integer> RECOVERY_READ_TIMEOUT = new IntProperty("jppf.recovery.read.timeout", 15000);
   /** Number of threads allocated to the node connection reaper. */
   public static final JPPFProperty<Integer> RECOVERY_REAPER_POOL_SIZE = new IntProperty("jppf.recovery.reaper.pool.size", Runtime.getRuntime().availableProcessors());
-  /** Interval between connection reaper runs. */
-  public static final JPPFProperty<Long> RECOVERY_REAPER_RUN_INTERVAL = new LongProperty("jppf.recovery.reaper.run.interval", 60_000L);
-  /** Port number for the detection of hardware failure. */
-  public static final JPPFProperty<Integer> RECOVERY_SERVER_PORT = new IntProperty("jppf.recovery.server.port", 22222);
   /** File to redirect {@link System#err} to. */
   public static final JPPFProperty<File> REDIRECT_ERR = new FileProperty("jppf.redirect.err", null);
   /** Append to existing file ({@code true}) or create new one ({@code false}). */

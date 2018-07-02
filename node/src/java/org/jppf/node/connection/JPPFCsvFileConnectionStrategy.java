@@ -27,14 +27,14 @@ import org.slf4j.*;
 /**
  * This implementation of {@link DriverConnectionStrategy} reads a list of drivers
  * from a CSV file where each line has the following format:
- * <p><code>secure, host, port, recovery_port</code>
+ * <p><code>secure, host, port, recovery_enabled</code>
  * <p>where:
  * <ul>
  * <li><i>secure</i> is a boolean value (either 'true' or 'false', case-insenssitive) indicating whether a SSL/TLS connection should be established.
  * any value that is not 'true' will be interpreted as 'false'.</li>
  * <li><i>host</i> is the host name or ip address of the driver to connect to</li>
  * <li><i>port</i> is the port to connect to on the driver host</li>
- * <li><i>recovery_port</i> is a valid port number for the recovery heartbeat mechanism, or a negative value to disable recovery for the node</li>
+ * <li><i>recovery_enabled</i> is a boolean value (either 'true' or 'false', case-insenssitive) indicating whether the recovery (or heartbeat) mechanism is enabled for the node</li>
  * </ul>
  * <p>Additionally, any line starting with a '#' (after trimming) will be considered as a comment and ignored.
  * <p>The file location is read from the configuration property {@code 'jppf.node.connection.strategy.file'}.

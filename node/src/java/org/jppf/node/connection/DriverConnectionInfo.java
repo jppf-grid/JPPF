@@ -45,6 +45,14 @@ public interface DriverConnectionInfo {
   /**
    * Get the recovery port for the heartbeat mechanism.
    * @return the recovery port a an int; a negative value indicates that recovery is disabled for the node.
+   * @deprecated as of JPPF 6.0, the recovery mechanism uses the same port number as the main server port.
+   * This method will return {@code -1} if recovery is disabled, or the value of {@link #getPort()} if it is enabled.
    */
   int getRecoveryPort();
+
+  /**
+   * Determine whether the recovery mechanism (exchange of heartbeat messages) is enabled.
+   * @return {@code true} if recovery is enabled, {@code false} otherwise.
+   */
+  boolean isRecoveryEnabled();
 }

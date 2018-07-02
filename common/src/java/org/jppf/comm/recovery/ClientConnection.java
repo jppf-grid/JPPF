@@ -127,7 +127,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
     if (debugEnabled) log.debug("configuring connection");
     final TypedProperties config = JPPFConfiguration.getProperties();
     if (host == null) host = config.get(JPPFProperties.SERVER_HOST);
-    if (port < 0) port = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
+    if (port < 0) port = config.get(JPPFProperties.SERVER_PORT);
     maxRetries = 1;
     socketReadTimeout = 0;
     socketWrapper = new BootstrapSocketClient();
