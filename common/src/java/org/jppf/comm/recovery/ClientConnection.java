@@ -105,7 +105,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
           setInitialized(true);
           final int timeout = message.getProperties().get(JPPFProperties.RECOVERY_READ_TIMEOUT);
           maxRetries = message.getProperties().get(JPPFProperties.RECOVERY_MAX_RETRIES);
-          socketReadTimeout = maxRetries * timeout;
+          socketReadTimeout = timeout;
           response.setUuid(uuid);
           if (debugEnabled) log.debug("initialized with timeout={}, maxRetries={}, socketReadTimeout={}, response={}", timeout, maxRetries, socketReadTimeout, response);
         }

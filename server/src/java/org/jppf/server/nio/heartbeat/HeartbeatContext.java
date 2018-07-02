@@ -44,7 +44,7 @@ class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
   /**
    * Uuid of the remote peer.
    */
-  final AtomicLong messageSequence = new AtomicLong(0L);
+  static final AtomicLong messageSequence = new AtomicLong(0L);
   /**
    * The current message to send or the last read one.
    */
