@@ -23,10 +23,10 @@ import org.jppf.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**
- *
+ * In this state, the server is reading a handshake response message from the node, expecting the node uuid in the response.
  * @author Laurent Cohen
  */
-public class WaitInitialResponseState extends HeartbeatServerState {
+class WaitInitialResponseState extends HeartbeatServerState {
   /**
    * Logger for this class.
    */

@@ -22,10 +22,10 @@ import org.jppf.comm.recovery.HeartbeatMessage;
 import org.jppf.nio.ChannelWrapper;
 
 /**
- *
+ * In this state, the server is reading a heartbeat response message from the node.
  * @author Laurent Cohen
  */
-public class WaitResponseState extends HeartbeatServerState {
+class WaitResponseState extends HeartbeatServerState {
   /**
    * Initialize this state.
    * @param server the server that handles this state.

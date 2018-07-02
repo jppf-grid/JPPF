@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node.
  * @author Laurent Cohen
  */
 class HeartbeatContext extends AbstractNioContext<HeartbeatState> {

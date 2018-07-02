@@ -20,10 +20,10 @@ package org.jppf.server.nio.heartbeat;
 
 
 /**
- * Enumeration of the possible states for a class server channel.
+ * Enumeration of the possible states for a channel.
  * @author Laurent Cohen
  */
-public enum HeartbeatState {
+enum HeartbeatState {
   /**
    * State of sending the initial bundle to the node.
    */

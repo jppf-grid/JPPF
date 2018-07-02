@@ -28,7 +28,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
- * 
+ * Performs periodic heartbeat echanges with the nodes and handles heartbeat failures detection.
  * @author Laurent Cohen
  */
 class HeartbeatMessageHandler {
@@ -173,7 +173,8 @@ class HeartbeatMessageHandler {
   }
 
   /**
-   * 
+   * This timer task periodically initiate a heartbeat exchange with all the nodes.
+   * The hearbeat echanges are asynchronous and handled via a dedicated thread pool.
    */
   class ReaperTask extends TimerTask {
     @Override

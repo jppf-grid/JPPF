@@ -20,10 +20,10 @@ package org.jppf.server.nio.heartbeat;
 
 
 /**
- * Enumeration of the possible state transitions for a Node server channel.
+ * Enumeration of the possible state transitions for a channel.
  * @author Laurent Cohen
  */
-public enum HeartbeatTransition {
+enum HeartbeatTransition {
   /**
    * Transition from a state to SENDING_BUNDLE.
    */

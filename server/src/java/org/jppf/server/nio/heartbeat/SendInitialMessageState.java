@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio.heartbeat;
 
+import java.net.ConnectException;
+
 import org.jppf.comm.recovery.HeartbeatMessage;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.utils.*;
@@ -25,10 +27,10 @@ import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
- *
+ * In this state, the server is sending a handshake message to the node, passing the heartbeat parameters in the message.
  * @author Laurent Cohen
  */
-public class SendInitialMessageState extends HeartbeatServerState {
+class SendInitialMessageState extends HeartbeatServerState {
   /**
    * Logger for this class.
    */
@@ -47,6 +49,7 @@ public class SendInitialMessageState extends HeartbeatServerState {
 
   @Override
   public HeartbeatTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
     final HeartbeatContext context = (HeartbeatContext) channel.getContext();
     if (context.getMessage() == null) {
       final HeartbeatMessage data = context.newHeartbeatMessage();

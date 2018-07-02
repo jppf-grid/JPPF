@@ -25,7 +25,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- *
+ * Nio-based server handling echanges of heartbeat messages between servers and nodes.
  * @author Laurent Cohen
  */
 public class HeartbeatNioServer extends NioServer<HeartbeatState, HeartbeatTransition> {

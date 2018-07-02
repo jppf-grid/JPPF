@@ -21,10 +21,10 @@ package org.jppf.server.nio.heartbeat;
 import org.jppf.nio.ChannelWrapper;
 
 /**
- *
+ * In this state, the channel is expected to be idle, i.e. no I/O occurs.
  * @author Laurent Cohen
  */
-public class IdleState extends HeartbeatServerState {
+class IdleState extends HeartbeatServerState {
   /**
    * Initialize this state.
    * @param server the server that handles this state.

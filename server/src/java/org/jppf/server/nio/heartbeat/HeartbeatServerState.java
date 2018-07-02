@@ -21,7 +21,7 @@ package org.jppf.server.nio.heartbeat;
 import org.jppf.nio.NioState;
 
 /**
- * Common abstract superclass for all states of a node that executes tasks.
+ * Common abstract superclass for all states of a connection.
  * @author Laurent Cohen
  */
 abstract class HeartbeatServerState extends NioState<HeartbeatTransition> {
