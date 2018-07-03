@@ -81,7 +81,7 @@ public class MemoryLocation extends AbstractLocation<byte[]> {
   }
 
   /**
-   * Get the size of the file this location points to.
+   * Get the size of the data this location points to.
    * @return the size as a long value, or -1 if the file does not exist.
    */
   @Override
