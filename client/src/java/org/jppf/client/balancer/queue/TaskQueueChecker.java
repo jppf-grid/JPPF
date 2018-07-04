@@ -225,12 +225,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
           Iterator<ClientJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
             ClientJob bundleWrapper = it.next();
-            if (bundleWrapper.isCancelled() || bundleWrapper.isCancelling()) continue;
+            if (bundleWrapper.isCancellingOrCancelled()) continue;
             channel = findIdleChannelIndex(bundleWrapper);
+            if (bundleWrapper.isCancellingOrCancelled()) continue;
             if (channel != null) selectedBundle = bundleWrapper;
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-          if (channel != null) {
+          if ((channel != null) && !selectedBundle.isCancellingOrCancelled()) {
             dispatchJobToChannel(channel, selectedBundle);
             dispatched = true;
           }
