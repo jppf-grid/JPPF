@@ -259,13 +259,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
           final Iterator<ClientJob> jobIterator = queue.iterator();
           while ((channel == null) && jobIterator.hasNext() && !idleChannels.isEmpty()) {
             final ClientJob job = jobIterator.next();
-            if (job.isCancelled() || job.isCancelling()) continue;
+            if (job.isCancellingOrCancelled()) continue;
             channel = findIdleChannel(job);
+            if (job.isCancellingOrCancelled()) continue;
             if (channel != null) selectedBundle = job;
             else if (traceEnabled) log.trace("no channel found for job {}", job);
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-          if (channel != null) {
+          if ((channel != null) && !selectedBundle.isCancellingOrCancelled()) {
             dispatchJobToChannel(channel, selectedBundle);
             dispatched = true;
           }
@@ -290,15 +291,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     final int idleChannelsSize = idleChannels.size();
     final List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
     final int highestPriority = getHighestPriority();
-    //final Integer highestPriority = idleChannels.firstKey();
-    //if (highestPriority == null) return null;
     final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
     if (channels == null) return null;
-    //final Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
     for (final ChannelWrapper ch: channels) {
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
-        //channelsToRemove.offer(ch);
         continue;
       }
       if (!job.acceptsChannel(ch)) continue;
@@ -309,12 +306,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       acceptableChannels.add(ch);
     }
     processPendingActions();
-    /*
-    if (!channelsToRemove.isEmpty()) {
-      ChannelWrapper ch;
-      while ((ch = channelsToRemove.poll()) != null) idleChannels.removeValue(ch.getPriority(), ch);
-    }
-    */
     final int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
     return (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;

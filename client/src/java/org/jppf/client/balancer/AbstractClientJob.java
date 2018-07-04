@@ -377,7 +377,7 @@ public abstract class AbstractClientJob {
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
     if (traceEnabled) log.trace(String.format("job '%s' : cancelled=%b, cancelling=%b, pending=%b, expired=%b, nb channels=%d, max channels=%d",
       job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
-    if (isCancelled() || isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
+    if (isCancelling() || isCancelled() || isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
     final ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;
     if (policy != null) {
@@ -427,5 +427,13 @@ public abstract class AbstractClientJob {
    */
   public boolean isCancelling() {
     return (job == null) ? false : job.getCancellingFlag().get();
+  }
+
+  /**
+   * Whether this job is being cancelled or has already been cancelled.
+   * @return {@code true} a cancellation request is being or has been processed, {@code false} otherwise.
+   */
+  public boolean isCancellingOrCancelled() {
+    return isCancelled() || isCancelling();
   }
 }
