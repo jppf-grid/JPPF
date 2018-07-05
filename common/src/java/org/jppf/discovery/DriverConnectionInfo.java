@@ -46,12 +46,16 @@ public class DriverConnectionInfo {
    * The connection pool size.
    */
   final int poolSize;
+  /**
+   * Whether the heartbeat mechanism is enabled for the connection pool.
+   */
+  final boolean heartbeatEnabled;
 
   /**
    * Initialize a plain connection with default name("driver"), pool size (1), host ("localhost") and port (11111).
    */
   public DriverConnectionInfo() {
-    this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue(), 1);
+    this("driver", false, SERVER_HOST.getDefaultValue(), SERVER_PORT.getDefaultValue(), 1, false);
   }
 
   /**
@@ -61,7 +65,7 @@ public class DriverConnectionInfo {
    * @param port the driver port to connect to.
    */
   public DriverConnectionInfo(final String name, final String host, final int port) {
-    this(name, false, host, port, 1);
+    this(name, false, host, port, 1, false);
   }
 
   /**
@@ -72,7 +76,7 @@ public class DriverConnectionInfo {
    * @param port the driver port to connect to.
    */
   public DriverConnectionInfo(final String name, final boolean secure, final String host, final int port) {
-    this(name, secure, host, port, 1);
+    this(name, secure, host, port, 1, false);
   }
 
   /**
@@ -84,11 +88,25 @@ public class DriverConnectionInfo {
    * @param poolSize the number of driver connections in the pool.
    */
   public DriverConnectionInfo(final String name, final boolean secure, final String host, final int port, final int poolSize) {
+    this(name, secure, host, port, poolSize, false);
+  }
+
+  /**
+   * Initialize a connection.
+   * @param name the name given to this connection.
+   * @param secure whether SSL/TLS should be used.
+   * @param host the driver host name or IP address.
+   * @param port the driver port to connect to.
+   * @param poolSize the number of driver connections in the pool.
+   * @param heartbeatEnabled whether the heartbeat mechanism is enabled for the connection pool.
+   */
+  public DriverConnectionInfo(final String name, final boolean secure, final String host, final int port, final int poolSize, final boolean heartbeatEnabled) {
     this.name = name;
     this.secure = secure;
     this.host = host;
     this.port = port;
     this.poolSize = poolSize >= 1 ? poolSize : 1;
+    this.heartbeatEnabled = heartbeatEnabled;
   }
 
   /**
@@ -129,6 +147,14 @@ public class DriverConnectionInfo {
    */
   public int getPoolSize() {
     return poolSize;
+  }
+
+  /**
+   * Determine whether the heartbeat mechanism is enabled for the connection pool.
+   * @return {@code true} if heartbeat is enabled, {@code false} otherwise.
+   */
+  public boolean isHeartbeatEnabled() {
+    return heartbeatEnabled;
   }
 
   @Override

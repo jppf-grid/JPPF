@@ -82,7 +82,6 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   public PeerDiscoveryThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final JPPFConnectionInformation localInfo) {
     if (localInfo == null) throw new IllegalArgumentException("localInfo is null");
     if (connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
-
     this.connectionHandler = connectionHandler;
     this.ipFilter = ipFilter;
     this.localInfo = localInfo;
@@ -103,6 +102,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
         }
         if ((info != null) && !hasConnectionInformation(info) && !wasRecentlyRemoved(info)) {
           if (debugEnabled) log.debug("Found peer connection information: " + info + ", infoSet=" + infoSet);
+          info.recoveryEnabled &= JPPFConfiguration.get(JPPFProperties.PEER_RECOVERY_ENABLED);
           addConnectionInformation(info);
           onNewConnection("Peer-" + count.incrementAndGet(), info);
         }

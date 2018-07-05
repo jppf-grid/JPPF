@@ -22,12 +22,23 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.recovery.*;
+import org.jppf.utils.concurrent.ThreadUtils;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class PeerConnectionPool implements AutoCloseable {
+public class PeerConnectionPool implements AutoCloseable, HeartbeatConnectionListener {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(PeerConnectionPool.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Name of the peer in the configuration file.
    */
@@ -56,6 +67,10 @@ public class PeerConnectionPool implements AutoCloseable {
    * Holds all the peer connections in this pool.
    */
   private final List<JPPFPeerInitializer> initializers = new ArrayList<>();
+  /**
+   * Connection to the recovery server.
+   */
+  private HeartbeatConnection recoveryConnection;
 
   /**
    * Initialize this connection pool.
@@ -127,11 +142,37 @@ public class PeerConnectionPool implements AutoCloseable {
       initializers.add(initializer);
       initializer.start();
     }
+    if (connectionInfo.recoveryEnabled) initHeartbeat();
+  }
+
+  /**
+   * Initialize the heartbeat meachanism if needed.
+   */
+  void initHeartbeat() {
+    if (recoveryConnection == null) {
+      if (debugEnabled) log.debug("Initializing recovery");
+      recoveryConnection = new HeartbeatConnection(connectionInfo.uuid, connectionInfo.host, connectionInfo.getValidPort(secure), secure);
+      recoveryConnection.addClientConnectionListener(this);
+      ThreadUtils.startThread(recoveryConnection, getPeerName() + "-Heartbeat");
+    }
   }
 
   @Override
   public void close() {
+    if (recoveryConnection != null) recoveryConnection.close();
     for (JPPFPeerInitializer initializer: initializers) initializer.close();
     initializers.clear();
+  }
+
+  /**
+   * @return the connection to the recovery server.
+   */
+  public HeartbeatConnection getRecoveryConnection() {
+    return recoveryConnection;
+  }
+
+  @Override
+  public void heartbeatConnectionFailed(final HeartbeatConnectionEvent event) {
+    close();
   }
 }

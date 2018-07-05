@@ -31,7 +31,7 @@ import org.slf4j.*;
  * @since 5.1
  * @author Laurent Cohen
  */
-public abstract class AbstractRemoteNode extends JPPFNode implements ClientConnectionListener {
+public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatConnectionListener {
   /**
    * Logger for this class.
    */
@@ -43,7 +43,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
   /**
    * Connection to the recovery server.
    */
-  private ClientConnection recoveryConnection = null;
+  private HeartbeatConnection recoveryConnection;
   /**
    * Server connection information.
    */
@@ -72,9 +72,9 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
+        recoveryConnection = new HeartbeatConnection(uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
         recoveryConnection.addClientConnectionListener(this);
-        ThreadUtils.startThread(recoveryConnection, "reaper client connection");
+        ThreadUtils.startThread(recoveryConnection, "HeartbeatConnection");
       }
     }
   }
@@ -84,7 +84,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
     if (nodeConnection != null) nodeConnection.close();
     if (recoveryConnection != null) {
-      final ClientConnection tmp = recoveryConnection;
+      final HeartbeatConnection tmp = recoveryConnection;
       if (tmp != null) {
         recoveryConnection = null;
         tmp.close();
@@ -93,7 +93,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
   }
 
   @Override
-  public void clientConnectionFailed(final ClientConnectionEvent event) {
+  public void heartbeatConnectionFailed(final HeartbeatConnectionEvent event) {
     try {
       if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
       reconnectionNotification = new JPPFNodeReconnectionNotification("The heartbeat mechanism failed to receive a message from the server", null, ConnectionReason.HEARTBEAT_FAILURE);

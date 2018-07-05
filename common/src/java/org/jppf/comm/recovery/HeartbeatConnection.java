@@ -32,11 +32,11 @@ import org.slf4j.*;
  * Client-side connection for the recovery mechanism.
  * @author Laurent Cohen
  */
-public class ClientConnection extends AbstractRecoveryConnection {
+public class HeartbeatConnection extends AbstractHeartbeatConnection {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(ClientConnection.class);
+  private static final Logger log = LoggerFactory.getLogger(HeartbeatConnection.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -48,13 +48,13 @@ public class ClientConnection extends AbstractRecoveryConnection {
   /**
    * The list of listeners to this object's events.
    */
-  private final List<ClientConnectionListener> listeners = new CopyOnWriteArrayList<>();
+  private final List<HeartbeatConnectionListener> listeners = new CopyOnWriteArrayList<>();
   /**
-   * 
+   * The host to connect to for echanging heartbeat mesages.
    */
   private String host;
   /**
-   * 
+   * The port to connect to.
    */
   private int port = -1;
   /**
@@ -69,7 +69,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    * @param port the port number to connect to on the host.
    * @param sslEnabled whether secure connectivity is enabled.
    */
-  public ClientConnection(final String uuid, final String host, final int port, final boolean sslEnabled) {
+  public HeartbeatConnection(final String uuid, final String host, final int port, final boolean sslEnabled) {
     this.uuid = uuid;
     this.host = host;
     this.port = port;
@@ -159,7 +159,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    * Add a listener to the list of listeners.
    * @param listener the listener to add.
    */
-  public void addClientConnectionListener(final ClientConnectionListener listener) {
+  public void addClientConnectionListener(final HeartbeatConnectionListener listener) {
     if (listener == null) return;
     listeners.add(listener);
   }
@@ -168,7 +168,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove.
    */
-  public void removeClientConnectionListener(final ClientConnectionListener listener) {
+  public void removeClientConnectionListener(final HeartbeatConnectionListener listener) {
     if (listener == null) return;
     listeners.remove(listener);
   }
@@ -177,7 +177,7 @@ public class ClientConnection extends AbstractRecoveryConnection {
    * Notify all listeners that an event has occurred.
    */
   private void fireClientConnectionEvent() {
-    final ClientConnectionEvent event = new ClientConnectionEvent(this);
-    for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
+    final HeartbeatConnectionEvent event = new HeartbeatConnectionEvent(this);
+    for (HeartbeatConnectionListener listener : listeners) listener.heartbeatConnectionFailed(event);
   }
 }

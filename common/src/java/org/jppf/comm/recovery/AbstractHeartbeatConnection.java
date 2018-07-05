@@ -30,11 +30,11 @@ import org.slf4j.*;
  * Common abstract super class for a connection dedicated to recovery from hardware failure of a remote peer.
  * @author Laurent Cohen
  */
-public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable {
+public abstract class AbstractHeartbeatConnection extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractRecoveryConnection.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractHeartbeatConnection.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

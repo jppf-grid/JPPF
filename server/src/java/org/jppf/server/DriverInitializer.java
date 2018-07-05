@@ -252,6 +252,7 @@ public class DriverInitializer {
             if (peerSSL) info.sslServerPorts = ports;
             else info.serverPorts = ports;
             final int size = props.get(PARAM_PEER_POOL_SIZE, name);
+            info.recoveryEnabled = props.get(PARAM_PEER_RECOVERY_ENABLED, name);
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             if (debugEnabled) log.debug(String.format("read peer configuration: name=%s, size=%d, secure=%b, info=%s", name, size, peerSSL, info));
             peerConnectionPoolHandler.newPool(name, size, info, peerSSL, false);

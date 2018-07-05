@@ -208,6 +208,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> PEER_POOL_SIZE = new IntProperty("jppf.peer.pool.size", 1);
   /** Toggle secure connections to remote peer servers. */
   public static final JPPFProperty<Boolean> PEER_SSL_ENABLED = new BooleanProperty("jppf.peer.ssl.enabled", false);
+  /** Heartbeat enabled flag for a discovered peer driver connection. */
+  public static final JPPFProperty<Boolean> PEER_RECOVERY_ENABLED = new BooleanProperty("jppf.peer.recovery.enabled", false);
   /** @exclude . */
   public static final JPPFProperty<Long> PEER_HANDLER_PERIOD = new LongProperty("jppf.peer.handler.period", 1000L);
   /** @exclude . */
@@ -222,6 +224,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> PARAM_PEER_SSL_ENABLED = new BooleanProperty("jppf.peer.<peer_name>.ssl.enabled", false);
   /** COnnection pool size for a manually configured peer driver connection (parametrized). */
   public static final JPPFProperty<Integer> PARAM_PEER_POOL_SIZE = new IntProperty("jppf.peer.<peer_name>.pool.size", 1, 1, Integer.MAX_VALUE);
+  /** Heartbeat enabled flag for a manually configured peer driver connection (parametrized). */
+  public static final JPPFProperty<Boolean> PARAM_PEER_RECOVERY_ENABLED = new BooleanProperty("jppf.peer.<peer_name>.recovery.enabled", false);
   /** Path to the security policy file. */
   public static final JPPFProperty<String> POLICY_FILE = new StringProperty("jppf.policy.file", null);
   /** Connection pool size for discovered server conenctions. */

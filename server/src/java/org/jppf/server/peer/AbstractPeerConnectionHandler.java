@@ -114,7 +114,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
     if (printConnectionMessage) {
       final String msg = "Reconnected to remote peer " + cname;
       log.info(msg);
-      System.out.println("Reconnected to remote peer " + cname);
+      System.out.println(msg);
     }
     postInit();
   }
