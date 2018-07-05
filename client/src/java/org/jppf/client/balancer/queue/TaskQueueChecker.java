@@ -267,8 +267,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
           if ((channel != null) && !selectedBundle.isCancellingOrCancelled()) {
-            dispatchJobToChannel(channel, selectedBundle);
-            dispatched = true;
+            dispatched = dispatchJobToChannel(channel, selectedBundle);
           }
         } catch (final Exception ex) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
@@ -315,12 +314,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
    * @param channel the driver channel to dispatch the job to.
    * @param job the job to dispatch.
+   * @return {@code true} if tje job was successfully dispatched, {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
-  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob job)  throws Exception {
+  private boolean dispatchJobToChannel(final ChannelWrapper channel, final ClientJob job)  throws Exception {
     if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {job.getJob().getUuid(), channel, channel.getConnectionUuid()});
     synchronized (channel.getMonitor()) {
       int size = 1;
+      if (job.isCancellingOrCancelled()) return false;
       try {
         updateBundler(job.getJob(), channel);
         size = channel.getBundler().getBundleSize();
@@ -328,10 +329,12 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
         size = bundlerFactory.getFallbackBundler().getBundleSize();
       }
+      if (job.isCancellingOrCancelled()) return false;
       final ClientTaskBundle jobDispatch = queue.nextBundle(job, size);
       job.addChannel(channel);
       channel.submit(jobDispatch);
     }
+    return true;
   }
 
   /**
