@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
  * Test database load-balancer persistence. 
  * @author Laurent Cohen
  */
-public class TestMultiServerAsyncFileLoadBalancerPersistence extends AbstractMuliServerLoadBalancerPersistenceTest {
+public class TestMultiServerAsyncFileLoadBalancerPersistence extends AbstractMultiServerLoadBalancerPersistenceTest {
   /**
    * Start the DB server and JPPF grid.
    * @throws Exception if any error occurs.

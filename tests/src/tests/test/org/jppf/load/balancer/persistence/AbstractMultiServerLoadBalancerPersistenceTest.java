@@ -44,7 +44,7 @@ import test.org.jppf.test.setup.common.*;
  *
  * @author Laurent Cohen
  */
-public abstract class AbstractMuliServerLoadBalancerPersistenceTest extends AbstractDatabaseSetup {
+public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends AbstractDatabaseSetup {
   /** */
   private final static int NB_TASKS = 2 * 50;
 
