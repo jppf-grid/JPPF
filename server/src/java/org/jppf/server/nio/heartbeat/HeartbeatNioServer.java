@@ -229,8 +229,10 @@ public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
     try {
       messageHandler.removeChannel(context);
       final SelectionKey key = context.getSocketChannel().keyFor(selector);
-      key.cancel();
-      key.channel().close();
+      if (key != null) {
+        key.cancel();
+        key.channel().close();
+      }
     } catch (final Exception e) {
       log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
     }

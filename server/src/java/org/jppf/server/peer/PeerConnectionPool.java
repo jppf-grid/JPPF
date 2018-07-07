@@ -31,7 +31,7 @@ import org.slf4j.*;
  *
  * @author Laurent Cohen
  */
-public class PeerConnectionPool implements AutoCloseable, HeartbeatConnectionListener {
+public class PeerConnectionPool implements HeartbeatConnectionListener {
   /**
    * Logger for this class.
    */
@@ -137,6 +137,7 @@ public class PeerConnectionPool implements AutoCloseable, HeartbeatConnectionLis
    * Initialize this pool by starting all connections up to the specified pool size.
    */
   private void init() {
+    connectionSequence.set(0);
     for (int i=1; i<=size; i++) {
       final String name = String.format("%s-%d", peerName, connectionSequence.incrementAndGet());
       final JPPFPeerInitializer initializer = new JPPFPeerInitializer(name, connectionInfo, secure, fromDiscovery);
@@ -158,9 +159,15 @@ public class PeerConnectionPool implements AutoCloseable, HeartbeatConnectionLis
     }
   }
 
-  @Override
+  /**
+   * 
+   */
   public void close() {
-    if (recoveryConnection != null) recoveryConnection.close();
+    if (debugEnabled) log.debug("Closing peer connection {}", this);
+    if (recoveryConnection != null) {
+      recoveryConnection.close();
+      recoveryConnection = null;
+    }
     for (JPPFPeerInitializer initializer: initializers) initializer.close();
     initializers.clear();
   }
@@ -175,5 +182,17 @@ public class PeerConnectionPool implements AutoCloseable, HeartbeatConnectionLis
   @Override
   public void heartbeatConnectionFailed(final HeartbeatConnectionEvent event) {
     close();
+    init();
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append(getClass().getSimpleName()).append('[')
+      .append("name=").append(peerName)
+      .append(", size=").append(size)
+      .append(", secure=").append(secure)
+      .append(", connectionInfo=").append(connectionInfo)
+      .append(", fromDiscovery=").append(fromDiscovery)
+      .append(']').toString();
   }
 }

@@ -32,7 +32,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPeerInitializer implements Runnable, AutoCloseable {
+public class JPPFPeerInitializer implements Runnable {
   /**
    * Logger for this class.
    */
@@ -136,7 +136,7 @@ public class JPPFPeerInitializer implements Runnable, AutoCloseable {
         final PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
         if (pdt != null) {
           final boolean removed = pdt.removeConnectionInformation(connectionInfo);
-          if (debugEnabled) log.debug((removed ? "successfully removed " : "failure to remove ") + "{}", connectionInfo);
+          if (debugEnabled) log.debug((removed ? "successfully removed " : "failed to remove ") + "{}", connectionInfo);
         }
       }
     } finally {
@@ -152,7 +152,9 @@ public class JPPFPeerInitializer implements Runnable, AutoCloseable {
     ThreadUtils.startThread(this, String.format("%s[%s]", getClass().getSimpleName(), peerName));
   }
 
-  @Override
+  /**
+   * 
+   */
   public void close() {
     if (provider != null) {
       provider.close();
