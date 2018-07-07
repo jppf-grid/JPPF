@@ -40,7 +40,7 @@ import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
-import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
+import org.jppf.server.nio.heartbeat.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;

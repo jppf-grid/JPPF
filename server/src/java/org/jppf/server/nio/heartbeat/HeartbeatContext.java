@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio.heartbeat;
 
+import java.nio.channels.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.comm.recovery.HeartbeatMessage;
@@ -26,13 +27,14 @@ import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node.
  * @author Laurent Cohen
  */
-class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
+class HeartbeatContext extends AbstractNioContext<EmptyEnum> {
   /**
    * Logger for this class.
    */
@@ -56,19 +58,28 @@ class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
   /**
    * The server that handles this context.
    */
-  private final HeartbeatNioServer server;
+  final HeartbeatNioServer server;
+  /**
+   * The socket channel's interest ops.
+   */
+  private int interestOps;
+  /**
+   * Selection key for the associated socket channel and nio server selector.
+   */
+  private SelectionKey selectionKey;
 
   /**
-   * 
    * @param server the server that handles this context.
+   * @param socketChannel the associated socket channel.
    */
-  HeartbeatContext(final HeartbeatNioServer server) {
+  HeartbeatContext(final HeartbeatNioServer server, final SocketChannel socketChannel) {
     this.server = server;
+    this.socketChannel = socketChannel;
   }
 
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (message == null) message = new SimpleNioMessage(wrapper);
+    if (message == null) message = new SimpleNioMessage(this);
     final boolean b = message.read();
     if (b) deserializeData();
     return b;
@@ -110,7 +121,15 @@ class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
    * @return the newly created heartbeat message.
    */
   public HeartbeatMessage newHeartbeatMessage() {
-    return new HeartbeatMessage(messageSequence.incrementAndGet());
+    final HeartbeatMessage data = new HeartbeatMessage(messageSequence.incrementAndGet());
+    if (uuid == null) {
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties props = data.getProperties();
+      props.set(JPPFProperties.RECOVERY_MAX_RETRIES, config.get(JPPFProperties.RECOVERY_MAX_RETRIES));
+      props.set(JPPFProperties.RECOVERY_READ_TIMEOUT, config.get(JPPFProperties.RECOVERY_READ_TIMEOUT));
+      props.set(JPPFProperties.RECOVERY_ENABLED, config.get(JPPFProperties.RECOVERY_ENABLED));
+    }
+    return data;
   }
 
   /**
@@ -133,7 +152,7 @@ class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
       if (debugEnabled) log.debug("closing heartbeat channel {} due to exception:\n{}", this, ExceptionUtils.getStackTrace(e));
       else log.warn("closing heartbeat channel {} due to exception: {}", this, ExceptionUtils.getMessage(e));
     }
-    server.closeConnection(channel);
+    server.closeConnection(this);
   }
 
   /**
@@ -156,5 +175,45 @@ class HeartbeatContext extends AbstractNioContext<HeartbeatState> {
    */
   public AtomicBoolean getSubmitted() {
     return submitted;
+  }
+
+  /**
+   * @return the socket channel's interest ops.
+   */
+  public int getInterestOps() {
+    return interestOps;
+  }
+
+  /**
+   * Set the socket channel's interest ops.
+   * @param interestOps the interest ops to set.
+   */
+  public void setInterestOps(final int interestOps) {
+    this.interestOps = interestOps;
+  }
+
+  /**
+   * @return the associated selection key.
+   */
+  public SelectionKey getSelectionKey() {
+    return selectionKey;
+  }
+
+  /**
+   * Set the associated selection key.
+   * @param selectionKey the ley to set.
+   */
+  public void setSelectionKey(final SelectionKey selectionKey) {
+    this.selectionKey = selectionKey;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("state=").append(getState());
+    sb.append(", ssl=").append(ssl);
+    sb.append(", interestOps=").append(interestOps);
+    sb.append(", socketChannel=").append(socketChannel);
+    return sb.append(']').toString();
   }
 }

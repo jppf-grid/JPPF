@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio.heartbeat;
 
+import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -112,7 +113,6 @@ class HeartbeatMessageHandler {
    */
   private void sendMessage(final HeartbeatContext context) throws Exception {
     try {
-      if (context.getState() != HeartbeatState.IDLE) return;
       int nbTries = 0;
       boolean done = false;
       while ((nbTries < maxTries) && !done) {
@@ -123,7 +123,7 @@ class HeartbeatMessageHandler {
           map.put(data.getMessageID(), data);
         }
         if (debugEnabled) log.debug("about to send {} to {}", data, context);
-        server.getTransitionManager().transitionChannel(context.getChannel(), HeartbeatTransition.TO_SEND_MESSAGE);
+        server.updateInterestOps(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
         synchronized(data) {
           data.wait(timeout);
           done = data.getResponse() != null;
