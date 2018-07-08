@@ -20,6 +20,7 @@ package org.jppf.jmxremote.nio;
 
 import java.nio.channels.SelectionKey;
 
+import org.jppf.nio.StatelessNioServer;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.SynchronizedInteger;
 import org.slf4j.*;
@@ -89,7 +90,7 @@ public class JMXTransitionTask implements Runnable {
         }
         if (result) {
           if (selecting) server.updateInterestOps(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
-          else JMXNioServer.updateInterestOpsNoWakeup(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
+          else StatelessNioServer.updateInterestOpsNoWakeup(context.getSelectionKey(), SelectionKey.OP_WRITE, true);
         }
       } catch (final Exception|Error  e) {
         context.setEnabled(false);

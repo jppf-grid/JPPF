@@ -34,7 +34,7 @@ import org.slf4j.*;
  * The NIO server that handles heartbeat connections.
  * @author Laurent Cohen
  */
-public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
+public final class HeartbeatNioServer extends StatelessNioServer {
   /**
    * Logger for this class.
    */
@@ -43,10 +43,6 @@ public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The message handler for this server.
    */
@@ -63,84 +59,34 @@ public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
   }
 
   @Override
-  protected NioServerFactory<EmptyEnum, EmptyEnum> createFactory() {
-    return null;
-  }
-
-  @Override
-  public void run() {
-    try {
-      final boolean hasTimeout = selectTimeout > 0L;
-      int n = 0;
-      while (!isStopped() && !externalStopCondition()) {
-        sync.waitForZeroAndSetToMinusOne();
-        try {
-          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        } finally {
-          sync.setToZeroIfNegative();
-        }
-        if (n > 0) go(selector.selectedKeys());
-      }
-    } catch (final Throwable t) {
-      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
-    } finally {
-      end();
-    }
-  }
-
-  /**
-   * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   * @throws Exception if any error occurs.
-   */
-  public void updateInterestOps(final SelectionKey key, final int update, final boolean add) throws Exception {
-    final HeartbeatContext context = (HeartbeatContext) key.attachment();
-    final int ops = context.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      context.setInterestOps(newOps);
-      sync.wakeUpAndSetOrIncrement();
-      try {
-        key.interestOps(newOps);
-      } finally {
-        sync.decrement();
-      }
-    }
-  }
-
-  @Override
   protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
     final Iterator<SelectionKey> it = selectedKeys.iterator();
     while (it.hasNext()) {
       final SelectionKey key = it.next();
       it.remove();
       if (!key.isValid()) continue;
-      final HeartbeatContext pair = (HeartbeatContext) key.attachment();
+      final HeartbeatContext context = (HeartbeatContext) key.attachment();
       try {
-        if (pair.isClosed()) continue;
+        if (context.isClosed()) continue;
         final boolean readable = key.isReadable(), writable = key.isWritable();
         if (readable) {
-          HeartbeatMessageReader.read(pair);
+          HeartbeatMessageReader.read(context);
         }
         if (writable) {
           updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
-          HeartbeatMessageWriter.write(pair);
+          HeartbeatMessageWriter.write(context);
         }
       } catch (final CancelledKeyException e) {
-        if ((pair != null) && !pair.isClosed()) {
-          log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-          pair.handleException(null, e);
+        if ((context != null) && !context.isClosed()) {
+          log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+          context.handleException(null, e);
         }
       } catch (final EOFException e) {
-        if (debugEnabled) log.debug("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-        pair.handleException(null, e);
+        if (debugEnabled) log.debug("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+        context.handleException(null, e);
       } catch (final Exception e) {
-        log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-        if (pair != null) pair.handleException(null, e);
+        log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+        if (context != null) context.handleException(null, e);
       }
     }
   }
@@ -157,23 +103,6 @@ public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
       log.error(e.getMessage(), e);
     }
     return null;
-  }
-
-  /**
-   * Register the specified channel with this server's selectior.
-   * @param context the ocntext associated with the channel.
-   * @param channel the channel to register.
-   * @throws Exception if any error occurs.
-   */
-  public void registerChannel(final HeartbeatContext context, final SocketChannel channel) throws Exception {
-    final int ops = SelectionKey.OP_READ;
-    context.setInterestOps(ops);
-    sync.wakeUpAndSetOrIncrement();
-    try {
-      context.setSelectionKey(channel.register(selector, ops, context));
-    } finally {
-      sync.decrement();
-    }
   }
 
   /**
@@ -242,24 +171,6 @@ public final class HeartbeatNioServer extends NioServer<EmptyEnum, EmptyEnum> {
   public void removeAllConnections() {
     if (!isStopped()) return;
     super.removeAllConnections();
-  }
-
-  /**
-   * Set the interest ops of a specified selection key.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   */
-  static void updateInterestOpsNoWakeup(final SelectionKey key, final int update, final boolean add) {
-    final HeartbeatContext pair = (HeartbeatContext) key.attachment();
-    final int ops = pair.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      key.interestOps(newOps);
-      pair.setInterestOps(newOps);
-    }
   }
 
   /**

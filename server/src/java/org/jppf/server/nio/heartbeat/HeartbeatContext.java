@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node.
  * @author Laurent Cohen
  */
-class HeartbeatContext extends AbstractNioContext<EmptyEnum> {
+class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChannelHandler {
   /**
    * Logger for this class.
    */
@@ -177,32 +177,22 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> {
     return submitted;
   }
 
-  /**
-   * @return the socket channel's interest ops.
-   */
+  @Override
   public int getInterestOps() {
     return interestOps;
   }
 
-  /**
-   * Set the socket channel's interest ops.
-   * @param interestOps the interest ops to set.
-   */
+  @Override
   public void setInterestOps(final int interestOps) {
     this.interestOps = interestOps;
   }
 
-  /**
-   * @return the associated selection key.
-   */
+  @Override
   public SelectionKey getSelectionKey() {
     return selectionKey;
   }
 
-  /**
-   * Set the associated selection key.
-   * @param selectionKey the ley to set.
-   */
+  @Override
   public void setSelectionKey(final SelectionKey selectionKey) {
     this.selectionKey = selectionKey;
   }

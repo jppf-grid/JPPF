@@ -29,6 +29,7 @@ import javax.security.auth.Subject;
 
 import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
+import org.jppf.nio.NioChannelHandler;
 import org.jppf.utils.Pair;
 import org.slf4j.*;
 
@@ -36,7 +37,7 @@ import org.slf4j.*;
  * Convenience class to group a pair of channels respectively reading from and writing to the same socket channel.
  * @author Laurent Cohen
  */
-public class ChannelsPair extends Pair<JMXContext, JMXContext> {
+public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioChannelHandler {
   /**
    * Explicit serialVersionUID.
    */
@@ -277,32 +278,22 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> {
     return nonSelectingWritingTask;
   }
 
-  /**
-   * @return the socket channel's interest ops.
-   */
+  @Override
   public int getInterestOps() {
     return interestOps;
   }
 
-  /**
-   * Set the socket channel's interest ops.
-   * @param interestOps the interest ops to set.
-   */
+  @Override
   public void setInterestOps(final int interestOps) {
     this.interestOps = interestOps;
   }
 
-  /**
-   * @return the associated selection key.
-   */
+  @Override
   public SelectionKey getSelectionKey() {
     return selectionKey;
   }
 
-  /**
-   * Set the associated selection key.
-   * @param selectionKey the ley to set.
-   */
+  @Override
   public void setSelectionKey(final SelectionKey selectionKey) {
     this.selectionKey = selectionKey;
   }

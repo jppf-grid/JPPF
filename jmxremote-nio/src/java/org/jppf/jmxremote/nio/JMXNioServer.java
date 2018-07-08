@@ -47,7 +47,7 @@ import org.slf4j.*;
  * The NIO server that handles client-side and server-side JMX connections.
  * @author Laurent Cohen
  */
-public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implements JMXNioServerMBean {
+public final class JMXNioServer extends StatelessNioServer implements JMXNioServerMBean {
   /**
    * Logger for this class.
    */
@@ -56,10 +56,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Sequence number for the instances of this class.
    */
@@ -109,56 +105,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     final AcceptorNioServer acceptor = (AcceptorNioServer) NioHelper.getServer(JPPFIdentifiers.ACCEPTOR_CHANNEL);
     this.stats = (acceptor != null) ? acceptor.getStats() : null;
     if (debugEnabled) log.debug("initialized {}, stats = {}", this, (stats == null ? "null" : stats.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(stats))));
-  }
-
-  @Override
-  protected NioServerFactory<EmptyEnum, EmptyEnum> createFactory() {
-    return null;
-  }
-
-  @Override
-  public void run() {
-    try {
-      final boolean hasTimeout = selectTimeout > 0L;
-      int n = 0;
-      while (!isStopped() && !externalStopCondition()) {
-        sync.waitForZeroAndSetToMinusOne();
-        try {
-          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        } finally {
-          sync.setToZeroIfNegative();
-        }
-        if (n > 0) go(selector.selectedKeys());
-      }
-    } catch (final Throwable t) {
-      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
-    } finally {
-      end();
-    }
-  }
-
-  /**
-   * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   * @throws Exception if any error occurs.
-   */
-  public void updateInterestOps(final SelectionKey key, final int update, final boolean add) throws Exception {
-    final ChannelsPair pair = (ChannelsPair) key.attachment();
-    final int ops = pair.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      pair.setInterestOps(newOps);
-      sync.wakeUpAndSetOrIncrement();
-      try {
-        key.interestOps(newOps);
-      } finally {
-        sync.decrement();
-      }
-    }
   }
 
   @Override
@@ -256,23 +202,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
     writingChannel.setMessageHandler(handler);
     if (debugEnabled) log.debug("created {}, env = {}", pair, env);
     return pair;
-  }
-
-  /**
-   * Register the specified channel with this server's selectior.
-   * @param pair the ocntext associated with the channel.
-   * @param channel the channel to register.
-   * @throws Exception if any error occurs.
-   */
-  public void registerChannel(final ChannelsPair pair, final SocketChannel channel) throws Exception {
-    final int ops = SelectionKey.OP_READ;
-    pair.setInterestOps(ops);
-    sync.wakeUpAndSetOrIncrement();
-    try {
-      pair.setSelectionKey(channel.register(selector, ops, pair));
-    } finally {
-      sync.decrement();
-    }
   }
 
   /**
@@ -477,24 +406,6 @@ public final class JMXNioServer extends NioServer<EmptyEnum, EmptyEnum> implemen
       for (final Map.Entry<Integer, Collection<String>> entry: connectionsByServerPort.entrySet()) sb.append("\n  ").append(entry.getKey()).append(" --> ").append(entry.getValue().size());
     }
     return sb.toString();
-  }
-
-  /**
-   * Set the interest ops of a specified selection key.
-   * This method is proposed as a convenience, to encapsulate the inner locking mechanism.
-   * @param key the key on which to set the interest operations.
-   * @param update the operations to update on the key.
-   * @param add whether to add the update ({@code true}) or remove it ({@code false}).
-   */
-  static void updateInterestOpsNoWakeup(final SelectionKey key, final int update, final boolean add) {
-    final ChannelsPair pair = (ChannelsPair) key.attachment();
-    final int ops = pair.getInterestOps();
-    final int newOps = add ? ops | update : ops & ~update;
-    if (newOps != ops) {
-      if (traceEnabled) log.trace(String.format("updating interestOps from %d to %d for %s", ops, newOps, key));
-      key.interestOps(newOps);
-      pair.setInterestOps(newOps);
-    }
   }
 
   /**
