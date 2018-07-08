@@ -29,7 +29,7 @@ import org.slf4j.*;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S> {
+public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S>, CloseableContext {
   /**
    * Logger for this class.
    */
@@ -228,18 +228,12 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     this.enabled = enabled;
   }
 
-  /**
-   * Determine whether this channel has been closed.
-   * @return {@code true} if this channel has been closed, {@code false} otherwise.
-   */
+  @Override
   public boolean isClosed() {
     return closed.get();
   }
 
-  /**
-   * Specify whether this channel has been closed.
-   * @param closed {@code true} if this channel has been closed, {@code false} otherwise.
-   */
+  @Override
   public void setClosed(final boolean closed) {
     this.closed.set(closed);
   }

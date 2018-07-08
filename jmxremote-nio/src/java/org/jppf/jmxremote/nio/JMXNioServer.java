@@ -108,37 +108,34 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
   }
 
   @Override
-  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
-    final Iterator<SelectionKey> it = selectedKeys.iterator();
-    while (it.hasNext()) {
-      final SelectionKey key = it.next();
-      it.remove();
-      if (!key.isValid()) continue;
-      final ChannelsPair pair = (ChannelsPair) key.attachment();
-      try {
-        if (pair.isClosed()) continue;
-        final boolean readable = key.isReadable(), writable = key.isWritable();
-        if (readable) {
-          if (pair.isClosing()) continue;
-          JMXMessageReader.read(pair.readingContext());
-        }
-        if (writable) {
-          updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
-          final JMXTransitionTask task = pair.getNonSelectingWritingTask();
-          if (!task.incrementCountIfNeeded()) task.run();
-        }
-      } catch (final CancelledKeyException e) {
-        if ((pair != null) && !pair.isClosing() && !pair.isClosed()) {
-          log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-          closeConnection(pair, e, false);
-        }
-      } catch (final EOFException e) {
-        if (debugEnabled) log.debug("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-        closeConnection(pair, e, false);
-      } catch (final Exception e) {
+  protected void handleRead(final SelectionKey key) throws Exception {
+    final ChannelsPair pair = (ChannelsPair) key.attachment();
+    if (pair.isClosing()) return;
+    JMXMessageReader.read(pair.readingContext());
+  }
+
+  @Override
+  protected void handleWrite(final SelectionKey key) throws Exception {
+    final ChannelsPair pair = (ChannelsPair) key.attachment();
+    updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
+    final JMXTransitionTask task = pair.getNonSelectingWritingTask();
+    if (!task.incrementCountIfNeeded()) task.run();
+  }
+
+  @Override
+  protected void handleSelectionException(final SelectionKey key, final Exception e) throws Exception {
+    final ChannelsPair pair = (ChannelsPair) key.attachment();
+    if (e instanceof CancelledKeyException) {
+      if ((pair != null) && !pair.isClosing() && !pair.isClosed()) {
         log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
-        if (pair != null) closeConnection(pair, e, false);
+        closeConnection(pair, e, false);
       }
+    } else if (e instanceof EOFException) {
+      if (debugEnabled) log.debug("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
+      closeConnection(pair, e, false);
+    } else {
+      log.error("error on {} :\n{}", pair, ExceptionUtils.getStackTrace(e));
+      if (pair != null) closeConnection(pair, e, false);
     }
   }
 

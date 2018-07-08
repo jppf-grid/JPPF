@@ -29,7 +29,7 @@ import javax.security.auth.Subject;
 
 import org.jppf.jmxremote.*;
 import org.jppf.jmxremote.message.JMXMessageHandler;
-import org.jppf.nio.NioChannelHandler;
+import org.jppf.nio.*;
 import org.jppf.utils.Pair;
 import org.slf4j.*;
 
@@ -37,7 +37,7 @@ import org.slf4j.*;
  * Convenience class to group a pair of channels respectively reading from and writing to the same socket channel.
  * @author Laurent Cohen
  */
-public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioChannelHandler {
+public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioChannelHandler, CloseableContext {
   /**
    * Explicit serialVersionUID.
    */
@@ -153,11 +153,16 @@ public class ChannelsPair extends Pair<JMXContext, JMXContext> implements NioCha
     }
   }
 
-  /**
-   * @return whther the channels are closed.
-   */
+  @Override
   public boolean isClosed() {
     return closed.get();
+  }
+
+  /**
+   * This implementation does not do anything.
+   */
+  @Override
+  public void setClosed(final boolean closed) {
   }
 
   /**

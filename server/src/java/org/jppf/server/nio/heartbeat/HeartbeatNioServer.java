@@ -21,7 +21,6 @@ package org.jppf.server.nio.heartbeat;
 import java.io.EOFException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
-import java.util.*;
 
 import javax.net.ssl.*;
 
@@ -59,35 +58,30 @@ public final class HeartbeatNioServer extends StatelessNioServer {
   }
 
   @Override
-  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
-    final Iterator<SelectionKey> it = selectedKeys.iterator();
-    while (it.hasNext()) {
-      final SelectionKey key = it.next();
-      it.remove();
-      if (!key.isValid()) continue;
-      final HeartbeatContext context = (HeartbeatContext) key.attachment();
-      try {
-        if (context.isClosed()) continue;
-        final boolean readable = key.isReadable(), writable = key.isWritable();
-        if (readable) {
-          HeartbeatMessageReader.read(context);
-        }
-        if (writable) {
-          updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
-          HeartbeatMessageWriter.write(context);
-        }
-      } catch (final CancelledKeyException e) {
-        if ((context != null) && !context.isClosed()) {
-          log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-          context.handleException(null, e);
-        }
-      } catch (final EOFException e) {
-        if (debugEnabled) log.debug("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-        context.handleException(null, e);
-      } catch (final Exception e) {
+  protected void handleRead(final SelectionKey key) throws Exception {
+    HeartbeatMessageReader.read((HeartbeatContext) key.attachment());
+  }
+
+  @Override
+  protected void handleWrite(final SelectionKey key) throws Exception {
+    updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
+    HeartbeatMessageWriter.write((HeartbeatContext) key.attachment());
+  }
+
+  @Override
+  protected void handleSelectionException(final SelectionKey key, final Exception e) throws Exception {
+    final HeartbeatContext context = (HeartbeatContext) key.attachment();
+    if (e instanceof CancelledKeyException) {
+      if ((context != null) && !context.isClosed()) {
         log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-        if (context != null) context.handleException(null, e);
+        closeConnection(context);
       }
+    } else if (e instanceof EOFException) {
+      if (debugEnabled) log.debug("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+      closeConnection(context);
+    } else {
+      log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
+      if (context != null) closeConnection(context);
     }
   }
 

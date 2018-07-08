@@ -19,6 +19,7 @@
 package org.jppf.nio;
 
 import java.nio.channels.*;
+import java.util.*;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -82,6 +83,46 @@ public abstract class StatelessNioServer extends NioServer<EmptyEnum, EmptyEnum>
       end();
     }
   }
+
+  @Override
+  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
+    final Iterator<SelectionKey> it = selectedKeys.iterator();
+    while (it.hasNext()) {
+      final SelectionKey key = it.next();
+      it.remove();
+      if (!key.isValid()) continue;
+      final CloseableContext context = (CloseableContext) key.attachment();
+      try {
+        if (context.isClosed()) continue;
+        if (key.isReadable()) handleRead(key);
+        if (key.isWritable()) handleWrite(key);
+      } catch (final Exception e) {
+        handleSelectionException(key, e);
+      }
+    }
+  }
+
+  /**
+   * Called when a selection key is selected and {@link SelectionKey#isReadable() readable}.
+   * @param key the key to handle.
+   * @throws Exception if any error occurs.
+   */
+  protected abstract void handleRead(final SelectionKey key) throws Exception;
+
+  /**
+   * Called when a selection key is selected and {@link SelectionKey#isWritable() writable}.
+   * @param key the key to handle.
+   * @throws Exception if any error occurs.
+   */
+  protected abstract void handleWrite(final SelectionKey key) throws Exception;
+
+  /**
+   * Called when a selection key is {@link SelectionKey#isWritable() writable}.
+   * @param key the key to handle.
+   * @param e the exception to handle.
+   * @throws Exception if any error occurs.
+   */
+  protected abstract void handleSelectionException(final SelectionKey key, final Exception e) throws Exception;
 
   /**
    * Set the interest ops of a specified selection key, ensuring no blocking occurs while doing so.
