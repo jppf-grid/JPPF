@@ -81,10 +81,10 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
     runThread = Thread.currentThread();
     try {
       configure();
-      if (debugEnabled) log.debug("initializing recovery client connection {}", socketWrapper);
+      if (debugEnabled) log.debug("initializing heartbeat connection {}", socketWrapper);
       socketInitializer = SocketInitializer.Factory.newInstance();
       if (!socketInitializer.initialize(socketWrapper)) {
-        log.error("Could not initialize heartbeat client connection: {}", socketWrapper);
+        log.error("Could not initialize heartbeat connection: {}", socketWrapper);
         close();
         return;
       }
@@ -93,7 +93,7 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
         close();
         return;
       }
-      if (debugEnabled) log.debug("senidng channel identifier NODE_HEARTBEAT_CHANNEL");
+      if (debugEnabled) log.debug("sending channel identifier NODE_HEARTBEAT_CHANNEL");
       socketWrapper.writeInt(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
       socketWrapper.flush();
       if (sslEnabled) socketWrapper = SSLHelper.createSSLClientConnection(socketWrapper);
@@ -116,8 +116,10 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
       if (debugEnabled) log.debug("thread " + Thread.currentThread().getName() + "interrupted, stopping", e);
       close();
     } catch (final Exception e) {
-      log.error(e.getMessage(), e);
-      fireClientConnectionEvent();
+      if (isInitialized()) {
+        log.error(e.getMessage(), e);
+        fireClientConnectionEvent();
+      } else log.info("heartbeat server handshake failed, possibly because heartbeat is disabled in the server, exception:\n{}", ExceptionUtils.getStackTrace(e));
       close();
     } finally {
       if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
