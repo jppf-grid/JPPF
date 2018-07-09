@@ -84,12 +84,12 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
       if (debugEnabled) log.debug("initializing recovery client connection {}", socketWrapper);
       socketInitializer = SocketInitializer.Factory.newInstance();
       if (!socketInitializer.initialize(socketWrapper)) {
-        log.error("Could not initialize recovery client connection: {}", socketWrapper);
+        log.error("Could not initialize heartbeat client connection: {}", socketWrapper);
         close();
         return;
       }
       if (!InterceptorHandler.invokeOnConnect(socketWrapper)) {
-        log.error("recovery client connection denied by interceptor: {}", socketWrapper);
+        log.error("heartbeat client connection denied by interceptor: {}", socketWrapper);
         close();
         return;
       }
@@ -112,12 +112,16 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
         if (debugEnabled) log.debug("sending {}", response);
         sendMessage(response);
       }
+    } catch (final InterruptedException e) {
+      if (debugEnabled) log.debug("thread " + Thread.currentThread().getName() + "interrupted, stopping", e);
+      close();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
-      if (!(e instanceof InterruptedException)) fireClientConnectionEvent();
+      fireClientConnectionEvent();
       close();
+    } finally {
+      if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
     }
-    if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
   }
 
   /**
@@ -135,9 +139,6 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
     socketWrapper.setPort(port);
   }
 
-  /**
-   * Close this client and release any resources it is using.
-   */
   @Override
   public void close() {
     setStopped(true);

@@ -63,7 +63,7 @@ class IdentifyingPeerState extends AcceptorServerState {
         final int id = context.getId();
         if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
         final NioServer<?, ?> server = NioHelper.getServer(id);
-        if (server == null) throw new JPPFException("unknown JPPF identifier: " + id);
+        if (server == null) throw new JPPFException("unknown JPPF identifier: " + id + " (0x" + Integer.toHexString(id).toUpperCase() + ")");
         if (debugEnabled) log.debug("cancelling key for {}", channel);
         final SelectionKey key = (SelectionKey) channel.getChannel();
         final SocketChannel socketChannel = (SocketChannel) key.channel();

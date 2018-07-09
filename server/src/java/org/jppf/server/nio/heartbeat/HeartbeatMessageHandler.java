@@ -129,14 +129,14 @@ class HeartbeatMessageHandler {
           done = data.getResponse() != null;
         }
         if (!done) {
-          if (debugEnabled) log.debug("node {} hasn't responded to {}/{} successive heartbeat messages at {} ms intervals", context, nbTries, maxTries, timeout);
+          if (debugEnabled) log.debug("node hasn't responded to {}/{} successive heartbeat messages at {} ms intervals: {}", nbTries, maxTries, timeout, context);
           synchronized(map) {
             map.remove(data.getMessageID());
           }
         }
       }
       if (!done) {
-        log.error("node {} failed to respond to {} successive heartbeat messages at {} ms intervals", context, maxTries, timeout);
+        log.error("node failed to respond to {} successive heartbeat messages at {} ms intervals: {}", maxTries, timeout, context);
         context.heartbeatFailed();
       }
     } finally {
@@ -159,7 +159,8 @@ class HeartbeatMessageHandler {
         request.setResponse(response);
         request.notifyAll();
       }
-    } else if (debugEnabled) log.debug("no entry found in the map for received messageID = {}", response.getMessageID());
+      if (debugEnabled) log.debug("found entry in the map for response {}", response);
+    } else if (debugEnabled) log.debug("no entry found in the map for response {}", response);
   }
 
   /**
