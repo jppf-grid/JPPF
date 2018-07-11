@@ -17,21 +17,22 @@
 # compute the directory of this script
 SCRIPT=$(readlink -f "$0")
 SCRIPT_PATH=$(dirname "$SCRIPT")
-echo script dir = $SCRIPT_PATH
+TEMP_FOLDER=$SCRIPT_PATH/tmp
+LIB_FOLDER=$TEMP_FOLDER/WEB-INF/lib
 
-rm -rf "$SCRIPT_PATH"/tmp
-mkdir -p "$SCRIPT_PATH"/tmp/WEB-INF/lib
+rm -rf "$TEMP_FOLDER"
+mkdir -p "$LIB_FOLDER"
 
-echo copying jar files to $SCRIPT_PATH/tmp/WEB-INF/lib
+echo copying jar files to $LIB_FOLDER
 
 for p in $*; do
   if [ "$p" != "$1" ]; then
-    cp $p "$SCRIPT_PATH"/tmp/WEB-INF/lib
+    cp $p "$LIB_FOLDER"
   fi
 done
 
 echo updating $1
 
-jar uf $1 -C $SCRIPT_PATH/tmp .
+jar uf $1 -C "$TEMP_FOLDER" .
 
-rm -rf $SCRIPT_PATH/tmp
+rm -rf "$TEMP_FOLDER"

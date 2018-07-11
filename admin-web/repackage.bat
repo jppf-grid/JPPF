@@ -14,26 +14,23 @@
 :: repackage build\jppf-admin-web-6.0.war C:\jppf\lib\mylib.jar C:\jppf\lib2\*.jar 
 ::--------------------------------------------------------------------------------
 
-set current_dir=%~dp0
+set SCRIPT_PATH=%~dp0
+set TEMP_FOLDER=%SCRIPT_PATH%tmp
+set LIB_FOLDER=%TEMP_FOLDER%\WEB-INF\lib
 
+rmdir /S /Q %TEMP_FOLDER% > nul
+mkdir %LIB_FOLDER%
 
-rmdir /S /Q %current_dir%tmp > nul
-mkdir %current_dir%\tmp\WEB-INF\lib
+echo copying jar files to %LIB_FOLDER%
 
-echo copying jar files to %current_dir%tmp\WEB-INF\lib
-
-for %%x in (%*) do (
-  if NOT "%1"=="%%x" (
-    for %%g in (%%x) do (
-      copy %%g %current_dir%tmp\WEB-INF\lib > nul
-    )
+for %%p in (%*) do (
+  if NOT "%1"=="%%p" (
+    copy %%p %LIB_FOLDER% > nul
   )
 )
 
 echo updating %1
 
-call jar uf %1 -C %current_dir%tmp .
+call jar uf %1 -C %TEMP_FOLDER% .
 
-rmdir /S /Q %current_dir%tmp > nul
-
-echo done
+rmdir /S /Q %TEMP_FOLDER% > nul
