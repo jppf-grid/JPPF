@@ -20,10 +20,12 @@ package org.jppf.client;
 
 import java.util.List;
 
+import org.jppf.comm.recovery.*;
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
+import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
 /**
@@ -31,7 +33,7 @@ import org.slf4j.*;
  * <p>This connection pool also holds a pool of JMX connections to the same remote driver
  * @since 4.1
  */
-public class JPPFConnectionPool extends AbstractClientConnectionPool {
+public class JPPFConnectionPool extends AbstractClientConnectionPool implements HeartbeatConnectionListener {
   /**
    * Logger for this class.
    */
@@ -40,6 +42,14 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Wether the heartbeat mechanism is enabled for the connection pool.
+   */
+  private final boolean heartbeatEnabled;
+  /**
+   * Connection to the recovery server.
+   */
+  private HeartbeatConnection recoveryConnection;
 
   /**
    * Initialize this pool with the specified parameters.
@@ -50,9 +60,11 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @param size the core size of this pool.
    * @param sslEnabled determines whether the pool is for SSL connections.
    * @param jmxPoolSize the core size of the JMX connections pool.
+   * @param heartbeatEnabled wether the heartbeat mechanism is enabled for the connection pool.
    */
-  JPPFConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize) {
+  JPPFConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize, final boolean heartbeatEnabled) {
     super(client, id, name, priority, size, sslEnabled, jmxPoolSize);
+    this.heartbeatEnabled = heartbeatEnabled;
   }
 
   /**
@@ -62,7 +74,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
    * @param info information needed for the pool's attributes.
    */
   JPPFConnectionPool(final JPPFClient client, final int id, final ClientConnectionPoolInfo info) {
-    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize());
+    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize(), info.isHeartbeatEnabled());
     this.discoveryInfo = info;
   }
 
@@ -95,6 +107,23 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool {
       for (int i=0; i<diff; i++) client.submitNewConnection(this);
     }
     return getSize();
+  }
+
+  /**
+   * Initialize the heartbeat meachanism if needed.
+   */
+  void initHeartbeat() {
+    if (heartbeatEnabled && (recoveryConnection == null)) {
+      if (debugEnabled) log.debug("Initializing recovery");
+      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, client.getUuid(), getDriverHost(), getDriverPort(), sslEnabled);
+      recoveryConnection.addClientConnectionListener(this);
+      ThreadUtils.startThread(recoveryConnection, name + "-Heartbeat");
+    }
+  }
+
+  @Override
+  public void heartbeatConnectionFailed(final HeartbeatConnectionEvent event) {
+    close();
   }
 
   /**

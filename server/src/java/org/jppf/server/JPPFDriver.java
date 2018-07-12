@@ -40,7 +40,7 @@ import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
-import org.jppf.server.nio.heartbeat.*;
+import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
@@ -119,7 +119,11 @@ public class JPPFDriver {
   /**
    * Handles the heartbeat messages with the nodes.
    */
-  private HeartbeatNioServer heartbeatServer;
+  private HeartbeatNioServer nodeHeartbeatServer;
+  /**
+   * Handles the heartbeat messages with the clients.
+   */
+  private HeartbeatNioServer clientHeartbeatServer;
   /**
    * Determines whether this server has scheduled a shutdown.
    */
@@ -188,8 +192,10 @@ public class JPPFDriver {
     final int[] sslPorts = extractValidPorts(info.sslServerPorts);
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
-    if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED))
-      NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, heartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
+    if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED)) {
+      NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, nodeHeartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
+      NioHelper.putServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, clientHeartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL)));
+    }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
@@ -331,7 +337,8 @@ public class JPPFDriver {
   public void shutdown() {
     log.info("Shutting down");
     if (acceptorServer != null) acceptorServer.shutdown();
-    if (heartbeatServer != null) heartbeatServer.shutdown();
+    if (nodeHeartbeatServer != null) nodeHeartbeatServer.shutdown();
+    if (clientHeartbeatServer != null) clientHeartbeatServer.shutdown();
     if (clientClassServer != null) clientClassServer.shutdown();
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
@@ -515,13 +522,5 @@ public class JPPFDriver {
    */
   public boolean isShuttingDown() {
     return shuttingDown.get();
-  }
-
-  /**
-   * 
-   * @return the heartbeat server.
-   */
-  public HeartbeatNioServer getHeartbeatServer() {
-    return heartbeatServer;
   }
 }

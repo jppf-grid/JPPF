@@ -84,6 +84,7 @@ public final class SSLHelper2 {
     switch(identifier) {
       case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
       case JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL:
+      case JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL:
         return getSSLContext(b ? "jppf.ssl.client" : "jppf.ssl");
       case JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL:
       case JPPFIdentifiers.NODE_JOB_DATA_CHANNEL:

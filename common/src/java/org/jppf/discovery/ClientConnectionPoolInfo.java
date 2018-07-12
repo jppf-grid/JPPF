@@ -60,7 +60,7 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    * @param port the driver port to connect to.
    */
   public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port) {
-    this(name, secure, host, port, DISCOVERY_PRIORITY.getDefaultValue(), POOL_SIZE.getDefaultValue(), JMX_POOL_SIZE.getDefaultValue());
+    this(name, secure, host, port, DISCOVERY_PRIORITY.getDefaultValue(), POOL_SIZE.getDefaultValue(), JMX_POOL_SIZE.getDefaultValue(), false);
   }
 
   /**
@@ -74,7 +74,23 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    * @param jmxPoolSize the associated JMX connection pool size.
    */
   public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize) {
-    super(name, secure, host, port, poolSize);
+    this(name, secure, host, port, poolSize, priority, jmxPoolSize, false);
+  }
+
+  /**
+   * Initialize a pool of connections with the specified parameters.
+   * @param name the name given to this connection pool, used as numbered prefix for individual connection names.
+   * @param secure whether SSL/TLS should be used.
+   * @param host the driver host name or IP address.
+   * @param port the driver port to connect to.
+   * @param priority the connection priority.
+   * @param poolSize the connection pool size.
+   * @param heartbeatEnabled wether the heartbeat mechanism is enabled for the connection pool.
+   * @param jmxPoolSize the associated JMX connection pool size.
+   */
+  public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize,
+    final boolean heartbeatEnabled) {
+    super(name, secure, host, port, poolSize, heartbeatEnabled);
     this.priority = priority;
     this.jmxPoolSize = jmxPoolSize;
   }

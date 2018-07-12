@@ -66,6 +66,7 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
       if (config.get(DISCOVERY_ENABLED)) {
         final int priority = config.get(DISCOVERY_PRIORITY);
         final boolean acceptMultipleInterfaces = config.get(DISCOVERY_ACCEPT_MULTIPLE_INTERFACES);
+        final boolean heartbeatEnabled = config.get(RECOVERY_ENABLED);
         if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         final boolean ssl = config.get(SSL_ENABLED);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
@@ -74,7 +75,7 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
             if (info.hasValidPort(ssl)) {
               final int poolSize = config.get(POOL_SIZE);
               final int jmxPoolSize = config.get(JMX_POOL_SIZE);
-              newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize));
+              newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize, heartbeatEnabled));
             } else {
               final String type = ssl ? "secure" : "plain";
               log.warn("cannot fulfill a {} connection request to {}:{} because the host does not expose this port as a {} port", type, info.host, info.getValidPort(ssl), type);
@@ -102,7 +103,8 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
             final int priority = config.get(PARAM_PRIORITY, name);
             final int poolSize = config.get(PARAM_POOL_SIZE, name);
             final int jmxPoolSize = config.get(PARAM_JMX_POOL_SIZE, name);
-            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize);
+            final boolean heartbeatEnabled = config.get(PARAM_RECOVERY_ENABLED, name);
+            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize, heartbeatEnabled);
             if (debugEnabled) log.debug("found pool definition in the configuration: {}", ccpi);
             infoList.add(ccpi);
           }

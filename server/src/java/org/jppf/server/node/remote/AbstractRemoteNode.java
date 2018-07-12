@@ -72,7 +72,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
     if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new HeartbeatConnection(uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
+        recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
         recoveryConnection.addClientConnectionListener(this);
         ThreadUtils.startThread(recoveryConnection, "HeartbeatConnection");
       }

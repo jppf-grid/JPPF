@@ -226,6 +226,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> PARAM_PEER_POOL_SIZE = new IntProperty("jppf.peer.<peer_name>.pool.size", 1, 1, Integer.MAX_VALUE);
   /** Heartbeat enabled flag for a manually configured peer driver connection (parametrized). */
   public static final JPPFProperty<Boolean> PARAM_PEER_RECOVERY_ENABLED = new BooleanProperty("jppf.peer.<peer_name>.recovery.enabled", false);
+  /** Heartbeat enabled flag for a manually configured peer client connection (parametrized). */
+  public static final JPPFProperty<Boolean> PARAM_RECOVERY_ENABLED = new BooleanProperty("<driver_name>.jppf.recovery.enabled", false);
   /** Path to the security policy file. */
   public static final JPPFProperty<String> POLICY_FILE = new StringProperty("jppf.policy.file", null);
   /** Connection pool size for discovered server conenctions. */
@@ -236,7 +238,7 @@ public class JPPFProperties {
   public static final JPPFProperty<Long> RECONNECT_INTERVAL = new LongProperty("jppf.reconnect.interval", 1L, "reconnect.interval");
   /** Time in seconds after which reconnection attempts stop. A negative value means never stop. */
   public static final JPPFProperty<Long> RECONNECT_MAX_TIME = new LongProperty("jppf.reconnect.max.time", 60L, "reconnect.max.time");
-  /** Enable/disable recovery from hardware failures. */
+  /** Enable/disable recovery from hardware failures through a heartbeat mechanism. */
   public static final JPPFProperty<Boolean> RECOVERY_ENABLED = new BooleanProperty("jppf.recovery.enabled", false);
   /** Maximum number of pings to the node before the connection is considered broken. */
   public static final JPPFProperty<Integer> RECOVERY_MAX_RETRIES = new IntProperty("jppf.recovery.max.retries", 3);

@@ -61,6 +61,10 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
    * Whether secure connectivity is enabled.
    */
   private final boolean sslEnabled;
+  /**
+   * Identifies this channel with the server.
+   */
+  private final int channelIdentifier;
 
   /**
    * Initialize this client connection with the specified uuid.
@@ -68,8 +72,10 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
    * @param host the host ot which to connect.
    * @param port the port number to connect to on the host.
    * @param sslEnabled whether secure connectivity is enabled.
+   * @param channelIdentifier identifies this channel with the server.
    */
-  public HeartbeatConnection(final String uuid, final String host, final int port, final boolean sslEnabled) {
+  public HeartbeatConnection(final int channelIdentifier, final String uuid, final String host, final int port, final boolean sslEnabled) {
+    this.channelIdentifier = channelIdentifier;
     this.uuid = uuid;
     this.host = host;
     this.port = port;
@@ -93,8 +99,8 @@ public class HeartbeatConnection extends AbstractHeartbeatConnection {
         close();
         return;
       }
-      if (debugEnabled) log.debug("sending channel identifier NODE_HEARTBEAT_CHANNEL");
-      socketWrapper.writeInt(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
+      if (debugEnabled) log.debug("sending channel identifier {}", JPPFIdentifiers.asString(channelIdentifier));
+      socketWrapper.writeInt(channelIdentifier);
       socketWrapper.flush();
       if (sslEnabled) socketWrapper = SSLHelper.createSSLClientConnection(socketWrapper);
       while (!isStopped()) {

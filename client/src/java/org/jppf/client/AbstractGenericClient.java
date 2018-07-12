@@ -195,6 +195,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           if (isClosed()) return;
           submitNewConnection(pool);
         }
+        pool.initHeartbeat();
       }
     };
     executor.execute(r);

@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.utils.JPPFIdentifiers;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
 
@@ -153,7 +154,7 @@ public class PeerConnectionPool implements HeartbeatConnectionListener {
   void initHeartbeat() {
     if (recoveryConnection == null) {
       if (debugEnabled) log.debug("Initializing recovery");
-      recoveryConnection = new HeartbeatConnection(JPPFDriver.getInstance().getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure);
+      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, JPPFDriver.getInstance().getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure);
       recoveryConnection.addClientConnectionListener(this);
       ThreadUtils.startThread(recoveryConnection, getPeerName() + "-Heartbeat");
     }
