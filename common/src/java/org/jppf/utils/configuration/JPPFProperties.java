@@ -69,7 +69,7 @@ public class JPPFProperties {
   public static final JPPFProperty<String> DISCOVERY_BROADCAST_INCLUDE_IPV6 = new StringProperty("jppf.discovery.broadcast.include.ipv6", null);
   /** UDP broadcast interval in milliseconds. */
   public static final JPPFProperty<Long> DISCOVERY_BROADCAST_INTERVAL = new LongProperty("jppf.discovery.broadcast.interval", 5000L);
-  /** Enable/disable server discovery. */
+  /** Enable/disable automatic server discovery via UDP multicast. */
   public static final JPPFProperty<Boolean> DISCOVERY_ENABLED = new BooleanProperty("jppf.discovery.enabled", true);
   /** Whether to discover server connections from multiple network interfaces. */
   public static final JPPFProperty<Boolean> DISCOVERY_ACCEPT_MULTIPLE_INTERFACES = new BooleanProperty("jppf.discovery.acceptMultipleInterfaces", false);

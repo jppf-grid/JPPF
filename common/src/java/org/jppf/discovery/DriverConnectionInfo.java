@@ -183,17 +183,20 @@ public class DriverConnectionInfo {
     else if (!host.equals(other.host)) return false;
     if (port != other.port) return false;
     if (secure != other.secure) return false;
+    if (poolSize != other.poolSize) return false;
+    if (heartbeatEnabled != other.heartbeatEnabled) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("name=").append(name);
-    sb.append(", secure=").append(secure);
-    sb.append(", host=").append(host);
-    sb.append(", port=").append(port);
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("name=").append(name)
+      .append(", secure=").append(secure)
+      .append(", host=").append(host)
+      .append(", port=").append(port)
+      .append(", poolSize=").append(poolSize)
+      .append(", heartbeatEnabled=").append(heartbeatEnabled)
+      .append(']').toString();
   }
 }

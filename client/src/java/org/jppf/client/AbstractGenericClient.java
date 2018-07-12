@@ -25,7 +25,6 @@ import javax.sql.DataSource;
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
-import org.jppf.comm.discovery.*;
 import org.jppf.discovery.*;
 import org.jppf.load.balancer.persistence.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
@@ -34,7 +33,7 @@ import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -169,115 +168,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) setLocalExecutionEnabled(true);
-    if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) initRemotePools(config);
     discoveryHandler.register(discoveryListener.open()).start();
-  }
-
-  /**
-   * Initialize remote connection pools according to configuration.
-   * @param config The JPPF configuration properties.
-   * @exclude
-   */
-  protected void initRemotePools(final TypedProperties config) {
-    try {
-      boolean initPeers;
-      if (config.get(JPPFProperties.DISCOVERY_ENABLED)) {
-        final int priority = config.get(JPPFProperties.DISCOVERY_PRIORITY);
-        final boolean acceptMultipleInterfaces = config.get(JPPFProperties.DISCOVERY_ACCEPT_MULTIPLE_INTERFACES);
-        if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
-        receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
-          @Override
-          public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            final boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
-            if (info.hasValidPort(ssl)) {
-              final int poolSize = config.get(JPPFProperties.POOL_SIZE);
-              final int jmxPoolSize = config.get(JPPFProperties.JMX_POOL_SIZE);
-              newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
-            } else {
-              final String type = ssl ? "secure" : "plain";
-              final String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
-                type, info.host, info.getValidPort(ssl), type);
-              log.warn(msg);
-            }
-          }
-        }, new IPFilter(config), acceptMultipleInterfaces);
-        ThreadUtils.startDaemonThread(receiverThread, "ReceiverThread");
-        initPeers = false;
-      } else {
-        receiverThread = null;
-        initPeers = true;
-      }
-      if (debugEnabled) log.debug("looking for peers in the configuration");
-      final String[] names = config.get(JPPFProperties.DRIVERS);
-      if (debugEnabled) log.debug("list of drivers: {}", Arrays.asList(names));
-      for (final String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-      if (debugEnabled) log.debug("initPeers = {}", initPeers);
-      if (initPeers) {
-        final List<ClientConnectionPoolInfo> infoList = new ArrayList<>();
-        for (final String name : names) {
-          if (!VALUE_JPPF_DISCOVERY.equals(name)) {
-            final JPPFConnectionInformation info = new JPPFConnectionInformation();
-            final boolean ssl = config.get(JPPFProperties.PARAM_SERVER_SSL_ENABLED, name);
-            final String host =  config.get(JPPFProperties.PARAM_SERVER_HOST, name);
-            info.host = host;
-            final int port = config.get(JPPFProperties.PARAM_SERVER_PORT, name);
-            if (!ssl) info.serverPorts = new int[] { port };
-            else info.sslServerPorts = new int[] { port };
-            if (receiverThread != null) receiverThread.addConnectionInformation(info);
-            final int priority = config.get(JPPFProperties.PARAM_PRIORITY, name);
-            final int poolSize = config.get(JPPFProperties.PARAM_POOL_SIZE, name);
-            final int jmxPoolSize = config.get(JPPFProperties.PARAM_JMX_POOL_SIZE, name);
-            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize);
-            if (debugEnabled) log.debug("found pool definition in the configuration: {}", ccpi);
-            infoList.add(ccpi);
-          }
-        }
-        if (debugEnabled) log.debug("found {} pool definitions in the configuration", infoList.size());
-        Collections.sort(infoList, new Comparator<ClientConnectionPoolInfo>() { // order by decreasing priority
-          @Override
-          public int compare(final ClientConnectionPoolInfo o1, final ClientConnectionPoolInfo o2) {
-            final int p1 = o1.getPriority(), p2 = o2.getPriority();
-            return p1 > p2 ? -1 : (p1 < p2 ? 1 : 0);
-          }
-        });
-        for (ClientConnectionPoolInfo poolInfo: infoList) newConnectionPool(poolInfo);
-      }
-    } catch(final Exception e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Called when a new connection pool is read from the configuration.
-   * @param name the name assigned to the connection pool.
-   * @param info the information required for the connection to connect to the driver.
-   * @param priority the priority assigned to the connection.
-   * @param poolSize the size of the connection pool.
-   * @param ssl determines whether the pool is for SSL connections.
-   * @param jmxPoolSize the core size of the JMX connections pool.
-   */
-  void newConnectionPool(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
-    if (debugEnabled) log.debug("new connection pool: {}", name);
-    final int size = poolSize > 0 ? poolSize : 1;
-    final Runnable r = new Runnable() {
-      @Override public void run() {
-        final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), name, priority, size, ssl, jmxPoolSize);
-        pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
-        synchronized(pools) {
-          pools.putValue(priority, pool);
-        }
-        HostIP hostIP = new HostIP(info.host, info.host);
-        if (getConfig().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
-        if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
-        pool.setDriverHostIP(hostIP);
-        fireConnectionPoolAdded(pool);
-        for (int i=1; i<=size; i++) {
-          if (isClosed()) return;
-          submitNewConnection(pool);
-        }
-      }
-    };
-    executor.execute(r);
+    if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) addDriverDiscovery(new ClientConfigDriverDiscovery(config));
   }
 
   /**
@@ -332,7 +224,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
     c.submitInitialization();
-    //executor.execute(new ConnectionInitializer(c));
     fireConnectionAdded(c);
     if (debugEnabled) log.debug("end of of newConnection({})", c.getName());
   }
@@ -547,7 +438,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -556,7 +446,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -571,5 +460,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   public LoadBalancerPersistenceManagement getLoadBalancerPersistenceManagement() {
     return loadBalancerPersistenceManager;
+  }
+
+  /**
+   * Add a custom driver discovery mechanism to those already registered, if any.
+   * @param discovery the driver discovery to add.
+   */
+  public void addDriverDiscovery(final ClientDriverDiscovery discovery) {
+    discoveryHandler.addDiscovery(discovery);
   }
 }

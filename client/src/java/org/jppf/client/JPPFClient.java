@@ -345,14 +345,6 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
-   * Add a custom driver discovery mechanism to those already registered, if any.
-   * @param discovery the driver discovery to add.
-   */
-  public void addDriverDiscovery(final ClientDriverDiscovery discovery) {
-    discoveryHandler.addDiscovery(discovery);
-  }
-
-  /**
    * Remove a custom driver discovery mechanism from those already registered.
    * @param discovery the driver discovery to remove.
    */

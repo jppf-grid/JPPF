@@ -92,11 +92,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     return -1;
   }
 
-  /**
-   * Compare this connection information with another.
-   * @param ci the other object to compare to.
-   * @return -1 if this connection information is less than the other, 1 if it is greater, 0 if they are equal.
-   */
   @Override
   public int compareTo(final JPPFConnectionInformation ci) {
     if ((ci == null) || (ci.uuid == null)) return 1;
@@ -104,21 +99,11 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     return uuid.compareTo(ci.uuid);
   }
 
-  /**
-   * Compute the hashcode of this object.
-   * @return the hashcode as an int.
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     return 31 + (uuid == null ? 0 : uuid.hashCode());
   }
 
-  /**
-   * Determine whether this object is equal to another.
-   * @param obj the object to compare to.
-   * @return true if the 2 objects are equal, false otherwise.
-   */
   @Override
   public boolean equals(final Object obj) {
     if (obj == null) return false;
@@ -181,15 +166,13 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("uuid=").append(uuid);
-    sb.append(", host=").append(host);
-    sb.append(", recoveryEnabled=").append(recoveryEnabled);
-    sb.append(", serverPorts=").append(StringUtils.buildString(serverPorts));
-    sb.append(", sslServerPorts=").append(StringUtils.buildString(sslServerPorts));
-    sb.append(']');
-    return sb.toString();
+    return  new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("uuid=").append(uuid)
+      .append(", host=").append(host)
+      .append(", recoveryEnabled=").append(recoveryEnabled)
+      .append(", serverPorts=").append(StringUtils.buildString(serverPorts))
+      .append(", sslServerPorts=").append(StringUtils.buildString(sslServerPorts))
+      .append(']').toString();
   }
 
   /**

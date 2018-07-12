@@ -91,13 +91,8 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
   public static JPPFConnectionInformation toJPPFConnectionInformation(final DriverConnectionInfo driverInfo) {
     final JPPFConnectionInformation info = new JPPFConnectionInformation();
     info.host = driverInfo.getHost();
-    if (driverInfo.isSecure()) {
-      info.sslServerPorts = new int[1];
-      info.sslServerPorts[0] = driverInfo.getPort();
-    } else {
-      info.serverPorts = new int[1];
-      info.serverPorts[0] = driverInfo.getPort();
-    }
+    if (driverInfo.isSecure()) info.sslServerPorts = new int[] { driverInfo.getPort() };
+    else info.serverPorts = new int[] { driverInfo.getPort() };
     return info;
   }
 
@@ -133,7 +128,7 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
   }
 
   /**
-   * Register the specified disocvery listener with all disoveries found with SPI.
+   * Register the specified discovery listener with all disoveries found with SPI.
    * @param listener the listener to register.
    * @return this handler.
    */
