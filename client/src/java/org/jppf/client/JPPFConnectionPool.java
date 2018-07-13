@@ -49,7 +49,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
   /**
    * Connection to the recovery server.
    */
-  private HeartbeatConnection recoveryConnection;
+  private HeartbeatConnection heartbeatConnection;
 
   /**
    * Initialize this pool with the specified parameters.
@@ -113,11 +113,11 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
    * Initialize the heartbeat meachanism if needed.
    */
   void initHeartbeat() {
-    if (heartbeatEnabled && (recoveryConnection == null)) {
+    if (heartbeatEnabled && (heartbeatConnection == null)) {
       if (debugEnabled) log.debug("Initializing recovery");
-      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, client.getUuid(), getDriverHost(), getDriverPort(), sslEnabled);
-      recoveryConnection.addClientConnectionListener(this);
-      ThreadUtils.startThread(recoveryConnection, name + "-Heartbeat");
+      heartbeatConnection = new HeartbeatConnection(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, client.getUuid(), getDriverHost(), getDriverPort(), sslEnabled);
+      heartbeatConnection.addClientConnectionListener(this);
+      ThreadUtils.startThread(heartbeatConnection, name + "-Heartbeat");
     }
   }
 
@@ -237,5 +237,25 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
    */
   public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
     return awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+  }
+
+  @Override
+  public void close() {
+    if (heartbeatConnection != null) heartbeatConnection.close();
+    super.close();
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("name=").append(name)
+      .append(", id=").append(id)
+      .append(", size=").append(size)
+      .append(", priority=").append(priority)
+      .append(", driverHost=").append(hostIP != null ? hostIP.hostName() : null)
+      .append(", driverPort=").append(driverPort)
+      .append(", sslEnabled=").append(sslEnabled)
+      .append(", heartbeatEnabled=").append(heartbeatEnabled)
+      .append(']').toString();
   }
 }

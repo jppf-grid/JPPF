@@ -278,20 +278,6 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
     return ref.get();
   }
 
-  @Override
-  public String toString() {
-    return new StringBuilder(getClass().getSimpleName()).append('[')
-      .append("name=").append(name)
-      .append(", id=").append(id)
-      .append(", size=").append(size)
-      .append(", priority=").append(priority)
-      .append(", driverHost=").append(hostIP != null ? hostIP.hostName() : null)
-      .append(", driverPort=").append(driverPort)
-      .append(", sslEnabled=").append(sslEnabled)
-      .append(']')
-      .toString();
-  }
-
   /**
    * Return the next sequence number.
    * @return the next sequence number.

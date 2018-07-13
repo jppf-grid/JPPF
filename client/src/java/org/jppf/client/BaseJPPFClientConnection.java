@@ -205,6 +205,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    */
   void sendCloseConnectionCommand() throws Exception {
+    if (taskServerConnection == null) return;
     final TaskBundle header = new JPPFTaskBundle();
     final ObjectSerializer ser = new ObjectSerializerImpl();
     final TraversalList<String> uuidPath = new TraversalList<>();

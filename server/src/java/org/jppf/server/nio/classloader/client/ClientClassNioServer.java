@@ -162,6 +162,23 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   }
 
   /**
+   * Remove all the provider connections for the specified client uuid.
+   * @param uuid the uuid of the client for which to remove connections.
+   */
+  public void removeProviderConnections(final String uuid) {
+    final Collection<ChannelWrapper<?>> channels = providerConnections.removeKey(uuid);
+    if (channels != null) {
+      for (final ChannelWrapper<?> channel: channels) {
+        try {
+          closeConnection(channel);
+        } catch (final Exception e) {
+          log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+        }
+      }
+    }
+  }
+
+  /**
    * Get all the provider connections handled by this server.
    * @return a list of connection channels.
    */

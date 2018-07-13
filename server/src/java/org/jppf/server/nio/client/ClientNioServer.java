@@ -46,7 +46,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   /**
    * 
    */
-  private List<ChannelWrapper<?>> channels = new Vector<>();
+  private List<ChannelWrapper<?>> channels = new ArrayList<>();
 
   /**
    * Initialize this class loader server.
@@ -69,7 +69,9 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
     try {
-      channels.add(channel);
+      synchronized (channels) {
+        channels.add(channel);
+      }
       if (!channel.getContext().isPeer()) transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -89,7 +91,9 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
    * @param channel the channel to remove.
    */
   public void removeChannel(final ChannelWrapper<?> channel) {
-    channels.remove(channel);
+    synchronized (channels) {
+      channels.remove(channel);
+    }
   }
 
   /**
@@ -113,12 +117,13 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
 
   /**
    * Close a connection to a client.
-   * @param channel a <code>SocketChannel</code> that encapsulates the connection.
+   * @param channel a {@link ChannelWrapper} that encapsulates the connection.
+   * @param remove whether to remove the channel from the list of channels.
    */
-  public static void closeClient(final ChannelWrapper<?> channel) {
+  static void closeClient(final ChannelWrapper<?> channel, final boolean remove) {
     if (debugEnabled) log.debug("closing client channel " + channel);
     try {
-      driver.getClientNioServer().removeChannel(channel);
+      if (remove) driver.getClientNioServer().removeChannel(channel);
       channel.close();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -130,6 +135,14 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
     }
   }
 
+  /**
+   * Close a connection to a client.
+   * @param channel a {@link ChannelWrapper} that encapsulates the connection.
+   */
+  static void closeClient(final ChannelWrapper<?> channel) {
+    closeClient(channel, true);
+  }
+
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel) {
     return ClientState.IDLE == channel.getContext().getState();
@@ -137,7 +150,29 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
 
   @Override
   public List<ChannelWrapper<?>> getAllConnections() {
-    return channels;
+    synchronized(channels) {
+      return new ArrayList<>(channels);
+    }
+  }
+
+  /**
+   * Get a list of all connections whose client uuid is the specified uuid.
+   * @param uuid the list of connections that have the specified uuid.
+   */
+  public void removeConnections(final String uuid) {
+    if (uuid == null) return;
+    final List<ChannelWrapper<?>> channelsTemp = getAllConnections();
+    final List<ChannelWrapper<?>> toRemove = new ArrayList<>(channelsTemp.size());
+    for (final ChannelWrapper<?> channel: channelsTemp) {
+      final ClientContext context = (ClientContext) channel.getContext();
+      if (uuid.equals(context.getUuid())) toRemove.add(channel);
+    }
+    if (!toRemove.isEmpty()) {
+      synchronized(channels) {
+        channels.removeAll(toRemove);
+      }
+      for (final ChannelWrapper<?> channel: toRemove) closeClient(channel, false);
+    }
   }
 
   @Override
@@ -145,11 +180,14 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition> {
     if (!isStopped()) return;
     lock.lock();
     try {
-      final List<ChannelWrapper<?>> list = new ArrayList<>(channels);
-      channels.clear();
-      for (ChannelWrapper<?> channel : list) {
+      final List<ChannelWrapper<?>> list;
+      synchronized(channels) {
+        list = new ArrayList<>(channels);
+        channels.clear();
+      }
+      for (final ChannelWrapper<?> channel : list) {
         try {
-          closeClient(channel);
+          closeClient(channel, false);
         } catch (final Exception e) {
           log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
         }

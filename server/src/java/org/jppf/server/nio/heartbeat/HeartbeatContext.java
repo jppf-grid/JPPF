@@ -31,7 +31,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
- * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node.
+ * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
 class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChannelHandler {
@@ -138,10 +138,15 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
   void heartbeatFailed() {
     if (debugEnabled) log.debug("node {} failed to respond to heartbeat messages, closing the associated node channels", this);
     final JPPFDriver driver = JPPFDriver.getInstance();
-    final AbstractNodeContext nodeContext = driver.getNodeNioServer().getConnection(uuid);
-    if (nodeContext != null) driver.getNodeNioServer().connectionFailed(nodeContext.getChannel());
-    final ChannelWrapper<?> nodeClassChannel = driver.getNodeClassServer().getNodeConnection(uuid);
-    if (nodeClassChannel != null) driver.getNodeClassServer().connectionFailed(nodeClassChannel);
+    if (server.getIdentifier() == JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL) {
+      final AbstractNodeContext nodeContext = driver.getNodeNioServer().getConnection(uuid);
+      if (nodeContext != null) driver.getNodeNioServer().connectionFailed(nodeContext.getChannel());
+      final ChannelWrapper<?> nodeClassChannel = driver.getNodeClassServer().getNodeConnection(uuid);
+      if (nodeClassChannel != null) driver.getNodeClassServer().connectionFailed(nodeClassChannel);
+    } else {
+      driver.getClientNioServer().removeConnections(uuid);
+      driver.getClientClassServer().removeProviderConnections(uuid);
+    }
     handleException(getChannel(), null);
   }
 
@@ -200,7 +205,8 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("state=").append(getState());
+    sb.append("uuid=").append(uuid);
+    sb.append(", state=").append(getState());
     sb.append(", ssl=").append(ssl);
     sb.append(", interestOps=").append(interestOps);
     sb.append(", socketChannel=").append(socketChannel);
