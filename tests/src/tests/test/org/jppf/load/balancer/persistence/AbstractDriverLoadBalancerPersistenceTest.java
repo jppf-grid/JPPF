@@ -139,6 +139,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
             }
           }, 5000L, 250L, false));
         }
+        mgt.deleteAlgorithm(algo);
       }
       Thread.sleep(500L);
       final List<String> nodes = mgt.listAllChannels();
