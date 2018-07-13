@@ -111,7 +111,6 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
   public NioMessage createMessage(final HeartbeatMessage data) throws Exception {
     heartbeatMessage = data;
     message = new SimpleNioMessage(this);
-    data.setUuid(uuid);
     ((SimpleNioMessage) message).setCurrentDataLocation(IOHelper.serializeData(data));
     return message;
   }
