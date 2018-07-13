@@ -74,7 +74,7 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    * @param jmxPoolSize the associated JMX connection pool size.
    */
   public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize) {
-    this(name, secure, host, port, poolSize, priority, jmxPoolSize, false);
+    this(name, secure, host, port, priority, poolSize, jmxPoolSize, false);
   }
 
   /**
@@ -144,15 +144,15 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("name=").append(name);
-    sb.append(", secure=").append(secure);
-    sb.append(", host=").append(host);
-    sb.append(", port=").append(port);
-    sb.append(", priority=").append(priority);
-    sb.append(", poolSize=").append(poolSize);
-    sb.append(", jmxPoolSize=").append(jmxPoolSize);
-    sb.append(']');
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("name=").append(name)
+      .append(", secure=").append(secure)
+      .append(", host=").append(host)
+      .append(", port=").append(port)
+      .append(", priority=").append(priority)
+      .append(", poolSize=").append(poolSize)
+      .append(", jmxPoolSize=").append(jmxPoolSize)
+      .append(", heartbeatEnabled=").append(heartbeatEnabled)
+      .append(']').toString();
   }
 }
