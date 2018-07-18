@@ -307,7 +307,8 @@ public class DriverInitializer {
    */
   private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
-    final JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
+    //final JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
+    final JPPFProperty<Boolean> prop = MANAGEMENT_ENABLED;
     final String tmp = ssl ? "secure " : "";
     try {
       // default is false for ssl, true for plain connection
