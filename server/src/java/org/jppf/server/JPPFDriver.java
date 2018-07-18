@@ -193,8 +193,8 @@ public class JPPFDriver {
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
     if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED)) {
-      NioHelper.putServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, nodeHeartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL)));
-      NioHelper.putServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, clientHeartbeatServer = startServer(new HeartbeatNioServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL)));
+      nodeHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL);
+      clientHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL);
     }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
@@ -402,9 +402,22 @@ public class JPPFDriver {
   }
 
   /**
+   * Start a heartbeat server with the specified channel identifier.
+   * @param identifier the channel identifier for the server connections.
+   * @param useSSL whether to use SSL connectivity.
+   * @return the created server.
+   * @throws Exception if any error occurs.
+   */
+  private static HeartbeatNioServer initHeartbeatServer(final int identifier, final boolean useSSL) throws Exception {
+    final HeartbeatNioServer server = startServer(new HeartbeatNioServer(identifier, useSSL));
+    NioHelper.putServer(identifier, server);
+    return server;
+  }
+
+  /**
    * Start server, register it to recovery server if requested and print initialization message.
-   * @param nioServer starting nio server
-   * @param <T> the type of the server to start
+   * @param <T> the type of the server to start.
+   * @param nioServer the nio server to start.
    * @return started nioServer
    */
   private static <T extends NioServer<?, ?>> T startServer(final T nioServer) {
