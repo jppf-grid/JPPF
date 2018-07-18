@@ -460,7 +460,7 @@ public class JPPFDriver {
    * @param config the configuration to test whether management is enabled.
    */
   private static boolean isManagementEnabled(final TypedProperties config) {
-    return config.get(JPPFProperties.MANAGEMENT_ENABLED) || config.get(JPPFProperties.MANAGEMENT_SSL_ENABLED);
+    return config.get(JPPFProperties.MANAGEMENT_ENABLED);
   }
 
   /**

@@ -95,7 +95,7 @@ class WaitInitialBundleState extends NodeServerState {
       String host = NodeServerUtils.getChannelHost(channel);
       final HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
       final boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-      final boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+      final boolean hasJmx = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
       final String masterUuid = bundle.getParameter(NODE_PROVISIONING_MASTER_UUID);
       int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
