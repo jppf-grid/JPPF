@@ -318,6 +318,8 @@ public class DriverInitializer {
         JPPFProperty<Integer> jmxProp = null;
         if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = ssl ? SERVER_SSL_PORT : SERVER_PORT;
         else jmxProp = ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT;
+        final int port = JPPFConfiguration.get(jmxProp);
+        if (port < 0) return null;
         server = JMXServerFactory.createServer(driver.getUuid(), ssl, jmxProp);
         server.start(getClass().getClassLoader());
         final String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
