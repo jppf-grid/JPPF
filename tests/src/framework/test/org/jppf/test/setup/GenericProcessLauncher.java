@@ -372,7 +372,7 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
           } catch (@SuppressWarnings("unused") final Exception ignore) {
           }
       }
-      process.destroy();
+      //process.destroy();
       boolean terminated = false;
       final long start = System.nanoTime();
       while (!terminated && ((System.nanoTime() - start) / 1_000_000L < TERMINATION_TIMEOUT)) {
