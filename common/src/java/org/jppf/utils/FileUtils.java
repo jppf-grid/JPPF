@@ -396,8 +396,11 @@ public final class FileUtils {
     try {
       if (path.isDirectory()) {
         final File[] files = path.listFiles();
-        if (files != null) for (File child: files)
-          if (!deletePath(child)) success = false;
+        if (files != null) {
+          for (final File child: files) {
+            if (!deletePath(child)) success = false;
+          }
+        }
       }
       if (!childrenOnly) if (!path.delete()) success = false;
     } catch (@SuppressWarnings("unused") final Exception e) {
