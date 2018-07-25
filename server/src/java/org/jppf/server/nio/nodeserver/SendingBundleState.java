@@ -91,6 +91,7 @@ class SendingBundleState extends NodeServerState {
       ServerTaskBundleNode nodeBundle = context.getBundle();
       JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
       if (schedule != null) {
+        if (debugEnabled) log.debug("setting dispatch expiration to {} for node {}", schedule, nodeBundle); 
         NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server, nodeBundle, context.isOffline() ? null : context);
         server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
       }
