@@ -124,7 +124,7 @@
         <local name="url"/>
         <property name="url" value="http://repo.maven.apache.org/maven2/${path}/@{a}/@{v}/@{a}-@{v}.@{p}"/>
         <echo message="downloading ${url} to @{dest}/@{a}-@{v}.@{p}"/>
-        <get src="${url}" dest="@{dest}" quiet="true" ignoreerrors="true"/>
+        <get src="${url}" dest="@{dest}" ignoreerrors="true"/>
       </sequential>
     </sequential>
   </macrodef>
