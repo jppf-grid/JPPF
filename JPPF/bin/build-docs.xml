@@ -83,41 +83,6 @@
 
   <property name="javadoc.bottom"><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2017 JPPF Team.</i></font>]]></property>
 
-  <property name="javadoc.sourcepath.before">
-    ${node}/src/java;${common}/src/java;${client}/src/java;${server}/src/java;${admin}/src/java;${jmxremote}/src;
-    ${jca-client}/src/java;${jca-client}/src/j2eeclient;${node-android}/events/src/main/java
-  </property>
-
-  <property name="javadoc.classpath.before">
-    ${common}/classes;
-    ${node}/classes;
-    ${admin}/classes;
-    ${client}/classes;
-    ${server}/classes;
-    ${demo}/classes;
-    ${jca-client}/classes/j2eeclient;
-    ${jca-client}/classes/jca;
-    ${samples-pack}/DataEncryption/classes;
-    ${env.ANDROID_HOME}/platforms/android-19/android.jar;
-    ${lib}/ApacheCommons/*;
-    ${lib}/BouncyCastle/*;
-    ${lib}/Checkstyle/*;
-    ${lib}/Groovy/*;
-    ${lib}/HikariCP/*;
-    ${lib}/J2EE/*;
-    ${lib}/java2html_50/*;
-    ${lib}/JFreeChart/*;
-    ${lib}/JGoodies/*;
-    ${lib}/JNA/*;
-    ${lib}/Jung/*;
-    ${lib}/JUnit/*;
-    ${lib}/log4j/*;
-    ${lib}/LZ4/*;
-    ${lib}/MigLayout/*;
-    ${lib}/RSyntaxTextArea/*;
-    ${lib}/slf4j/*
-  </property>
-  
   <!-- ========================================================================= -->
   <!--  Generate the Javadoc                                                     -->
   <!-- ========================================================================= -->
@@ -174,57 +139,6 @@
     <echo message="Javadoc generated in ${javadoc}"/>
   </target>
   
-  <target name="javadoc.external">
-    <replaceProp dest="javadoc.sourcepath" search="\\s" replace=""/>
-    <replaceProp dest="javadoc.classpath" search="\\s" replace=""/>
-    <echo message="javadoc path = ${env.JAVA_HOME}/bin/javadoc"/>
-    <!-- JAVA_HOME should point to a JDK 1.7 -->
-    <exec executable="${env.JAVA_HOME}/bin/javadoc">
-      <arg value="-protected"/>
-      <arg value="-sourcepath"/>
-      <arg value="${javadoc.sourcepath}"/>
-      <arg value="-subpackages"/>
-      <arg value="org.jppf"/>
-      <arg value="-classpath"/>
-      <arg value="${javadoc.classpath}"/>
-      <arg value="-source"/>
-      <arg value="1.7"/>
-      <arg value="-stylesheetfile"/>
-      <arg value="${bin}/stylesheet.css"/>
-      <arg value="-use"/>
-      <arg value="-doclet"/>
-      <arg value="org.jppf.javadoc.ExcludeDoclet"/>
-      <arg value="-docletpath"/>
-      <arg value="${basedir}/classes"/>
-      <arg value="-link"/>
-      <arg value="https://docs.oracle.com/javase/7/docs/api/"/>
-      <arg value="-link"/>
-      <arg value="https://docs.oracle.com/javaee/6/api/"/>
-      <arg value="-link"/>
-      <arg value="https://junit.org/junit4/javadoc/latest"/>
-      <arg value="-link"/>
-      <arg value="http://oshi.github.io/oshi/apidocs/"/>
-      <arg value="-link"/>
-      <arg value="https://x-stream.github.io/javadoc"/>
-      <arg value="-linkoffline"/>
-      <arg value="https://d.android.com/reference"/>
-      <arg value="file:${env.ANDROID_HOME}/docs/reference"/>
-      <arg value="-doctitle"/>
-      <arg value="'JPPF v${version.number}'"/>
-      <arg value="-header"/>
-      <arg value="${javadoc.header}"/>
-      <arg value="-bottom"/>
-      <arg value="${javadoc.bottom}"/>
-      <arg value="-J-Xmx512m"/>
-      <arg value="-linksource"/>
-      <arg value="-quiet"/>
-      <arg value="-windowtitle"/>
-      <arg value="JPPF"/>
-      <arg value="-d"/>
-      <arg value="${javadoc}"/>
-    </exec>
-  </target>
-
   <path id="doclet.classpath">
     <pathelement location="${java.home}/lib/tools.jar"/>
   </path>

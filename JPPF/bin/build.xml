@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="JPPF" default="build" basedir="..">
+<project name="JPPF" default="build" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ========================================================================= -->
   <!--                          Property definitions                             -->
@@ -74,6 +74,7 @@
   <!-- ========================================================================= -->
 
   <path id="project.classpath">
+    <pathelement location="${jmxremote}/classes"/>
     <pathelement location="${common}/classes"/>
     <pathelement location="${node}/classes"/>
     <pathelement location="${admin}/classes"/>
@@ -142,7 +143,7 @@
   <!--                                    Init                                   -->
   <!-- ========================================================================= -->
 
-  <target name="init">
+  <target name="init" depends="dependencies">
     <mkdir dir="${build}"/>
     <available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
     <!-- Format the build number to a 4 figures integer with leading zeroes if required -->

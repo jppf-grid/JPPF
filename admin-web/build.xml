@@ -47,6 +47,24 @@
   </path>
 
   <!-- ==================================================================== -->
+  <!-- Init                                                                 -->
+  <!-- ==================================================================== -->
+
+  <target name="init" depends="clean, prep, dependencies">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${build.dir}"/>
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <path id="checkstyle.path">
+      <fileset dir="${lib.dir}/build" includes="*.jar"/>
+    </path>
+    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
+    <path id="maven-ant-tasks.classpath" path="${lib.dir}/build/maven-ant-tasks-2.1.3.jar"/>
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath"/>
+  </target>
+
+  <!-- ==================================================================== -->
   <!-- Clean                                                                -->
   <!-- ==================================================================== -->
 
@@ -57,18 +75,6 @@
     <delete quiet="true">
       <fileset dir="${build.dir}" includes="**/*.*"/>
     </delete>
-  </target>
-
-  <!-- ==================================================================== -->
-  <!-- Init                                                                 -->
-  <!-- ==================================================================== -->
-
-  <target name="init" depends="clean, prep">
-    <mkdir dir="${classes.dir}"/>
-    <mkdir dir="${build.dir}"/>
-    <tstamp>
-      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
-    </tstamp>
   </target>
 
   <!-- ==================================================================== -->
@@ -84,11 +90,11 @@
     </condition>
   </target>
 
+  <import file="bin/build-libs.xml"/>
+
   <!-- ==================================================================== -->
   <!-- Compile the application                                              -->
   <!-- ==================================================================== -->
-
-  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${lib.dir}/checkstyle-6.19-all.jar" />
 
   <target name="compile" depends="init">
     <echo message="compiling the JPPFWebAdmin classes ..." />
@@ -176,9 +182,6 @@
   <!-- ========================================================================= -->
   <!-- Generate the Maven artifacts                                              -->
   <!-- ========================================================================= -->
-
-  <path id="maven-ant-tasks.classpath" path="${lib.dir}/maven-ant-tasks-2.1.3.jar"/>
-  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath"/>
 
   <target name="maven" depends="maven.init, jar, maven.generate" description=""/>
   

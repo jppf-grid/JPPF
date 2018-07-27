@@ -5,7 +5,7 @@
 
 <img src="https://www.jppf.org/images/logo3.gif"/>
 
-# The open source grid computing solution
+# **The open source grid computing solution**
 
 This is the home for the JPPF source code. Other services can be found at the following locations:
 
@@ -20,7 +20,7 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[JPPF](JPPF)**: contains the build scripts, web site and associated templates, documentation as LibreOffice text documents
 * **[admin](admin)**: the code and resources for the desktop (Swing-based) admin console
 * **[admin-web](admin-web)**: the code and resources for the web admin console
-* **[application-template](application-template)**: source code for the JPPF client application template 
+* **[application-template](application-template)**: source code for the JPPF client application template
 * **[client](client)**: source code for the JPPF client APIs
 * **[common](common)**: utilities and classes common to the other modules
 * **[demo](demo)**: some demos and tests of JPPF features, which may be useful as code samples
@@ -34,3 +34,15 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * **[server](server)**: source code for the JPPF driver/server
 * **[stress-tests](stress-tests)**: a framework for starting and using local JPPF grids with complex topologies
 * **[tests](tests)**: JUnit-based tests for JPPF grids, with the associated homegrown test framework
+
+## Building JPPF
+
+***Requirements***
+
+* **Java 7** or later
+* **[Apache Ant 1.9.1](https://ant.apache.org)** or later
+
+***Steps***
+
+* clone the repository: `git clone git@github.com:lolocohen/JPPF.git`
+* from the repository root: `ant build`

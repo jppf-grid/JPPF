@@ -419,17 +419,15 @@ public class BaseSetup {
     commonCP.add("../jmxremote-nio/classes");
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.7.25.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.7.25.jar");
-    commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
-    commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
-    commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
-    commonCP.add("../JPPF/lib/JNA/jna-4.5.1.jar");
-    commonCP.add("../JPPF/lib/JNA/jna-platform-4.5.1.jar");
-    commonCP.add("../JPPF/lib/oshi/oshi-core-3.5.0.jar");
-    commonCP.add("../JPPF/lib/oshi/threetenbp-1.3.6.jar");
+    commonCP.add("../JPPF/lib/log4j/*");
+    commonCP.add("../JPPF/lib/LZ4/*");
+    commonCP.add("../JPPF/lib/ApacheCommons/*");
+    commonCP.add("../JPPF/lib/JNA/*");
+    commonCP.add("../JPPF/lib/oshi/*");
     
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
-    driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
+    driverCP.add("../JPPF/lib/Groovy/*");
     config.driver.jppf = dir + "/driver.template.properties";
     config.driver.log4j = dir + "/log4j-driver.template.properties";
     config.driver.classpath = driverCP;

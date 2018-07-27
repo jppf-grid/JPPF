@@ -23,6 +23,11 @@ limitations under the License.
   <!-- ==================================================================== -->
 
   <target name="compile" depends="init, i18n" unless="compile.done">
+    <path id="checkstyle.path">
+      <fileset dir="${lib}/Checkstyle" includes="${Checkstyle.inc}"/>
+    </path>
+    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
+    <compile.module path="${jmxremote}"/>
     <compile.module path="${common}"/>
     <compile.module path="${jmxremote-nio}"/>
     <compile.module path="${node}"/>
@@ -33,8 +38,6 @@ limitations under the License.
     <compile.module.simple path="${application.template}"/>
     <property name="compile.done" value="true"/>
   </target>
-
-  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/../JPPF/lib/Checkstyle/checkstyle-6.19-all.jar" />
 
   <!--
     Compile a project/module.
@@ -120,6 +123,7 @@ limitations under the License.
   <target name="jar" depends="compile" unless="jar.done">
     <jar.module module="node"/>
     <jar.module module="common"/>
+    <jar.module module="jmxremote" jar="jmxremote_optional" version="${jmx.version.number}"/>
     <jar.module module="jmxremote-nio"/>
     <jar.module module="client"/>
     <jar.module module="admin"/>
@@ -141,15 +145,17 @@ limitations under the License.
     - module: the root path of the project or module
     - jar: the suffix of the generated jar file name jppf-@{jar}.jar
            defaults to the value of the "module" attribute
+    - version: the jar version number
   -->
   <macrodef name="jar.module">
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
+    <attribute name="version" default="${version.number}"/>
     <sequential>
-      <jar jarfile="${build}/jppf-@{jar}-${version.number}.jar" index="true">
+      <jar jarfile="${build}/jppf-@{jar}-@{version}.jar" index="true">
         <fileset dir="${basedir}/../@{module}/classes" excludes="**/package-info.class"/>
         <manifest>
-          <attribute name="JPPF-Version" value="${version.number}"/>
+          <attribute name="JPPF-Version" value="@{version}"/>
           <attribute name="JPPF-Build" value="${build.number}"/>
           <attribute name="JPPF-BuildDate" value="${readable.now}"/>
         </manifest>
@@ -162,6 +168,7 @@ limitations under the License.
   <!-- ==================================================================== -->
 
   <target name="jar.src" depends="compile" unless="jar.src.done">
+    <jar.src.module module="jmxremote" jar="jmxremote_optional" version="${jmx.version.number}"/>
     <jar.src.module module="common"/>
     <jar.src.module module="jmxremote-nio"/>
     <jar.src.module module="node"/>
@@ -182,8 +189,9 @@ limitations under the License.
   <macrodef name="jar.src.module">
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
+    <attribute name="version" default="${version.number}"/>
     <sequential>
-      <jar jarfile="${build}/jppf-@{jar}-src-${version.number}.jar" index="true">
+      <jar jarfile="${build}/jppf-@{jar}-src-@{version}.jar" index="true">
         <fileset dir="${basedir}/../@{module}/src/java"/>
         <fileset dir="${basedir}/../@{module}/src/resources"/>
         <fileset file="${bin}/build.number"/>

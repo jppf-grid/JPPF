@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="lib/wicket-extensions-7.4.0.jar" sourcepath="C:/ftp/dev/Apache/apache-wicket-7.4.0/wicket-extensions/src/main/java"/>
 	<classpathentry kind="lib" path="lib/wicket-ioc-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-jmx-7.4.0.jar"/>
-	<classpathentry kind="lib" path="lib/wicket-js-tests-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-metrics-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-native-websocket-core-7.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/wicket-native-websocket-javax-7.4.0.jar"/>

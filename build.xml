@@ -28,6 +28,11 @@
   <!-- Main targets                                                              -->
   <!-- ========================================================================= -->
 
+  <target name="dependencies" description="Download JPPF dependencies">
+    <echo message="Downloading JPPF dependencies"/>
+    <ant dir="JPPF/bin" target="dependencies" useNativeBasedir="true"/>
+  </target>
+
   <target name="build" description="build JPPF">
     <echo message="Building JPPF (without installer)"/>
     <ant dir="jmxremote" target="compile" useNativeBasedir="true"/>

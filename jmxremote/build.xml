@@ -25,17 +25,14 @@
   <property name="build.properties.file" value="${basedir}/build.properties"/>
   <property file="${build.properties.file}"/>
 	<property name="classes.dir"           value="${basedir}/classes"/>
-  <property name="src.dir"               value="${basedir}/src"/>
+  <property name="src.dir"               value="${basedir}/src/java"/>
+  <property name="resources.dir"         value="${basedir}/src/resources"/>
   <property name="javadoc"               value="${basedir}/javadoc"/>
   <property name="build"                 value="${basedir}/build"/>
   <property name="jppf"                  value="${basedir}/../JPPF"/>
   <property name="app"                   value="jppf-jmxremote_optional"/>
   <property name="app.ver"               value="${app}-${jmx.version.number}"/>
   <property name="build.sysclasspath"    value="last"/>
-
-  <path id="maven-ant-tasks.classpath" path="${jppf}/lib/maven/maven-ant-tasks-2.1.3.jar"/>
-  <echo message="maven tasks classpath = ${lib}/maven/maven-ant-tasks-2.1.3.jar"/>
-  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath"/>
 
 	<!-- ========================================================================= -->
 	<!-- Classpath definitions                                                     -->
@@ -86,6 +83,10 @@
 				<exclude name="**/*.java"/>
 				<exclude name="**/package.html"/>
 			</fileset>
+      <fileset dir="${resources.dir}">
+        <exclude name="**/*.java"/>
+        <exclude name="**/package.html"/>
+      </fileset>
 		</copy>
   </target>
 
@@ -172,6 +173,9 @@
   <target name="maven" depends="maven.init, maven.generate" description=""/>
 
   <target name="maven.init" depends="">
+    <path id="maven-ant-tasks.classpath" path="${jppf}/lib/maven/maven-ant-tasks-2.1.3.jar"/>
+    <echo message="maven tasks classpath = ${lib}/maven/maven-ant-tasks-2.1.3.jar"/>
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath"/>
     <property name="maven.dist" value="${build}"/>
     <property file="${user.home}/gpg-passphrase.txt"/>
     <!-- defined maven snapshots and staging repository id and url -->

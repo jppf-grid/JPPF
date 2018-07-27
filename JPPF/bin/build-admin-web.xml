@@ -41,15 +41,16 @@
   <!-- Update the dependencies -->
   <target name="admin.web.init">
     <copy todir="${admin-web}/bin" file="${basedir}/CheckStyle_JPPF_config.xml" overwrite="true"/>
-    <delete><fileset dir="${admin-web}/lib" includes="jppf-*.jar"/></delete>
+    <delete quiet="true"><fileset dir="${admin-web}/lib" includes="jppf-*.jar"/></delete>
     <copy todir="${admin-web}/lib" overwrite="true">
       <fileset dir="${build}">
         <include name="jppf-common-${version.number}.jar"/>
         <include name="jppf-jmxremote-nio-${version.number}.jar"/>
         <include name="jppf-client-${version.number}.jar"/>
         <include name="jppf-admin-${version.number}.jar"/>
+        <include name="jppf-jmxremote_optional-*.jar"/>
+        <exclude name="jppf-jmxremote_optional-src-*.jar"/>
       </fileset>
-      <fileset dir="${lib}/jmxremote" includes="jppf-jmxremote_optional-${jmx.version.number}.jar"/>
       <fileset dir="${lib}/log4j" includes="${log4j.inc}"/>
       <fileset dir="${lib}/LZ4" includes="${LZ4.inc}"/>
       <fileset dir="${lib}/slf4j" includes="${slf4j.inc}"/>

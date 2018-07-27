@@ -32,15 +32,12 @@
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
 	<classpathentry kind="src" output="WordCount/classes" path="WordCount/src"/>
 	<classpathentry kind="src" output="WordCount/classes-client" path="WordCount/src-client"/>
-	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
-	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-httpclient-3.0.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/lucene-core-2.2.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/lucene-demos-2.2.0.jar"/>
 	<classpathentry kind="lib" path="shared/lib/lucene-memory-2.2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="shared/lib/miglayout-3.7-swing.jar"/>
 	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
@@ -71,5 +68,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote-nio"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.7.25.jar"/>
+	<classpathentry kind="lib" path="WebSearchEngine/lib/crawler-1.0.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/miglayout-core-4.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/miglayout-swing-4.2.jar"/>
+	<classpathentry kind="lib" path="SequenceAlignment/lib/jaligner.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>
