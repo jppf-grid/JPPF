@@ -69,13 +69,13 @@
 
 
   <!-- ========================================================================= -->
-  <!--  Build                                                                    -->
+  <!-- Build                                                                     -->
   <!-- ========================================================================= -->
 
   <target name="build" depends="jar" description="build a redistributable jar"/>
 
   <!-- ========================================================================= -->
-  <!--                                  Compile                                  -->
+  <!-- Compile                                                                   -->
   <!-- ========================================================================= -->
 
   <target name="compile" depends="clean, init">
@@ -119,7 +119,7 @@
   <!-- Run the sample application                                                -->
   <!-- ========================================================================= -->
 
-  <target name="run">
+  <target name="run" description="run the demo">
     <echo message="Network Interceptor demo"/>
     <java fork="yes" classname="org.jppf.example.interceptor.NetworkInterceptorDemo" classpathref="run.classpath">
       <jvmarg value="-Xmx256m"/>

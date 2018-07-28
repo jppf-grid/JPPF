@@ -51,7 +51,7 @@
   <!-- Init                                                                      -->
   <!-- ========================================================================= -->
 
-  <target name="init" description="Initialize ressources">
+  <target name="init">
   </target>
 
 
@@ -81,7 +81,7 @@
   <!-- Jar                                                                       -->
   <!-- ========================================================================= -->
 
-  <target name="jar" depends="compile">
+  <target name="jar" depends="compile" description="build the demo jar">
     <jar jarfile="${basedir}/${ant.project.name}.jar" index="true">
       <fileset dir="${classes}"/>
     </jar>

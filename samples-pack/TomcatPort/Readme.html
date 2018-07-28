@@ -5,7 +5,7 @@ It has been tested with <a href="http://tomcat.apache.org">Apache Tomcat</a> ver
 
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.0/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have a server and node, from a command prompt, perform the following steps:
 <ul class="samplesList">
   <li>configure the application settings, by editing the configuration files (JPPF and logging) in the <b>TomcatPort/src/java</b> folder</li>
@@ -25,7 +25,7 @@ Integration with the Tomcat Servlets/JSP container.
 <p>If you need more insight into the code of this demo, you can consult the JSP source files located in the <b>TomcatPort/src/resources</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

@@ -19,7 +19,7 @@
 <project name='WebSearchEngine' basedir="." default="run">
 
 	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
+	<!-- Property definitions                                                      -->
 	<!-- ========================================================================= -->
 
 	<property name="shared"      value="${basedir}/../shared"/>
@@ -31,7 +31,7 @@
 	<property name="javadoc"     value="${basedir}/javadoc"/>
 
 	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
+	<!-- Classpath definitions                                                     -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
@@ -47,7 +47,7 @@
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
+	<!-- Clean                                                                     -->
 	<!-- ========================================================================= -->
 
   <target name="clean">
@@ -55,16 +55,16 @@
   </target>               
 
 	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
+	<!-- Init                                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
  		<mkdir dir="${classes.dir}"/>
 	</target>
 
 
 	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
+	<!-- Compile                                                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean, init">
@@ -82,10 +82,10 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                     Run the sample application                            -->
+	<!-- Run the sample application                                                -->
 	<!-- ========================================================================= -->
 
-	<target name="run">
+	<target name="run" description="run the demo">
 		<echo message="starting the JPPF Web Search Engine application"/>
 		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="project.classpath">
 			<jvmarg value="-server"/>
@@ -98,10 +98,10 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
+	<!-- Generate the Javadoc                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+	<target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

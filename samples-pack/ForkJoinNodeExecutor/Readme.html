@@ -6,7 +6,7 @@ The use of this fork/join executor is illustrated with a Fibonacci computation d
 
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/wiki">JPPF documentation</a>.<br>
 <ol class="samplesList">
   <li>For a node to use the fork/join executor add-on, you need to add the following property to its configuration file:
 <pre class="prettyprint lang-conf">jppf.thread.manager.class = org.jppf.execute.ThreadManagerForkJoin</pre>
@@ -38,7 +38,7 @@ To generate the Javadoc, from a command prompt type: <b>&quot;ant javadoc&quot;<
 <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
+  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

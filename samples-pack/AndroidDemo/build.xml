@@ -47,7 +47,7 @@
     <delete dir="${classes}" quiet="true" includes="**/*.*"/>
   </target>
 
-  <target name="init" description="Initialize ressources">
+  <target name="init">
     <mkdir dir="${classes}"/>
   </target>
 
@@ -68,7 +68,7 @@
   <!-- ========================================================================= -->
 
   <!-- create a jar with only the classes required for the JPPF tasks -->
-  <target name="jar" depends="compile">
+  <target name="jar" depends="compile" description="build the demo jar">
     <delete file="demo.jar" quiet="true"/>
     <jar jarfile="demo.jar">
       <fileset dir="${classes}" excludes="**/Runner.*"/>
@@ -76,7 +76,7 @@
   </target>
   
   <!-- create a jar in dex format from the previously generated Java jar file -->
-  <target name="dex.jar" depends="jar" description="dex">
+  <target name="dex.jar" depends="jar" description="generate the demo jar in dex format">
     <delete file="dex-demo.jar" quiet="true"/>
     <dex in="demo.jar" out="dex-demo.jar"/>
     <delete file="demo.jar" quiet="true"/>

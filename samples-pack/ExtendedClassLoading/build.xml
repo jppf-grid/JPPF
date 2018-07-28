@@ -19,7 +19,7 @@
 <project name='Extended Class Loading' basedir="." default="build">
 
 	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
+	<!-- Property definitions                                                      -->
 	<!-- ========================================================================= -->
 
 	<property name="shared"            value="${basedir}/../shared"/>
@@ -34,7 +34,7 @@
 	<property name="javadoc"           value="${basedir}/javadoc"/>
 
 	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
+	<!-- Classpath definitions                                                     -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
@@ -57,7 +57,7 @@
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
+	<!-- Clean                                                                     -->
 	<!-- ========================================================================= -->
 
   <target name="clean">
@@ -76,21 +76,21 @@
   </target>               
 
 	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
+	<!-- Init                                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
 	</target>
 
 
 	<!-- ========================================================================= -->
-	<!--                                  Build                                    -->
+	<!-- Build                                                                     -->
 	<!-- ========================================================================= -->
 
 	<target name="build" depends="jar"/>
 
 	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
+	<!-- Compile                                                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean, init, compile.2, compile.1"/>
@@ -117,7 +117,7 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                                  Jar                                      -->
+	<!-- Jar                                                                       -->
 	<!-- ========================================================================= -->
 
 	<target name="jar" depends="compile, jar.1, jar.2">
@@ -148,10 +148,10 @@
 	</target>
 	
 	<!-- ========================================================================= -->
-	<!--                     Run the sample application                            -->
+	<!-- Run the sample application                                                -->
 	<!-- ========================================================================= -->
 
-	<target name="run">
+	<target name="run" description="run the demo">
 		<echo message="Running the Extended Class Loading demo"/>
 		<java fork="yes" classname="org.jppf.example.extendedclassloading.client.MyRunner" classpathref="run.classpath">
 			<jvmarg value="-Djppf.config=jppf.properties"/>
@@ -161,10 +161,10 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
+	<!-- Generate the Javadoc                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+	<target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

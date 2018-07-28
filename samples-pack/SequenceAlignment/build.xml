@@ -19,7 +19,7 @@
 <project name='SequenceAlignment' basedir="." default="run">
 
   <!-- ========================================================================= -->
-  <!--                          Property definitions                             -->
+  <!-- Property definitions                                                      -->
   <!-- ========================================================================= -->
 
   <property name="shared"      value="${basedir}/../shared"/>
@@ -31,7 +31,7 @@
   <property name="javadoc"     value="${basedir}/javadoc"/>
 
   <!-- ========================================================================= -->
-  <!--                           Classpath definitions                           -->
+  <!-- Classpath definitions                                                     -->
   <!-- ========================================================================= -->
 
   <path id="project.classpath">
@@ -49,7 +49,7 @@
   </path>
 
   <!-- ========================================================================= -->
-  <!--                                    Clean                                  -->
+  <!-- Clean                                                                     -->
   <!-- ========================================================================= -->
 
   <target name="clean">
@@ -57,7 +57,7 @@
   </target>               
 
   <!-- ========================================================================= -->
-  <!--                                    Init                                   -->
+  <!-- Init                                                                      -->
   <!-- ========================================================================= -->
 
   <target name="init">
@@ -65,7 +65,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                                  Compile                                  -->
+  <!-- Compile                                                                   -->
   <!-- ========================================================================= -->
 
   <target name="compile" depends="clean, init" description="compile the sample's source code">
@@ -83,7 +83,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                     Run the sample application                            -->
+  <!-- Run the sample application                                                -->
   <!-- ========================================================================= -->
 
   <target name="run" description="run the sample">
@@ -99,10 +99,10 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                        Generate the Javadoc                               -->
+  <!-- Generate the Javadoc                                                      -->
   <!-- ========================================================================= -->
 
-  <target name="javadoc" description="generate all javadoc">
+  <target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
     <javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

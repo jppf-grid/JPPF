@@ -19,7 +19,7 @@
 <project name='Node Life Cycle' basedir="." default="jar">
 
 	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
+	<!-- Property definitions                                                      -->
 	<!-- ========================================================================= -->
 
 	<property name="shared"      value="${basedir}/../shared"/>
@@ -34,7 +34,7 @@
 	<property name="result.file" value="NodeLifeCycle.jar"/>
 
 	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
+	<!-- Classpath definitions                                                     -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
@@ -54,7 +54,7 @@
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
+	<!-- Clean                                                                     -->
 	<!-- ========================================================================= -->
 
   <target name="clean">
@@ -62,7 +62,7 @@
   </target>               
 
 	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
+	<!-- Init                                                                      -->
 	<!-- ========================================================================= -->
 
 	<target name="init">
@@ -71,7 +71,7 @@
 
 
 	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
+	<!-- Compile                                                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean, init">
@@ -90,10 +90,10 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                                  Jar                                      -->
+	<!-- Jar                                                                       -->
 	<!-- ========================================================================= -->
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile" description="build the demo jar">
 	  <jar jarfile="${result.file}" index="true">
 			<fileset dir="${classes.dir}">
 	  		<include name="org/jppf/example/nodelifecycle/node/**/*.*"/>
@@ -107,7 +107,7 @@
   </target>
 	
 	<!-- ========================================================================= -->
-	<!--                     Run the sample application                            -->
+	<!-- Run the sample application                                                -->
 	<!-- ========================================================================= -->
 
 	<target name="run" description="Run the sample application">
@@ -121,7 +121,7 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--      Create the H2 database and table (DB server must be started)         -->
+	<!-- Create the H2 database and table (DB server must be started)              -->
 	<!-- ========================================================================= -->
 
 	<target name="reset.db" description="Reset the database">
@@ -145,7 +145,7 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                    Start the H2 database server                           -->
+	<!-- Start the H2 database server                                              -->
 	<!-- ========================================================================= -->
 
 	<target name="start.db.server">
@@ -157,7 +157,7 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                    Stop the H2 database server                            -->
+	<!-- Stop the H2 database server                                               -->
 	<!-- ========================================================================= -->
 
 	<target name="stop.db.server">
@@ -171,10 +171,10 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
+	<!-- Generate the Javadoc                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+	<target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

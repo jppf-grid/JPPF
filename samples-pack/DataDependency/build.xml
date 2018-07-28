@@ -19,7 +19,7 @@
 <project name='Data Dependency' basedir="." default="run">
 
 	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
+	<!-- Property definitions                                                      -->
 	<!-- ========================================================================= -->
 
 	<property name="shared"      value="${basedir}/../shared"/>
@@ -31,7 +31,7 @@
 	<property name="javadoc"     value="${basedir}/javadoc"/>
 
 	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
+	<!-- Classpath definitions                                                     -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
@@ -48,7 +48,7 @@
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
+	<!-- Clean                                                                     -->
 	<!-- ========================================================================= -->
 
   <target name="clean">
@@ -56,16 +56,16 @@
   </target>               
 
 	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
+	<!-- Init                                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
  		<mkdir dir="${classes.dir}"/>
 	</target>
 
 
 	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
+	<!-- Compile                                                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean, init">
@@ -84,10 +84,10 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                                  Jar                                      -->
+	<!-- Jar                                                                       -->
 	<!-- ========================================================================= -->
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile" description="build the demo jar">
 	  <jar jarfile="DataDependency.jar" index="true">
 			<fileset dir="${classes.dir}">
 				<include name="**/model/*.*"/>
@@ -101,7 +101,7 @@
   </target>
 	
 	<!-- ========================================================================= -->
-	<!--                     Build the deployment archive files                    -->
+	<!-- Build the deployment archive files                                        -->
 	<!-- ========================================================================= -->
 
 	<target name="zip" depends="jar">
@@ -130,10 +130,10 @@
 	</target>
 	
 	<!-- ========================================================================= -->
-	<!--                     Run the sample application                            -->
+	<!-- Run the sample application                                                -->
 	<!-- ========================================================================= -->
 
-	<target name="run">
+	<target name="run" description="run the demo">
 		<echo message="Running the Data Dependency application"/>
 		<java fork="yes" classname="org.jppf.example.datadependency.DataDependency" classpathref="project.classpath">
 			<jvmarg value="-server"/>
@@ -144,10 +144,10 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
+	<!-- Generate the Javadoc                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+	<target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"

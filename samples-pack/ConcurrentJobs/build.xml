@@ -19,7 +19,7 @@
 <project name='ConcurrentJobs' basedir="." default="build">
 
 	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
+	<!-- Property definitions                                                      -->
 	<!-- ========================================================================= -->
 
 	<property name="shared"            value="${basedir}/../shared"/>
@@ -29,10 +29,9 @@
   <property name="classes.dir"       value="${basedir}/classes"/>
 	<property name="src.dir"           value="${basedir}/src"/>
   <property name="javadoc"           value="${basedir}/javadoc"/>
-  <property name="prefix"            value="JPPF-node"/>
 
 	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
+	<!-- Classpath definitions                                                     -->
 	<!-- ========================================================================= -->
 
 	<path id="project.classpath">
@@ -53,7 +52,7 @@
   </path>
 
 	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
+	<!-- Clean                                                                     -->
 	<!-- ========================================================================= -->
 
   <target name="clean">
@@ -63,21 +62,21 @@
   </target>               
 
 	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
+	<!-- Init                                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
 	</target>
 
 
 	<!-- ========================================================================= -->
-	<!--                                  Build                                    -->
+	<!-- Build                                                                     -->
 	<!-- ========================================================================= -->
 
 	<target name="build" depends="compile" description="build the Concurrent Jobs demo"/>
 
 	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
+	<!-- Compile                                                                   -->
 	<!-- ========================================================================= -->
 
 	<target name="compile" depends="clean">
@@ -93,10 +92,10 @@
   </target>
 
 	<!-- ========================================================================= -->
-	<!--                     Run the sample application                            -->
+	<!-- Run the sample application                                                -->
 	<!-- ========================================================================= -->
 
-	<target name="run">
+	<target name="run" description="build the Concurrent Jobs demo">
 		<echo message="Running the Concurrent Jobs demo"/>
 		<java fork="yes" classname="org.jppf.example.concurrentjobs.ConcurrentJobs" classpathref="run.classpath">
       <jvmarg value="-Xmx256m"/>
@@ -107,10 +106,10 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
+	<!-- Generate the Javadoc                                                      -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+	<target name="javadoc" description="generate the javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
