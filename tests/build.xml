@@ -76,9 +76,7 @@
     <pathelement location="${samples-pack}/KryoSerializer/classes"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-2.22-all.jar"/>
     <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
-    <pathelement location="${basedir}/lib/scala-library.jar"/>
-    <pathelement location="${basedir}/lib/scala-reflect.jar"/>
-    <pathelement location="${basedir}/lib/h2.jar"/>
+    <fileset dir="${basedir}/lib" includes="*.jar"/>
   </path>
 
   <!-- ========================================================================= -->
@@ -91,7 +89,7 @@
   <!--  Compile the JUnit tests                                                  -->
   <!-- ========================================================================= -->
 
-  <target name="compile">
+  <target name="compile" depends="dependencies">
     <path id="checkstyle.path">
       <fileset dir="${lib}/Checkstyle" includes="*.jar"/>
     </path>
@@ -332,4 +330,20 @@
     <fail if="tests.failed">Test failure, aborting build</fail>
     -->
   </target>
+
+  <!-- ========================================================================= -->
+  <!-- Download JPPF dependencies                                                -->
+  <!-- ========================================================================= -->
+
+  <import file="../JPPF/bin/build-libs.xml"/>
+
+  <property name="h2.version" value="1.4.195"/>
+  <property name="scala.version" value="2.11.8"/>
+
+  <target name="dependencies" description="download libs">
+    <get.maven.lib g="org.scala-lang" a="scala-library" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-library.jar"/>
+    <get.maven.lib g="org.scala-lang" a="scala-reflect" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-reflect.jar"/>
+    <get.maven.lib g="com.h2database" a="h2"            v="${h2.version}"    dest="${basedir}/lib" destfile="${basedir}/lib/h2.jar"/>
+  </target>
+
 </project> 

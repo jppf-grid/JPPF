@@ -38,12 +38,14 @@
 
   <target name="j2ee.connector.build">
     <copy todir="${jca-client}" file="${basedir}/CheckStyle_JPPF_config.xml"/>
-    <delete dir="${jca-client}/lib" quiet="true" includes="jppf-client*.jar,jppf-common*.jar"/>
+    <delete dir="${jca-client}/lib" quiet="true" includes="jppf-client*.jar,jppf-common*.jar,jppf-jmxremote-nio*.jar"/>
     <copy todir="${jca-client}/lib">
       <fileset dir="${build}">
         <include name="jppf-client*.jar"/>
         <include name="jppf-common*.jar"/>
+        <include name="jppf-jmxremote_optional*.jar"/>
         <include name="jppf-jmxremote-nio*.jar"/>
+        <exclude name="jppf*src*.jar"/>
       </fileset>
     </copy>
     <copy todir="${jca-client}">

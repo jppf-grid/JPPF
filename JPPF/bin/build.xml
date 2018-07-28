@@ -208,6 +208,7 @@
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 
   <import file="build-libs.xml"/>
+  <import file="build-dependencies.xml"/>
   <import file="build-compile-jar.xml"/>
   <import file="build-modules.xml"/>
   <import file="build-samples.xml"/>

@@ -94,7 +94,7 @@
   <!--                                    Init                              -->
   <!-- ==================================================================== -->
 
-  <target name="init" depends="clean" description="Initialize ressources">
+  <target name="init" depends="clean, dependencies" description="Initialize ressources">
     <mkdir dir="${classes.dir}" />
     <mkdir dir="${classes.dir}/jca" />
     <mkdir dir="${classes.dir}/j2eeclient" />
@@ -108,13 +108,18 @@
   <target name="build" depends="build.util.jar,ear.all,rar.all" />
   <target name="build.deploy.jboss" depends="build, jboss.deploy" />
 
+  <import file="build-libs.xml"/>
+
   <!-- ==================================================================== -->
   <!--                         Compile the application                      -->
   <!-- ==================================================================== -->
 
-  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/../JPPF/lib/Checkstyle/checkstyle-6.19-all.jar" />
 
   <target name="compile" depends="init">
+    <path id="checkstyle.path">
+      <fileset dir="${lib.dir}/Checkstyle" includes="*.jar"/>
+    </path>
+    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
     <echo message="compiling the J2EE connector classes ..." />
     <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml">
       <fileset dir="${src.dir}" includes="**/*.java" />
