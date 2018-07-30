@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 
-<project name="JPPF-libs" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
+<project name="JPPF-dependencies" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <!-- ========================================================================= -->
   <!-- Library definitions                                                       -->

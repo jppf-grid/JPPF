@@ -51,11 +51,13 @@
         <local name="group"/>
         <property name="group" value="@{g}"/>
         <script language="javascript">
-          project.setProperty("path", project.getProperty("group").replace(".", "/"));
+          project.setProperty("path", project.getProperty("group").replaceAll("\\.", "/"));
         </script>
         <local name="url"/>
         <property name="url" value="http://repo.maven.apache.org/maven2/${path}/@{a}/@{v}/@{a}-@{v}.@{p}"/>
+        <!--
         <echo message="downloading ${url} to @{destfile}"/>
+        -->
         <get src="${url}" dest="@{destfile}" ignoreerrors="true"/>
       </sequential>
     </sequential>
