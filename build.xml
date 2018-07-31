@@ -31,6 +31,10 @@
   <target name="dependencies" description="Download JPPF dependencies">
     <echo message="Downloading JPPF dependencies"/>
     <ant dir="JPPF/bin" target="dependencies" useNativeBasedir="true"/>
+    <ant dir="JPPF/bin" target="samples.dependencies" useNativeBasedir="true"/>
+    <ant dir="admin-web" target="dependencies" useNativeBasedir="true"/>
+    <ant dir="jca-client" target="dependencies" useNativeBasedir="true"/>
+    <ant dir="tests" target="dependencies" useNativeBasedir="true"/>
   </target>
 
   <target name="build" description="build JPPF">
