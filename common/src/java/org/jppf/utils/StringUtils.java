@@ -22,6 +22,7 @@ import java.net.*;
 import java.nio.charset.Charset;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 
@@ -31,17 +32,17 @@ import java.util.regex.Pattern;
  */
 public final class StringUtils {
   /**
-   * Logger for this class.
-   */
-  //private static Logger log = LoggerFactory.getLogger(StringUtils.class);
-  /**
    * Charset instance for UTF-8 encoding.
    */
-  public static final Charset UTF_8 = makeUTF8();
-  /**
-   * Constant for an empty array of URLs.
-   */
-  public static final String[] ZERO_STRING = new String[0];
+  public static final Charset UTF_8 = new Callable<Charset>() {
+    @Override public Charset call() {
+      try {
+        return Charset.forName("UTF-8");
+      } catch(@SuppressWarnings("unused") final Exception e) {
+        return null;
+      }
+    }
+  }.call();
   /**
    * Constant for an empty array of Objects.
    */
@@ -50,10 +51,6 @@ public final class StringUtils {
    * Constant for an empty array of URLs.
    */
   public static final URL[] ZERO_URL = new URL[0];
-  /**
-   * Constant for an empty array of ints.
-   */
-  public static final int[] ZERO_INT = new int[0];
   /**
    * An array of char containing the hex digits in ascending order.
    */
@@ -168,23 +165,6 @@ public final class StringUtils {
       }
     }
     return sb.toString();
-  }
-
-  /**
-   * Convert a string of space-separated hexadecimal numbers into an array of bytes.
-   * @param hexString the string to convert.
-   * @return the resulting array of bytes.
-   */
-  public static byte[] toBytes(final String hexString) {
-    final String[] bytes = RegexUtils.SPACES_PATTERN.split(hexString);
-    final List<Byte> list = new ArrayList<>(bytes.length);
-    final byte[] result = new byte[list.size()];
-    for (int i=0; i<bytes.length; i++) {
-      int n = Byte.parseByte(bytes[i].substring(0, 1), 16);
-      n = 16 * n + Byte.parseByte(bytes[i].substring(1), 16);
-      result[i] = Byte.valueOf((byte) n);
-    }
-    return result;
   }
 
   /**
@@ -361,18 +341,6 @@ public final class StringUtils {
   }
 
   /**
-   * Create an instance of the UTF-8 charset.
-   * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
-   */
-  private static Charset makeUTF8() {
-    try {
-      return Charset.forName("UTF-8");
-    } catch(@SuppressWarnings("unused") final Exception e) {
-      return null;
-    }
-  }
-
-  /**
    * Print a top-down representation of a class loader hierarchy into a string.
    * @param leafClassLoader the class loader at the bottom of the hierarchy.
    * @return a string representation of the class loader hierarchy.
@@ -416,8 +384,7 @@ public final class StringUtils {
         sb.append(urls[i]);
       }
     }
-    sb.append(']');
-    return sb.toString();
+    return sb.append(']').toString();
   }
 
   /**
@@ -430,9 +397,7 @@ public final class StringUtils {
     if (source == null) return def;
     final NumberFormat nf = NumberFormat.getInstance();
     try {
-      final Number n = nf.parse(source);
-      //System.out.printf("source=%s, n=%s, locale=%s%n", source, n, Locale.getDefault());
-      return n;
+      return nf.parse(source);
     } catch (@SuppressWarnings("unused") final ParseException ignore) {
     }
     return null;
