@@ -91,6 +91,10 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * Handles reservations of nodes to jobs.
    */
   NodeReservationHandler reservationHandler;
+  /**
+   * The number of connected nodes below which the driver load-balances to other peer drivers.
+   */
+  final int peerLoadBalanceThreshold;
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -106,6 +110,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
     this.stats = stats;
     this.bundlerFactory = bundlerFactory;
     this.driverInfo = JPPFDriver.getInstance().getSystemInformation();
+    this.peerLoadBalanceThreshold = JPPFDriver.getInstance().getInitializer().getPeerConnectionPoolHandler().getLoadBalanceThreshold();
   }
 
   /**

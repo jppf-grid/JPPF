@@ -216,6 +216,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Long> PEER_DISCOVERY_REMOVAL_CLEANUP_INTERVAL = new LongProperty("jppf.peer.discovery.removal.cleanup.interval", 30_000L);
   /** Space-separated list of peer server names. */
   public static final JPPFProperty<String> PEERS = new StringProperty("jppf.peers", null);
+  /** The number of connected nodes below which this driver load-balances to other peer drivers. */
+  public static final JPPFProperty<Integer> PEERS_LOAD_BALANCE_THRESHOLD = new IntProperty("jppf.peers.load.balance.threshold", Integer.MAX_VALUE);
   /** Server host for a manually configured peer driver connection (parametrized). */
   public static final JPPFProperty<String> PARAM_PEER_SERVER_HOST = new StringProperty("jppf.peer.<peer_name>.server.host", "localhost");
   /** Server port for a manually configured peer driver connection (parametrized). */

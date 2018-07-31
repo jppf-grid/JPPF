@@ -91,7 +91,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
   /**
    * Handles listeners to node connection events.
    */
-  private final NodeConnectionEventHandler nodeConnectionHandler;
+  final NodeConnectionEventHandler nodeConnectionHandler;
   /**
    * Listener used for monitoring state changes.
    */

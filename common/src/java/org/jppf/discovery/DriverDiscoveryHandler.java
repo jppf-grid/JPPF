@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.DebuggableThread;
 import org.slf4j.*;
 
 /**
@@ -201,7 +202,7 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
   /**
    * Thread implementation wrapping the execution of the {@code discover()} method of each discovery.
    */
-  class DiscoveryThread extends Thread {
+  class DiscoveryThread extends DebuggableThread {
     /**
      * The discovery to run in its own thread.
      */

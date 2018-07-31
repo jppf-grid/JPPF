@@ -144,31 +144,31 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
 
   /**
    * Retrieve a suitable channel for the specified job.
-   * @param bundleWrapper the job to execute.
+   * @param job the job to execute.
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private C retrieveChannel(final ServerJob bundleWrapper) throws Exception {
-    return checkJobState(bundleWrapper) ? findIdleChannelIndex(bundleWrapper) : null;
+  private C retrieveChannel(final ServerJob job) throws Exception {
+    return checkJobState(job) ? findIdleChannelIndex(job) : null;
   }
 
   /**
    * Prepare the specified job for the selected channel, after applying the load balancer to the job.
    * @param channel the node channel to prepare dispatch the job to.
-   * @param selectedBundle the job to dispatch.
+   * @param selectedJob the job to dispatch.
    * @return the task bundle to dispatch to the specified node.
    */
-  private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedBundle) {
-    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
+  private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedJob) {
+    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedJob.getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try {
-      updateBundler(selectedBundle.getJob(), channel);
+      updateBundler(selectedJob.getJob(), channel);
       size = channel.getBundler().getBundleSize();
     } catch (final Exception e) {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
-    return queue.nextBundle(selectedBundle, size);
+    return queue.nextBundle(selectedJob, size);
   }
 
   /**
@@ -213,6 +213,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           continue;
         }
         if (!channel.isActive()) continue;
+        if (channel.isPeer() && (server.nodeConnectionHandler.getConnectedRealNodes() >= peerLoadBalanceThreshold)) {
+          if (debugEnabled) log.debug("this driver has {} nodes and the threshold is {}", server.nodeConnectionHandler.getConnectedNodes(), peerLoadBalanceThreshold);
+          continue;
+        }
         if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + channel.getUuid());
         if (uuidPath.contains(channel.getUuid())) {
           if (debugEnabled) log.debug("bundle uuid path already contains node " + channel + " : uuidPath=" + uuidPath + ", nodeUuid=" + channel.getUuid());

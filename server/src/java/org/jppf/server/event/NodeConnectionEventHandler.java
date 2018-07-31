@@ -20,6 +20,7 @@ package org.jppf.server.event;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.management.*;
 import org.jppf.utils.*;
@@ -44,6 +45,18 @@ public class NodeConnectionEventHandler {
    * The list of node connection listeners.
    */
   private final List<NodeConnectionListener> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * Keeps track of the number of connected nodes.
+   */
+  private final AtomicInteger connectedNodes = new AtomicInteger(0);
+  /**
+   * Keeps track of the number of connected peers.
+   */
+  private final AtomicInteger connectedPeers = new AtomicInteger(0);
+  /**
+   * Keeps track of the number of connected real (not peer) nodes.
+   */
+  private final AtomicInteger connectedRealNodes = new AtomicInteger(0);
 
   /**
    * Add a listener to the list of listeners.
@@ -68,6 +81,9 @@ public class NodeConnectionEventHandler {
    * @param info encapsulates the information about the node.
    */
   public void fireNodeConnected(final JPPFManagementInfo info) {
+    connectedNodes.incrementAndGet();
+    if (info.isPeer()) connectedPeers.incrementAndGet();
+    else connectedRealNodes.incrementAndGet();
     final NodeConnectionEvent event = new NodeConnectionEvent(info);
     for (final NodeConnectionListener listener : listeners) listener.nodeConnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
@@ -78,6 +94,9 @@ public class NodeConnectionEventHandler {
    * @param info encapsulates the information about the node.
    */
   public void fireNodeDisconnected(final JPPFManagementInfo info) {
+    connectedNodes.decrementAndGet();
+    if (info.isPeer()) connectedPeers.decrementAndGet();
+    else connectedRealNodes.decrementAndGet();
     final NodeConnectionEvent event = new NodeConnectionEvent(info);
     for (final NodeConnectionListener listener : listeners) listener.nodeDisconnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeDisconnected(info);
@@ -96,5 +115,26 @@ public class NodeConnectionEventHandler {
       if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
     }
     listeners.addAll(list);
+  }
+
+  /**
+   * @return the number of connected nodes.
+   */
+  public int getConnectedNodes() {
+    return connectedNodes.get();
+  }
+
+  /**
+   * @return the number of connected peers.
+   */
+  public int getConnectedPeers() {
+    return connectedPeers.get();
+  }
+
+  /**
+   * @return the number of connected real (not peer) nodes.
+   */
+  public int getConnectedRealNodes() {
+    return connectedRealNodes.get();
   }
 }

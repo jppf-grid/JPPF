@@ -19,6 +19,8 @@
 package org.jppf.server.peer;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -34,6 +36,19 @@ public class PeerConnectionPoolHandler {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The number of connected nodes below which the driver load-balances to other peer drivers.
+   */
+  private final int loadBalanceThreshold;
+
+  /**
+   * Initialize this connection pool handler.
+   * @param config the driver configuration properties.
+   */
+  public PeerConnectionPoolHandler(final TypedProperties config) {
+    final int n = config.get(JPPFProperties.PEERS_LOAD_BALANCE_THRESHOLD);
+    this.loadBalanceThreshold = (n < 0) ? 0 : n;
+  }
 
   /**
    * Create a new peer connection pool.
@@ -49,5 +64,12 @@ public class PeerConnectionPoolHandler {
       peerName, size, connectionInfo, secure, fromDiscovery));
     final PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
     return pool;
+  }
+
+  /**
+   * @return the number of connected nodes below which the driver load-balances to other peer drivers.
+   */
+  public int getLoadBalanceThreshold() {
+    return loadBalanceThreshold;
   }
 }

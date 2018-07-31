@@ -115,7 +115,7 @@ public class DriverInitializer {
   /**
    * Handles the pools of connections to remote peer drivers.
    */
-  final PeerConnectionPoolHandler peerConnectionPoolHandler = new PeerConnectionPoolHandler();
+  private final PeerConnectionPoolHandler peerConnectionPoolHandler;
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -125,6 +125,7 @@ public class DriverInitializer {
   public DriverInitializer(final JPPFDriver driver, final TypedProperties config) {
     this.driver = driver;
     this.config = config;
+    this.peerConnectionPoolHandler = new PeerConnectionPoolHandler(config);
   }
 
   /**
@@ -227,7 +228,7 @@ public class DriverInitializer {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
           peerDiscoveryThread.addConnectionInformation(info);
-          peerConnectionPoolHandler.newPool(name, JPPFConfiguration.get(PEER_POOL_SIZE), info, ssl, false);
+          getPeerConnectionPoolHandler().newPool(name, JPPFConfiguration.get(PEER_POOL_SIZE), info, ssl, false);
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
@@ -255,7 +256,7 @@ public class DriverInitializer {
             info.recoveryEnabled = props.get(PARAM_PEER_RECOVERY_ENABLED, name);
             if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             if (debugEnabled) log.debug(String.format("read peer configuration: name=%s, size=%d, secure=%b, info=%s", name, size, peerSSL, info));
-            peerConnectionPoolHandler.newPool(name, size, info, peerSSL, false);
+            getPeerConnectionPoolHandler().newPool(name, size, info, peerSSL, false);
           }
         }
       }
@@ -443,5 +444,12 @@ public class DriverInitializer {
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
     final TypedProperties config = JPPFConfiguration.getProperties();
     factory.configure(config, JPPFDatasourceFactory.Scope.LOCAL);
+  }
+
+  /**
+   * @return the object that handles the pools of connections to remote peer drivers.
+   */
+  public PeerConnectionPoolHandler getPeerConnectionPoolHandler() {
+    return peerConnectionPoolHandler;
   }
 }

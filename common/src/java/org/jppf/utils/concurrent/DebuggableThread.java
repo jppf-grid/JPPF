@@ -36,10 +36,18 @@ public class DebuggableThread extends Thread {
 
   /**
    * Construct this thread.
+   * @param name the name of this thread.
+   */
+  public DebuggableThread(final String name) {
+    super(name);
+  }
+
+  /**
+   * Construct this thread.
    * @param target the associate {@code Runnable}.
    */
   public DebuggableThread(final Runnable target) {
-    super(Thread.currentThread().getThreadGroup(), target);
+    super(target);
   }
 
   /**
@@ -48,7 +56,7 @@ public class DebuggableThread extends Thread {
    * @param name the name of this thread.
    */
   public DebuggableThread(final Runnable target, final String name) {
-    this(Thread.currentThread().getThreadGroup(), target, name);
+    super(target, name);
   }
 
   /**

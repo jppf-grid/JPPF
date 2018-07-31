@@ -54,7 +54,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
     }
     if (!hasPool) {
       final JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);
-      JPPFDriver.getInstance().getInitializer().peerConnectionPoolHandler.newPool(info.getName(), info.getPoolSize(), connectionInfo, info.isSecure(), false);
+      JPPFDriver.getInstance().getInitializer().getPeerConnectionPoolHandler().newPool(info.getName(), info.getPoolSize(), connectionInfo, info.isSecure(), false);
     }
     return !hasPool;
   }
