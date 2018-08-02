@@ -308,12 +308,10 @@ public class DriverInitializer {
    */
   private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
-    //final JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
-    final JPPFProperty<Boolean> prop = MANAGEMENT_ENABLED;
     final String tmp = ssl ? "secure " : "";
     try {
       // default is false for ssl, true for plain connection
-      if (config.get(prop)) {
+      if (config.get(MANAGEMENT_ENABLED)) {
         if (debugEnabled) log.debug("initializing {}management", tmp);
         final String protocol = JPPFConfiguration.get(JMX_REMOTE_PROTOCOL);
         JPPFProperty<Integer> jmxProp = null;
@@ -329,7 +327,7 @@ public class DriverInitializer {
       }
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
-      config.set(prop, false);
+      config.set(MANAGEMENT_ENABLED, false);
       String s = e.getMessage();
       s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
       System.out.println(tmp + "management failed to initialize, with error message: '" + s + '\'');
