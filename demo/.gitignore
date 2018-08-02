@@ -1,4 +1,5 @@
 /classes/
 /slave_nodes/
+/tmplib/
 *.log
 *.lck
