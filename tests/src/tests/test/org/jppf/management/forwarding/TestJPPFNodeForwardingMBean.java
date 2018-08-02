@@ -374,7 +374,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     final String uuid = job.getUuid();
     client.submitJob(job);
-    Thread.sleep(750L);
+    Thread.sleep(1000L);
     final Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);
     final List<Task<?>> jobResult = job.awaitResults();
