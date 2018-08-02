@@ -144,7 +144,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
           final List<String> channelAlgos = mgt.listAlgorithms(channel);
           BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> algo = %-12s, list of algos for channel %s = %s", algo, channel, channelAlgos);
           assertNotNull(channelAlgos);
-          assertEquals(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), 1, channelAlgos.size());
+          assertTrue(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), channelAlgos.size() >= 1);
           assertEquals(algo, channelAlgos.get(0));
           mgt.deleteChannel(channel);
           assertTrue(RetryUtils.runWithRetryTimeout(5000L, 100L, new Callable<Boolean>() {
