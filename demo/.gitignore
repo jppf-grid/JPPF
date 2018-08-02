@@ -1,5 +1,5 @@
 /classes/
 /slave_nodes/
-/etmplib/
+/templib/
 *.log
 *.lck
