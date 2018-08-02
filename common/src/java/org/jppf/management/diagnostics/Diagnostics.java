@@ -110,9 +110,15 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
     if (heapDumpCollector == null) {
       if (debugEnabled) log.debug("a heap dump collector could not be created for this JVM - no heap dumps will be available");
     }
-    MonitoringDataProviderHandler.getProviders();
-    MonitoringDataProviderHandler.initProviders();
-    MonitoringDataProviderHandler.getAllProperties();
+    final Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        MonitoringDataProviderHandler.getProviders();
+        MonitoringDataProviderHandler.initProviders();
+        MonitoringDataProviderHandler.getAllProperties();
+      }
+    };
+    ThreadUtils.startThread(r, "DataProviderInit");
   }
 
   @Override

@@ -35,7 +35,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.LinkedListSortedMap;
-import org.jppf.utils.concurrent.JPPFQueueLock;
+import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -177,7 +177,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     header.setDriverQueueTaskCount(header.getTaskCount());
     //final Lock jobLock = ConcurrentUtils.newLock("ServerJob[name=" + header.getName() + ", uuid=" + header.getUuid() + "]");
     //final Lock jobLock = ConcurrentUtils.newLock();
-    final Lock jobLock = new JPPFQueueLock("job-" + header.getName());
+    final Lock jobLock = ConcurrentUtils.newLock("job-" + header.getName());
     final ServerJob serverJob = new ServerJob(jobLock, jobManager, header, clientBundle.getDataProvider());
     serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
     serverJob.setQueueEntryTime(System.currentTimeMillis());
