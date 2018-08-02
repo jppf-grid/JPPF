@@ -22,10 +22,14 @@
   <!-- Properties and macrodefs to download dependencies                         -->
   <!-- ========================================================================= -->
   
-  <property name="slf4j.version" value="1.7.25"/>
-  <property name="log4j.version" value="1.2.15"/>
-  <property name="jung.version" value="2.0.1"/>
+  <property name="slf4j.version"     value="1.7.25"/>
+  <property name="log4j.version"     value="1.2.15"/>
+  <property name="jung.version"      value="2.0.1"/>
   <property name="miglayout.version" value="4.2"/>
+  <property name="jna.version"       value="4.5.1"/>
+  <property name="oshi.version"      value="3.5.0"/>
+  <property name="looks.version"     value="2.7.0"/>
+  <property name="rsta.version"      value="2.6.1"/>
 
   <!-- =============================================================================
     Download a file from Maven Central to a specified folder

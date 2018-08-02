@@ -67,9 +67,14 @@ public class ConsoleLauncher {
     try {
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if ((args  == null) || (args.length < 2)) throw new IllegalArgumentException("Usage: UILauncher page_location location_source");
-      final String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-          "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
-      //if (args.length > 2) adminConsole = false;
+      try {
+        final Class<?> clazz = Class.forName("com.jgoodies.looks.LookUtils");
+        clazz.getDeclaredMethod("setLoggingEnabled", boolean.class).invoke(null, false);
+      } catch (@SuppressWarnings("unused") final Throwable t) {
+      }
+      System.setProperty("Plastic.defaultTheme", "DesertBluer");
+      final String[] laf = { "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel",
+          "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
       final int n = 3;
       boolean success = false;
       final String s = System.getProperty("swing.defaultlaf");

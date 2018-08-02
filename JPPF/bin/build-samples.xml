@@ -146,10 +146,14 @@
     <get.maven.lib g="com.zaxxer"          a="HikariCP-java7"     v="2.4.11"               dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="log4j"               a="log4j"              v="1.2.15"               dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="net.jpountz.lz4"     a="lz4"                v="1.3.0"                dest="${samples-pack}/shared/lib"/>
-    <get.maven.lib g="com.jgoodies"        a="looks"              v="2.2.2"                dest="${samples-pack}/shared/lib"/>
+    <!--
+    <get.maven.lib g="com.jgoodies"        a="looks"              v="${looks.version}"     dest="${lib}/JGoodies"/>
+    -->
+    <get.maven.lib g="com.jgoodies"        a="jgoodies-looks"     v="${looks.version}"     dest="${lib}/JGoodies"/>
+    <get.maven.lib g="com.jgoodies"        a="jgoodies-common"    v="1.8.1"                dest="${lib}/JGoodies"/>
     <get.maven.lib g="com.miglayout"       a="miglayout-core"     v="${miglayout.version}" dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="com.miglayout"       a="miglayout-swing"    v="${miglayout.version}" dest="${samples-pack}/shared/lib"/>
-    <get.maven.lib g="com.fifesoft"        a="rsyntaxtextarea"    v="2.5.7"                dest="${samples-pack}/shared/lib"/>
+    <get.maven.lib g="com.fifesoft"        a="rsyntaxtextarea"    v="${rsta.version}"       dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="org.slf4j"           a="slf4j-api"          v="${slf4j.version}"     dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="org.slf4j"           a="slf4j-log4j12"      v="${slf4j.version}"     dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="commons-codec"       a="commons-codec"      v="1.3"                  dest="${samples-pack}/shared/lib"/>

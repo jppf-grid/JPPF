@@ -67,9 +67,13 @@
     <get.maven.lib g="org.apache.geronimo.specs" a="geronimo-j2ee-connector_1.5_spec" v="2.0.0" dest="${lib}/J2EE"/>
     <get.maven.lib g="jfree"                a="jcommon"            v="1.0.15"               dest="${lib}/JFreeChart"/>
     <get.maven.lib g="jfree"                a="jfreechart"         v="1.0.12"               dest="${lib}/JFreeChart"/>
-    <get.maven.lib g="com.jgoodies"         a="looks"              v="2.2.2"                dest="${lib}/JGoodies"/>
-    <get.maven.lib g="net.java.dev.jna"     a="jna"                v="4.5.1"                dest="${lib}/JNA"/>
-    <get.maven.lib g="net.java.dev.jna"     a="jna-platform"       v="4.5.1"                dest="${lib}/JNA"/>
+    <!--
+    <get.maven.lib g="com.jgoodies"         a="looks"              v="${looks.version}"     dest="${lib}/JGoodies"/>
+    -->
+    <get.maven.lib g="com.jgoodies"         a="jgoodies-looks"     v="${looks.version}"     dest="${lib}/JGoodies"/>
+    <get.maven.lib g="com.jgoodies"         a="jgoodies-common"    v="1.8.1"                dest="${lib}/JGoodies"/>
+    <get.maven.lib g="net.java.dev.jna"     a="jna"                v="${jna.version}"       dest="${lib}/JNA"/>
+    <get.maven.lib g="net.java.dev.jna"     a="jna-platform"       v="${jna.version}"       dest="${lib}/JNA"/>
     <get.maven.lib g="net.sourceforge.collections" a="collections-generic" v="4.01"         dest="${lib}/Jung"/>
     <get.maven.lib g="colt"                 a="colt"               v="1.2.0"                dest="${lib}/Jung"/>
     <get.maven.lib g="concurrent"           a="concurrent"         v="1.3.4"                dest="${lib}/Jung"/>
@@ -83,11 +87,11 @@
     <get.maven.lib g="org.apache.maven"     a="maven-ant-tasks"    v="2.1.3"                dest="${lib}/maven"/>
     <get.maven.lib g="com.miglayout"        a="miglayout-core"     v="${miglayout.version}" dest="${lib}/MigLayout"/>
     <get.maven.lib g="com.miglayout"        a="miglayout-swing"    v="${miglayout.version}" dest="${lib}/MigLayout"/>
-    <get.maven.lib g="com.github.oshi"      a="oshi-core"          v="3.5.0"                dest="${lib}/oshi"/>
+    <get.maven.lib g="com.github.oshi"      a="oshi-core"          v="${oshi.version}"      dest="${lib}/oshi"/>
     <get.maven.lib g="org.threeten"         a="threetenbp"         v="1.3.6"                dest="${lib}/oshi"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-api"          v="${slf4j.version}"     dest="${lib}/slf4j"/>
     <get.maven.lib g="org.slf4j"            a="slf4j-log4j12"      v="${slf4j.version}"     dest="${lib}/slf4j"/>
-    <get.maven.lib g="com.fifesoft"         a="rsyntaxtextarea"    v="2.5.7"                dest="${lib}/RSyntaxTextArea"/>
+    <get.maven.lib g="com.fifesoft"         a="rsyntaxtextarea"    v="${rsta.version}"      dest="${lib}/RSyntaxTextArea"/>
   </target>
 
 </project>

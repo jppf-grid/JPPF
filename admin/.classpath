@@ -15,9 +15,10 @@
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-graph-impl-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-visualization-2.0.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
-	<classpathentry kind="lib" path="/JPPF/lib/JGoodies/looks-2.2.2.jar"/>
-	<classpathentry kind="lib" path="/JPPF/lib/RSyntaxTextArea/rsyntaxtextarea-2.5.7.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/MigLayout/miglayout-core-4.2.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/MigLayout/miglayout-swing-4.2.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/JGoodies/jgoodies-common-1.8.1.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/JGoodies/jgoodies-looks-2.7.0.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/RSyntaxTextArea/rsyntaxtextarea-2.6.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
