@@ -4,10 +4,10 @@
   <name>JPPF @module@ API</name>
   <version>@version@</version>
   <description>JPPF, the open source grid computing solution</description>
-  <url>http://www.jppf.org</url>
+  <url>https://www.jppf.org</url>
   <issueManagement>
     <system>The Bug Genie</system>
-    <url>http://www.jppf.org/tracker/tbg</url>
+    <url>https://www.jppf.org/tracker/tbg</url>
   </issueManagement>
   <licenses>
     <license>

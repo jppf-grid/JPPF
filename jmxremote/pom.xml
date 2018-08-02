@@ -11,10 +11,10 @@
   <name>JPPF JMX Remote</name>
   <version>@version@</version>
   <description>A modification of the OpenDMK JMX remote implementation. Licensed under the Apache Software License v2.0 as permitted by the original CDDL license</description>
-  <url>http://www.jppf.org</url>
+  <url>https://www.jppf.org</url>
   <issueManagement>
     <system>The Bug Genie</system>
-    <url>http://www.jppf.org/tracker/tbg</url>
+    <url>https://www.jppf.org/tracker/tbg</url>
   </issueManagement>
   <licenses>
     <license>
