@@ -40,7 +40,7 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * When using this method, the local and remote locations are assumed to be the same.
    * @param name the the name of the element to add.
    * @param location the location of the element to add.
-   * @return this <code>ClassPath</code>.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath add(String name, Location<?> location);
 
@@ -50,27 +50,27 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * @param name the the name of the element to add.
    * @param localLocation the location of the element to add, in the client environment.
    * @param remoteLocation the location of the element to add, in the node environment.
-   * @return this <code>ClassPath</code>.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath add(String name, Location<?> localLocation, Location<?> remoteLocation);
 
   /**
    * Remove the specified element from this classpath.
    * @param element the classpath element to remove.
-   * @return this <code>ClassPath</code>.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath remove(ClassPathElement element);
 
   /**
    * Remove the specified element from this classpath.
    * @param name the name of the classpath element to remove.
-   * @return this <code>ClassPath</code>.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath remove(String name);
 
   /**
    * Empty this classpath (remove all classpath elements).
-   * @return this classpath.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath clear();
 
@@ -104,7 +104,7 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * Specify whether the node should force a reset of the class loader before executing the tasks.
    * <p>This only applies when this classpath is empty. If it is not empty, then the reset will occur regardless the value of the specified flag.
    * @param forceReset <code>true</code> if the class loader reset should be forced, <code>false</code> otherwise.
-   * @return this classpath, for method chaining.
+   * @return this {@code ClassPath}, for method call chaining.
    */
   ClassPath setForceClassLoaderReset(boolean forceReset);
 }
