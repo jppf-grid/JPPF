@@ -124,7 +124,7 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
       } catch(final ClassNotFoundException e) {
         final String msg = "HikariCP libraries are not in the classpath, no datasource will be defined";
         if (debugEnabled) log.debug(msg, e);
-        else log.warn(msg);
+        else log.info(msg);
         return;
       }
       hikariConfigConstructor = ReflectionHelper.findConstructor(hikariConfigClass, Properties.class);
