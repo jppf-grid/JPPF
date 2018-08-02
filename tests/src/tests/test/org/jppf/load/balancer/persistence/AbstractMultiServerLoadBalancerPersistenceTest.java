@@ -130,7 +130,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
     final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String[] algos = { "proportional", "autotuned", "rl2" };
-      for (String algo: algos) {
+      for (final String algo: algos) {
         for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(algo, lbi[i].getParameters());
         final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
         job.getClientSLA().setMaxChannels(2);
@@ -145,7 +145,8 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
           BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> algo = %-12s, list of algos for channel %s = %s", algo, channel, channelAlgos);
           assertNotNull(channelAlgos);
           assertTrue(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), channelAlgos.size() >= 1);
-          assertTrue(channelAlgos.contains(algo));
+          assertEquals(algo, channelAlgos.get(0));
+          //assertTrue(channelAlgos.contains(algo));
           mgt.deleteChannel(channel);
           assertTrue(RetryUtils.runWithRetryTimeout(5000L, 100L, new Callable<Boolean>() {
             @Override public Boolean call() throws Exception {
@@ -156,6 +157,11 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         }
         //if (channels.size() <= 3)
         mgt.deleteAlgorithm(algo);
+        ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+          @Override public boolean evaluateWithException() throws Exception {
+            return mgt.listAllChannelsWithAlgorithm(algo).isEmpty();
+          }
+        }, 5000L, 250L, false);
       }
       ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
         @Override public boolean evaluateWithException() throws Exception {
