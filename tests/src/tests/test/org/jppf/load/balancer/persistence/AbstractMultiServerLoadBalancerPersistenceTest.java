@@ -145,7 +145,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
           BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> algo = %-12s, list of algos for channel %s = %s", algo, channel, channelAlgos);
           assertNotNull(channelAlgos);
           assertTrue(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), channelAlgos.size() >= 1);
-          assertEquals(algo, channelAlgos.get(0));
+          assertTrue(channelAlgos.contains(algo));
           mgt.deleteChannel(channel);
           assertTrue(RetryUtils.runWithRetryTimeout(5000L, 100L, new Callable<Boolean>() {
             @Override public Boolean call() throws Exception {
