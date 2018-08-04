@@ -119,10 +119,14 @@ public class TestNodeRestart extends BaseTest {
     @Override
     public synchronized void handleNotification(final Notification notif, final Object handback) {
       state = notif.getType();
-      if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(notif.getType())) {
+      if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(state)) {
         connectedCount++;
+        print(false, false, ">>> received node connected notification, connectedCount=%d", connectedCount);
         notify();
-      } else disconnectedCount++;
+      } else {
+        disconnectedCount++;
+        print(false, false, ">>> received node disconnected notification, disconnectedCount=%d", disconnectedCount);
+      }
     }
 
     /**
