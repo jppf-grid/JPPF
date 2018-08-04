@@ -131,6 +131,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
           assertEquals(String.format("algo=%s, node=%s, nodeAlgos=%s", algo, node, nodeAlgos), 1, nodeAlgos.size());
           assertEquals(algo, nodeAlgos.get(0));
           mgt.deleteChannel(node);
+          /*
           assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
             @Override
             public boolean evaluateWithException() throws Exception {
@@ -138,6 +139,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
               return (nodeAlgos != null) && nodeAlgos.isEmpty();
             }
           }, 5000L, 250L, false));
+          */
         }
         mgt.deleteAlgorithm(algo);
       }
