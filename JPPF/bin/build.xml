@@ -202,7 +202,7 @@
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
+  <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
     description="deploy without building the javadoc nor the installer"/>
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
@@ -264,6 +264,7 @@
         <include name="docs/home/scripts/**/*.*"/>
         <exclude name="docs/home/db_settings.inc.php"/>
         <exclude name="**/*.zip"/>
+        <exclude name="lib/**/*.*"/>
       </zipfileset>
       <zipfileset dir="${jmxremote}" prefix="${zip.prefix}/jmxremote" excludes="**/*.zip,**/*.jar"/>
       <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
@@ -272,14 +273,14 @@
       <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
       <zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
       <zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
-      <zipfileset dir="${admin-web}" prefix="${zip.prefix}/admin-web" excludes="**/*.war"/>
+      <zipfileset dir="${admin-web}" prefix="${zip.prefix}/admin-web" excludes="**/*.war,lib/**/*.*"/>
       <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
-      <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client" excludes="lib/**/*.*"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
       <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log, csdoc/**/*.*"/>
       <zipfileset dir="${node-android}" prefix="${zip.prefix}/node-android" excludes="**/build/**/*.*"/>
-      <zipfileset dir="${samples-pack}" prefix="${zip.prefix}/samples-pack" excludes="**/*.zip,**/*.log"/>
-      <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
+      <zipfileset dir="${samples-pack}" prefix="${zip.prefix}/samples-pack" excludes="**/*.zip,**/*.log,shared/lib/**/*.*"/>
+      <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log,lib/**/*.*"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
         <exclude name="**/*.log"/>
         <exclude name="**/diagnostics.txt"/>
