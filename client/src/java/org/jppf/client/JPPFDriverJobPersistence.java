@@ -87,7 +87,7 @@ public class JPPFDriverJobPersistence {
   }
 
   /**
-   * Delete the persisted job with the sdpecified uuid. This method is equivalent to calling {@link #deleteJobs(JobSelector) deleteJobs(new JobUuidSelector(uuid))}.
+   * Delete the persisted job with the specified uuid. This method is equivalent to calling {@link #deleteJobs(JobSelector) deleteJobs(new JobUuidSelector(uuid))}.
    * @param uuid the UUID of the job to delete.
    * @return {@code true} if the job was successfully deleted, {@code false}.otherwise.
    * @throws Exception if any error occurs while communicating with the driver.
