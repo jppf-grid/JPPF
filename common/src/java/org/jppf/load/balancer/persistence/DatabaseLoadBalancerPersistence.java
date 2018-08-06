@@ -159,7 +159,7 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
       final int isolation  = connection.getTransactionIsolation();
       connection.setAutoCommit(false);
       try {
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         storeElement(connection, info, info.getStateAsBytes());
         connection.commit();
       } catch(final Exception e) {

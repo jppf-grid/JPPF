@@ -140,7 +140,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
       final int isolation  = connection.getTransactionIsolation();
       connection.setAutoCommit(false);
       try {
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         for (PersistenceInfo info: infos) storeElement(connection, info, null);
         connection.commit();
         if (debugEnabled) log.debug("commit done");

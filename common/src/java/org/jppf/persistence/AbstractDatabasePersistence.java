@@ -205,7 +205,7 @@ public abstract class AbstractDatabasePersistence<I> {
       final int isolation  = connection.getTransactionIsolation();
       try {
         connection.setAutoCommit(false);
-        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM " + tableName)) {
           try (ResultSet rs = ps.executeQuery()) {
             connection.commit();
