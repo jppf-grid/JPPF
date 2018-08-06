@@ -21,7 +21,7 @@ package org.jppf.utils.configuration;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -58,5 +58,20 @@ public class ConfigurationUtils {
       log.error("error listing the properties in class {}:\n{}", c, ExceptionUtils.getStackTrace(e));
     }
     return properties;
+  }
+
+  /**
+   * @param props the properties to clean up.
+   * @return a new {@link TypedProperties} object where passwords are replaced with a dummy string.
+   */
+  public static Properties hidePasswords(final Properties props) {
+    if (props == null) return null;
+    final Properties  result = new Properties();
+    final String[] keys = { "password", "pwd" };
+    for (final String name: props.stringPropertyNames()) {
+      if (StringUtils.hasOneOf(name, true, keys)) result.setProperty(name, "********");
+      else result.setProperty(name, props.getProperty(name));
+    }
+    return result;
   }
 }

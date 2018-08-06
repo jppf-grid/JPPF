@@ -29,6 +29,7 @@ import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationUtils;
 import org.slf4j.*;
 
 /**
@@ -233,7 +234,7 @@ public final class JPPFDatasourceFactory {
       }
     });
     final List<String> ids = getConfigIds(allDSProps, reqScope);
-    if (debugEnabled) log.debug("found datasource configuration ids with scope={}: {}", reqScope, ids);
+    if (debugEnabled) log.debug("datasource configuration ids with scope={}: {}", reqScope, ids);
     final Map<String, TypedProperties> result = new HashMap<>(ids.size());
     for (final String id: ids) {
       final String prefix = DS_PROP_PREFIX + id + ".";
@@ -290,7 +291,7 @@ public final class JPPFDatasourceFactory {
     final String dsName = props.getProperty(start + "name");
     if (dsName == null) return null;
     if (getDataSource(dsName) != null) {
-      log.warn(String.format("ignoring duplicate definition for datasource '%s' : %s", dsName, props));
+      log.warn("ignoring duplicate definition for datasource '{}' : {}", dsName, ConfigurationUtils.hidePasswords(props));
       return null;
     }
     if (info != null) {
@@ -306,8 +307,8 @@ public final class JPPFDatasourceFactory {
             }
           }
         } catch (final Exception e) {
-          log.error(String.format("failed to parse execution policy for datasource '%'%npolicy defintion: %s%npolicy text: %s%nException: %s",
-            dsName, policyDef, policyText, ExceptionUtils.getStackTrace(e)));
+          log.error("failed to parse execution policy for datasource '{}'\npolicy definition: {}\npolicy text: {}\nException: {}",
+            dsName, policyDef, policyText, ExceptionUtils.getStackTrace(e));
         }
       }
     }
@@ -319,7 +320,7 @@ public final class JPPFDatasourceFactory {
     synchronized(dsMap) {
       final DataSource ds = initializer.createDataSource(cleanProps, dsName);
       dsMap.put(dsName, ds);
-      if (debugEnabled) log.debug(String.format("defined datasource with configId=%s, name=%s, properties=%s", configId, dsName, cleanProps));
+      if (debugEnabled) log.debug("defined datasource with configId={}, name={}, properties={}", configId, dsName, ConfigurationUtils.hidePasswords(cleanProps));
       return new Pair<>(dsName, ds);
     }
   }

@@ -24,6 +24,7 @@ import java.util.*;
 import javax.sql.DataSource;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationUtils;
 import org.slf4j.*;
 
 /**
@@ -84,9 +85,9 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
         final TypedProperties cleanProps = props.filter(new TypedProperties.Filter() {
           @Override
           public boolean accepts(final String name, final String value) {
-            final boolean b = (name != null) && allowedProperties.contains(name);
+            final boolean b = (name != null) && (allowedProperties.contains(name) || name.startsWith("dataSource."));
             if (!b && log.isWarnEnabled() && !StringUtils.isOneOf(name, false, "scope", "name", "policy", "policy.text"))
-              log.warn(String.format("property '%s' not supported in definition of datasource with name=%s. Will be ignored", name, dsName));
+              log.warn("property '{}' not supported in definition of datasource with name={}. It will be ignored", name, dsName);
             return b;
           }
         });
@@ -95,7 +96,7 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
         if (debugEnabled) log.debug(String.format("defined datasource with name=%s, properties=%s", dsName, cleanProps));
         return ds;
       } catch (final Exception e) {
-        log.error(String.format("defined datasource with name=%s, properties=%s:%n%s", dsName, props, ExceptionUtils.getStackTrace(e)));
+        log.error("error defining datasource with name={}, properties={}:\n{}", dsName, ConfigurationUtils.hidePasswords(props), ExceptionUtils.getStackTrace(e));
       }
     }
     return null;
