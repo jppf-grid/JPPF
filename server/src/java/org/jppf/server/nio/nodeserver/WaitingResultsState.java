@@ -120,9 +120,9 @@ class WaitingResultsState extends NodeServerState {
         nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
         nodeBundle.resultsReceived(t);
       } else if (nodeBundle.getServerJob().isCancelled()) {
-        if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks for already cancelled bundle : " + received.bundle());
+        if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled bundle: {}", received.second().size(), received.bundle());
       } else {
-        if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
+        if (debugEnabled) log.debug("received bundle with {} tasks, taskCount={}: {}", received.second().size(), newBundle.getTaskCount(), received.bundle());
         if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
         if (!nodeBundle.isExpired()) {
           Set<Integer> resubmitSet = null;
