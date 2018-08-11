@@ -360,4 +360,10 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   AtomicBoolean getClosed() {
     return closed;
   }
+
+  @Override
+  public boolean setState(final ClientState state) {
+    if (debugEnabled) log.debug("changing state from {} to {} for {}", this.state, state, this);
+    return super.setState(state);
+  }
 }

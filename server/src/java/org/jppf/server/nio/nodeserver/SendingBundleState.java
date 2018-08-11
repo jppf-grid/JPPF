@@ -25,7 +25,7 @@ import java.net.ConnectException;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.ServerTaskBundleNode;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -68,7 +68,15 @@ class SendingBundleState extends NodeServerState {
     final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) {
       final ServerTaskBundleNode nodeBundle = context.getBundle();
-      final TaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
+      final ServerJob job = nodeBundle.getClientJob();
+      if (job.isCancelled()) {
+        if (!nodeBundle.isCancelled()) {
+          if (debugEnabled) log.debug("job was cancelled but not job dispatch: {}", nodeBundle);
+          job.cancelDispatch(nodeBundle);
+          return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+        }
+      }
+      final TaskBundle bundle = nodeBundle.getJob();
       if (bundle != null) {
         if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
         nodeBundle.setOffline(context.isOffline());

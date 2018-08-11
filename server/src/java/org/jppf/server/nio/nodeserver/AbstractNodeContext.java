@@ -367,7 +367,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         executionStatus = ExecutorStatus.DISABLED;
         break;
     }
-    if (debugEnabled) log.debug(String.format("changing state to %s, newStatus=%s, oldStatus=%s, node=%s", state, executionStatus, oldExecutionStatus, this));
+    if (debugEnabled) log.debug("changing state to {}, newStatus={}, oldStatus={}, node={}", state, executionStatus, oldExecutionStatus, this);
     fireExecutionStatusChanged(oldExecutionStatus, executionStatus);
     return b;
   }
@@ -435,7 +435,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   * @return a {@code true} when cancel was successful {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
   boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
@@ -474,9 +474,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
-   * Set the <code>Runnable</code> that will be called when node context is closed.
-   * <code>Runnable</code> called when node context is closed.
-   * @param onClose a <code>Runnable</code> called when node context is closed or <code>null</code>.
+   * Set the {@code Runnable} that will be called when node context is closed.
+   * @param onClose a {@code Runnable} called when node context is closed or {@code null}.
    */
   public void setOnClose(final Runnable onClose) {
     this.onClose = onClose;

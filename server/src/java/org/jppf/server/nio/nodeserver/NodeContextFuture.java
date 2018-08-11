@@ -60,8 +60,8 @@ class NodeContextFuture extends FutureTask<Object> {
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("cancelling " + context + ", isCancelled()=" + isCancelled());
-    if (isDone()) return false;
     if (isCancelled()) return true;
+    if (isDone()) return false;
     if (context.bundle == null) return false;
     try {
       context.bundle.cancel();

@@ -112,15 +112,21 @@ class WaitingResultsState extends NodeServerState {
     final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     Bundler<?> bundler = context.getBundler();
     final ServerTaskBundleNode nodeBundle = context.getBundle();
-    final Lock lock = nodeBundle.getClientJob().getLock();
+    final ServerJob job = nodeBundle.getClientJob();
+    final Lock lock = job.getLock();
     lock.lock();
     try {
       if (t != null) {
         if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
         nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
         nodeBundle.resultsReceived(t);
-      } else if (nodeBundle.getServerJob().isCancelled()) {
-        if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled bundle: {}", received.second().size(), received.bundle());
+      //} else if (job.isCancelled() && nodeBundle.isCancelled()) {
+      } else if (job.isCancelled()) {
+        if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled job: {}", received.second().size(), received.bundle());
+        if (!nodeBundle.isCancelled()) {
+          if (debugEnabled) log.debug("node bundle was not cancelled: {}", nodeBundle);
+          job.cancelDispatch(nodeBundle);
+        }
       } else {
         if (debugEnabled) log.debug("received bundle with {} tasks, taskCount={}: {}", received.second().size(), newBundle.getTaskCount(), received.bundle());
         if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);

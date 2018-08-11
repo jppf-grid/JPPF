@@ -107,7 +107,25 @@ public class BaseTestHelper {
    * @throws Exception if any error occurs.
    */
   public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
-    final JPPFJob job = new JPPFJob();
+    return createJob(name, null, blocking, broadcast, nbTasks, taskClass, params);
+  }
+
+  /**
+   * Create a job with the specified parameters.
+   * The type of the tasks is specified via their class, and the constructor to
+   * use is specified based on the number of parameters.
+   * @param name the job's name.
+   * @param uuid the job uuid.
+   * @param blocking specifies whether the job is blocking.
+   * @param broadcast specifies whether the job is a broadcast job.
+   * @param nbTasks the number of tasks to add to the job.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param params the parameters for the tasks constructor.
+   * @return a <code>JPPFJob</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFJob createJob(final String name, final String uuid, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
+    final JPPFJob job = new JPPFJob(uuid);
     job.setName(name);
     final int nbArgs = (params == null) ? 0 : params.length;
     final Constructor<?> constructor = findConstructor(taskClass, nbArgs);

@@ -21,6 +21,7 @@ package org.jppf.nio;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.JPPFSnapshot;
 import org.slf4j.*;
 
@@ -34,6 +35,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The current state of the channel this context is associated with.
    */
@@ -102,6 +107,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 
   @Override
   public boolean setState(final S state) {
+    if (debugEnabled) log.debug("changing state from {} to {} for {}", this.state, state, this);
     this.state = state;
     return true;
   }

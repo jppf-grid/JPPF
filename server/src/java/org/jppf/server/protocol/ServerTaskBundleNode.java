@@ -261,8 +261,7 @@ public class ServerTaskBundleNode {
    */
   public synchronized void cancel() {
     this.cancelled = true;
-    for (ServerTask task: taskList)
-      task.cancel();
+    for (ServerTask task: taskList) task.cancel();
   }
 
   /**

@@ -74,7 +74,7 @@ class ClassLoaderRegistrationHandler implements AutoCloseable {
    * Register class loader with this submission manager.
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
-   * @return theresgistered class loader.
+   * @return the registered class loader.
    */
   ClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
     if (cl == null) throw new IllegalArgumentException("cl is null");

@@ -209,7 +209,7 @@ public class ServerJob extends AbstractServerJobBase {
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
-      } else {
+      } else if (bundle != null) {
         final List<ServerTask> taskList = new ArrayList<>();
         for (final ServerTask task : bundle.getTaskList()) {
           if (task.getState() == TaskState.RESUBMIT) task.setState(TaskState.PENDING);
@@ -240,17 +240,22 @@ public class ServerJob extends AbstractServerJobBase {
       map = new HashMap<>(dispatchSet);
     }
     if (debugEnabled) log.debug("cancelling {} dispatches for {}", map.size(), this);
-    for (final Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
-      try {
-        final ServerTaskBundleNode nodeBundle = entry.getValue();
-        final Future<?> future = nodeBundle.getFuture();
-        if (!future.isDone()) {
-          future.cancel(false);
-          nodeBundle.resultsReceived((List<DataLocation>) null);
-        }
-      } catch (final Exception e) {
-        log.error("Error cancelling job " + this, e);
+    for (final Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) cancelDispatch(entry.getValue());
+  }
+
+  /**
+   * Cancel the specified job dispatch.
+   * @param nodeBundle the dispatch to cancel.
+   */
+  public void cancelDispatch(final ServerTaskBundleNode nodeBundle) {
+    try {
+      final Future<?> future = nodeBundle.getFuture();
+      if (!future.isDone()) {
+        future.cancel(false);
+        nodeBundle.resultsReceived((List<DataLocation>) null);
       }
+    } catch (final Exception e) {
+      log.error("Error cancelling job " + this, e);
     }
   }
 
@@ -266,9 +271,7 @@ public class ServerJob extends AbstractServerJobBase {
         clientMap.putValue(task.getBundle(), task);
       }
     }
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: clientMap.entrySet()) {
-      entry.getKey().resultReceived(entry.getValue());
-    }
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: clientMap.entrySet()) entry.getKey().resultReceived(entry.getValue());
   }
 
   /**
@@ -278,6 +281,7 @@ public class ServerJob extends AbstractServerJobBase {
    */
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel {}", this);
+    boolean result = false;
     lock.lock();
     try {
       if (setCancelled(mayInterruptIfRunning)) {
@@ -286,12 +290,13 @@ public class ServerJob extends AbstractServerJobBase {
         setSubmissionStatus(SubmissionStatus.COMPLETE);
         //taskCompleted(null, null);
         JPPFDriver.getInstance().getNodeNioServer().getNodeReservationHandler().onJobCancelled(this);
-        return true;
+        result = true;
       }
-      else return false;
     } finally {
       lock.unlock();
     }
+    if (result) setSubmissionStatus(SubmissionStatus.ENDED);
+    return result;
   }
 
   /**

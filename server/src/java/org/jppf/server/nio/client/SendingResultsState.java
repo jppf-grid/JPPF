@@ -24,7 +24,7 @@ import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.protocol.ServerTaskBundleClient;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -69,10 +69,16 @@ class SendingResultsState extends ClientServerState {
       context.setBundle(clientBundle);
       context.serializeBundle();
     }
+    if (context.getNbTasksToSend() <= 0) {
+      if (debugEnabled) log.debug("*** NbTasksToSend = {} for {}", context.getNbTasksToSend(), clientBundle);
+      context.setInitialBundleWrapper(null);
+      context.setClientMessage(null);
+      return TO_WAITING_JOB;
+    }
     if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("*** sent entire bundle {} to {}", clientBundle, context);
       context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
-      if (debugEnabled) log.debug("*** NbTasksToSend={}, sent tasks count={}, CompletedBundlesEmpty={}", new Object[] {context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty()});
+      if (debugEnabled) log.debug("*** NbTasksToSend={}, sent tasks count={}, CompletedBundlesEmpty={}", context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty());
       context.setBundle(null);
       context.setClientMessage(null);
       if (context.isCompletedBundlesEmpty()) {

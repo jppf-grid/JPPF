@@ -29,7 +29,7 @@ import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.junit.*;
+import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -148,21 +148,21 @@ public class TestJPPFJob extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @SuppressWarnings("deprecation")
-  @Ignore
   @Test(timeout=15000)
   public void testCancelImmediately() throws Exception {
-    final String name  = ReflectionUtils.getCurrentClassAndMethod();
+    ///final String name  = ReflectionUtils.getCurrentMethodName();
+    final String name  = "tci";
     final int nbTasks = 1;
     final int nbJobs = 10;
-    try (final JPPFClient client = BaseSetup.createClient(null, true)) {
+    try (final JPPFClient client = BaseSetup.createClient("c1", true)) {
       int totalCancelCount = 0;
       for (int i=1; i<=nbJobs; i++) {
         print(false, false, ">>> test iteration %d", i);
-        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, false, false, nbTasks, LifeCycleTask.class, 1000L);
+        final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, "tci-" + i, false, false, nbTasks, LifeCycleTask.class, 1000L);
         client.submitJob(job);
         Thread.sleep(1L);
-        final boolean cancelled = job.cancel(true);
         print(false, false, ">>> cancelling job %d", i);
+        final boolean cancelled = job.cancel(true);
         assertTrue(cancelled);
         print(false, false, ">>> awaiting results for job %d", i);
         final List<Task<?>> results = job.awaitResults();
