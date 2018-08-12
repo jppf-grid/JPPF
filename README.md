@@ -44,7 +44,7 @@ This is the home for the JPPF source code. Other services can be found at the fo
 
 ***Steps***
 
-* clone the repository: `git clone git@github.com:lolocohen/JPPF.git`
+* clone the repository:<br> `git clone git@github.com:jppf-grid/JPPF.git` or `git clone https://github.com/jppf-grid/JPPF.git`
 * from the repository root: `ant build`
 * to run the tests: `ant test`
 * the test results are available in `<repo_root>/tests/report`, the logs are in `<repo_root>/tests/logs` (1 set of logs per test class)
