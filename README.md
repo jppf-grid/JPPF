@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lolocohen/JPPF.svg?branch=master)](https://travis-ci.org/lolocohen/JPPF)
+[![Build Status](https://travis-ci.org/jppf-grid/JPPF.svg?branch=master)](https://travis-ci.org/jppf-grid/JPPF)
 &nbsp;[![Maven central](https://maven-badges.herokuapp.com/maven-central/org.jppf/jppf-common/badge.svg)](http://search.maven.org/#search|ga|1|org.jppf)
 [![Apache License 2.0](http://img.shields.io/badge/license-Apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Project Stats](https://www.openhub.net/p/jppf-project/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jppf-project?ref=github)
