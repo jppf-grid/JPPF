@@ -9,13 +9,13 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
 **Direct download**: from the [nightly build](https://sourceforge.net/projects/jppf-project/files/jppf-project/nightly/), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
 
-**Maven**: currently in the Sonatype snapshots repository at https://oss.sonatype.org/content/repositories/snapshots:
+**Maven**: currently in Maven Central repository at http://repo.maven.apache.org/maven2/org/jppf:
 
 ~~~xml
 <dependency>
   <groupId>org.jppf</groupId>
   <artifactId>jppf-jmxremote-nio</artifactId>
-  <version>6.0-alpha-4-SNAPSHOT</version>
+  <version>6.0-beta</version>
 </dependency>
 ~~~
 
