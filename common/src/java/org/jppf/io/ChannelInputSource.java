@@ -75,7 +75,8 @@ public class ChannelInputSource implements InputSource {
       final int remaining = data.remaining();
       int count = 0;
       while (count < remaining) {
-        if (data.remaining() < tmpBuffer.remaining()) tmpBuffer.limit(data.remaining());
+        final int dataRemaining = (count == 0) ? remaining: data.remaining();
+        if (dataRemaining < tmpBuffer.remaining()) tmpBuffer.limit(dataRemaining);
         final int n = channel.read(tmpBuffer);
         if (n < 0) throw new EOFException();
         else if (n == 0) break;

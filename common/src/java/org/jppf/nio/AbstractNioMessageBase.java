@@ -43,6 +43,10 @@ public abstract class AbstractNioMessageBase implements NioMessage {
    */
   protected NioObject currentLengthObject;
   /**
+   * 
+   */
+  protected boolean resetCurrentLength = true;
+  /**
    * Object storing the object currently being read or written.
    */
   protected NioObject currentObject;

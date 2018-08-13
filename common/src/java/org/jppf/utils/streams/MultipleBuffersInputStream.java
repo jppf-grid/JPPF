@@ -19,9 +19,8 @@
 package org.jppf.utils.streams;
 
 import java.io.*;
-import java.util.List;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
 /**
@@ -41,7 +40,7 @@ public class MultipleBuffersInputStream extends InputStream {
   /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */
-  private final List<JPPFBuffer> list;
+  private final JPPFBuffer[] list;
   /**
    * The JPPFBuffer currently being read from.
    */
@@ -59,7 +58,7 @@ public class MultipleBuffersInputStream extends InputStream {
    * Initialize this input stream with the specified buffers.
    * @param buffers an array of {@link JPPFBuffer} instances.
    */
-  public MultipleBuffersInputStream(final List<JPPFBuffer> buffers) {
+  public MultipleBuffersInputStream(final JPPFBuffer[] buffers) {
     list = buffers;
   }
 
@@ -118,11 +117,11 @@ public class MultipleBuffersInputStream extends InputStream {
    */
   private void nextBuffer() {
     bufferIndex++;
-    if (bufferIndex >= list.size()) {
+    if (bufferIndex >= list.length) {
       eofReached = true;
       currentBuffer = null;
     } else {
-      currentBuffer = list.get(bufferIndex);
+      currentBuffer = list[bufferIndex];
       currentBuffer.pos = 0;
     }
   }
@@ -131,7 +130,7 @@ public class MultipleBuffersInputStream extends InputStream {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    sb.append(", nbBuffers=").append(list.size());
+    sb.append(", nbBuffers=").append(list.length);
     sb.append(", bufferIndex=").append(bufferIndex);
     if (currentBuffer == null) sb.append(", currentBuffer=null");
     else {

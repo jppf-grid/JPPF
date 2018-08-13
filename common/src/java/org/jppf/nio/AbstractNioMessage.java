@@ -119,9 +119,11 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
    * @throws Exception if an IO error occurs.
    */
   protected boolean readNextObject() throws Exception {
-    if (currentLengthObject == null) {
+    if (resetCurrentLength) {
+      resetCurrentLength = false;
       lengthBuf.reset();
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
+      if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
+      else currentLengthObject.reset();
     }
     if (currentLength < 0) {
       try {
@@ -136,7 +138,7 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
       }
       count += 4;
     }
-    if (currentLength > 0) {
+    //if (currentLength > 0) {
       if (currentObject == null) {
         final DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
         currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
@@ -147,13 +149,13 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
         updateCounts(currentObject.getChannelCount(), READ);
         throw e;
       }
-    }
+    //}
     count += currentLength;
     if (currentObject != null) updateCounts(currentObject.getChannelCount(), READ);
     locations.add(currentObject == null ? null : currentObject.getData());
-    currentLengthObject = null;
     currentObject = null;
     currentLength = -1;
+    resetCurrentLength = true;
     if (debug) log.debug("channel id={} read object at position {}", channel.getChannel().getId(), position);
     position++;
     return true;
@@ -165,10 +167,12 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
    * @throws Exception if an IO error occurs.
    */
   protected boolean writeNextObject() throws Exception {
-    if (currentLengthObject == null) {
+    if (resetCurrentLength) {
+      resetCurrentLength = false;
       currentDataLocation = locations.get(position);
       SerializationUtils.writeInt(currentDataLocation.getSize(), lengthBuf.reset().getBuffer(0).buffer, 0);
-      currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
+      if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(lengthBuf, sslHandler) : new PlainNioObject(channel.getSocketChannel(), lengthBuf);
+      else currentLengthObject.reset();
     }
     if (currentLength < 0) {
       try {
@@ -181,7 +185,7 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
       count += 4;
       updateCounts(currentLengthObject.getChannelCount(), WRITE);
     }
-    if (currentLength > 0) {
+    //if (currentLength > 0) {
       if (currentObject == null) {
         final DataLocation loc = currentDataLocation.copy();
         currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel.getSocketChannel(), loc);
@@ -192,14 +196,14 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
         updateCounts(currentObject.getChannelCount(), WRITE);
         throw e;
       }
-    }
+    //}
     count += currentLength;
     if (currentObject != null) updateCounts(currentObject.getChannelCount(), WRITE);
     if (debug) log.debug("channel id={} wrote object at position {}", channel.getChannel().getId(), position);
     position++;
-    currentLengthObject = null;
     currentObject = null;
     currentLength = -1;
+    resetCurrentLength = true;
     currentDataLocation = null;
     return true;
   }

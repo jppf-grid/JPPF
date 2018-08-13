@@ -157,4 +157,12 @@ public class SSLNioObject extends AbstractNioObject {
     channelCount = count;
     return b;
   }
+
+  @Override
+  public NioObject reset() {
+    is = null;
+    os = null;
+    statefulCount = 0;
+    return super.reset();
+  }
 }

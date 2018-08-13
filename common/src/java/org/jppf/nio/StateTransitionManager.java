@@ -155,6 +155,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   @SuppressWarnings("unchecked")
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) throws Exception {
     if (traceEnabled) log.trace("transition {} for channel {}", transition, channel);
+    final NioTransition<S> t = factory.getTransition(transition);
+    final S s2 = t.getState();
     lock.lock();
     try {
       server.wakeUpSelectorIfNeeded();
@@ -162,16 +164,18 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
         channel.setInterestOps(0);
         final NioContext<S> context = (NioContext<S>) channel.getContext();
         final S s1 = context.getState();
-        final NioTransition<S> t = factory.getTransition(transition);
-        final S s2 = t.getState();
-        if (s1 != null) if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
-        else if (traceEnabled) log.trace(getTransitionMessage(s1, s2, t, channel, submit));
-        if (context.setState(s2)) if (!submit) {
-          channel.setInterestOps(t.getInterestOps());
-          if (traceEnabled) log.trace("set interestOps={} for channel id={}", t.getInterestOps(), channel.getId());
-        } else {
-          submitTransition(channel);
-          if (traceEnabled) log.trace("submitted transition={} for channel id={}", t, channel.getId());
+        if (s1 != null) {
+          if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
+          else if (traceEnabled) log.trace("transition" + getTransitionMessage(s1, s2, t, channel, submit));
+        }
+        if (context.setState(s2)) {
+          if (!submit) {
+            channel.setInterestOps(t.getInterestOps());
+            if (traceEnabled) log.trace("set interestOps={} for channel id={}", t.getInterestOps(), channel.getId());
+          } else {
+            submitTransition(channel);
+            if (traceEnabled) log.trace("submitted transition={} for channel id={}", t, channel.getId());
+          }
         }
       }
     } catch (final Exception e) {

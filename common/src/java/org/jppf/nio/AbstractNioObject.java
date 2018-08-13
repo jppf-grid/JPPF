@@ -67,4 +67,11 @@ public abstract class AbstractNioObject implements NioObject {
   public long getChannelCount() {
     return channelCount;
   }
+
+  @Override
+  public NioObject reset() {
+    count = 0;
+    channelCount = 0;
+    return this;
+  }
 }

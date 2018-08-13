@@ -88,6 +88,10 @@ public final class SystemUtils {
    * The runtime for the current JVM.
    */
   private static final Runtime RUNTIME = Runtime.getRuntime();
+  /**
+   * The maximum heap memory the JVM will attempt yo use.
+   */
+  private static final long MAX_MEMORY = RUNTIME.maxMemory();
 
   /**
    * Instantiation of this class is not permitted.
@@ -268,7 +272,7 @@ public final class SystemUtils {
    * @return the maximum number of free bytes in the heap.
    */
   public static long maxFreeHeap() {
-    return RUNTIME.maxMemory() - (RUNTIME.totalMemory() - RUNTIME.freeMemory());
+    return MAX_MEMORY - (RUNTIME.totalMemory() - RUNTIME.freeMemory());
   }
 
   /**
@@ -284,7 +288,7 @@ public final class SystemUtils {
    * @return the percentage of heap memory used.
    */
   public static double heapUsagePct() {
-    return 100d * (RUNTIME.totalMemory() - RUNTIME.freeMemory()) / RUNTIME.maxMemory();
+    return 100d * (RUNTIME.totalMemory() - RUNTIME.freeMemory()) / MAX_MEMORY;
   }
 
   /**
@@ -439,16 +443,14 @@ public final class SystemUtils {
    * @return the currently used heap memory.
    */
   public static long getUsedMemory() {
-    final Runtime rt = Runtime.getRuntime();
-    return rt.totalMemory() - rt.freeMemory();
+    return RUNTIME.totalMemory() - RUNTIME.freeMemory();
   }
 
   /**
    * @return the currently used heap memory.
    */
   public static double getPctUsedMemory() {
-    final Runtime rt = Runtime.getRuntime();
-    return (double) (rt.totalMemory() - rt.freeMemory()) / (double) rt.maxMemory();
+    return (double) (RUNTIME.totalMemory() - RUNTIME.freeMemory()) / (double) MAX_MEMORY;
   }
 
   /**

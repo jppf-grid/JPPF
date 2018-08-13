@@ -135,7 +135,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
     print(false, false, "waiting for no more jobs in store");
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS, 250, false));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
 
@@ -170,7 +170,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
     assertEquals(JobStatus.COMPLETE, job2.getStatus());
     assertTrue(mgr.deleteJob(job.getUuid()));
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS, 250, false));
   }
 
   /**
@@ -195,7 +195,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     print(false, false, "got jmx connection");
     final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
+    assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS, 250, false));
     assertFalse(mgr.deleteJob(job.getUuid()));
   }
 
@@ -350,7 +350,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       assertEquals(JobStatus.COMPLETE, job2.getStatus());
       assertTrue(mgr.deleteJob(job.getUuid()));
       print(true, false, "checking no more jobs in store");
-      assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS));
+      assertTrue(ConcurrentUtils.awaitCondition(new EmptyPersistedUuids(mgr), WAIT_TIME_EMPTY_UUIDS, 250, false));
     } finally {
       if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
       if (pool != null) {

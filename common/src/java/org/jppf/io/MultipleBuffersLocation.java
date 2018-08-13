@@ -41,7 +41,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   /**
    * The list of buffers that contain the data.
    */
-  private final List<JPPFBuffer> list;
+  private final JPPFBuffer[] list;
   /**
    * The current count of bytes read from/written to the underlying file.
    */
@@ -54,14 +54,17 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * Index of the current buffer.
    */
   private int currentBufferIndex;
+  /**
+   * Current buffer being read.
+   */
+  private final JPPFBuffer firstBuffer;
 
   /**
    * Initialize this location with the specified size.
    * @param size the total size of the data.
    */
   public MultipleBuffersLocation(final int size) {
-    list = new ArrayList<>();
-    list.add(new JPPFBuffer(new byte[size], size));
+    list = new JPPFBuffer[] { firstBuffer = new JPPFBuffer(new byte[size], size) };
     this.size = size;
   }
 
@@ -71,7 +74,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @param size the total size of the data.
    */
   public MultipleBuffersLocation(final List<JPPFBuffer> list, final int size) {
-    this.list = list;
+    this.list = list.toArray(new JPPFBuffer[list.size()]);
+    firstBuffer = this.list[0];
     this.size = size;
   }
 
@@ -81,7 +85,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @param buffers the list of buffers that contain the data.
    */
   public MultipleBuffersLocation(final List<JPPFBuffer> buffers) {
-    this.list = buffers;
+    this.list = buffers.toArray(new JPPFBuffer[buffers.size()]);
+    firstBuffer = this.list[0];
     this.size = 0;
     for (JPPFBuffer buf : buffers) this.size += buf.length;
   }
@@ -91,12 +96,21 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @param buffers the buffers that contain the data.
    */
   public MultipleBuffersLocation(final JPPFBuffer... buffers) {
-    this.list = new ArrayList<>(buffers.length);
+    this.list = buffers;
     this.size = 0;
-    for (JPPFBuffer buf : buffers) {
-      this.list.add(buf);
-      this.size += buf.length;
-    }
+    firstBuffer = buffers[0];
+    for (JPPFBuffer buf : buffers) this.size += buf.length;
+  }
+
+  /**
+   * Initialize this location from an array of buffers.
+   * @param size the data total size.
+   * @param buffers the buffers that contain the data.
+   */
+  public MultipleBuffersLocation(final int size, final JPPFBuffer... buffers) {
+    this.list = buffers;
+    this.size = size;
+    firstBuffer = buffers[0];
   }
 
   /**
@@ -104,11 +118,13 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @param buffers the buffers that contain the data.
    */
   public MultipleBuffersLocation(final byte[]... buffers) {
-    this.list = new ArrayList<>(buffers.length);
-    this.size = 0;
-    for (byte[] buf : buffers) {
-      this.list.add(new JPPFBuffer(buf));
-      this.size += buf.length;
+    this.list = new JPPFBuffer[buffers.length];
+    this.list[0] = (firstBuffer =  new JPPFBuffer(buffers[0]));
+    this.size = firstBuffer.length;
+    for (int i=1; i<buffers.length; i++) {
+      final JPPFBuffer jppfBuffer = new JPPFBuffer(buffers[i]);
+      this.list[i] = jppfBuffer;
+      this.size += jppfBuffer.length;
     }
   }
 
@@ -116,15 +132,9 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
   public int transferFrom(final InputSource source, final boolean blocking) throws Exception {
     if (!transferring) {
       transferring = true;
-      currentBuffer = list.get(0);
+      currentBuffer = firstBuffer;
       currentBufferIndex = 0;
       currentBuffer.pos = 0;
-      /*
-      if (!blocking && (list.size() > 1)) {
-        list.clear();
-        list.add(currentBuffer);
-      }
-      */
       count = 0;
     }
     try {
@@ -144,12 +154,9 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @throws Exception if an IO error occurs.
    */
   private int blockingTransferFrom(final InputSource source) throws Exception {
-    //if (traceEnabled) log.trace("blocking transfer: size=" + size);
     while (count < size) {
       final int remaining = size - count;
       final int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
-      //if (traceEnabled) log.trace("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
-      //	", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
       if (n < 0) throw new EOFException();
       if (n < remaining) currentBuffer.pos += n;
       count += n;
@@ -166,7 +173,6 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    */
   private int nonBlockingTransferFrom(final InputSource source) throws Exception {
     final int remaining = size - count;
-    //if (traceEnabled) log.trace("blocking transfer: size="+size+", remaining="+remaining);
     final int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
     if (n > 0) {
       count += n;
@@ -181,7 +187,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
     if (!transferring) {
       transferring = true;
       if (!blocking) {
-        currentBuffer = list.get(0);
+        currentBuffer = firstBuffer;
         currentBuffer.pos = 0;
         currentBufferIndex = 0;
       }
@@ -237,15 +243,15 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
         log.error(e.getMessage(), e);
       }
     }
-    if (traceEnabled) log.trace(String.format("count/size=%d/%d, n/remaining=%d/%d, currentBufferIndex/listSize=%d/%d, pos=%d (%s)",
-      count, size, n, remaining, currentBufferIndex, list.size(), currentBuffer.pos, this));
+    if (traceEnabled) log.trace("count/size={}/{}, n/remaining={}/{}, currentBufferIndex/listSize={}/{}, pos={} ({})",
+      count, size, n, remaining, currentBufferIndex, list.length, currentBuffer.pos, this);
     if (n > 0) {
       count += n;
       if (n < remaining) currentBuffer.pos += n;
       else {
-        if (currentBufferIndex < list.size() - 1) {
+        if (currentBufferIndex < list.length - 1) {
           currentBufferIndex++;
-          currentBuffer = list.get(currentBufferIndex);
+          currentBuffer = list[currentBufferIndex];
           currentBuffer.pos = 0;
         } else {
           currentBuffer = null;
@@ -262,30 +268,22 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
 
   @Override
   public OutputStream getOutputStream() throws Exception {
-    return new MultipleBuffersOutputStream(list);
+    return new MultipleBuffersOutputStream(Arrays.asList(list));
   }
 
   @Override
   public DataLocation copy() {
-    return new MultipleBuffersLocation(copyList(), size);
+    return new MultipleBuffersLocation(size, copyList());
   }
 
   /**
    * Make a shallow copy of the list of buffers. The internal byte[] are not copied, they are merely referenced.
    * @return a list of {@link JPPFBuffer} instances.
    */
-  private List<JPPFBuffer> copyList() {
-    final List<JPPFBuffer> copy = new ArrayList<>(list.size());
-    for (JPPFBuffer buf : list) copy.add(new JPPFBuffer(buf.buffer, buf.length));
+  private JPPFBuffer[] copyList() {
+    final JPPFBuffer[] copy = new JPPFBuffer[list.length];
+    System.arraycopy(list, 0, copy, 0, list.length);
     return copy;
-  }
-
-  /**
-   * Get the list of buffers that contain the data.
-   * @return a list of {@link JPPFBuffer} instances.
-   */
-  public List<JPPFBuffer> getBufferList() {
-    return list;
   }
 
   /**
@@ -294,7 +292,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    * @return a list of {@link JPPFBuffer} instances.
    */
   public JPPFBuffer getBuffer(final int n) {
-    return list.get(n);
+    return (n == 0) ? firstBuffer : list[n];
   }
 
   /**
@@ -305,6 +303,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
     count = 0;
     currentBuffer = null;
     currentBufferIndex = 0;
+    transferring = false;
     return this;
   }
 

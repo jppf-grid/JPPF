@@ -128,4 +128,11 @@ public class PlainNioObject extends AbstractNioObject {
     sb.append("]");
     return sb.toString();
   }
+
+  @Override
+  public NioObject reset() {
+    source = null;
+    dest = null;
+    return super.reset();
+  }
 }

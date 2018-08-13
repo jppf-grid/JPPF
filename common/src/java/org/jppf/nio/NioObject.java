@@ -28,8 +28,7 @@ import org.jppf.io.DataLocation;
  * should keep state information between calls. 
  * @author Laurent Cohen
  */
-public interface NioObject
-{
+public interface NioObject {
   /**
    * Attempt to read an object from an inbound channel.
    * @return <code>true</code> if an object was fully read, <code>false</code> otherwise.
@@ -61,4 +60,10 @@ public interface NioObject
    * @return the number of bytes as a long value.
    */
   long getChannelCount();
+
+  /**
+   * Reset this object.
+   * @return an Object of the same class.
+   */
+  NioObject reset();
 }
