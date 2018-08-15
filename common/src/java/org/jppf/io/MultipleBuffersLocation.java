@@ -282,7 +282,11 @@ public class MultipleBuffersLocation extends AbstractDataLocation {
    */
   private JPPFBuffer[] copyList() {
     final JPPFBuffer[] copy = new JPPFBuffer[list.length];
-    System.arraycopy(list, 0, copy, 0, list.length);
+    //System.arraycopy(list, 0, copy, 0, list.length);
+    for (int i=0; i<list.length; i++) {
+      final JPPFBuffer buf = list[i];
+      copy[i] = new JPPFBuffer(buf.buffer, buf.length);
+    }
     return copy;
   }
 
