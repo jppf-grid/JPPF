@@ -29,16 +29,30 @@ public class DefaultJavaSerialization implements JPPFSerialization {
     new ObjectOutputStream(os).writeObject(o);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    final ObjectInputStream ois = new ObjectInputStream(is) {
-      @Override
-      protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) return super.resolveClass(desc);
-        return Class.forName(desc.getName(), false, cl);
-      }
-    };
-    return ois.readObject();
+    return new InternalObjectInputStream(is).readObject();
+  }
+
+  /**
+   * An {@link ObjectInputSteam} which overrides the class resolution.
+   */
+  private static final class InternalObjectInputStream extends ObjectInputStream {
+    /**
+     * Initialize with the specified input stream.
+     * @param is the stream from which to deserialize.
+     * @throws IOException if any error occurs.
+     */
+    private InternalObjectInputStream(final InputStream is) throws IOException {
+      super(is);
+    }
+
+    @Override
+    protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) return super.resolveClass(desc);
+      return Class.forName(desc.getName(), false, cl);
+    }
   }
 }

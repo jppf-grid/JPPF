@@ -19,6 +19,7 @@
 package org.jppf.client.utils;
 
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
@@ -56,6 +57,14 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    * A counter for the total number of submitted tasks.
    */
   private int taskCount = 0;
+  /**
+   * Synchronize access to this job stream.
+   */
+  private final Lock lock = new ReentrantLock();
+  /**
+   * Used to wait for number of concurrent jobs to be less than the concurrentcy limit.
+   */
+  private final Condition concurrencyLimitCondition = lock.newCondition();
 
   /**
    * Initialize this job provider.
@@ -81,16 +90,21 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    * @throws NoSuchElementException if this stream has no more job to provide.
    */
   @Override
-  public synchronized JPPFJob next() throws NoSuchElementException {
-    if (!hasNext()) throw new NoSuchElementException();
-    while (currentNbJobs >= concurrencyLimit) {
-      try {
-        wait();
-      } catch (final InterruptedException e) {
-        e.printStackTrace();
+  public JPPFJob next() throws NoSuchElementException {
+    lock.lock();
+    try {
+      if (!hasNext()) throw new NoSuchElementException();
+      while (currentNbJobs >= concurrencyLimit) {
+        try {
+          concurrencyLimitCondition.await();
+        } catch (final InterruptedException e) {
+          e.printStackTrace();
+        }
       }
+      return buildJob();
+    } finally {
+      lock.unlock();
     }
-    return buildJob();
   }
 
   /**
@@ -135,11 +149,13 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    */
   @Override
   public void jobEnded(final JobEvent event) {
-    synchronized(this) {
-      // decrease the counter of running jobs and notify all threads waiting in next()
+    lock.lock();
+    try {
       currentNbJobs--;
       executedJobCount++;
-      notifyAll();
+      concurrencyLimitCondition.signalAll();
+    } finally {
+      lock.unlock();
     }
     // process the results asynchronously
     processResults(event.getJob());
@@ -171,31 +187,51 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    * Determine whether any job is still being executed.
    * @return {@code true} if at least one job was submitted and has not yet completed, {@code false} otherwise.
    */
-  public synchronized boolean hasPendingJob() {
-    return currentNbJobs > 0;
+  public boolean hasPendingJob() {
+    lock.lock();
+    try {
+      return currentNbJobs > 0;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Get the number of submitted jobs.
    * @return the count of submitted jobs.
    */
-  public synchronized int getJobCount() {
-    return submittedJobCount;
+  public int getJobCount() {
+    lock.lock();
+    try {
+      return submittedJobCount;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Get the number of completed jobs.
    * @return the count of completed jobs.
    */
-  public synchronized int getExecutedJobCount() {
-    return executedJobCount;
+  public int getExecutedJobCount() {
+    lock.lock();
+    try {
+      return executedJobCount;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Get the number of submitted task.
    * @return the count of submitted tasks.
    */
-  public synchronized int getTaskCount() {
-    return taskCount;
+  public int getTaskCount() {
+    lock.lock();
+    try {
+      return taskCount;
+    } finally {
+      lock.unlock();
+    }
   }
 }

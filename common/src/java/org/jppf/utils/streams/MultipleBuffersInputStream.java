@@ -89,14 +89,17 @@ public class MultipleBuffersInputStream extends InputStream {
   public int read(final byte[] b, final int off, final int len) throws IOException {
     if (eofReached) return -1;
     int count = 0;
-    int n;
     while (count < len) {
       if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
       if (eofReached) break;
-      n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
-      System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
-      count += n;
-      currentBuffer.pos += n;
+      final int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
+      //final int n = Math.min(currentBuffer.remainingFromPos(), len - count);
+      if (n == 1) b[off + count++] = currentBuffer.buffer[currentBuffer.pos++];
+      else {
+        System.arraycopy(currentBuffer.buffer, currentBuffer.pos, b, off + count, n);
+        count += n;
+        currentBuffer.pos += n;
+      }
     }
     return count;
   }
