@@ -111,7 +111,7 @@ public class TestJMXMPServer extends BaseTest {
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
       client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
-      client.connectAndWait(3000L);
+      client.connectAndWait(9000L);
       assertTrue(client.isConnected());
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);
@@ -169,7 +169,7 @@ public class TestJMXMPServer extends BaseTest {
       final String[] params = forwarder.getParameters();
       assertTrue(Arrays.equals(PARAMS, params));
       client = new JMXConnectionWrapper(JMXHelper.JMXMP_PROTOCOL, "localhost", PORT, false);
-      client.connectAndWait(3000L);
+      client.connectAndWait(9000L);
       assertTrue(client.isConnected());
       final MyTestMBean mbean = client.getProxy(MyTestMBean.MBEAN_NAME, MyTestMBean.class);
       assertNotNull(mbean);
