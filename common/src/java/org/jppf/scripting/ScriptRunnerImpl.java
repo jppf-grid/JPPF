@@ -120,7 +120,7 @@ class ScriptRunnerImpl implements ScriptRunner {
         }
       } else cacheHits.incrementAndGet();
     }
-    if (debugEnabled) log.debug(String.format("script cache statistics for '%s': requests=%d, hits=%d, misses=%d", language, cacheRequests.get(), cacheHits.get(), cacheMisses.get()));
+    if (debugEnabled) log.debug("script cache statistics for '{}': requests={}, hits={}, misses={}", language, cacheRequests.get(), cacheHits.get(), cacheMisses.get());
     try {
       final Object res = (cs != null) ? cs.eval(bindings) : engine.eval(script, bindings);
       return res;

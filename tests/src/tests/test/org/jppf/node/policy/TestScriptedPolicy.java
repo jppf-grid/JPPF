@@ -20,6 +20,7 @@ package test.org.jppf.node.policy;
 
 import static org.junit.Assert.*;
 
+import java.io.StringReader;
 import java.util.List;
 
 import org.jppf.JPPFException;
@@ -213,5 +214,16 @@ public class TestScriptedPolicy extends Setup1D2N1C {
     } finally {
       client.setLocalExecutionEnabled(false);
     }
+  }
+
+  /**
+   * Test the constructors of {@link ScriptedPolicy}.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testConstructors() throws Exception {
+    final String script = "return true;";
+    new ScriptedPolicy("javascript", script);
+    new ScriptedPolicy("javascript", new StringReader(script));
   }
 }
