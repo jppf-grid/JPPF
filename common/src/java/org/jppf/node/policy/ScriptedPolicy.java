@@ -82,7 +82,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
    */
   public ScriptedPolicy(final String language, final Reader scriptReader) throws IOException {
     this(language);
-    if (script == null) throw new IllegalArgumentException("the script cannot be null");
+    if (scriptReader == null) throw new IllegalArgumentException("the script reader cannot be null");
     this.script = FileUtils.readTextFile(scriptReader);
   }
 
