@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2017 JPPF Team.
+ * Copyright (C) 2005-2018 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,9 +104,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
         final StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
         log.debug(sb.toString());
       }
-      //System.out.println(sb.toString());
     } catch (final JPPFScriptingException e) {
-      //e.printStackTrace();
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
     } finally {
       ScriptRunnerFactory.releaseScriptRunner(runner);
