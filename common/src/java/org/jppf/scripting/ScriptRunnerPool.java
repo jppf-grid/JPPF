@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2017 JPPF Team.
+ * Copyright (C) 2005-2018 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
   @Override
   protected ScriptRunner create() {
     try {
-    return new ScriptRunnerImpl(language);
+      return new ScriptRunnerImpl(language);
     } catch(@SuppressWarnings("unused") final JPPFScriptingException e) {
       return null;
     }
