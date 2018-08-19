@@ -1,6 +1,6 @@
 <!--
 	JPPF
-	Copyright (C) 2005-2017 JPPF Team. 
+	Copyright (C) 2005-2018 JPPF Team. 
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -133,7 +133,7 @@
       <arg value="-J-Xmx512m"/>
       <packageset dir="${src.dir}"/>
       <link href="https://docs.oracle.com/javase/7/docs/api/"/>
-      <doctitle><![CDATA[JPPF-jmxremote_optional v${version.number}]]></doctitle>
+      <doctitle><![CDATA[JPPF-jmxremote_optional v${jmx.version.number}]]></doctitle>
       <header>
         <![CDATA[
           <table>

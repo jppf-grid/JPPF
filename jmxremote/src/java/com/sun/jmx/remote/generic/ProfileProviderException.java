@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2017 JPPF Team.
+ * Copyright (C) 2005-2018 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,13 +72,9 @@ package com.sun.jmx.remote.generic;
  */
 public class ProfileProviderException extends Exception {
   /**
-   * 
+   * Explicit serial version uid.
    */
   private static final long serialVersionUID = -4648936399123015595L;
-  /**
-   * 
-   */
-  private Exception cause = null;
 
   /**
    * Constructs a <code>ProfileProviderException</code> with no specified detail message.
@@ -100,12 +96,6 @@ public class ProfileProviderException extends Exception {
    * @param cause the nested exception
    */
   public ProfileProviderException(final String message, final Exception cause) {
-    super(message);
-    this.cause = cause;
-  }
-
-  @Override
-  public Throwable getCause() {
-    return cause;
+    super(message, cause);
   }
 }
