@@ -275,7 +275,7 @@
         <td align="center" style="font-size: 9pt; color: #6D78B6">
           <a href="http://www.jppf.org"><img src="/images/jppf_group_large.gif" border="0" alt="JPPF"/></a>
         </td>
-        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2017 JPPF.org</td>
+        <td align="middle" valign="middle" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2018 JPPF.org</td>
         <td align="middle" valign="center">
           <!-- Google+ button -->
           <!--

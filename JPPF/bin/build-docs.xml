@@ -1,6 +1,6 @@
 <!--
   JPPF
-  Copyright (C) 2005-2017 JPPF Team. 
+  Copyright (C) 2005-2018 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,7 +81,7 @@
       </td></tr></table>
   ]]></property>
 
-  <property name="javadoc.bottom"><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2017 JPPF Team.</i></font>]]></property>
+  <property name="javadoc.bottom"><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2018 JPPF Team.</i></font>]]></property>
 
   <!-- ========================================================================= -->
   <!--  Generate the Javadoc                                                     -->
@@ -125,7 +125,7 @@
       <packageset dir="${jca-client}/src/java"/>
       <packageset dir="${jca-client}/src/j2eeclient"/>
       <packageset dir="${node-android}/events/src/main/java"/>
-      <packageset dir="${jmxremote}/src"/>
+      <packageset dir="${jmxremote}/src/java"/>
       <link href="https://docs.oracle.com/javase/7/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <link href="https://junit.org/junit4/javadoc/latest"/>

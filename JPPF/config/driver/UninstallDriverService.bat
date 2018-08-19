@@ -1,6 +1,6 @@
 @echo off
 rem JPPF
-rem Copyright (C) 2005-2012 JPPF Team.
+rem Copyright (C) 2005-2018 JPPF Team.
 rem http://www.jppf.org
 rem 
 rem Licensed under the Apache License, Version 2.0 (the "License");
