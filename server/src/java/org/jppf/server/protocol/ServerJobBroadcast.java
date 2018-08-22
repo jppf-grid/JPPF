@@ -256,4 +256,23 @@ public class ServerJobBroadcast extends ServerJob {
       lock.unlock();
     }
   }
+
+  /**
+   * @return the parent job of this broadcast.
+   */
+  public ServerJobBroadcast getParentJob() {
+    return parentJob;
+  }
+
+  /**
+   * @return the broadcast  jobs that were dispatched to a node.
+   */
+  public List<ServerJobBroadcast> getDispatchedBroadcasts() {
+    lock.lock();
+    try {
+      return (parentJob != null) ? Collections.EMPTY_LIST : new ArrayList<>(broadcastMap.values());
+    } finally {
+      lock.unlock();
+    }
+  }
 }

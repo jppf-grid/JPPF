@@ -25,7 +25,8 @@ import javax.management.*;
 import org.jppf.job.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.ServerJob;
+import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.*;
@@ -40,11 +41,11 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(DriverJobManagement.class);
+  private static final Logger log = LoggerFactory.getLogger(DriverJobManagement.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Reference to the driver.
    */
@@ -57,80 +58,85 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     driver.getJobManager().addJobManagerListener(new JobEventNotifier());
   }
 
-  /**
-   * Cancel the job with the specified id.
-   * @param jobUuid the id of the job to cancel.
-   * @throws Exception if any error occurs.
-   */
   @Override
   public void cancelJob(final String jobUuid) throws Exception {
-    ServerJob serverJob = getServerJob(jobUuid);
-    if (serverJob != null) {
-      if (debugEnabled) log.debug("Request to cancel job '{}'", serverJob.getJob().getName());
-      serverJob.cancel(false);
-      //driver.getNodeNioServer().getNodeReservationHandler().onJobCancelled(serverJob);
+    cancelJob(getServerJob(jobUuid));
+  }
+
+  /**
+   * Cancel the job with the specified id.
+   * @param job the job to cancel.
+   * @throws Exception if any error occurs.
+   */
+  private void cancelJob(final ServerJob job) throws Exception {
+    if (job != null) {
+      if (debugEnabled) log.debug("Request to cancel job '{}'", job.getJob().getName());
+      job.cancel(false);
       JPPFStatistics stats = driver.getStatistics();
-      stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -serverJob.getTaskCount());
-    } else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+      stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -job.getTaskCount());
+    } else if (debugEnabled) log.debug("job is null");
+  }
+
+  @Override
+  public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception {
+    suspendJob(getServerJob(jobUuid), requeue);
   }
 
   /**
    * Suspend the job with the specified id.
-   * @param jobUuid the id of the job to suspend.
-   * @param requeue true if the sub-jobs running on each node should be canceled and requeued, false if they should be left to execute until completion.
+   * @param job the job to suspend.
+   * @param requeue {@code true} if the sub-jobs running on each node should be canceled and requeued, {@code false} if they should be left to execute until completion.
    * @throws Exception if any error occurs.
    */
-  @Override
-  public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception {
-    ServerJob bundleWrapper = getServerJob(jobUuid);
-    if (bundleWrapper == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+  private static void suspendJob(final ServerJob job, final Boolean requeue) throws Exception {
+    if (job == null) {
+      if (debugEnabled) log.debug("job is null");
       return;
     }
-    if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
+    if (debugEnabled) log.debug("Request to suspend job '" + job.getJob().getName() + '\'');
+    job.setSuspended(true, requeue);
+  }
+
+  @Override
+  public void resumeJob(final String jobUuid) throws Exception {
+    resumeJob(getServerJob(jobUuid));
   }
 
   /**
-   * Resume the job with the specified id.
-   * @param jobUuid the id of the job to resume.
+   * Resume the specified job.
+   * @param job the job to resume.
    * @throws Exception if any error occurs.
    */
-  @Override
-  public void resumeJob(final String jobUuid) throws Exception {
-    ServerJob bundleWrapper = getServerJob(jobUuid);
-    if (bundleWrapper == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
+  private void resumeJob(final ServerJob job) throws Exception {
+    if (job == null) {
+      if (debugEnabled) log.debug("job is null");
       return;
     }
-    if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    bundleWrapper.setSuspended(false, false);
+    if (debugEnabled) log.debug("Request to resume job '" + job.getJob().getName() + '\'');
+    job.setSuspended(false, false);
     driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 
-  /**
-   * Update the maximum number of nodes a node can run on.
-   * @param jobUuid the id of the job to update.
-   * @param maxNodes the new maximum number of nodes for the job.
-   * @throws Exception if any error occurs.
-   */
   @Override
   public void updateMaxNodes(final String jobUuid, final Integer maxNodes) throws Exception {
-    ServerJob serverJob = getServerJob(jobUuid);
-    if (serverJob == null) {
-      if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
-      return;
-    }
-    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + serverJob.getJob().getName() + '\'');
-    serverJob.setMaxNodes(maxNodes);
+    updateMaxNodes(getServerJob(jobUuid), maxNodes);
   }
 
   /**
-   * Get the set of ids for all the jobs currently queued or executing.
-   * @return a set of ids as strings.
+   * Update the maximum number of nodes a job can run on.
+   * @param job the job to update.
+   * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
-   * @deprecated use {@link #getAllJobUuids()} instead.
    */
+  private static void updateMaxNodes(final ServerJob job, final Integer maxNodes) throws Exception {
+    if (job == null) {
+      if (debugEnabled) log.debug("job is null");
+      return;
+    }
+    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + job.getJob().getName() + '\'');
+    job.setMaxNodes(maxNodes);
+  }
+
   @Override
   public String[] getAllJobIds() throws Exception {
     return getAllJobUuids();
@@ -142,12 +148,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     return ids.toArray(new String[ids.size()]);
   }
 
-  /**
-   * Get an object describing the job with the specified uuid.
-   * @param jobUuid the id of the job to get information about.
-   * @return an instance of <code>JobInformation</code>.
-   * @throws Exception if any error occurs.
-   */
   @Override
   public JobInformation getJobInformation(final String jobUuid) throws Exception {
     ServerJob job = getServerJob(jobUuid);
@@ -157,17 +157,30 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     return jobInfo;
   }
 
+  @Override
+  public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception {
+    return getNodeInformation(getServerJob(jobUuid));
+  }
+
   /**
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
-   * @param jobUuid the id of the job for which to find node information.
+   * @param job the job for which to find node information.
    * @return array of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
    */
-  @Override
-  public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception {
-    ServerJob bundleWrapper = getServerJob(jobUuid);
-    if (bundleWrapper == null) return NodeJobInformation.EMPTY_ARRAY;
-    return bundleWrapper.getNodeJobInformation();
+  private static NodeJobInformation[] getNodeInformation(final ServerJob job) throws Exception {
+    if (job == null) return NodeJobInformation.EMPTY_ARRAY;
+    if (!(job instanceof ServerJobBroadcast)) return job.getNodeJobInformation();
+    final ServerJobBroadcast broadcast = (ServerJobBroadcast) job;
+    final List<ServerJobBroadcast> dispatches = broadcast.getDispatchedBroadcasts();
+    final List<NodeJobInformation> result = new ArrayList<>(dispatches.size());
+    for (final ServerJobBroadcast childJob: dispatches) {
+      final NodeJobInformation[] nji = childJob.getNodeJobInformation();
+      if (nji != null) {
+        for (final NodeJobInformation info: nji) result.add(info);
+      }
+    }
+    return result.toArray(new NodeJobInformation[result.size()]);
   }
 
   @Override
@@ -237,51 +250,55 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
   @Override
   public void cancelJobs(final JobSelector selector) throws Exception {
-    Set<String> uuids = selectJobUuids(selector);
-    if (debugEnabled) log.debug("request to cancel jobs with these uuids: {}, job selector = {}", uuids, selector);
-    for (String uuid: uuids) cancelJob(uuid);
+    final List<ServerJob> jobs = selectJobs(selector);
+    if (debugEnabled) log.debug("request to cancel {} jobs, job selector = {}", jobs.size(), selector);
+    for (final ServerJob job: jobs) cancelJob(job);
   }
 
   @Override
   public void suspendJobs(final JobSelector selector, final Boolean requeue) throws Exception {
-    for (String uuid: selectJobUuids(selector)) suspendJob(uuid, requeue);
+    for (final ServerJob job: selectJobs(selector)) suspendJob(job, requeue);
   }
 
   @Override
   public void resumeJobs(final JobSelector selector) throws Exception {
-    for (String uuid: selectJobUuids(selector)) resumeJob(uuid);
+    for (final ServerJob job: selectJobs(selector)) resumeJob(job);
   }
 
   @Override
   public void updateMaxNodes(final JobSelector selector, final Integer maxNodes) throws Exception {
-    for (String uuid: selectJobUuids(selector)) updateMaxNodes(uuid, maxNodes);
+    for (final ServerJob job: selectJobs(selector)) updateMaxNodes(job, maxNodes);
   }
 
   @Override
   public JobInformation[] getJobInformation(final JobSelector selector) throws Exception {
-    Set<String> uuids = selectJobUuids(selector);
-    Set<JobInformation> result = new HashSet<>();
-    for (String uuid: uuids) {
-      JobInformation info = getJobInformation(uuid);
-      if (info != null) result.add(info);
+    final Set<JobInformation> result = new HashSet<>();
+    final List<ServerJob> jobs = selectJobs(selector);
+    for (final ServerJob job: jobs) {
+      if (!JPPFJobManager.isBroadcastDispatch(job)) {
+        final JobInformation info = getJobInformation(job.getUuid());
+        result.add(info);
+      }
     }
     return result.toArray(new JobInformation[result.size()]);
   }
 
   @Override
   public Map<String, NodeJobInformation[]> getNodeInformation(final JobSelector selector) throws Exception {
-    Set<String> uuids = selectJobUuids(selector);
-    Map<String, NodeJobInformation[]> result = new HashMap<>();
-    for (String uuid: uuids) {
-      NodeJobInformation[] info = getNodeInformation(uuid);
-      if (info != null) result.put(uuid, info);
+    final Map<String, NodeJobInformation[]> result = new HashMap<>();
+    final List<ServerJob> jobs = selectJobs(selector);
+    for (final ServerJob job: jobs) {
+      if (!JPPFJobManager.isBroadcastDispatch(job)) {
+        final NodeJobInformation[] info = getNodeInformation(job);
+        if (info != null) result.put(job.getUuid(), info);
+      }
     }
     return result;
   }
 
   @Override
   public void updatePriority(final JobSelector selector, final Integer newPriority) {
-    for (String uuid: selectJobUuids(selector)) updatePriority(uuid, newPriority);
+    for (final ServerJob job: selectJobs(selector)) updatePriority(job.getUuid(), newPriority);
   }
 
   /**
@@ -289,18 +306,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param selector determines for which jobs to return the uuid.
    * @return a set of uuids, possibly empty.
    */
-  private Set<String> selectJobUuids(final JobSelector selector) {
-    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
-    if ((selector == null) || (selector instanceof AllJobsSelector)) return queue.getAllJobIds();
-    if (selector instanceof JobUuidSelector) {
-      Set<String> allUuids = queue.getAllJobIds();
-      allUuids.retainAll(((JobUuidSelector) selector).getUuids());
-      return allUuids;
-    }
-    Set<String> list = new HashSet<>();
-    List<ServerJob> allJobs = queue.getAllJobs();
-    for (ServerJob job: allJobs) {
-      if (selector.accepts(job.getJob())) list.add(job.getUuid());
+  private static List<ServerJob> selectJobs(final JobSelector selector) {
+    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final List<ServerJob> allJobs = queue.getAllJobs();
+    final List<ServerJob> list = new ArrayList<>(allJobs.size());
+    for (final ServerJob job: allJobs) {
+      if (selector.accepts(job.getJob()) && !JPPFJobManager.isBroadcastDispatch(job)) list.add(job);
     }
     return list;
   }

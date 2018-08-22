@@ -118,8 +118,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       jobMap.putValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
-    submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
-    fireJobTasksEvent(channel, nodeBundle, true);
+    if (!isBroadcastDispatch(serverJob)) {
+      submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
+      fireJobTasksEvent(channel, nodeBundle, true);
+    } else {
+      final ServerJobBroadcast broadcast = (ServerJobBroadcast) serverJob;
+      submitEvent(JobEventType.JOB_DISPATCHED, broadcast.getParentJob(), channel);
+    }
   }
 
   @Override
@@ -131,9 +136,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
         log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
       } else if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     }
-    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
-    submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
-    fireJobTasksEvent(channel, nodeBundle, false);
+    if (!isBroadcastDispatch(serverJob)) {
+      submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
+      fireJobTasksEvent(channel, nodeBundle, false);
+    } else {
+      final ServerJobBroadcast broadcast = (ServerJobBroadcast) serverJob;
+      submitEvent(JobEventType.JOB_RETURNED, broadcast.getParentJob(), channel);
+    }
   }
 
   /**
@@ -144,7 +153,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     TaskBundle bundle = serverJob.getJob();
     String jobUuid = bundle.getUuid();
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
-    submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
+    if (!isBroadcastDispatch(serverJob)) {
+      submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
+    }
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
@@ -167,7 +178,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
-    submitEvent(JobEventType.JOB_ENDED, serverJob, null);
+    if (!isBroadcastDispatch(serverJob)) {
+      submitEvent(JobEventType.JOB_ENDED, serverJob, null);
+    }
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
@@ -402,6 +415,16 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private void incNotifCount() {
     int n = notifCount.incrementAndGet();
     if (n > notifMax.get()) notifMax.set(n);
+  }
+
+  /**
+   * Determine whether the specified job is the dispatch of a broadcast job to a node.
+   * @param job the job to evaluate.
+   * @return {@code true} if the job is the dispatch of a broadcast job, {@code false} otherwise.
+   */
+  public static boolean isBroadcastDispatch(final AbstractServerJob job) {
+    if (!(job instanceof ServerJobBroadcast)) return false;
+    return job.getBroadcastUUID() != null;
   }
 
   /**

@@ -209,7 +209,7 @@ public class BroadcastManager {
           newBundle.setSLA(((JPPFJobSLA) sla).copy());
           newBundle.setMetadata(broadcastJob.getMetadata());
           newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
-          newBundle.setName(broadcastJob.getName() + " [node: " + info.toString() + ']');
+          newBundle.setName(broadcastJob.getName() + " [node: " + info.toDisplayString() + ']');
           newBundle.setUuid(JPPFUuid.normalUUID());
           jobList.add(newBundle);
           if (debugEnabled) log.debug("node uuid={} accepted for broadcast {}", uuid, broadcastJob);
