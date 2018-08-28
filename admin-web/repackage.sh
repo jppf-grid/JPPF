@@ -11,8 +11,24 @@
 #   example: ~/jppf/lib/mylib.jar ~/jppf/lib2/*.jar 
 # 
 # Full example usage:
-# ./repackage.sh build/jppf-admin-web-6.0.war ~/jppf/lib/mylib.jar ~/jppf/lib2/*.jar 
+# ./repackage.sh build/jppf-admin-web-6.0.war ~/jppf/lib/mylib.jar ~/jppf/lib2/*.jar
 #-----------------------------------------------------------------------------------
+
+# if no parameter, print usage and exit
+if [ "$1" = "" ]; then
+  echo Repackage a war file by adding specified jars in its WEB-INF/lib directory
+  echo
+  echo Usage:
+  echo "  ./repackage.sh <war_location> <jar_location_1> ... <jar_location_n>"
+  echo where:
+  echo - war_location is the path to the war file to repackage
+  echo - jar_location_x is the path to one or more jar files to add to the war\'s WEB-INF/lib folder
+  echo "  wildcards * and ? are accepted"
+  echo
+  echo Example:
+  echo "  ./repackage.sh build/jppf-admin-web-6.0.war ~/jppf/lib/mylib.jar ~/jppf/lib2/*.jar"
+  exit
+fi
 
 # compute the directory of this script
 SCRIPT=$(readlink -f "$0")
