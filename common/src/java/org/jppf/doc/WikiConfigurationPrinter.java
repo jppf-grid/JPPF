@@ -188,9 +188,7 @@ public class WikiConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   private WikiConfigurationPrinter doTagTitle(final String tag) {
-    print("=== ").print(convertTag(tag)).print(" properties").println(" ===");
-    println("<br>");
-    return this;
+    return print("=== ").print(convertTag(tag)).print(" properties").println(" ===").println("");
   }
 
   /**
@@ -198,7 +196,7 @@ public class WikiConfigurationPrinter {
    * @return this printer, for method call chaining.
    */
   private WikiConfigurationPrinter startTable() {
-    return println("{| border=\"1\" cellspacing=\"0\" cellpadding=\"2\"");
+    return println("{| border=\"1\" cellspacing=\"0\" cellpadding=\"2\" width=\"100%\"");
   }
 
   /**
