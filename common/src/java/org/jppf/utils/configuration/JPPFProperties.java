@@ -156,13 +156,11 @@ public class JPPFProperties {
   /** Management remote connector port. */
   public static final JPPFProperty<Integer> MANAGEMENT_PORT = new IntProperty("jppf.management.port", 11198, 1024, 65535);
   /** Enable/disable JMX via secure connections. */
-  public static final JPPFProperty<Boolean> MANAGEMENT_SSL_ENABLED = new BooleanProperty("jppf.management.ssl.enabled", false);
+  public static final JPPFProperty<Boolean> MANAGEMENT_SSL_ENABLED = new BooleanProperty("jppf.management.ssl.enabled", false).setDeprecated(true);
   /** Secure JMX server port. */
-  public static final JPPFProperty<Integer> MANAGEMENT_SSL_PORT = new IntProperty("jppf.management.ssl.port", 93, 1024, 65535);
+  public static final JPPFProperty<Integer> MANAGEMENT_SSL_PORT = new IntProperty("jppf.management.ssl.port", 11193, 1024, 65535).setDeprecated(true);
   /** Node management port (to distinguish from server management port when local node is on). */
   public static final JPPFProperty<Integer> MANAGEMENT_PORT_NODE = new IntProperty("jppf.node.management.port", 11198, 1024, 65535, "jppf.management.port");
-  /** Node secure management port (to distinguish from server management port when local node is on). */
-  public static final JPPFProperty<Integer> MANAGEMENT_SSL_PORT_NODE = new IntProperty("jppf.node.management.ssl.port", 93, 1024, 65535, "jppf.management.ssl.port");
   /** Fully qualifed class name of a MBeanServerForwarder implementation with optional space-separated string parameters. */
   public static final JPPFProperty<String[]> MANAGEMENT_SERVER_FORWARDER = new StringArrayProperty("jppf.management.server.forwarder", " ", null);
   /** Size of the pool of threads used to process node forwarding requests and notifications. */

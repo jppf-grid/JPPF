@@ -74,14 +74,14 @@ public interface JPPFProperty<T> extends Serializable {
 
   /**
    * Get a short label for this property.
-   * @param locale the locale in which the short label of this property should be retruned.
+   * @param locale the locale in which the short label of this property should be returned.
    * @return the label as a string.
    */
   String getShortLabel(Locale locale);
 
   /**
    * Get a description of this property.
-   * @param locale the locale in which the documentation of this property should be retruned.
+   * @param locale the locale in which the documentation of this property should be returned.
    * @return the description as a string.
    */
   String getDocumentation(Locale locale);
@@ -115,6 +115,19 @@ public interface JPPFProperty<T> extends Serializable {
   String getParameterDoc(String param);
 
   /**
+   * Get a string explaining why a property was deprecated and/or what to use instead.
+   * @return a text documentation about this property's deprecation.
+   */
+  String getDeprecatedDoc();
+
+  /**
+   * Get a string explaining why a property was deprecated and/or what to use instead.
+   * @param locale the locale in which the text should be returned.
+   * @return a text documentation about this property's deprecation.
+   */
+  public String getDeprecatedDoc(Locale locale);
+
+  /**
    * Resolve the name of the property by substituting the parameters names with actual values.
    * @param params the values of the parameters.
    * @return the new resolve name.
@@ -132,4 +145,18 @@ public interface JPPFProperty<T> extends Serializable {
    * @exclude
    */
   public String resolveName(String alias, String...params);
+
+  /**
+   * Determine whether this property is deprecated.
+   * @return {@code true} if the property is deprecated, {@code false} otherwise.
+   */
+  boolean isDeprecated();
+
+  /**
+   * Specify whether this property is deprecated.
+   * @param deprecated {@code true} if the property is deprecated, {@code false} otherwise.
+   * @return this property, for method call chaining.
+   * @exclude
+   */
+  JPPFProperty<T> setDeprecated(boolean deprecated);
 }

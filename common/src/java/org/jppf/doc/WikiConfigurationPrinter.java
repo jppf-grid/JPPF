@@ -55,14 +55,12 @@ public class WikiConfigurationPrinter {
     put("org.jppf.job.persistence.impl", "o.j.j.p.i");
     put("9223372036854775807", "Long.MAX_VALUE");
     put("2147483647", "Integer.MAX_VALUE");
-    // 
   }};
   /**
    * HTML character entity conversions for the description column.
    */
   private final static Map<String, String> DESC_HTML_CONVERSIONS = new LinkedHashMap<String, String>() {{
     put("|", "&#124;");
-    // 
   }};
   /**
    * Mapping of tags to readable names.
@@ -80,7 +78,7 @@ public class WikiConfigurationPrinter {
     put("persistence", "Persistence");
     put("ssl", "SSL/TLS");
     put("jmxremote", "JMX remote");
-    // 
+    put("memory", "Memory usage optimization");
   }};
   /**
    * Names of the properties whose default value is {@code Runtime.getRuntime().availableProcessors()}.
@@ -231,14 +229,19 @@ public class WikiConfigurationPrinter {
   private WikiConfigurationPrinter doPropertyRow(final JPPFProperty<?> prop) {
     println("|-style=\"line-height: 1.1em\"");
     // property name
-    doCell(convert(prop.getName()));
+    String name = convert(prop.getName());
+    if (prop.isDeprecated()) name = "<span style=\"text-decoration: line-through\">" + name + "</span>";
+    doCell(name);
     // default value
     Object value = prop.getDefaultValue();
     if (AVAILABLE_PROCESSORS_NAMES.contains(prop.getName())) value = "available processors";
-    if ("jppf.resource.cache.dir".equals(prop.getName())) value = "System.getProperty(\"java.io.tmpdir\")";
-    if (value instanceof String[]) value = toString((String[]) value);
+    else if ("jppf.resource.cache.dir".equals(prop.getName())) value = "sys.property \"java.io.tmpdir\"";
+    else if ("jppf.notification.offload.memory.threshold".equals(prop.getName())) value = "80% of max heap size";
+    else if (value instanceof String[]) value = toString((String[]) value);
     else if ("".equals(value)) value = "empty string";
-    doCell((value == null) ? "null" : convert(value.toString()));
+    String val = ((value == null) ? "null" : convert(value.toString()));
+    if (prop.isDeprecated()) val = "<span style=\"text-decoration: line-through\">" + val + "</span>";
+    doCell(val);
     /*
     // aliases
     doCell(toString(prop.getAliases()));
@@ -336,7 +339,11 @@ public class WikiConfigurationPrinter {
    * @return a string describing the propery.
    */
   private static String getPropertyDoc(final JPPFProperty<?> property) {
-    final StringBuilder sb = new StringBuilder(property.getDocumentation());
+    final StringBuilder sb = new StringBuilder();
+    if (property.isDeprecated()) {
+      sb.append("'''''Deprecated:''' ").append(convert(property.getDeprecatedDoc())).append("''<br>");
+    }
+    sb.append(property.getDocumentation());
     final String[] params = property.getParameters();
     if ((params != null) && (params.length > 0)) {
       for (String param: params) {

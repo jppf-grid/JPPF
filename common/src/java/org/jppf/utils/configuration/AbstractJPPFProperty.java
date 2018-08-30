@@ -71,6 +71,10 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * Names of the parmaters used in the property's name, if any.
    */
   private final String[] paramNames;
+  /**
+   * Whether this property is deprecated.
+   */
+  private boolean deprecated;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -233,5 +237,29 @@ public abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    */
   public void setI18nBase(final String i18nBase) {
     this.i18nBase = i18nBase;
+  }
+
+  @Override
+  public boolean isDeprecated() {
+    return deprecated;
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public JPPFProperty<T> setDeprecated(final boolean deprecated) {
+    this.deprecated = deprecated;
+    return this;
+  }
+
+  @Override
+  public String getDeprecatedDoc() {
+    return LocalizationUtils.getLocalized(i18nBase, name + ".deprecated");
+  }
+
+  @Override
+  public String getDeprecatedDoc(final Locale locale) {
+    return LocalizationUtils.getLocalized(i18nBase, name + ".deprecated", locale);
   }
 }
