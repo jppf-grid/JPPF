@@ -1,4 +1,4 @@
 /build/
-/lib/jppf-common.jar
-/lib/jppf-server.jar
-/lib/jppf-node-android.jar
+/libs/jppf-common.jar
+/libs/jppf-server.jar
+/libs/jppf-node-android.jar
