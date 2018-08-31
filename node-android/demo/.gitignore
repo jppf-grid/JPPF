@@ -1,1 +1,5 @@
 /build/
+/lib/jppf-common.jar
+/lib/jppf-server.jar
+/lib/jppf-node-android.jar
+/lib/events-release.aar
