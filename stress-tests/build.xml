@@ -84,9 +84,11 @@
   <!--                           Compile                                         -->
   <!-- ========================================================================= -->
 
-  <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${basedir}/../JPPF/lib/Checkstyle/checkstyle-6.19-all.jar" />
-
   <target name="compile" depends="init" description="compile the junit tests classes">
+    <path id="checkstyle.path">
+      <fileset dir="${lib}/Checkstyle" includes="*.jar"/>
+    </path>
+    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpathref="checkstyle.path"/>
     <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
       <fileset dir="${framework.src}" includes="**/*.java"/>
       <fileset dir="${scenarios.src}" includes="**/*.java"/>
