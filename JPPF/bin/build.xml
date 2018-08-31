@@ -67,7 +67,7 @@
   <property name="runtime.gui"           value="${build}/runtime/gui"/>
   <property name="app.ver"               value="${ant.project.name}-${version.number}"/>
   <property name="build.sysclasspath"    value="last"/>
-
+  <property name="version.file"          value="${common}/src/resources/META-INF/jppf-version.properties"/>
 
   <!-- ========================================================================= -->
   <!--                           Classpath definitions                           -->
@@ -159,11 +159,9 @@
     </tstamp>
     <!-- Write the build and version information to a resource file -->
     <!-- The resource file will be part of the corresponding jar    -->
-    <propertyfile file="${common}/src/resources/META-INF/jppf-version.properties">
-      <entry key="version.number" type="string" value="${version.number}"/>
-      <entry key="build.number" type="string" value="${build.number}"/>
-      <entry key="build.date" type="string" value="${readable.now}"/>
-    </propertyfile>
+    <echo append="false" file="${version.file}">version.number = ${version.number}
+build.number = ${build.number}
+build.date = ${readable.now}</echo>
   </target>
 
   <!-- ========================================================================= -->
@@ -176,7 +174,7 @@
       - propname: the name of the property to display to the output console
   -->
   <macrodef name="echoprop">
-  <attribute name="name"/>
+    <attribute name="name"/>
     <sequential>
       <echo message="@{name} = ${@{name}}"/>
     </sequential>
