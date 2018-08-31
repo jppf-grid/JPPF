@@ -2,3 +2,6 @@
 /libs/jppf-common.jar
 /libs/jppf-server.jar
 /libs/jppf-node-android.jar
+/libs/lz4*.jar
+/libs/slf4j*.jar
+/libs/*.aar
