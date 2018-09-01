@@ -56,7 +56,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
   /**
    * Invocation of {@code removeNotificationListener(NotificationListener, NotificationFilter, Object)}.
    */
-  private static final int REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK = 6;
+  private static final int REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK = 6;
   /**
    * Method {@code addNotificationListener(NotificationListener, NotificationFilter, Object)}.
    */
@@ -134,7 +134,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
         mbsc.removeNotificationListener(objectName, (NotificationListener) args[0]);
         break;
 
-      case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
+      case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK:
         mbsc.removeNotificationListener(objectName, (NotificationListener) args[0], (NotificationFilter) args[1], args[2]);
         break;
 
@@ -180,19 +180,20 @@ public class MBeanInvocationHandler implements InvocationHandler {
      * @throws Exception if any error occurs.
      */
     private MethodInfo(final Method method) throws Exception {
+      final String name = method.getName();
       if (ReflectionUtils.isSetter(method)) type = SET_ATTRIBUTE;
       else if (ReflectionUtils.isGetter(method)) type = GET_ATTRIBUTE;
-      else if ("addNotificationListener".equals(method.getName())) {
+      else if ("addNotificationListener".equals(name)) {
         type = (ReflectionUtils.sameSignature(method, ADD_NOTIFICATION_LISTENER_METHOD)) ? ADD_NOTIFICATION_LISTENER : INVOKE;
-      } else if ("removeNotificationListener".equals(method.getName())) {
+      } else if ("removeNotificationListener".equals(name)) {
         type = (ReflectionUtils.sameSignature(method, REMOVE_NOTIFICATION_LISTENER_METHOD))
-          ? REMOVE_NOTIFICATION_LISTENER : (ReflectionUtils.sameSignature(method, REMOVE_NOTIFICATION_LISTENER_3_METHOD) ? REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK : INVOKE);
+          ? REMOVE_NOTIFICATION_LISTENER : (ReflectionUtils.sameSignature(method, REMOVE_NOTIFICATION_LISTENER_3_METHOD) ? REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK : INVOKE);
       } else type = INVOKE;
       switch(type) {
         case SET_ATTRIBUTE:
         case GET_ATTRIBUTE:
           signature = EMPTY_SIG;
-          attribute = ReflectionUtils.getMBeanAttributeName(method);
+          attribute = ReflectionUtils.getMBeanAttributeName(name);
           break;
 
         case INVOKE:
@@ -207,7 +208,7 @@ public class MBeanInvocationHandler implements InvocationHandler {
 
         case ADD_NOTIFICATION_LISTENER:
         case REMOVE_NOTIFICATION_LISTENER:
-        case REMOVE_NOTIFICATION_LISTENER_FILTER_NANDBACK:
+        case REMOVE_NOTIFICATION_LISTENER_FILTER_HANDBACK:
           attribute = null;
           signature = EMPTY_SIG;
           break;

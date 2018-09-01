@@ -71,7 +71,7 @@ class JMXMessageReader {
     while (true) {
       boolean b = false;
       try {
-        b = context.readMessage(context.getChannel());
+        b = context.readMessage(null);
       } catch (final IOException e) {
         final ChannelsPair pair = context.getChannels();
         if (pair.isClosed() || pair.isClosing()) return;
@@ -345,7 +345,7 @@ class JMXMessageReader {
           if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
           else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
         }
-        if (e instanceof Exception) context.handleException(context.getChannel(), (Exception) e);
+        if (e instanceof Exception) context.handleException(null, (Exception) e);
         else throw (Error) e;
       }
     }

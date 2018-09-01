@@ -97,7 +97,16 @@ public class ReflectionUtils {
    * or {@code null} if the input method is not a setter or getter.
    */
   public static String getMBeanAttributeName(final Method meth) {
-    final String name = meth.getName();
+    return getMBeanAttributeName(meth.getName());
+  }
+
+  /**
+   * Get the name of an MBean attribute based on the name of a getter or setter method.
+   * @param name the name of the method to analyse.
+   * @return the name of an MBean attribute following the {@code javax.management} coventions,
+   * or {@code null} if the input method is not a setter or getter.
+   */
+  public static String getMBeanAttributeName(final String name) {
     if (name.startsWith("is")) return name.substring(2);
     else if (name.startsWith("get") || name.startsWith("set")) return name.substring(3);
     return null;
