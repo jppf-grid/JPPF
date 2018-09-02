@@ -48,7 +48,7 @@ public class CryptoUtils {
         final byte[] sig = digest.digest();
         hash = StringUtils.toHexString(sig);
       } catch (final Exception e) {
-        log.error(String.format("error compputing %s hash for string %s : %s", algorithm, source, ExceptionUtils.getStackTrace(e)));
+        log.error("error compputing {} hash for string {} : {}", algorithm, source, ExceptionUtils.getStackTrace(e));
       }
     }
     return hash;

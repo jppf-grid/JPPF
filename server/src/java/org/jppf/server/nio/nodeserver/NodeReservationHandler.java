@@ -321,7 +321,7 @@ public class NodeReservationHandler {
           }
           jmx.updateConfiguration(config, restart);
         } catch (@SuppressWarnings("unused") final Exception e) {
-          log.error(String.format("error reserving node %s for job %s", node, job));
+          log.error("error reserving node {} for job {}", node, job);
         }
       }
     }

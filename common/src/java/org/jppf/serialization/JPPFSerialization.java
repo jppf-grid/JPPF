@@ -156,7 +156,7 @@ public interface JPPFSerialization {
         return (composite == null) ? serialization : composite;
       } catch (final Exception e) {
         final String msg = String.format("error instantiating serialization scheme '%s'", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
-        log.error(String.format(msg + " :%n%s", ExceptionUtils.getStackTrace(e)));
+        log.error(msg + " :\n{}", ExceptionUtils.getStackTrace(e));
         throw new JPPFError(msg, e);
       }
     }
@@ -170,7 +170,6 @@ public interface JPPFSerialization {
       compositeClasses.clear();
       configure();
       if (debugEnabled) log.debug("serialization = {}, composite = {}", serializationClass, compositeClasses);
-      //log.info(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
     }
   }
 }

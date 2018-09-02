@@ -134,7 +134,7 @@ public class GraphTopologyHandler implements TopologyListener {
         driverAdded(new TopologyEvent(manager, driver, null, TopologyEvent.UpdateType.TOPOLOGY));
         for (final AbstractTopologyComponent child: driver.getChildren()) {
           final TopologyNode node = (TopologyNode) child;
-          log.debug(String.format("adding %s %s to driver %s", (node.isNode() ? "node" : "peer"), node, driver));
+          log.debug("adding {} {} to driver {}", (node.isNode() ? "node" : "peer"), node, driver);
           nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
         }
       }
@@ -464,7 +464,7 @@ public class GraphTopologyHandler implements TopologyListener {
         collapsedMap.put(node.getUuid(), CollapsedState.EXPANDED);
       }
       graphOption.repaintGraph(graphOption.isAutoLayout());
-      if (debugEnabled) log.debug(String.format("added %s %s to driver %s ", (node.isNode() ? "node" : "peer"), node, driver));
+      if (debugEnabled) log.debug("added {} {} to driver {}", (node.isNode() ? "node" : "peer"), node, driver);
     }
   };
 }

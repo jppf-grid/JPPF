@@ -158,7 +158,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    */
   public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
     if (!isConnected()) {
-      log.warn(String.format("invoking mbean '%s' method '%s(%s)' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature))));
+      log.warn("invoking mbean '{}' method '{}({})' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature)));
       return null;
     }
     Object result = null;
@@ -196,7 +196,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    */
   public Object getAttribute(final String name, final String attribute) throws Exception {
     if (!isConnected()) {
-      log.warn(String.format("getting mbean '%s' attribute '%s' while not connected", name, attribute));
+      log.warn("getting mbean '{}' attribute '{}' while not connected", name, attribute);
       return null;
     }
     Object result = null;
@@ -221,7 +221,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
    */
   public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
     if (!isConnected()) {
-      log.warn(String.format("setting mbean '%s' attribute '%s' while not connected", name, attribute));
+      log.warn("setting mbean '{}' attribute '{}' while not connected", name, attribute);
       return;
     }
     try {

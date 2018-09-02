@@ -51,9 +51,9 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
 
   @Override
   public boolean handle(final AjaxRequestTarget target, final DefaultMutableTreeNode node, final Object...params) {
-    if (debugEnabled) log.debug(String.format("handling %s with params %s", node, Arrays.asList(params)));
+    if (debugEnabled) log.debug("handling {} with params {}", node, Arrays.asList(params));
     if ((filter != null) && !filter.accepts(node)) return false;
-    if (debugEnabled) log.debug(String.format("node %s accepted", node));
+    if (debugEnabled) log.debug("node {} accepted", node);
     TypedProperties props = null;
     if ((params != null) && (params.length > 0)) {
       if (params[0] instanceof TypedProperties) props = (TypedProperties) params[0];
@@ -65,7 +65,7 @@ public class MultipleSelectionHandler extends AbstractSelectionHandler {
     final boolean sel = isSelected(uuid);
     final int size = selected.size();
     boolean selectionChanged = true;
-    if (debugEnabled) log.debug(String.format("ctrl=%b, shift=%b, sel=%b, size=%d", ctrl, shift, sel, size));
+    if (debugEnabled) log.debug("ctrl={}, shift={}, sel={}, size={}", ctrl, shift, sel, size);
     if (shift && (lastSelected != null)) {
       blockSelect(target, node, uuid);
       lastSelected = uuid;

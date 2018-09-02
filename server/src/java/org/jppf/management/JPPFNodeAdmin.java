@@ -169,7 +169,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
             try {
               node.shutdown(restart);
             } catch (final Exception|Error e) {
-              log.error(String.format("error trying to %s the node: %s", s, ExceptionUtils.getStackTrace(e)));
+              log.error("error trying to {} the node: {}", s, ExceptionUtils.getStackTrace(e));
               if (e instanceof Error) throw (Error) e;
               if (e instanceof RuntimeException) throw (RuntimeException) e;
             }

@@ -22,7 +22,7 @@ import java.text.ParseException;
 
 import org.jppf.client.balancer.ClientJob;
 import org.jppf.scheduling.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -70,7 +70,7 @@ class ScheduleManager {
         });
       } catch (final ParseException e) {
         clientJob.setPending(false);
-        log.error(String.format("Unparseable start date for job '%s' : date = %s, date format = %s", name , schedule.getDate(), schedule.getFormat()), e);
+        log.error("Unparseable start date for job '{}' : date = {}, date format = {}\n{}", name , schedule.getDate(), schedule.getFormat(), ExceptionUtils.getStackTrace(e));
       }
     } else {
       clientJob.setPending(false);
@@ -98,7 +98,7 @@ class ScheduleManager {
           }
         });
       } catch (final ParseException e) {
-        log.error(String.format("Unparseable expiration date for job '%s' : date = %s, date format = %s", name , schedule.getDate(), schedule.getFormat()), e);
+        log.error("Unparseable expiration date for job '{}' : date = {}, date format = {}\n{}", name , schedule.getDate(), schedule.getFormat(), ExceptionUtils.getStackTrace(e));
       }
     }
   }

@@ -385,11 +385,11 @@ public final class ReflectionHelper {
     try {
       clazz = Class.forName(className);
     } catch (final ClassNotFoundException e) {
-      log.error(String.format("The implementation of %s, class %s, was not found. Error is: %s", inf.getName(), className, ExceptionUtils.getStackTrace(e)));
+      log.error("The implementation of {}, class {}, was not found. Error is: {}", inf.getName(), className, ExceptionUtils.getStackTrace(e));
       return null;
     }
     if (!inf.isAssignableFrom(clazz)) {
-      log.error(String.format("The configured class '%s' for property '%s' does not implement or extend %s.", clazz.getName(), propName, inf.getName()));
+      log.error("The configured class '{}' for property '{}' does not implement or extend {}.", clazz.getName(), propName, inf.getName());
       return null;
     }
     Object result = null;
@@ -398,7 +398,7 @@ public final class ReflectionHelper {
       try {
         result = stringArrayConstructor.newInstance(new Object[] {params});
       } catch (final Exception e) {
-        log.error(String.format("Error invoking %s(String[]) with params=%s for property '%s': %s", clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
+        log.error("Error invoking {}(String[]) with params={} for property '{}': {}", clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e));
         return null;
       }
     } else {
@@ -407,7 +407,7 @@ public final class ReflectionHelper {
         try {
           result = defaultConstructor.newInstance();
         } catch (final Exception e) {
-          log.error(String.format("Error invoking default constructor of configured class '%s' for property '%s': %s", clazz.getName(), propName, ExceptionUtils.getStackTrace(e)));
+          log.error("Error invoking default constructor of configured class '{}' for property '{}': {}", clazz.getName(), propName, ExceptionUtils.getStackTrace(e));
           return null;
         }
         if (params.length > 0) {
@@ -416,8 +416,7 @@ public final class ReflectionHelper {
             try {
               setParamsMethod.invoke(result, new Object[] {params});
             } catch (final Exception e) {
-              log.error(String.format("Error invoking %s.setParameters(%s) for property '%s': %s",
-                clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e)));
+              log.error("Error invoking {}.setParameters({}) for property '{}': {}", clazz.getName(), Arrays.asList(params), propName, ExceptionUtils.getStackTrace(e));
               return null;
             }
           }

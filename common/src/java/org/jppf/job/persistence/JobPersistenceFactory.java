@@ -52,12 +52,12 @@ public final class JobPersistenceFactory {
     try {
       tmp = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, JPPFProperties.JOB_PERSISTENCE);
     } catch (final Exception e) {
-      log.error(String.format("error creating JobPersistence configured as %s = %s, falling back to %s%n%s", JPPFProperties.JOB_PERSISTENCE.getName(),
-        Arrays.toString(JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE)), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e)));
+      log.error("error creating JobPersistence configured as {} = {}, falling back to {}\n{}", JPPFProperties.JOB_PERSISTENCE.getName(),
+        Arrays.toString(JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE)), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e));
       try {
         tmp = new DefaultFilePersistence();
       } catch (final Exception e2) {
-        log.error(String.format("fallback to %s failed, job persistence is disabled%n%s", DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e2)));
+        log.error("fallback to {} failed, job persistence is disabled\n{}", DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e2));
       }
     }
     persistence = tmp;

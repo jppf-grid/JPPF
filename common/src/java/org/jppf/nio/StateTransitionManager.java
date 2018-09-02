@@ -236,7 +236,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
         ((sslHandler.getAppReceiveBuffer().position() > 0) || (sslHandler.getNetReceiveBuffer().position() > 0));
       return b;
     } catch (final RuntimeException e) {
-      log.error(String.format("error for transition=%s, channel=%s, exception=%s", transition, channel, e));
+      log.error("error for transition={}, channel={}, exception={}", transition, channel, ExceptionUtils.getStackTrace(e));
       throw e;
     }
   }

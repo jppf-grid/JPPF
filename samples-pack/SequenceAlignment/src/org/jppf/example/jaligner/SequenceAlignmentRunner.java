@@ -96,7 +96,7 @@ public class SequenceAlignmentRunner {
    * @throws Exception if the computation failed.
    */
   public static void perform(final String targetSequence, final String matrix, final String dbPath, final Option option) throws Exception {
-    log.info(String.format("performing computation with targetSequence=%s, matrix=%s, dbPath=%s, option=%s", targetSequence, matrix, dbPath, option));
+    log.info("performing computation with targetSequence={}, matrix={}, dbPath={}, option={}", targetSequence, matrix, dbPath, option);
     SequenceAlignmentRunner.option = option;
     createOrDisplayWaitWindow();
     final AlignmentExecution exec = new AlignmentExecution(targetSequence, matrix, dbPath);

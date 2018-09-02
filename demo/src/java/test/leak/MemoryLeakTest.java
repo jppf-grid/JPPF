@@ -178,14 +178,14 @@ public class MemoryLeakTest {
   private static class MyQueueListener implements ClientQueueListener {
     @Override
     public void jobAdded(final ClientQueueEvent event) {
-      log.info(String.format("added job '%s' to the queue", event.getJob().getName()));
+      log.info("added job '{}' to the queue", event.getJob().getName());
     }
 
     @Override
     public void jobRemoved(final ClientQueueEvent event) {
       final String name = event.getJob().getName();
-      if ("test1".equals(name)) log.info(String.format("removed job '%s' from the queue, callstack=%n%s", name, ExceptionUtils.getCallStack()));
-      else log.info(String.format("removed job '%s' from the queue", name));
+      if ("test1".equals(name)) log.info("removed job '{}' from the queue, callstack=\n{}", name, ExceptionUtils.getCallStack());
+      else log.info("removed job '{}' from the queue", name);
     }
   }
 

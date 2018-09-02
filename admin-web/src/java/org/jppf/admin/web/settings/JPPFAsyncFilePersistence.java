@@ -56,8 +56,7 @@ public class JPPFAsyncFilePersistence extends AbstractFilePersistence {
       public void run() {
         final File file = new File(FileUtils.getJPPFTempDir(), name + ".settings");
         if (settings == null) {
-          //if (debugEnabled) log.debug(String.format("attempting to write null string to '%s', call stack:%n%s", name, ExceptionUtils.getCallStack()));
-          if (debugEnabled) log.debug(String.format("attempting to write null string to '%s'", name));
+          if (debugEnabled) log.debug("attempting to write null string to '{}'", name);
           if (file.exists() && !file.delete()) log.debug("could not delete file %s", file);
         } else {
           try {

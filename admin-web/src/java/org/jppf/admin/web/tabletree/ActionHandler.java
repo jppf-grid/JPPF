@@ -93,7 +93,7 @@ public class ActionHandler {
    */
   public void addActionLink(final Form<String> toolbar, final AbstractActionLink link) {
     final UpdatableAction action = actions.get(link.getId());
-    if (debugEnabled) log.debug(String.format("adding link %s, id=%s, action=%s", link, link.getId(), action));
+    if (debugEnabled) log.debug("adding link {}, id={}, action={}", link, link.getId(), action);
     link.setAction(action);
     toolbar.add(link);
     actionLinks.put(link.getId(), link);

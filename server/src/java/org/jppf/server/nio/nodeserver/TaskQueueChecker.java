@@ -123,7 +123,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
                     dispatchJobToChannel(channel, nodeBundle);
                     return true;
                   } catch (final Exception e) {
-                    log.error(String.format("%s%nchannel=%s%njob=%s%nstack trace: %s", ExceptionUtils.getMessage(e), channel, nodeBundle, ExceptionUtils.getStackTrace(e)));
+                    log.error("{}\nchannel={}\njob={}\nstack trace: {}", ExceptionUtils.getMessage(e), channel, nodeBundle, ExceptionUtils.getStackTrace(e));
                     channel.unclose();
                     channel.handleException(channel.getChannel(), e);
                   }

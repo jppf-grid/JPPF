@@ -125,7 +125,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     this.config = initConfig(configuration);
     try {
       final Map<String, DataSource> result = JPPFDatasourceFactory.getInstance().createDataSources(config);
-      log.info(String.format("created client-side datasources: %s", result.keySet()));
+      log.info("created client-side datasources: {}", result.keySet());
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }

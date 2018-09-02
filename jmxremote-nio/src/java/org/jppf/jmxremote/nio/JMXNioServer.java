@@ -288,7 +288,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
         if (ex != null) fireNotification(type, new JMXConnectionStatusEvent(connectionID, ex));
         else fireNotification(type, new JMXConnectionStatusEvent(connectionID));
       } catch (final Exception e) {
-        log.error(String.format("error firing %s notification for connectionID=%s, exception=%s:%n%s", type, connectionID, ex, ExceptionUtils.getStackTrace(e)));
+        log.error("error firing {} notification for connectionID={}, exception={}:\n{}", type, connectionID, ex, ExceptionUtils.getStackTrace(e));
       }
     }
   }

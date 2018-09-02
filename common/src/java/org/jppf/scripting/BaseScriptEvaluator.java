@@ -121,7 +121,7 @@ public class BaseScriptEvaluator implements Serializable {
     } catch (final Exception|NoClassDefFoundError e) {
       if (!evaluationError) {
         evaluationError = true;
-        log.error(String.format("exception occurred evaluting script: %s%nscript language: %s, script content:%n%s", ExceptionUtils.getStackTrace(e), language, script));
+        log.error("exception occurred evaluting script: {}\nscript language: {}, script content:\n{}", ExceptionUtils.getStackTrace(e), language, script);
       }
     } finally {
       if (runner != null) ScriptRunnerFactory.releaseScriptRunner(runner);

@@ -224,7 +224,7 @@ public class DriverDiscoveryHandler<E extends DriverConnectionInfo> {
         discovery.discover();
       } catch (@SuppressWarnings("unused") final InterruptedException  ignore) {
       } catch (final Throwable t) {
-        log.error(String.format("Error while running discovery %s in thread %s: %s", discovery, this, ExceptionUtils.getStackTrace(t)));
+        log.error("Error while running discovery {} in thread {}: {}", discovery, this, ExceptionUtils.getStackTrace(t));
       }
     }
   }

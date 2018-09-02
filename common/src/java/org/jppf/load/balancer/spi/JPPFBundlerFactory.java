@@ -370,8 +370,8 @@ public class JPPFBundlerFactory {
     try {
       return ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, JPPFProperties.LOAD_BALANCING_PERSISTENCE);
     } catch (final Exception e) {
-      log.error(String.format("error creating LoadBalancerPersistence configured as %s = %s, load-balancer persistence is disabled%n%s",
-        JPPFProperties.LOAD_BALANCING_PERSISTENCE.getName(), JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), ExceptionUtils.getStackTrace(e)));
+      log.error("error creating LoadBalancerPersistence configured as {} = {}, load-balancer persistence is disabled\n{}",
+        JPPFProperties.LOAD_BALANCING_PERSISTENCE.getName(), JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), ExceptionUtils.getStackTrace(e));
     }
     return null;
   }

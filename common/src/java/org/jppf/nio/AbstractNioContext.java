@@ -21,7 +21,7 @@ package org.jppf.nio;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFSnapshot;
 import org.slf4j.*;
 
@@ -260,7 +260,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
       try {
         onCloseAction.run();
       } catch (final Exception e) {
-        log.error(String.format("error in onClose action for %s", this), e);
+        log.error("error in onClose action for {}\n{}", this, ExceptionUtils.getStackTrace(e));
       }
     }
   }

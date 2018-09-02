@@ -51,7 +51,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {
-        log.error(String.format("UncaughtException in thread[%d:%s] - %s", t.getId(), t.getName(), ExceptionUtils.getStackTrace(e)));
+        log.error("UncaughtException in thread[{}:{}] - {}", t.getId(), t.getName(), ExceptionUtils.getStackTrace(e));
       }
     }, false) {
       @Override

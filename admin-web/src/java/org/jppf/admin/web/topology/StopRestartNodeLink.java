@@ -169,7 +169,7 @@ public class StopRestartNodeLink extends AbstractActionLink {
         try {
           final JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
-          if (debugEnabled) log.debug(String.format("invoking %s with interrupt=%b for the nodes: %s", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue()));
+          if (debugEnabled) log.debug("invoking {} with interrupt={} for the nodes: {}", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue());
           final NodeSelector selector = new UuidSelector(entry.getValue());
           if (restart) forwarder.restart(selector, interruptIfRunning);
           else forwarder.shutdown(selector, interruptIfRunning);

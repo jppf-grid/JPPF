@@ -60,7 +60,7 @@ public class AbstractDotnetListenerWrapper {
    * @param methodNames the names of the .Net listener notification methods.
    */
   public AbstractDotnetListenerWrapper(final boolean debugEnabled, final system.Object dotnetDispatcher, final String...methodNames) {
-    if (debugEnabled) log.debug(String.format("init of %s wrapper for dispatcher %s, methods=%s", getClass().getSimpleName(), dotnetDispatcher, StringUtils.arrayToString(methodNames)));
+    if (debugEnabled) log.debug("init of {} wrapper for dispatcher {}, methods={}", getClass().getSimpleName(), dotnetDispatcher, StringUtils.arrayToString(methodNames));
     if (dotnetDispatcher == null) throw new IllegalArgumentException(".Net listener cannot be null");
     this.dotnetDispatcher = dotnetDispatcher;
     this.debugEnabled = debugEnabled;
@@ -85,12 +85,12 @@ public class AbstractDotnetListenerWrapper {
    */
   protected void delegate(final Object event, final String methodName) {
     if (dotnetDispatcher == null) return;
-    if (debugEnabled) log.debug(String.format("delegating to method %s.%s() event=%s", namePrefix, methodName, event));
+    if (debugEnabled) log.debug("delegating to method {}.{}() event={}", namePrefix, methodName, event);
     try {
       final Method m = methodMap.get(methodName);
       m.invoke(dotnetDispatcher, event);
     } catch (final Exception e) {
-      log.error(String.format("error invoking %s.%s() with event=%s :%n%s", namePrefix, methodName, event, ExceptionUtils.getStackTrace(e)));
+      log.error("error invoking {}.{}() with event={} :\n{}", namePrefix, methodName, event, ExceptionUtils.getStackTrace(e));
     }
   }
 }
