@@ -143,10 +143,13 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         }
         mgt.deleteAlgorithm(algo);
       }
-      Thread.sleep(500L);
-      final List<String> nodes = mgt.listAllChannels();
-      assertNotNull(nodes);
-      assertTrue("nodes should be empty but is " + nodes, nodes.isEmpty());
+      assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+        @Override
+        public boolean evaluateWithException() throws Exception {
+          final List<String> nodes = mgt.listAllChannels();
+          return (nodes != null) && nodes.isEmpty();
+        }
+      }, 5000L, 500L, false));
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
