@@ -18,7 +18,7 @@
 
 package sample.test.deadlock;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
@@ -62,11 +62,12 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     final RunOptions ro = new RunOptions();
-    printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
+    print("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
+    final JMXDriverConnectionWrapper jmx;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
-      getJmxConnection(client);
+      jmx = getJmxConnection(client);
       ro.callback = new ScriptedJobCallback();
       //ro.callback = new SystemExitCallback();
       //ro.callback = new JobPersistenceCallback();
@@ -96,7 +97,8 @@ public class DeadlockRunner {
           //requestNodeShutdown(client);
         }
         while (jobProvider.hasPendingJob()) Thread.sleep(10L);
-        printf("*** executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
+        print("*** executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
+        printStats(jmx);
       } finally {
         if (ro.simulateNodeCrashes) {
           pt.setStopped(true);
@@ -119,7 +121,7 @@ public class DeadlockRunner {
       updateSlaveNodes(jppfClient, 0);
       final TimeMarker marker = new TimeMarker().start();
       for (int n: nbSlaves) updateSlaveNodes(jppfClient, n);
-      printf("total time: %s", marker.stop().getLastElapsedAsString());
+      print("total time: %s", marker.stop().getLastElapsedAsString());
       updateSlaveNodes(jppfClient, 0);
     } catch(final Exception e) {
       e.printStackTrace();
@@ -131,10 +133,10 @@ public class DeadlockRunner {
    * @param job the JPPF job whose results are printed.
    */
   public static void processResults(final JPPFJob job) {
-    printf("*** results for job '%s' ***", job.getName());
+    print("*** results for job '%s' ***", job.getName());
     final List<Task<?>> results = job.getAllResults();
     for (Task<?> task: results) {
-      if (task.getThrowable() != null) printf("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      if (task.getThrowable() != null) print("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
       //else System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
     }
   }
@@ -146,13 +148,13 @@ public class DeadlockRunner {
    * @throws Exception if any error occurs.
    */
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
-    printf("***** ensuring %d connections ...", nbConnections);
+    print("***** ensuring %d connections ...", nbConnections);
     final JPPFConnectionPool pool = client.awaitConnectionPool();
-    printf("***** ensuring %d connections, found pool = %s", nbConnections, pool);
+    print("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
-    printf("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
+    print("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
     pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
-    printf("***** ensuring %d connections, after pool.await()", nbConnections);
+    print("***** ensuring %d connections, after pool.await()", nbConnections);
   }
 
   /**
@@ -162,7 +164,7 @@ public class DeadlockRunner {
    * @throws Exception if any error occurs.
    */
   private static void updateSlaveNodes(final JPPFClient client, final int nbSlaves) throws Exception {
-    printf("ensuring %d slaves ...", nbSlaves);
+    print("ensuring %d slaves ...", nbSlaves);
     final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     if (jmx.nbNodes() == nbSlaves + 1) return;
     final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
@@ -171,7 +173,7 @@ public class DeadlockRunner {
     final TimeMarker marker = new TimeMarker().start();
     forwarder.provisionSlaveNodes(masterSelector, nbSlaves, null);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
-    printf("slaves confirmation wait time: %s", marker.stop().getLastElapsedAsString());
+    print("slaves confirmation wait time: %s", marker.stop().getLastElapsedAsString());
   }
 
   /**
@@ -181,7 +183,7 @@ public class DeadlockRunner {
    */
   @SuppressWarnings("unused")
   private static void requestNodeShutdown(final JPPFClient client) throws Exception {
-    printf("requesting node shutdown ...");
+    print("requesting node shutdown ...");
     final JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     final NodeSelector selector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     jmx.getNodeForwarder().shutdown(selector, false);
@@ -213,11 +215,46 @@ public class DeadlockRunner {
   }
 
   /**
+   * Print statistics to the console.
+   * @param jmx the jmx connection.
+   * @throws Exception if any error occurs.
+   */
+  private static void printStats(final JMXDriverConnectionWrapper jmx) throws Exception {
+    final Map<String, Object> map = jmx.getNodeForwarder().state(NodeSelector.ALL_NODES);
+    double total = 0d;
+    double min = Double.MAX_VALUE;
+    double max = 0d;
+    double mean = 0d;
+    final int nbNodes = map.size();
+    double meanDev = 0d;
+    double minDev = Double.MAX_VALUE;
+    double maxDev = 0d;
+    final int[] nbTasks = new int[nbNodes];
+    int count = 0;
+    for (final Map.Entry<String, Object> entry: map.entrySet()) nbTasks[count++] = ((JPPFNodeState) entry.getValue()).getNbTasksExecuted();
+    for (int nb: nbTasks) {
+      if (nb > max) max = nb;
+      if (nb < min) min = nb;
+      total += nb;
+    }
+    mean = total / nbNodes;
+    for (int nb: nbTasks) {
+      final double dev = Math.abs(nb - mean);
+      if (dev > maxDev) maxDev = dev;
+      if (dev < minDev) minDev = dev;
+      meanDev += dev;
+    }
+    meanDev /= nbNodes;
+    print("nodes = %d, tasks = %,.2f, avg = %,.2f, min = %,.2f, max = %,.2f", nbNodes, total, mean, min, max);
+    print("deviations: mean = %,.2f, min = %,.2f, max = %,.2f", meanDev, minDev, maxDev);
+  }
+
+  /**
    * Print and log the specified formatted message.
    * @param format the message format.
    * @param params the parameters of the message.
    */
-  static void printf(final String format, final Object...params) {
+  static void print(final String format, final Object...params) {
     final String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
