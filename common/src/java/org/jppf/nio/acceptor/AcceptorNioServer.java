@@ -280,13 +280,13 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       }
       if (debugEnabled) log.debug("about to register server {} with selector", server);
       sync.wakeUpAndSetOrIncrement();
-      if (debugEnabled) log.debug("registering server {} with selector", server);
       try {
+        if (debugEnabled) log.debug("registering server {} with selector", server);
         server.register(selector, SelectionKey.OP_ACCEPT, map);
+        if (debugEnabled) log.debug("server {} registered with selector", server);
       } finally {
         sync.decrement();
       }
-      if (debugEnabled) log.debug("server {} registered with selector", server);
     }
     if (debugEnabled) log.debug("server added for port={}, ssl={}", port, ssl);
   }

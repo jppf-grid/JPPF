@@ -319,7 +319,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (closed.get()) return;
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
-    if (debugEnabled) log.debug(String.format("updating status from %s to %s for %s", oldStatus, newStatus, wrapper));
+    if (debugEnabled) log.debug("updating status from {} to {} for {}", oldStatus, newStatus, wrapper);
     if ((wrapper == null) || (oldStatus == newStatus)) return;
     final boolean bNew = newStatus.isWorkingStatus();
     final boolean bOld = oldStatus.isWorkingStatus();

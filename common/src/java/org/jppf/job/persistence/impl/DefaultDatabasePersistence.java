@@ -232,7 +232,7 @@ public class DefaultDatabasePersistence extends AbstractDatabasePersistence<Pers
           final int[] result = new int[positions.size()];
           int i = 0;
           for (Integer n: positions) result[i++] = n;
-          if (debugEnabled) log.debug(String.format("positions of %s for job uuid=%s : %s", type, jobUuid, StringUtils.buildString(", ", "{", "}", result)));
+          if (debugEnabled) log.debug("positions of {} for job uuid={} : {}", type, jobUuid, StringUtils.buildString(", ", "{", "}", result));
           return result;
         }
       }

@@ -121,7 +121,7 @@ public interface JPPFSerialization {
       }
       if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
       if (className != null) {
-        if (debugEnabled) log.debug(String.format("serializationClass=%s, compositeClasses=%s, compositeMap=%s", className, compositeClasses, compositeMap));
+        if (debugEnabled) log.debug("serializationClass={}, compositeClasses={}, compositeMap={}", className, compositeClasses, compositeMap);
         try {
           serializationClass = (Class<? extends JPPFSerialization>) Class.forName(className);
         } catch (final Exception e) {
@@ -169,7 +169,7 @@ public interface JPPFSerialization {
       serializationClass = null;
       compositeClasses.clear();
       configure();
-      if (debugEnabled) log.debug(String.format("serialization = %s, composite = %s", serializationClass, compositeClasses));
+      if (debugEnabled) log.debug("serialization = {}, composite = {}", serializationClass, compositeClasses);
       //log.info(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
     }
   }

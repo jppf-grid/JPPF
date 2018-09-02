@@ -188,7 +188,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @exclude
    */
   public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel<ClientTaskBundle> channel, final List<Task<?>> tasks) {
-    if (log.isDebugEnabled()) log.debug(String.format("firing %s event with %d tasks for %s, connection = %s", type, (tasks == null ? 0 : tasks.size()), this, channel));
+    if (log.isDebugEnabled()) log.debug("firing {} event with {} tasks for {}, connection = {}", type, (tasks == null ? 0 : tasks.size()), this, channel);
     final JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
@@ -362,7 +362,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
       if (tasks != null) {
         results.addResults(tasks);
         unexecutedTaskCount = this.unexecutedTaskCount();
-        if (debugEnabled) log.debug(String.format("Received results for %d tasks, pendingCount=%d, count=%d, jobResults=%s", tasks.size(), unexecutedTaskCount, tasks.size(), results));
+        if (debugEnabled) log.debug("Received results for {} tasks, pendingCount={}, count={}, jobResults={}", tasks.size(), unexecutedTaskCount, tasks.size(), results);
         if (persistenceManager != null) {
           try {
             @SuppressWarnings("unchecked")

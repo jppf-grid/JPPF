@@ -78,11 +78,11 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public Object getPersistedJobObject(final String uuid, final PersistenceObjectType type, final int position) throws Exception {
-    if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d", uuid, type, position));
+    if (debugEnabled) log.debug("requesting object with uuid={}, type={}, pos={}", uuid, type, position);
     final DataLocation data = handler.load(new PersistenceInfoImpl(uuid, null, type, position, null));
     if (debugEnabled) {
-      if (data != null) log.debug(String.format("got object=%s for uuid=%s, type=%s, pos=%d", data, uuid, type, position));
-      else log.debug(String.format("could not find persisted object for uuid=%s, type=%s, pos=%d", uuid, type, position));
+      if (data != null) log.debug("got object={} for uuid={}, type={}, pos={}", data, uuid, type, position);
+      else log.debug("could not find persisted object for uuid={}, type={}, pos={}", uuid, type, position);
     }
     return deserialize(data, type);
   }
@@ -163,7 +163,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public Object getPersistedJobObject(final long requestId, final String uuid, final PersistenceObjectType type, final int position) throws Exception {
-    if (debugEnabled) log.debug(String.format("requesting object with uuid=%s, type=%s, pos=%d, requestId=%d", uuid, type, position, requestId));
+    if (debugEnabled) log.debug("requesting object with uuid={}, type={}, pos={}, requestId={}", uuid, type, position, requestId);
     final Map<PersistenceInfoKey, DataLocation> map = loadRequests.get(requestId);
     if (map == null) return null;
     final PersistenceInfoKey key = new PersistenceInfoKey(uuid, type, position);
@@ -198,7 +198,7 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   @Override
   public boolean deleteLoadRequest(final long requestId) throws Exception {
-    if (debugEnabled) log.debug(String.format("deleting load request with id=%d", requestId));
+    if (debugEnabled) log.debug("deleting load request with id={}", requestId);
     return loadRequests.remove(requestId) != null;
   }
 }

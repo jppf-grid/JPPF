@@ -403,7 +403,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param node the node that was added.
    */
   void nodeAdded(final TopologyDriver driver, final TopologyNode node) {
-    if (debugEnabled) log.debug(String.format("adding %s %s to driver %s", node.isPeer() ? "peer" : "node", node, driver));
+    if (debugEnabled) log.debug("adding {} {} to driver {}", node.isPeer() ? "peer" : "node", node, driver);
     if (node.isNode()) {
       final TopologyNode other = getNodeOrPeer(node.getUuid());
       if (other != null) nodeRemoved((TopologyDriver) other.getParent(), other);
@@ -428,7 +428,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter implements Au
    * @param node the node that was removed.
    */
   void nodeRemoved(final TopologyDriver driver, final TopologyNode node) {
-    if (debugEnabled) log.debug(String.format("removing %s %s from driver %s", (node.isNode() ? "node" : "peer"), node, driver));
+    if (debugEnabled) log.debug("removing {} {} from driver {}", (node.isNode() ? "node" : "peer"), node, driver);
     driver.remove(node);
     if (node.isNode()) {
       synchronized(nodeMap) {

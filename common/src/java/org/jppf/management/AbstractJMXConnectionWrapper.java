@@ -130,7 +130,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
       if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
       else initJPPF();
-      if (debugEnabled) log.debug(String.format("created AbstractJMXConnectionWrapper with sslEnabled=%b, url=%s, env=%s", this.sslEnabled, url, env));
+      if (debugEnabled) log.debug("created AbstractJMXConnectionWrapper with sslEnabled={}, url={}, env={}", this.sslEnabled, url, env);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }

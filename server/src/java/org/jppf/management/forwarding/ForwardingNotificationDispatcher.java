@@ -102,9 +102,9 @@ class ForwardingNotificationDispatcher {
           handlerMap.put(mBeanName, handler);
           return true;
         } catch (final Exception e) {
-          final String format = "failed to add notification listener for node=%s : exception=%s";
-          if (debugEnabled) log.debug(String.format(format, node, ExceptionUtils.getStackTrace(e)));
-          else log.info(String.format(format, node, ExceptionUtils.getMessage(e)));
+          final String format = "failed to add notification listener for node={} : exception={}";
+          if (debugEnabled) log.debug(format, node, ExceptionUtils.getStackTrace(e));
+          else log.info(format, node, ExceptionUtils.getMessage(e));
         }
       }
     } finally {

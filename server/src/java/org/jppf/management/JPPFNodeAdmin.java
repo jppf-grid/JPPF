@@ -180,7 +180,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     } else {
       node.requestShutdown(restart);
       nodeState.setPendingAction(pendingAction());
-      if (debugEnabled) log.debug(String.format("pending action after %s request: %s", s, nodeState.getPendingAction()));
+      if (debugEnabled) log.debug("pending action after {} request: {}", s, nodeState.getPendingAction());
     }
   }
 
@@ -231,7 +231,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
     if (configOverrides == null) return;
-    if (debugEnabled) log.debug(String.format("node request to change configuration, restart=%b, interruptIfRunning=%b", restart, interruptIfRunning));
+    if (debugEnabled) log.debug("node request to change configuration, restart={}, interruptIfRunning={}", restart, interruptIfRunning);
     // we don't allow the node uuid to be overriden
     if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
     final TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();

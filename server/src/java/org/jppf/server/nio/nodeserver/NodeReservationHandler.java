@@ -95,7 +95,7 @@ public class NodeReservationHandler {
    * @param node the node to restart and reserve.
    */
   void doReservation(final ServerJob job, final AbstractNodeContext node) {
-    if (debugEnabled) log.debug(String.format("reserving node %s for job %s", node.getUuid(), job.getUuid()));
+    if (debugEnabled) log.debug("reserving node {} for job {}", node.getUuid(), job.getUuid());
     synchronized(this) {
       pendingMap.put(node.getUuid(), job.getUuid());
       jobPendingMap.putValue(job.getUuid(), node.getUuid());
@@ -128,7 +128,7 @@ public class NodeReservationHandler {
    * @param job the job being cancelled.
    */
   public synchronized void onJobCancelled(final ServerJob job) {
-    if (debugEnabled) log.debug(String.format("job %s cancelled, removing all reservations", job.getUuid()));
+    if (debugEnabled) log.debug("job {} cancelled, removing all reservations", job.getUuid());
     removeJobReservations(job.getUuid());
   }
 
@@ -140,12 +140,12 @@ public class NodeReservationHandler {
     if (debugEnabled) log.debug("removing all reservations for job {}", jobUuid);
     Collection<String> nodes = jobPendingMap.removeKey(jobUuid);
     if (nodes != null) {
-      if (debugEnabled) log.debug(String.format("removing %d pending node reservations for cancelled job %s", nodes.size(), jobUuid));
+      if (debugEnabled) log.debug("removing {} pending node reservations for cancelled job {}", nodes.size(), jobUuid);
       for (String nodeUuid: nodes) pendingMap.remove(nodeUuid);
     }
     nodes = jobReadyMap.removeKey(jobUuid);
     if (nodes != null) {
-      if (debugEnabled) log.debug(String.format("removing %d ready node reservations for cancelled job %s", nodes.size(), jobUuid));
+      if (debugEnabled) log.debug("removing {} ready node reservations for cancelled job {}", nodes.size(), jobUuid);
       for (String nodeUuid: nodes) readyMap.remove(nodeUuid);
     }
   }
@@ -218,7 +218,7 @@ public class NodeReservationHandler {
     final TypedProperties config = node.getSystemInformation().getJppf();
     final String reservedJobUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
     if (reservedJobUuid != null) {
-      if (debugEnabled) log.debug(String.format("node %s is reserved for job %s", node.getUuid(), reservedJobUuid));
+      if (debugEnabled) log.debug("node {} is reserved for job {}", node.getUuid(), reservedJobUuid);
       final String oldNodeUuid = config.get(JPPFProperties.NODE_RESERVED_UUID);
       final ServerJob job = server.getTaskQueueChecker().queue.getJob(reservedJobUuid);
       if (debugEnabled) log.debug("job with uuid={} {} in the queue", reservedJobUuid, (job == null) ? "no longer" : "found");
@@ -229,9 +229,9 @@ public class NodeReservationHandler {
           return true;
         }
         final String pendingJobUuid = pendingMap.get(oldNodeUuid);
-        if (debugEnabled) log.debug(String.format("node %s previous uuid was %s and was reserved for job %s (reservedJobUuid=%s)", node.getUuid(), oldNodeUuid, pendingJobUuid, reservedJobUuid));
+        if (debugEnabled) log.debug("node {} previous uuid was {} and was reserved for job {} (reservedJobUuid={})", node.getUuid(), oldNodeUuid, pendingJobUuid, reservedJobUuid);
         if (reservedJobUuid.equals(pendingJobUuid)) {
-          if (debugEnabled) log.debug(String.format("oldNodeUuid=%s, nodeUuid=%s, jobUuid=%s", oldNodeUuid, node.getUuid(), pendingJobUuid));
+          if (debugEnabled) log.debug("oldNodeUuid={}, nodeUuid={}, jobUuid={}", oldNodeUuid, node.getUuid(), pendingJobUuid);
           pendingMap.remove(oldNodeUuid);
           if (pendingJobUuid != null) readyMap.put(node.getUuid(), pendingJobUuid);
           jobPendingMap.removeValue(reservedJobUuid, oldNodeUuid);
@@ -311,7 +311,7 @@ public class NodeReservationHandler {
       final JMXNodeConnectionWrapper jmx = node.getJmxConnection();
       if ((jmx != null) && jmx.isConnected()) {
         try {
-          if (debugEnabled) log.debug(String.format("about to restart node %s reserved for job %s with config=%s", node.getUuid(), job.getUuid(), config));
+          if (debugEnabled) log.debug("about to restart node {} reserved for job {} with config={}", node.getUuid(), job.getUuid(), config);
           final boolean restart =  spec.isForceRestart() || (node.reservationScore > 0);
           node.reservationTansition = Transition.KEEP;
           // if node is not restarted, synchronize server version of the node's config

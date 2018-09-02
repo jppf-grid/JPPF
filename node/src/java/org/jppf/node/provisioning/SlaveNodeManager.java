@@ -136,7 +136,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param configOverrides a set of overrides to the slave's configuration.
    */
   private void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
-    if (debugEnabled) log.debug(String.format("provisioning request for %d slaves, interruptIfRunning=%b, configOverrides=%s", requestedSlaves, interruptIfRunning, configOverrides));
+    if (debugEnabled) log.debug("provisioning request for {} slaves, interruptIfRunning={}, configOverrides={}", requestedSlaves, interruptIfRunning, configOverrides);
     final int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {

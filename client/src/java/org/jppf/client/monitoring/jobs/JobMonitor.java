@@ -84,7 +84,7 @@ public class JobMonitor extends TopologyListenerAdapter implements JobMonitoring
    * @param listeners optional listeners that can be registered immediately with this job monitor.
    */
   public JobMonitor(final JobMonitorUpdateMode updateMode, final long period, final TopologyManager topologyManager, final JobMonitoringListener...listeners) {
-    if (debugEnabled) log.debug(String.format("initializing job monitor in %s mode with period = %d", updateMode, period));
+    if (debugEnabled) log.debug("initializing job monitor in {} mode with period = {}", updateMode, period);
     this.topologyManager = topologyManager;
     if (listeners != null) {
       for (JobMonitoringListener listener: listeners) addJobMonitoringListener(listener);

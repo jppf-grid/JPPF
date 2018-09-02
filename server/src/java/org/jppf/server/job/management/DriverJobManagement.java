@@ -245,7 +245,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     if (debugEnabled && (notification instanceof JobNotification)) {
       final JobNotification event = (JobNotification) notification;
       if (event.getEventType() != JobEventType.JOB_UPDATED)
-        log.debug(String.format("sending event %s for job %s, node=%s", event.getEventType(), event.getJobInformation(), event.getNodeInfo()));
+        log.debug("sending event {} for job {}, node={}", event.getEventType(), event.getJobInformation(), event.getNodeInfo());
     }
     super.sendNotification(notification);
   }
@@ -349,19 +349,19 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
   @Override
   public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
-    if (debugEnabled) log.debug(String.format("adding notification listener=%s with filter=%s and handback=%s", listener, filter, handback));
+    if (debugEnabled) log.debug("adding notification listener={} with filter={} and handback={}", listener, filter, handback);
     super.addNotificationListener(listener, filter, handback);
   }
 
   @Override
   public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
-    if (debugEnabled) log.debug(String.format("removing notification listener=%s", listener));
+    if (debugEnabled) log.debug("removing notification listener=" + listener);
     super.removeNotificationListener(listener);
   }
 
   @Override
   public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
-    if (debugEnabled) log.debug(String.format("removing notification listener=%s with filter=%s and handback=%s", listener, filter, handback));
+    if (debugEnabled) log.debug("removing notification listener={} with filter={} and handback={}", listener, filter, handback);
     super.removeNotificationListener(listener, filter, handback);
   }
 }

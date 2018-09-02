@@ -310,7 +310,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   public synchronized void jobResultsReceived(final ExecutorChannel<?> channel, final ServerJob job, final Collection<ServerTask> tasks) {
     JPPFDriver.getInstance().getQueue().getPersistenceHandler().storeResults(job, tasks);
     if (!taskReturnListeners.isEmpty()) {
-      if (debugEnabled) log.debug(String.format("results received with channel=%s, job=%s, nb Tasks=%d", channel, job, tasks.size()));
+      if (debugEnabled) log.debug("results received with channel={}, job={}, nb Tasks={}", channel, job, tasks.size());
       final JobTasksEvent event = createJobTasksEvent(channel, job, tasks);
       for (final JobTasksListener listener: taskReturnListeners) listener.resultsReceived(event);
     }

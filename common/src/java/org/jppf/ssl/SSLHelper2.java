@@ -124,7 +124,7 @@ public final class SSLHelper2 {
           }
         }
       }
-      if (debugEnabled) log.debug(String.format("tmfs=%s, trustManagers=%s", Arrays.asList(tmfs), trustManagers));
+      if (debugEnabled) log.debug("tmfs={}, trustManagers={}", Arrays.asList(tmfs), trustManagers);
       final SSLContext sslContext = SSLContext.getInstance(sslConfig.get(JPPFProperties.SSL_CONTEXT_PROTOCOL));
       sslContext.init(kmf == null ? null : kmf.getKeyManagers(), trustManagers == null ? null : new TrustManager[] { new CompositeX509TrustManager(trustManagers) }, null);
       if (debugEnabled) log.debug("initialized SSLContext = {}", sslContext);
@@ -329,11 +329,11 @@ public final class SSLHelper2 {
     final String keyOrTrust = baseProperty.contains("keystore") ? "keystore" : "truststore";
     String s = sslConfig.getString(baseProperty + ".file", null);
     if (s != null) {
-      if (debugEnabled) log.debug(String.format("getting %s of type %s from file %s", keyOrTrust, storeType, s));
+      if (debugEnabled) log.debug("getting {} of type {} from file {}", keyOrTrust, storeType, s);
       return getKeyOrTrustStore(new FileStoreSource(s).call(), pwd, storeType);
     }
     s = sslConfig.getString(baseProperty + ".source", null);
-    if (debugEnabled) log.debug(String.format("getting %s of type %s from source %s", keyOrTrust, storeType, s));
+    if (debugEnabled) log.debug("getting {} of type {} from source {}", keyOrTrust, storeType, s);
     return getKeyOrTrustStore((InputStream) callSource(s), pwd, storeType);
   }
 

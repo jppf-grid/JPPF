@@ -183,7 +183,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
    * @throws Exception if any error occurs.
    */
   public ChannelsPair createChannelsPair(final Map<String, ?> env, final String connectionID, final int port, final SocketChannel channel, final boolean ssl, final boolean client) throws Exception {
-    if (debugEnabled) log.debug(String.format("connectionID=%s, port=%d, ssl=%b, client=%b, channel=%s, env=%s", connectionID, port, ssl, client, channel, env));
+    if (debugEnabled) log.debug("connectionID={}, port={}, ssl={}, client={}, channel={}, env={}", connectionID, port, ssl, client, channel, env);
     if (channel.isBlocking()) channel.configureBlocking(false);
     final JMXContext readingChannel = createContext(env, channel, ssl, true, null, client);
     final JMXContext writingChannel = createContext(env, channel, ssl, false, readingChannel.getSSLHandler(), client);
@@ -215,7 +215,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
   private JMXContext createContext(final Map<String, ?> env, final SocketChannel channel, final boolean ssl, final boolean reading, final SSLHandler sslHandler, final boolean client)
     throws Exception {
     final JMXContext context = createNioContext(reading, channel);
-    if (debugEnabled) log.debug(String.format("creating channel wrapper for ssl=%b, reading=%b, sslHandler=%s, context=%s, env=%s", ssl, reading, sslHandler, context, env));
+    if (debugEnabled) log.debug("creating channel wrapper for ssl={}, reading={}, sslHandler={}, context={}, env={}", ssl, reading, sslHandler, context, env);
     context.setSsl(ssl);
     if (ssl) {
       if (sslHandler == null) {
@@ -235,7 +235,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
    */
   @SuppressWarnings("unchecked")
   private static void configureSSL(final Map<String, ?> env, final JMXContext context, final boolean client) throws Exception {
-    if (debugEnabled) log.debug(String.format("configuring %s-side SSL for %s, env = %s", (client ? "client" : "server"), context, env));
+    if (debugEnabled) log.debug("configuring {}-side SSL for {}, env = {}", (client ? "client" : "server"), context, env);
     ((Map<String, Object>) env).put(JPPFJMXProperties.TLS_ENABLED.getName(), "true");
     ((Map<String, Object>) env).put("jppf.ssl", true);
     final SSLHelper2 helper = SSLHelper.getJPPFJMXremoteSSLHelper(env);
@@ -246,7 +246,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
     final SSLParameters params = helper.getSSLParameters();
     engine.setUseClientMode(client);
     engine.setSSLParameters(params);
-    if (debugEnabled) log.debug(String.format("created SSLEngine: useClientMode = %b, parameters = %s", engine.getUseClientMode(), engine.getSSLParameters()));
+    if (debugEnabled) log.debug("created SSLEngine: useClientMode = {}, parameters = {}", engine.getUseClientMode(), engine.getSSLParameters());
     final SSLHandler sslHandler = new SSLHandlerImpl(channel, engine);
     context.setSSLHandler(sslHandler);
   }

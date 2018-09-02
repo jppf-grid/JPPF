@@ -93,7 +93,7 @@ public class DatasourceInitializerImpl implements DatasourceInitializer {
         });
         final Object cfg = hikariConfigConstructor.newInstance(cleanProps);
         final DataSource ds = (DataSource) hikariDatasourceConstructor.newInstance(cfg);
-        if (debugEnabled) log.debug(String.format("defined datasource with name=%s, properties=%s", dsName, cleanProps));
+        if (debugEnabled) log.debug("defined datasource with name={}, properties={}", dsName, cleanProps);
         return ds;
       } catch (final Exception e) {
         log.error("error defining datasource with name={}, properties={}:\n{}", dsName, ConfigurationUtils.hidePasswords(props), ExceptionUtils.getStackTrace(e));

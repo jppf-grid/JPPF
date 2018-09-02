@@ -87,7 +87,7 @@ public abstract class JPPFContainer {
    * @throws Exception if an error occurs while initializing.
    */
   public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
-    if (debugEnabled) log.debug(String.format("new JPPFContainer with uuidPath=%s, classLoader=%s, clientAccess=%b", uuidPath, classLoader, clientAccess));
+    if (debugEnabled) log.debug("new JPPFContainer with uuidPath={}, classLoader={}, clientAccess={}", uuidPath, classLoader, clientAccess);
     this.uuidPath = uuidPath;
     this.classLoader = classLoader;
     this.clientAccess = clientAccess;

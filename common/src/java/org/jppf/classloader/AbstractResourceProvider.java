@@ -125,7 +125,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   @Override
   public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classloader, final boolean lookupInFileSystem) {
     final ClassLoader cl = resolveClassLoader(classloader);
-    if (debugEnabled) log.debug(String.format("before lookup: name=%s, resolved classloader=%s, lookupInFileSystem=%b", name, cl, lookupInFileSystem));
+    if (debugEnabled) log.debug("before lookup: name={}, resolved classloader={}, lookupInFileSystem={}", name, cl, lookupInFileSystem);
     List<byte[]> result = null;
     try {
       final Enumeration<URL> urlEnum = cl.getResources(name);
@@ -163,7 +163,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
         log.error(e.getMessage(), e);
       }
     }
-    if (debugEnabled) log.debug(String.format("after lookup: result for %s is %s", name, result));
+    if (debugEnabled) log.debug("after lookup: result for {} is {}", name, result);
     return result;
   }
 

@@ -229,7 +229,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
     try {
       return (NodePendingAction) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "pendingAction");
     } catch (final Exception e) {
-      if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
+      if (debugEnabled) log.debug("error invoking {} on MBean {}: {}", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e));
     }
     return null;
   }
@@ -239,7 +239,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
     try {
       return (Boolean) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "hasPendingAction");
     } catch (final Exception e) {
-      if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
+      if (debugEnabled) log.debug("error invoking {} on MBean {}: {}", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e));
     }
     return false;
   }

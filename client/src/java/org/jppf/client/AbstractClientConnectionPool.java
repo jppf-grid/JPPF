@@ -267,7 +267,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    */
   public List<JPPFClientConnection> awaitConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
     final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
-    if (debugEnabled) log.debug(String.format("awaiting %d connections with operator=%s and status in %s", nbConnections, op, Arrays.asList(statuses)));
+    if (debugEnabled) log.debug("awaiting {} connections with operator={} and status in {}", nbConnections, op, Arrays.asList(statuses));
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {

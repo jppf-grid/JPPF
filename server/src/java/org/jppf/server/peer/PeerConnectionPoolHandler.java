@@ -60,8 +60,7 @@ public class PeerConnectionPoolHandler {
    * @return the newly created pool.
    */
   public PeerConnectionPool newPool(final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
-    if (debugEnabled) log.debug(String.format("creating PeerConnectionPool with peerName=%s, size=%d, connectionInfo=%s, secure=%b, fromDiscovery=%b",
-      peerName, size, connectionInfo, secure, fromDiscovery));
+    if (debugEnabled) log.debug("creating PeerConnectionPool with peerName={}, size={}, connectionInfo={}, secure={}, fromDiscovery={}", peerName, size, connectionInfo, secure, fromDiscovery);
     final PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
     return pool;
   }

@@ -58,7 +58,7 @@ public class JPPFJMXServer extends AbstractJMXServer {
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
     else this.portProperty = portProperty;
-    if (debugEnabled) log.debug(String.format("initializing with ssl=%b, portProperty=%s", ssl, this.portProperty));
+    if (debugEnabled) log.debug("initializing with ssl={}, portProperty={}", ssl, this.portProperty);
   }
 
   /**

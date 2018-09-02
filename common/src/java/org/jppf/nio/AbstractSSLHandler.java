@@ -110,8 +110,8 @@ public abstract class AbstractSSLHandler implements SSLHandler {
     this.netSendBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
     this.appReceiveBuffer = ByteBuffer.wrap(new byte[session.getApplicationBufferSize()]);
     this.netReceiveBuffer = ByteBuffer.wrap(new byte[session.getPacketBufferSize() + 50]);
-    if (debugEnabled) log.debug(String.format("creating SSLHandler for channel %s, useClientMode=%b, ssl params = [%s]",
-      channel, sslEngine.getUseClientMode(), SSLHelper2.dumpSSLParameters(sslEngine.getSSLParameters())));
+    if (debugEnabled) log.debug("creating SSLHandler for channel {}, useClientMode={}, ssl params = [{}]",
+      channel, sslEngine.getUseClientMode(), SSLHelper2.dumpSSLParameters(sslEngine.getSSLParameters()));
   }
 
   @Override

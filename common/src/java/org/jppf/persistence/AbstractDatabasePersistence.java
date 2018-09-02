@@ -213,7 +213,7 @@ public abstract class AbstractDatabasePersistence<I> {
           }
         } catch(@SuppressWarnings("unused") final SQLException e) {
         }
-        if (debugEnabled) log.debug(String.format("table '%s' does not exist in the database, creating it", tableName));
+        if (debugEnabled) log.debug("table '{}' does not exist in the database, creating it", tableName);
         
         try (PreparedStatement ps = connection.prepareStatement(getTableDDL(tableName))) {
           ps.executeUpdate();

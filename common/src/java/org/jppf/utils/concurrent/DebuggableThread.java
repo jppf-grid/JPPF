@@ -71,7 +71,7 @@ public class DebuggableThread extends Thread {
 
   @Override
   public void interrupt() {
-    if (debugEnabled) log.debug(String.format("interrupt() called on %s by %s, call stack:\n%s", this, Thread.currentThread(), ExceptionUtils.getCallStack()));
+    if (debugEnabled) log.debug("interrupt() called on {} by {}, call stack:\n{}", this, Thread.currentThread(), ExceptionUtils.getCallStack());
     super.interrupt();
   }
 }

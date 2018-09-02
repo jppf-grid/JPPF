@@ -248,9 +248,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
           final Integer firstKey = idleChannels.firstKey();
           final int highestPriority = getHighestPriority();
           final Collection<ChannelWrapper> channels = idleChannels.getValues(highestPriority);
-          if (size <= 5) log.debug(String.format("nb idle channels = %d, firstKey = %s, highestPriority = %d ==> %d channels: %s",
-            size, firstKey, highestPriority, channels == null ? 0 : channels.size(), channels));
-          else log.debug(String.format("nb idle channels = %d, firstKey = %s, highestPriority = %d ==> %d channels", size, firstKey, highestPriority, channels == null ? 0 : channels.size()));
+          final int nbChannels = (channels == null) ? 0 : channels.size();
+          if (size <= 5) log.debug("nb idle channels = {}, firstKey = {}, highestPriority = {} ==> {} channels: {}", size, firstKey, highestPriority, nbChannels, channels);
+          else log.debug("nb idle channels = {}, firstKey = {}, highestPriority = {} ==> {} channels", size, firstKey, highestPriority, nbChannels);
         }
         ChannelWrapper channel = null;
         ClientJob selectedBundle = null;

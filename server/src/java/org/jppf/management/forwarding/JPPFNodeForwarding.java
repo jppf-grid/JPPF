@@ -333,14 +333,14 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
             throw new IllegalArgumentException(String.format(
               "unknown type of operation %d for mbean=%s, memeber=%s, param=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
         }
-        if (debugEnabled) log.debug(String.format("about to forward with type=%d, mbean=%s, member=%s, params=%s, node=%s", type, mbeanName, memberName, Arrays.deepToString(params), node));
+        if (debugEnabled) log.debug("about to forward with type={}, mbean={}, member={}, params={}, node={}", type, mbeanName, memberName, Arrays.deepToString(params), node);
         executor.execute(task);
       }
       return callback.await();
     } catch (final Exception e) {
       if (debugEnabled) {
-        log.debug(String.format("error forwarding with type=%d, nb nodes=%d, mbeanNaem=%s, memberName=%s, params=%s%n%s",
-          type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e)));
+        log.debug("error forwarding with type={}, nb nodes={}, mbeanNaem={}, memberName={}, params={}\n{}",
+          type, nodes.size(), mbeanName, memberName, Arrays.asList(params), ExceptionUtils.getStackTrace(e));
       }
       throw e;
     }

@@ -141,7 +141,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   protected NioServer(final String name, final int identifier, final boolean useSSL) throws Exception {
     super(name);
     setDaemon(true);
-    if (debugEnabled) log.debug(String.format("starting %s with identifier=%s and useSSL=%b", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL));
+    if (debugEnabled) log.debug("starting {} with identifier={} and useSSL={}", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL);
     log.info("initializing {}({})", getClass().getSimpleName(), getName());
     this.identifier = identifier;
     selector = Selector.open();
@@ -161,7 +161,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
     this(identifier, false);
-    if (debugEnabled) log.debug(String.format("starting %s with ports=%s and sslPorts=%s", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts)));
+    if (debugEnabled) log.debug("starting {} with ports={} and sslPorts={}", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts));
     this.ports = ports;
     this.sslPorts = sslPorts;
     init();

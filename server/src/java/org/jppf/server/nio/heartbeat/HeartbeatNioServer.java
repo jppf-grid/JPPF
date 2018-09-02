@@ -109,7 +109,7 @@ public final class HeartbeatNioServer extends StatelessNioServer {
   private HeartbeatContext createContext(final SocketChannel channel, final boolean ssl)
     throws Exception {
     final HeartbeatContext context = createNioContext(channel);
-    if (debugEnabled) log.debug(String.format("creating channel wrapper for ssl=%b, context=%s", ssl, context));
+    if (debugEnabled) log.debug("creating channel wrapper for ssl={}, context={}", ssl, context);
     context.setSsl(ssl);
     if (ssl) {
       if (debugEnabled) log.debug("creating SSLEngine for {}", context);
@@ -125,7 +125,7 @@ public final class HeartbeatNioServer extends StatelessNioServer {
    */
   @SuppressWarnings("unchecked")
   private static void configureSSL(final HeartbeatContext context) throws Exception {
-    if (debugEnabled) log.debug(String.format("configuring SSL for %s", context));
+    if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
     final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
@@ -133,7 +133,7 @@ public final class HeartbeatNioServer extends StatelessNioServer {
     final SSLParameters params = SSLHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
-    if (debugEnabled) log.debug(String.format("created SSLEngine: useClientMode = %b, parameters = %s", engine.getUseClientMode(), engine.getSSLParameters()));
+    if (debugEnabled) log.debug("created SSLEngine: useClientMode = {}, parameters = {}", engine.getUseClientMode(), engine.getSSLParameters());
     final SSLHandler sslHandler = new SSLHandlerImpl(channel, engine);
     context.setSSLHandler(sslHandler);
   }

@@ -178,7 +178,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @throws Exception if any error occurs.
    */
   private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) throws Exception {
-    if (debugEnabled) log.debug(String.format("dispatching %d tasks of job '%s' to node %s", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid()));
+    if (debugEnabled) log.debug("dispatching {} tasks of job '{}' to node {}", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid());
     synchronized(channel.getMonitor()) {
       final Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);
@@ -203,7 +203,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     final int nbJobChannels = job.getNbChannels();
     final int nbReservedNodes = reservationHandler.getNbReservedNodes(job.getUuid());
     final Collection<String> readyNodes = (spec == null) ? null : reservationHandler.getReadyNodes(job.getUuid());
-    if (debugEnabled) log.debug(String.format("jobUuid=%s, readyNodes=%s", job.getUuid(), readyNodes));
+    if (debugEnabled) log.debug("jobUuid={}, readyNodes={}", job.getUuid(), readyNodes);
     while (iterator.hasNext()) {
       final C channel = iterator.next();
       synchronized(channel.getMonitor()) {
@@ -246,7 +246,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
           if (readyNodes != null) {
             b = readyNodes.contains(channel.getUuid());
           }
-          if (debugEnabled) log.debug(String.format("nodeUuid=%s, readyJobUuid=%s, jobUuid=%s, b=%b", channel.getUuid(), readyJobUuid, job.getUuid(), b));
+          if (debugEnabled) log.debug("nodeUuid={}, readyJobUuid={}, jobUuid={}, b={}", channel.getUuid(), readyJobUuid, job.getUuid(), b);
           if (!b && (nbReservedNodes >= sla.getMaxNodes())) continue;
         }
         if (channel.isLocal() && localNodeBiasEnabled) { // add a bias toward local node
@@ -374,7 +374,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     final CollectionSortedMap<Integer, C> scoreMap = new SetSortedMap<>();
-    if (debugEnabled) log.debug(String.format("computing scores for job '%s', uuid=%s", job.getName(), job.getUuid()));
+    if (debugEnabled) log.debug("computing scores for job '{}', uuid={}", job.getName(), job.getUuid());
     for (final C channel: channels) {
       if (!channel.isLocal() && !channel.isOffline() && !channel.isPeer()) {
         final String reservedJobUuid = server.getNodeReservationHandler().getPendingJobUUID(channel);

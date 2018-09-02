@@ -207,7 +207,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
           try {
             positions[count++] = Integer.valueOf(s2);
           } catch (final Exception e) {
-            if (debugEnabled) log.debug(String.format("positions of %s for job %s (path=%s, s=%s, prefix=%s, s2=%s) : %s", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e)));
+            if (debugEnabled) log.debug("positions of {} for job {} (path={}, s={}, prefix={}, s2={}) : {}", type, jobUuid, path, s, prefix, s2, ExceptionUtils.getStackTrace(e));
             throw e;
           }
         }

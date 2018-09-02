@@ -179,7 +179,7 @@ public class JPPFJMXConnector implements JMXConnector {
     final String type;
     if (isClose) type = (exception == null) ? JMXConnectionNotification.CLOSED : JMXConnectionNotification.FAILED;
     else type = JMXConnectionNotification.OPENED;
-    if (debugEnabled) log.debug(String.format("firing notif with type=%s, exception=%s, connectionID=%s", type, ExceptionUtils.getMessage(exception), connectionID));
+    if (debugEnabled) log.debug("firing notif with type={}, exception={}, connectionID={}", type, ExceptionUtils.getMessage(exception), connectionID);
     final JMXConnectionNotification notif = new JMXConnectionNotification(type, this, connectionID, notificationSequence.incrementAndGet(), null, null);
     for (final ConnectionListenerInfo info: connectionListeners) {
       if ((info.filter == null) || info.filter.isNotificationEnabled(notif)) info.listener.handleNotification(notif, info.handback);

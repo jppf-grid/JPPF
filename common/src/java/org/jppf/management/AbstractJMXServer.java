@@ -163,7 +163,7 @@ public abstract class AbstractJMXServer implements JMXServer {
         nbTries++;
         if (nbTries > 65530 - 1024) throw e;
         if ((e instanceof BindException) || StringUtils.hasOneOf(e.getMessage(), true, "bind", "address already in use")) {
-          if (debugEnabled) log.debug(String.format("starting %s server on port %d failed at attempt %,d because the port is already in use", protocol, managementPort, nbTries));
+          if (debugEnabled) log.debug("starting {} server on port {} failed at attempt {} because the port is already in use", protocol, managementPort, nbTries);
           if (managementPort >= 65530) managementPort = 1024;
           managementPort++;
         }
@@ -171,6 +171,6 @@ public abstract class AbstractJMXServer implements JMXServer {
       }
     }
     stopped = false;
-    if (debugEnabled) log.debug(String.format("%s started at URL %s after %d tries", getClass().getSimpleName(), url, nbTries));
+    if (debugEnabled) log.debug("{} started at URL {} after {} tries", getClass().getSimpleName(), url, nbTries);
   }
 }

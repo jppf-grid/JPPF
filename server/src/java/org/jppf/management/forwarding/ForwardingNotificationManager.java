@@ -242,8 +242,8 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   @Override
   public synchronized void notificationReceived(final ForwardingNotificationEvent event) {
     final Notification notif = event.getNotification();
-    if (debugEnabled) log.debug(String.format("received notification from node=%s, mbean=%s, notification=%s (sequence=%d, timestamp=%d)",
-      event.getNodeUuid(), event.getMBeanName(), notif, notif.getSequenceNumber(), notif.getTimeStamp()));
+    if (debugEnabled) log.debug("received notification from node={}, mbean={}, notification={} (sequence={}, timestamp={})",
+      event.getNodeUuid(), event.getMBeanName(), notif, notif.getSequenceNumber(), notif.getTimeStamp());
     forwarder.sendNotification(new JPPFNodeForwardingNotification(notif, event.getNodeUuid(), event.getMBeanName()));
   }
 }
