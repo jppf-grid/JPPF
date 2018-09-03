@@ -61,6 +61,7 @@ Once you have installed a server and one or multiple nodes, perform the followin
   <li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
   <li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
   <li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
+
 <pre class="prettyprint lang-conf">
 #------------------------------------------------------------------------------#
 #         Parameters specific to the data dependency application               #
@@ -102,6 +103,7 @@ maxTaskDuration = 100
 # interval between 2 snapshots when running in snapshot-based mode
 snapshotInterval = 3250
 </pre>
+
   </li>
   <li>once you have configured your scenario, in the sample's command prompt, type either "<b>run.bat</b>" (on Windows), "<b>./run.sh</b>" (on Linux/Unix) or "<b>ant run</b>" to run the simulation</li>
   <li>for a clearer visualization of what is happening during the simulation, it is recommended to start the JPPF administration UI in  the "Jobs" view:<br/>
