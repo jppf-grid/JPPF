@@ -24,7 +24,7 @@
     </ol>
   </li>
   <li>During the demo, the "job data" view of the administration console will show the jobs executing in parallel and how they are distributed among the nodes:<br>
-    <img src="images/monitoring.gif"/></li>
+    <img src="images/Monitoring.gif"/></li>
 </ul>
 
 <h3>Source files</h3>
