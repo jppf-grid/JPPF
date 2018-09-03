@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Job Dependencies demo"}$
+# Job Dependencies demo
+
 <h3>What does the sample do?</h3>
 <p>This demo illustrates a solution to submit jobs that have a dependency on one or more other jobs.
 It supports any non-cyclic dependency graph and will work even when the jobs in the dependency graph are submitted from multiple JPPF clients running on multiple machines.
@@ -82,21 +83,21 @@ Job A ==>
 <h3>Source files</h3>
 <p>package <b>org.jppf.example.job.dependencies</b>:
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/job/dependencies/JobDependenciesRunner.java.html">JobDependenciesRunner.java</a>: the entry point for the demo, reads the dependency graph and submits multiple jobs accordingly</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencyProcessor.java.html">DependencyProcessor.java<a/>: deployed as a <a href="https://www.jppf.org/doc/6.0/index.php?title=JPPF_startup_classes#Server_startup_classes">server startup class</a>,
+  <li><a href="src/org/jppf/example/job/dependencies/JobDependenciesRunner.java">JobDependenciesRunner.java</a>: the entry point for the demo, reads the dependency graph and submits multiple jobs accordingly</li>
+  <li><a href="src/org/jppf/example/job/dependencies/DependencyProcessor.java">DependencyProcessor.java<a/>: deployed as a <a href="https://www.jppf.org/doc/6.0/index.php?title=JPPF_startup_classes#Server_startup_classes">server startup class</a>,
   suspends / resumes jobs based on the state of their dependencies</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencyGraph.java.html">DependencyGraph.java</a>: represents the job dependencies graph</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencyNode.java.html">DependencyNode.java</a>: represents a node (aka vertex) in the dependency graph</li>
-  <li><a href="src/org/jppf/example/job/dependencies/DependencySpec.java.html">DependencySpec.java</a>: represents information of a job and its dependencies, supplied to the job's metadata</li>
-  <li><a href="src/org/jppf/example/job/dependencies/Utils.java.html">Utils.java</a>: provides utility methods to read the dependency graph file and print formatted messages to the ouput console</li>
-  <li><a href="src/org/jppf/example/job/dependencies/MyTask.java.html">MyTask.java</a>: a simple JPPF task implementation used by all the jobs in the demo</li>
+  <li><a href="src/org/jppf/example/job/dependencies/DependencyGraph.java">DependencyGraph.java</a>: represents the job dependencies graph</li>
+  <li><a href="src/org/jppf/example/job/dependencies/DependencyNode.java">DependencyNode.java</a>: represents a node (aka vertex) in the dependency graph</li>
+  <li><a href="src/org/jppf/example/job/dependencies/DependencySpec.java">DependencySpec.java</a>: represents information of a job and its dependencies, supplied to the job's metadata</li>
+  <li><a href="src/org/jppf/example/job/dependencies/Utils.java">Utils.java</a>: provides utility methods to read the dependency graph file and print formatted messages to the ouput console</li>
+  <li><a href="src/org/jppf/example/job/dependencies/MyTask.java">MyTask.java</a>: a simple JPPF task implementation used by all the jobs in the demo</li>
   <li><a href="dependency_graph.txt.html">dependency_graph.txt</a>: this is the configuration file where the job dependency graph is defined</li>
 </ul>
 <p>package <b>org.jppf.example.job.dependencies.management</b>:
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManagerMBean.java.html">DependencyManagerMBean.java</a>: the job dependencies management interface</li>
-  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManager.java.html">DependencyManager.java</a>: the job dependencies management implementation</li>
-  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManagerMBeanProvider.java.html">DependencyManagerMBeanProvider.java</a>: implementation of the discovery interface for the pluggable MBean</li>
+  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManagerMBean.java">DependencyManagerMBean.java</a>: the job dependencies management interface</li>
+  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManager.java">DependencyManager.java</a>: the job dependencies management implementation</li>
+  <li><a href="src/org/jppf/example/job/dependencies/management/DependencyManagerMBeanProvider.java">DependencyManagerMBeanProvider.java</a>: implementation of the discovery interface for the pluggable MBean</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -106,4 +107,4 @@ Job A ==>
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

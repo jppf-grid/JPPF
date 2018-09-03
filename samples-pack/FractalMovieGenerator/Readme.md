@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Generation of Mandelbrot Fractal Movies"}$
+# Generation of Mandelbrot Fractal Movies
+
 <h3>What does the sample do?</h3>
 This sample demonstrates a JPPF grid based on a volunteer computing model.
 Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme.html">Fractals</a> sample.
@@ -80,4 +81,4 @@ Note that uploading it to Youtube required an additonal encoding step using the 
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

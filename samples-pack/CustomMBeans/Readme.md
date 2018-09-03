@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Custom MBeans demo"}$
+# Custom MBeans demo
+
 <h3>What does the sample do?</h3>
 This samples illustrates the implementation of custom MBeans for a JPPF server and node.
 Each MBean simply retrieves the number of processors available to the JVM it is running in.
@@ -34,4 +35,4 @@ For a detailed explanation, please refer to the related documentation in the
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

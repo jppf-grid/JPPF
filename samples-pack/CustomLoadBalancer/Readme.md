@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Custom Load Balancer demo"}$
+# Custom Load Balancer demo
+
 <h3>What does the sample do?</h3>
 This sample illustrates the implementation of a <a href="https://www.jppf.org/doc/6.0/index.php?title=Creating_a_custom_load-balancer">custom load-balancer</a> that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
 
@@ -18,7 +19,7 @@ We want the JPPF server to be able to dispatch the tasks to the apppropriate nod
   <li>"task.time": the maximum duration of each task in the job</li>
   <li>"allowed.time": the maximum allowed time for execution of a single set of tasks on a node</li>
   <li>"id": the job id (for debugging and logging purposes only)</li>
-  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java.html">fully commented job runner source code</a></li>
+  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">fully commented job runner source code</a></li>
 </ul>
 b) Information provided by each node:
 <ul class="samplesList">
@@ -29,7 +30,7 @@ c) Our load-balancer will compute the maximum number of tasks in the job that ca
 <ul class="samplesList">
   <li>the estimated total memory footprint of the tasks, which must fit in the node's available memory.</li>
   <li>the estimated total execution time, that must be less than the allowed time</li>
-  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java.html">fully commented load-balancer source code</a></li>
+  <li>for full details, please take a look at the <a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">fully commented load-balancer source code</a></li>
 </ul>
 d) Furthermore, additional node filtering will be applied before the load-balancing comes into play, by the means of an execution policy for each job:
 <ul class="samplesList">
@@ -39,11 +40,11 @@ d) Furthermore, additional node filtering will be applied before the load-balanc
 </ul>
 Here is a set of links to the source of each Java class in this sample:
 <ul>
-  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java.html">CustomLoadBalancer</a>: load-balancer implementation</li>
-  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java.html">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
-  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java.html">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
-  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java.html">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
-  <li><a href="src/org/jppf/example/loadbalancer/common/MyCustomPolicy.java.html">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
+  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancer.java">CustomLoadBalancer</a>: load-balancer implementation</li>
+  <li><a href="src/org/jppf/example/loadbalancer/server/CustomLoadBalancerProvider.java">CustomLoadBalancerProvider</a>: the provider class that plugs our load balancer into the JPPF server</li>
+  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerRunner.java">CustomLoadBalancerRunner</a>: the client side application that executes the jobs on the grid</li>
+  <li><a href="src/org/jppf/example/loadbalancer/client/CustomLoadBalancerTask.java">CustomLoadBalancerTask</a>: the JPPF tasks enclosed in the jobs</li>
+  <li><a href="src/org/jppf/example/loadbalancer/common/MyCustomPolicy.java">MyCustomPolicy</a>: the custom execution policy used for "heavy" jobs</li>
 </ul>
 
 <h3>How do I run it?</h3>
@@ -53,9 +54,9 @@ Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>To configure the two nodes, there are 2 predefined node configurations we will use:
     <ul class="samplesNestedList">
-      <li>copy <a href="config/node1/jppf-node.properties.html"><b>CustomLoadBalancer/config/node1/jppf-node.properties</b></a> to the <b>config</b> folder of your first node installation (it will replace the existing file).
+      <li>copy <a href="config/node1/jppf-node.properties"><b>CustomLoadBalancer/config/node1/jppf-node.properties</b></a> to the <b>config</b> folder of your first node installation (it will replace the existing file).
       This will setup the first node with 64 MB of heap and 1 processing thread; this node will be used for "heavy" jobs</li>
-      <li>copy <a href="config/node2/jppf-node.properties.html"><b>CustomLoadBalancer/config/node2/jppf-node.properties</b></a> to the <b>config</b> folder of your second node installation (it will replace the existing file).
+      <li>copy <a href="config/node2/jppf-node.properties"><b>CustomLoadBalancer/config/node2/jppf-node.properties</b></a> to the <b>config</b> folder of your second node installation (it will replace the existing file).
       This will setup the second node with 64 MB of heap and 4 processing thread; this node will be used for "light" jobs</li>
     </ul>
   </li>
@@ -65,7 +66,7 @@ Once you have installed a server and node, perform the following steps:
   <li>in the server's installation config/jppf-driver.properties file, replace the property "<b>jppf.load.balancing.algorithm = xxxxx</b>" with "<b>jppf.load.balancing.algorithm = customLoadBalancer</b>",
   to let the server know it must use the new load-balancer</li>
   <li>start the JPPF server and each of the 2 nodes</li>
-  <li>the demo application should already be configured with a connection pool size of 2; to confirm it you can open the file <a href="config/jppf-client.properties.html"><b>jppf-client.properties</a></b> in <b>CustomerLoadbalancer/config</b>, you should see a line "<b>jppf.pool.size = 2"</b></li>
+  <li>the demo application should already be configured with a connection pool size of 2; to confirm it you can open the file <a href="config/jppf-client.properties"><b>jppf-client.properties</a></b> in <b>CustomerLoadbalancer/config</b>, you should see a line "<b>jppf.pool.size = 2"</b></li>
   <li>start the demo, by opening a console in <b>JPPF-x.y-samples-pack/CustomLoadBalancer</b>, and typing: "<b>ant run</b>"</li>
   <li>in the first node's console output you should see messages of this type:<br>
     <tt>[java] Starting execution of task Heavy Job - task 1</tt> (as many as there are tasks in the "heavy" job)</li>
@@ -106,4 +107,4 @@ Once you have installed a server and node, perform the following steps:
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

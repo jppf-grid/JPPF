@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Android demo"}$
+# Android demo
+
 <h3>What does the sample do?</h3>
 <p>This sample demonstrates how a Java task can be executed on an Android node.
 
@@ -13,9 +14,9 @@ $template{name="sample-readme-html-header" title="Android demo"}$
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="build.xml.html">build.xml</a>: this is the build script, where the Java jar is converted to dex format</li>
-  <li><a href="src/org/jppf/example/android/demo/Runner.java.html">Runner.java</a>: The entry point for the demo, builds a JPPF job for execution on Android and submits it to the grid</li>
-  <li><a href="src/org/jppf/example/android/demo/DemoAndroidTask.java.html">DemoAndroidTask.java</a>: a simple task example, excuted on an Android node</li>
+  <li><a href="build.xml">build.xml</a>: this is the build script, where the Java jar is converted to dex format</li>
+  <li><a href="src/org/jppf/example/android/demo/Runner.java">Runner.java</a>: The entry point for the demo, builds a JPPF job for execution on Android and submits it to the grid</li>
+  <li><a href="src/org/jppf/example/android/demo/DemoAndroidTask.java">DemoAndroidTask.java</a>: a simple task example, excuted on an Android node</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -25,4 +26,4 @@ $template{name="sample-readme-html-header" title="Android demo"}$
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

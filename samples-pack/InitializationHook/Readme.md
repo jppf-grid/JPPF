@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Initialization Hook sample"}$
+# Initialization Hook sample
+
 <h3>What does the sample do?</h3>
 <p>This sample demonstrates the use of a node initialization hook to implement a failover mechanism for the connection to the server.
 The hook reads a list of JPPF server addresses from the node configuration, and uses these addresses in the configured order.
@@ -62,10 +63,10 @@ Node successfully initialized
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/initializationhook/DiscoveryHook.java.html">DiscoveryHook.java</a> : this is the implementation of our connection failover mechanism, via a node initialization hook.</li>
-  <li><a href="config/driver1/jppf-driver.properties.html">driver1/jppf-driver.properties</a> : the configuration of the first driver</li>
-  <li><a href="config/driver2/jppf-driver.properties.html">driver2/jppf-driver.properties</a> : the configuration of the second driver</li>
-  <li><a href="config/node/jppf-node.properties.html">node/jppf-node.properties</a> : the configuration of the node</li>
+  <li><a href="src/org/jppf/example/initializationhook/DiscoveryHook.java">DiscoveryHook.java</a> : this is the implementation of our connection failover mechanism, via a node initialization hook.</li>
+  <li><a href="config/driver1/jppf-driver.properties">driver1/jppf-driver.properties</a> : the configuration of the first driver</li>
+  <li><a href="config/driver2/jppf-driver.properties">driver2/jppf-driver.properties</a> : the configuration of the second driver</li>
+  <li><a href="config/node/jppf-node.properties">node/jppf-node.properties</a> : the configuration of the node</li>
 </ul>
 
 <h3>What features of JPPF are demonstrated?</h3>
@@ -78,4 +79,4 @@ The main feature demonstrated is detailed in the JPPF documentation, in the
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

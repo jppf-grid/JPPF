@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Adaptive Grid demo"}$
+# Adaptive Grid demo
+
 <h3>What does the sample do?</h3>
 <p>This sample demonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
 <p>To achieve this, the demo will adjust two components of the grid topology:
@@ -45,7 +46,7 @@ It will display a message each tile the size of the connection pool or the numbe
 </pre>
 <p>It is also interesting to monitor the grid with the administration console: the topology view will show the slave nodes that are started and stopped,
 and the job data view will show more or less jobs in the server queue, depending on the client connection pool size.
-<p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties.html">config/jppf.properties</a> file:
+<p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties">config/jppf.properties</a> file:
 <pre class="prettyprint lang-conf">
 # the maximum allowed connection pool size
 maxAllowedPoolSize = 10
@@ -59,9 +60,9 @@ taskDuration = 1500
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/adaptivegrid/AdaptiveGridDemo.java.html">AdaptiveGridDemo.java</a>: The entry point for the demo</li>
-  <li><a href="src/org/jppf/example/adaptivegrid/DriverConnectionManager.java.html">DriverConnectionManager.java</a>: encapsulates the fuctionality to update the connection pool size and number of slave nodes</li>
-  <li><a href="src/org/jppf/example/adaptivegrid/SimpleTask.java.html">SimpleTask.java</a>: a very simple JPPF task used in this demo</li>
+  <li><a href="src/org/jppf/example/adaptivegrid/AdaptiveGridDemo.java">AdaptiveGridDemo.java</a>: The entry point for the demo</li>
+  <li><a href="src/org/jppf/example/adaptivegrid/DriverConnectionManager.java">DriverConnectionManager.java</a>: encapsulates the fuctionality to update the connection pool size and number of slave nodes</li>
+  <li><a href="src/org/jppf/example/adaptivegrid/SimpleTask.java">SimpleTask.java</a>: a very simple JPPF task used in this demo</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -71,4 +72,4 @@ taskDuration = 1500
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

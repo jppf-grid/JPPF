@@ -136,6 +136,31 @@
   </target>
 
   <!-- ========================================================================= -->
+  <!-- Convert Readme.html into Readme.md                                        -->
+  <!-- ========================================================================= -->
+
+  <target name="samples.generate.md">
+    <delete dir="${samples-pack}" quiet="true" includes="**/*.md"/>
+    <resourcecount>
+      <fileset dir="${samples-pack}" includes="**/Readme.html"/>
+    </resourcecount>
+    <copy file="${samples-pack}/samples-pack-Readme.html" tofile="${samples-pack}/Readme.md"/>
+    <copy todir="${samples-pack}" enablemultiplemappings="true">
+      <fileset dir="${samples-pack}" includes="**/Readme.html"/>
+      <globmapper from="*.html" to="*.md"/>
+    </copy>
+
+    <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
+      <fileset dir="${samples-pack}" includes="**/*.md"/>
+    </replaceregexp>
+    <replace token="$template{name=&quot;sample-readme-html-footer&quot;}$" value="" dir="${samples-pack}" includes="**/*.md"/>
+    <replace token=".java.html"       value=".java"       dir="${samples-pack}" includes="**/*.md"/>
+    <replace token=".properties.html" value=".properties" dir="${samples-pack}" includes="**/*.md"/>
+    <replace token=".xml.html"        value=".xml"        dir="${samples-pack}" includes="**/*.md"/>
+    <replace token=".c.html"          value=".c"          dir="${samples-pack}" includes="**/*.md"/>
+  </target>
+
+  <!-- ========================================================================= -->
   <!-- Download the samples' dependencies                                        -->
   <!-- ========================================================================= -->
   
@@ -146,14 +171,11 @@
     <get.maven.lib g="com.zaxxer"          a="HikariCP-java7"     v="2.4.11"               dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="log4j"               a="log4j"              v="1.2.15"               dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="net.jpountz.lz4"     a="lz4"                v="1.3.0"                dest="${samples-pack}/shared/lib"/>
-    <!--
-    <get.maven.lib g="com.jgoodies"        a="looks"              v="${looks.version}"     dest="${lib}/JGoodies"/>
-    -->
-    <get.maven.lib g="com.jgoodies"        a="jgoodies-looks"     v="${looks.version}"     dest="${lib}/JGoodies"/>
-    <get.maven.lib g="com.jgoodies"        a="jgoodies-common"    v="1.8.1"                dest="${lib}/JGoodies"/>
+    <get.maven.lib g="com.jgoodies"        a="jgoodies-looks"     v="${looks.version}"     dest="${samples-pack}/shared/lib"/>
+    <get.maven.lib g="com.jgoodies"        a="jgoodies-common"    v="1.8.1"                dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="com.miglayout"       a="miglayout-core"     v="${miglayout.version}" dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="com.miglayout"       a="miglayout-swing"    v="${miglayout.version}" dest="${samples-pack}/shared/lib"/>
-    <get.maven.lib g="com.fifesoft"        a="rsyntaxtextarea"    v="${rsta.version}"       dest="${samples-pack}/shared/lib"/>
+    <get.maven.lib g="com.fifesoft"        a="rsyntaxtextarea"    v="${rsta.version}"      dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="org.slf4j"           a="slf4j-api"          v="${slf4j.version}"     dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="org.slf4j"           a="slf4j-log4j12"      v="${slf4j.version}"     dest="${samples-pack}/shared/lib"/>
     <get.maven.lib g="commons-codec"       a="commons-codec"      v="1.3"                  dest="${samples-pack}/shared/lib"/>

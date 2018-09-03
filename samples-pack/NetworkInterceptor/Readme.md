@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Network Interceptor demo"}$
+# Network Interceptor demo
+
 <h3>What does the sample do?</h3>
 <p>This sample demonstrates the use of a <a href="https://www.jppf.org/doc/6.0/index.php?title=Network_interceptors">Network interceptor</a> in a very simple authentication scheme.
 <p>The authentication consists in the client side of each connection sending a user name that must match the user name on the server side. The server then sends a response, either "OK" or an error message.
@@ -44,10 +45,10 @@ successful server authentication
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/interceptor/NetworkInterceptorDemo.java.html">NetworkInterceptorDemo.java</a>: The entry point for the demo</li>
-  <li><a href="src/org/jppf/example/interceptor/DefaultNetworkConnectionInterceptor.java.html">DefaultNetworkConnectionInterceptor.java</a>: the network interceptor implementation</li>
-  <li><a href="src/org/jppf/example/interceptor/CryptoHelper.java.html">CryptoHelper.java</a>: utility class used to create secret keys and encrypt/decrypt data</li>
-  <li><a href="src/org/jppf/example/interceptor/MyTask.java.html">MyTask.java</a>: a simple JPPF task added to the job submitted by the demo</li>
+  <li><a href="src/org/jppf/example/interceptor/NetworkInterceptorDemo.java">NetworkInterceptorDemo.java</a>: The entry point for the demo</li>
+  <li><a href="src/org/jppf/example/interceptor/DefaultNetworkConnectionInterceptor.java">DefaultNetworkConnectionInterceptor.java</a>: the network interceptor implementation</li>
+  <li><a href="src/org/jppf/example/interceptor/CryptoHelper.java">CryptoHelper.java</a>: utility class used to create secret keys and encrypt/decrypt data</li>
+  <li><a href="src/org/jppf/example/interceptor/MyTask.java">MyTask.java</a>: a simple JPPF task added to the job submitted by the demo</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -57,4 +58,4 @@ successful server authentication
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

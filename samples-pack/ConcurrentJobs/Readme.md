@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Concurrent Jobs demo"}$
+# Concurrent Jobs demo
+
 <h3>What does the sample do?</h3>
 <p>This sample demonstrates fully working implementations of the patterns explored in the <a href="https://www.jppf.org/doc/6.0/index.php?title=Submitting_multiple_jobs_concurrently"><i>Submitting multiple jobs concurrently</i></a> section of the documentation.
 
@@ -28,9 +29,9 @@ $template{name="sample-readme-html-header" title="Concurrent Jobs demo"}$
 
 <h3>Source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/concurrentjobs/ConcurrentJobs.java.html">ConcurrentJobs.java</a>: The entry point for the demo, implements all the concurrent job patterns</li>
-  <li><a href="src/org/jppf/example/concurrentjobs/JobProvider.java.html">JobProvider.java<a/>: provides a stream of jobs based on the data in a text input file</li>
-  <li><a href="src/org/jppf/example/concurrentjobs/MyTask.java.html">MyTask.java</a>: a simple JPPF task implementation used by all execution patterns in the demo</li>
+  <li><a href="src/org/jppf/example/concurrentjobs/ConcurrentJobs.java">ConcurrentJobs.java</a>: The entry point for the demo, implements all the concurrent job patterns</li>
+  <li><a href="src/org/jppf/example/concurrentjobs/JobProvider.java">JobProvider.java<a/>: provides a stream of jobs based on the data in a text input file</li>
+  <li><a href="src/org/jppf/example/concurrentjobs/MyTask.java">MyTask.java</a>: a simple JPPF task implementation used by all execution patterns in the demo</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -40,4 +41,4 @@ $template{name="sample-readme-html-header" title="Concurrent Jobs demo"}$
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

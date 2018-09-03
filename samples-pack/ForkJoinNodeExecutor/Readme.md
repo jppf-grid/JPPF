@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Fibonacci Fork/Join demo"}$
+# Fibonacci Fork/Join demo
+
 <h3>What does the sample do?</h3>
 This demo demonstrates a node add-on which replaces the standard node processing thread pool with a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">fork/join thread pool</a>.
 This allows JPPF tasks to locally (in the node) spawn ForkJoinTask (or any of its subclasses) instances and have them processed as expected for a ForkJoinPool.
@@ -45,4 +46,4 @@ To generate the Javadoc, from a command prompt type: <b>&quot;ant javadoc&quot;<
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

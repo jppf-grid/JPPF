@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Dense Matrix Multiplication demo"}$
+# Dense Matrix Multiplication demo
+
 <h3>What does the sample do?</h3>
 This sample performs the multplication of 2 square dense matrices by dividing the operation into as many JPPF tasks as there are rows in each matrix. Each task multiplies a row of the first matrix by the second matrix.
 
@@ -38,4 +39,4 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

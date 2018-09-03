@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Job Recovery demo"}$
+# Job Recovery demo
+
 <h3>What does the sample do?</h3>
 This sample demonstrates how the state of a JPPF job can be persisted on the client side, then recovered after a client crash.<br/>
 For this purpose, the demo application submits a job then, while the job is still executing, exits brutally.
@@ -34,8 +35,8 @@ loaded job 'the_job_uuid' from persistence store ...
 
 <h3>Related source files</h3>
 <ul class="samplesList">
-  <li><a href="src/org/jppf/example/jobrecovery/Runner.java.html">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
-  <li><a href="src/org/jppf/example/jobrecovery/MyTask.java.html">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
+  <li><a href="src/org/jppf/example/jobrecovery/Runner.java">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
+  <li><a href="src/org/jppf/example/jobrecovery/MyTask.java">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
 </ul>
 
 <h3>How can I build the sample?</h3>
@@ -50,4 +51,4 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

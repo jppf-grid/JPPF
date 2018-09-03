@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Word Count demo"}$
+# Word Count demo
+
 <h3>What does the sample do?</h3>
 This sample performs a word count on a full or partial Wikipedia database. It illustrates how JPPF can be used to process large datasets in a very efficient way.
 The actual processing is vaguely similar to a mpa/reduce process, which is not surprising given what we are trying to accomplish.
@@ -72,4 +73,4 @@ wordcount.job.capacity = 2
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+

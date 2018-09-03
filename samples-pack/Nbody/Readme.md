@@ -1,4 +1,5 @@
-$template{name="sample-readme-html-header" title="Parallel N-body demo"}$
+# Parallel N-body demo
+
 <h3>What does the sample do?</h3>
 <p>This sample is a parallel implementation of the <a href="http://en.wikipedia.org/wiki/N-body_problem" alt="N_body on Wikipedia">N-body problem</a> for simulating the motion of anti-protons trapped in a magnetic field.<br>
 It displays a real-time graphical simulation of the movement of the anti-protons, based on the parameters specified in the configuration file.<br/>
@@ -40,4 +41,4 @@ nbody.bodies.per.task = 25
   <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
-$template{name="sample-readme-html-footer"}$
+
