@@ -188,7 +188,8 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    if (channel != null) sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    else sb.append("channel=null");
     sb.append(", state=").append(getState());
     sb.append(", uuid=").append(uuid);
     sb.append(", connectionUuid=").append(connectionUuid);
