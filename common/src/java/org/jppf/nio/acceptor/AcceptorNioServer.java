@@ -77,8 +77,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public AcceptorNioServer(final int[] ports, final int[] sslPorts, final JPPFStatistics stats) throws Exception {
     super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL);
-    //this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    this.selectTimeout = 1L;
+    this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.stats = stats;
     identifyingState = factory.getState(AcceptorState.IDENTIFYING_PEER);
     if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
@@ -90,8 +89,13 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
       final boolean hasTimeout = selectTimeout > 0L;
       int n = 0;
       while (!isStopped() && !externalStopCondition()) {
-        n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (n > 0) go(selector.selectedKeys());
+        sync.waitForZeroAndSetToMinusOne();
+        try {
+          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
+          if (n > 0) go(selector.selectedKeys());
+        } finally {
+          sync.setToZeroIfNegative();
+        }
       }
     } catch (final Throwable t) {
       log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
