@@ -140,11 +140,10 @@
   <!-- ========================================================================= -->
 
   <target name="samples.generate.md">
-    <delete dir="${samples-pack}" quiet="true" includes="**/*.md"/>
+    <delete dir="${samples-pack}" quiet="true" includes="**/*.md" excludes="Readme.md"/>
     <resourcecount>
       <fileset dir="${samples-pack}" includes="**/Readme.html"/>
     </resourcecount>
-    <copy file="${samples-pack}/samples-pack-Readme.html" tofile="${samples-pack}/Readme.md"/>
     <copy todir="${samples-pack}" enablemultiplemappings="true">
       <fileset dir="${samples-pack}" includes="**/Readme.html"/>
       <globmapper from="*.html" to="*.md"/>
