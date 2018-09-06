@@ -39,7 +39,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransition> {
+public class AcceptorNioServer extends StatelessNioServer {
   /**
    * Logger for this class.
    */
@@ -52,10 +52,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * The statsistics to update, if any.
    */
   private final JPPFStatistics stats;
-  /**
-   * 
-   */
-  private final NioState<AcceptorTransition> identifyingState;
 
   /**
    * Initialize this server with the specified port numbers.
@@ -79,70 +75,30 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     this.stats = stats;
-    identifyingState = factory.getState(AcceptorState.IDENTIFYING_PEER);
     if (debugEnabled) log.debug("{} initialized", getClass().getSimpleName());
   }
 
   @Override
-  public void run() {
-    try {
-      final boolean hasTimeout = selectTimeout > 0L;
-      int n = 0;
-      while (!isStopped() && !externalStopCondition()) {
-        sync.waitForZeroAndSetToMinusOne();
-        try {
-          n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-          if (n > 0) go(selector.selectedKeys());
-        } finally {
-          sync.setToZeroIfNegative();
-        }
-      }
-    } catch (final Throwable t) {
-      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), ExceptionUtils.getStackTrace(t));
-    } finally {
-      end();
-    }
+  protected void handleRead(final SelectionKey key) throws Exception {
+    AcceptorMessageReader.read((AcceptorContext) key.attachment());
   }
 
-  /**
-   * Process the keys selected by the selector for IO operations.
-   * @param selectedKeys the set of keys that were selected by the latest <code>select()</code> invocation.
-   * @throws Exception if an error is raised while processing the keys.
-   */
   @Override
-  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
-    final Iterator<SelectionKey> it = selectedKeys.iterator();
-    while (it.hasNext()) {
-      final SelectionKey key = it.next();
-      it.remove();
-      if (!key.isValid()) continue;
-      AcceptorContext context = null;
+  protected void handleWrite(final SelectionKey key) throws Exception {
+  }
+
+  @Override
+  protected void handleSelectionException(final SelectionKey key, final Exception e) throws Exception {
+    log.error(e.getMessage(), e);
+    if (!(key.channel() instanceof ServerSocketChannel)) {
       try {
-        if (key.isAcceptable()) {
-          doAccept(key);
-        } else if (key.isReadable()) {
-          context = (AcceptorContext) key.attachment();
-          identifyingState.performTransition(context.getChannel());
-        }
-      } catch (final Exception e) {
-        log.error(e.getMessage(), e);
-        if (context != null) context.handleException(context.getChannel(), e);
-        if (!(key.channel() instanceof ServerSocketChannel)) {
-          try {
-            key.channel().close();
-          } catch (final Exception e2) {
-            log.error(e2.getMessage(), e2);
-          }
-        }
+        key.channel().close();
+      } catch (final Exception e2) {
+        log.error(e2.getMessage(), e2);
       }
     }
   }
 
-  /**
-   * accept the incoming connection.
-   * It accept and put it in a state to define what type of peer is.
-   * @param key the selection key that represents the channel's registration with the selector.
-   */
   @Override
   protected void doAccept(final SelectionKey key) {
     final ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
@@ -191,55 +147,26 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
     final boolean peer, final Object...params) throws Exception {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", this, channel, ssl);
-    final AcceptorContext context = (AcceptorContext) createNioContext(serverSocketChannel);
+    final AcceptorContext context = (AcceptorContext) createNioContext(serverSocketChannel, channel);
     context.setPeer(peer);
-    context.setState(AcceptorState.IDENTIFYING_PEER);
     if (sslHandler != null) context.setSSLHandler(sslHandler);
     final SelectionKey selKey = channel.register(selector, 0, context);
-    final SelectionKeyWrapper wrapper = new SelectionKeyWrapper(selKey);
-    context.setChannel(wrapper);
     context.setSsl(ssl);
     if (ssl && (sslHandler == null) && (sslContext != null)) {
-      if (debugEnabled) log.debug("creating SSLEngine for  {}", wrapper);
+      if (debugEnabled) log.debug("creating SSLEngine for  {}", context);
       final SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
       configureSSLEngine(engine);
-      context.setSSLHandler(new SSLHandlerImpl(wrapper, engine));
+      context.setSSLHandler(new SSLHandlerImpl(channel, engine));
     }
     context.setInterestOps(SelectionKey.OP_READ);
     selKey.interestOps(SelectionKey.OP_READ);
     if (debugEnabled) log.debug("{} channel {} accepted", this, channel);
-    return wrapper;
+    return null;
   }
 
   @Override
-  protected NioServerFactory<AcceptorState, AcceptorTransition> createFactory() {
-    return new AcceptorServerFactory(this);
-  }
-
-  @Override
-  public void postAccept(final ChannelWrapper<?> channel) {
-  }
-
-  @Override
-  public NioContext<AcceptorState> createNioContext(final Object...params) {
-    return new AcceptorContext(this, (ServerSocketChannel) params[0], stats);
-  }
-
-  /**
-   * Close a connection to a node.
-   * @param channel a <code>SocketChannel</code> that encapsulates the connection.
-   */
-  public void closeChannel(final ChannelWrapper<?> channel) {
-    try {
-      channel.close();
-    } catch (final Exception e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public boolean isIdle(final ChannelWrapper<?> channel) {
-    return false;
+  public NioContext<EmptyEnum> createNioContext(final Object...params) {
+    return new AcceptorContext(this, (ServerSocketChannel) params[0], (SocketChannel) params[1], stats);
   }
 
   @Override

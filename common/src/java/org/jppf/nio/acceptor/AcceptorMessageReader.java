@@ -22,46 +22,48 @@ import java.nio.channels.*;
 
 import org.jppf.JPPFException;
 import org.jppf.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
- * This class performs performs the work of reading a task bundle execution response from a node.
+ * Reads from the channel until no more data is available. Each fully read message is handed off
+ * to a global thread pool for deserialization and processing.
  * @author Laurent Cohen
  */
-class IdentifyingPeerState extends AcceptorServerState {
+class AcceptorMessageReader {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(IdentifyingPeerState.class);
+  private static final Logger log = LoggerFactory.getLogger(AcceptorMessageReader.class);
   /**
-   * Determines whether DEBUG logging level is enabled.
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
-   * Initialize this state.
-   * @param server the server that handles this state.
+   * Read from the channel until no more data is available (i.e. socket receive buffer is empty).
+   * @param context the JMX context that reads the data.
+   * @throws Exception if any error occurs.
    */
-  public IdentifyingPeerState(final AcceptorNioServer server) {
-    super(server);
+  static void read(final AcceptorContext context) throws Exception {
+    if (context.isSsl()) {
+      synchronized(context.getSocketChannel()) {
+        doRead(context);
+      }
+    } else doRead(context);
   }
 
   /**
-   * Execute the action associated with this channel state.
-   * @param channel the selection key corresponding to the channel and selector for this state.
-   * @return a state transition as an <code>NioTransition</code> instance.
-   * @throws Exception if an error occurs while transitioning to another state.
+   * Read from the channel until no more data is available (i.e. socket receive buffer is empty).
+   * @param context the JMX context that reads the data.
+   * @throws Exception if any error occurs.
    */
-  @Override
-  public AcceptorTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    final AcceptorContext context = (AcceptorContext) channel.getContext();
-    if (log.isTraceEnabled()) log.trace("about to read from channel {}", channel);
+  private static void doRead(final AcceptorContext context) throws Exception {
+    if (log.isTraceEnabled()) log.trace("about to read from channel {}", context);
     while (true) {
-      if (context.readMessage(channel)) {
-        if (!(channel instanceof SelectionKeyWrapper)) return null;
+      if (context.readMessage(null)) {
         final int id = context.getId();
-        if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
+        if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), context);
         final NioServer<?, ?> server = NioHelper.getServer(id);
         if (server == null) {
           final String name = JPPFIdentifiers.asString(id);
@@ -69,17 +71,16 @@ class IdentifyingPeerState extends AcceptorServerState {
             throw new JPPFException("unknown JPPF identifier: " + id + " (0x" + Integer.toHexString(id).toUpperCase() + ")");
           else throw new JPPFException("no server is started for JPPF identifier [" + id + ", 0x" + Integer.toHexString(id).toUpperCase() + ", " + name + "]");
         }
-        if (debugEnabled) log.debug("cancelling key for {}", channel);
-        final SelectionKey key = (SelectionKey) channel.getChannel();
-        final SocketChannel socketChannel = (SocketChannel) key.channel();
+        if (debugEnabled) log.debug("cancelling key for {}", context);
+        final SocketChannel socketChannel = context.getSocketChannel();
+        final SelectionKey key = socketChannel.keyFor(context.server.getSelector());
         key.cancel();
         if (debugEnabled) log.debug("transfering channel to new server {}", server);
         server.accept(context.getServerSocketChannel(), socketChannel, context.getSSLHandler(), context.isSsl(), false);
         if (debugEnabled) log.debug("channel accepted: {}", socketChannel);
         context.setSSLHandler(null);
-        return null;
+        break;
       } else if (context.byteCount <= 0L) break;
     }
-    return AcceptorTransition.TO_IDENTIFYING_PEER;
   }
 }

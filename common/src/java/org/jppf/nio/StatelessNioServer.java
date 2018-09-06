@@ -58,6 +58,17 @@ public abstract class StatelessNioServer extends NioServer<EmptyEnum, EmptyEnum>
     super(name, identifier, useSSL);
   }
 
+  /**
+   * Initialize this server with a specified list of port numbers and name.
+   * @param ports the list of ports this server accepts connections from.
+   * @param sslPorts the list of SSL ports this server accepts connections from.
+   * @param identifier the channel identifier for channels handled by this server.
+   * @throws Exception if the underlying server socket can't be opened.
+   */
+  public StatelessNioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
+    super(ports, sslPorts, identifier);
+  }
+
   @Override
   protected NioServerFactory<EmptyEnum, EmptyEnum> createFactory() {
     return null;
@@ -91,11 +102,15 @@ public abstract class StatelessNioServer extends NioServer<EmptyEnum, EmptyEnum>
       final SelectionKey key = it.next();
       it.remove();
       if (!key.isValid()) continue;
-      final CloseableContext context = (CloseableContext) key.attachment();
       try {
-        if (context.isClosed()) continue;
-        if (key.isReadable()) handleRead(key);
-        if (key.isWritable()) handleWrite(key);
+        if (key.isAcceptable()) {
+          doAccept(key);
+        } else {
+          final CloseableContext context = (CloseableContext) key.attachment();
+          if (context.isClosed()) continue;
+          if (key.isReadable()) handleRead(key);
+          if (key.isValid() && key.isWritable()) handleWrite(key);
+        }
       } catch (final Exception e) {
         handleSelectionException(key, e);
       }

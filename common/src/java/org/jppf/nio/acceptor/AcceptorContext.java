@@ -18,18 +18,27 @@
 
 package org.jppf.nio.acceptor;
 
-import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.*;
 
 import org.jppf.nio.*;
 import org.jppf.serialization.SerializationUtils;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
+import org.slf4j.*;
 
 /**
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public class AcceptorContext extends SimpleNioContext<AcceptorState> {
+public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AcceptorContext.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Identifier for the channel.
    */
@@ -41,7 +50,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
   /**
    * The acceptor server.
    */
-  private final AcceptorNioServer server;
+  final AcceptorNioServer server;
   /**
    * The statsistics to update, if any.
    */
@@ -59,12 +68,14 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    * 
    * @param server the acceptor server.
    * @param serverSocketChannel the server socket channel that accepted the connection.
+   * @param socketChannel the socket channel that represent the connection.
    * @param stats the statsistics to update, if any.
    */
-  public AcceptorContext(final AcceptorNioServer server, final ServerSocketChannel serverSocketChannel, final JPPFStatistics stats) {
+  public AcceptorContext(final AcceptorNioServer server, final ServerSocketChannel serverSocketChannel, final SocketChannel socketChannel, final JPPFStatistics stats) {
     this.server = server;
     this.stats = stats;
     this.serverSocketChannel = serverSocketChannel;
+    this.socketChannel = socketChannel;
   }
 
   /**
@@ -76,10 +87,13 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (nioObject == null) nioObject = new PlainNioObject(wrapper.getSocketChannel(), 4);
+    if (nioObject == null) nioObject = new PlainNioObject(socketChannel, 4);
     boolean b = false;
     try {
+      byteCount = nioObject.getChannelCount();
       b = nioObject.read();
+      byteCount = nioObject.getChannelCount() - byteCount;
+      if (debugEnabled) log.debug("read {} bytes from {}", byteCount, this);
     } catch (final Exception e) {
       if (stats != null) stats.addValue(JPPFStatisticsHelper.JMX_IN_TRAFFIC, nioObject.getChannelCount());
       throw e;
@@ -94,7 +108,6 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState> {
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e) {
-    server.closeChannel(channel);
   }
 
   /**
