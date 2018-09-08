@@ -34,6 +34,7 @@ $template{name="sample-readme-html-header" title="JPPF Samples Pack"}$
   <li><a href="AndroidDemo">Packaging tasks for execution on an Android device</a></li>
   <li><a href="JobDependencies">How to manage dependencies between jobs</a></li>
   <li><a href="NetworkInterceptor">Using network interceptors to implement a simple auhentication protocol</a></li>
+  <li><a href="ConfigurationProperties">Using the configurtion API to generate the documentation of all predefined JPPF properties</a></li>
 </ul>
 
 $template{name="sample-readme-html-footer"}$

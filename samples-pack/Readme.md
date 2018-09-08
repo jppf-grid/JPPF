@@ -35,3 +35,4 @@ The current applications in the samples pack are:
 * [Packaging tasks for execution on an Android device](AndroidDemo)
 * [Managing dependencies between jobs](JobDependencies)
 * [Using network interceptors to implement a simple auhentication protocol](NetworkInterceptor)
+* [Using the configurtion API to generate the documentation of all predefined JPPF properties](ConfigurationProperties)

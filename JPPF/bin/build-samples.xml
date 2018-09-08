@@ -58,6 +58,7 @@
     <include.code sample="AdaptiveGrid" include="**/*.java"/>
     <include.code sample="AndroidDemo" include="**/*.java,build.xml"/>
     <include.code sample="ConcurrentJobs" include="**/*.java"/>
+    <include.code sample="ConfigurationProperties" include="**/*.java"/>
     <include.code sample="CustomLoadBalancer" include="**/*.java"/>
     <include.code sample="DataEncryption" include="**/*.java"/>
     <include.code sample="ExtendedClassLoading" include="**/*.java"/>
@@ -100,6 +101,7 @@
         <include name="**/*.html"/>
         <exclude name="**/package.html"/>
         <exclude name="**/Readme.html"/>
+        <exclude name="**/Readme.md"/>
         <include name="AdaptiveGrid/**/jppf.properties"/>
         <include name="ConcurrentJobs/images/*.*"/>
         <include name="CustomLoadBalancer/**/*.properties"/>

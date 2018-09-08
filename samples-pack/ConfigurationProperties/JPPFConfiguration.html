@@ -1,0 +1,2150 @@
+<html>
+  <head>
+    <title>    JPPF configuration properties    </title>
+    <link rel='stylesheet' type='text/css' href='http://www.jppf.org/jppf.css' title='Style'>
+    <link rel='shortcut icon' href='http://www.jppf.org/images/jppf-icon.ico' type='image/x-icon'>
+    <style>
+      h1, h2, h3 , h4, h5  { font-family: Arial, Verdana, sans-serif; color: white }
+      h1, h2, h3  { margin: 0pt }
+      table, td, th { border: solid 1px #6D78B6 }
+      table { border-bottom: solid 2px #6D78B6; border-right: solid 2px #6D78B6; width: 100% }
+      td, th { padding: 3px }
+      td { border-bottom: none; border-right: none }
+      th, .header_cell { text-align: left; font-weight: bold; background-color: #C5D0F0; color: #6D78B6; white-space: nowrap; border-color: white }
+      .tag_cell { border-left: none; border-top: solid 1px white; background-color: #6D78B6; border-color: #6D78B6; border-top-width: 2px; border-left-width: 2px }
+      .deprecated { text-decoration: line-through }
+    </style>
+  </head>
+  <body>
+    <table border='0' cellspacing='0' cellpadding='0'>
+            <h1 style='color: #6D78B6'>      JPPF configuration properties      </h1><br>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Driver</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.cpu.load.computation.interval</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Determines the frequency at which the JVM's cpu load is recomputed, in ms</td>
+      </tr>
+      <tr>
+        <td>jppf.debug.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>whether the debug mbean is enabled</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.broadcast.exclude.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Prevent broadcast to the specified IPv4 addresses (exclusive filter, server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.broadcast.exclude.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Prevent broadcast to the specified IPv6 addresses (exclusive filter, server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.broadcast.include.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Broadcast to the specified IPv4 addresses (inclusive filter, server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.broadcast.include.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Broadcast to the specified IPv6 addresses (inclusive filter, server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.broadcast.interval</td>
+        <td>5000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>UDP broadcast interval in milliseconds</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable server discovery via UDP multicast</td>
+      </tr>
+      <tr>
+        <td>jppf.java.path</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Full path to the Java executable</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence</td>
+        <td>o.j.j.p.i.DefaultFilePersistence</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Class name of the implementation of the job persistence in the driver</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence.ddl.location</td>
+        <td>org/jppf/job/persistence/impl/job_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the databse job persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence.memory.threshold</td>
+        <td>70.0</td>
+        <td>&nbsp;</td>
+        <td>double</td>
+        <td>Percentage of used heap above which async job persistence switches to sequential mode, until the used heap decreases below the threshold</td>
+      </tr>
+      <tr>
+        <td>jppf.jvm.options</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>JVM options for the node or server process</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.algorithm</td>
+        <td>proportional</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Load balancing algorithm name</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence</td>
+        <td>null</td>
+        <td>jppf.load.balancer.persistence</td>
+        <td>String[]</td>
+        <td>Class name of the implementation of a load-balancer persistence in the driver or client, with optional parameters</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.ddl.location</td>
+        <td>org/jppf/load/balancer/persistence/load_balancer_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.hash</td>
+        <td>SHA-1</td>
+        <td>jppf.load.balancer.persistence.hash</td>
+        <td>String</td>
+        <td>The hash function used to generate load-balancer state identifiers</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.profile</td>
+        <td>jppf</td>
+        <td>jppf.load.balancing.strategy</td>
+        <td>String</td>
+        <td>Load balancing parameters profile name</td>
+      </tr>
+      <tr>
+        <td>jppf.local.node.bias</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether bias towards local node for scheduling is enabled in the driver</td>
+      </tr>
+      <tr>
+        <td>jppf.local.node.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to enable a node to run in the same JVM as the driver</td>
+      </tr>
+      <tr>
+        <td>jppf.management.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable management of the node or server</td>
+      </tr>
+      <tr>
+        <td>jppf.management.server.forwarder</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Fully qualifed class name of a MBeanServerForwarder implementation with optional space-separated string parameters</td>
+      </tr>
+      <tr>
+        <td><span class="deprecated">jppf.management.ssl.enabled</span></td>
+        <td><span class="deprecated">false</span></td>
+        <td><span class="deprecated">&nbsp;</span></td>
+        <td><span class="deprecated">boolean</span></td>
+        <td><i><b>Deprecated:</b> management is now enabled on both plain and secure connections via "jppf.management.enabled"</i><br>Enable/disable JMX via secure connections</td>
+      </tr>
+      <tr>
+        <td><span class="deprecated">jppf.management.ssl.port</span></td>
+        <td><span class="deprecated">11193</span></td>
+        <td><span class="deprecated">&nbsp;</span></td>
+        <td><span class="deprecated">int</span></td>
+        <td><i><b>Deprecated:</b> the secure management port is now the same as the server port given in "jppf.ssl.server.port"</i><br>Secure JMX server port</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.check.connection</td>
+        <td>true</td>
+        <td>jppf.nio.connection.check</td>
+        <td>boolean</td>
+        <td>Enable/disable network connection checks on write operations</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.select.timeout</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.node.forwarding.pool.size</td>
+        <td>available processors</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Size of the pool of threads used to process node forwarding requests and notifications</td>
+      </tr>
+      <tr>
+        <td>jppf.node.idle</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether a node is idle. This property is only set within a server.</td>
+      </tr>
+      <tr>
+        <td>jppf.node.management.port</td>
+        <td>11198</td>
+        <td>jppf.management.port</td>
+        <td>int</td>
+        <td>Node management port (to distinguish from server management port when local node is on)</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.job</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>UUID of the job for which a node is reserved</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.uuid</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.&lt;peer_name&gt;.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Connection pool size for a manually configured peer driver connection<br>- <i>peer_name</i>: one of the peer driver names defined with the 'jppf.peers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.&lt;peer_name&gt;.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Heartbeat enabled flag for a manually configured peer driver connection.<br>- <i>peer_name</i>: one of the peer driver names defined with the 'jppf.peers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.&lt;peer_name&gt;.server.host</td>
+        <td>localhost</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Server host for a manually configured peer driver connection<br>- <i>peer_name</i>: one of the peer driver names defined with the 'jppf.peers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.&lt;peer_name&gt;.server.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server port for a manually configured peer driver connection<br>- <i>peer_name</i>: one of the peer driver names defined with the 'jppf.peers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.&lt;peer_name&gt;.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>SSL enabled flag for a manually configured peer driver connection<br>- <i>peer_name</i>: one of the peer driver names defined with the 'jppf.peers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.allow.orphans</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to send jobs to orphan peer servers</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.discovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable peer server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.discovery.removal.cleanup.interval</td>
+        <td>30000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.handler.period</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Size of discovered peer server connection pools</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.processing.threads</td>
+        <td>8</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Heartbeat enabled flag for a discovered peer driver connection.</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Toggle secure connections to remote peer servers</td>
+      </tr>
+      <tr>
+        <td>jppf.peers</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Space-separated list of peer server names</td>
+      </tr>
+      <tr>
+        <td>jppf.peers.load.balance.threshold</td>
+        <td>Integer.MAX_VALUE</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>The number of connected nodes below which this driver load-balances to other peer drivers</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable recovery from hardware failures through a heartbeat mechanism</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.max.retries</td>
+        <td>3</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Maximum number of pings to the node before the connection is considered broken</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.read.timeout</td>
+        <td>15000</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Maximum ping response time from the node</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.reaper.pool.size</td>
+        <td>available processors</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Number of threads allocated to the node connection reaper</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.err</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>File to redirect System.err to</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.err.append</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Append to existing file (true) or create a new one (false)</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.out</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>File to redirect System.out to</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.out.append</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Append to existing file (true) or create a new one (false)</td>
+      </tr>
+      <tr>
+        <td>jppf.resolve.addresses</td>
+        <td>true</td>
+        <td>org.jppf.resolve.addresses</td>
+        <td>boolean</td>
+        <td>Whether to resolve IP addresses</td>
+      </tr>
+      <tr>
+        <td>jppf.server.exitOnShutdown</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to exit the JVM when shutting the driver down</td>
+      </tr>
+      <tr>
+        <td>jppf.server.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server port</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.distinct.truststore</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to use a separate trust store for client certificates (server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the client trust store in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the SSL configuration in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>SSL configuration as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enabled/disable secure connections</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.server.port</td>
+        <td>11143</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server port number for secure connections</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.thread.pool.size</td>
+        <td>10</td>
+        <td>jppf.ssl.thread.pool</td>
+        <td>int</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Node</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.classloader.cache.size</td>
+        <td>50</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Size of the class loader cache for the node</td>
+      </tr>
+      <tr>
+        <td>jppf.classloader.delegation</td>
+        <td>parent</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Class loader delegation mode: 'parent' or 'url'</td>
+      </tr>
+      <tr>
+        <td>jppf.classloader.file.lookup</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable lookup of classpath resources in the file system</td>
+      </tr>
+      <tr>
+        <td>jppf.config.overrides.path</td>
+        <td>config/config-overrides.properties</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>Path to the temporary config overrides properties file</td>
+      </tr>
+      <tr>
+        <td>jppf.cpu.load.computation.interval</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Determines the frequency at which the JVM's cpu load is recomputed, in ms</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable server discovery via UDP multicast</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.exclude.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv4 exclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.exclude.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv6 exclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.group</td>
+        <td>230.0.0.1</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Server discovery: UDP multicast group</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.include.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv4 inclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.include.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv6 inclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server discovery: UDP multicast port</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.timeout</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server discovery timeout in milliseconds</td>
+      </tr>
+      <tr>
+        <td>jppf.idle.interruptIfRunning</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Node idle mode: whether to shutdown the node at once when user activity resumes or wait until the node is no longer executing tasks</td>
+      </tr>
+      <tr>
+        <td>jppf.idle.mode.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable the idle mode</td>
+      </tr>
+      <tr>
+        <td>jppf.idle.poll.interval</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Node idle mode: how often the node will check for keyboard and mouse inactivity</td>
+      </tr>
+      <tr>
+        <td>jppf.idle.timeout</td>
+        <td>300000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Node idle mode: the time of keyboard and mouse inactivity before considering the node idle</td>
+      </tr>
+      <tr>
+        <td>jppf.java.path</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Full path to the Java executable</td>
+      </tr>
+      <tr>
+        <td>jppf.jvm.options</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>JVM options for the node or server process</td>
+      </tr>
+      <tr>
+        <td>jppf.management.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable management of the node or server</td>
+      </tr>
+      <tr>
+        <td>jppf.management.host</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Management server host</td>
+      </tr>
+      <tr>
+        <td>jppf.management.port</td>
+        <td>11198</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Management remote connector port</td>
+      </tr>
+      <tr>
+        <td>jppf.management.server.forwarder</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Fully qualifed class name of a MBeanServerForwarder implementation with optional space-separated string parameters</td>
+      </tr>
+      <tr>
+        <td>jppf.node.android</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the node is an Android node</td>
+      </tr>
+      <tr>
+        <td>jppf.node.check.connection</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.node.class</td>
+        <td>org.jppf.server.node.remote.JPPFRemoteNode</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Internal use. The class of node to instantiate upon node startup. For instance Java and Android nodes use a different class</td>
+      </tr>
+      <tr>
+        <td>jppf.node.classloading.batch.period</td>
+        <td>100</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>How often batched class loading requests are sent to the server</td>
+      </tr>
+      <tr>
+        <td>jppf.node.management.port</td>
+        <td>11198</td>
+        <td>jppf.management.port</td>
+        <td>int</td>
+        <td>Node management port (to distinguish from server management port when local node is on)</td>
+      </tr>
+      <tr>
+        <td>jppf.node.offline</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the node runs in offline mode </td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.master</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the node is a master node</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.master.uuid</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>UUID of the master node for a given slave node</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.slave</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the node is a slave node</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.slave.config.path</td>
+        <td>config</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Directory where slave-specific configuration files are located</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.slave.id</td>
+        <td>-1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Id of a slave node generated by/scoped by its master. Unique within a single master's scope. Associate with "jppf.node.provisioning.master.uuid" to provide a globally unique id.</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.slave.jvm.options</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>JVM options always added to the slave startup command</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.slave.path.prefix</td>
+        <td>slave_nodes/node_</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path prefix for the root directory of slave nodes</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.startup.overrides.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>Path to an optional config overrides file for slaves launched at startup</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.startup.overrides.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>An optional config overrides source (name of a class implementing org.jppf.utils.JPPFConfiguration.ConfigurationSourceReader or org.jppf.utils.JPPFConfiguration.ConfigurationSource) for slaves launched at startup</td>
+      </tr>
+      <tr>
+        <td>jppf.node.provisioning.startup.slaves</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Number of slaves to launch upon master node startup</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.job</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>UUID of the job for which a node is reserved</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.uuid</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.policy.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the security policy file</td>
+      </tr>
+      <tr>
+        <td>jppf.processing.threads</td>
+        <td>available processors</td>
+        <td>processing.threads</td>
+        <td>int</td>
+        <td>Number of processing threads in the node</td>
+      </tr>
+      <tr>
+        <td>jppf.provisioning.request.check.timeout</td>
+        <td>15000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable recovery from hardware failures through a heartbeat mechanism</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.err</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>File to redirect System.err to</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.err.append</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Append to existing file (true) or create a new one (false)</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.out</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>File</td>
+        <td>File to redirect System.out to</td>
+      </tr>
+      <tr>
+        <td>jppf.redirect.out.append</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Append to existing file (true) or create a new one (false)</td>
+      </tr>
+      <tr>
+        <td>jppf.resolve.addresses</td>
+        <td>true</td>
+        <td>org.jppf.resolve.addresses</td>
+        <td>boolean</td>
+        <td>Whether to resolve IP addresses</td>
+      </tr>
+      <tr>
+        <td>jppf.resource.cache.dir</td>
+        <td>sys.property "java.io.tmpdir"</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Root location of the file-persisted caches</td>
+      </tr>
+      <tr>
+        <td>jppf.resource.cache.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the class loader resource cache is enabled</td>
+      </tr>
+      <tr>
+        <td>jppf.resource.cache.storage</td>
+        <td>file</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Type of cache storage: either 'file' or 'memory'</td>
+      </tr>
+      <tr>
+        <td>jppf.server.connection.strategy</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Fully qualified name of a class implementing org.jppf.node.connection.DriverConnectionStrategy</td>
+      </tr>
+      <tr>
+        <td>jppf.server.host</td>
+        <td>localhost</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Server host name or IP address</td>
+      </tr>
+      <tr>
+        <td>jppf.server.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server port</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the SSL configuration in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>SSL configuration as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enabled/disable secure connections</td>
+      </tr>
+      <tr>
+        <td>jppf.thread.manager.class</td>
+        <td>default</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Type of thread pool to use in the node: either 'default' or 'org.jppf.server.node.fj.ThreadManagerForkJoin'</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Node screensaver</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.centerimage</td>
+        <td>org/jppf/node/jppf@home.gif</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the larger image at the center of the screen (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.class</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Class name of an implementation of org.jppf.node.screensaver.JPPFScreenSaver</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable the screen saver</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.fullscreen</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to display the screen saver in full screen mode</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.handle.collisions</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Handle collisions between moving logos (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.height</td>
+        <td>800</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Height in pixels (windowed mode)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.icon</td>
+        <td>org/jppf/node/jppf-icon.gif</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the image for the frame's icon (windowed mode)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.location.x</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Screensaver's on-screen X coordinate (windowed mode)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.location.y</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Screensaver's on-screen Y coordinate (windowed mode)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.logo.path</td>
+        <td>org/jppf/node/jppf_group_small.gif</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path(s) to the moving logo image(s) (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.logos</td>
+        <td>10</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Number of moving moving logos (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.mouse.motion.close</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to close the screensaver on mouse motion (full screen mode)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.mouse.motion.delay</td>
+        <td>500</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.node.listener</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Class name of an implementation of  org.jppf.node.screensaver.NodeIntegration</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.speed</td>
+        <td>100</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Speed of moving moving logos! from 1 to 100 (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.status.panel.alignment</td>
+        <td>center</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Hhorizontal alignment of the status panel (built-in default screensaver)</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.title</td>
+        <td>JPPF screensaver</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Title of the screensaver's JFrame in windowed mode</td>
+      </tr>
+      <tr>
+        <td>jppf.screensaver.width</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Width in pixels (windowed mode)</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Client</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.jmx.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Manually defined JMX connection ppol size for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Manually defined connection ppol size for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.priority</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Manually defined priority for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Heartbeat enabled flag for a manually configured peer client connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.server.host</td>
+        <td>localhost</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Manually defined driver host for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.server.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Manually defined driver port for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>&lt;driver_name&gt;.jppf.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Manually defined SSL enabled flag for a client-to-driver connection<br>- <i>driver_name</i>: one of the driver names defined with the 'jppf.drivers' property</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.acceptMultipleInterfaces</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to discover server connections from multiple network interfaces</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable server discovery via UDP multicast</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.exclude.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv4 exclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.exclude.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv6 exclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.group</td>
+        <td>230.0.0.1</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Server discovery: UDP multicast group</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.include.ipv4</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv4 inclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.include.ipv6</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>IPv6 inclusion patterns for server discovery</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server discovery: UDP multicast port</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.priority</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Priority assigned to discovered server connections (client/admiin console)</td>
+      </tr>
+      <tr>
+        <td>jppf.discovery.timeout</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server discovery timeout in milliseconds</td>
+      </tr>
+      <tr>
+        <td>jppf.drivers</td>
+        <td>default-driver</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Names of the manually configured servers in the client</td>
+      </tr>
+      <tr>
+        <td>jppf.jmx.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>JMX connection pool size when discovery is enabled</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.algorithm</td>
+        <td>proportional</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Load balancing algorithm name</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence</td>
+        <td>null</td>
+        <td>jppf.load.balancer.persistence</td>
+        <td>String[]</td>
+        <td>Class name of the implementation of a load-balancer persistence in the driver or client, with optional parameters</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.ddl.location</td>
+        <td>org/jppf/load/balancer/persistence/load_balancer_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.hash</td>
+        <td>SHA-1</td>
+        <td>jppf.load.balancer.persistence.hash</td>
+        <td>String</td>
+        <td>The hash function used to generate load-balancer state identifiers</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.profile</td>
+        <td>jppf</td>
+        <td>jppf.load.balancing.strategy</td>
+        <td>String</td>
+        <td>Load balancing parameters profile name</td>
+      </tr>
+      <tr>
+        <td>jppf.local.execution.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable local execution in the client</td>
+      </tr>
+      <tr>
+        <td>jppf.local.execution.priority</td>
+        <td>0</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Priority assigned to the client local executor</td>
+      </tr>
+      <tr>
+        <td>jppf.local.execution.threads</td>
+        <td>available processors</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Maximum threads to use for local execution</td>
+      </tr>
+      <tr>
+        <td>jppf.pool.size</td>
+        <td>1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Connection pool size for server connections discovered via UDP multicast</td>
+      </tr>
+      <tr>
+        <td>jppf.recovery.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable recovery from hardware failures through a heartbeat mechanism</td>
+      </tr>
+      <tr>
+        <td>jppf.remote.execution.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable remote execution (client only)</td>
+      </tr>
+      <tr>
+        <td>jppf.resolve.addresses</td>
+        <td>true</td>
+        <td>org.jppf.resolve.addresses</td>
+        <td>boolean</td>
+        <td>Whether to resolve IP addresses</td>
+      </tr>
+      <tr>
+        <td>jppf.server.host</td>
+        <td>localhost</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Server host name or IP address</td>
+      </tr>
+      <tr>
+        <td>jppf.server.port</td>
+        <td>11111</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Server port</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the SSL configuration in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.configuration.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>SSL configuration as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enabled/disable secure connections</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Desktop console</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.addto</td>
+        <td>Main</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>The built-in view a pluggable view is attached to. It must be one of the tabbed panes of the admin console. Possible values: Main &#124; Topology &#124; Charts<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.autoselect</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to automatically select the pluggable view<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.class</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Name of a pluggable view class, extending org.jppf.ui.plugin.PluggableView<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.enabled</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable / disable a pluggable view<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.icon</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the icon for a pluggable view, seen as the tab icon<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.position</td>
+        <td>-1</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>The position at which a pluggable view is inserted withing the enclosing tabbed pane. A negative value means insert at the end<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.console.view.&lt;view_name&gt;.title</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>The title for the view, seen as the tab label<br>- <i>view_name</i>: a user-assigned name for the view</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.default.scrollbar.thickness</td>
+        <td>10</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>The default thickness of the scrollbars in the GUI</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.splash</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to display the animated splash screen at console startup, defaults to false</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.splash.delay</td>
+        <td>500</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Interval between images in milliseconds</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.splash.images</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>One or more paths to the images displayed in a rolling sequence (like a slide show), separated by '&#124;' (pipe) characters</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.splash.message</td>
+        <td>empty string</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>The fixed text displayed at center of the splash screen</td>
+      </tr>
+      <tr>
+        <td>jppf.ui.splash.message.color</td>
+        <td>64, 64, 128</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>The color of the fixed text displayed at center of the splash screen, as an 'r, g, b' or 'r, g, b, a' value</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Web console</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.web.admin.refresh.interval</td>
+        <td>3</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Interval in seconds between 2 refreshes of a page in the web admin console</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Desktop and Web consoles</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.refresh.interval.health</td>
+        <td>3000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Interval between updates of the JVM health data</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.refresh.interval.stats</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Interval between updates of the server statistics</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.refresh.interval.topology</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Interval between updates of the topology views</td>
+      </tr>
+      <tr>
+        <td>jppf.admin.refresh.system.info</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Wether to refresh the nodes' system info as well (to use for node filtering on the client side)</td>
+      </tr>
+      <tr>
+        <td>jppf.gui.publish.mode</td>
+        <td>immediate_notifications</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>UI refresh mode for the job data panel: 'immediate_notifications' &#124; 'deferred_notifications' &#124; 'polling'</td>
+      </tr>
+      <tr>
+        <td>jppf.gui.publish.period</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Interval between updates of the job data view</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Common</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.check.low.memory</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to check for low memory and trigger disk offloading</td>
+      </tr>
+      <tr>
+        <td>jppf.classloader.file.lookup</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable lookup of classpath resources in the file system</td>
+      </tr>
+      <tr>
+        <td>jppf.disk.overflow.threshold</td>
+        <td>2.0</td>
+        <td>&nbsp;</td>
+        <td>double</td>
+        <td>Ratio of available heap over the size of an object to deserialize, below which disk overflow is triggered</td>
+      </tr>
+      <tr>
+        <td>jppf.gc.on.disk.overflow</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to call System.gc() and recompute the avalaible heap size before triggering disk overflow</td>
+      </tr>
+      <tr>
+        <td>jppf.jmxremote.protocol</td>
+        <td>jppf</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>The JMX remote protocol</td>
+      </tr>
+      <tr>
+        <td>jppf.jmxremote.request.timeout</td>
+        <td>Long.MAX_VALUE</td>
+        <td>jppf.jmx.request.timeout</td>
+        <td>long</td>
+        <td>Timeout in milliseconds for JMX requests</td>
+      </tr>
+      <tr>
+        <td>jppf.length.buffer.pool.size</td>
+        <td>100</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Temporary buffer pool size for reading lengths as ints (size 4)</td>
+      </tr>
+      <tr>
+        <td>jppf.low.memory.threshold</td>
+        <td>32</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Minimum heap size in MB below which disk overflow is systematically triggered, to avoid heap fragmentation and ensure there's enough memory to deserialize job headers</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.pool.size</td>
+        <td>8</td>
+        <td>jppf.transition.thread.pool.size</td>
+        <td>int</td>
+        <td>Core number of threads performing network I/O</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.pool.type</td>
+        <td>sync</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Type of NIO thread pool: either dynamic or fixed</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.queue.size</td>
+        <td>50</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Queue size for the pool of threads performing network I/O</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.ttl</td>
+        <td>15000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>TTL in milliseconds for threads beyond the core number performing network I/O</td>
+      </tr>
+      <tr>
+        <td>jppf.notification.offload.memory.threshold</td>
+        <td>80% of max heap size</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Used heap in bytes above which notifications from task are offloaded to file. Defaults to 0.8 * maxHeapSize.</td>
+      </tr>
+      <tr>
+        <td>jppf.object.serialization.class</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Serialization scheme: name of a class implementing org.jppf.serialization.JPPFSerialization</td>
+      </tr>
+      <tr>
+        <td>jppf.reconnect.initial.delay</td>
+        <td>0</td>
+        <td>reconnect.initial.delay</td>
+        <td>long</td>
+        <td>Delay in seconds before the first (re)connection attempt</td>
+      </tr>
+      <tr>
+        <td>jppf.reconnect.interval</td>
+        <td>1</td>
+        <td>reconnect.interval</td>
+        <td>long</td>
+        <td>Frequency in seconds of reconnection attempts</td>
+      </tr>
+      <tr>
+        <td>jppf.reconnect.max.time</td>
+        <td>60</td>
+        <td>reconnect.max.time</td>
+        <td>long</td>
+        <td>Time in seconds after which reconnection attempts stop. A negative value means never stop</td>
+      </tr>
+      <tr>
+        <td>jppf.resource.cache.dir</td>
+        <td>sys.property "java.io.tmpdir"</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Root location of the file-persisted caches</td>
+      </tr>
+      <tr>
+        <td>jppf.script.default.language</td>
+        <td>javascript</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Default script language for scripted property values</td>
+      </tr>
+      <tr>
+        <td>jppf.sequential.serialization</td>
+        <td>false</td>
+        <td>jppf.sequential.deserialization</td>
+        <td>boolean</td>
+        <td>Whether object graphs should be serialized or deserialized sequentially instead of in parallel</td>
+      </tr>
+      <tr>
+        <td>jppf.serialization.exception.hook</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.socket.buffer.size</td>
+        <td>32768</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Receive/send buffer size for socket connections</td>
+      </tr>
+      <tr>
+        <td>jppf.socket.keepalive</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable socket keepalive</td>
+      </tr>
+      <tr>
+        <td>jppf.socket.max-idle</td>
+        <td>-1</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Seconds a socket connection can remain idle before being closed (client only)</td>
+      </tr>
+      <tr>
+        <td>jppf.socket.tcp_nodelay</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Enable/disable Nagle's algorithm</td>
+      </tr>
+      <tr>
+        <td>jppf.temp.buffer.pool.size</td>
+        <td>10</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Maximum size of temporary buffers pool</td>
+      </tr>
+      <tr>
+        <td>jppf.temp.buffer.size</td>
+        <td>32768</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Size of temporary buffers used in I/O transfers</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>.Net</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.dotnet.bridge.initialized</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether the node is .Net-enabled</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Persistence</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence</td>
+        <td>o.j.j.p.i.DefaultFilePersistence</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Class name of the implementation of the job persistence in the driver</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence.ddl.location</td>
+        <td>org/jppf/job/persistence/impl/job_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the databse job persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence.memory.threshold</td>
+        <td>70.0</td>
+        <td>&nbsp;</td>
+        <td>double</td>
+        <td>Percentage of used heap above which async job persistence switches to sequential mode, until the used heap decreases below the threshold</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.ddl.location</td>
+        <td>org/jppf/load/balancer/persistence/load_balancer_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>SSL/TLS</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.cipher.suites</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>Space-separated enabled cipher suites</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.auth</td>
+        <td>none</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>SSL client authentication level: 'none' &#124; 'want' &#124; 'need'</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.distinct.truststore</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to use a separate trust store for client certificates (server only)</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the client trust store in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.password</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Plain text client trust store password</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.password.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Client trust store password as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Client trust store location as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.client.truststore.type</td>
+        <td>jks</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Client trust store format, e.g. 'JKS'</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.context.protocol</td>
+        <td>TLSv1.2</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>javax.net.ssl.SSLContext protocol</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.keystore.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the key store in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.keystore.password</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Plain text key store password</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.keyststore.password.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Key store password as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.keyststore.type</td>
+        <td>jks</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Key store format, e.g. 'JKS'</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.keytstore.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Key store location as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.protocols</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String[]</td>
+        <td>A list of space-separated enabled protocols</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.truststore.file</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Path to the trust store in the file system or classpath</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.truststore.password</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Plain text trust store password</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.truststore.password.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Trust store password as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.truststore.source</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Trust store location as an arbitrary source</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.truststore.type</td>
+        <td>jks</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Trust store format, e.g. 'JKS'</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>JMX remote</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.jmxremote.request.timeout</td>
+        <td>Long.MAX_VALUE</td>
+        <td>jppf.jmx.request.timeout</td>
+        <td>long</td>
+        <td>Timeout in milliseconds for JMX requests</td>
+      </tr>
+      <tr>
+        <td>jppf.management.connection.timeout</td>
+        <td>60000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>JMX client connection timeout in millis. 0 or less means no timeout</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Memory usage optimization</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.check.low.memory</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to check for low memory and trigger disk offloading</td>
+      </tr>
+      <tr>
+        <td>jppf.disk.overflow.threshold</td>
+        <td>2.0</td>
+        <td>&nbsp;</td>
+        <td>double</td>
+        <td>Ratio of available heap over the size of an object to deserialize, below which disk overflow is triggered</td>
+      </tr>
+      <tr>
+        <td>jppf.gc.on.disk.overflow</td>
+        <td>true</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>Whether to call System.gc() and recompute the avalaible heap size before triggering disk overflow</td>
+      </tr>
+      <tr>
+        <td>jppf.low.memory.threshold</td>
+        <td>32</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Minimum heap size in MB below which disk overflow is systematically triggered, to avoid heap fragmentation and ensure there's enough memory to deserialize job headers</td>
+      </tr>
+      <tr>
+        <td>jppf.notification.offload.memory.threshold</td>
+        <td>80% of max heap size</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Used heap in bytes above which notifications from task are offloaded to file. Defaults to 0.8 * maxHeapSize.</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Internal use</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.cpu.load.computation.interval</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Determines the frequency at which the JVM's cpu load is recomputed, in ms</td>
+      </tr>
+      <tr>
+        <td>jppf.debug.enabled</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>whether the debug mbean is enabled</td>
+      </tr>
+      <tr>
+        <td>jppf.job.persistence.ddl.location</td>
+        <td>org/jppf/job/persistence/impl/job_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the databse job persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.load.balancing.persistence.ddl.location</td>
+        <td>org/jppf/load/balancer/persistence/load_balancer_persistence.sql</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Location of the file that contains the DDL statements to create the database table for the laod-balancers persistence</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.select.timeout</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.node.check.connection</td>
+        <td>false</td>
+        <td>&nbsp;</td>
+        <td>boolean</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.node.class</td>
+        <td>org.jppf.server.node.remote.JPPFRemoteNode</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Internal use. The class of node to instantiate upon node startup. For instance Java and Android nodes use a different class</td>
+      </tr>
+      <tr>
+        <td>jppf.node.forwarding.pool.size</td>
+        <td>available processors</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Size of the pool of threads used to process node forwarding requests and notifications</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.job</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>UUID of the job for which a node is reserved</td>
+      </tr>
+      <tr>
+        <td>jppf.node.reserved.uuid</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.discovery.removal.cleanup.interval</td>
+        <td>30000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.handler.period</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.peer.processing.threads</td>
+        <td>8</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.provisioning.request.check.timeout</td>
+        <td>15000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.resource.provider.class</td>
+        <td>org.jppf.classloader.ResourceProviderImpl</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.sequential.serialization</td>
+        <td>false</td>
+        <td>jppf.sequential.deserialization</td>
+        <td>boolean</td>
+        <td>Whether object graphs should be serialized or deserialized sequentially instead of in parallel</td>
+      </tr>
+      <tr>
+        <td>jppf.serialization.exception.hook</td>
+        <td>null</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td>jppf.ssl.thread.pool.size</td>
+        <td>10</td>
+        <td>jppf.ssl.thread.pool</td>
+        <td>int</td>
+        <td>internal use</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>NIO</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.check.connection</td>
+        <td>true</td>
+        <td>jppf.nio.connection.check</td>
+        <td>boolean</td>
+        <td>Enable/disable network connection checks on write operations</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.pool.size</td>
+        <td>8</td>
+        <td>jppf.transition.thread.pool.size</td>
+        <td>int</td>
+        <td>Core number of threads performing network I/O</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.pool.type</td>
+        <td>sync</td>
+        <td>&nbsp;</td>
+        <td>String</td>
+        <td>Type of NIO thread pool: either dynamic or fixed</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.queue.size</td>
+        <td>50</td>
+        <td>&nbsp;</td>
+        <td>int</td>
+        <td>Queue size for the pool of threads performing network I/O</td>
+      </tr>
+      <tr>
+        <td>jppf.nio.thread.ttl</td>
+        <td>15000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>TTL in milliseconds for threads beyond the core number performing network I/O</td>
+      </tr>
+      <tr>
+        <td class='header_cell tag_cell' colspan='5'><h3>Management</h3></td>
+      </tr>
+      <tr>
+        <td class='header_cell'>Name</td>
+        <td class='header_cell'>Default value</td>
+        <td class='header_cell'>Aliases</td>
+        <td class='header_cell'>Value type</td>
+        <td class='header_cell'>Description</td>
+      </tr>
+      <tr>
+        <td>jppf.cpu.load.computation.interval</td>
+        <td>1000</td>
+        <td>&nbsp;</td>
+        <td>long</td>
+        <td>Determines the frequency at which the JVM's cpu load is recomputed, in ms</td>
+      </tr>
+    </table>
+  </body
+</html>
