@@ -122,18 +122,18 @@ public class WikiConfigurationPrinter {
   /**
    * Print all JPPF properties grouped by tag. 
    * @param title the page title.
-   * @param allProps the list of properties to print.
+   * @param properties the list of properties to print.
    * @return a string holding the resulting HTML document.
    */
-  public String printProperties(final String title, final List<JPPFProperty<?>> allProps) {
+  public String printProperties(final String title, final List<JPPFProperty<?>> properties) {
     sb = new StringBuilder();
     prologue();
-    final CollectionMap<String, JPPFProperty<?>> taggedMap = new SortedSetSortedMap<>(new TagComparator<String>(), new PropComparator());
-    for (final JPPFProperty<?> prop: allProps) {
-      final Set<String> tags = new HashSet<>(prop.getTags());
+    final CollectionMap<String, JPPFProperty<?>> taggedMap = new SortedSetSortedMap<>(new TagComparator<String>(), new PropertyNameComparator());
+    for (final JPPFProperty<?> property: properties) {
+      final Set<String> tags = new HashSet<>(property.getTags());
       if (!tags.removeAll(EXCLUDED_TAGS)) {
         for (final String tag: tags) {
-          taggedMap.putValue(tag, prop);
+          taggedMap.putValue(tag, property);
         }
       }
     }
@@ -223,24 +223,24 @@ public class WikiConfigurationPrinter {
 
   /**
    * Print a table row for the specified proeprty.
-   * @param prop the property whose information is printed in the rowx.
+   * @param property the property whose information is printed in the rowx.
    * @return this printer, for method call chaining.
    */
-  private WikiConfigurationPrinter doPropertyRow(final JPPFProperty<?> prop) {
+  private WikiConfigurationPrinter doPropertyRow(final JPPFProperty<?> property) {
     println("|-style=\"line-height: 1.1em\"");
     // property name
-    String name = convert(prop.getName());
-    if (prop.isDeprecated()) name = "<span style=\"text-decoration: line-through\">" + name + "</span>";
+    String name = convert(property.getName());
+    if (property.isDeprecated()) name = "<span style=\"text-decoration: line-through\">" + name + "</span>";
     doCell(name);
     // default value
-    Object value = prop.getDefaultValue();
-    if (AVAILABLE_PROCESSORS_NAMES.contains(prop.getName())) value = "available processors";
-    else if ("jppf.resource.cache.dir".equals(prop.getName())) value = "sys.property \"java.io.tmpdir\"";
-    else if ("jppf.notification.offload.memory.threshold".equals(prop.getName())) value = "80% of max heap size";
+    Object value = property.getDefaultValue();
+    if (AVAILABLE_PROCESSORS_NAMES.contains(property.getName())) value = "available processors";
+    else if ("jppf.resource.cache.dir".equals(property.getName())) value = "sys.property \"java.io.tmpdir\"";
+    else if ("jppf.notification.offload.memory.threshold".equals(property.getName())) value = "80% of max heap size";
     else if (value instanceof String[]) value = toString((String[]) value);
     else if ("".equals(value)) value = "empty string";
     String val = ((value == null) ? "null" : convert(value.toString()));
-    if (prop.isDeprecated()) val = "<span style=\"text-decoration: line-through\">" + val + "</span>";
+    if (property.isDeprecated()) val = "<span style=\"text-decoration: line-through\">" + val + "</span>";
     doCell(val);
     /*
     // aliases
@@ -249,7 +249,7 @@ public class WikiConfigurationPrinter {
     doCell(prop.valueType().getSimpleName());
     */
     // description
-    value = getPropertyDoc(prop);
+    value = getPropertyDoc(property);
     doCell(value == null ? "" : convertDescription(value.toString()));
     return this;
   }
@@ -310,7 +310,7 @@ public class WikiConfigurationPrinter {
   /**
    * Compares {@link JPPFProperty} instances based on their names in ascending order.
    */
-  private static class PropComparator implements Comparator<JPPFProperty<?>> {
+  private static class PropertyNameComparator implements Comparator<JPPFProperty<?>> {
     @Override
     public int compare(final JPPFProperty<?> o1, final JPPFProperty<?> o2) {
       return o1.getName().compareTo(o2.getName());
@@ -365,7 +365,6 @@ public class WikiConfigurationPrinter {
     for (Map.Entry<String, String> entry: HTML_CONVERSIONS.entrySet()) s = s.replace(entry.getKey(), entry.getValue());
     return s;
   }
-
 
   /**
    * Convert special characters into character entities in the description column.
