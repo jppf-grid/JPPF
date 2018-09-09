@@ -24,11 +24,11 @@ Once you have installed the 2 servers and at least one node, perform the followi
   <li>Replace the servers configurations with those provided in this sample</li>
   <li>Start the two drivers</li>
   <li>Start the node. Upon startup you should see the following messages in the node's console:
-<pre class="samples">*** found 3 servers ***
-  registered server localhost:11111
-  registered server localhost:11121
-  registered server localhost:11131
-</pre>
+<pre class="samples"><code>*** found 3 servers ***
+registered server localhost:11111
+registered server localhost:11121
+registered server localhost:11131
+</code></pre>
   </li>
   <li>Kill the first driver (the one listening to port 11111), the node console will display the following:
 <pre class="samples">Attempting connection to the node server at localhost:11111
@@ -75,7 +75,7 @@ The main feature demonstrated is detailed in the JPPF documentation, in the
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

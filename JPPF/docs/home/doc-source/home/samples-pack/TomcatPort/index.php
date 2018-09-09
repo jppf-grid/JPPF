@@ -25,7 +25,7 @@ Integration with the Tomcat Servlets/JSP container.
 <p>If you need more insight into the code of this demo, you can consult the JSP source files located in the <b>TomcatPort/src/resources</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

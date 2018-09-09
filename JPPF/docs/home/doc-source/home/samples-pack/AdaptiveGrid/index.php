@@ -16,7 +16,8 @@ It will display a message each tile the size of the connection pool or the numbe
 
 <h3>How do I run it?</h3>
 <p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.0/index.php?title=Introduction">JPPF documentation</a>.
-<p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:
+<p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:</p>
+
 <pre class="prettyprint lang-txt">
 [demo] Starting the demo with maxAllowedNodes=10 and maxAllowedPoolSize=10
 [demo] **** submitting jobs batch #1 (1 jobs) *****
@@ -42,9 +43,9 @@ It will display a message each tile the size of the connection pool or the numbe
 [demo] decreasing the number of server connections to 1
 [demo] decreasing the number of nodes to 1
 </pre>
-          <p>It is also interesting to monitor the grid with the amdinistration console: the topology view will show the slave nodes that are started and stopped,
-          and the job data view will show more or less jobs in the server queue, depending on the client connection pool size.
-          <p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties.html">config/jppf.properties</a> file:
+<p>It is also interesting to monitor the grid with the administration console: the topology view will show the slave nodes that are started and stopped,
+and the job data view will show more or less jobs in the server queue, depending on the client connection pool size.
+<p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties.html">config/jppf.properties</a> file:
 <pre class="prettyprint lang-conf">
 # the maximum allowed connection pool size
 maxAllowedPoolSize = 10
@@ -67,7 +68,7 @@ taskDuration = 1500
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>AdaptiveGrid/src</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

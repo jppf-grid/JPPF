@@ -51,6 +51,7 @@ wordcount.channels = 4
 # how many concurrent job can be executing at the same time before reading of articles blocks
 wordcount.job.capacity = 2
 </pre>
+
   These parameters allow you to tune the demo's behavior, and optimize the memory footprint vs. throughput tradeoff. Feel free to experiment!.
   The initial values provided in this sample are fit for a client application with 1 GB or heap (-Xmx1024m). If you were to increase the job capacity, you might have to increase the application's heap size as well,
   in order to avoid out of memory conditions</li>
@@ -68,7 +69,7 @@ wordcount.job.capacity = 2
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

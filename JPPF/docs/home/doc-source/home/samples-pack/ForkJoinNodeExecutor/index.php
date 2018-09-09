@@ -9,7 +9,9 @@ Before running this sample application, you must have a JPPF server and at least
 For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/wiki">JPPF documentation</a>.<br>
 <ol class="samplesList">
   <li>For a node to use the fork/join executor add-on, you need to add the following property to its configuration file:
-<pre class="prettyprint lang-conf">jppf.thread.manager.class = org.jppf.execute.ThreadManagerForkJoin</pre>
+<pre class="prettyprint lang-conf">
+jppf.thread.manager.class = org.jppf.execute.ThreadManagerForkJoin
+</pre>
   </li>
   <li>Once this is done, start the server and the node(s)</li>
   <li>From a command prompt, type: <b>&quot;run.bat&quot;</b> (on Windows) or <b>&quot;./run.sh&quot;</b> (on Linux/Unix)</li>
@@ -20,10 +22,12 @@ For information on how to set up a node and server, please refer to the <a href=
 <ol class="samplesList">
   <li>open the file "<b>config/jppf.properties</b>" in a text editor</li>
   <li>at the top of the file, you will see the following properties:
-<pre class="prettyprint lang-conf"># number of Fibonacci computation tasks to execute
+<pre class="prettyprint lang-conf">
+# number of Fibonacci computation tasks to execute
 fib.fj.nbTasks = 10
 # order of Fibonacci number to compute
-fib.fj.N = 10</pre>
+fib.fj.N = 10
+</pre>
   </li>
   <li>"<b>fib.fj.nbTasks</b>" allows you change the number of tasks in the submitted job, and thusto simulate various workloads on the grid and especially on the nodes</li>
   <li>"<b>fib.fj.N</b>" is the Fibonacci order, the higher it is the larger the number of spawned fork/join tasks will be</li>
@@ -38,7 +42,7 @@ To generate the Javadoc, from a command prompt type: <b>&quot;ant javadoc&quot;<
 <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

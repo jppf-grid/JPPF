@@ -19,7 +19,9 @@ To build and run the demo, please follow these steps:
       <li>add <b>NetworkInterceptor.jar</b> to their classpath, by simply dropping it into their <b>lib</b> directory</li>
       <li>edit their configuration file - <b>config/jppf-driver.properties</b> for the driver, <b>config/jppf-node.properties</b> for a node - and look for the <b>jppf.jvm.options</b> property.
         At the end of the property's value, add <b>"-Djppf.user.name=&lt;your_user_name&gt;"</b>. As an example, the property should now look like this:
-        <pre class="prettyprint lang-conf" style="margin: 0">jppf.jvm.options = -server -Xmx256m <i><b>-Djppf.user.name=jppf_user</b></i></pre>
+<pre class="prettyprint lang-conf" style="margin: 0">
+jppf.jvm.options = -server -Xmx256m -Djppf.user.name=jppf_user
+</pre>
       </li>
     </ul>
   </li>
@@ -52,7 +54,7 @@ successful server authentication
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>NetworkInterceptor/src</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

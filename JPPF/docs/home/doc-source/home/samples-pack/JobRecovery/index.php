@@ -10,18 +10,24 @@ Only the part of the job that hadn't completed will be executed.
   <li>Before running this sample application, you must have a JPPF server and one node running. For information on how to set up a node and server, please refer to the <a href="https://www.jppf.org/doc/6.0">JPPF documentation</a>.</li>
   <li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.</li>
   <li>A the first execution, the application will show that no job exists in the job perisstence store, with a message similar to this:
-<pre class="samples">no job found in persistence store, creating a new job with 10 tasks</pre>
+<pre class="samples">
+no job found in persistence store, creating a new job with 10 tasks
+</pre>
   </li>
   <li>You will then see, in the node's shell console, messages like this:
-<pre class="samples">task 1 completed sucessfully
+<pre class="samples">
+task 1 completed sucessfully
 ...
 task 5 completed sucessfully
-task 6 completed with error [java.lang.InterruptedException: sleep interrupted]</pre>
+task 6 completed with error [java.lang.InterruptedException: sleep interrupted]
+</pre>
   </li>
   <li>at this point, you will notice that the application has exited, without displaying the job execution results</li>
   <li>restart the application: you should now see a message like:
-<pre class="samples">found jobs in persistence store: [the_job_uuid]
-loaded job 'the_job_uuid' from persistence store ...</pre>
+<pre class="samples">
+found jobs in persistence store: [the_job_uuid]
+loaded job 'the_job_uuid' from persistence store ...
+</pre>
   </li>
   <li>the node's console will again display successful completion messages, but starting from the latest task that was successfully persisted</li>
 </ol>
@@ -41,7 +47,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

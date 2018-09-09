@@ -18,6 +18,7 @@ matrix.size = 300
 # number of times the matrix multiplication is performed
 matrix.iterations = 100
 </pre>
+
   </li>
   <li>"<b>matrix.size</b>" allows you to experiment with different sizes of the matrices</li>
   <li>"<b>matrix.iterations</b>" is the number of times the matrix multiplication will be performed.
@@ -34,7 +35,7 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

@@ -31,12 +31,14 @@ It supports any non-cyclic dependency graph and will work even when the jobs in 
     </tr>
     <tr>
       <td align="left" valign="center">
-<pre class="prettyprint lang-regex"><br>Job F ==> Job A, Job B, Job E | remove
+<pre class="prettyprint lang-regex"><code>
+Job F ==> Job A, Job B, Job E | remove
 Job E ==> Job C, Job D
 Job D ==> Job B, Job C
 Job C ==> Job A
 Job B ==> Job A
-Job A ==><br> </pre>
+Job A ==><br>
+</code></pre>
       </td>
       <td align="center" valign="top"><img src="data/DependenciesGraph.gif"/></td>
     </tr>
@@ -45,8 +47,10 @@ Job A ==><br> </pre>
 </ul>
 <p><b>4. Detection of cycles in the dependency graph</b>
 <p>When a cycle is detected, the server will print a message to the console, similar to this:
-<pre class="prettyprint lang-regex">[2016-05-09 21:48:00.621] cycle detected while adding dependency 'Job C' to 'Job A' :
-Job A ==> Job B ==> Job C ==> Job A</pre>
+<pre class="prettyprint lang-regex">
+[2016-05-09 21:48:00.621] cycle detected while adding dependency 'Job C' to 'Job A' :
+Job A ==> Job B ==> Job C ==> Job A
+</pre>
 Furthermore, no dependency will be assigned to the job, so that it can be executed and avoid being stuck in the server queue.
 
 <p><b>5. Distributed scenario: submitting jobs in the dependency graph from separate clients</b>
@@ -56,16 +60,20 @@ Furthermore, no dependency will be assigned to the job, so that it can be execut
   <li>in <code>JobDependencies/dependency_graph.txt</code>, remove or comment out the <i>last</i> 3 declared dependencies, so the dependencies should look like this:
 <pre class="prettyprint lang-regex" style="margin: 0px">Job F ==> Job A, Job B, Job E | remove
 Job E ==> Job C, Job D
-Job D ==> Job B, Job C</pre>
+Job D ==> Job B, Job C
+</pre>
   </li>
   <li>in <code>JobDependencies2/dependency_graph.txt</code>, remove or comment out the <i>first</i> 3 declared dependencies, the dependencies should look like this:
 <pre class="prettyprint lang-regex" style="margin: 0px">Job C ==> Job A
 Job B ==> Job A
-Job A ==></pre>
+Job A ==>
+</pre>
   </li>
   <li>if not already done, start a server and at least one node</li>
   <li>start the demo in JobDependencies with "run.bat" or "./run.sh". You will observe that it prints the following message:
-  <pre class="prettyprint lang-regex" style="margin: 0px">[2016-07-22 08:51:33.667] runner: ***** awaiting results for 'Job F' *****</pre>
+<pre class="prettyprint lang-regex" style="margin: 0px"><code>
+[2016-07-22 08:51:33.667] runner: ***** awaiting results for 'Job F' *****
+</code></pre>
   </li>
   <li>start the demo in JobDependencies2 with "run.bat" or "./run.sh". It will print completion messages for the jobs A, B and C</li>
   <li>now if you get back to the console for JobDependencies, you will see that jobs D, E, F were completed as well, following the completion of their dependencies submitted by the other instance of the demo in JobDependencies2</li>
@@ -95,7 +103,7 @@ Job A ==></pre>
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomLoadBalancer/src</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

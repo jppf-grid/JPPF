@@ -72,7 +72,7 @@ Once you have installed a server and node, perform the following steps:
   <li>in the second node's console output you should see messages of this type:<br>
     <tt>[java] Starting execution of task Light Job - task 2</tt> (as many as there are tasks in the "light" job)</li>
   <li>the demo console output should show something like this:
-<pre>[java] ********** Results for job : Heavy Job **********
+<pre><code>[java] ********** Results for job : Heavy Job **********
 [java]
 [java] Result for task Heavy Job - task 1 : the execution was performed successfully
 [java] Result for task Heavy Job - task 2 : the execution was performed successfully
@@ -85,7 +85,8 @@ Once you have installed a server and node, perform the following steps:
 [java] Result for task Light Job - task 2 : the execution was performed successfully
 [java] Result for task Light Job - task 3 : the execution was performed successfully
 [java] Result for task Light Job - task 4 : the execution was performed successfully
-       .....</pre>
+       .....
+</code></pre>
   </li>
 </ol>
 
@@ -102,7 +103,7 @@ Once you have installed a server and node, perform the following steps:
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomLoadBalancer/src</b> folder.
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

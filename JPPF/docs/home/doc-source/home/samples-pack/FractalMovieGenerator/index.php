@@ -41,7 +41,8 @@ where:
   trans_time: the duration (in seconds) of a transition
     between 2 records in the input file
 note: the total number of frames in the generated movie is equal to
-  (nb_input_records-1) * frame_rate * trans_time</pre>
+  (nb_input_records-1) * frame_rate * trans_time
+</pre>
 
 <p>It is also possible to specify how many jobs can be sent concurrently by the application, by setting the following in config/jppf.properties:
 <pre class="prettyprint lang-conf">
@@ -49,12 +50,14 @@ note: the total number of frames in the generated movie is equal to
 # if &gt; 1, it also requires setting a connection pool
 jppf.fractals.concurrent.jobs = 4
 </pre>
+
 <p>This mechanism limits the memory consumption of the application, as the generated images can be huge and lead to OutOfMemoryError if too many are generated in parallel.
 For instance, to have up to 4 images generated in parallel, you would set the following:
 <pre class="prettyprint lang-conf">
 jppf.fractals.concurrent.jobs = 4
 jppf.pool.size = 4
 </pre>
+
 <p>Lastly, you can also configure a job <a href="https://www.jppf.org/doc/6.0/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">dispatch timeout and maximum allowed timeouts</a> in the client configuration.
 These 2 properties are used to prevent jobs from getting stuck forever, in case a node never completes the execution of a job. This is done as follows:
 <pre class="prettyprint lang-conf">
@@ -64,6 +67,7 @@ jppf.fractals.dispatch.timeout = 15000
 # maximum number of allowed timeouts before a job is cancelled; defaults to 1
 jppf.fractals.dispatch.max.timeouts = 1
 </pre>
+
 <h3>Example generated video</h3>
 The following was generated as an image size of 640x360 (360p definition), using a frame rate of 30 fps, and based on the input file "<b>FractalMovieGenerator/data/mandelbrot.csv</b>".
 Note that uploading it to Youtube required an additonal encoding step using the H.264 codec to generate a .mp4 video file.
@@ -73,7 +77,7 @@ Note that uploading it to Youtube required an additonal encoding step using the 
 <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the <a href="javadoc/index.html">API documentation</a>.
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
-  <li><a href="https://www.jppf.org/forums"/>The JPPF Forums</a></li>
+  <li><a href="https://www.jppf.org/forums">The JPPF Forums</a></li>
   <li><a href="https://www.jppf.org/doc/6.0/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$
