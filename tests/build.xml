@@ -206,6 +206,7 @@
     </junit>
     <antcall target="zip.last.test.logs"/>
     <antcall target="junit.report"/>
+    <antcall target="zip.results"/>
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
   
@@ -234,6 +235,7 @@
     </junit>
     <antcall target="zip.last.test.logs"/>
     <antcall target="junit.report"/>
+    <antcall target="zip.results"/>
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
   
@@ -247,6 +249,27 @@
     <zip destfile="${last.zip}">
       <zipfileset dir="${basedir}">
         <include name="*.log"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Zip the build results                                                     -->
+  <!-- ========================================================================= -->
+  
+  <target name="zip.results">
+    <property name="results.file" value="all_results.zip"/>
+    <delete file="${basedir}/${results.file}" quiet="true"/>
+    <zip destfile="${basedir}/${results.file}">
+      <zipfileset dir="${basedir}/logs" prefix="logs">
+        <include name="*.zip"/>
+        <exclude name="${results.file}"/>
+      </zipfileset>
+      <zipfileset dir="${basedir}" prefix="logs">
+        <include name="*.log"/>
+      </zipfileset>
+      <zipfileset dir="${basedir}/report" prefix="report">
+        <exclude name="*.xml"/>
       </zipfileset>
     </zip>
   </target>
