@@ -445,14 +445,8 @@ public class OptionElementFactory {
     } else if ("script".equalsIgnoreCase(source)) {
       if (!desc.scripts.isEmpty()) {
         final ScriptDescriptor scriptDesc = desc.scripts.get(0);
-        ScriptRunner runner = null;
-        try {
-          runner = ScriptRunnerFactory.getScriptRunner(scriptDesc.language);
-          final String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
-          if (path != null) list.add(builder.buildPage(path, null));
-        } finally {
-          ScriptRunnerFactory.releaseScriptRunner(runner);
-        }
+        final String path = (String) new ScriptDefinition(scriptDesc.language, scriptDesc.language).evaluate();
+        if (path != null) list.add(builder.buildPage(path, null));
       }
     }
     return list;

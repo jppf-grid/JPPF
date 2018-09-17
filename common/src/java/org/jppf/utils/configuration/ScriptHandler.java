@@ -160,22 +160,14 @@ public class ScriptHandler {
         final String script = loadScript(name, language, type, source);
         if (script == null) result = matched;
         else {
-          final ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
-          if (runner == null) {
-            log.warn("property '{}' : could not obtain a '{}' script engine", name, language);
+          try {
+            final Object res = new ScriptDefinition(language, script, bindings).evaluate();
+            result = (res == null) ? null : res.toString();
+          } catch(final Exception e) {
+            final String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
+            if (debugEnabled) log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
+            else log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getMessage(e)});
             result = matched;
-          } else {
-            try {
-              final Object res = runner.evaluate(script, bindings);
-              result = res == null ? null : res.toString();
-            } catch(final Exception e) {
-              final String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
-              if (debugEnabled) log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
-              else log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getMessage(e)});
-              result = matched;
-            } finally {
-              ScriptRunnerFactory.releaseScriptRunner(runner);
-            }
           }
         }
       }

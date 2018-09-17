@@ -39,21 +39,9 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The JSR 223 script language to use.
+   * Specfications for the script to execute.
    */
-  protected String language;
-  /**
-   * The script to execute from this task.
-   */
-  protected String script;
-  /**
-   * Unique identifier for the script, which allows reusing a compiled version if one has already been produced.
-   */
-  protected String reusableId;
-  /**
-   * The bindings provide variables available to the script engine during execution of the script.
-   */
-  protected Map<String, Object> bindings = new HashMap<>();
+  protected ScriptDefinition scriptSpec;
 
   /**
    * Default constructor provided as a convenience for subclassing.
@@ -71,12 +59,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @throws IllegalArgumentException if {@code language} or {@code script} is {@code null}.
    */
   public ScriptedTask(final String language, final String script, final String reusableId, final Map<String, Object> bindings) throws IllegalArgumentException {
-    if (language == null) throw new IllegalArgumentException("the script language cannot be null");
-    if (script == null) throw new IllegalArgumentException("the script source cannot be null");
-    this.language = language;
-    this.script = script;
-    this.reusableId = reusableId;
-    if (bindings != null) this.bindings.putAll(bindings);
+    this.scriptSpec = new ScriptDefinition(language, script, reusableId, bindings);
   }
 
   /**
@@ -91,7 +74,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    */
   public ScriptedTask(final String language, final Reader scriptReader, final String reusableId, final Map<String, Object> bindings)
       throws IllegalArgumentException, IOException {
-    this(language, FileUtils.readTextFile(scriptReader), reusableId, bindings);
+    this.scriptSpec = new ScriptDefinition(language, FileUtils.readTextFile(scriptReader), reusableId, bindings);
   }
 
   /**
@@ -106,26 +89,20 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    */
   public ScriptedTask(final String language, final File scriptFile, final String reusableId, final Map<String, Object> bindings)
       throws IllegalArgumentException, IOException {
-    this(language, FileUtils.readTextFile(scriptFile), reusableId, bindings);
+    this.scriptSpec = new ScriptDefinition(language, FileUtils.readTextFile(scriptFile), reusableId, bindings);
   }
 
   @Override
   public void run() {
-    ScriptRunner runner = null;
     try {
-      runner = ScriptRunnerFactory.getScriptRunner(language);
-      if (runner != null) {
-        final Map<String, Object> bnd = new HashMap<>(bindings);
-        bnd.put("jppfTask", this);
-        @SuppressWarnings("unchecked")
-        final T result = (T) runner.evaluate(reusableId, script, bnd);
-        // may have been set from the script
-        if ((getResult() == null) && (result != null)) setResult(result);
-      }
-    } catch(final Exception e) {
+      final Map<String, Object> bnd = new HashMap<>();
+      bnd.put("jppfTask", this);
+      @SuppressWarnings("unchecked")
+      final T result = (T) scriptSpec.evaluate(bnd);
+      // may have been set from the script
+      if ((getResult() == null) && (result != null)) setResult(result);
+    } catch(final JPPFScriptingException e) {
       setThrowable(e);
-    } finally {
-      ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 
@@ -134,7 +111,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @return the script language a s a script.
    */
   public String getLanguage() {
-    return language;
+    return scriptSpec.getLanguage();
   }
 
   /**
@@ -142,7 +119,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @return the script source as a string.
    */
   public String getScript() {
-    return script;
+    return scriptSpec.getScript();
   }
 
   /**
@@ -150,7 +127,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @return the identifier as a string.
    */
   public String getReusableId() {
-    return reusableId;
+    return scriptSpec.getId();
   }
 
   /**
@@ -158,7 +135,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @return a map of variable names to their value.
    */
   public Map<String, Object> getBindings() {
-    return bindings;
+    return scriptSpec.getBindings();
   }
 
   /**
@@ -167,8 +144,8 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @param value the value of the variable.
    * @return this task, for method chaining.
    */
-  public ScriptedTask<T>addBinding(final String name, final Object value) {
-    bindings.put(name, value);
+  public ScriptedTask<T> addBinding(final String name, final Object value) {
+    scriptSpec.addBinding(name, value);
     return this;
   }
 
@@ -178,6 +155,6 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    * @return the value of the variable, or {@code null} if the variable was not bound.
    */
   public Object removeBinding(final String name) {
-    return bindings.remove(name);
+    return scriptSpec.removeBinding(name);
   }
 }

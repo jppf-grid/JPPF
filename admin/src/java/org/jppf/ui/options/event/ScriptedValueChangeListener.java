@@ -94,11 +94,10 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
     final Map<String, Object> variables = new HashMap<>();
     variables.put("root", option.getRoot());
     variables.put("option", option);
-    ScriptRunner runner = null;
     try {
-      runner = ScriptRunnerFactory.getScriptRunner(this.language);
+      final ScriptDefinition spec = new ScriptDefinition(this.language, scriptText, uuid, variables);
       final long start = System.nanoTime();
-      runner.evaluate(uuid, scriptText, variables);
+      spec.evaluate();
       final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) {
         final StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
@@ -106,8 +105,6 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
       }
     } catch (final JPPFScriptingException e) {
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
-    } finally {
-      ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 }

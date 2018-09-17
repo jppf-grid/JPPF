@@ -113,27 +113,21 @@ public class ConfigurationHelper {
       value = value.substring(idx + 1).trim();
       final String[] params = paramsStr.split(";");
       for (int i=0; i<params.length; i++) params[i] = "return " + params[i].trim();
-      ScriptRunner runner = null;
-      try {
-        runner = ScriptRunnerFactory.getScriptRunner("groovy");
-        final int start = (Integer) runner.evaluate(params[0], variables);
-        final int end = (Integer) runner.evaluate(params[1], variables);
-        for (int i=start; i<= end; i++) {
-          final String iStr = Integer.toString(i);
-          final boolean proceed = (Boolean) runner.evaluate(params[2].replace("$i", iStr), variables);
-          if (proceed) {
-            String v = value;
-            if (v.startsWith("expr:")) {
-              final String expr = v.substring("expr:".length()).trim().replace("$i", iStr);
-              final Object o = runner.evaluate(expr, variables);
-              if (o != null) v = o.toString();
-            }
-            final String actualKey = key.replace("$i", iStr);
-            result.setProperty(actualKey, v);
+      final int start = (Integer) new ScriptDefinition("groovy", params[0], variables).evaluate();
+      final int end = (Integer) new ScriptDefinition("groovy", params[1], variables).evaluate();
+      for (int i=start; i<= end; i++) {
+        final String iStr = Integer.toString(i);
+        final boolean proceed = (Boolean) new ScriptDefinition("groovy", params[2].replace("$i", iStr), variables).evaluate();
+        if (proceed) {
+          String v = value;
+          if (v.startsWith("expr:")) {
+            final String expr = v.substring("expr:".length()).trim().replace("$i", iStr);
+            final Object o = new ScriptDefinition("groovy", expr, variables).evaluate();
+            if (o != null) v = o.toString();
           }
+          final String actualKey = key.replace("$i", iStr);
+          result.setProperty(actualKey, v);
         }
-      } finally {
-        ScriptRunnerFactory.releaseScriptRunner(runner);
       }
     } else {
       value = parseValue(key, value, variables);
@@ -153,14 +147,8 @@ public class ConfigurationHelper {
     String value = source.trim();
     if (value.startsWith("expr:")) {
       final String expr = value.substring("expr:".length()).trim();
-      ScriptRunner runner = null;
-      try {
-        runner = ScriptRunnerFactory.getScriptRunner("groovy");
-        final Object o = runner.evaluate(expr, variables);
-        if (o != null) value = o.toString();
-      } finally {
-        ScriptRunnerFactory.releaseScriptRunner(runner);
-      }
+      final Object o = new ScriptDefinition("groovy", expr, variables).evaluate();
+      if (o != null) value = o.toString();
     }
     return value;
   }
