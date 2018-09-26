@@ -32,15 +32,25 @@ import java.net.URL;
  */
 public class MavenCentralLocation extends URLLocation {
   /**
-   * Create this maven central location with the specified GAV string and default "jar" packaging.
-   * <p>Example:
-   * <pre>Location&lt;URL&gt; location = new MavenCentralLocation("org.jppf:jppf-admin:5.2.9");</pre>
-   * @param gav the maven identifier in format "groupId:artifactId:version".
-   * @throws MalformedURLException if resulting URL is incorrect.
+   * Explicit serialVersionUID.
    */
-  public MavenCentralLocation(final String gav) throws MalformedURLException {
-    super(convertToURL(gav, "jar"));
-  }
+  private static final long serialVersionUID = 1L;
+  /**
+   * The group id.
+   */
+  private String groupId;
+  /**
+   * The artifact id.
+   */
+  private final String artifactId;
+  /**
+   * The version string.
+   */
+  private final String version;
+  /**
+   * The type of packaging.
+   */
+  private final String packaging;
 
   /**
    * Create this maven central location with the specified GAV string and packaging.
@@ -52,6 +62,22 @@ public class MavenCentralLocation extends URLLocation {
    */
   public MavenCentralLocation(final String gav, final String packaging) throws MalformedURLException {
     super(convertToURL(gav, packaging));
+    final String[] tokens = gav.split(":");
+    this.groupId = tokens[0];
+    this.artifactId = tokens[1];
+    this.version = tokens[2];
+    this.packaging = packaging;
+  }
+
+  /**
+   * Create this maven central location with the specified GAV string and default "jar" packaging.
+   * <p>Example:
+   * <pre>Location&lt;URL&gt; location = new MavenCentralLocation("org.jppf:jppf-admin:5.2.9");</pre>
+   * @param gav the maven identifier in format "groupId:artifactId:version".
+   * @throws MalformedURLException if resulting URL is incorrect.
+   */
+  public MavenCentralLocation(final String gav) throws MalformedURLException {
+    this(gav, "jar");
   }
 
   /**
@@ -64,7 +90,7 @@ public class MavenCentralLocation extends URLLocation {
    * @throws MalformedURLException if resulting URL is incorrect.
    */
   public MavenCentralLocation(final String groupId, final String artifactId, final String version) throws MalformedURLException {
-    super(convertToURL(groupId + ":" + artifactId + ":" + version, "jar"));
+    this(groupId + ":" + artifactId + ":" + version, "jar");
   }
 
   /**
@@ -78,7 +104,7 @@ public class MavenCentralLocation extends URLLocation {
    * @throws MalformedURLException if resulting URL is incoreect.
    */
   public MavenCentralLocation(final String groupId, final String artifactId, final String version, final String packaging) throws MalformedURLException {
-    super(convertToURL(groupId + ":" + artifactId + ":" + version, packaging));
+    this(groupId + ":" + artifactId + ":" + version, packaging);
   }
 
   /**
@@ -93,7 +119,6 @@ public class MavenCentralLocation extends URLLocation {
     if ((tokens == null) || (tokens.length != 3)) throw new IllegalArgumentException("malformed gav '" + gav + "'");
     final String path = tokens[0].replace(".", "/");
     return new URL(String.format("http://repo.maven.apache.org/maven2/%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
-    //return new URL(String.format("http://search.maven.org/remotecontent?filepath=%s/%s/%s/%s-%s.%s", path, tokens[1], tokens[2], tokens[1], tokens[2], packaging));
   }
 
   /**
@@ -102,5 +127,45 @@ public class MavenCentralLocation extends URLLocation {
   @Override
   public OutputStream getOutputStream() throws Exception {
     throw new UnsupportedOperationException("Uploads to Maven central locations are not supported");
+  }
+
+  /**
+   * Get the group id of the correpsonding Maven artifact.
+   * @return the groupId string.
+   */
+  public String getGroupId() {
+    return groupId;
+  }
+
+  /**
+   * Get the artifact id of the correpsonding Maven artifact.
+   * @return the artifactId string.
+   */
+  public String getArtifactId() {
+    return artifactId;
+  }
+
+  /**
+   * Get the version of the correpsonding Maven artifact.
+   * @return the version string.
+   */
+  public String getVersion() {
+    return version;
+  }
+
+  /**
+   * Get the packaging of the correpsonding Maven artifact.
+   * @return the packaging string.
+   */
+  public String getPackaging() {
+    return packaging;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("gav=").append(groupId).append(':').append(artifactId).append(':').append(version)
+      .append(", packaging =").append(packaging)
+      .append(']').toString();
   }
 }
