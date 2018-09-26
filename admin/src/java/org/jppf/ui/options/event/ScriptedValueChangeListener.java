@@ -99,12 +99,9 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
       final long start = System.nanoTime();
       spec.evaluate();
       final long elapsed = (System.nanoTime() - start) / 1_000_000L;
-      if (debugEnabled) {
-        final StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
-        log.debug(sb.toString());
-      }
+      if (debugEnabled) log.debug("executed {} script in {} ms for [{}]", language, elapsed, option);
     } catch (final JPPFScriptingException e) {
-      log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
+      log.error("Error while executing script for {}" + "\nScript = {}\n{}", option, scriptText, ExceptionUtils.getStackTrace(e));
     }
   }
 }

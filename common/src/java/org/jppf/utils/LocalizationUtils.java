@@ -116,7 +116,9 @@ public final class LocalizationUtils {
     if ((baseName == null) || notFoundBundleCache.containsKey(baseName)) return def;
     ResourceBundle bundle = null;
     try {
-      bundle = ResourceBundle.getBundle(baseName, locale);
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) cl = LocalizationUtils.class.getClassLoader();
+      bundle = ResourceBundle.getBundle(baseName, locale, cl);
     } catch (final Exception e) {
       notFoundBundleCache.put(baseName, Boolean.TRUE);
       if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find resource bundle \"" + baseName +  '\"', e);

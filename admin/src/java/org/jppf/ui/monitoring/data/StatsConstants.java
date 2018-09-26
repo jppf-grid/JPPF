@@ -195,10 +195,16 @@ public class StatsConstants {
    * @return a mapping of non-localized names to {@link LocalizedListItem} objects.
    */
   public static Map<String, LocalizedListItem> createLocalizedItems(final Locale locale) {
-    final Map<String, LocalizedListItem> map = new LinkedHashMap<>();
-    int i = 0;
-    for (final String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
-    return Collections.unmodifiableMap(map);
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(StatsConstants.class.getClassLoader());
+      final Map<String, LocalizedListItem> map = new LinkedHashMap<>();
+      int i = 0;
+      for (final String name: ALL_TABLES_MAP.keySet()) map.put(name, new LocalizedListItem(name, i++, STATS_BASE, locale));
+      return Collections.unmodifiableMap(map);
+    } finally {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
   }
 
   /**

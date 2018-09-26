@@ -32,7 +32,7 @@ import org.jppf.ui.treetable.*;
 import org.jppf.utils.LocalizationUtils;
 
 /**
- * Abstract superclass for all actions in the topology panel.
+ * Handle the "set visible column" action used in all tree table views (topology tree, JVM health and job data).
  * @author Laurent Cohen
  */
 public class ShowHideColumnsAction extends AbstractUpdatableAction {
@@ -76,7 +76,6 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     final List<Integer> visibleIndexes = treeTableOption.getVisibleColumnIndexes();
     for (int i=0; i<visibleIndexes.size(); i++) {
       final int index = visibleIndexes.get(i);
-      //final LocalizedListItem item = new LocalizedListItem(model.getBaseColumnName(index), index, model.getColumnName(index), model.getColumnTooltip(index));
       final LocalizedListItem item = allItems.get(index - 1);
       visibleItems.add(item);
     }
