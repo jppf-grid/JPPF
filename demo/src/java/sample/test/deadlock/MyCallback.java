@@ -69,7 +69,7 @@ class MyCallback extends JobStreamingCallback.Adapter {
     final File file = new File(filename);
     try {
       final Location<?> loc = new FileLocation(file).copyTo(new MemoryLocation(file.length()));
-      cp.add(filename, loc);
+      cp.add(loc);
     } catch (final Exception e) {
       throw new IllegalStateException(e.getMessage(), e);
     }

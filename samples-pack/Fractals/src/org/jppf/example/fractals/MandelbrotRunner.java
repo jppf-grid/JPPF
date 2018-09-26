@@ -66,6 +66,7 @@ public class MandelbrotRunner extends AbstractRunner {
     super("mandelbrot", jobCapacity);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
     final int nbTask = cfg.height;

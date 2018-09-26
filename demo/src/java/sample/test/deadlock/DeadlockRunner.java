@@ -18,9 +18,12 @@
 
 package sample.test.deadlock;
 
+import java.io.*;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.utils.AbstractJPPFJobStream;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
@@ -97,8 +100,7 @@ public class DeadlockRunner {
           //requestNodeShutdown(client);
         }
         while (jobProvider.hasPendingJob()) Thread.sleep(10L);
-        print("*** executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
-        printStats(jmx);
+        printStats(jmx, jobProvider, marker);
       } finally {
         if (ro.simulateNodeCrashes) {
           pt.setStopped(true);
@@ -217,9 +219,11 @@ public class DeadlockRunner {
   /**
    * Print statistics to the console.
    * @param jmx the jmx connection.
+   * @param jobProvider the job stream that provided all the jobs.
+   * @param marker contains the time it toolk to perform the test.
    * @throws Exception if any error occurs.
    */
-  private static void printStats(final JMXDriverConnectionWrapper jmx) throws Exception {
+  private static void printStats(final JMXDriverConnectionWrapper jmx, final AbstractJPPFJobStream jobProvider, final TimeMarker marker) throws Exception {
     final Map<String, Object> map = jmx.getNodeForwarder().state(NodeSelector.ALL_NODES);
     double total = 0d;
     double min = Double.MAX_VALUE;
@@ -245,8 +249,41 @@ public class DeadlockRunner {
       meanDev += dev;
     }
     meanDev /= nbNodes;
-    print("nodes = %d, tasks = %,.2f, avg = %,.2f, min = %,.2f, max = %,.2f", nbNodes, total, mean, min, max);
-    print("deviations: mean = %,.2f, min = %,.2f, max = %,.2f", meanDev, minDev, maxDev);
+    final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
+    print("executed a total of %,d jobs and %,d tasks in %s", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
+    print("nodes = %d, tasks = %,.2f; avg = %,.2f; min = %,.2f; max = %,.2f", nbNodes, total, mean, min, max);
+    print("deviations: avg = %,.2f; min = %,.2f; max = %,.2f", meanDev, minDev, maxDev);
+    final File file = new File("lb.csv");
+    final TypedProperties props = lbi.getParameters();
+    final boolean computed = props.getBoolean("ga_computed", false);
+    props.remove("ga_computed");
+    final boolean fileExists = file.exists();
+    try (final FileWriter writer = new FileWriter(file, true)) {
+      if (!fileExists) writeWithQuotedStrings(writer, "nb nodes", "nb jobs", "time", "avg dev", "algorithm", "params", "ga-computed").write("\n");
+      writeWithQuotedStrings(
+        writer, nbNodes, jobProvider.getJobCount(), marker.getLastElapsed() / 1_000_000L, meanDev, lbi.getAlgorithm(), new TreeMap<>(props).toString(), Boolean.toString(computed));
+      writer.write("\n");
+    }
+  }
+
+  /**
+   * Write a csv line where string elements are quoted.
+   * @param writer the writer which writes to the file.
+   * @param params the elements to write into the file.
+   * @return the writer, for method call chaining.
+   * @throws Exception if any error occurs.
+   */
+  private static Writer writeWithQuotedStrings(final Writer writer, final Object...params) throws Exception {
+    if ((params != null) && (params.length > 0)) {
+      for (int i=0; i<params.length; i++) {
+        if (i > 0) writer.write(", ");
+        final Object o = params[i];
+        if (o == null) writer.write("null");
+        else if (o instanceof String) writer.write("\"" + o.toString() + "\"");
+        else writer.write(o.toString());
+      }
+    }
+    return writer;
   }
 
   /**

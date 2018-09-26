@@ -17,7 +17,6 @@
  */
 package sample.dist.matrix;
 
-import java.io.File;
 import java.util.List;
 
 import org.jppf.JPPFException;
@@ -95,10 +94,9 @@ public class MatrixRunner {
         final String[] paths = s.split("\\|");
         for (final String path: paths) {
           final String p = path.trim();
-          final String name = new File(p).getName();
           final Location<?> fileLoc = new FileLocation(p);
           final Location<?> jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
-          classpath.add(name, jar);
+          classpath.add(jar);
         }
       }
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);

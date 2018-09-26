@@ -32,54 +32,117 @@ public class ClassPathElementImpl implements ClassPathElement {
   /**
    * The location of this classpath element in the client environment.
    */
-  protected final Location<?> localLocation;
+  private final Location<?> sourceLocation;
   /**
    * The location of this classpath element in the node environment.
    */
-  protected final Location<?> remoteLocation;
+  private final Location<?> targetLocation;
   /**
    * The name of this classpath element.
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
    */
-  protected final String name;
+  private final String name;
+  /**
+   * Whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
+   */
+  private final boolean copyToExistingFile;
 
   /**
    * Initialize this classpath element with the specified name and local location.
    * The remote location is set to the same location.
    * @param name the name of this classpath element.
    * @param location the location of this classpath element.
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
    */
-  protected ClassPathElementImpl(final String name, final Location<?> location) {
-    this.name = name;
-    this.localLocation = location;
-    this.remoteLocation = this.localLocation;
+  ClassPathElementImpl(final String name, final Location<?> location) {
+    this(name, location, location);
   }
 
   /**
    * Initialize this classpath element with the specified name and local location.
    * The remote location is set to the same location.
    * @param name the name of this classpath element.
-   * @param localLocation the location of this classpath element in the client environment.
-   * @param remoteLocation the location of this classpath element in the node environment.
+   * @param sourceLocation the location of this classpath element in the client environment.
+   * @param targetLocation the location of this classpath element in the node environment.
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
    */
-  protected ClassPathElementImpl(final String name, final Location<?> localLocation, final Location<?> remoteLocation) {
+  ClassPathElementImpl(final String name, final Location<?> sourceLocation, final Location<?> targetLocation) {
     this.name = name;
-    this.localLocation = localLocation;
-    this.remoteLocation = remoteLocation;
+    this.sourceLocation = sourceLocation;
+    this.targetLocation = targetLocation;
+    this.copyToExistingFile = true;
   }
 
+  /**
+   * Initialize this classpath element with the specified name and local location.
+   * The remote location is set to the same location.
+   * @param location the location of this classpath element.
+   */
+  ClassPathElementImpl(final Location<?> location) {
+    this(location, location, true);
+  }
+
+  /**
+   * Initialize this classpath element with the specified name and local location.
+   * The remote location is set to the same location.
+   * @param sourceLocation the location of this classpath element in the client environment.
+   * @param targetLocation the location of this classpath element in the node environment.
+   */
+  ClassPathElementImpl(final Location<?> sourceLocation, final Location<?> targetLocation) {
+    this(sourceLocation, targetLocation, true);
+  }
+
+  /**
+   * Initialize this classpath element with the specified name and local location.
+   * The remote location is set to the same location.
+   * @param sourceLocation the location of this classpath element in the client environment.
+   * @param targetLocation the location of this classpath element in the node environment.
+   * @param copyToExistingFileLocation whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
+   */
+  ClassPathElementImpl(final Location<?> sourceLocation, final Location<?> targetLocation, final boolean copyToExistingFileLocation) {
+    this.name = null;
+    this.sourceLocation = sourceLocation;
+    this.targetLocation = targetLocation;
+    this.copyToExistingFile = copyToExistingFileLocation;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
+   */
   @Override
   public String getName() {
     return name;
   }
 
   @Override
+  public Location<?> getSourceLocation() {
+    return sourceLocation;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #getSourceLocation()} instead.
+   * @exclude
+   */
+  @Override
   public Location<?> getLocalLocation() {
-    return localLocation;
+    return sourceLocation;
   }
 
   @Override
+  public Location<?> getTargetLocation() {
+    return targetLocation;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #getTargetLocation()} instead.
+   * @exclude
+   */
+  @Override
   public Location<?> getRemoteLocation() {
-    return remoteLocation;
+    return targetLocation;
   }
 
   /**
@@ -93,6 +156,14 @@ public class ClassPathElementImpl implements ClassPathElement {
 
   @Override
   public String toString() {
-    return name;
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("source=").append(sourceLocation)
+      .append(", target=").append(targetLocation)
+      .append(']').toString();
+  }
+
+  @Override
+  public boolean isCopyToExistingFile() {
+    return copyToExistingFile;
   }
 }

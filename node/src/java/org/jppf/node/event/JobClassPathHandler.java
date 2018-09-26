@@ -20,6 +20,7 @@ package org.jppf.node.event;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.location.*;
@@ -43,10 +44,13 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
    * Determines whether debug log statements are enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * 
+   */
+  private static final AtomicLong SEQUENCE = new AtomicLong(0L);
 
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
-    Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     final ClassPath classpath = event.getJob().getSLA().getClassPath();
     if (classpath == null) return;
     final Node node = event.getNode();
@@ -66,20 +70,25 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
         }
         if (!validated) continue;
         URL url = null;
-        final Location<?> local = elt.getLocalLocation();
-        final Location<?> remote = elt.getRemoteLocation();
+        final Location<?> source = elt.getSourceLocation();
+        final Location<?> target = elt.getTargetLocation();
+        if (debugEnabled) log.debug("processing classpath element with [source = {}; target = {}]", source, target);
         try {
-          if (remote != local) {
-            if (debugEnabled) log.debug("copying {} to {}", local, remote);
-            local.copyTo(remote);
+          if (target != source) {
+            final String path = getFilePath(target);
+            if ((path == null) || (elt.isCopyToExistingFile() || !new File(path).exists())) {
+              if (debugEnabled) log.debug("copying {} to {}", source, target);
+              source.copyTo(target);
+            }
           }
-          if (remote instanceof MemoryLocation) {
-            cl.getResourceCache().registerResource(elt.getName(), remote);
-            url = cl.getResourceCache().getResourceURL(elt.getName());
-          } else if (remote instanceof FileLocation) {
-            final File file = new File(((FileLocation) remote).getPath());
+          if (target instanceof MemoryLocation) {
+            final String name = Long.toString(SEQUENCE.incrementAndGet());
+            cl.getResourceCache().registerResource(name, target);
+            url = cl.getResourceCache().getResourceURL(name);
+          } else if (target instanceof FileLocation) {
+            final File file = new File(((FileLocation) target).getPath());
             if (file.exists()) url = file.toURI().toURL();
-          } else if (remote instanceof URLLocation) url = ((URLLocation) remote).getPath();
+          } else if (target instanceof URLLocation) url = ((URLLocation) target).getPath();
         } catch (final Exception e) {
           final String format = "exception occurred during processing of classpath element '{}' : {}";
           if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));
@@ -89,5 +98,19 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
       }
       //classpath.clear();
     }
+  }
+
+  /**
+   * Get the file path of the specified location, if applicable.
+   * @param location the location to check.
+   * @return the file path, or {@code null} if the location does not point to a file.
+   */
+  private static String getFilePath(final Location<?> location) {
+    if (location instanceof FileLocation) return ((FileLocation) location).getPath();
+    if (location instanceof URLLocation) {
+      final URL url = ((URLLocation) location).getPath();
+      if ("file".equalsIgnoreCase(url.getProtocol())) return url.getPath();
+    }
+    return null;
   }
 }

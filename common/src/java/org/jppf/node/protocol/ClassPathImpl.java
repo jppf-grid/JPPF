@@ -34,7 +34,7 @@ public class ClassPathImpl implements ClassPath {
   /**
    * Mapping of classpath elements to their names.
    */
-  private final Map<String, ClassPathElement> elementMap = new HashMap<>();
+  private final List<ClassPathElement> elementList = new ArrayList<>();
   /**
    * Determines whether the node should force a reset of the class loader before executing the tasks.
    */
@@ -42,58 +42,104 @@ public class ClassPathImpl implements ClassPath {
 
   @Override
   public Iterator<ClassPathElement> iterator() {
-    return elementMap.values().iterator();
+    return elementList.iterator();
   }
 
   @Override
   public ClassPath add(final ClassPathElement element) {
-    elementMap.put(element.getName(), element);
+    elementList.add(element);
     return this;
   }
 
+  @Override
+  public ClassPath add(final Location<?> location) {
+    elementList.add(new ClassPathElementImpl(location, location));
+    return this;
+  }
+
+  @Override
+  public ClassPath add(final Location<?> sourceLocation, final Location<?> targetLocation) {
+    elementList.add(new ClassPathElementImpl(sourceLocation, targetLocation));
+    return this;
+  }
+
+  @Override
+  public ClassPath add(final Location<?> sourceLocation, final Location<?> targetLocation, final boolean copyToExistingFileLocation) {
+    elementList.add(new ClassPathElementImpl(sourceLocation, targetLocation, copyToExistingFileLocation));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
+   */
   @Override
   public ClassPath add(final String name, final Location<?> location) {
-    elementMap.put(name, new ClassPathElementImpl(name, location));
+    elementList.add(new ClassPathElementImpl(location));
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
+   */
   @Override
   public ClassPath add(final String name, final Location<?> localLocation, final Location<?> remoteLocation) {
-    elementMap.put(name, new ClassPathElementImpl(name, localLocation, remoteLocation));
+    elementList.add(new ClassPathElementImpl(localLocation, remoteLocation));
     return this;
   }
 
   @Override
   public ClassPath remove(final ClassPathElement element) {
-    elementMap.remove(element.getName());
+    elementList.remove(element);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
+   */
   @Override
   public ClassPath remove(final String name) {
-    elementMap.remove(name);
-    return null;
+    ClassPathElement toRemove = null;
+    if (name == null) return null;
+    for (final ClassPathElement elt: elementList) {
+      if (name.equals(elt.getName())) {
+        toRemove = elt;
+        break;
+      }
+    }
+    if (toRemove != null) elementList.remove(toRemove);
+    return this;
   }
 
   @Override
   public ClassPath clear() {
-    elementMap.clear();
+    elementList.clear();
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated the {@code name} attribute has no clearly defined, consistent semantics. It is no longer used.
+   */
   @Override
   public ClassPathElement element(final String name) {
-    return elementMap.get(name);
+    if (name == null) return null;
+    for (final ClassPathElement elt: elementList) {
+      if (name.equals(elt.getName())) return elt;
+    }
+    return null;
   }
 
   @Override
   public Collection<ClassPathElement> allElements() {
-    return new ArrayList<>(elementMap.values());
+    return new ArrayList<>(elementList);
   }
 
   @Override
   public boolean isEmpty() {
-    return elementMap.isEmpty();
+    return elementList.isEmpty();
   }
 
   @Override
@@ -112,8 +158,10 @@ public class ClassPathImpl implements ClassPath {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     int count = 0;
     for (final ClassPathElement elt: this) {
-      if (count > 0) sb.append(", ");
-      sb.append(elt.getName());
+      if (count > 0) sb.append(", ClassPathElement[");
+      sb.append("source=").append(elt.getSourceLocation().getPath());
+      sb.append(", target=").append(elt.getTargetLocation().getPath());
+      sb.append(']');
       count++;
     }
     sb.append(']');

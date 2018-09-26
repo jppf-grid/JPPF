@@ -28,11 +28,11 @@ import org.jppf.location.Location;
  * They are intended to be transported along with a job SLA.
  * @author Laurent Cohen
  */
-public interface ClassPathElement extends Serializable
-{
+public interface ClassPathElement extends Serializable {
   /**
    * Get the name of this classpath element.
    * @return the name as a string.
+   * @deprecated the {@code name} attribute has no clearly definied, consistent semantics. It can be bypassed entirely.
    */
   String getName();
 
@@ -40,11 +40,27 @@ public interface ClassPathElement extends Serializable
    * Get the location of this element, pointing to or embedding the underlying jar or zip file in the client environment.
    * @return a {@link Location} object.
    */
+  Location<?> getSourceLocation();
+
+  /**
+   * Get the location of this element, pointing to or embedding the underlying jar or zip file in the client environment.
+   * @return a {@link Location} object.
+   * @deprecated use {@link #getSourceLocation()} instead.
+   * @exclude
+   */
   Location<?> getLocalLocation();
 
   /**
    * Get the location of this element, pointing to or embedding the underlying jar or zip file in the node environment.
    * @return a {@link Location} object.
+   */
+  Location<?> getTargetLocation();
+
+  /**
+   * Get the location of this element, pointing to or embedding the underlying jar or zip file in the client environment.
+   * @return a {@link Location} object.
+   * @deprecated use {@link #getTargetLocation()} instead.
+   * @exclude
    */
   Location<?> getRemoteLocation();
 
@@ -55,4 +71,11 @@ public interface ClassPathElement extends Serializable
    * @return <code>true</code> if the validation issuccessful, <code>false</code> if it fails.
    */
   boolean validate();
+
+  /**
+   * Determine whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
+   * This is an optimization that can avoid unnecessary netword and/or disk I/O.
+   * @return {@code false} if the target is a {@link FileLocation} and should not be copied into, {@code true} otherwise.
+   */
+  boolean isCopyToExistingFile();
 }

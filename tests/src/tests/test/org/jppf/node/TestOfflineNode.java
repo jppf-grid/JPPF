@@ -57,7 +57,15 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     final TestConfiguration testConfig = createConfig("offline_node");
-    testConfig.node.classpath.add("../server/classes");
+    final List<String> cp = testConfig.node.classpath;
+    for (int i=0; i<cp.size(); i++) {
+      if (cp.get(i).replace("\\", "/").contains("tests/classes/framework")) {
+        cp.remove(i);
+        break;
+      }
+    }
+    print(false, "setup node classpath: %s", cp);
+    cp.add("../server/classes");
     testConfig.driver.log4j = "classes/tests/config/offline_node/log4j-driver.properties";
     testConfig.node.log4j = "classes/tests/config/offline_node/log4j-node.properties";
     client = BaseSetup.setup(1, 2, true, false, testConfig);
@@ -95,7 +103,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
     final int nbTasks = 5;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
-    job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
+    job.getSLA().getClassPath().add(loc);
     final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
@@ -117,7 +125,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
     final int nbTasks = 1;
     final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
     final Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
-    job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
+    job.getSLA().getClassPath().add(loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
     final List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);

@@ -81,6 +81,7 @@ public class Runner {
     final Location<byte[]> memoryLoc = fileLoc.copyTo(new MemoryLocation(file.length()));
     // add the memory location to the classpath
     final ClassPath classpath = job.getSLA().getClassPath();
-    classpath.add(file.getName(), memoryLoc);
+    classpath.add(memoryLoc);
+    //classpath.add(file.getName(), memoryLoc);
   }
 }

@@ -21,7 +21,7 @@ package org.jppf.node.protocol;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.jppf.location.Location;
+import org.jppf.location.*;
 
 /**
  * A container for class path elements.
@@ -38,21 +38,58 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
   /**
    * Add the specified element to this classpath.
    * When using this method, the local and remote locations are assumed to be the same.
+   * @param location the location of the element to add.
+   * @return this {@code ClassPath}, for method call chaining.
+   */
+  ClassPath add(Location<?> location);
+
+  /**
+   * Add the specified element to this classpath.
+   * Upon processing by the node, the local location will be copied into the remote location.
+   * @param sourceLocation the location of the element to add, in the client environment.
+   * @param targetLocation the location of the element to add, in the node environment.
+   * @return this {@code ClassPath}, for method call chaining.
+   */
+  ClassPath add(Location<?> sourceLocation, Location<?> targetLocation);
+
+  /**
+   * Add the specified element to this classpath.
+   * Upon processing by the node, the local location will be copied into the remote location, unless all of the following are true:
+   * <ul>
+   * <li>copyToExistingFile is {@code false}</li>
+   * <li>targetLocation is a {@link FileLocation}</li>
+   * <li>the file pointed to by targetLocation already exists on the file system</li>
+   * </ul>
+   * @param sourceLocation the location of the element to add, in the client environment.
+   * @param targetLocation the location of the element to add, in the node environment.
+   * @param copyToExistingFile whether to copy the source to the target if the target is either a {@link FileLocation}
+   * or an {@link URLLocation} with a {@code file} URL protocol (e.g. {@code file:/home/user/mylib.jar}), and if it already exists on the file system.
+   * @return this {@code ClassPath}, for method call chaining.
+   */
+  ClassPath add(Location<?> sourceLocation, Location<?> targetLocation, final boolean copyToExistingFile);
+
+  /**
+   * Add the specified element to this classpath.
+   * When using this method, the local and remote locations are assumed to be the same.
    * @param name the the name of the element to add.
    * @param location the location of the element to add.
    * @return this {@code ClassPath}, for method call chaining.
+   * @deprecated the {@code name} attribute has no clearly definied, consistent semantics. It is no longer used.
+   * Use {@link #add(Location) add(location)} instead.
    */
   ClassPath add(String name, Location<?> location);
 
   /**
    * Add the specified element to this classpath.
-   * Upon processing by the node, the local location will be copied into the remote location.
+   * Upon processing by the node, the source location will be copied into the target location.
    * @param name the the name of the element to add.
-   * @param localLocation the location of the element to add, in the client environment.
-   * @param remoteLocation the location of the element to add, in the node environment.
+   * @param sourceLocation the location of the element to add, in the client environment.
+   * @param targetLocation the location of the element to add, in the node environment.
    * @return this {@code ClassPath}, for method call chaining.
+   * @deprecated the {@code name} attribute has no clearly definied, consistent semantics. It is no longer used.
+   * Use {@link #add(Location, Location) add(sourceLocation, remoteLocation)} instead.
    */
-  ClassPath add(String name, Location<?> localLocation, Location<?> remoteLocation);
+  ClassPath add(String name, Location<?> sourceLocation, Location<?> targetLocation);
 
   /**
    * Remove the specified element from this classpath.
@@ -65,6 +102,8 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * Remove the specified element from this classpath.
    * @param name the name of the classpath element to remove.
    * @return this {@code ClassPath}, for method call chaining.
+   * @deprecated the {@code name} attribute has no clearly definied, consistent semantics. It is no longer used.
+   * Use {@link #remove(ClassPathElement)} instead.
    */
   ClassPath remove(String name);
 
@@ -78,6 +117,7 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
    * Get the element with the specified name.
    * @param name the name of the classpath element to find.
    * @return a {@link ClassPathElement} instance or <code>null</code> if the element could no be found.
+   * @deprecated the {@code name} attribute has no clearly definied, consistent semantics. It is no longer used.
    */
   ClassPathElement element(String name);
 

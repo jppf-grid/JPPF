@@ -43,10 +43,6 @@ public class MyRunner {
    */
   private static Logger log = LoggerFactory.getLogger(MyRunner.class);
   /**
-   * The JPPF client.
-   */
-  private static JPPFClient client = null;
-  /**
    * Location where the downloaded libraries are stored on the client's file system.
    */
   public static final String CLIENT_LIB_DIR = "dynamicLibs";
@@ -61,12 +57,9 @@ public class MyRunner {
    * which will be used as a filter to delete the libraries in the nodes' repositories. Additional arguments are ignored.
    */
   public static void main(final String[] args) {
-    try {
-      client = new JPPFClient();
-
-      // create the classpath specified with the '-c' command-line argument
+    try (final JPPFClient client = new JPPFClient()) {
+      // create the classpath specified with the '-cp' command-line argument
       final ClassPath classpath = ClassPathHelper.createClassPathFromArguments(CLIENT_LIB_DIR, args);
-      //classpath = ClassPathHelper.createClassPathFromRootFolder(CLIENT_LIB_DIR);
       if ((classpath != null) && (classpath.size() > 0)) output("found dynamic libraries: " + classpath);
       else output("found no dynamic library");
 
@@ -84,13 +77,10 @@ public class MyRunner {
       }
 
       // execute the jobs and process their results
-      executeJob(job1);
-      executeJob(job2);
-
+      executeJob(client, job1);
+      executeJob(client, job2);
     } catch (final Exception e) {
       e.printStackTrace();
-    } finally {
-      if (client != null) client.close();
     }
   }
 
@@ -119,10 +109,11 @@ public class MyRunner {
 
   /**
    * Execute the specified job on the grid and process its results.
-   * @param job the job to execute
+   * @param client the JPPF client to which the job is submitted.
+   * @param job the job to execute.
    * @throws Exception if any error occurs while creating the job.
    */
-  private static void executeJob(final JPPFJob job) throws Exception {
+  private static void executeJob(final JPPFClient client, final JPPFJob job) throws Exception {
     // submit the job to the grid
     final List<Task<?>> results = client.submitJob(job);
 
