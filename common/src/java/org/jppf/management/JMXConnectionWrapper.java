@@ -93,10 +93,8 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
         if ((jct = connectionThread.get()) == null) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
-          final Thread t = new DebuggableThread(jct, CONNECTION_NAME_PREFIX + getId());
-          t.setDaemon(true);
           connectionStart = System.nanoTime();
-          t.start();
+          ThreadUtils.startDaemonThread(jct, CONNECTION_NAME_PREFIX + getId());
         }
       }
     }
@@ -163,7 +161,6 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     }
     Object result = null;
     try {
-      //final ObjectName mbeanName = new ObjectName(name);
       final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
     } catch(final IOException e) {
@@ -201,7 +198,6 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     }
     Object result = null;
     try {
-      //final ObjectName mbeanName = new ObjectName(name);
       final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       result = getMbeanConnection().getAttribute(mbeanName, attribute);
     } catch(final IOException e) {
@@ -225,7 +221,6 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       return;
     }
     try {
-      //final ObjectName mbeanName = new ObjectName(name);
       final ObjectName mbeanName = ObjectNameCache.getObjectName(name);
       getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
     } catch(final IOException e) {
@@ -291,7 +286,6 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
     if (!isConnected()) connect();
     if (isConnected()) {
       final MBeanServerConnection mbsc = getMbeanConnection();
-      //return JMX.newMBeanProxy(mbsc, objectName, inf, true);
       return MBeanInvocationHandler.newMBeanProxy(inf, mbsc, objectName);
     }
     return null;

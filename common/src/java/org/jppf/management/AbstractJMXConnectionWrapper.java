@@ -130,6 +130,10 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       if (sslEnabled) SSLHelper.configureJMXProperties(protocol, env);
       if (JMXHelper.JMXMP_PROTOCOL.equals(protocol)) initJMXMP();
       else initJPPF();
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) cl = getClass().getClassLoader();
+      env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, cl);
+      env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, cl);
       if (debugEnabled) log.debug("created AbstractJMXConnectionWrapper with sslEnabled={}, url={}, env={}", this.sslEnabled, url, env);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
@@ -144,8 +148,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
   private void initJMXMP() throws Exception {
     env.put(GenericConnector.OBJECT_WRAPPING, JMXMPServer.newObjectWrapping());
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
-    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
-    env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
     env.put("jmx.remote.x.server.max.threads", 1);
     env.put("jmx.remote.x.client.connection.check.period", 0);
     env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_REQUEST_TIMEOUT));
@@ -157,8 +159,6 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
    */
   private void initJPPF() throws Exception {
     env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "org.jppf.jmxremote.protocol");
-    env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
-    env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
     env.put(JPPFJMXProperties.REQUEST_TIMEOUT.getName(), JPPFConfiguration.get(JPPFJMXProperties.REQUEST_TIMEOUT));
     env.put(JPPFJMXProperties.TLS_ENABLED.getName(), Boolean.valueOf(sslEnabled).toString());
   }
