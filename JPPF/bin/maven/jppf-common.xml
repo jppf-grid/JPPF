@@ -31,6 +31,10 @@
           <artifactId>jmxri</artifactId>
           <groupId>com.sun.jmx</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
