@@ -17,7 +17,7 @@
  */
 
 /**
- * Bootstrap classes for launching a node.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Defining_the_node_connection_strategy">pluggable node connection strategies</a>.
  * <p>Found in: <b>jppf-node.jar</b>
  * @since 4.1
  */

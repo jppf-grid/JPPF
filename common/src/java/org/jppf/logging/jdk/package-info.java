@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for the extensions to the JDK logging facilities.
+ * Support for JDK logging <a href="https://www.jppf.org/doc/@version@/index.php?title=Server_management#Remote_logging">via JMX notifications</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.logging.jdk;

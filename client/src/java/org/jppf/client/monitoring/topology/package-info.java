@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the monitoring and refreshing of the JPPF grid topology.
+ * Classes supporting the <a href="https://www.jppf.org/doc/@version@/index.php?title=Grid_topology_monitoring">monitoring and refreshing of the JPPF grid topology</a>.
  * <p>Found in: <b>jppf-client.jar</b> 
  * @since 5.0
  */

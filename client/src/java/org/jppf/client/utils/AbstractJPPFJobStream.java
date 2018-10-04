@@ -27,11 +27,15 @@ import org.jppf.client.event.*;
 /**
  * Instances of this class provide a stream of JPPF jobs.
  * <p>A common usage pattern is as follows:<br>
- * <pre> JPPFClient client = new JPPFClient();
+ * <pre> // concurrency level
  * int concurrency = 4;
- * try (AbstractJPPFJobStream jobStream = MyJobStreamImplementation(concurrency)) {
+ * try (JPPFClient client = new JPPFClient();
+ *   AbstractJPPFJobStream jobStream = new MyJobStreamImplementation(concurrency)) {
+ *   // set the connection pool size appropriately
+ *   client.awaitWorkingConnectionPool().setSize(concurrency);
  *   for (JPPFJob job: jobStream) {
- *     if (job != null) client.submitJob(job);
+ *     if (job != null)
+ *       client.submitJob(job);
  *   }
  * }</pre>
  */

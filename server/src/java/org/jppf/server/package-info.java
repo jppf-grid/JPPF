@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the core functionality of the JPPF asynchronous communication model.
+ * The JPPF driver API.
  * <p>Found in: <b>jppf-server.jar</b>
  */
 package org.jppf.server;

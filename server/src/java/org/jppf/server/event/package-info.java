@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for events occurring in the server.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Receiving_node_connection_events_in_the_server">node connection events</a> occurring in the server.
  * <p>Found in: <b>jppf-server.jar</b>
  */
 package org.jppf.server.event;

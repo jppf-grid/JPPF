@@ -17,7 +17,8 @@
  */
 
 /**
- * Support classes for node event notifications.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle events</a>
+ * and <a href="https://www.jppf.org/doc/@version@/index.php?title=Task_objects#Sending_notifications_from_a_task">task notifications</a>.
  * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b>
  */
 package org.jppf.node.event;

@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for socket and socket channel interceptors.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Network_interceptors">socket and socket channel interceptors</a>.
 */
 package org.jppf.comm.interceptor;
 

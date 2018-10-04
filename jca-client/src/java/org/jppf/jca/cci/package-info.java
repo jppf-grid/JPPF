@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes supporting the common client interface for the JPPF resource adapter.
+ * Classes supporting the common client interface for the <a href="https://www.jppf.org/doc/@version@/index.php?title=J2EE_Connector">JPPF resource adapter</a>.
  */
 package org.jppf.jca.cci;

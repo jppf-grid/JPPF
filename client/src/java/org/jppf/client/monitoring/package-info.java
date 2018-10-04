@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the monitoring and refreshing of the JPPF grid topology.
+ * Base classes supporting the monitoring of JPPF grid topologies and jobs.
  * <p>Found in: <b>jppf-client.jar</b> 
  * @since 5.0
  */

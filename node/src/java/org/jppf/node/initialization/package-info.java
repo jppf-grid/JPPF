@@ -17,8 +17,7 @@
  */
 
 /**
- * Support for modification of the node's configuration before it connects to the driver.<br/>
- * This allows for custom server discovery and failover schemes. 
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Node_initialization_hooks">node initialization hooks</a>. 
  * <p>Found in: <b>jppf-node.jar</b>
  */
 package org.jppf.node.initialization;

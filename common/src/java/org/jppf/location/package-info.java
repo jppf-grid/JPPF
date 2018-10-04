@@ -17,7 +17,7 @@
  */
 
 /**
- * Interfaces supporting the data transported between components of the communication model.
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=The_Location_API">Location API</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.location;

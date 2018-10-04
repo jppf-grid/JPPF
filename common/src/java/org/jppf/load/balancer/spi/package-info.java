@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for pluggable load-balancing algorithms.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Creating_a_custom_load-balancer">pluggable load-balancing algorithms</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.load.balancer.spi;

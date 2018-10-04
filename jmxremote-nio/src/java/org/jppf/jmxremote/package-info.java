@@ -17,7 +17,7 @@
  */
 
 /**
- * Implementation of a JMX remote connector based on Java NIO.
+ * Implementation of a <a href="https://github.com/jppf-grid/JPPF/tree/master/jmxremote-nio">JMX remote connector based on Java NIO</a>.
  * <p>Found in: <b>jppf-jmxremote-nio.jar</b> 
  */
 package org.jppf.jmxremote;

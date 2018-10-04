@@ -17,7 +17,8 @@
  */
 
 /**
- * Classes supporting submission of tasks via executor services as specified in <code>java.util.concurrent</code>.
+ * Classes supporting submission of tasks via <a href="https://www.jppf.org/doc/@version@/index.php?title=JPPF_Executor_Services">distributed executor services</a>
+ * as specified in {@link java.util.concurrent}.
  * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.concurrent;

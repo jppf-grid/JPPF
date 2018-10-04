@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for jobs persistence on the server side (implementation package).
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Jobs_persistence_in_the_driver#Built-in_persistence_implementations">built-in job persistence implementations</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.job.persistence.impl;

@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting persistence features.
+ * Classes supporting <a href="https://www.jppf.org/doc/@version@/index.php?title=Database_services">database services</a> and other persistence features.
  * <p>Found in: <b>jppf-common.jar</b>
 */
 package org.jppf.persistence;

@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes supporting usage, loading and storage of the JPPF configuration.
+ * Classes supporting usage, loading and storage of the <a href="https://www.jppf.org/doc/@version@/index.php?title=Configuration_guide">JPPF configuration</a>.
  */
 package org.jppf.utils.configuration;

@@ -17,7 +17,10 @@
  */
 
 /**
- * API used for JPPF-annotated tasks and POJO tasks.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Task_objects#JPPF-annotated_tasks">JPPF-annotated</a>,
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Task_objects#Runnable_tasks">Runnable</a>,
+ * <a href="https://www.jppf.org/doc/@version@/index.php?title=Task_objects#Callable_tasks">Callable</a>
+ * and <a href="https://www.jppf.org/doc/@version@/index.php?title=Task_objects#POJO_tasks">POJO</a> tasks.
  * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b> 
  */
 package org.jppf.client.taskwrapper;

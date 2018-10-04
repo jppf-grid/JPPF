@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for the JVM health monitoring and diagnostics.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Monitoring_data_providers">pluggable monitoring data providers</a>.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.management.diagnostics.provider;

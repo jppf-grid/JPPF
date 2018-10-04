@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting monitoring and statistics in JPPF.
+ * Classes supporting <a href="https://www.jppf.org/doc/@version@/index.php?title=The_JPPF_statistics_API">statistics</a> in JPPF.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.utils.stats;

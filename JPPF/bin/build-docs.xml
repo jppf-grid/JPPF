@@ -135,6 +135,16 @@
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>${javadoc.header}</header>
       <bottom>${javadoc.bottom}</bottom>
+      <group title="Client API" packages="org.jppf.client*"/>
+      <group title="Node API" packages="org.jppf.node*:org.jppf.server.node*:org.jppf.classloader*"/>
+      <group title="Server API" packages="org.jppf.server:org.jppf.server.event"/>
+      <group title="Management" packages="org.jppf.management*:org.jppf.jmxremote:org.jppf.jmx:javax.management*"/>
+      <group title="Job management" packages="org.jppf.job*:org.jppf.server.job.management"/>
+      <group title="Load-balancing" packages="org.jppf.load.balancer*"/>
+      <group title="Persistence" packages="org.jppf.persistence*:org.jppf.job.persistence*:org.jppf.load.balancer.persistence"/>
+      <group title="Desktop admin console" packages="org.jppf.ui*"/>
+      <group title="J2EE connector" packages="org.jppf.jca*"/>
+      <group title="Android node" packages="org.jppf.android*"/>
     </javadoc>
     <echo message="Javadoc generated in ${javadoc}"/>
   </target>
@@ -219,9 +229,12 @@
     <sequential>
       <replace dir="@{dir}">
         <include name="**/*.html"/>
-        <replacetoken><![CDATA[</head>]]></replacetoken>
-        <replacevalue><![CDATA[<link rel="shortcut icon" href="@{icon}" type="image/x-icon">
+        <replacefilter>
+          <replacetoken><![CDATA[</head>]]></replacetoken>
+          <replacevalue><![CDATA[<link rel="shortcut icon" href="@{icon}" type="image/x-icon">
       </head>]]></replacevalue>
+        </replacefilter>
+        <replacefilter token="@version@" value="6.0"/>
       </replace>
     </sequential>
   </macrodef>

@@ -17,7 +17,8 @@
  */
 
 /**
- * Classes providing support for alternatives to Java standard serialization mechanism.
+ * Classes providing support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Specifying_alternate_serialization_schemes">alternate serialization mechanisms</a>
+ * and <a href="https://www.jppf.org/doc/@version@/index.php?title=Composite_serialization">composite serialization</a>.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.serialization;

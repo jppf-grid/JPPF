@@ -17,7 +17,7 @@
  */
 
 /**
- * Bootstrap classes for launching a node.
+ * The JPPF node API.
  * <p>Found in: <b>jppf-node.jar</b>
  */
 package org.jppf.node;

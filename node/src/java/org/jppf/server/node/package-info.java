@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the server node-side of the JPPF asynchronous communication model.
+ * The JPPF node API.
  * <p>Found in: <b>jppf-node.jar</b>
  */
 package org.jppf.server.node;

@@ -385,22 +385,28 @@ caption a:link, caption a:hover, caption a:active, caption a:visited {
     color:#FFFFFF;
 }
 .overviewSummary caption span, .packageSummary caption span, .contentContainer ul.blockList li.blockList caption span, .summary caption span, .classUseContainer caption span, .constantValuesContainer caption span {
-    white-space:nowrap;
-    padding-top:0px;
-    padding-left:8px;
-    display:block;
-    float:left;
-    background-image:url(resources/titlebar.gif);
-    height:15px;
+    background-color: #FBD323;
+    border-radius: 4px;
+    color: black;
+    display: block;
+    float: left;
+    height: 15px;
+    padding: 4px 8px;
+    white-space: nowrap;
+}
+
+.packageSummary caption span, .contentContainer ul.blockList li.blockList caption span, .summary caption span, .classUseContainer caption span, .constantValuesContainer caption span {
+    display: none;
 }
 
 .overviewSummary .tabEnd, .packageSummary .tabEnd, .contentContainer ul.blockList li.blockList .tabEnd, .summary .tabEnd, .classUseContainer .tabEnd, .constantValuesContainer .tabEnd {
     width:10px;
-    background-image:url(resources/titlebar_end.gif);
+    /*background-image:url(resources/titlebar_end.gif);*/
     background-repeat:no-repeat;
     background-position:top right;
     position:relative;
     float:left;
+    display: none;
 }
 ul.blockList ul.blockList li.blockList table {
     margin:0 0 12px 0px;
@@ -505,7 +511,7 @@ h1.hidden {
 
 h1.bar { margin: 0.8em; }
 
-caption { display: none; }
+/*caption { display: none; }*/
 
 ul.navList li {
     color: #6D78B6;

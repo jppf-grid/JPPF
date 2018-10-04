@@ -17,6 +17,6 @@
  */
 
 /**
- * Support for pluggable views that can be added to the admin console.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Pluggable_views">pluggable views</a> that can be added to the admin console.
  */
 package org.jppf.ui.plugin;

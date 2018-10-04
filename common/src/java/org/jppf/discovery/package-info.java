@@ -17,7 +17,8 @@
  */
 
 /**
- * Support for custom discovery of JPPF drivers.
+ * Support for custom discovery of JPPF drivers from <a href="https://www.jppf.org/doc/@version@/index.php?title=Custom_discovery_of_remote_drivers">clients</a>
+ * and <a href="https://www.jppf.org/doc/@version@/index.php?title=Custom_discovery_of_peer_drivers">other drivers</a>.
  * <p>Found in: <b>jppf-common.jar</b>
  * @since 5.2.1
  */

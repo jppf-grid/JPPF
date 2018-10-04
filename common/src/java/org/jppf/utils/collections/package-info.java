@@ -17,7 +17,7 @@
  */
 
 /**
- * Utility and helper classes providing complex collections porcessing.
+ * Utility and helper classes providing complex collections processing.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.utils.collections;

@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for extensions to the log4j logging facilities.
+ * Support for Log4j logging <a href="https://www.jppf.org/doc/@version@/index.php?title=Server_management#Remote_logging">via JMX notifications</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.logging.log4j;

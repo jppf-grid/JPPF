@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes for an API that enables persistence of jobs and their state.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Jobs_runtime_behavior,_recovery_and_failover#Job_persistence_and_recovery">job persistence on the client side</a>.
  * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.persistence;

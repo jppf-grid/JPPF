@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for a screen saver associated with a node.
+ * Support for the <a href="https://www.jppf.org/doc/@version@/index.php?title=JPPF_node_screensaver#JPPF_built-in_screensaver">built-in node screen saver</a>.
  * <p>Found in: <b>jppf-node.jar</b>
  * @since 4.0
  */

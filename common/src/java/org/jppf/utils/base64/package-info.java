@@ -19,5 +19,6 @@
 /**
  * Utility and helper classes used throughout for Base64 encoding / decoding.
  * <p>Found in: <b>jppf-common.jar</b>
+ * @exclude
  */
 package org.jppf.utils.base64;

@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the monitoring and refreshing of the JPPF jobs hierarchy.
+ * Classes supporting the <a href="https://www.jppf.org/doc/@version@/index.php?title=Job_monitoring_API">monitoring and refreshing of the JPPF jobs hierarchy</a>.
  * <p>Found in: <b>jppf-client.jar</b> 
  * @since 5.1
  */

@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the persistence of the state of a load-balancer.
+ * Classes supporting the <a href="https://www.jppf.org/doc/@version@/index.php?title=Load-balancer_state_persistence">persistence of the state of a load-balancer</a>.
  * <p>This is particularly useful for adaptive load-balancers, as it allows
  * them to be immediately in an optimal efficiency state and  skip (most of) the convergence phase.
  * <p>Interfaces and classes in this package are common to server-side and client-side load-balancing.

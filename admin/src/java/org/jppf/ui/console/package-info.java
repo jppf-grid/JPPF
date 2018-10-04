@@ -18,7 +18,7 @@
 
 /**
  * Support classes for launching the JPPF administration console as a standalone GUI application
- * or to embed it within ane external Swing-based GUI.
+ * or to <a href="https://www.jppf.org/doc/@version@/index.php?title=Embedding_the_administration_console">embed</a> it within an external Swing-based GUI.
  * <p>Found in: <b>jppf-admin.jar</b> 
  * @since 5.0
  */

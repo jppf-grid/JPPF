@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for job management in the server.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Environment_providers_for_JMX_remote_connections">JMX environment providers</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.jmx;

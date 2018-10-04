@@ -17,7 +17,7 @@
  */
 
 /**
- * This package contains the implementations of a ll the JPPF built-in load-balancing algorithms.
+ * This package contains the implementations of all the JPPF <a href="https://www.jppf.org/doc/@version@/index.php?title=Built-in_algorithms">built-in load-balancing algorithms</a>.
  * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.load.balancer.impl;

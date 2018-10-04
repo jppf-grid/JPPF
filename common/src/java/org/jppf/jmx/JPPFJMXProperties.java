@@ -25,6 +25,7 @@ import org.jppf.utils.configuration.*;
 /**
  * An enumeration of {@link JPPFProperty} constants that apply to the JPPF jmx remote connector.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFJMXProperties {
   /** Maximum time in milliseconds to wait for a JMX request to succeed, default to 15,000 ms. */

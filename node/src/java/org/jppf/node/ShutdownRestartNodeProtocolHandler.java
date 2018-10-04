@@ -28,6 +28,7 @@ import org.slf4j.*;
  * The protocol handler which executes commands sent to a slave node by its master node.
  * @author Laurent Cohen
  * @since 5.0
+ * @exclude
  */
 public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProtocolHandler {
   /**

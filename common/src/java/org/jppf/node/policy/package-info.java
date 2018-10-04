@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the application of execution policy to task bundles and nodes.
+ * Classes supporting <a href="https://www.jppf.org/doc/@version@/index.php?title=Execution_Policies">execution policies</a>.
  * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.node.policy;

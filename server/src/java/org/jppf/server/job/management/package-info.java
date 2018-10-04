@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for job management mbeans in the server.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Server_management#Job-level_management_and_monitoring">job management</a> mbeans in the server.
  * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b>
  */
 package org.jppf.server.job.management;

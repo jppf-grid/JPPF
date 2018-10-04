@@ -17,7 +17,7 @@
  */
 
 /**
- * Utilities pertaining to the client APIs.
+ * Support for <a href="https://www.jppf.org/doc/@version@/index.php?title=Submitting_multiple_jobs_concurrently#Job_streaming">job streaming</a>.
  * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.utils;

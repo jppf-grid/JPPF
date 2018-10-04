@@ -68,14 +68,16 @@ public interface ClassPathElement extends Serializable {
    * Perform a validation of this classpath element.
    * If validation fails, if will not be added to the node's classpath and its classes will not be loaded nor executed.
    * <p>An example use is to check that a jar file is signed and that it is secure to use it.
-   * @return <code>true</code> if the validation issuccessful, <code>false</code> if it fails.
+   * @return {@code true} if the validation issuccessful, {@code false} if it fails.
    */
   boolean validate();
 
   /**
-   * Determine whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
-   * This is an optimization that can avoid unnecessary netword and/or disk I/O.
-   * @return {@code false} if the target is a {@link FileLocation} and should not be copied into, {@code true} otherwise.
+   * Determine whether to copy the source to the target if the target is a file and if it already exists on the file system.
+   * <br>This applies to instances of {@link org.jppf.location.FileLocation FileLocation} and instances of {@link org.jppf.location.URLLocation URLLocation}
+   * whose URL protocol is "{@code file}".
+   * <br>This is an optimization that can avoid unnecessary netword and/or disk I/O.
+   * @return {@code false} if the target is a file and should not be copied into, {@code true} otherwise.
    */
   boolean isCopyToExistingFile();
 }

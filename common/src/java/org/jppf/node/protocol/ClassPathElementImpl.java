@@ -43,7 +43,7 @@ public class ClassPathElementImpl implements ClassPathElement {
    */
   private final String name;
   /**
-   * Whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
+   * Whether to copy the source to the target if the target is a file and if it already exists on the file system.
    */
   private final boolean copyToExistingFile;
 
@@ -97,7 +97,7 @@ public class ClassPathElementImpl implements ClassPathElement {
    * The remote location is set to the same location.
    * @param sourceLocation the location of this classpath element in the client environment.
    * @param targetLocation the location of this classpath element in the node environment.
-   * @param copyToExistingFileLocation whether to copy the source to the target if the target is a {@link FileLocation} and if it already exists on the file system.
+   * @param copyToExistingFileLocation whether to copy the source to the target if the target is a file and if it already exists on the file system.
    */
   ClassPathElementImpl(final Location<?> sourceLocation, final Location<?> targetLocation, final boolean copyToExistingFileLocation) {
     this.name = null;

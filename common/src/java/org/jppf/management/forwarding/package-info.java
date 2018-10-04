@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for the forwarding of node JMX requests and notifications via the driver.
+ * Support for the <a href="https://www.jppf.org/doc/@version@/index.php?title=Nodes_management_and_monitoring_via_the_driver">forwarding of node JMX requests and notifications via the driver</a>.
  * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b>
  */
 package org.jppf.management.forwarding;
