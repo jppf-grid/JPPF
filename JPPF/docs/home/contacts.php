@@ -76,17 +76,17 @@
         <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
-        <?php if ($currentPage == "v6.0 (beta)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php if ($currentPage == "v6.0") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php if ($currentPage == "v5.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php if ($currentPage == "v5.1") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "v4.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/4.2" class="<?php echo $itemClass; ?>">v4.2</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
         <?php if ($currentPage == "All .Net APIs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc#csdoc" class="<?php echo $itemClass; ?>">&raquo; All .Net APIs</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
@@ -99,7 +99,7 @@
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=6.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "CI") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/ci.php" class="<?php echo $itemClass; ?>">&raquo; CI</a><br></div>
@@ -113,7 +113,7 @@
 <h1 align="center">JPPF Contacts</h1>
 <div class="column_left" style="text-align: justify">
   <div class="blockWithHighlightedTitle" style="padding-left: 5px; padding-right: 5px">
-<h3><img src="images/icons/engineering.png" class="titleWithIcon"/>Project administrator</h3>
+<h3 style="${style}"><img src="images/icons/engineering.png" class="titleWithIcon"/>Project administrator</h3>
 <p>Laurent Cohen<br>
 <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
 +33 2 32 35 13 12<br>
@@ -121,7 +121,7 @@ Evreux, France<br>
 lives in France, speaks English and French
 <br></div>
   <br><div class="blockWithHighlightedTitle" style="padding-left: 5px; padding-right: 5px">
-<h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Community manager</h3>
+<h3 style="${style}"><img src="images/icons/personal2.png" class="titleWithIcon"/>Community manager</h3>
 <p>Laurent Cohen<br>
 <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
 +33 2 32 35 13 12<br>
@@ -129,7 +129,7 @@ Evreux, France<br>
 lives in France, speaks English and French
 <br></div>
   <br><div class="blockWithHighlightedTitle" style="padding-left: 5px; padding-right: 5px">
-<h3><img src="images/icons/news.png" class="titleWithIcon"/>Press contact</h3>
+<h3 style="${style}"><img src="images/icons/news.png" class="titleWithIcon"/>Press contact</h3>
 <p>Laurent Cohen<br>
 <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
 +33 2 32 35 13 12<br>
@@ -140,12 +140,12 @@ lives in France, speaks English and French
 </div>
 <div class="column_right" style="text-align: justify; height: 100%">
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
-    <h3><img src="images/icons/warning.png" class="titleWithIcon"/>Notice</h3>
+    <h3 style="${style}"><img src="images/icons/warning.png" class="titleWithIcon"/>Notice</h3>
     <p>the people in this list have volunteered their precious time for specific inquiries in a limited number of areas.
     Please do not abuse this time. The contact information provided in this list is not to be used for technical support purposes. For technical support, please use our <a href="/forums">user forums</a>
   <br></div>
   <br><div class="blockWithHighlightedTitle" style="vertical-align: middle">
-    <h3><img src="images/icons/contribute.png" class="titleWithIcon"/>Contributing</h3>
+    <h3 style="${style}"><img src="images/icons/contribute.png" class="titleWithIcon"/>Contributing</h3>
     <p>If you would like to volunteer for one of the listed roles, or a new role you'd like to suggest, please contact the <span style="font-weight: 900; color: #5D68A6">project administrator</span>.
     We will be happy to discuss how it can be arranged according to your specific and personal affinities and constraints.
     There are sufficient areas of contribution that we're sure you can find one you'll be happy with!

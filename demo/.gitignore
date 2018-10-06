@@ -4,3 +4,5 @@
 /templib/
 *.log
 *.lck
+*.csv
+*.ods

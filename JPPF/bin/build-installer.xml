@@ -19,15 +19,15 @@
 <project name="JPPF-installer" basedir="..">
 
   <!-- ========================================================================= -->
-  <!--                    Generate the IzPack installer jar                      -->
+  <!-- Generate the IzPack installer jar                                         -->
   <!-- ========================================================================= -->
   <!-- This requires the property  ${izpack.home} defined in build.properties    -->
   <!-- It must point to the root installation directory of IzPack                -->
   <!-- ========================================================================= -->
 
   <target name="installer" depends="installer.check.izpack.present" if="izpack.present" description="">
-    <property name="jppf.web.dir" value="http://www.jppf.org/download/${version.number}"/>
-    <installer.package url="http://www.jppf.org/" />
+    <property name="jppf.web.dir" value="https://www.jppf.org/download/${version.number}"/>
+    <installer.package url="https://www.jppf.org/" />
     <installer.copy.files/>
   </target>
   

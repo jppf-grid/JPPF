@@ -342,7 +342,7 @@ a.yellow_highlight:hover {
   box-shadow: none;
 }
 
-.yhd {
+.yhd, .yhd2 {
   color: white;
   background-color: #6D78B6;
   font-size: 16pt;
@@ -359,6 +359,10 @@ a.yellow_highlight:hover {
   animation-timing-function: ease-in-out;
   animation-direction: alternate;
   animation-iteration-count: infinite;
+}
+
+.yhd2 {
+  font-size: 12pt;
 }
 
 @keyframes glow_effect {

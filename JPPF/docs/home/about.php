@@ -76,17 +76,17 @@
         <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
-        <?php if ($currentPage == "v6.0 (beta)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php if ($currentPage == "v6.0") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php if ($currentPage == "v5.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php if ($currentPage == "v5.1") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "v4.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/4.2" class="<?php echo $itemClass; ?>">v4.2</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
         <?php if ($currentPage == "All .Net APIs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc#csdoc" class="<?php echo $itemClass; ?>">&raquo; All .Net APIs</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
@@ -99,7 +99,7 @@
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=6.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "CI") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/ci.php" class="<?php echo $itemClass; ?>">&raquo; CI</a><br></div>
@@ -113,12 +113,12 @@
   <h1 align="center">About</h1>
 	<div align="justify">
     <div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/help.png" class="titleWithIcon"/>What it is</h3>
+    <h3 style="${style}"><img src="images/icons/help.png" class="titleWithIcon"/>What it is</h3>
 		<p>Simply put, JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
 		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/how.png" class="titleWithIcon"/>How it works</h3>
+    <h3 style="${style}"><img src="images/icons/how.png" class="titleWithIcon"/>How it works</h3>
 		<p>There are 2 aspects to this:
     <p><i><b>Dividing an application into smaller parts that can be executed independently and in parallel.</b></i>
     <br>JPPF provides facilities that make this effort a lot easier, faster and much less painful than without them.
@@ -129,19 +129,19 @@
     In JPPF terms, a unit of work is called a "job", and its constituting "tasks" are distributed by the server among the nodes for parallel execution.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/network-local.png" class="titleWithIcon"/>Extreme scalability</h3>
+    <h3 style="${style}"><img src="images/icons/network-local.png" class="titleWithIcon"/>Extreme scalability</h3>
     <p>JPPF can easily and seamlessly scale from a standalone application on a single machine, to a massively distributed grid of machines comprising thousands of compute nodes.
     Always using the same API, you can scale up your JPPF grid at any level, without ever changing a single line of code.
     <p>Not only does JPPF take advantage of multiple machines, it also uses multiple cores on each machine whenever possible.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Powered by the community</h3>
+    <h3 style="${style}"><img src="images/icons/personal2.png" class="titleWithIcon"/>Powered by the community</h3>
     <p>With over 10 years of active development, JPPF boasts an architecture with a proven record of reliability, performance and scalability.
     A project committed to its community, it demonstrates an outstanding support to its users and engages in a continuous conversation with them.
     Every question, issue report or feature request turns into a contribution which, in the end, benefits the whole community.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/default.png" class="titleWithIcon"/>Advantages</h3>
+    <h3 style="${style}"><img src="images/icons/default.png" class="titleWithIcon"/>Advantages</h3>
 		<p>Chief among JPPF benefits is its ease of installation, use and deployment. There is no need to spend days to write a "Hello World" application. A couple of minutes, up to a couple of hours at most, will suffice.
 		Deploying JPPF components over a cluster is as simple as copying files over FTP or any network file system.
 		JPPF allows developers to focus on their core software development, instead of wasting time on the complexities of parallel and distributed processing.
@@ -153,7 +153,7 @@
 		By extending the Java class loading mechanism, JPPF removes most of the deployment burden from the application's life cycle, dramatically shortening the time-to-market and time-to-production.
     <br></div>
     <br><div class="blockWithHighlightedTitle">
-    <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Outstanding features</h3>
+    <h3 style="${style}"><img src="images/icons/view-list.png" class="titleWithIcon"/>Outstanding features</h3>
     <p>There is a lot more to JPPF than running and deploying your applications on the grid: scalability, security, fault tolerance, load-balancing, job scheduling, monitoring and management of the grid, integration with popular platforms and frameworks,
     extensions and customization, etc. The <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.
     <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc">full fledged documentation</a>.

@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="5.2" ?>
+<?php $jppfVersion="6.0" ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	  <head>
     <title>JPPF Press Kit
@@ -77,17 +77,17 @@
         <?php if ($currentPage == "Source code") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="https://github.com/jppf-grid/JPPF" class="<?php echo $itemClass; ?>">&raquo; Source code</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
-        <?php if ($currentPage == "v6.0 (beta)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php if ($currentPage == "v6.0") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php if ($currentPage == "v5.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php if ($currentPage == "v5.1") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "v4.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/4.2" class="<?php echo $itemClass; ?>">v4.2</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
         <?php if ($currentPage == "All .Net APIs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc#csdoc" class="<?php echo $itemClass; ?>">&raquo; All .Net APIs</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/6.0" class="<?php echo $itemClass; ?>">v6.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
@@ -100,7 +100,7 @@
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=6.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "CI") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/ci.php" class="<?php echo $itemClass; ?>">&raquo; CI</a><br></div>
@@ -146,61 +146,89 @@
 <!-- ============================== -->
 <!-- start version-specific content -->
 <!-- ============================== -->
-<h3><img src="images/icons/news.png" class="titleWithIcon"/>Press release: JPPF <?php echo $jppfVersion ?></h3>
-<p><b>Administration console:</b>
+<h3 style="${style}"><img src="images/icons/news.png" class="titleWithIcon"/>Press release: JPPF <?php echo $jppfVersion ?></h3>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Web_administration_console"><b>Web administration console</b></a>
 <ul class="samplesList">
-  <li><a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/NodeFiltering-Active.gif">node filtering</a> with an execution policy editor with import/export capabilities</li>
-  <li>ability to <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/VisibleServerStatistics.png">select the visible statistics</a> in the server statiscs view</li>
-  <li>syntax hihghlighting in all the editors: properties/node filtering</li>
-  <li>the admin console splash screen is now <a href="/doc/5.2/index.php?title=Client_and_administration_console_configuration#Customizing_the_administration_console.27s_splash_screen">customizable</a> via the configuration</li>
-  <li>the administration console is now fully localized, with full <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/UpdateNodeConfiguration.gif">English</a> and <a href="/screenshots/gallery-images/Admin%20Console%20-%20Desktop/UpdateNodeConfigurationFrench.gif">French</a> translations available
+  <li>same functionality as the desktop console, except for the topology graph and the charts</li>
+  <li>role-based authentication and authorization</li>
+  <li>tested on major web servers: Tomcat, Jetty, JBoss, Open Liberty, Weblogic, Glassfish</li>
 </ul>
-<p><b>Configuration:</b>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Database_services"><b>Database Services</b></a>
 <ul class="samplesList">
-  <li>all documented properties are now defined as <a href="/javadoc/5.2/index.html?org/jppf/utils/configuration/JPPFProperties.html">constants</a></li>
-  <li>a new and elegant <a href="/doc/5.2/index.php?title=The_JPPF_configuration_API#Predefined_JPPF_properties">API</a> was created to handle them easily</li>
-  <li>it is now possible to specify in the configuration which JVM to use for the nodes and servers. This also applies to master and slave nodes when they are (re)started</li>
+  <li>easily create JDBC datasource definitions and propagate them throughout the grid</li>
+  <li>reuse datasource definitions accross job submissions</li>
 </ul>
-<p><b>Customization/extension:</b>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Jobs_persistence_in_the_driver"><b>Jobs Persistence</b></a>
 <ul class="samplesList">
-  <li>ability to <a href="/doc/5.2/index.php?title=Composite_serialization">chain serialization schemes</a> to provide compression or encryption over actual serialization</li>
-  <li><a href="/doc/5.2/index.php?title=Specifying_alternate_serialization_schemes#Generic_JPPF_serialization">the JPPF serialization</a> scheme was thouroughly optimized and is now faster than the Java serialization</li>
-  <li>it is now possible to register for <a href="/doc/5.2/index.php?title=Receiving_server_statistics_events">statistics change events</a> in the server</li>
-  <li><a href="/doc/5.2/index.php?title=Network_interceptors">Network communication interceptors</a> enable user-defined code to be executed on both sides of each new connection</li>
-  <li>A <a href="/doc/5.2/index.php?title=Pluggable_MBeanServerForwarder">pluggable MBeanServerForwarder</a> can now be associated to the JMX remote connector servers created by JPPF drivers and nodes</li>
-  <li><a href="/doc/5.2/index.php?title=Environment_providers_for_JMX_remote_connections">Pluggable environment providers</a> for JMX remote connector clients and servers</li>
+  <li>automatic job recovery in case of grid crashes</li>
+  <li>"submit and forget" jobs, then check their completion state and retrieve their results from a separate client later on</li>
+  <li>retrieve jobs on demand from a persistent store and resubmit them to completion if needed</li>
+  <li>pluggable persistence mechanism</li>
+  <li>built-in implementations: database persistence, file-based persistence, asynchronous (write-behind) wrapper and caching wrapper</li>
 </ul>
-<p><b>Android node:</b>
+<p><a href="https://github.com/jppf-grid/JPPF/tree/master/jmxremote-nio"><b>NIO-based JMX remote connector</b></a>
 <ul class="samplesList">
-  <li>It is now possible to configure the node to stop working or terminate <a href="/doc/5.2/index.php?title=Android_Node#Battery_state_monitoring">when the device's battery is low</a></li></li>
-  <li>Improved the <a href="/screenshots/gallery-images/Android/AndroidMainScreenBusy.gif">default feedback screen</a></li>
+  <li>a fast, scalable, NIO-based JMX remote connector that uses less system resources</li>
+  <li>can be used as a standalone connector</li>
+  <li>perfectly integrated with JPPF (no additional port required in the JPPF server)</li>
 </ul>
-<p><b>Job SLA:</b>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Monitoring_data_providers"><b>Pluggable monitoring data providers</b></a>
 <ul class="samplesList">
-  <li>The job SLA can now specifiy <a href="/doc/5.2/index.php?title=Job_Service_Level_Agreement#Grid_policy">filtering rules</a> based on the server properties and the number of nodes satisfying one or more conditions<br>
-  Example: "execute when the server has at least 2 GB of heap memory and at least 3 nodes with more than 4 cores each"</li>
-  <li>The job SLA can <a href="/doc/5.2/index.php?title=Job_Service_Level_Agreement#Specifying_the_desired_node_configuration">specify the desired configuration</a>
-  of the nodes on which it will execute and force the nodes to reconfigure themselves accordingly</li>
-  <li>execution policies based on server properties now have <a href="/doc/5.2/index.php?title=Execution_policy_properties#Server_statistics">access to the server statistics</a>
+  <li>plugins for any source of data for JVM/Process/SYstem health monitoring</li>
+  <li>provided data is automatically and immediately available in the desktop and web administration consoles</li>
+  <li>out-of-the-box health monitoring data is implemnted as a built-in monitoring data provider</li>
 </ul>
-<p><b>Management and Monitoring</b>
-<p>Two new types of node selectors are now available: <a href="/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Scripted_node_selector">scripted node selector</a> and <a href="/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Custom_node_selector">custom node selector</a>
-<p><b>Load-balancing</b>
-<p>A <a href="/doc/5.2/index.php?title=Built-in_algorithms#.22rl2.22">new load-balancing algorithm</a>, named "rl2", was implemented
-<p><b>Documentation</b>
-<p>Added a complete section on <a href="/doc/5.2/index.php?title=Load_Balancing">load balancing</a>
-<p><b>Samples</b>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Load-balancer_state_persistence"><b>Persistence and reuse of load-balancers states</b></a>
 <ul class="samplesList">
-  <li>A new sample was added, illustrating a full-fledged management of <a href="/samples-pack/JobDependencies">dependencies between jobs</a></li>
-  <li>The <a href="/samples-pack/NetworkInterceptor">Network Interceptor sample</a> shows how a network connection interceptor can be used to implement a simple authentication mechanism with symetric encryption</li>
+  <li>the state of the adaptive load-balancers can now be persisted, allowing the reuse of optimal parameters without the long convergence phase</li>
+  <li>state persistence is available to client-side and server-side load-balancing</li>
+  <li>pluggable persistence mechanism</li>
+  <li>built-in implementations: database persistence, file-based persistence and asynchronous (write-behind) wrapper</li>
 </ul>
-<p><b>Packaging</b>
-<p>The JPPF jar files now include the version number in their name, e.g. jppf-common-5.2.jar
-<p><b>Continuous Integration</b>
+<p><b>Server configuration now requires a single port for everything, including management and heartbeating</b></li>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Execution_Policies#Execution_policy_arguments_as_expressions"><b>Complex expressions as arguments of execution policies</b></a>
 <ul class="samplesList">
-  <li>A large amount of time and effort was invested in setting up a continuous integration environment based on Jenkins</li>
-  <li>Automated builds are now in place with <a href="/ci.php">results</a> automatically published to the JPPF web site</li>
-  <li>Automated tests coverage was largely improved</li>
+  <li>all arguments of execution policies can include scipts and properties substitutions</li>
+  <li>comparisons are no longer limited to available properties and their value, complex expressions can be used instead</li>
+</ul>
+<p><a href="https://www.jppf.org/doc/6.0/index.php?title=Configuring_a_JPPF_server#Heartbeat-based_connection_failure_detection"><b>Revamping of the heartbeat mechanism for connection failure detection</b></a>
+<ul class="samplesList">
+  <li>heartbeat mechanism is now available for client-to-server and server-to-server connections</li>
+  <li>configuration simplification: heartbeat only needs to be enabled on the remote peers</li>
+</ul>
+<p><b>Desktop administration console enhancements</b>
+<ul class="samplesList">
+  <li>pick lists are now used in the desktop console to select the visible columns of all tree views</li>
+  <li>added a "select all nodes" button in the topology views and a "select all jobs" buttons in the jobs view</li>
+  <li>load-balancing settings tab was moved to a popup dialog in the topology views</li>
+  <li><a href="https://www.jppf.org/screenshots/gallery-images/Admin%20Console%20-%20Desktop/MasterSlave.png">master/slave nodes relationships</a> are now visible in the graph view of the topology</li>
+</ul>
+<p><b>Multi-server topologies improvements</b>
+<ul class="samplesList">
+  <li>Full-fledged NIO implementation</li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=Configuring_a_JPPF_server#Configuring_peer_connections_manually">Server to server connection pooling</a></li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=Configuring_a_JPPF_server#Peer_drivers_load-balancing_threshold">Load-balancing vs. failover threshold</a></li>
+</ul>
+<p><b>Configuration API improvements</b>
+<ul class="samplesList">
+  <li>localization support for the documentation of properties</li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=The_JPPF_configuration_API#Parametrized_properties">parametrized configuration properties</a></li>
+  <li>deprecation support</li>
+  <li>new sample "<a href="https://www.jppf.org/samples-pack/ConfigurationProperties">JPPF properties documentation generator</a>"</li>
+</ul>
+<p><b>Various enhancements</b>
+<ul class="samplesList">
+  <li>server statistics snapshots now have a last updated timestamp</li>
+  <li>the new <a href="https://www.jppf.org/doc/6.0/index.php?title=The_Location_API#MavenCentralLocation">MavenCentralLocation</a> class allows downloading artifacts from Maven Central</li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=Defining_the_node_connection_strategy#Configuration-based_CSV_server_definitions">a new built-in node connection strategy</a> allows configuration with a single configuration property</li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=Deployment_on_Open_Liberty">port of the J2EE connector to Open Liberty</a></li>
+  <li>the JPPF client code handling the connections state was simplified, resulting in improved robustness and performance</li>
+  <li><a href="https://www.jppf.org/doc/6.0/index.php?title=Task_objects#Getting_information_on_the_node_executing_the_task">JPPF tasks can now access the node they execute on</a></li>
+  <li>significant performance improvements, based on numerous profiling sessions and stress tests</li>
+  <li>all APIs deprecated in 5.x were removed</li>
+  <li>wherever applicable, setter and modifier methods were refactored to enable method call chaining, allowing a more fluent code style</li>
+  <li>use ScriptDefinition objects wherever JSR 223 compliant scripts are used</li>
+  <li>improvements to the handling of <a href="https://www.jppf.org/doc/6.0/index.php?title=Job_Service_Level_Agreement#Setting_a_class_path_onto_the_job">jobs classpath</a></li>
 </ul>
 <!-- ============================== -->
 <!-- end version-specific content   -->
@@ -210,7 +238,7 @@
   <div class="column_left" style="text-align: justify">
     <br><div class="blockWithHighlightedTitle">
     <a name="features"></a>
-    <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Features</h3>
+    <h3 style="${style}"><img src="images/icons/view-list.png" class="titleWithIcon"/>Features</h3>
     <div class="u_link" style="margin-left: 10px">
       <a href="release_notes.php?version=<?php echo $jppfVersion ?>">Release notes</a>: see everything that's new in JPPF <?php echo $jppfVersion ?><br>
       Our <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.<br>
@@ -220,7 +248,7 @@
     <br>
     <br><div class="blockWithHighlightedTitle">
     <a name="license"></a>
-    <h3><img src="images/icons/document-sign.png" class="titleWithIcon"/>License</h3>
+    <h3 style="${style}"><img src="images/icons/document-sign.png" class="titleWithIcon"/>License</h3>
     <p>JPPF is released under the terms of the <a href="/license.php">Apachache v2.0</a> license.
     This <a href="http://www.opensource.org">OSI-approved</a> open source license is friendly to individuals, businesses, governments and academia, for commercial and non-commercial purposes.
     It does not restrict the use of JPPF with commercial and proprietary applications.
@@ -230,19 +258,19 @@
   <div class="column_right" style="text-align: justify">
     <br><div class="blockWithHighlightedTitle">
     <a name="downloads"></a>
-    <h3><img src="images/icons/download.png" class="titleWithIcon"/>Downloads</h3>
+    <h3 style="${style}"><img src="images/icons/download.png" class="titleWithIcon"/>Downloads</h3>
     All files can be found from our <a href="/downloads.php">downloads page</a>.<br>
     <br>
     </div>
     <br><div class="blockWithHighlightedTitle">
     <a name="documentation"></a>
-    <h3><img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation</h3>
-    <p>The JPPF documentation can be found <a href="/doc/v5">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+    <h3 style="${style}"><img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation</h3>
+    <p>The JPPF documentation can be found <a href="/doc/6.0">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
     <br>
     </div>
     <br><div class="blockWithHighlightedTitle">
     <a name="contacts"></a>
-    <h3><img src="images/icons/contact.png" class="titleWithIcon"/>Contacts</h3>
+    <h3 style="${style}"><img src="images/icons/contact.png" class="titleWithIcon"/>Contacts</h3>
     <p>For any press inquiry, please refer to our <a href="/contacts.php">contacts</a> page.
     <br>
     </div>

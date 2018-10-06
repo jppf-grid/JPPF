@@ -57,12 +57,14 @@
   </panels>
 
   <packs>
+    <!--
     <pack name="Full_sources" required="no" preselected="no">
       <description>All JPPF modules with their source code</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-full-src" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-full-src">
         <include name="**/*.*"/>
       </fileset>
     </pack>
+    -->
     <pack name="JPPF_Driver" required="no" preselected="yes">
       <description>The JPPF server librairies and launch scripts</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-driver" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver">
@@ -88,6 +90,13 @@
         <include name="**/*.*"/>
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui/startConsole.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Web_Console" required="no" preselected="yes">
+      <description>The JPPF administration and monitoring console librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-admin-web" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-web">
+        <include name="**/*.*"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-web/repackage.sh" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Application_Template" required="no" preselected="yes">
       <description>A fully working JPPF template application to use as a starting point</description>
@@ -166,6 +175,12 @@
     <pack name="J2EE_Connector" required="no" preselected="no">
       <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-j2ee-connector" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-j2ee-connector">
+        <include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JMX_Remote_NIO" required="no" preselected="no">
+      <description>A standalone, NIO-based JMX remote connector</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-jmxremote-nio" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-jmxremote-nio">
         <include name="**/*.*"/>
       </fileset>
     </pack>
