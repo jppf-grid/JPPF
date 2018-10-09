@@ -85,7 +85,7 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
         log.error(e.getMessage(), e);
       }
     }
-    return new Pair<String, Bundler<?>>(algo, bundler);
+    return new Pair<>(algo, bundler);
   }
 
   /**
@@ -120,7 +120,7 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
   public List<String> listAlgorithms(final String channelID) throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) return Collections.emptyList();
     final List<String> hashes = persistence.list(new LoadBalancerPersistenceInfo(channelID, null, null));
-    final List<String> names = hashes.isEmpty() ? Collections.<String>emptyList() : new ArrayList<String>(hashes.size());
+    final List<String> names = hashes.isEmpty() ? Collections.<String>emptyList() : new ArrayList<>(hashes.size());
     for (final String hash: hashes) names.add(factory.getAlgorithmNameFromHash(hash));
     return names;
   }

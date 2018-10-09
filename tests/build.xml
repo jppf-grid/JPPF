@@ -106,7 +106,7 @@
     <mkdir dir="${framework.classes}"/>
     <mkdir dir="${tests.classes}"/>
     <echo message="compiling addons classes: ${addons.classes}"/>
-    <javac destdir="${addons.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+    <javac destdir="${addons.classes}" source="1.8" target="1.8" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${addons.src}"/>
@@ -115,13 +115,13 @@
       <fileset dir="${addons.src}" excludes="**/*.class"/>
     </copy>
     <echo message="compiling framework classes: ${tests.classes}"/>
-    <javac destdir="${framework.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+    <javac destdir="${framework.classes}" source="1.8" target="1.8" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${framework.src}"/>
     </javac>
     <echo message="compiling unit test classes: ${tests.classes}"/>
-    <javac destdir="${tests.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
+    <javac destdir="${tests.classes}" source="1.8" target="1.8" debug="on" deprecation="off" optimize="on" includes="**/*.java" createMissingPackageInfoClass="false">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${tests.src}"/>

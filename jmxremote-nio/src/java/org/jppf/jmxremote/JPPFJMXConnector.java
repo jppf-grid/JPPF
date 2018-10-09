@@ -97,7 +97,7 @@ public class JPPFJMXConnector implements JMXConnector {
    * @param environment the environment for this connector.
    */
   public JPPFJMXConnector(final JMXServiceURL serviceURL, final Map<String, ?> environment) {
-    this.environment = (environment == null) ? new HashMap<String, Object>() : new HashMap<>(environment);
+    this.environment = (environment == null) ? new HashMap<>() : new HashMap<>(environment);
     this.address = serviceURL;
     if (debugEnabled) log.debug("initialized JPPFJMXConnector with serviceURL = {} and environment = {}", address, this.environment);
   }

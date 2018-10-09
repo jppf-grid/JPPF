@@ -84,7 +84,7 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     final AbstractAction applyAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         final List<Object> picked = pickList.getPickedItems();
-        final List<LocalizedListItem> visibleItems = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
+        final List<LocalizedListItem> visibleItems = (picked == null) ? new ArrayList<>() : new ArrayList<>(picked.size());
         for (final Object o: picked) visibleItems.add((LocalizedListItem) o);
         applyVisibleColumns(visibleItems);
       }

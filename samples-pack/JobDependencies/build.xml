@@ -66,7 +66,7 @@
   <!-- ========================================================================= -->
 
   <target name="compile" depends="clean, init">
-    <javac srcdir="" destdir="${classes}" source="1.7" target="1.7"
+    <javac srcdir="" destdir="${classes}" source="1.8" target="1.8"
       debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>

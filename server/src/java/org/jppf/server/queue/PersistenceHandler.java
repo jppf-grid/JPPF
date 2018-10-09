@@ -353,6 +353,6 @@ public class PersistenceHandler {
    * @throws JobPersistenceException if any error occurs while searching for persisted jobs.
    */
   public List<String> getPersistedJobUuids() throws JobPersistenceException {
-    return isPersistenceReady() ? persistence.getPersistedJobUuids() : new ArrayList<String>();
+    return isPersistenceReady() ? persistence.getPersistedJobUuids() : new ArrayList<>();
   }
 }

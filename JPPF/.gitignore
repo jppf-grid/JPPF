@@ -1,4 +1,4 @@
 /classes/
-/build/**/*.*
+/build/
 *.log
 /lib/

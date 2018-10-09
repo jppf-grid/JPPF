@@ -81,7 +81,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
    */
   public JMXContext(final JMXNioServer server, final boolean reading, final SocketChannel socketChannel) {
     this.server = server;
-    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<MessageWrapper>();
+    pendingJmxMessages = reading ? null : new LinkedBlockingQueue<>();
     this.peer = false;
     this.socketChannel = socketChannel;
   }

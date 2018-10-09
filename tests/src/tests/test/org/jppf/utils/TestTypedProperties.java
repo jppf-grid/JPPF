@@ -395,14 +395,14 @@ public class TestTypedProperties extends BaseTest {
       checkProperty(props, "jppf.script.default.language", "groovy");
       checkProperty(props, "prop.0", "hello miscreant world");
 
-      checkProperty(props, "prop.1", "hello 5.0 world");
+      checkProperty(props, "prop.1", "hello 5 world");
       checkProperty(props, "prop.2", "hello $script:glouglou:{ 2 + 3 }$ world");
       checkProperty(props, "prop.3", "hello 5 world");
       checkProperty(props, "prop.4", "hello 5 dear 7 world");
       checkProperty(props, "prop.5", "hello hello miscreant world 5 world");
       checkProperty(props, "prop.6", "hello hello miscreant world5 universe");
 
-      checkProperty(props, "prop.11", "hello 5.0 world");
+      checkProperty(props, "prop.11", "hello 5 world");
       checkProperty(props, "prop.12", "hello $S:glouglou:{ 2 + 3 }$ world");
       checkProperty(props, "prop.13", "hello 5 world");
       checkProperty(props, "prop.14", "hello 5 dear 7 world");
@@ -449,10 +449,10 @@ public class TestTypedProperties extends BaseTest {
     assertEquals("host2", props.getString("driver2.jppf.server.host"));
     assertEquals(11112, props.getInt("driver2.jppf.server.port"));
 
-    assertEquals("host1", props.remove(hostProp, "driver1"));
-    assertEquals(Integer.valueOf(11111), props.remove(portProp, "driver1"));
-    assertEquals("host2", props.remove(hostProp, "driver2"));
-    assertEquals(Integer.valueOf(11112), props.remove(portProp, "driver2"));
+    assertEquals("host1", props.removeProperty(hostProp, "driver1"));
+    assertEquals(Integer.valueOf(11111), props.removeProperty(portProp, "driver1"));
+    assertEquals("host2", props.removeProperty(hostProp, "driver2"));
+    assertEquals(Integer.valueOf(11112), props.removeProperty(portProp, "driver2"));
   }
 
   /**

@@ -12,7 +12,7 @@ script:
 - ant test
 
 jdk:
-  - openjdk7
+  - openjdk8
 
 after_script:
 - curl --ftp-create-dirs

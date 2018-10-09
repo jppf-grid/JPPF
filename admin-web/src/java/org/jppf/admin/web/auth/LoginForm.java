@@ -18,7 +18,7 @@
 
 package org.jppf.admin.web.auth;
 
-import org.apache.wicket.Session;
+import org.apache.wicket.*;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
@@ -122,11 +122,12 @@ public class LoginForm extends Form<String> {
   /**
    * @param target .
    */
+  @SuppressWarnings("unchecked")
   private void doOK(final AjaxRequestTarget target) {
     final AuthenticatedWebSession session = AuthenticatedWebSession.get();
     if (session.signIn(getUsername(), getPassword())) {
       //continueToOriginalDestination();
-      setResponsePage(session.getRoles().hasRole(JPPFRoles.ADMIN) ? AdminPage.class  : getApplication().getHomePage());
+      setResponsePage((Class<Page>) (session.getRoles().hasRole(JPPFRoles.ADMIN) ? AdminPage.class  : getApplication().getHomePage()));
       hasError = false;
     } else {
       final String message = LocalizationUtils.getLocalized(LoginPage.class.getName(), "login.error", Session.get().getLocale());

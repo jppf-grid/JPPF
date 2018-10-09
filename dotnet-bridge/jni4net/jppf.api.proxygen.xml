@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
   <!-- List of Java classes which should have proxy generated -->
   <JavaClass TypeName="java.lang.AutoCloseable"/>
+  <JavaClass TypeName="java.lang.Iterable"/>
   <JavaClass TypeName="java.util.EventObject"/>
   <JavaClass TypeName="java.util.concurrent.Callable"/>
   <JavaClass TypeName="java.util.concurrent.Future"/>

@@ -120,7 +120,7 @@ public class ScriptDefinition implements Serializable {
     this.language = language;
     this.script = script;
     this.id = (id == null) ? JPPFUuid.normalUUID() : id;
-    this.bindings = (bindings == null) ? new HashMap<String, Object>() : new HashMap<>(bindings);
+    this.bindings = (bindings == null) ? new HashMap<>() : new HashMap<>(bindings);
   }
 
   /**

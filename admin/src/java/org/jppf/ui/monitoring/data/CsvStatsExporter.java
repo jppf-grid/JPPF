@@ -57,7 +57,7 @@ public class CsvStatsExporter implements StatsExporter {
     final StringBuilder sb = new StringBuilder();
     sb.append("\"JPPF driver statistics\",\n\n");
     final Map<Fields, Double> m = statsHandler.getLatestDoubleValues(driver);
-    final Map<Fields, Double> map = (m == null) ? new HashMap<Fields, Double>() : new HashMap<>(m);
+    final Map<Fields, Double> map = (m == null) ? new HashMap<>() : new HashMap<>(m);
     sb.append(format(map, EXECUTION_FIELDS, "ExecutionTable.label"));
     sb.append(format(map, NODE_EXECUTION_FIELDS, "NodeExecutionTable.label"));
     sb.append(format(map, TRANSPORT_FIELDS, "NetworkOverheadTable.label"));

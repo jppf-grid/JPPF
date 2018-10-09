@@ -153,7 +153,7 @@ public final class JPPFConfiguration {
    * @since 6.0
    */
   public static <T> T remove(final JPPFProperty<T> property, final String...parameters) {
-    return getProperties().remove(property, parameters);
+    return getProperties().removeProperty(property, parameters);
   }
 
   /**

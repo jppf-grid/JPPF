@@ -111,9 +111,12 @@
 
   <target name="javadoc.anttask">
     <echo message="Generating javadoc in ${javadoc}"/>
-    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.7"
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.8"
       stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
+      <!--
+      <arg value="-J-Xrunjdwp:transport=dt_socket,address=localhost:8000,server=y,suspend=y"/>
+      -->
       <arg value="-linksource"/>
       <arg value="-quiet"/>
       <packageset dir="${node}/src/java"/>
@@ -131,7 +134,9 @@
       <link href="https://junit.org/junit4/javadoc/latest"/>
       <link href="http://x-stream.github.io/javadoc"/>
       <link href="http://oshi.github.io/oshi/apidocs/"/>
+      <!--
       <link offline="true" href="https://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
+      -->
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>${javadoc.header}</header>
       <bottom>${javadoc.bottom}</bottom>
@@ -156,7 +161,7 @@
   <target name="compile.doclet">
     <delete quiet="true"><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
     <mkdir dir="${basedir}/classes"/>
-    <javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
+    <javac srcdir="" destdir="${basedir}/classes" source="1.8" target="1.8"
       debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="doclet.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>

@@ -59,7 +59,7 @@ public class ReflectionUtils {
     sb.append('[');
     final Method[] methods = clazz.getMethods();
     // we want the attributes in ascending alphabetical order
-    final Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<String, Object>() : new HashMap<String, Object>(names.length);
+    final Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<>() : new HashMap<>(names.length);
     for (Method method : methods) {
       if (isGetter(method) && !"getClass".equals(method.getName())) {
         String attrName = null;

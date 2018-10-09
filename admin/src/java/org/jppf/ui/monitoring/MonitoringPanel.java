@@ -206,7 +206,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
         @Override public void actionPerformed(final ActionEvent event) {
           visibleItems.clear();
           final List<Object> picked = option.getPickList().getPickedItems();
-          final List<LocalizedListItem> value = (picked == null) ? new ArrayList<LocalizedListItem>() : new ArrayList<LocalizedListItem>(picked.size());
+          final List<LocalizedListItem> value = (picked == null) ? new ArrayList<>() : new ArrayList<>(picked.size());
           for (final Object o: picked) value.add((LocalizedListItem) o);
           visibleItems.addAll(value);
           clearTablesFromView();

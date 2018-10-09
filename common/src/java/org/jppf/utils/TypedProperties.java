@@ -522,8 +522,23 @@ public class TypedProperties extends AbstractTypedProperties {
    * @param parameters the values to replace the property's parameters with.
    * @return the old value of the property, or {@code null} if it wasn't defined.
    * @since 6.0
+   * @deprecated use {@link #removeProperty(JPPFProperty, String...)} instead.
    */
   public <T> T remove(final JPPFProperty<T> property, final String...parameters) {
+    final Object o = remove(property.resolveName(parameters));
+    if (!(o instanceof String)) return null; 
+    return property.valueOf((String) o);
+  }
+
+  /**
+   * Remove the specified predefined parametrized property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @param parameters the values to replace the property's parameters with.
+   * @return the old value of the property, or {@code null} if it wasn't defined.
+   * @since 6.1
+   */
+  public <T> T removeProperty(final JPPFProperty<T> property, final String...parameters) {
     final Object o = remove(property.resolveName(parameters));
     if (!(o instanceof String)) return null; 
     return property.valueOf((String) o);

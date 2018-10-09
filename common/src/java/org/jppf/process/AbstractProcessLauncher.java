@@ -48,7 +48,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   /**
    * Constant for no JVM options.
    */
-  private static final Pair<List<String>, List<String>> NO_OPTIONS = new Pair<List<String>, List<String>>(new ArrayList<String>(), new ArrayList<String>());
+  private static final Pair<List<String>, List<String>> NO_OPTIONS = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
   /**
    * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
    */

@@ -58,7 +58,6 @@ import java.nio.channels.Selector;
  * @author Laurent Cohen
  */
 public interface SelectorSynchronizer {
-
   /**
    * Wait for the value to go down to zero, then set it to -1.
    */
@@ -79,5 +78,4 @@ public interface SelectorSynchronizer {
    * or set the value to the update value if it does not succeed..
    */
   void wakeUpAndSetOrIncrement();
-
 }
