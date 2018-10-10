@@ -39,7 +39,7 @@ This is the home for the JPPF source code. Other services can be found at the fo
 
 ***Requirements***
 
-* **Java 7** or later
+* **Java 8** or later
 * **[Apache Ant 1.9.1](https://ant.apache.org)** or later
 
 ***Steps***
