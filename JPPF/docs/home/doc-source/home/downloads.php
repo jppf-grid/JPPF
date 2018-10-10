@@ -10,12 +10,17 @@ $template{name="about-page-header" title="Downloads"}$
       <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
       <td><h4>All JPPF releases:</h4></td>
       <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 40px;">
+        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
+          <li><a href="https://search.maven.org/#search|ga|1|g:org.jppf"><b>JPPF on Maven Central</b></a></li>
+        </ul>
+      </td>
+      <td style="vertical-align: middle">
+        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
           <li><a href="https://github.com/jppf-grid/JPPF/tags"><b>JPPF releases on Github</b></a></li>
         </ul>
       </td>
       <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 70px;">
+        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
           <li><a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>Older releases on SourceForge</b></a></li>
         </ul>
       </td>
