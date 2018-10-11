@@ -48,3 +48,8 @@ This is the home for the JPPF source code. Other services can be found at the fo
 * from the repository root: `ant build`
 * to run the tests: `ant test`
 * the test results are available in `<repo_root>/tests/report`, the logs are in `<repo_root>/tests/logs` (1 set of logs per test class)
+
+## JPPF Maven artifacts
+
+* [**Maven Central**](http://search.maven.org/#search|ga|1|org.jppf)
+* [**Snapshots at Sonatype**](https://oss.sonatype.org/content/repositories/snapshots/org/jppf/)
