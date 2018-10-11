@@ -234,7 +234,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       checkJobResults(nbTasks, results, false);
       List<String> nodes = mgt.listAllChannels();
       assertNotNull(nodes);
-      assertEquals(BaseSetup.nbNodes(), nodes.size());
+      assertFalse(nodes.isEmpty());
       for (String node: nodes) {
         List<String> nodeAlgos = mgt.listAlgorithms(node);
         assertNotNull(nodeAlgos);
