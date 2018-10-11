@@ -239,7 +239,7 @@
           <replacevalue><![CDATA[<link rel="shortcut icon" href="@{icon}" type="image/x-icon">
       </head>]]></replacevalue>
         </replacefilter>
-        <replacefilter token="@version@" value="6.0"/>
+        <replacefilter token="@version@" value="6.1"/>
       </replace>
     </sequential>
   </macrodef>
