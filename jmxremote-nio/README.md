@@ -15,7 +15,7 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 <dependency>
   <groupId>org.jppf</groupId>
   <artifactId>jppf-jmxremote-nio</artifactId>
-  <version>6.0-beta</version>
+  <version>6.0</version>
 </dependency>
 ~~~
 
