@@ -91,19 +91,14 @@ public class SystemInformationAction extends AbstractTopologyAction {
     editor.setBackground(Color.WHITE);
     editor.setCaretPosition(0);
     final JScrollPane panel = new JScrollPane(editor);
-    dialog.getContentPane().add(panel);
     final AbstractAction escAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
       }
     };
     setOkCancelKeys(panel, null, escAction);
-    dialog.setLocationRelativeTo(null);
-    dialog.setLocation(location);
-    dialog.setSize(600, 600);
-    dialog.setVisible(true);
+    readyDialog(dialog, panel, location);
     runAction(new AsyncRunnable(dialog, editor));
   }
 

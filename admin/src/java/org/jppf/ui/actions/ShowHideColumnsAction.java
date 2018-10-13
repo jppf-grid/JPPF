@@ -68,17 +68,13 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     pickList.setRightTitle(LocalizationUtils.getLocalized(BASE, "visible.columns.right.title"));
     final AbstractJPPFTreeTableModel model = treeTableOption.getModel();
     final List<LocalizedListItem> allItems = new ArrayList<>();
-    final List<LocalizedListItem> visibleItems = new ArrayList<>();
     for (int i=1; i<model.getColumnCount(); i++) {
       final LocalizedListItem item = new LocalizedListItem(model.getBaseColumnName(i), i, model.getColumnName(i), model.getColumnTooltip(i));
       allItems.add(item);
     }
     final List<Integer> visibleIndexes = treeTableOption.getVisibleColumnIndexes();
-    for (int i=0; i<visibleIndexes.size(); i++) {
-      final int index = visibleIndexes.get(i);
-      final LocalizedListItem item = allItems.get(index - 1);
-      visibleItems.add(item);
-    }
+    final List<LocalizedListItem> visibleItems = new ArrayList<>();
+    visibleIndexes.forEach(index -> visibleItems.add(allItems.get(index - 1)));
     option.populate(new ArrayList<Object>(allItems), new ArrayList<Object>(visibleItems));
     final JButton applyBtn = (JButton) thisPanel.findFirstWithName("/visible.stats.apply").getUIComponent();
     final AbstractAction applyAction = new AbstractAction() {
@@ -93,17 +89,12 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     final JButton closeBtn = (JButton) thisPanel.findFirstWithName("/visible.stats.close").getUIComponent();
     final AbstractAction closeAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
       }
     };
     closeBtn.addActionListener(closeAction);
     AbstractUpdatableAction.setOkCancelKeys(thisPanel, applyAction, closeAction);
-    dialog.getContentPane().add(thisPanel.getUIComponent());
-    dialog.pack();
-    dialog.setLocationRelativeTo(null);
-    if (location != null) dialog.setLocation(location);
-    dialog.setVisible(true);
+    readyDialog(dialog, thisPanel.getUIComponent(), location);
   }
 
   /**

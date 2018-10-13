@@ -90,8 +90,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     final AbstractAction okAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
         doOK();
       }
     };
@@ -99,17 +98,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     final AbstractAction cancelAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
       }
     };
     cancelBtn.addActionListener(cancelAction);
     setOkCancelKeys(panel, okAction, cancelAction);
-    dialog.getContentPane().add(panel.getUIComponent());
-    dialog.pack();
-    dialog.setLocationRelativeTo(null);
-    if (location != null) dialog.setLocation(location);
-    dialog.setVisible(true);
+    readyDialog(dialog, panel.getUIComponent(), location);
   }
 
   /**

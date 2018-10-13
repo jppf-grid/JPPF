@@ -87,8 +87,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
       final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
           doOK();
         }
       };
@@ -96,18 +95,13 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
       final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       cancelBtn.addActionListener(cancelAction);
       setAllLabelsColors();
-      dialog.getContentPane().add(panel.getUIComponent());
-      dialog.pack();
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      dialog.setVisible(true);
+      readyDialog(dialog, panel.getUIComponent(), location);
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

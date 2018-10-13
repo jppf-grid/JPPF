@@ -72,8 +72,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       dialog.addWindowListener(new WindowAdapter() {
         @Override
         public void windowClosing(final WindowEvent e) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       });
       final JEditorPane editor = new JEditorPane("text/html", "");
@@ -85,19 +84,15 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       editor.setEditable(false);
       editor.setOpaque(true);
       final JScrollPane panel = new JScrollPane(editor);
-      dialog.getContentPane().add(panel);
       final AbstractAction escAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       setOkCancelKeys(panel, null, escAction);
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
+      readyDialog(dialog, panel, location);
       dialog.setSize(600, 600);
-      dialog.setVisible(true);
       runAction(new AsyncRunnable(dialog, editor));
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);

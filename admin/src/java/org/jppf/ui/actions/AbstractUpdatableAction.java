@@ -201,4 +201,27 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
     OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
     return elt;
   }
+
+  /**
+   * Make the specified dialog ready for display.
+   * @param dialog the dialog to prepare.
+   * @param comp the dialog"'s content.
+   * @param location the dialog's location, may be {@code null}.
+   */
+  protected void readyDialog(final JDialog dialog, final JComponent comp, final Point location) {
+    dialog.getContentPane().add(comp);
+    dialog.pack();
+    dialog.setLocationRelativeTo(null);
+    if (location != null) dialog.setLocation(location);
+    dialog.setVisible(true);
+  }
+
+  /**
+   * Dispose of the specified dialog.
+   * @param dialog the dialog to dispose of.
+   */
+  protected void disposeDialog(final JDialog dialog) {
+    dialog.setVisible(false);
+    dialog.dispose();
+  }
 }

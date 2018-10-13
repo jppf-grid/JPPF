@@ -103,8 +103,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
       final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
           doOK();
         }
       };
@@ -112,18 +111,12 @@ public class NodeThreadsAction extends AbstractTopologyAction {
       final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       cancelBtn.addActionListener(cancelAction);
-      final JComponent comp = panel.getUIComponent();
-      dialog.getContentPane().add(comp);
-      dialog.pack();
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      dialog.setVisible(true);
+      readyDialog(dialog, panel.getUIComponent(), location);
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

@@ -97,26 +97,20 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
       final AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
           doOK();
         }
       };
       final AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       okBtn.addActionListener(okAction);
       cancelBtn.addActionListener(cancelAction);
       setOkCancelKeys(panel, okAction, cancelAction);
-      dialog.getContentPane().add(panel.getUIComponent());
-      dialog.pack();
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
-      dialog.setVisible(true);
+      readyDialog(dialog, panel.getUIComponent(), location);
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

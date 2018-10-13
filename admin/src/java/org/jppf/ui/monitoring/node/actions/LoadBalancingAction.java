@@ -77,11 +77,6 @@ public class LoadBalancingAction extends AbstractTopologyAction {
     setEnabled(false);
   }
 
-  /**
-   * Perform the action.
-   * @param event encapsulates the source of the event and additional information.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-   */
   @Override
   public void actionPerformed(final ActionEvent event) {
     final AbstractButton btn = (AbstractButton) event.getSource();
@@ -94,31 +89,18 @@ public class LoadBalancingAction extends AbstractTopologyAction {
       final JButton refreshBtn = (JButton) panel.findFirstWithName("Refresh").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("load.balancing.caption", driver.getDisplayName()), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/balance.png").getImage());
-      final Action applyAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(final ActionEvent event) { doApply(driver); }
-      };
-      applyBtn.addActionListener(applyAction);
-      final Action refreshAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(final ActionEvent event) { doRefresh(driver); }
-      };
-      refreshBtn.addActionListener(refreshAction);
+      applyBtn.addActionListener(evt -> doApply(driver));
+      refreshBtn.addActionListener(evt -> doRefresh(driver));
       final Action closeAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       setKeyAction(applyBtn, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), closeAction, "close");
-      dialog.getContentPane().add(panel.getUIComponent());
-      doRefresh(driver);
-      dialog.pack();
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
+      readyDialog(dialog, panel.getUIComponent(), location);
       dialog.setSize(500, 500);
-      dialog.setVisible(true);
+      doRefresh(driver);
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

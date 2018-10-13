@@ -83,10 +83,6 @@ public class ProvisioningAction extends AbstractTopologyAction {
     setEnabled(dataArray.length > 0);
   }
 
-  /**
-   * Perform the action.
-   * @param event not used.
-   */
   @Override
   public void actionPerformed(final ActionEvent event) {
     final AbstractButton btn = (AbstractButton) event.getSource();
@@ -98,8 +94,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
     final AbstractAction okAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
         doOK();
       }
     };
@@ -107,18 +102,13 @@ public class ProvisioningAction extends AbstractTopologyAction {
       @Override public void actionPerformed(final ActionEvent event) {
         final CodeEditorOption textArea = (CodeEditorOption) panel.findFirstWithName("configOverrides");
         overrides = (String) textArea.getValue();
-        dialog.setVisible(false);
-        dialog.dispose();
+        disposeDialog(dialog);
       }
     };
     okBtn.addActionListener(okAction);
     cancelBtn.addActionListener(cancelAction);
     setOkCancelKeys(panel, okAction, cancelAction);
-    dialog.getContentPane().add(panel.getUIComponent());
-    dialog.pack();
-    dialog.setLocationRelativeTo(null);
-    if (location != null) dialog.setLocation(location);
-    dialog.setVisible(true);
+    readyDialog(dialog, panel.getUIComponent(), location);
   }
 
   /**

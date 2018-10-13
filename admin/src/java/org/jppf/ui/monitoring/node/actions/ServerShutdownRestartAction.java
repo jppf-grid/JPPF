@@ -111,8 +111,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
       final Action okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
           doOK(list);
         }
       };
@@ -120,17 +119,12 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
       final Action cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          dialog.setVisible(false);
-          dialog.dispose();
+          disposeDialog(dialog);
         }
       };
       cancelBtn.addActionListener(cancelAction);
-      dialog.getContentPane().add(panel.getUIComponent());
-      dialog.pack();
-      dialog.setLocationRelativeTo(null);
-      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      dialog.setVisible(true);
+      readyDialog(dialog, panel.getUIComponent(), location);
     } catch(final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
