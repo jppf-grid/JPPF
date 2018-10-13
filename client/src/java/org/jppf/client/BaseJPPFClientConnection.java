@@ -185,7 +185,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug(toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
+    if (debugEnabled) log.debug("{} sending handshake job, uuidPath={}", toDebugString(), uuidPath);
     header.setUuid(new JPPFUuid().toString());
     header.setName("handshake job");
     header.setHandshake(true);
@@ -197,6 +197,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser); // null data provider
     socketClient.flush();
+    if (debugEnabled) log.debug("{} sent handshake job, receiving handshake results", toDebugString());
     return receiveBundleAndResults(ser, getClass().getClassLoader()).first();
   }
 
@@ -211,7 +212,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     final TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug(toDebugString() + " sending close command job, uuidPath=" + uuidPath);
+    if (debugEnabled) log.debug("{} sending close command job, uuidPath={}", toDebugString(), uuidPath);
     header.setName("close command job");
     header.setUuid("close command job");
     header.setParameter(BundleParameter.CONNECTION_UUID, connectionUuid);
@@ -224,6 +225,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       IOHelper.sendData(socketClient, null, ser); // null data provider
       socketClient.flush();
     }
+    if (debugEnabled) log.debug("{} sent close command job", toDebugString());
   }
 
   /**
@@ -245,9 +247,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
       final int count = bundle.getTaskCount();
       final int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
-      if (debugEnabled) {
-        log.debug(toDebugString() + " : received bundle " + bundle + ", positions=" + StringUtils.buildString(positions));
-      }
+      if (debugEnabled) log.debug("{} : received bundle {},  positions={}", toDebugString(), bundle, StringUtils.buildString(positions));
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try {
         for (int i = 0; i < count; i++) {
@@ -266,7 +266,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       if (t != null) {
         if (debugEnabled) log.debug(toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         final Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        for (final Task<?> task : taskList) task.setThrowable(e);
+        taskList.forEach(task -> task.setThrowable(e));
       }
       return new Pair<>(bundle, taskList);
     } catch (final AsynchronousCloseException e) {
