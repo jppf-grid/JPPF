@@ -174,8 +174,8 @@ public class ConfigurationHTMLPrinter {
   private ConfigurationHTMLPrinter prologue(final String title) {
     println("<html>").incrementIndent().println("<head>").incrementIndent();
     print("<title>").print(title).println("</title>");
-    println("<link rel='stylesheet' type='text/css' href='http://www.jppf.org/jppf.css' title='Style'>");
-    println("<link rel='shortcut icon' href='http://www.jppf.org/images/jppf-icon.ico' type='image/x-icon'>");
+    println("<link rel='stylesheet' type='text/css' href='https://www.jppf.org/jppf.css' title='Style'>");
+    println("<link rel='shortcut icon' href='https://www.jppf.org/images/jppf-icon.ico' type='image/x-icon'>");
     println("<style>").incrementIndent();
     println("h1, h2, h3 , h4, h5  { font-family: Arial, Verdana, sans-serif; color: white }");
     println("h1, h2, h3  { margin: 0pt }");
