@@ -19,6 +19,7 @@ package org.jppf.client;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 import javax.sql.DataSource;
 
@@ -28,12 +29,13 @@ import org.jppf.client.event.*;
 import org.jppf.discovery.*;
 import org.jppf.load.balancer.persistence.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
+import org.jppf.node.policy.*;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -95,6 +97,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * Manages the persisted states of the load-balancers.
    */
   LoadBalancerPersistenceManager loadBalancerPersistenceManager;
+  /**
+   * Synchronizes access to the default client and server side job sla execution policy. 
+   */
+  final Lock defaultPolicyLock = new ReentrantLock();
+  /**
+   * The default server-side job sla execution policy.
+   */
+  ExecutionPolicy defaultPolicy;
+  /**
+   * The default client-side job sla execution policy.
+   */
+  ExecutionPolicy defaultClientPolicy;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -141,6 +155,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (jobManager == null) jobManager = createJobManager();
+    defaultPolicyLock.lock();
+    try {
+      defaultPolicy = retrieveDefaultPolicy(JPPFProperties.JOB_SLA_DEFAULT_POLICY);
+      defaultClientPolicy = retrieveDefaultPolicy(JPPFProperties.JOB_CLIENT_SLA_DEFAULT_POLICY);
+    } finally {
+      defaultPolicyLock.unlock();
+    }
     final Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -148,6 +169,23 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       }
     };
     ThreadUtils.startThread(r, "InitPools");
+  }
+
+  /**
+   * Retrieve and parse an execution àpolicy from the specified configuration property.
+   * @param prop the configuration propoerty from which to retrieve the execution policy.
+   * @return the retrieved policy, or {@code null} if no policy was specified or if the parsing failed.
+   */
+  private ExecutionPolicy retrieveDefaultPolicy(final JPPFProperty<String> prop) {
+    final String policyXML = PolicyUtils.resolvePolicy(config, prop.getName());
+    if (policyXML != null) {
+      try {
+        return PolicyParser.parsePolicy(policyXML.trim());
+      } catch (final Exception e) {
+        log.warn("failed to parse execution policy for {}, with content = {}\n{}", prop.getName(), policyXML, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    return null;
   }
 
   /**

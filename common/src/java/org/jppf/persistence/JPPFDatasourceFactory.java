@@ -18,14 +18,11 @@
 
 package org.jppf.persistence;
 
-import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.regex.*;
 
 import javax.sql.DataSource;
 
-import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.*;
 import org.jppf.utils.*;
@@ -332,58 +329,9 @@ public final class JPPFDatasourceFactory {
    * @return an {@link ExecutionPolicy} instance, or {@code null} if none could be created.
    */
   private static  String resolvePolicy(final TypedProperties props, final String configId) {
-    String policy = null;
-    try {
-      final String prefix = (configId == null) ? "" : "jppf.datasource." + configId + ".";
-      final String s = props.getString(prefix + "policy");
-      if (s == null) return null;
-      final String[] tokens = s.split("\\|");
-      for (int i=0; i<tokens.length; i++) tokens[i] = tokens[i].trim();
-      final String type;
-      final String source;
-      if (tokens.length >= 2) {
-        type = tokens[0].toLowerCase();
-        source = tokens[1];
-      } else {
-        type = "inline";
-        source = tokens[0];
-      }
-      try (final Reader reader = getPolicyReader(type, source)) {
-        policy = FileUtils.readTextFile(reader);
-        if (policy != null) props.setString(prefix + "policy.text", policy);
-      }
-    } catch (final Exception e) {
-      log.error("error resolving the execution policy for datasource definition with configId=" + configId, e);
-    }
+    final String prefix = (configId == null) ? "" : "jppf.datasource." + configId + ".";
+    final String policy = PolicyUtils.resolvePolicy(props, prefix + "policy");
+    if (policy != null) props.setString(prefix + "policy.text", policy);
     return policy;
-  }
-
-  /**
-   * Get a reader for the execution policy based on the type and source.
-   * @param type the type of source: one of "inline", "file", "url".
-   * @param source the source for the policy, its smeaning depends on the type.
-   * @return an execution policy parsed from the source.
-   * @throws Exception if any error occurs.
-   */
-  private static Reader getPolicyReader(final String type, final String source) throws Exception {
-    Reader reader = null;
-    switch(type) {
-      case "inline":
-        reader = new StringReader(source);
-        break;
-
-      case "file":
-        reader = FileUtils.getFileReader(source);
-        break;
-
-      case "url":
-        final URL url = new URL(source);
-        reader = new InputStreamReader(url.openConnection().getInputStream(), "utf-8");
-        break;
-
-      default:
-        throw new JPPFException("unknown soure type '" + type + "' for execution policy '" + source + "'");
-    }
-    return reader;
   }
 }
