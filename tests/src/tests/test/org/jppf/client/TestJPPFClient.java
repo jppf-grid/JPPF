@@ -22,7 +22,6 @@ import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,12 +51,7 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @BeforeClass
   public static void classSetup() throws Exception {
-    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-      @Override
-      public void uncaughtException(final Thread t, final Throwable e) {
-        print(false, false, "Uncaught exception in thread %s%n%s", t, ExceptionUtils.getStackTrace(e));
-      }
-    });
+    Thread.setDefaultUncaughtExceptionHandler((t, e) -> print(false, false, "Uncaught exception in thread %s%n%s", t, ExceptionUtils.getStackTrace(e)));
   }
 
   /**
@@ -378,10 +372,9 @@ public class TestJPPFClient extends Setup1D1N {
    * A task that checks the current thread context class loader during its execution.
    */
   public static class ThreadContextClassLoaderTask extends AbstractTask<String> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
+
     @Override
     public void run() {
       final ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -389,11 +382,7 @@ public class TestJPPFClient extends Setup1D1N {
       if (isInNode()) {
         if (!(cl instanceof AbstractJPPFClassLoader)) throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
         final AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader) getTaskClassLoader();
-        if (cl != ajcl2) {
-          throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
-              "thread context class loader = " + cl + "\n" +
-              "task class loader = " + ajcl2);
-        }
+        if (cl != ajcl2) throw new IllegalStateException("thread context class loader and task class loader do not match:\n" + "thread context class loader = " + cl + "\ntask class loader = " + ajcl2);
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
       setResult(cl.toString());

@@ -25,7 +25,8 @@ import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.discovery.ClientDriverDiscovery;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.*;
@@ -120,11 +121,14 @@ public class JPPFClient extends AbstractGenericClient {
     }
     job.client = this;
     if (debugEnabled) log.debug("submitting job {}", job);
+    ExecutionPolicy defaultPolicy = getDefaultPolicy();
+    ExecutionPolicy jobPolicy = job.getSLA().getExecutionPolicy();
+    if ((jobPolicy == null) && (defaultPolicy != null)) job.getSLA().setExecutionPolicy(defaultPolicy);
+    defaultPolicy = getDefaultClientPolicy();
+    jobPolicy = job.getClientSLA().getExecutionPolicy();
+    if ((jobPolicy == null) && (defaultPolicy != null)) job.getClientSLA().setExecutionPolicy(defaultPolicy);
     if (log.isTraceEnabled()) {
-      for (Task<?> task: job) {
-        log.trace(String.format("task %s, position=%d, taskObject=%s, taskObject class=%s", task, task.getPosition(), task.getTaskObject(),
-            (task.getTaskObject() != null) ? task.getTaskObject().getClass() : null));
-      }
+      job.forEach(t -> log.trace("task {}, pos={}, taskObject={}, taskObject class={}", t, t.getPosition(), t.getTaskObject(), (t.getTaskObject() != null) ? t.getTaskObject().getClass() : null));
     }
     getJobManager().submitJob(job);
     if (job.isBlocking()) return job.awaitResults();
@@ -390,5 +394,57 @@ public class JPPFClient extends AbstractGenericClient {
   public int nbIdleCOnnections() {
     final JobManagerClient manager = (JobManagerClient) getJobManager();
     return (manager == null) ? -1 : manager.nbAvailableConnections();
+  }
+
+  /**
+   * Get the default server-side job execution policy.
+   * @return an {@link ExecutionPolicy}, or {@code null} if none was specified.
+   */
+  public ExecutionPolicy getDefaultPolicy() {
+    defaultPolicyLock.lock();
+    try {
+      return defaultPolicy;
+    } finally {
+      defaultPolicyLock.unlock();
+    }
+  }
+
+  /**
+   * Set the default server-side job execution policy.
+   * @param defaultPolicy the execution policy to set as default, may be {@code null}.
+   */
+  public void setDefaultPolicy(final ExecutionPolicy defaultPolicy) {
+    defaultPolicyLock.lock();
+    try {
+      this.defaultPolicy = defaultPolicy;
+    } finally {
+      defaultPolicyLock.unlock();
+    }
+  }
+
+  /**
+   * Get the default client-side job execution policy.
+   * @return an {@link ExecutionPolicy}, or {@code null} if none was specified.
+   */
+  public ExecutionPolicy getDefaultClientPolicy() {
+    defaultPolicyLock.lock();
+    try {
+      return defaultClientPolicy;
+    } finally {
+      defaultPolicyLock.unlock();
+    }
+  }
+
+  /**
+   * Set the default client-side job execution policy.
+   * @param defaultClientPolicy the execution policy to set as default, may be {@code null}.
+   */
+  public void setDefaultClientPolicy(final ExecutionPolicy defaultClientPolicy) {
+    defaultPolicyLock.lock();
+    try {
+      this.defaultClientPolicy = defaultClientPolicy;
+    } finally {
+      defaultPolicyLock.unlock();
+    }
   }
 }
