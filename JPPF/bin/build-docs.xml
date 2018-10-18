@@ -129,7 +129,7 @@
       <packageset dir="${jca-client}/src/j2eeclient"/>
       <packageset dir="${node-android}/events/src/main/java"/>
       <packageset dir="${jmxremote}/src/java"/>
-      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javase/8/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <link href="https://junit.org/junit4/javadoc/latest"/>
       <link href="http://x-stream.github.io/javadoc"/>

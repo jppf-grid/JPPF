@@ -296,7 +296,7 @@
     >
       <arg value="-J-Xmx512m"/>
       <packageset dir="${src.dir}/java"/>
-      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javase/8/docs/api/"/>
       <link href="https://ci.apache.org/projects/wicket/apidocs/7.x/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <doctitle><![CDATA[JPPF Web Administration Console v${version.number}]]></doctitle>
