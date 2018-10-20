@@ -26,7 +26,7 @@ import java.util.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class PolicyDescriptor {
+class PolicyDescriptor {
   /**
    * The type of rule, eg AND, NOT, OneOf, Equal, etc.
    */

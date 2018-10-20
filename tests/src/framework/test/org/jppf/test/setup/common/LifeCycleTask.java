@@ -137,6 +137,7 @@ public class LifeCycleTask extends AbstractTask<String> {
         }
       }
       if (isInNode()) uuidFromNode = getNode().getUuid();
+      else uuidFromNode = "local_channel";
       if (duration > 0L) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       displayTask("successful");

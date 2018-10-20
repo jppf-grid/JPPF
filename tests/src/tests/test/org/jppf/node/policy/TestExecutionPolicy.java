@@ -333,6 +333,24 @@ public class TestExecutionPolicy extends BaseTest {
   }
 
   /**
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testAcceptAll() throws Exception {
+    checkPolicy(new AcceptAll(), true);
+    checkPolicy(new AcceptAll(new RejectAll()), true);
+  }
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testRejectAll() throws Exception {
+    checkPolicy(new RejectAll(), false);
+    checkPolicy(new RejectAll(new AcceptAll()), false);
+  }
+
+  /**
    * Check that the specified execution policy's evaluation returns the expected result.
    * @param policy the policy to evaluate.
    * @param expected the policy's expected return value.
@@ -341,9 +359,18 @@ public class TestExecutionPolicy extends BaseTest {
   private static void checkPolicy(final ExecutionPolicy policy, final boolean expected) throws Exception {
     assertEquals(expected, policy.accepts(systemInfo));
     final String s1 = policy.toString();
-    final StringBuilder sb = new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
-      .append(s1).append("</jppf:ExecutionPolicy>\n");
-    final ExecutionPolicy parsed = PolicyParser.parsePolicy(sb.toString());
+    print(false, false, "checking policy:\n%s", s1);
+    final String str = new StringBuilder("<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'>\n")
+      .append(s1).append("</jppf:ExecutionPolicy>\n").toString();
+    try {
+      PolicyParser.validatePolicy(str);
+    } catch (final Exception e) {
+      final String message = String.format("policy validation exception: %s", ExceptionUtils.getStackTrace(e));
+      print(false, false, message);
+      fail(message);
+    }
+    final ExecutionPolicy parsed = PolicyParser.parsePolicy(str);
+    assertNotNull(parsed);
     assertEquals(expected, parsed.accepts(systemInfo));
     assertEquals(s1, parsed.toString());
   }
@@ -368,6 +395,33 @@ public class TestExecutionPolicy extends BaseTest {
     assertEquals(job.getMetadata(), ctx.getMetadata());
     assertEquals(2, ctx.getJobDispatches());
     assertEquals(stats, ctx.getStats());
+  }
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testEmptyPolicy() throws Exception {
+    final String str = "<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'></jppf:ExecutionPolicy>";
+    Exception exception = null;
+    try {
+      PolicyParser.validatePolicy(str);
+    } catch (final Exception e) {
+      exception = e;
+      print(false, false, "policy validation exception: %s", ExceptionUtils.getStackTrace(e));
+    }
+    assertNotNull(exception);
+
+    ExecutionPolicy policy = null;
+    exception = null;
+    try {
+      policy = PolicyParser.parsePolicy(str);
+    } catch (final Exception e) {
+      exception = e;
+      print(false, false, "policy parsing exception: %s", ExceptionUtils.getStackTrace(e));
+    }
+    assertNotNull(exception);
+    assertNull(policy);
   }
 
   /**

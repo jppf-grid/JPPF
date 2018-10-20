@@ -38,7 +38,7 @@ public class PolicyParser {
    */
   private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
       "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference",
-      "IsInIPv4Subnet", "IsInIPv6Subnet", NodesMatching.XML_TAG);
+      "IsInIPv4Subnet", "IsInIPv6Subnet", NodesMatching.XML_TAG, AcceptAll.XML_TAG, RejectAll.XML_TAG);
   /**
    * The DOM parser used to build the descriptor tree.
    */
@@ -62,7 +62,7 @@ public class PolicyParser {
    */
   public PolicyDescriptor parse(final String docPath) throws Exception {
     final InputStream is = FileUtils.getFileInputStream(docPath);
-    if (is == null) return null;
+    if (is == null) throw new JPPFException("could not find document at " + docPath);
     final Document doc = parser.parse(is);
     return generateTree(findFirstElement(doc));
   }
@@ -115,8 +115,7 @@ public class PolicyParser {
       final Node childNode = list.item(i);
       if (childNode.getNodeType() == Node.ELEMENT_NODE) {
         final String name = childNode.getNodeName();
-        /*if ("Script".equals(name)) desc.script = getTextNodeValue(childNode);
-        else*/ if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
+        if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
         else if ("Property".equals(name) || "Value".equals(name) || "Subnet".equals(name)) desc.operands.add(getTextNodeValue(childNode));
         else if ("Arg".equals(name)) desc.arguments.add(getTextNodeValue(childNode));
       }
@@ -227,7 +226,8 @@ public class PolicyParser {
    */
   public static ExecutionPolicy parsePolicy(final Reader reader) throws Exception {
     final PolicyDescriptor desc = new PolicyParser().parse(reader);
-    return desc.children.isEmpty() ? null :  new PolicyBuilder().buildPolicy(desc.children.get(0));
+    if (desc.children.isEmpty()) throw new JPPFException("empty execution policy");
+    return new PolicyBuilder().buildPolicy(desc.children.get(0));
   }
 
   /**

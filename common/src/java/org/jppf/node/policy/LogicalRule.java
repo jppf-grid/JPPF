@@ -41,13 +41,11 @@ abstract class LogicalRule extends ExecutionPolicy {
    */
   @Override
   public String toString(final int indentLevel) {
-    synchronized(ExecutionPolicy.class) {
-      final StringBuilder sb = new StringBuilder();
-      if (children == null) sb.append(indent(indentLevel)).append("null\n");
-      else {
-        for (final ExecutionPolicy ep: children) sb.append(ep.toString(indentLevel));
-      }
-      return sb.toString();
+    final StringBuilder sb = new StringBuilder();
+    if (children == null) sb.append(indent(indentLevel)).append("null\n");
+    else {
+      for (final ExecutionPolicy ep: children) sb.append(ep.toString(indentLevel));
     }
+    return sb.toString();
   }
 }
