@@ -12,7 +12,8 @@ echo start time: %TIME% > time.tmp
 del /F /Q logs\*.zip > nul
 
 if "%1" == ""  (set PATTERN=**/JPPFSuite.java) else (set PATTERN=%1)
-for /L %%i in (1,1,%2) do (
+if "%2" == ""  (set NB_REPEATS=1) else (set NB_REPEATS=%2)
+for /L %%i in (1,1,%NB_REPEATS%) do (
   echo(
   echo ***** Test run %%i *****
   del /F /Q *.log > nul
