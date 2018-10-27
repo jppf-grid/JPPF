@@ -120,7 +120,6 @@ class WaitingResultsState extends NodeServerState {
         if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
         nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
         nodeBundle.resultsReceived(t);
-      //} else if (job.isCancelled() && nodeBundle.isCancelled()) {
       } else if (job.isCancelled()) {
         if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled job: {}", received.second().size(), received.bundle());
         if (!nodeBundle.isCancelled()) {
@@ -153,6 +152,7 @@ class WaitingResultsState extends NodeServerState {
         final List<DataLocation> data = received.data();
         if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
         if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
+        server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
         nodeBundle.resultsReceived(data);
         final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
         updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
@@ -161,7 +161,6 @@ class WaitingResultsState extends NodeServerState {
           final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
           BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
         } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
-        server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
       }
     } finally {
       lock.unlock();

@@ -69,7 +69,7 @@ public class DeadlockDetector {
   public synchronized static void setup(final String type, final long interval) {
     if (alreadyRun) return;
     alreadyRun = true;
-    System.out.println("setting up " + type + " deadlock detector");
+    log.info("setting up {} deadlock detector", type);
     try {
       final String suffix;
       if ("client".equals(type)) {

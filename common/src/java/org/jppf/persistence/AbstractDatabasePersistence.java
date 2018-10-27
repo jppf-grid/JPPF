@@ -25,7 +25,7 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -200,9 +200,8 @@ public abstract class AbstractDatabasePersistence<I> {
    */
   private void checkTable(final String tableName) throws Exception {
     if (debugEnabled) log.debug("checking table {}", tableName);
-    try (final Connection connection = dataSource.getConnection()) {
-      final boolean autoCommit = connection.getAutoCommit();
-      final int isolation  = connection.getTransactionIsolation();
+    try (ConnectionWrapper wrapper = getConnection(false, Connection.TRANSACTION_READ_COMMITTED)) {
+      final Connection connection = wrapper.getConnection();
       try {
         connection.setAutoCommit(false);
         connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
@@ -222,9 +221,6 @@ public abstract class AbstractDatabasePersistence<I> {
       } catch(final Exception e) {
         log.warn("failed to create table '{}', load-balancer persistence may not work: {}", tableName, ExceptionUtils.getMessage(e));
         connection.rollback();
-      } finally {
-        connection.setTransactionIsolation(isolation);
-        connection.setAutoCommit(autoCommit);
       }
     }
   }
@@ -246,5 +242,63 @@ public abstract class AbstractDatabasePersistence<I> {
   @Override
   public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append("[tableName=").append(tableName).append(", dataSourceName=").append(dataSourceName).append(']').toString();
+  }
+
+  /**
+   * Get a connection and set its characteristics, which will be restored to their original values upon close.
+   * @param autocommit the connection's autocommit flag to set.
+   * @param isolation the connection's transaction isolation level to set.
+   * @return a {@link ConnectionWrapper} wrapping the actual JDBC connection.
+   * @throws Exception if any error occurs.
+   */
+  protected ConnectionWrapper getConnection(final boolean autocommit, final int isolation) throws Exception {
+    return new ConnectionWrapper(dataSource.getConnection(), autocommit, isolation);
+  }
+
+  /**
+   * A wrapper for a connection and some of its characteristics.
+   */
+  protected static class ConnectionWrapper implements AutoCloseable {
+    /**
+     * The connection.
+     */
+    private final Connection connection;
+    /**
+     * The connection's autocommit flag to restore on close.
+     */
+    private final boolean autocommit;
+    /**
+     * The connection's transaction isolation level to restore on close.
+     */
+    private final int isolation;
+
+    /**
+     * 
+     * @param connection the connection.
+     * @param autocommit the connection's autocommit flag to set.
+     * @param isolation the connection's transaction isolation level to set.
+     * @throws Exception if any error occurs.
+     */
+    protected ConnectionWrapper(final Connection connection, final boolean autocommit, final int isolation) throws Exception {
+      this.connection = connection;
+      this.autocommit = connection.getAutoCommit();
+      this.isolation = connection.getTransactionIsolation();
+      connection.setAutoCommit(autocommit);
+      connection.setTransactionIsolation(isolation);
+    }
+
+    @Override
+    public void close() throws Exception {
+      connection.setAutoCommit(autocommit);
+      connection.setTransactionIsolation(isolation);
+      connection.close();
+    }
+
+    /**
+     * @return the connection.
+     */
+    public Connection getConnection() {
+      return connection;
+    }
   }
 }

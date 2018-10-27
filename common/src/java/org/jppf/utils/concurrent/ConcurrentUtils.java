@@ -237,9 +237,9 @@ public final class ConcurrentUtils {
   /**
    * This abstrat class handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
    */
-  public static abstract class ConditionFalseOnException implements Condition {
+  public static interface ConditionFalseOnException extends Condition {
     @Override
-    public boolean evaluate() {
+    default boolean evaluate() {
       try {
         return evaluateWithException();
       } catch (@SuppressWarnings("unused") final Exception e) {

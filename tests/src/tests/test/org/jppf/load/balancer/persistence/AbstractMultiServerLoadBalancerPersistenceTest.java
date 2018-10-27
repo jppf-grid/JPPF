@@ -21,7 +21,6 @@ package test.org.jppf.load.balancer.persistence;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import org.jppf.client.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
@@ -31,7 +30,6 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
-import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -41,7 +39,7 @@ import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
- *
+ * Test load-balancer state perisstence on the server site in a muli-server topology.
  * @author Laurent Cohen
  */
 public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends AbstractDatabaseSetup {
@@ -106,9 +104,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         job.getClientSLA().setMaxChannels(2);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(NB_TASKS, results, false);
-        final List<String> channels = mgt.listAllChannels();
-        assertNotNull(channels);
-        assertTrue(channels.isEmpty());
+        assertTrue(checkEmptyChannels(mgt));
       }
     } finally {
       for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(lbi[i].getAlgorithm(), lbi[i].getParameters());
@@ -136,6 +132,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         job.getClientSLA().setMaxChannels(2);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(NB_TASKS, results, false);
+        awaitNoMorePendingOperations(mgt);
         final List<String> channels = mgt.listAllChannels();
         print(true, false, ">>> list of nodes for algo=%-12s : %s", algo, channels);
         assertNotNull(channels);
@@ -145,32 +142,13 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
           BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> algo = %-12s, list of algos for channel %s = %s", algo, channel, channelAlgos);
           assertNotNull(channelAlgos);
           assertTrue(String.format("algo=%s, channelAlgos=%s, channel=%s", algo, channelAlgos, channel), channelAlgos.size() >= 1);
-          //assertEquals(algo, channelAlgos.get(0));
-          //assertTrue(channelAlgos.contains(algo));
           mgt.deleteChannel(channel);
-          assertTrue(RetryUtils.runWithRetryTimeout(5000L, 100L, new Callable<Boolean>() {
-            @Override public Boolean call() throws Exception {
-              if (mgt.listAlgorithms(channel).isEmpty()) return true;
-              throw new IllegalStateException("list of algos for channel "  + channel + " is not empty");
-            }
-          }));
+          awaitNoMorePendingOperations(mgt);
+          assertTrue(mgt.listAlgorithms(channel).isEmpty());
         }
-        //if (channels.size() <= 3)
         mgt.deleteAlgorithm(algo);
-        /*
-        ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-          @Override public boolean evaluateWithException() throws Exception {
-            final List<String> list = mgt.listAllChannelsWithAlgorithm(algo);
-            return (list == null) || list.isEmpty();
-          }
-        }, 5000L, 250L, false);
-        */
       }
-      ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-        @Override public boolean evaluateWithException() throws Exception {
-          return mgt.listAllChannels().isEmpty();
-        }
-      }, 5000L, 250L, false);
+      assertTrue(checkEmptyChannels(mgt));
       final List<String> channels = mgt.listAllChannels();
       BaseTestHelper.printToAll(jmxList, true, true, true, false, false, ">>> remaining list of channels = %s", channels);
       assertNotNull(channels);
@@ -205,6 +183,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(NB_TASKS, results, false);
       }
+      awaitNoMorePendingOperations(mgt);
       final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
         final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
@@ -224,6 +203,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
+      awaitNoMorePendingOperations(mgt);
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
@@ -256,6 +236,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       job.getClientSLA().setMaxChannels(2);
       final List<Task<?>> results = client.submitJob(job);
       checkJobResults(NB_TASKS, results, false);
+      awaitNoMorePendingOperations(mgt);
       final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertFalse(channels.isEmpty());
@@ -266,23 +247,14 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         assertEquals(algo, channelAlgos.get(0));
         assertTrue(mgt.hasAlgorithm(channel, algo));
         mgt.delete(channel, algo);
+        awaitNoMorePendingOperations(mgt);
         assertFalse(mgt.hasAlgorithm(channel, algo));
         channelAlgos = mgt.listAlgorithms(channel);
         assertNotNull(channelAlgos);
         assertTrue(channelAlgos.isEmpty());
       }
       mgt.deleteAlgorithm(algo);
-      assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-        @Override public boolean evaluateWithException() throws Exception {
-          return mgt.listAllChannels().isEmpty();
-        }
-      }, 5000L, 250L, false));
-      /*
-      if (channels.size() <= 3) mgt.deleteAlgorithm(algo);
-      channels = mgt.listAllChannels();
-      assertNotNull(channels);
-      assertTrue("channels should be empty but is " + channels, channels.isEmpty());
-      */
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       for (int i=0; i<jmxList.size(); i++) jmxList.get(i).changeLoadBalancerSettings(lbi[i].getAlgorithm(), lbi[i].getParameters());
     }

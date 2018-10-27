@@ -19,8 +19,6 @@ package org.jppf.utils;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import org.jppf.utils.configuration.JPPFProperties;
@@ -498,43 +496,5 @@ public final class FileUtils {
     final int idx = imageName.lastIndexOf('.');
     if (idx <= 0) return new Pair<>(imageName, null);
     return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
-  }
-
-  /**
-   * A file walker that deletes a complete file and folder hierarchy.
-   */
-  public static class DeleteFileVisitor extends SimpleFileVisitor<Path> {
-    /**
-     * Optional path matcher to filter the files to delete.
-     */
-    private final PathMatcher matcher;
-
-    /**
-     * Initialize without a matcher.
-     */
-    public DeleteFileVisitor() {
-      this(null);
-    }
-
-    /**
-     * Initialize with the specified path matcher.
-     * @param matcher anoptional path matcher to filter the files to delete.
-     */
-    public DeleteFileVisitor(final PathMatcher matcher) {
-      this.matcher = matcher;
-    }
-
-    @Override
-    public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-      if ((matcher == null) || matcher.matches(file)) Files.delete(file);
-      return FileVisitResult.CONTINUE;
-    }
-
-    @Override
-    public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
-      if (e != null) throw e;
-      if (dir.toFile().listFiles().length <= 0) Files.delete(dir);
-      return FileVisitResult.CONTINUE;
-    }
   }
 }

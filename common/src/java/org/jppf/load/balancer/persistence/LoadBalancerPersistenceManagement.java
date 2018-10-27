@@ -90,4 +90,10 @@ public interface LoadBalancerPersistenceManagement {
    * @throws LoadBalancerPersistenceException if any error occurs.
    */
   void delete(String channelID, String algorithm) throws LoadBalancerPersistenceException;
+
+  /**
+   * Get the number of persistence operations, including load, store, delete and list, that have started but not yet completed.
+   * @return the number of uncompleted operations.
+   */
+  int getUncompletedOperations();
 }

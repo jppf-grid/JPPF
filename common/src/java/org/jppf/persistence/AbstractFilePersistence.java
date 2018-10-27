@@ -21,7 +21,7 @@ package org.jppf.persistence;
 import java.io.IOException;
 import java.nio.file.*;
 
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.DeleteFileVisitor;
 import org.slf4j.*;
 
 /**
@@ -61,7 +61,12 @@ public abstract class AbstractFilePersistence<I, E extends Exception> {
    * @param paths the root directory for this persistence.
    */
   public AbstractFilePersistence(final String... paths) {
-    this.rootPath = Paths.get(paths[0]);
+    rootPath = Paths.get(paths[0]);
+    try {
+      if (!Files.exists(rootPath)) Files.createDirectories(rootPath);
+    } catch (final IOException e) {
+      throw new IllegalStateException("error creating root path '" + rootPath + "' for file persistence", e);
+    }
     if (debugEnabled) log.debug("initializing {} with rootPath={}", getClass().getSimpleName(), rootPath);
   }
 
@@ -106,7 +111,7 @@ public abstract class AbstractFilePersistence<I, E extends Exception> {
           if (!Files.isDirectory(path) && pathname(path.getFileName()).endsWith(DEFAULT_EXTENSION)) return false;
         }
       }
-      Files.walkFileTree(channelPath, new FileUtils.DeleteFileVisitor());
+      Files.walkFileTree(channelPath, new DeleteFileVisitor());
       return true;
     } catch (final IOException e) {
       throw convertException(e);
@@ -150,4 +155,22 @@ public abstract class AbstractFilePersistence<I, E extends Exception> {
    * @exclude
    */
   protected abstract E convertException(final Exception e);
+
+  /**
+   * Determines whether two paths denote the same file.
+   * @param path1 the first path to check.
+   * @param path2 the second path to check.
+   * @return {@code true} if the two path represent the same file, {@code false} otherwise.
+   * @see Files#isSameFile(Path, Path)
+   */
+  protected static boolean isSameFile(final Path path1, final Path path2) {
+    try {
+      final boolean b = Files.isSameFile(path1, path2);;
+      if (debugEnabled) log.debug("{} equals {} ? {}", path1, path2, b);
+      return b;
+    } catch (final IOException e) {
+      log.error(e.getMessage(), e);
+      return false;
+    }
+  }
 }

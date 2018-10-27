@@ -82,9 +82,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         job.getClientSLA().setMaxChannels(2);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        final List<String> channels = mgt.listAllChannels();
-        assertNotNull(channels);
-        assertTrue(channels.isEmpty());
+        assertTrue(checkEmptyChannels(mgt));
       }
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
@@ -111,6 +109,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         job.getClientSLA().setMaxChannels(2);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
+        awaitNoMorePendingOperations(mgt);
         final List<String> channels = mgt.listAllChannels();
         print(true, false, "list of nodes for algo=%s : %s", algo, channels);
         assertNotNull(channels);
@@ -122,14 +121,13 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
           assertEquals(String.format("algo=%s, node=%s", algo, channel), 1, channelAlgos.size());
           assertEquals(algo, channelAlgos.get(0));
           mgt.deleteChannel(channel);
+          awaitNoMorePendingOperations(mgt);
           channelAlgos = mgt.listAlgorithms(channel);
           assertNotNull(channelAlgos);
           assertTrue(channelAlgos.isEmpty());
         }
       }
-      final List<String> channels = mgt.listAllChannels();
-      assertNotNull(channels);
-      assertTrue(channels.isEmpty());
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
@@ -157,13 +155,13 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
       }
+      awaitNoMorePendingOperations(mgt);
       final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
         final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         print(true, false, "list of nodes for algo=%s : %s", algos[i], channels);
         assertNotNull(channels);
         if (i == 0) {
-          //assertEquals(BaseSetup.nbDrivers() + 1, channels.size());
           assertFalse(channels.isEmpty());
         } else {
           assertEquals(1, channels.size());
@@ -174,24 +172,23 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
-        //assertEquals(2, channelAlgos.size());
         assertFalse(channelAlgos.isEmpty());
         assertTrue(channelAlgos.contains(algos[0]));
         assertTrue(channelAlgos.contains(algos[entry.getKey()]));
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
+      awaitNoMorePendingOperations(mgt);
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
-        final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
+        final String channel = entry.getValue();
+        final List<String> channelAlgos = mgt.listAlgorithms(channel);
         assertNotNull(channelAlgos);
         assertEquals(1, channelAlgos.size());
         assertFalse(channelAlgos.contains(algos[0]));
         assertTrue(channelAlgos.contains(algos[entry.getKey()]));
-        mgt.deleteChannel(entry.getValue());
+        mgt.deleteChannel(channel);
       }
-      final List<String> channels = mgt.listAllChannels();
-      assertNotNull(channels);
-      assertTrue(channels.isEmpty());
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
@@ -215,9 +212,9 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       job.getClientSLA().setMaxChannels(2);
       final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
-      List<String> channels = mgt.listAllChannels();
+      awaitNoMorePendingOperations(mgt);
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
-      //assertEquals(BaseSetup.nbDrivers() + 1, channels.size());
       assertFalse(channels.isEmpty());
       for (String channel: channels) {
         List<String> channelAlgos = mgt.listAlgorithms(channel);
@@ -226,14 +223,13 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         assertEquals(algo, channelAlgos.get(0));
         assertTrue(mgt.hasAlgorithm(channel, algo));
         mgt.delete(channel, algo);
+        awaitNoMorePendingOperations(mgt);
         assertFalse(mgt.hasAlgorithm(channel, algo));
         channelAlgos = mgt.listAlgorithms(channel);
         assertNotNull(channelAlgos);
         assertTrue(channelAlgos.isEmpty());
       }
-      channels = mgt.listAllChannels();
-      assertNotNull(channels);
-      assertTrue(channels.isEmpty());
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
@@ -257,7 +253,6 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       pool.awaitWorkingConnections(Operator.EQUAL, 2);
       final JobManagerClient jmc = (JobManagerClient) client.getJobManager();
       while (jmc.getTaskQueueChecker().getNbIdleChannels() < 2) Thread.sleep(10L);
-      //Thread.sleep(100L);
       final String algo = "proportional";
       final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
@@ -271,7 +266,8 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       });
       final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
-      List<String> channels = mgt.listAllChannels();
+      awaitNoMorePendingOperations(mgt);
+      final List<String> channels = mgt.listAllChannels();
       assertNotNull(channels);
       assertEquals(pool.getSize(), channels.size());
       for (String channel: channels) {
@@ -281,14 +277,13 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         assertEquals(algo, channelAlgos.get(0));
         assertTrue(mgt.hasAlgorithm(channel, algo));
         mgt.delete(channel, algo);
+        awaitNoMorePendingOperations(mgt);
         assertFalse(mgt.hasAlgorithm(channel, algo));
         channelAlgos = mgt.listAlgorithms(channel);
         assertNotNull(channelAlgos);
         assertTrue(channelAlgos.isEmpty());
       }
-      channels = mgt.listAllChannels();
-      assertNotNull(channels);
-      assertTrue(channels.isEmpty());
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
       pool.setSize(1);

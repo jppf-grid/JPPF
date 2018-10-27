@@ -78,8 +78,9 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
     if (isPersistenceEnabled() && (bundler instanceof PersistentState)) {
       final LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algo, factory.getAlgorithmHash(algo), null);
       try {
+        if (debugEnabled) log.debug("loading state for {}", info);
         final Object state = persistence.load(info);
-        if (debugEnabled) log.debug("persisted state for {} is " + state, info);
+        if (debugEnabled) log.debug("loaded state for {} is {}", info, state);
         if (state != null) ((PersistentState) bundler).setState(state);
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
@@ -96,29 +97,34 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
    */
   public void storeBundler(final Pair<String, String> channelId, final Bundler<?> bundler, final String algorithm) {
     if (isPersistenceEnabled() && (bundler instanceof PersistentState)) {
+      long time = System.nanoTime();
       try {
         final Object state = ((PersistentState) bundler).getState();
         if (state != null) {
           final Lock lock = ((PersistentState) bundler).getStateLock();
-          //if (debugEnabled) log.debug("persisting state for {}, {}", nodeId, algorithm);
+          if (debugEnabled) log.debug("storing state for channelId = {}, algorithm = {}", channelId, algorithm);
           final LoadBalancerPersistenceInfo info = new LoadBalancerPersistenceInfo(channelId.first(), channelId.second(), algorithm, factory.getAlgorithmHash(algorithm), state, lock);
           persistence.store(info);
         }
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
+      time = System.nanoTime() - time;
+      if (debugEnabled) log.debug(String.format(Locale.US, "store time: %.3f ms", time / 1_000_000d));
     }
   }
 
   @Override
   public List<String> listAllChannels() throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) return Collections.emptyList();
+    if (debugEnabled) log.debug("listing all channels");
     return persistence.list(null);
   }
 
   @Override
   public List<String> listAlgorithms(final String channelID) throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) return Collections.emptyList();
+    if (debugEnabled) log.debug("listing all algorithms for channelID = {}", channelID);
     final List<String> hashes = persistence.list(new LoadBalancerPersistenceInfo(channelID, null, null));
     final List<String> names = hashes.isEmpty() ? Collections.<String>emptyList() : new ArrayList<>(hashes.size());
     for (final String hash: hashes) names.add(factory.getAlgorithmNameFromHash(hash));
@@ -128,6 +134,7 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
   @Override
   public List<String> listAllChannelsWithAlgorithm(final String algorithm) throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) return Collections.emptyList();
+    if (debugEnabled) log.debug("listing all channels for algo = {}", algorithm);
     return persistence.list(new LoadBalancerPersistenceInfo(null, null, algorithm, factory.getAlgorithmHash(algorithm), null));
   }
 
@@ -138,22 +145,26 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
 
   @Override
   public void deleteAll() throws LoadBalancerPersistenceException {
+    if (debugEnabled) log.debug("deleting all");
     if (isPersistenceEnabled()) persistence.delete(null);
   }
 
   @Override
   public void deleteChannel(final String channelID) throws LoadBalancerPersistenceException {
+    if (debugEnabled) log.debug("deleting channelID = {}", channelID);
     if (isPersistenceEnabled()) persistence.delete(new LoadBalancerPersistenceInfo(channelID, null, null));
   }
 
   @Override
   public void deleteAlgorithm(final String algorithm) throws LoadBalancerPersistenceException {
+    if (debugEnabled) log.debug("deleting algorithm = {}", algorithm);
     if (isPersistenceEnabled()) persistence.delete(new LoadBalancerPersistenceInfo(null, null, algorithm, factory.getAlgorithmHash(algorithm), null));
   }
 
   @Override
   public void delete(final String channelID, final String algorithm) throws LoadBalancerPersistenceException {
     if (!isPersistenceEnabled()) throw new IllegalStateException("load-balancer persistence is not configured");
+    if (debugEnabled) log.debug("deleting channelID = {}, algorithm = {}", channelID, algorithm);
     persistence.delete(new LoadBalancerPersistenceInfo(channelID, channelID, algorithm, factory.getAlgorithmHash(algorithm), null));
   }
 
@@ -162,5 +173,10 @@ public class LoadBalancerPersistenceManager implements LoadBalancerPersistenceMa
    */
   public JPPFBundlerFactory getFactory() {
     return factory;
+  }
+
+  @Override
+  public int getUncompletedOperations() {
+    return (persistence == null) ? 0 : persistence.getUncompletedOperations();
   }
 }

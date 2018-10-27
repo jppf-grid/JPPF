@@ -39,4 +39,9 @@ public class TestClientAsyncFileLoadBalancerPersistence extends AbstractClientLo
     config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 1, true, true, config);
   }
+
+  @Override
+  protected boolean isAsyncLoadBalancerPersistence() {
+    return true;
+  }
 }

@@ -21,6 +21,7 @@ package org.jppf.load.balancer.persistence;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.persistence.AbstractDatabasePersistence;
 import org.jppf.serialization.JPPFSerializationHelper;
@@ -109,6 +110,10 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
    * The default persistence datasource name.
    */
   public static final String DEFAULT_DATASOURCE = "loadBalancerDS";
+  /**
+   * The number of persistence operations, including load, store, delete and list, that have started but not yet completed.
+   */
+  private final AtomicInteger uncompletedOperations = new AtomicInteger(0);
 
   /**
    * Intialize this persistence with the {@linkplain #DEFAULT_TABLE default table name}.
@@ -133,49 +138,60 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
 
   @Override
   public Object load(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     if (debugEnabled) log.debug("loading {}", info);
-    try (final Connection connection = dataSource.getConnection()) {
-      final String sql = getSQL("load.sql");
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setString(1, info.getChannelID());
-        ps.setString(2, info.getAlgorithmID());
+    final String sql = getSQL("load.sql");
+    final String[] args = { info.getChannelID(), info.getAlgorithmID() };
+    try (final ConnectionWrapper wrapper = getConnection(false, Connection.TRANSACTION_READ_COMMITTED)) {
+      if (debugEnabled) log.debug("before executing sql=\"{}\" with params={}", sql, Arrays.toString(args));
+      try (PreparedStatement ps = wrapper.getConnection().prepareStatement(sql)) {
+        ps.setString(1, args[0]);
+        ps.setString(2, args[1]);
         try (ResultSet rs = ps.executeQuery()) {
           if (rs.next()) {
-            return JPPFSerializationHelper.deserialize(rs.getBinaryStream(1));
+            final Object o = JPPFSerializationHelper.deserialize(rs.getBinaryStream(1));
+            wrapper.getConnection().commit();
+            return o;
           }
         }
+      } catch(final Exception e) {
+        wrapper.getConnection().rollback();
+        throw e;
       }
     } catch(final Exception e) {
-      throw new LoadBalancerPersistenceException(e);
+      final String message = "error performing SQL query = \"" + sql + "\" with params = " + Arrays.toString(args);
+      throw new LoadBalancerPersistenceException(message, e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
     return null;
   }
 
   @Override
   public void store(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     if (debugEnabled) log.debug("storing {}", info);
-    try (Connection connection = dataSource.getConnection()) {
-      final boolean autocommit = connection.getAutoCommit();
-      final int isolation  = connection.getTransactionIsolation();
-      connection.setAutoCommit(false);
+    try (ConnectionWrapper wrapper = getConnection(false, Connection.TRANSACTION_READ_COMMITTED)) {
+      final Connection connection = wrapper.getConnection();
       try {
-        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         storeElement(connection, info, info.getStateAsBytes());
         connection.commit();
       } catch(final Exception e) {
         connection.rollback();
-        throw new LoadBalancerPersistenceException(e);
-      } finally {
-        connection.setAutoCommit(autocommit);
-        connection.setTransactionIsolation(isolation);
+        throw e;
       }
+    } catch(final LoadBalancerPersistenceException e) {
+      throw e;
     } catch(final Exception e) {
       throw new LoadBalancerPersistenceException(e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
   @Override
   public void delete(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     if (debugEnabled) log.debug("deleting {}", info);
     String sql = null;
     String[] args = EMPTY_STRINGS;
@@ -191,18 +207,28 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
       sql = getSQL("delete.algo.sql");
       args = new String[] { info.getChannelID(), info.getAlgorithmID() };
     }
-    try (final Connection connection = dataSource.getConnection()) {
+    if (debugEnabled) log.debug("before executing sql=\"{}\" with params={}", sql, Arrays.toString(args));
+    try (ConnectionWrapper wrapper = getConnection(false, Connection.TRANSACTION_READ_COMMITTED)) {
+      final Connection connection = wrapper.getConnection();
       try (final PreparedStatement ps = connection.prepareStatement(sql)) {
         for (int i=0; i<args.length; i++) ps.setString(i + 1, args[i]);
         ps.executeUpdate();
+        connection.commit();
+      } catch(final Exception e) {
+        connection.rollback();
+        throw e;
       }
     } catch(final Exception e) {
-      throw new LoadBalancerPersistenceException(e);
+      final String message = "error performing SQL query = \"" + sql + "\" with params = " + Arrays.toString(args);
+      throw new LoadBalancerPersistenceException(message, e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
   @Override
   public List<String> list(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     String sql = null;
     String[] args = EMPTY_STRINGS;
     if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {
@@ -217,16 +243,25 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
       sql = getSQL("get.node.with.algo.sql");
       args = new String[] { info.getChannelID(), info.getAlgorithmID() };
     }
+    if (debugEnabled) log.debug("before executing sql=\"{}\" with params={}", sql, Arrays.toString(args));
     final List<String> result = new ArrayList<>();
-    try (final Connection connection = dataSource.getConnection()) {
+    try (ConnectionWrapper wrapper = getConnection(false, Connection.TRANSACTION_READ_COMMITTED)) {
+      final Connection connection = wrapper.getConnection();
       try (final PreparedStatement ps = connection.prepareStatement(sql)) {
         for (int i=0; i<args.length; i++) ps.setString(i + 1, args[i]);
         try (final ResultSet rs = ps.executeQuery()) {
           while (rs.next()) result.add(rs.getString(1));
+          connection.commit();
         }
+      } catch(final Exception e) {
+        connection.rollback();
+        throw e;
       }
     } catch(final Exception e) {
-      throw new LoadBalancerPersistenceException(e);
+      final String message = "error performing SQL query = \"" + sql + "\" with params = " + Arrays.toString(args);
+      throw new LoadBalancerPersistenceException(message, e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
     if (debugEnabled) log.debug("result for {} is {}", info, result);
     return result;
@@ -235,38 +270,59 @@ public class DatabaseLoadBalancerPersistence extends AbstractDatabasePersistence
   /** @exclude */
   @Override
   protected boolean lockForUpdate(final Connection connection, final LoadBalancerPersistenceInfo info) throws Exception {
-    try (final PreparedStatement ps = connection.prepareStatement(getSQL("select.for.update.sql"))) {
-      ps.setString(1, info.getChannelID());
-      ps.setString(2, info.getAlgorithmID());
+    final String[] args = { info.getChannelID(), info.getAlgorithmID() };
+    final String sql = getSQL("select.for.update.sql");
+    if (debugEnabled) log.debug("before performing SQL query = \"{}\" with params = {}", sql, Arrays.toString(args));
+    try (final PreparedStatement ps = connection.prepareStatement(sql)) {
+      ps.setString(1, args[0]);
+      ps.setString(2, args[1]);
       try (final ResultSet rs = ps.executeQuery()) {
         return rs.next();
       }
+    } catch(final SQLException e) {
+      final String message = "error performing SQL query = \"" + sql + "\" with params = " + Arrays.toString(args);
+      throw new LoadBalancerPersistenceException(message, e);
     }
   }
 
   /** @exclude */
   @Override
   protected void insertElement(final Connection connection, final LoadBalancerPersistenceInfo info, final byte[] bytes) throws Exception {
-    try (final PreparedStatement ps = connection.prepareStatement(getSQL("insert.sql"))) {
+    final String sql = getSQL("insert.sql");
+    if (debugEnabled) log.debug("before performing SQL update = \"{}\" with params = [{}, {}, blob(length={})]", sql, info.getChannelID(), info.getAlgorithmID(), bytes.length);
+    try (final PreparedStatement ps = connection.prepareStatement(sql)) {
       try (final InputStream is = new ByteArrayInputStream(bytes)) {
         ps.setString(1, info.getChannelID());
         ps.setString(2, info.getAlgorithmID());
         ps.setBlob(3, is);
         ps.executeUpdate();
       }
+    } catch(final SQLException e) {
+      final String message = "error performing SQL update = \"" + sql + "\" with params = [" + info.getChannelID() + ", " + info.getAlgorithmID() + ", blob(length=" + bytes.length + ")]";
+      throw new LoadBalancerPersistenceException(message, e);
     }
   }
 
   /** @exclude */
   @Override
   protected void updateElement(final Connection connection, final LoadBalancerPersistenceInfo info, final byte[] bytes) throws Exception {
-    try (PreparedStatement ps2 = connection.prepareStatement(getSQL("update.sql"))) {
+    final String sql = getSQL("update.sql");
+    if (debugEnabled) log.debug("before performing SQL update = \"{}\" with params = [blob(length={}), {}, {}]", sql, bytes.length, info.getChannelID(), info.getAlgorithmID());
+    try (PreparedStatement ps2 = connection.prepareStatement(sql)) {
       try (InputStream is = new ByteArrayInputStream(bytes)) {
         ps2.setBlob(1, is);
         ps2.setString(2, info.getChannelID());
         ps2.setString(3, info.getAlgorithmID());
         ps2.executeUpdate();
       }
+    } catch(final SQLException e) {
+      final String message = "error performing SQL update = \"" + sql + "\" with params = [blob(length=" + bytes.length + "), " + info.getChannelID() + ", " + info.getAlgorithmID() + "]";
+      throw new LoadBalancerPersistenceException(message, e);
     }
+  }
+
+  @Override
+  public int getUncompletedOperations() {
+    return uncompletedOperations.get();
   }
 }

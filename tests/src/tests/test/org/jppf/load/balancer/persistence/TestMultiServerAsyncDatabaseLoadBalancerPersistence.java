@@ -33,4 +33,9 @@ public class TestMultiServerAsyncDatabaseLoadBalancerPersistence extends Abstrac
   public static void setup() throws Exception {
     setupConfig("driver_async_db.properties", true);
   }
+
+  @Override
+  protected boolean isAsyncLoadBalancerPersistence() {
+    return true;
+  }
 }

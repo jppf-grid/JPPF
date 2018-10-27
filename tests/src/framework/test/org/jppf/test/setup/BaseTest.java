@@ -21,6 +21,7 @@ package test.org.jppf.test.setup;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.jmx.JMXHelper;
@@ -41,7 +42,6 @@ import org.slf4j.*;
 public class BaseTest {
   static {
     Locale.setDefault(Locale.US);
-    DeadlockDetector.setup("client");
   }
   /**
    * Logger for this class.
@@ -226,6 +226,9 @@ public class BaseTest {
 
   /** */
   public static class BaseTestClassWatcher extends TestWatcher {
+    /** */
+    private static AtomicBoolean detectorStarted = new AtomicBoolean(false);
+
     @Override
     protected void starting(final Description description) {
       // delete the drivers and nodes log files if they exist
@@ -235,19 +238,16 @@ public class BaseTest {
       if (logFiles != null) {
         for (final File file: logFiles) {
           if (file.exists()) {
-            //log.info("deleting file {}", file);
             if (!file.delete()) {
               print(true, true, "Could not delete %s%n", file);
-              //log.error("could not delete {}", file);
             }
           }
         }
       }
       final File slavesDir = new File(dir, "slave_nodes");
-      if (slavesDir.exists()) {
-        if (!FileUtils.deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
-      }
+      if (slavesDir.exists() && !FileUtils.deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
+      if (detectorStarted.compareAndSet(false, true)) DeadlockDetector.setup("client");
       // redirect System.out and System.err to files
       stdOut = System.out;
       stdErr = System.err;
@@ -264,7 +264,6 @@ public class BaseTest {
     protected void finished(final Description description) {
       print("***** finished class %s *****", description.getClassName());
       try {
-        //if (client != null) BaseSetup.generateDriverThreadDump(client);
         // redirect System.out and System.err back to their original destination
         if ((stdOut != null) && (stdOut != System.out)) {
           final PrintStream tmp = System.out;

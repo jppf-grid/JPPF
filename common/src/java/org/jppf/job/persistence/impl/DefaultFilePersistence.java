@@ -167,7 +167,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
     try {
       if (debugEnabled) log.debug("deleting job with uuid = {}", jobUuid);
       final Path jobDir = getSubDir(jobUuid);
-      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new FileUtils.DeleteFileVisitor());
+      if (Files.exists(jobDir)) Files.walkFileTree(jobDir, new DeleteFileVisitor());
     } catch (final Exception e) {
       throw new JobPersistenceException(e);
     }

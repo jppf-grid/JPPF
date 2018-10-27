@@ -79,11 +79,11 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testNonPersistentAlgos() throws Exception {
+    final String method = ReflectionUtils.getCurrentMethodName();
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String[] algos = { "manual", "nodethreads" };
       final int nbTasks = 100;
@@ -92,9 +92,8 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
-        final List<String> nodes = mgt.listAllChannels();
-        assertNotNull(nodes);
-        assertTrue(nodes.isEmpty());
+        awaitNoMorePendingOperations(mgt);
+        assertTrue(checkEmptyChannels(mgt));
       }
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
@@ -108,11 +107,11 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testPersistentAlgos() throws Exception {
+    final String method = ReflectionUtils.getCurrentMethodName();
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
@@ -121,35 +120,26 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
+        awaitNoMorePendingOperations(mgt);
         final List<String> nodes = mgt.listAllChannels();
-        print(true, false, "list of nodes for algo=%s : %s", algo, nodes);
+        BaseTestHelper.printToAll(jmx, true, true, true, false, false, "algo = %-12s, list of all nodes: %s", algo, nodes);
         assertNotNull(nodes);
         //assertEquals(BaseSetup.nbNodes(), nodes.size());
         for (final String node: nodes) {
           final List<String> nodeAlgos = mgt.listAlgorithms(node);
+          BaseTestHelper.printToAll(jmx, true, true, true, false, false, "list of algos for node=%s : %s", node, nodeAlgos);
           assertNotNull(nodeAlgos);
           assertEquals(String.format("algo=%s, node=%s, nodeAlgos=%s", algo, node, nodeAlgos), 1, nodeAlgos.size());
           assertEquals(algo, nodeAlgos.get(0));
+          BaseTestHelper.printToAll(jmx, true, true, true, false, false, "deleting records for node = %s", node);
           mgt.deleteChannel(node);
-          /*
-          assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-            @Override
-            public boolean evaluateWithException() throws Exception {
-              final List<String> nodeAlgos = mgt.listAlgorithms(node);
-              return (nodeAlgos != null) && nodeAlgos.isEmpty();
-            }
-          }, 5000L, 250L, false));
-          */
+          awaitNoMorePendingOperations(mgt);
         }
+        BaseTestHelper.printToAll(jmx, true, true, true, false, false, "deleting records for algo = %s", algo);
         mgt.deleteAlgorithm(algo);
+        assertTrue(checkEmptyChannelsForAlgo(mgt, algo));
       }
-      assertTrue(ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-        @Override
-        public boolean evaluateWithException() throws Exception {
-          final List<String> nodes = mgt.listAllChannels();
-          return (nodes != null) && nodes.isEmpty();
-        }
-      }, 5000L, 500L, false));
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
@@ -161,11 +151,11 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testDifferentAlgosPerNode() throws Exception {
+    final String method = ReflectionUtils.getCurrentMethodName();
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
@@ -177,9 +167,11 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         final List<Task<?>> results = client.submitJob(job);
         checkJobResults(nbTasks, results, false);
       }
+      awaitNoMorePendingOperations(mgt);
       final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
         final List<String> nodes = mgt.listAllChannelsWithAlgorithm(algos[i]);
+        print(false, false, "[1] i = %d, nodes for algo = %-12s : %s", i, algos[i], nodes);
         assertNotNull(nodes);
         if (i == 0) {
           assertEquals(BaseSetup.nbNodes(), nodes.size());
@@ -191,6 +183,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       // check that node1 has algos[0] + algos[1] and node2 has algos[0] + algos[2]
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> nodeAlgos = mgt.listAlgorithms(entry.getValue());
+        print(false, false, "[2] algos for node %s : %s", entry.getValue(), nodeAlgos);
         assertNotNull(nodeAlgos);
         assertEquals(2, nodeAlgos.size());
         assertTrue(nodeAlgos.contains(algos[0]));
@@ -198,17 +191,18 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
+      awaitNoMorePendingOperations(mgt);
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> nodeAlgos = mgt.listAlgorithms(entry.getValue());
+        print(false, false, "[3] algos for node %s : %s", entry.getValue(), nodeAlgos);
         assertNotNull(nodeAlgos);
         assertEquals(1, nodeAlgos.size());
         assertFalse(nodeAlgos.contains(algos[0]));
         assertTrue(nodeAlgos.contains(algos[entry.getKey()]));
         mgt.deleteChannel(entry.getValue());
+        awaitNoMorePendingOperations(mgt);
       }
-      final List<String> nodes = mgt.listAllChannels();
-      assertNotNull(nodes);
-      assertTrue(nodes.isEmpty());
+      assertTrue(checkEmptyChannels(mgt));
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
@@ -220,11 +214,11 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
    */
   @Test(timeout = 10000)
   public void testDeleteSingleAlgo() throws Exception {
+    final String method = ReflectionUtils.getCurrentMethodName();
     final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
-    final String method = ReflectionUtils.getCurrentMethodName();
     try {
       final String algo = "proportional";
       final int nbTasks = 100;
@@ -232,24 +226,33 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, nbTasks, LifeCycleTask.class, 0L);
       final List<Task<?>> results = client.submitJob(job);
       checkJobResults(nbTasks, results, false);
+      awaitNoMorePendingOperations(mgt);
       List<String> nodes = mgt.listAllChannels();
+      print(false, false, "list of nodes: %s", nodes);
       assertNotNull(nodes);
       assertFalse(nodes.isEmpty());
       for (String node: nodes) {
         List<String> nodeAlgos = mgt.listAlgorithms(node);
+        print(false, false, "[1] algos for node %s : %s", node, nodeAlgos);
         assertNotNull(nodeAlgos);
         assertEquals(String.format("algo=%s, node=%s", algo, node), 1, nodeAlgos.size());
         assertEquals(algo, nodeAlgos.get(0));
         assertTrue(mgt.hasAlgorithm(node, algo));
         mgt.delete(node, algo);
+        awaitNoMorePendingOperations(mgt);
         assertFalse(mgt.hasAlgorithm(node, algo));
         nodeAlgos = mgt.listAlgorithms(node);
+        print(false, false, "[2] algos for node %s : %s", node, nodeAlgos);
         assertNotNull(nodeAlgos);
         assertTrue(nodeAlgos.isEmpty());
       }
-      nodes = mgt.listAllChannels();
-      assertNotNull(nodes);
-      assertTrue(nodes.isEmpty());
+      final boolean empty = checkEmptyChannels(mgt);
+      if (!empty) {
+        nodes = mgt.listAllChannels();
+        print(false, false, "list of nodes not empty: %s", nodes);
+        for (final String node: nodes) print(false, false, "list of algos for node %s : %s", node, mgt.listAlgorithms(node));
+      }
+      assertTrue(empty);
     } finally {
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }

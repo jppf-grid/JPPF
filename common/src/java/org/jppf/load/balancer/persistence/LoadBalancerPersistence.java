@@ -76,4 +76,10 @@ public interface LoadBalancerPersistence {
    * @throws LoadBalancerPersistenceException if any erorr occurs during the persistence operation.
    */
   List<String> list(LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException;
+
+  /**
+   * Get the number of persistence operations, including load, store, delete and list, that have started but not yet completed.
+   * @return the number of uncompleted operations.
+   */
+  int getUncompletedOperations();
 }

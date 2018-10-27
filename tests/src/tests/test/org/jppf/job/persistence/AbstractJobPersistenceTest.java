@@ -85,7 +85,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
           RetryUtils.runWithRetryTimeout(5_000L, 500L, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-              Files.walkFileTree(dirPath, new FileUtils.DeleteFileVisitor());
+              Files.walkFileTree(dirPath, new DeleteFileVisitor());
               return null;
             }
           });
@@ -385,7 +385,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
   };
 
   /** */
-  static class PersistedJobCompletion extends ConcurrentUtils.ConditionFalseOnException {
+  static class PersistedJobCompletion implements ConcurrentUtils.ConditionFalseOnException {
     /** */
     final JPPFDriverJobPersistence mgr;
     /** */

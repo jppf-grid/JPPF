@@ -21,10 +21,11 @@ package org.jppf.load.balancer.persistence;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.persistence.AbstractFilePersistence;
 import org.jppf.serialization.JPPFSerializationHelper;
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.DeleteFileVisitor;
 import org.slf4j.*;
 
 /**
@@ -72,6 +73,10 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
    * The default root path if none is specified.
    */
   public static final String DEFAULT_ROOT = "lb_persistence";
+  /**
+   * The number of persistence operations, including load, store, delete and list, that have started but not yet completed.
+   */
+  private final AtomicInteger uncompletedOperations = new AtomicInteger(0);
 
   /**
    * Initialize this persistence with the root path {@link #DEFAULT_ROOT} under the current user directory.
@@ -90,6 +95,7 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
 
   @Override
   public void store(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     try {
       if (debugEnabled) log.debug("storing {}", info);
       final Path nodeDir = getSubDir(info.getChannelID());
@@ -102,11 +108,14 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
       Files.move(tmpPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
   @Override
   public Object load(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     try {
       if (debugEnabled) log.debug("loading {}", info);
       final Path nodeDir = getSubDir(info.getChannelID());
@@ -118,42 +127,41 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
       }
     } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
   @Override
   public void delete(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     try {
       if (debugEnabled) log.debug("deleting bundlers for {}", info);
       if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {
-        if (Files.exists(rootPath)) Files.walkFileTree(rootPath, new FileUtils.DeleteFileVisitor());
+        if (Files.exists(rootPath)) Files.walkFileTree(rootPath, new DeleteFileVisitor(null, dir -> !isSameFile(rootPath, dir)));
       } else if (info.getAlgorithmID() == null) {
         final Path channelDir = getSubDir(info.getChannelID());
-        if (Files.exists(channelDir)) Files.walkFileTree(channelDir, new FileUtils.DeleteFileVisitor());
+        if (Files.exists(channelDir)) Files.walkFileTree(channelDir, new DeleteFileVisitor());
       } else if (info.getChannelID() == null) {
         final String filename = info.getAlgorithmID() + DEFAULT_EXTENSION;
-        final List<Path> channelsToDelete = new ArrayList<>();
-        Files.walkFileTree(rootPath, new FileUtils.DeleteFileVisitor(new PathMatcher() {
-          @Override
-          public boolean matches(final Path path) {
-            final boolean b = filename.equals(path.getFileName().toString());
-            if (b) channelsToDelete.add(path.getParent());
-            return b;
-          }
-        }));
-        for (Path channelPath: channelsToDelete) deleteIfEmpty(channelPath);
+        Files.walkFileTree(rootPath, new DeleteFileVisitor(file -> filename.equals(file.getFileName().toString()), dir -> !isSameFile(rootPath, dir)));
       } else {
         final Path path = getBundlerPath(getSubDir(info.getChannelID()), info.getAlgorithmID(), false);
+        if (debugEnabled) log.debug("deleting path = {}", path);
         Files.deleteIfExists(path);
         deleteIfEmpty(getSubDir(info.getChannelID()));
       }
+      if (debugEnabled) log.debug("delete done for {}", info);
     } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
   @Override
   public List<String> list(final LoadBalancerPersistenceInfo info) throws LoadBalancerPersistenceException {
+    uncompletedOperations.incrementAndGet();
     try {
       final List<String> result = new ArrayList<>();
       if ((info == null) || ((info.getChannelID() == null) && (info.getAlgorithmID() == null))) {
@@ -171,13 +179,11 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
           if (traceEnabled) log.trace("listing algos in {}", channelDir);
           if (Files.exists(channelDir)) {
             if (traceEnabled) log.trace("listing algos in existing {}", channelDir);
-            try (final DirectoryStream<Path> channelDS = Files.newDirectoryStream(channelDir, new DirectoryStream.Filter<Path>() {
-              @Override
-              public boolean accept(final Path entry) throws IOException {
+            try (final DirectoryStream<Path> channelDS = Files.newDirectoryStream(channelDir, entry -> {
                 if (traceEnabled) log.trace("filter checking {}", entry);
                 return !Files.isDirectory(entry) && pathname(entry).endsWith(DEFAULT_EXTENSION);
               }
-            })) {
+            )) {
               for (final Path path : channelDS) {
                 if (path != null) {
                   final String name = pathname(path.getFileName());
@@ -206,6 +212,8 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
       return result;
     } catch (final Exception e) {
       throw new LoadBalancerPersistenceException(e);
+    } finally {
+      uncompletedOperations.decrementAndGet();
     }
   }
 
@@ -224,5 +232,10 @@ public class FileLoadBalancerPersistence extends AbstractFilePersistence<LoadBal
   @Override
   protected LoadBalancerPersistenceException convertException(final Exception e) {
     return (e instanceof LoadBalancerPersistenceException) ? (LoadBalancerPersistenceException) e : new LoadBalancerPersistenceException(e);
+  }
+
+  @Override
+  public int getUncompletedOperations() {
+    return uncompletedOperations.get();
   }
 }

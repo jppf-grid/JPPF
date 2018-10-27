@@ -33,4 +33,9 @@ public class TestMultiServerAsyncFileLoadBalancerPersistence extends AbstractMul
   public static void setup() throws Exception {
     setupConfig("driver_async_file.properties", false);
   }
+
+  @Override
+  protected boolean isAsyncLoadBalancerPersistence() {
+    return true;
+  }
 }

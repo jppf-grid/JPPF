@@ -56,6 +56,11 @@ public class LoadBalancerPersistenceManagerMBeanStaticProxy extends AbstractMBea
   }
 
   @Override
+  public int getUncompletedOperations() {
+    return (int) getAttribute("UncompletedOperations");
+  }
+
+  @Override
   public List listAlgorithms(final String param0) {
     return (List) invoke("listAlgorithms", new Object[] { param0 }, new String[] { "java.lang.String" });
   }

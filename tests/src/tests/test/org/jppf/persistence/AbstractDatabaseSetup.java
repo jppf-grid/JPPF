@@ -22,15 +22,18 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Collection;
+import java.util.*;
 
 import org.apache.log4j.Level;
 import org.h2.tools.*;
 import org.jppf.client.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManagement;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.*;
@@ -156,6 +159,14 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
   }
 
   /**
+   * @return whether the persistence being tested is an asynchronous wrapper for laod-balancer persistence, in which case job results checking should wait for a given time before checking,
+   * to give persistence enough time to complete.
+   */
+  protected boolean isAsyncLoadBalancerPersistence() {
+    return false;
+  }
+
+  /**
    * Create a jmx connection independent of the specified client.
    * @param client .
    * @return a {@link JMXDriverConnectionWrapper}.
@@ -190,5 +201,44 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    */
   protected static void dumpDatabase(final String filepath) throws Exception {
     if (h2Server != null) Script.main("-url", DB_URL, "-user", DB_USER, "-password", DB_PWD, "-script", filepath);
+  }
+
+  /**
+   * Check whether the list of load-balancer states is empty.
+   * @param mgt the load-balancer state manager.
+   * @return {@code true} if the list of channel states is empty, {@code false} otherwise.
+   */
+  protected boolean checkEmptyChannels(final LoadBalancerPersistenceManagement mgt) {
+    return ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+      @Override
+      public boolean evaluateWithException() throws Exception {
+        final List<String> channels = mgt.listAllChannels();
+        return (channels != null) && channels.isEmpty();
+      }
+    }, 5000L, 500L, false);
+  }
+
+  /**
+   * Check whether the list of load-balancer states for the specified algorithm is empty.
+   * @param mgt the load-balancer state manager.
+   * @param algo load-balancer algorithm for which to check.
+   * @return {@code true} if the list of channel states is empty, {@code false} otherwise.
+   */
+  protected boolean checkEmptyChannelsForAlgo(final LoadBalancerPersistenceManagement mgt, final String algo) {
+    return ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
+      @Override
+      public boolean evaluateWithException() throws Exception {
+        final List<String> channels = mgt.listAllChannelsWithAlgorithm(algo);
+        return (channels != null) && channels.isEmpty();
+      }
+    }, 5000L, 500L, false);
+  }
+
+  /**
+   * Wait until the persistence has no more pending operation, or the timeout expires, whichever happens first.
+   * @param mgt the load-balancer state manager.
+   */
+  protected void awaitNoMorePendingOperations(final LoadBalancerPersistenceManagement mgt) {
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) (() -> mgt.getUncompletedOperations() <= 0), 5000L, 100L, false);
   }
 }

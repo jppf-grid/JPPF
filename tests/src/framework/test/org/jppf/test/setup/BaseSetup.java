@@ -226,7 +226,6 @@ public class BaseSetup {
 
   /**
    * Stops the driver and node and close the client.
-   * @throws Exception if a process could not be stopped.
    */
   private static void close() {
     try {
@@ -353,7 +352,6 @@ public class BaseSetup {
    */
   protected static void stopProcesses() {
     try {
-      //StreamUtils.waitKeyPressed("Press a key to stop all proccesses");
       if (nodes != null) {
         for (final NodeProcessLauncher n: nodes) {
           BaseTest.print(true, false, "stopping %s", n.getName());
@@ -375,15 +373,7 @@ public class BaseSetup {
    * Create the shutdown hook.
    */
   protected static void createShutdownHook() {
-    shutdownHook = new Thread() {
-      @Override
-      public void run() {
-        try {
-          close();
-        } catch(@SuppressWarnings("unused") final Exception ignore) {
-        }
-      }
-    };
+    shutdownHook = new Thread(() -> close());
     Runtime.getRuntime().addShutdownHook(shutdownHook);
   }
 

@@ -20,6 +20,7 @@ package org.jppf.load.balancer.persistence;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
@@ -58,13 +59,17 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * The actual persistence implementation to which operations are delegated.
    */
   private final LoadBalancerPersistence delegate;
   /**
    * Performs asycnhronous operations.
    */
-  private final ExecutorService executor;
+  private final ThreadPoolExecutor executor;
   /**
    * Contains unexecuted persistence (actually "store" operations) tasks. The size of this map is never greater than {@code nbNodes * nbAlgorithms}.
    * <p>If a new entry is posted for a channelID + algorithm and an entry already exists, then the existing entry is overriden. This avoids useless
@@ -76,6 +81,10 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    * Number of threads in the pool.
    */
   private int nbThreads;
+  /**
+   * The number of persistence operations, including load, store, delete and list, that have started but not yet completed.
+   */
+  private final AtomicInteger uncompletedOperations = new AtomicInteger(0);
 
   /**
    * Initialize this persistence with the specified parameters.
@@ -149,9 +158,17 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    * @param max the maximum thread pool size.
    * @return an {@link ExecutorService}.
    */
-  private static ExecutorService createExecutor(final int max) {
-    final LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    return new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, queue, new JPPFThreadFactory("AsyncLBPersistence"));
+  private ThreadPoolExecutor createExecutor(final int max) {
+    final RejectedExecutionHandler handler = new ThreadPoolExecutor.AbortPolicy() {
+      @Override
+      public void rejectedExecution(final Runnable r, final ThreadPoolExecutor e) {
+        decUncompletedOperations();
+        super.rejectedExecution(r, e);
+      }
+    };
+    final ThreadPoolExecutor pool = new ThreadPoolExecutor(1, max, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new JPPFThreadFactory("AsyncLBPersistence"));
+    pool.setRejectedExecutionHandler(handler);
+    return pool;
   }
 
   /**
@@ -164,9 +181,11 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
   private <T> T submit(final PersistenceTask<T> task) throws LoadBalancerPersistenceException {
     try {
       final Future<PersistenceTask<T>> f = executor.submit(task, task);
+      if (traceEnabled) log.trace("before get() for {}", task);
       final PersistenceTask<T> t = f.get();
+      if (traceEnabled) log.trace("after get() for {}, exception = {}", task, t.exception);
       if (t.exception != null) throw t.exception;
-      if (debugEnabled) log.debug("got result = " + t.result);
+      if (debugEnabled) log.debug("got result = {}", t.result);
       return t.result;
     } catch (final ClassCastException e) {
       log.error(e.getMessage(), e);
@@ -190,11 +209,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
    * of a concrete, sequential synchronous persistence implementation.
    * @param <T> the type of result this task returns.
    */
-  private static abstract class PersistenceTask<T> implements Runnable {
-    /**
-     * Logger for this class.
-     */
-    private static Logger logger = LoggerFactory.getLogger(PersistenceTask.class);
+  private abstract class PersistenceTask<T> implements Runnable {
     /**
      * The optional result of this task's execution.
      */
@@ -212,6 +227,7 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
      * @param hasResult whether this task is expected to have a result.
      */
     private PersistenceTask(final boolean hasResult) {
+      incUncompletedOperations();
       this.hasResult = hasResult;
     }
 
@@ -221,7 +237,9 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
         result = execute();
       } catch (final LoadBalancerPersistenceException e) {
         exception = e;
-        if (!hasResult) logger.error(e.getMessage(), e);
+        if (!hasResult) log.error(e.getMessage(), e);
+      } finally {
+        decUncompletedOperations();
       }
     }
 
@@ -271,6 +289,29 @@ public class AsynchronousLoadBalancerPersistence implements LoadBalancerPersiste
 
   @Override
   public String toString() {
-    return new StringBuilder("AsynchronousLoadBalancerPersistence[nbThreads=").append(nbThreads).append(", delegate=").append(delegate).append(']').toString();
+    return new StringBuilder(getClass().getSimpleName()).append("[nbThreads=").append(nbThreads).append(", delegate=").append(delegate).append(']').toString();
+  }
+
+  @Override
+  public int getUncompletedOperations() {
+    return uncompletedOperations.get();
+  }
+
+  /**
+   * @return the number of uncompleted operations.
+   */
+  private int incUncompletedOperations() {
+    final int ops = uncompletedOperations.incrementAndGet();
+    if (traceEnabled) log.trace("uncompleted ops: {}", ops);
+    return ops;
+  }
+
+  /**
+   * @return the number of uncompleted operations.
+   */
+  private int decUncompletedOperations() {
+    final int ops = uncompletedOperations.decrementAndGet();
+    if (traceEnabled) log.trace("uncompleted ops: {}", ops);
+    return ops;
   }
 }
