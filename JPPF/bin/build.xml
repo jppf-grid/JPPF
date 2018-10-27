@@ -200,8 +200,10 @@ build.date = ${readable.now}</echo>
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-  <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after"
-    description="deploy without building the javadoc nor the installer"/>
+  <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, tests.build, user.guide, doc, cleanup.after" description="deploy without building the javadoc nor the installer"/>
+  <!--
+  <target name="deploy.base" depends="clean.all, rebuild, runtime, samples.pack, admin.web, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc, cleanup.after" description="deploy without building the javadoc nor the installer"/>
+  -->  
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 
