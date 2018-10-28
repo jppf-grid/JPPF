@@ -74,8 +74,7 @@
     <fileset dir="${lib}/JNA" includes="*.jar"/>
     <fileset dir="${lib}/oshi" includes="*.jar"/>
     <pathelement location="${samples-pack}/KryoSerializer/classes"/>
-    <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-2.22-all.jar"/>
-    <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
+    <fileset dir="${samples-pack}/KryoSerializer/lib" includes="*.jar"/>
     <fileset dir="${basedir}/lib" includes="*.jar"/>
   </path>
 

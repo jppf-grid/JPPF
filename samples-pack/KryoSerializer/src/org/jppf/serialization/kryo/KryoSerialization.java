@@ -24,13 +24,14 @@ import java.util.*;
 
 import javax.management.ObjectName;
 
-import org.jppf.serialization.*;
+import org.jppf.serialization.JPPFSerialization;
 import org.jppf.utils.pooling.*;
-import org.objenesis.instantiator.ObjectInstantiator;
-import org.objenesis.strategy.*;
+import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Kryo.DefaultInstantiatorStrategy;
 import com.esotericsoftware.kryo.io.*;
+import com.esotericsoftware.kryo.serializers.CollectionSerializer;
 import com.esotericsoftware.kryo.util.*;
 
 import de.javakaffee.kryoserializers.*;
@@ -39,16 +40,6 @@ import de.javakaffee.kryoserializers.*;
  * This implementation uses the <a href="http://code.google.com/p/kryo/">Kryo</a> serialization.
  */
 public class KryoSerialization implements JPPFSerialization {
-  /**
-   * Strategy used to instantiate objects during desrialization.
-   */
-  @SuppressWarnings("unused")
-  private static InstantiatorStrategy str = new InstantiatorStrategy() {
-    @Override
-    public ObjectInstantiator newInstantiatorOf(@SuppressWarnings("rawtypes") final Class c) {
-      return new JPPFInstantiator(c);
-    }
-  };
   /**
    * A fast dynamic pool of {@link Kryo} instances.
    * Using this provides a huge performance improvement vs creating a new Kryo instance each time we serialize or deserialize an object.
@@ -87,33 +78,6 @@ public class KryoSerialization implements JPPFSerialization {
   }
 
   /**
-   * Creates objects without invoking any constructor.
-   */
-  private static class JPPFInstantiator implements ObjectInstantiator {
-    /**
-     * The class to instantiate.
-     */
-    private final Class<?> c;
-
-    /**
-     * Initialize this instantiator with the specified class.
-     * @param c the class to instantiate.
-     */
-    public JPPFInstantiator(final Class<?> c) {
-      this.c = c;
-    }
-
-    @Override
-    public Object newInstance() {
-      try {
-        return SerializationReflectionHelper.create(c);
-      } catch (final Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
- 
-  /**
    * Forces the clearing of the class name to class map upon invocation of the {@code reset()} method.
    */
   public static class CustomClassResolver extends DefaultClassResolver {
@@ -132,8 +96,10 @@ public class KryoSerialization implements JPPFSerialization {
   private static Kryo createKryo() {
     final Kryo kryo = new Kryo(new CustomClassResolver(), new MapReferenceResolver());
     kryo.setAutoReset(true);
-    kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+    kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+
     kryo.register(ObjectName.class, new ObjectNameSerializer());
+    kryo.register(Collection.class, new CollectionSerializer());
     kryo.register(Arrays.asList( "" ).getClass(), new ArraysAsListSerializer() );
     kryo.register(Collections.EMPTY_LIST.getClass(), new CollectionsEmptyListSerializer() );
     kryo.register(Collections.EMPTY_MAP.getClass(), new CollectionsEmptyMapSerializer() );
@@ -147,6 +113,7 @@ public class KryoSerialization implements JPPFSerialization {
     SynchronizedCollectionsSerializer.registerSerializers(kryo);
     kryo.register(EnumMap.class, new EnumMapSerializer());
     kryo.register(EnumSet.class, new EnumSetSerializer());
+    //kryo.register(Map.class, new MapSerializer());
     return kryo;
   }
 }

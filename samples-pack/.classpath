@@ -63,8 +63,6 @@
 	<classpathentry kind="lib" path="GPU/lib/aparapi.jar"/>
 	<classpathentry kind="lib" path="FractalMovieGenerator/lib/monte-cc.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.22-all.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.26.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote-nio"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.7.25.jar"/>
@@ -72,5 +70,8 @@
 	<classpathentry kind="lib" path="shared/lib/miglayout-core-4.2.jar"/>
 	<classpathentry kind="lib" path="shared/lib/miglayout-swing-4.2.jar"/>
 	<classpathentry kind="lib" path="SequenceAlignment/lib/jaligner.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.42.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-shaded-4.0.2.jar" sourcepath="C:/Users/lcohen/AppData/Local/Temp/.org.sf.feeling.decompiler1540100587978/source/kryo-shaded-4.0.2-sources.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/objenesis-2.1.jar" sourcepath="C:/Users/lcohen/AppData/Local/Temp/.org.sf.feeling.decompiler1540100587978/source/objenesis-2.1-sources.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

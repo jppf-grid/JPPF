@@ -42,8 +42,7 @@ public class TestKryoWithLZ4 extends AbstractTestSerialization {
     final TestConfiguration config = createConfig("serialization/kryo_lz4");
     final List<String> commonCP = new ArrayList<>();
     commonCP.add("../samples-pack/KryoSerializer/classes");
-    commonCP.add("../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar");
-    commonCP.add("../samples-pack/KryoSerializer/lib/kryo-2.22-all.jar");
+    commonCP.add("../samples-pack/KryoSerializer/lib/*");
     config.driver.classpath.addAll(commonCP);
     config.node.classpath.addAll(commonCP);
     client = BaseSetup.setup(1, 1, true, config);

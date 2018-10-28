@@ -39,7 +39,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   private static final long TEST_TIMEOUT = 15_000L;
   /**
-   * WHtehr the serialization scheme allows non-serializable classes.
+   * Whether the serialization scheme allows non-serializable classes.
    */
   static boolean allowsNonSerializable = true;
 
