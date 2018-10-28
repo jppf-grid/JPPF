@@ -58,6 +58,10 @@ public class AsynchronousPersistence implements JobPersistence {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * The actual persistence implementation to which operations are delegated.
    */
   private final JobPersistence delegate;
@@ -201,7 +205,10 @@ public class AsynchronousPersistence implements JobPersistence {
     try {
       final Future<PersistenceTask<T>> f = executor.submit(task, task);
       final PersistenceTask<T> t = f.get();
-      if (t.exception != null) throw t.exception;
+      if (t.exception != null) {
+        if (traceEnabled) log.trace("after get() for {}, exception = {}", task, t.exception);
+        throw t.exception;
+      }
       if (debugEnabled) log.debug("got result = {}", t.result);
       return t.result;
     } catch (final ClassCastException e) {

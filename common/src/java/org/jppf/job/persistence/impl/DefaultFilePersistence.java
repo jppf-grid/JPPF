@@ -200,7 +200,7 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
         final List<Path> list = getPathsFor(jobDir, type);
         positions = new int[list.size()];
         int count = 0;
-        for (Path path : list) {
+        for (final Path path : list) {
           final String s = pathname(path.getFileName());
           final String prefix = getPrefixForType(type);
           final String s2 = s.substring(prefix.length(), s.length() - DEFAULT_EXTENSION.length());
@@ -260,18 +260,15 @@ public class DefaultFilePersistence extends AbstractFilePersistence<PersistenceI
    */
   private List<Path> getPathsFor(final Path jobDir, final PersistenceObjectType type) throws IOException {
     final List<Path> result = new ArrayList<>();
-    try (final DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, new DirectoryStream.Filter<Path>() {
-      @Override
-      public boolean accept(final Path entry) throws IOException {
-        final String fileName = pathname(entry.getFileName());
-        final String prefix = getPrefixForType(type);
-        return fileName.startsWith(prefix) && fileName.endsWith(DEFAULT_EXTENSION);
-      }
+    try (final DirectoryStream<Path> ds = Files.newDirectoryStream(jobDir, entry -> {
+      final String fileName = pathname(entry.getFileName());
+      return fileName.startsWith(getPrefixForType(type)) && fileName.endsWith(DEFAULT_EXTENSION);
     })) {
       for (final Path path : ds) {
         if (path != null) result.add(path);
       }
     }
+
     return result;
   }
 
