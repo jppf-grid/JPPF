@@ -19,6 +19,7 @@
 package test.org.jppf.test.setup;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.remote.JMXServiceURL;
 
@@ -31,7 +32,7 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.common.TestUtils;
@@ -46,6 +47,8 @@ public class BaseSetup {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(BaseSetup.class);
+  /** */
+  private static AtomicBoolean detectorStarted = new AtomicBoolean(false);
   /**
    * The default configuratin used when none is specified.
    */
@@ -53,6 +56,7 @@ public class BaseSetup {
   static {
     TestConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
     JPPFConfiguration.reset();
+    if (detectorStarted.compareAndSet(false, true)) DeadlockDetector.setup("client");
   }
   /**
    * The jppf client to use.

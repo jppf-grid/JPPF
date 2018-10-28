@@ -21,13 +21,11 @@ package test.org.jppf.test.setup;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.jmx.JMXHelper;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
-import org.jppf.utils.concurrent.DeadlockDetector;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
@@ -226,9 +224,6 @@ public class BaseTest {
 
   /** */
   public static class BaseTestClassWatcher extends TestWatcher {
-    /** */
-    private static AtomicBoolean detectorStarted = new AtomicBoolean(false);
-
     @Override
     protected void starting(final Description description) {
       // delete the drivers and nodes log files if they exist
@@ -247,7 +242,6 @@ public class BaseTest {
       final File slavesDir = new File(dir, "slave_nodes");
       if (slavesDir.exists() && !FileUtils.deletePath(slavesDir)) print(true, true, "Could not delete '%s'", slavesDir);
       org.apache.log4j.PropertyConfigurator.configure("classes/tests/config/log4j-client.properties");
-      if (detectorStarted.compareAndSet(false, true)) DeadlockDetector.setup("client");
       // redirect System.out and System.err to files
       stdOut = System.out;
       stdErr = System.err;

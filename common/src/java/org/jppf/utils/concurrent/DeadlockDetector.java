@@ -28,7 +28,7 @@ import org.slf4j.*;
 
 /**
  * This class performs periodic deadlock checks and prints detailed deadlock information,
- * along with a thread dump, to the log, the first time a deadlock is detetced.
+ * along with a thread dump, to the log, the first time a deadlock is detected.
  * @author Laurent Cohen
  */
 public class DeadlockDetector {

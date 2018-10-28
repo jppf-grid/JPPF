@@ -24,7 +24,6 @@ import java.lang.management.*;
 import javax.management.*;
 
 import org.jppf.JPPFException;
-import org.jppf.management.diagnostics.provider.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.slf4j.*;
@@ -107,16 +106,12 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       ThreadUtils.startDaemonThread(cpuTimeCollector, "CPUTimeCollector");
     }
     heapDumpCollector = HeapDumpCollector.Factory.newInstance();
-    if (heapDumpCollector == null) {
-      if (debugEnabled) log.debug("a heap dump collector could not be created for this JVM - no heap dumps will be available");
-    }
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        MonitoringDataProviderHandler.getProviders();
-        MonitoringDataProviderHandler.initProviders();
-        MonitoringDataProviderHandler.getAllProperties();
-      }
+    if (heapDumpCollector == null) log.info("a heap dump collector could not be created for this JVM - no heap dumps will be available");
+    MonitoringDataProviderHandler.getProviders();
+    // provider initialization can take a long time, in particular oshi
+    final Runnable r = () -> {
+      MonitoringDataProviderHandler.initProviders();
+      MonitoringDataProviderHandler.getAllProperties();
     };
     ThreadUtils.startThread(r, "DataProviderInit");
   }
@@ -163,9 +158,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
   @Override
   public HealthSnapshot healthSnapshot() throws Exception {
     final HealthSnapshot snapshot = new HealthSnapshot();
-    for (final MonitoringDataProvider provider: MonitoringDataProviderHandler.getProviders()) {
-      snapshot.putProperties(provider.getValues());
-    }
+    MonitoringDataProviderHandler.getProviders().forEach(provider -> snapshot.putProperties(provider.getValues())); 
     return snapshot;
   }
 
