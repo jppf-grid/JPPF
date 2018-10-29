@@ -18,10 +18,14 @@
 
 package org.jppf.node.policy;
 
+import java.util.*;
+
+import org.jppf.JPPFRuntimeException;
+
 /**
  * An execution policy that realizes a binary logical combination of the policies specified as operands.
  */
-abstract class LogicalRule extends ExecutionPolicy {
+public abstract class LogicalRule extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -47,5 +51,19 @@ abstract class LogicalRule extends ExecutionPolicy {
       for (final ExecutionPolicy ep: children) sb.append(ep.toString(indentLevel));
     }
     return sb.toString();
+  }
+
+  @Override
+  protected ExecutionPolicy[] checkRules(final ExecutionPolicy...rules) throws JPPFRuntimeException {
+    if ((rules != null) && (rules.length > 0)) {
+      final List<ExecutionPolicy> result = new ArrayList<>();
+      for (final ExecutionPolicy rule: rules) {
+        if (rule != null) result.add(rule);
+      }
+      if (result.size() == 1) result.add(result.get(0));
+      if (result.size() > 0) return result.toArray(new ExecutionPolicy[result.size()]);
+    }
+    final String message = String.format("the execution policy rule '%s' must have at lest one non-null argument", getClass().getSimpleName());
+    throw new JPPFRuntimeException(message);
   }
 }

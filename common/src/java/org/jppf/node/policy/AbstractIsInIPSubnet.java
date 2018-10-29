@@ -20,6 +20,7 @@ package org.jppf.node.policy;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.net.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -30,7 +31,7 @@ import org.slf4j.*;
  * @author Daniel Widdis
  * @author Laurent Cohen
  */
-abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends ExecutionPolicy {
+public abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -92,9 +93,7 @@ abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends 
    *        {@link IPv4AddressPattern} or {@link IPv6AddressPattern}
    */
   public AbstractIsInIPSubnet(final String... subnets) {
-    if ((subnets == null) || (subnets.length <= 0)) throw new IllegalArgumentException("at least one IPv4 subnet must be specified");
-    this.subnets = new ArrayList<>(subnets.length);
-    for (String subnet: subnets) this.subnets.add(new StringExpression(subnet));
+    this((subnets == null) ? null : Arrays.asList(subnets));
   }
 
   /**
@@ -106,9 +105,9 @@ abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends 
    *        {@link IPv4AddressPattern} or {@link IPv6AddressPattern}
    */
   public AbstractIsInIPSubnet(final Collection<String> subnets) {
-    if ((subnets == null) || subnets.isEmpty())  throw new IllegalArgumentException("at least one IPv4 subnet must be specified");
-    this.subnets = new ArrayList<>(subnets.size());
-    for (String subnet: subnets) this.subnets.add(new StringExpression(subnet));
+    final Collection<String> checked = checkSubnets(subnets);
+    this.subnets = new ArrayList<>(checked.size());
+    for (final String subnet: checked) this.subnets.add(new StringExpression(subnet));
   }
 
   /**
@@ -166,5 +165,23 @@ abstract class AbstractIsInIPSubnet<P extends AbstractIPAddressPattern> extends 
     for (Expression<String> subnet: subnets) sb.append(indent(n + 1)).append(xmlElement(SUBNET, subnet.getExpression())).append('\n');
     sb.append(indent(n)).append(tagEnd(getIPType().xmlTag)).append('\n');
     return sb.toString();
+  }
+
+  /**
+   * Check that the specified subnets array contains at least one non-null string.
+   * @param subnets the subnet arguments to check.
+   * @return an array made of all the non-null subnets.
+   * @throws JPPFRuntimeException if there is no non-null subnet.
+   */
+  private List<String> checkSubnets(final Collection<String> subnets) throws JPPFRuntimeException {
+    if ((subnets != null) && (subnets.size() > 0)) {
+      final List<String> result = new ArrayList<>();
+      for (final String subnet: subnets) {
+        if (subnet != null) result.add(subnet);
+      }
+      if (result.size() > 0) return result;
+    }
+    final String message = String.format("the execution policy rule '%s' must have at least one non-null subnet", getClass().getSimpleName());
+    throw new JPPFRuntimeException(message);
   }
 }
