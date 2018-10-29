@@ -46,7 +46,7 @@ public class AcceptAll extends ExecutionPolicy {
    * @param wrappedPolicy the policy to wrap.
    */
   public AcceptAll(final ExecutionPolicy wrappedPolicy) {
-    super(wrappedPolicy);
+    super();
   }
 
   @Override

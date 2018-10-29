@@ -79,6 +79,8 @@ public class NodesMatching extends ExecutionPolicy {
    * @param nodePolicy the execution policy to match the nodes against. If {@code null}, then all the nodes will match.
    */
   public NodesMatching(final Operator operator, final long expectedNodes, final ExecutionPolicy nodePolicy) {
+    if (expectedNodes < 0L) throw new JPPFRuntimeException("the number of expected nodes cannot be less than 0 in a '" + getClass().getSimpleName() + "' policy rule");
+    if (nodePolicy == null) throw new JPPFRuntimeException("the node policy cannot be null in a '" + getClass().getSimpleName() + "' policy rule");
     this.operator = operator == null ? Operator.EQUAL : operator;
     this.expectedNodes = new NumericExpression((double) expectedNodes);
     this.nodePolicy = nodePolicy;
@@ -91,6 +93,8 @@ public class NodesMatching extends ExecutionPolicy {
    * @param nodePolicy the execution policy to match the nodes against. If {@code null}, then all the nodes will match.
    */
   public NodesMatching(final Operator operator, final String expectedNodes, final ExecutionPolicy nodePolicy) {
+    if (expectedNodes == null) throw new JPPFRuntimeException("the number of expected nodes expression cannot be null in a '" + getClass().getSimpleName() + "' policy rule");
+    if (nodePolicy == null) throw new JPPFRuntimeException("the node policy cannot be null");
     this.operator = operator == null ? Operator.EQUAL : operator;
     this.expectedNodes = new NumericExpression(expectedNodes);
     this.nodePolicy = nodePolicy;

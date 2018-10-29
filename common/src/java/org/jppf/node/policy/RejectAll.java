@@ -46,7 +46,7 @@ public class RejectAll extends ExecutionPolicy {
    * @param wrappedPolicy the policy to wrap.
    */
   public RejectAll(final ExecutionPolicy wrappedPolicy) {
-    super(wrappedPolicy);
+    super();
   }
 
   @Override

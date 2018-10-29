@@ -19,7 +19,9 @@
 package org.jppf.node.policy;
 
 import java.io.Serializable;
+import java.util.*;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
@@ -41,7 +43,7 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   private static Logger log = LoggerFactory.getLogger(ExecutionPolicy.class);
   /**
-   *
+   * Default value for child policies is an empty array.
    */
   private static final ExecutionPolicy[] NO_CHILDREN = new ExecutionPolicy[0];
   /**
@@ -74,7 +76,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @param children the children of this policy.
    */
   protected ExecutionPolicy(final ExecutionPolicy... children) {
-    this.children = children;
+    this.children = checkRules(children);
   }
 
   /**
@@ -411,8 +413,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @param rule the operand.
      */
     public NotRule(final ExecutionPolicy rule) {
-      super(new ExecutionPolicy[] { rule });
-      if (rule == null) throw new IllegalArgumentException("negated rule cannot be null");
+      super(rule);
     }
 
     @Override
@@ -423,6 +424,18 @@ public abstract class ExecutionPolicy implements Serializable {
     @Override
     public String toString(final int n) {
       return new StringBuilder(indent(n)).append("<NOT>\n").append(children[0].toString(n + 1)).append(indent(n)).append("</NOT>\n").toString();
+    }
+
+    @Override
+    protected ExecutionPolicy[] checkRules(final ExecutionPolicy...rules) throws JPPFRuntimeException {
+      if ((rules != null) && (rules.length > 0)) {
+        final List<ExecutionPolicy> result = new ArrayList<>();
+        for (final ExecutionPolicy rule: rules) {
+          if (rule != null) result.add(rule);
+        }
+        if (!result.isEmpty()) return result.toArray(new ExecutionPolicy[result.size()]);
+      }
+      throw new JPPFRuntimeException("negated rule cannot be null");
     }
   }
 
@@ -539,5 +552,15 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   static boolean isExpression(final String value) {
     return SubstitutionsHandler.SUBST_PATTERN.matcher(value).find() || ScriptHandler.SCRIPT_PATTERN.matcher(value).find();
+  }
+
+  /**
+   * Check whether the policy has valid arguments.
+   * @param rules the arguments to check.
+   * @return the non-null arguments, possibly a subset of the provided arguments.
+   * @throws JPPFRuntimeException if the arguments are not valid.
+   */
+  protected ExecutionPolicy[] checkRules(final ExecutionPolicy...rules) throws JPPFRuntimeException {
+    return rules;
   }
 }
