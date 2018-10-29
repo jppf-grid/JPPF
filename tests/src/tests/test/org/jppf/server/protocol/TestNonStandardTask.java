@@ -33,7 +33,7 @@ import org.junit.Test;
 import test.org.jppf.test.setup.Setup1D1N1C;
 
 /**
- * Unit tests for POJO {@link Task}s annotated with &#64;{@link JPPFRunnable}.
+ * Unit tests for POJO {@link Task}s annotated with &#64;{@link JPPFRunnable} or expressed s lambdas.
  * In this class, we test that the behavior is the expected one, from the client point of view,
  * as specified in the job SLA.
  * @author Laurent Cohen
@@ -236,6 +236,30 @@ public class TestNonStandardTask extends Setup1D1N1C {
     assertEquals(endResult, aimt.result);
   }
 
+  /**
+   * Test tasks expressed as lambda expressions.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTasksAsLambdas() throws Exception {
+    final String resultMessage = "Hello, world";
+    final JPPFJob job = new JPPFJob();
+    job.setName(ReflectionUtils.getCurrentMethodName());
+    job.add(() -> System.out.println(resultMessage));
+    job.add(() -> resultMessage);
+    final int nbTasks = job.getTaskCount();
+    final List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    results.forEach(task -> {
+      assertNotNull(task);
+      final Throwable t = task.getThrowable();
+      if (t != null) print(false, false, "task %s has exception:\n%s", task, ExceptionUtils.getStackTrace(t));
+      assertNull(t);
+      if (task.getTaskObject() instanceof Callable) assertEquals(resultMessage, task.getResult());
+    });
+  }
+
   /** */
   public static class AnnotatedStaticMethodTask {
     /**
@@ -250,9 +274,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class AnnotatedInstanceMethodTask implements Serializable {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /** */
     public String result;
@@ -270,9 +292,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class AnnotatedConstructorTask implements Serializable {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /** */
     public final String result;
@@ -288,9 +308,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class PojoTask implements Serializable {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /** */
     public String result;
@@ -326,9 +344,7 @@ public class TestNonStandardTask extends Setup1D1N1C {
 
   /** */
   public static class RunnableTask implements Runnable, Serializable {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /** */
     public String result;
@@ -349,12 +365,9 @@ public class TestNonStandardTask extends Setup1D1N1C {
     }
   }
 
-
   /** */
   public static class CallableTask implements Callable<String>, Serializable {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** Explicit serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /** */
     public String result;
