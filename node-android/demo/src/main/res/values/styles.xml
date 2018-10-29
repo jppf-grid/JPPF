@@ -2,7 +2,7 @@
 
   <!-- Base application theme. -->
 
-  <style name="AppTheme" parent="AppTheme">
+  <style name="AppTheme" parent="android:Theme.Holo">
 
   </style>
 

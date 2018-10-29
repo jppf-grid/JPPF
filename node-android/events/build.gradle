@@ -45,6 +45,11 @@ dependencies {
   provided fileTree(dir: 'libs', include: ['*.jar'])
 }
 
+tasks.assemble << {
+  tasks.copyLibsToDemo
+}
+
+/*
 tasks.assembleRelease << {
   tasks.copyLibsToDemo
 }
@@ -52,6 +57,7 @@ tasks.assembleRelease << {
 tasks.assembleDebug << {
   tasks.copyLibsToDemo
 }
+*/
 
 task copyLibsToDemo {
   if (!copyDone) {
