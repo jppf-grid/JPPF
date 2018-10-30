@@ -142,10 +142,10 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
 
   /**
    * Add a {@link Runnable} task to this job.
+   * <p><b>Note:</b> it is recommended to use {@link #add(JPPFRunnableTask)} whenever possible instead. This ensures that the provided {@link Runnable} is {@link java.io.Serializable serializable}.
    * @param runnable the runnable task to add to this job.
    * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
-   * @deprecaed use {@link #add(JPPFRunnableTask)} instead.
    * @since 5.0
    */
   public Task<?> add(final Runnable runnable) throws JPPFException {
@@ -165,10 +165,10 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
 
   /**
    * Add a {@link Callable} task to this job.
+   * <p><b>Note:</b> it is recommended to use {@link #add(JPPFCallable)} whenever possible instead. This ensures that the provided {@link Callable} is {@link java.io.Serializable serializable}.
    * @param callable the callable task to add to this job.
    * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
-   * @deprecaed use {@link #add(JPPFCallable)} instead.
    * @since 5.0
    */
   public Task<?> add(final Callable<?> callable) throws JPPFException {

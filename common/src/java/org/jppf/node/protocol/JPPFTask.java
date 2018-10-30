@@ -24,7 +24,7 @@ package org.jppf.node.protocol;
  * {@link AbstractTask} should always be used instead as a superclass.
  * @author Laurent Cohen
  */
-public abstract class JPPFTask extends AbstractTask<Object> {
+public class JPPFTask extends AbstractTask<Object> {
   /**
    * Explicit serialVersionUID.
    */

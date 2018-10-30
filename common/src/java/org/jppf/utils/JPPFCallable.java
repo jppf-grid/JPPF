@@ -26,5 +26,6 @@ import java.util.concurrent.Callable;
  * @param <V> the type of object returned by the {@link #call() call()} method.
  * @author Laurent Cohen
  */
+@FunctionalInterface
 public interface JPPFCallable<V> extends Callable<V>, Serializable {
 }
