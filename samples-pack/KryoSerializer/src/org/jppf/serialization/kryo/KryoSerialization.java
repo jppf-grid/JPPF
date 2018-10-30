@@ -24,6 +24,7 @@ import java.util.*;
 
 import javax.management.ObjectName;
 
+import org.jppf.management.*;
 import org.jppf.serialization.*;
 import org.jppf.utils.pooling.*;
 import org.objenesis.instantiator.ObjectInstantiator;
@@ -134,6 +135,8 @@ public class KryoSerialization implements JPPFSerialization {
     kryo.setAutoReset(true);
     kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
     kryo.register(ObjectName.class, new ObjectNameSerializer());
+    kryo.register(OffloadableNotification.class, new GenericObjectSerializer());
+    kryo.register(TaskExecutionNotification.class, new GenericObjectSerializer());
     kryo.register(Arrays.asList( "" ).getClass(), new ArraysAsListSerializer() );
     kryo.register(Collections.EMPTY_LIST.getClass(), new CollectionsEmptyListSerializer() );
     kryo.register(Collections.EMPTY_MAP.getClass(), new CollectionsEmptyMapSerializer() );

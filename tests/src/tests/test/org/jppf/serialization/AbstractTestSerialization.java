@@ -23,8 +23,11 @@ import static org.junit.Assert.*;
 import java.io.NotSerializableException;
 import java.util.Arrays;
 
+import javax.management.ObjectName;
+
+import org.jppf.management.*;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.ObjectSerializerImpl;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.AbstractNonStandardSetup;
@@ -320,6 +323,30 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
     final boolean[] array1 = {true, false};
     final boolean[] array2 = (boolean[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
+  }
+
+  /**
+   * Regression test for bug <a href="https://www.jppf.org/tracker/tbg/jppf/issues/JPPF-556">JPPF-556 DefaultJPPFSerialization fails to serialize JPPF task execution notification </a>.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = TEST_TIMEOUT)
+  public void testTaskExecutionNotification() throws Exception {
+    final ObjectName name = new ObjectName("domain:name=a");
+    final TaskExecutionNotification notif = new TaskExecutionNotification(name, 1L, new TaskInformation("a", "b", "c", 2L, 3L, true, 4), "d", true);
+    final TaskExecutionNotification notif2 = (TaskExecutionNotification) copyBySerialization(notif);
+    assertTrue(notif != notif2);
+    assertEquals(name, notif2.getSource());
+    assertEquals(1L, notif2.getSequenceNumber());
+    final TaskInformation ti = notif2.getTaskInformation();
+    assertEquals("a", ti.getId());
+    assertEquals("b", ti.getJobId());
+    assertEquals("c", ti.getJobName());
+    assertEquals(2L, ti.getCpuTime());
+    assertEquals(3L, ti.getElapsedTime());
+    assertTrue(ti.hasError());
+    assertEquals(4, ti.getJobPosition());
+    assertEquals("d", notif2.getUserData());
+    assertTrue(notif2.isUserNotification());
   }
 
   /**
