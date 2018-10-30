@@ -117,7 +117,7 @@ public class OffloadableNotification extends Notification {
    * @throws IOException if any I/O error occurs.
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
-    out.defaultWriteObject();
+    out.writeBoolean(userDataOffloaded);
     if (userDataOffloaded) {
       final OutputDestination dest = new StreamOutputDestination(out);
       try {
@@ -137,7 +137,7 @@ public class OffloadableNotification extends Notification {
    * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
+    userDataOffloaded = in.readBoolean();
     if (userDataOffloaded) {
       try {
         dataLocation = IOHelper.readData(new StreamInputSource(in));
