@@ -21,7 +21,6 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.NEW;
 
 import java.io.NotSerializableException;
-import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
@@ -87,6 +86,10 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * The connection pool this connection belongs to.
    */
   final JPPFConnectionPool pool;
+  /**
+   * 
+   */
+  private final ObjectSerializer defaultSerializer;
 
   /**
    * Initialize this connection with a parent pool.
@@ -95,6 +98,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   BaseJPPFClientConnection(final JPPFConnectionPool pool) {
     this.pool = pool;
     SEQUENTIAL_DESERIALIZATION = pool.getClient().getConfig().getBoolean("jppf.sequential.deserialization", false);
+    defaultSerializer = new ObjectSerializerImpl();
   }
 
   /**
@@ -137,7 +141,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       try {
         IOHelper.sendData(socketClient, task, ser);
       } catch(final NotSerializableException e) {
-        log.error("error serializing task {} for {} : {}", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
+        log.error("error serializing task {} for {} : {}", task, job, ExceptionUtils.getStackTrace(e));
         task.setThrowable(e);
         IOHelper.sendNullData(socketClient);
         notSerializableTasks.add(task);
@@ -232,19 +236,53 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * Receive results of tasks execution.
    * @param ser the serializer to use.
    * @param cl the class loader to use for deserializing the tasks.
+   * @return a pair of objects representing the executed tasks results, and the index of the first result within the initial task execution request.
+   * @throws Exception if an error is raised while reading the results from the server.
+   */
+  public Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
+    final TaskBundle bundle = receiveHeader(ser, cl);
+    final List<Task<?>> tasks = receiveTasks(bundle, ser, cl);
+    return new Pair<>(bundle, tasks);
+  }
+
+  /**
+   * Receive results of tasks execution.
+   * @param ser the serializer to use.
+   * @param cl the class loader to use for deserializing the tasks.
+   * @return .
+   * @throws Exception if an error is raised while reading the results from the server.
+   */
+  public TaskBundle receiveHeader(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
+    TaskBundle bundle = null;
+    final ObjectSerializer actualSerializer = (ser == null) ? defaultSerializer : ser;
+    final ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
+    try {
+      final ClassLoader loader = (cl == null) ? getClass().getClassLoader() : cl;
+      Thread.currentThread().setContextClassLoader(loader);
+      final SocketWrapper socketClient = taskServerConnection.getSocketClient();
+      bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, actualSerializer);
+      return bundle;
+    } finally {
+      Thread.currentThread().setContextClassLoader(ctxCl);
+    }
+  }
+
+  /**
+   * Receive results of tasks execution.
+   * @param bundle the job header.
+   * @param ser the serializer to use.
+   * @param cl the class loader to use for deserializing the tasks.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  private Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
+  public List<Task<?>> receiveTasks(final TaskBundle bundle, final ObjectSerializer ser, final ClassLoader cl) throws Exception {
     final List<Task<?>> taskList = new LinkedList<>();
-    TaskBundle bundle = null;
     final ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
     try {
-      final ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
+      final ClassLoader loader = (cl == null) ? getClass().getClassLoader() : cl;
       Thread.currentThread().setContextClassLoader(loader);
       final SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
       final int count = bundle.getTaskCount();
       final int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
       if (debugEnabled) log.debug("{} : received bundle {},  positions={}", toDebugString(), bundle, StringUtils.buildString(positions));
@@ -268,10 +306,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
         final Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         taskList.forEach(task -> task.setThrowable(e));
       }
-      return new Pair<>(bundle, taskList);
-    } catch (final AsynchronousCloseException e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      throw e;
+      return taskList;
     } finally {
       Thread.currentThread().setContextClassLoader(ctxCl);
     }

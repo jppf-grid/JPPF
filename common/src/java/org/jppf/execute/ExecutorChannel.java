@@ -114,4 +114,26 @@ public interface ExecutorChannel<T> extends AutoCloseable {
    * @return <code>true</code> if the channel is active, <code>false</code> if it is inactive.
    */
   boolean isActive();
+
+  /**
+   * Determine whether this channel is asynchronous, i.e. it can handle mmultiple jobs concurrently.
+   * @return {@code true} if the channel is asynchronous, {@code false} if it is synchronous.
+   */
+  default boolean isAsynchronous() {
+    return false;
+  }
+
+  /**
+   * Get the maximum number of jobs that can be processed concurrently by this channel.
+   * @return the maximum number of jobs as an {@code int} value.
+   */
+  default int getMaxJobs() {
+    return 1;
+  }
+
+  /**
+   * Get the number of jobs currently being processed by this channel.
+   * @return the current number of jobs as an {@code int} value.
+   */
+  int getCurrentNbJobs();
 }

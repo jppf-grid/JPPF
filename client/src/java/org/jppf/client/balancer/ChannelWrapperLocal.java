@@ -140,6 +140,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (!isClosed()) {
+      jobCount.set(1);
       if (debugEnabled) log.debug("locally submitting {}", bundle);
       setStatus(JPPFClientConnectionStatus.EXECUTING);
       final Runnable task = new LocalRunnable(bundle);
@@ -201,6 +202,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         bundle.taskCompleted(exception);
         bundle.getClientJob().removeChannel(ChannelWrapperLocal.this);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
+        jobCount.set(0);
       }
     }
   }

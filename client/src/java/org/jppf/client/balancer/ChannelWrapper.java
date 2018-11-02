@@ -20,6 +20,7 @@ package org.jppf.client.balancer;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
@@ -77,6 +78,10 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * 
    */
   String bundlerAlgorithm;
+  /**
+   * 
+   */
+  final AtomicInteger jobCount = new AtomicInteger(0);
 
   /**
    * Default constructor.
@@ -86,7 +91,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
 
   /**
    * Get the status of this connection.
-   * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
+   * @return a {@link JPPFClientConnectionStatus} enumerated value.
    */
   public abstract JPPFClientConnectionStatus getStatus();
 
@@ -265,5 +270,10 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * Init the channel id for load-balancer persistence.
    */
   public void initChannelID() {
+  }
+
+  @Override
+  public int getCurrentNbJobs() {
+    return jobCount.get();
   }
 }

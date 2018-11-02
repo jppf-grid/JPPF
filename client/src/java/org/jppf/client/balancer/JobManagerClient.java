@@ -194,10 +194,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
     if (wrapper == null) {
       try {
-        wrapper = new ChannelWrapperRemote(cnn);
-        final JPPFConnectionPool pool = cnn.getConnectionPool();
+        wrapper = client.getConfig().get(JPPFProperties.CLIENT_ASYNCHRONOUS) ? new ChannelWrapperRemoteAsync(cnn) : new ChannelWrapperRemote(cnn);
         final JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
+        final JPPFConnectionPool pool = cnn.getConnectionPool();
         final JPPFManagementInfo info = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
@@ -439,8 +439,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     final List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
     final Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
     for (final ChannelWrapper idleChannel : idleChannels) {
-      if (idleChannel instanceof ChannelWrapperRemote) {
-        final ChannelWrapperRemote wrapperRemote = (ChannelWrapperRemote) idleChannel;
+      if (idleChannel instanceof AbstractChannelWrapperRemote) {
+        final AbstractChannelWrapperRemote wrapperRemote = (AbstractChannelWrapperRemote) idleChannel;
         availableConnections.add(wrapperRemote.getChannel());
       }
     }

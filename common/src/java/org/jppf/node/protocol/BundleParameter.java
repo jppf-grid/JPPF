@@ -147,5 +147,9 @@ public enum BundleParameter {
   /**
    * UUID of the master node if the current node is a slave.
    */
-  NODE_PROVISIONING_MASTER_UUID
+  NODE_PROVISIONING_MASTER_UUID,
+  /**
+   * Id of the client-side bundle.
+   */
+  CLIENT_BUNDLE_ID
 }

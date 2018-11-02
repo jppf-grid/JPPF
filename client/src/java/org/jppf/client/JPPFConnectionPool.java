@@ -61,9 +61,11 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
    * @param sslEnabled determines whether the pool is for SSL connections.
    * @param jmxPoolSize the core size of the JMX connections pool.
    * @param heartbeatEnabled wether the heartbeat mechanism is enabled for the connection pool.
+   * @param maxJobs the maximum number of jobs that can be processed concurrently by each connection.
    */
-  JPPFConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize, final boolean heartbeatEnabled) {
-    super(client, id, name, priority, size, sslEnabled, jmxPoolSize);
+  JPPFConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize, final boolean heartbeatEnabled,
+    final int maxJobs) {
+    super(client, id, name, priority, size, sslEnabled, jmxPoolSize, maxJobs);
     this.heartbeatEnabled = heartbeatEnabled;
   }
 
@@ -74,7 +76,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
    * @param info information needed for the pool's attributes.
    */
   JPPFConnectionPool(final JPPFClient client, final int id, final ClientConnectionPoolInfo info) {
-    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize(), info.isHeartbeatEnabled());
+    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize(), info.isHeartbeatEnabled(), info.getMaxJobs());
     this.discoveryInfo = info;
   }
 

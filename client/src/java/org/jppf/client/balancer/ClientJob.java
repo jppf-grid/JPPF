@@ -216,6 +216,7 @@ public class ClientJob extends AbstractClientJob {
     final boolean empty;
     synchronized (bundleMap) {
       empty = bundleMap.isEmpty();
+      if (debugEnabled) log.debug("adding channel {} to bundleMap of {}", channel, this);
       bundleMap.put(bundle, channel);
     }
     if (empty) {
@@ -313,6 +314,7 @@ public class ClientJob extends AbstractClientJob {
     final boolean empty;
     synchronized (bundleMap) {
       final ChannelWrapper channel = bundleMap.remove(bundle);
+      if (debugEnabled) log.debug("removed channel {} from bundleMap of {}", channel, this);
       if ((bundle != null) && (channel == null)) throw new IllegalStateException("future already removed");
       empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
@@ -430,8 +432,8 @@ public class ClientJob extends AbstractClientJob {
         try {
           final ChannelWrapper wrapper = entry.getValue();
           wrapper.cancel(entry.getKey());
-          if (wrapper instanceof ChannelWrapperRemote) {
-            final JPPFConnectionPool pool = ((ChannelWrapperRemote) wrapper).getChannel().getConnectionPool();
+          if (wrapper instanceof AbstractChannelWrapperRemote) {
+            final JPPFConnectionPool pool = ((AbstractChannelWrapperRemote) wrapper).getChannel().getConnectionPool();
             final String driverUuid = pool.getDriverUuid();
             if (!uuids.contains(driverUuid)) {
               uuids.add(driverUuid);

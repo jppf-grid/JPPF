@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
@@ -35,6 +36,14 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Count of instances of this class.
+   */
+  private static final AtomicLong instanceCount = new AtomicLong(0L);
+  /**
+   * The id for this bundle.
+   */
+  private final long bundleId = instanceCount.incrementAndGet();
   /**
    * The job to execute.
    */
@@ -67,7 +76,6 @@ public class ClientTaskBundle extends JPPFTaskBundle {
    */
   public ClientTaskBundle(final ClientJob job, final List<Task<?>> tasks) {
     if (job == null) throw new IllegalArgumentException("job is null");
-
     this.job = job;
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
@@ -208,7 +216,8 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("name=").append(getName());
+    sb.append("bundleId=").append(bundleId);
+    sb.append(", name=").append(getName());
     sb.append(", jobUuid=").append(getUuid());
     sb.append(", initialTaskCount=").append(getInitialTaskCount());
     sb.append(", taskCount=").append(getTaskCount());
@@ -216,5 +225,12 @@ public class ClientTaskBundle extends JPPFTaskBundle {
     sb.append(", cancelled=").append(isCancelled());
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * @return the id for this bundle.
+   */
+  public long getBundleId() {
+    return bundleId;
   }
 }

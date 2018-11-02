@@ -560,4 +560,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public Pair<String, String> getNodeIdentifier() {
     return nodeIdentifier;
   }
+
+  @Override
+  public int getCurrentNbJobs() {
+    return (bundle == null) ? 0 : 1;
+  }
 }

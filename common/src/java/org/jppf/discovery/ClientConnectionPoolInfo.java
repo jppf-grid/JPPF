@@ -34,6 +34,10 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    * The associated JMX connection pool size.
    */
   private final int jmxPoolSize;
+  /**
+   * The maximum number of jobs that can be processed concurrently by each connection.
+   */
+  private final int maxJobs;
 
   /**
    * Initialize a pool of plain connections with default name("driver"), host ("localhost"), port (11111), priority (0) and pool size (1).
@@ -90,9 +94,27 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    */
   public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize,
     final boolean heartbeatEnabled) {
+    this(name, secure, host, port, priority, poolSize, jmxPoolSize, heartbeatEnabled, MAX_JOBS.getDefaultValue());
+  }
+
+  /**
+   * Initialize a pool of connections with the specified parameters.
+   * @param name the name given to this connection pool, used as numbered prefix for individual connection names.
+   * @param secure whether SSL/TLS should be used.
+   * @param host the driver host name or IP address.
+   * @param port the driver port to connect to.
+   * @param priority the connection priority.
+   * @param poolSize the connection pool size.
+   * @param heartbeatEnabled wether the heartbeat mechanism is enabled for the connection pool.
+   * @param jmxPoolSize the associated JMX connection pool size.
+   * @param maxJobs the maximum number of jobs that can be processed concurrently by each connection.
+   */
+  public ClientConnectionPoolInfo(final String name, final boolean secure, final String host, final int port, final int priority, final int poolSize, final int jmxPoolSize,
+    final boolean heartbeatEnabled, final int maxJobs) {
     super(name, secure, host, port, poolSize, heartbeatEnabled);
     this.priority = priority;
     this.jmxPoolSize = jmxPoolSize;
+    this.maxJobs = maxJobs;
   }
 
   /**
@@ -109,6 +131,14 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
    */
   public int getJmxPoolSize() {
     return jmxPoolSize;
+  }
+
+  /**
+   * Get the maximum number of jobs that can be processed concurrently by each connection.
+   * @return The maximum number of jobs as an {@code int} value.
+   */
+  public int getMaxJobs() {
+    return maxJobs;
   }
 
   @Override

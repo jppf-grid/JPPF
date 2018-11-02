@@ -99,10 +99,12 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> PARAM_SERVER_SSL_ENABLED = new BooleanProperty("<driver_name>.jppf.ssl.enabled", false);
   /** Manually defined priority for a client-to-driver connection (parametrized). */
   public static final JPPFProperty<Integer> PARAM_PRIORITY = new IntProperty("<driver_name>.jppf.priority", 0);
-  /** Manually defined connection ppol size for a client-to-driver connection (parametrized). */
+  /** Manually defined connection pool size for a client-to-driver connection (parametrized). */
   public static final JPPFProperty<Integer> PARAM_POOL_SIZE = new IntProperty("<driver_name>.jppf.pool.size", 1, 1, Integer.MAX_VALUE);
-  /** Manually defined JMX connection ppol size for a client-to-driver connection (parametrized). */
+  /** Manually defined JMX connection pool size for a client-to-driver connection (parametrized). */
   public static final JPPFProperty<Integer> PARAM_JMX_POOL_SIZE = new IntProperty("<driver_name>.jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+  /** Manually defined maximum number of jobs that can be handled concurrently by a single connection. */
+  public static final JPPFProperty<Integer> PARAM_MAX_JOBS = new IntProperty("<driver_name>.jppf.max.jobs", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
   /** UI refresh mode for the job data panel: 'immediate_notifications' | 'deferred_notifications' | 'polling'. */
   public static final JPPFProperty<String> GUI_PUBLISH_MODE = new StringProperty("jppf.gui.publish.mode", "immediate_notifications");
   /** Interval between updates of the job data view. */
@@ -232,6 +234,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> POLICY_FILE = new StringProperty("jppf.policy.file", null);
   /** Connection pool size for server connections discovered via UDP multicast. */
   public static final JPPFProperty<Integer> POOL_SIZE = new IntProperty("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
+  /** Manually defined maximum number of jobs that can be handled concurrently by a single connection. */
+  public static final JPPFProperty<Integer> MAX_JOBS = new IntProperty("jppf.max.jobs", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
   /** Delay in seconds before the first (re)connection attempt. */
   public static final JPPFProperty<Long> RECONNECT_INITIAL_DELAY = new LongProperty("jppf.reconnect.initial.delay", 0L, "reconnect.initial.delay");
   /** Frequency in seconds of reconnection attempts. */
@@ -448,6 +452,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.sla.default.policy", null);
   /** A default client-side execution policy to associate with submitted jobs when they don't have one. */
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
+  /** Whether client connections are asynchronous and can handle multiple jobs concurrently. */
+  public static final JPPFProperty<Boolean> CLIENT_ASYNCHRONOUS = new BooleanProperty("jppf.client.asynchronous", false);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

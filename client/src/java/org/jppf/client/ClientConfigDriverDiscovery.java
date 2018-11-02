@@ -75,7 +75,8 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
             if (info.hasValidPort(ssl)) {
               final int poolSize = config.get(POOL_SIZE);
               final int jmxPoolSize = config.get(JMX_POOL_SIZE);
-              newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize, heartbeatEnabled));
+              final int maxJobs = config.get(MAX_JOBS);
+              newConnection(new ClientConnectionPoolInfo(name, ssl, info.host, info.getValidPort(ssl), priority, poolSize, jmxPoolSize, heartbeatEnabled, maxJobs));
             } else {
               final String type = ssl ? "secure" : "plain";
               log.warn("cannot fulfill a {} connection request to {}:{} because the host does not expose this port as a {} port", type, info.host, info.getValidPort(ssl), type);
@@ -104,7 +105,8 @@ public class ClientConfigDriverDiscovery extends ClientDriverDiscovery {
             final int poolSize = config.get(PARAM_POOL_SIZE, name);
             final int jmxPoolSize = config.get(PARAM_JMX_POOL_SIZE, name);
             final boolean heartbeatEnabled = config.get(PARAM_RECOVERY_ENABLED, name);
-            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize, heartbeatEnabled);
+            final int maxJobs = config.get(PARAM_MAX_JOBS, name);
+            final ClientConnectionPoolInfo ccpi = new ClientConnectionPoolInfo(name, ssl, host, port, priority, poolSize, jmxPoolSize, heartbeatEnabled, maxJobs);
             if (debugEnabled) log.debug("found pool definition in the configuration: {}", ccpi);
             infoList.add(ccpi);
           }

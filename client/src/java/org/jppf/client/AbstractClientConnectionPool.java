@@ -90,6 +90,10 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * Inofrmation on this pool as discovered.
    */
   ClientConnectionPoolInfo discoveryInfo;
+  /**
+   * The maximum number of jobs that can be processed concurrently by each connection.
+   */
+  int maxJobs;
 
   /**
    * Initialize this pool with the specified parameters.
@@ -100,8 +104,9 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * @param size the core size of this pool.
    * @param sslEnabled determines whether the pool is for SSL connections.
    * @param jmxPoolSize the core size of the JMX connections pool.
+   * @param maxJobs the maximum number of jobs that can be processed concurrently by each connection.
    */
-  AbstractClientConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize) {
+  AbstractClientConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize, final int maxJobs) {
     super(size);
     this.client = client;
     this.id = id;
@@ -109,6 +114,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
     this.name = name;
     this.sslEnabled = sslEnabled;
     jmxPool = new JMXConnectionPool(jmxPoolSize, sslEnabled);
+    this.maxJobs = maxJobs;
   }
 
   /**
@@ -118,7 +124,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    * @param info information needed for the pool's attributes.
    */
   AbstractClientConnectionPool(final JPPFClient client, final int id, final ClientConnectionPoolInfo info) {
-    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize());
+    this(client, id, info.getName(), info.getPriority(), info.getPoolSize(), info.isSecure(), info.getJmxPoolSize(), info.getMaxJobs());
     this.discoveryInfo = info;
   }
 
@@ -430,6 +436,25 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
    */
   public int setJMXPoolSize(final int maxSize) {
     return jmxPool.setSize(maxSize);
+  }
+
+  /**
+   * Get the maximum number of jobs that can be processed concurrently by each connection.
+   * @return The maximum number of jobs as an {@code int} value.
+   */
+  public int getMaxJobs() {
+    return maxJobs;
+  }
+
+  /**
+   * Set the maximum number of jobs that can be processed concurrently by each connection.
+   * If the provided {@code maxJobs} is <= 0, this method has no effect.
+   * @param maxJobs the maximum number of jobs to set.
+   * @return the new maximum number of jobs.
+   */
+  public int setMaxJobs(final int maxJobs) {
+    if (maxJobs > 0) this.maxJobs = maxJobs;
+    return this.maxJobs;
   }
 
   /**

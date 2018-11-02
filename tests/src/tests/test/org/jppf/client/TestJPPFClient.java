@@ -273,8 +273,10 @@ public class TestJPPFClient extends Setup1D1N {
       assertNotNull(results);
       assertEquals(1, results.size());
       final Task<?> task = results.get(0);
-      assertNotNull(task.getThrowable());
-      assertTrue(task.getThrowable() instanceof NotSerializableException);
+      final Throwable t = task.getThrowable();
+      assertNotNull(t);
+      print(false, false, "throwable is: %s", ExceptionUtils.getStackTrace(t));
+      assertTrue(String.format("throwable = %s", t), t instanceof NotSerializableException);
     }
   }
 

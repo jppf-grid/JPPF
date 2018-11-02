@@ -297,6 +297,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         continue;
       }
+      if (ch.getCurrentNbJobs() >= ch.getMaxJobs()) continue;
       if (!job.acceptsChannel(ch)) continue;
       if(job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(ch.getUuid())) {
         if (traceEnabled) log.trace("broadcast job {} not matching channel", job);

@@ -21,7 +21,7 @@ package org.jppf.client.event;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.client.balancer.ChannelWrapperRemote;
+import org.jppf.client.balancer.AbstractChannelWrapperRemote;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
 
@@ -123,6 +123,6 @@ public class JobEvent extends EventObject {
    * @since 4.2
    */
   public JPPFClientConnection getConnection() {
-    return isRemoteExecution() ? ((ChannelWrapperRemote) channel).getChannel() : null;
+    return isRemoteExecution() ? ((AbstractChannelWrapperRemote) channel).getChannel() : null;
   }
 }
