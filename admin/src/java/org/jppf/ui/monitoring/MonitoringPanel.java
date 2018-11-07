@@ -110,16 +110,20 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    * Add all visible tables to the view.
    */
   private void addTables() {
-    for (LocalizedListItem item: visibleItems) addTablePanel(StatsConstants.ALL_TABLES_MAP.get(item.getName()), item.getName());
+    synchronized(tableModels) {
+      for (LocalizedListItem item: visibleItems) addTablePanel(StatsConstants.ALL_TABLES_MAP.get(item.getName()), item.getName());
+    }
   }
 
   /**
    * Remove all tables from the view.
    */
   private void clearTablesFromView() {
-    for (JComponent comp: visibleTableComps) remove(comp);
-    visibleTableComps.clear();
-    tableModels.clear();
+    synchronized(tableModels) {
+      for (JComponent comp: visibleTableComps) remove(comp);
+      visibleTableComps.clear();
+      tableModels.clear();
+    }
   }
 
   /**
@@ -141,13 +145,15 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
    */
   @Override
   public void dataUpdated(final StatsHandlerEvent event) {
-    for (final MonitorTableModel model: tableModels) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          model.fireTableDataChanged();
-        }
-      });
+    synchronized(tableModels) {
+      for (final MonitorTableModel model: tableModels) {
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            model.fireTableDataChanged();
+          }
+        });
+      }
     }
   }
 
