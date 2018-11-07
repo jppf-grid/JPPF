@@ -212,6 +212,7 @@ table.details tr th{
 }
 table.details tr td{
     background:#C5D0F0;
+    white-space:nowrap;
 }
 p {
     line-height:1.5em;
