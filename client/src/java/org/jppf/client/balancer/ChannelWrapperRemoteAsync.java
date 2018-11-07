@@ -131,6 +131,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           final long start = System.nanoTime();
           final RemoteResponse response = new RemoteResponse(clientBundle, 0, cl, ser, start);
           synchronized(response) {
+            if (response.currentCount < response.taskCount) responseMap.put(clientBundle.getBundleId(), response);
             if (debugEnabled) log.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
             final List<Task<?>> notSerializableTasks = channel.sendTasks(ser, cl, bundle, newJob);
             clientBundle.jobDispatched(ChannelWrapperRemoteAsync.this);
@@ -139,8 +140,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
               response.currentCount = notSerializableTasks.size();
               clientBundle.resultsReceived(notSerializableTasks);
             }
-            if (response.currentCount < response.taskCount) responseMap.put(clientBundle.getBundleId(), response);
-            else handleBundleComplete(clientBundle, null);
+            if (response.currentCount >= response.taskCount) handleBundleComplete(clientBundle, null);
           }
         } catch (final Throwable t) {
           handleThrowable(clientBundle, t, true);

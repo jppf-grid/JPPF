@@ -209,13 +209,11 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @return {@code true} if the list of channel states is empty, {@code false} otherwise.
    */
   protected boolean checkEmptyChannels(final LoadBalancerPersistenceManagement mgt) {
-    return ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-      @Override
-      public boolean evaluateWithException() throws Exception {
-        final List<String> channels = mgt.listAllChannels();
-        return (channels != null) && channels.isEmpty();
-      }
-    }, 5000L, 500L, false);
+    final ConcurrentUtils.ConditionFalseOnException cond = () -> {
+      final List<String> channels = mgt.listAllChannels();
+      return (channels != null) && channels.isEmpty();
+    };
+    return ConcurrentUtils.awaitCondition(cond, 5000L, 500L, false);
   }
 
   /**
@@ -225,13 +223,11 @@ public abstract class AbstractDatabaseSetup extends AbstractNonStandardSetup {
    * @return {@code true} if the list of channel states is empty, {@code false} otherwise.
    */
   protected boolean checkEmptyChannelsForAlgo(final LoadBalancerPersistenceManagement mgt, final String algo) {
-    return ConcurrentUtils.awaitCondition(new ConcurrentUtils.ConditionFalseOnException() {
-      @Override
-      public boolean evaluateWithException() throws Exception {
-        final List<String> channels = mgt.listAllChannelsWithAlgorithm(algo);
-        return (channels != null) && channels.isEmpty();
-      }
-    }, 5000L, 500L, false);
+    final ConcurrentUtils.ConditionFalseOnException cond = () -> {
+      final List<String> channels = mgt.listAllChannelsWithAlgorithm(algo);
+      return (channels != null) && channels.isEmpty();
+    };
+    return ConcurrentUtils.awaitCondition(cond, 5000L, 500L, false);
   }
 
   /**
