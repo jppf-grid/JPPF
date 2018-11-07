@@ -156,12 +156,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       log.warn("channel is not active ({})\n{}", channel, ExceptionUtils.getCallStack());
       return;
     }
-    pendingActions.offer(new Runnable() {
-      @Override
-      public void run() {
-        if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
-        idleChannels.putValue(channel.getPriority(), channel);
-      }
+    pendingActions.offer(() -> {
+      if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
+      idleChannels.putValue(channel.getPriority(), channel);
     });
     wakeUp();
   }
@@ -173,12 +170,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   public void removeIdleChannel(final ChannelWrapper channel) {
     if (debugEnabled) log.debug("removing chhanel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
-    pendingActions.offer(new Runnable() {
-      @Override
-      public void run() {
-        if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
-        idleChannels.removeValue(channel.getPriority(), channel);
-      }
+    pendingActions.offer(() -> {
+      if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
+      idleChannels.removeValue(channel.getPriority(), channel);
     });
     wakeUp();
   }
