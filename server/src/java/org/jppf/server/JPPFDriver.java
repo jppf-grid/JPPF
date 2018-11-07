@@ -30,7 +30,7 @@ import org.jppf.job.JobTasksListenerManager;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
 import org.jppf.nio.*;
-import org.jppf.nio.acceptor.*;
+import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.process.LauncherListener;
@@ -40,6 +40,7 @@ import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
+import org.jppf.server.nio.client.async.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
@@ -100,6 +101,10 @@ public class JPPFDriver {
    * Serves the execution requests coming from client applications.
    */
   private ClientNioServer clientNioServer;
+  /**
+   * Serves the execution requests coming from client applications.
+   */
+  private AsyncClientNioServer asyncClientNioServer;
   /**
    * Serves the JPPF nodes.
    */
@@ -198,7 +203,9 @@ public class JPPFDriver {
     }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
-    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
+    if (JPPFConfiguration.get(JPPFProperties.CLIENT_ASYNCHRONOUS))
+      NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
+    else NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(new NodeNioServer(this, taskQueue, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
     jobManager.loadTaskReturnListeners();
@@ -246,11 +253,20 @@ public class JPPFDriver {
 
   /**
    * Get the JPPF client server.
-   * @return a <code>ClientNioServer</code> instance.
+   * @return a {@link ClientNioServer} instance.
    * @exclude
    */
   public ClientNioServer getClientNioServer() {
     return clientNioServer;
+  }
+
+  /**
+   * Get the JPPF client server.
+   * @return a {@link AsyncClientNioServer} instance.
+   * @exclude
+   */
+  public AsyncClientNioServer getAsyncClientNioServer() {
+    return asyncClientNioServer;
   }
 
   /**

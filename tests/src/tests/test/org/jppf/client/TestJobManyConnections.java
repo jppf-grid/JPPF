@@ -46,6 +46,7 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
     config.driver.jppf = "classes/tests/config/p2p/driver2.properties";
     config.driver.log4j = "classes/tests/config/p2p/log4j-driver2.properties";
     client = BaseSetup.setup(nbDrivers, nbDrivers, true, false, config);
+    print(false, false, "client configuration:\n%s", client.getConfig().asString());
     checkPeers(nbDrivers, 10_000L, false, true);
     client.setLoadBalancerSettings("proportional", new TypedProperties().setInt("InitialiSize", 10));
   }

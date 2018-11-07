@@ -93,6 +93,10 @@ public class ServerTaskBundleClient {
    * The strategy to use to send the results back to the client.
    */
   final SendResultsStrategy strategy;
+  /**
+   * Id of the source bundle, if any. If no source bundle then it is set to -1.
+   */
+  final long sourceBundleId;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -125,6 +129,7 @@ public class ServerTaskBundleClient {
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
     this.dataProvider = dataProvider;
+    this.sourceBundleId = -1L;
     if (!job.isHandshake() && !job.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
       final int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
       final int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
@@ -163,6 +168,7 @@ public class ServerTaskBundleClient {
     for (ServerTask task: tasks) task.setBundle(this);
     this.pendingTasksCount.set(tasks.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
+    this.sourceBundleId = -1L;
   }
 
   /**
@@ -185,6 +191,7 @@ public class ServerTaskBundleClient {
     this.done = source.isDone();
     this.cancelled = source.isCancelled();
     this.strategy = source.strategy;
+    this.sourceBundleId = source.getId();
   }
 
   /**
@@ -441,6 +448,13 @@ public class ServerTaskBundleClient {
    */
   public long getId() {
     return id;
+  }
+
+  /**
+   * @return the id of the bundle from which this one was created, if any. If this bundle is the roigial one, then its id is returned.
+   */
+  public long getOriginalBundleId() {
+    return (sourceBundleId < 0L) ? id : sourceBundleId;
   }
 
   /**

@@ -63,8 +63,8 @@ class WaitingHandshakeState extends ClientServerState {
     final ClientContext context = (ClientContext) channel.getContext();
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel)) {
-      final ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      final TaskBundle header = bundleWrapper.getJob();
+      final ServerTaskBundleClient bundle = context.deserializeBundle();
+      final TaskBundle header = bundle.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
       context.setConnectionUuid((String) header.getParameter(BundleParameter.CONNECTION_UUID));
       header.getUuidPath().incPosition();
@@ -82,7 +82,7 @@ class WaitingHandshakeState extends ClientServerState {
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
 
       context.setClientMessage(null);
-      context.setBundle(bundleWrapper);
+      context.setBundle(bundle);
       header.clear();
       // send system info (and more) back to the client
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());

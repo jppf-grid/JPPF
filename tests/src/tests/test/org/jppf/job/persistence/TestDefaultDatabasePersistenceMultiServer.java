@@ -32,6 +32,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.ConcurrentUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
@@ -99,52 +100,53 @@ public class TestDefaultDatabasePersistenceMultiServer extends AbstractDatabaseS
    */
   @Test(timeout = 10000)
   public void testJobPersistedInAllDrivers() throws Exception {
-    final int nbTasks = 10;
-    final String method = ReflectionUtils.getCurrentMethodName();
-    final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 0L);
-    job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
-    job.getClientSLA().setMaxChannels(2);
-    final List<Task<?>> results = client.submitJob(job);
-    checkJobResults(nbTasks, results, false);
-    // check that tasks were dispatched to both drivers and attached nodes
-    final Set<String> set = new HashSet<>();
-    for (final Task<?> task: results) {
-      assertTrue(task instanceof LifeCycleTask);
-      final LifeCycleTask lct = (LifeCycleTask) task;
-      if (!set.contains(lct.getNodeUuid())) set.add(lct.getNodeUuid());
-    }
-    assertEquals(2, set.size());
-    final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
-      @Override
-      public boolean evaluate() {
-        try {
-          return nbTasks == queryNbResults(job.getUuid());
-        } catch (@SuppressWarnings("unused") final Exception e) {
-          return false;
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    final List<Integer> maxJobs = new ArrayList<>(pools.size()); 
+    try {
+      pools.forEach(pool -> {
+        maxJobs.add(pool.getMaxJobs());
+        pool.setMaxJobs(1);
+      });
+      final int nbTasks = 10;
+      final String method = ReflectionUtils.getCurrentMethodName();
+      final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 0L);
+      job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
+      job.getClientSLA().setMaxChannels(2);
+      final List<Task<?>> results = client.submitJob(job);
+      checkJobResults(nbTasks, results, false);
+      // check that tasks were dispatched to both drivers and attached nodes
+      final Set<String> set = new HashSet<>();
+      for (final Task<?> task: results) {
+        assertTrue(task instanceof LifeCycleTask);
+        final LifeCycleTask lct = (LifeCycleTask) task;
+        if (!set.contains(lct.getNodeUuid())) set.add(lct.getNodeUuid());
+      }
+      assertEquals(2, set.size());
+      final ConcurrentUtils.Condition cond = (ConcurrentUtils.ConditionFalseOnException) () -> nbTasks == queryNbResults(job.getUuid());
+      ConcurrentUtils.awaitCondition(cond, 5000L, 500L, true);
+      print(false, false, "before job check, number of results = %d", queryNbResults(job.getUuid()));
+      for (int i=1; i<=2; i++) {
+        try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + i)) {
+          print(false, false, "testing driver %d", i);
+          jmx.connectAndWait(5000L);
+          assertTrue(jmx.isConnected());
+          final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
+          final List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
+          assertNotNull(uuids);
+          assertEquals(1, uuids.size());
+          assertEquals(job.getUuid(), uuids.get(0));
+          assertTrue(mgr.isJobComplete(job.getUuid()));
+          final JPPFJob job2 = mgr.retrieveJob(job.getUuid());
+          compareJobs(job, job2, true);
+          checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
+          if (i == 2) {
+            print(false, false, "after job check, number of results = %d", queryNbResults(job.getUuid()));
+            assertTrue(mgr.deleteJob(job.getUuid()));
+          }
         }
       }
-    };
-    ConcurrentUtils.awaitInterruptibleCondition(cond, 5000L, 500L, true);
-    print(false, false, "before job check, number of results = %d", queryNbResults(job.getUuid()));
-    for (int i=1; i<=2; i++) {
-      try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + i)) {
-        print(false, false, "testing driver %d", i);
-        jmx.connectAndWait(5000L);
-        assertTrue(jmx.isConnected());
-        final JPPFDriverJobPersistence mgr = new JPPFDriverJobPersistence(jmx);
-        final List<String> uuids = mgr.listJobs(JobSelector.ALL_JOBS);
-        assertNotNull(uuids);
-        assertEquals(1, uuids.size());
-        assertEquals(job.getUuid(), uuids.get(0));
-        assertTrue(mgr.isJobComplete(job.getUuid()));
-        final JPPFJob job2 = mgr.retrieveJob(job.getUuid());
-        compareJobs(job, job2, true);
-        checkJobResults(nbTasks, job2.getResults().getAllResults(), false);
-        if (i == 2) {
-          print(false, false, "after job check, number of results = %d", queryNbResults(job.getUuid()));
-          assertTrue(mgr.deleteJob(job.getUuid()));
-        }
-      }
+    } finally {
+      for (int i=0; i<pools.size(); i++) pools.get(i).setMaxJobs(maxJobs.get(i));
     }
   }
 

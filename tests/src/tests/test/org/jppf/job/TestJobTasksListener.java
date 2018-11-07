@@ -37,7 +37,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.Setup1D1N;
-import test.org.jppf.test.setup.common.AwaitJobNotificationListener;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Test the {@link JobTasksListener} facitlity.
@@ -56,11 +56,8 @@ public class TestJobTasksListener extends Setup1D1N {
    */
   @BeforeClass
   public static void setupClass() throws Exception {
-    final long timeout = 60_000L;
-    final long start = System.currentTimeMillis();
     jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1);
-    jmx.connectAndWait(timeout - (System.currentTimeMillis() - start));
-    assertTrue("failed to connect to " + jmx, jmx.isConnected());
+    assertTrue("failed to connect to " + jmx, jmx.connectAndWait(10_000L));
     final String script = new StringBuilder()
       .append("function addListener() {\n")
       .append("  var driver = org.jppf.server.JPPFDriver.getInstance();\n")
@@ -118,20 +115,29 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testResultsReceived() throws Exception {
     final int nbTasks = 10;
     configure();
-    final AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
+    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
+    final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (JPPFClient client = new JPPFClient()) {
+      client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
       job.setBlocking(false);
       job.getSLA().setCancelUponClientDisconnect(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 100L));
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
       client.submitJob(job);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
       jobListener.await(); // wait until all tasks have been dispatched to the server
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");
+      jobQueuedJmxListener.await();
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> all tasks dispatched, job queued, closing client");
     }
-    // driver is closed, wait until job has completed on the server side
-    jobJmxListener.await();
+    // client is closed, wait until job has completed on the server side
+    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> awaiting %s notification", jobEndedJmxListener.getExpectedEvent());
+    jobEndedJmxListener.await();
+    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got %s notification", jobEndedJmxListener.getExpectedEvent());
     Thread.sleep(200L);
     assertTrue(MyJobTasksListener.RESULTS_FILE.exists());
     final List<Result> results = readResults(MyJobTasksListener.RESULTS_FILE, true);
@@ -160,9 +166,11 @@ public class TestJobTasksListener extends Setup1D1N {
   public void testWithDispatchExpiration() throws Exception {
     final int nbTasks = 1, maxExpirations = 2, nbRuns = maxExpirations + 1;
     configure();
-    final AwaitJobNotificationListener jobJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
+    final AwaitJobNotificationListener jobQueuedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_QUEUED);
+    final AwaitJobNotificationListener jobEndedJmxListener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_ENDED);
     final JPPFJob job = new JPPFJob();
     try (final JPPFClient client = new JPPFClient()) {
+      client.awaitWorkingConnectionPool();
       job.setName(ReflectionUtils.getCurrentMethodName());
       job.setBlocking(false);
       job.getSLA().setCancelUponClientDisconnect(false);
@@ -171,11 +179,18 @@ public class TestJobTasksListener extends Setup1D1N {
       for (int i=1; i<=nbTasks; i++) job.add(new MyJobTasksListenerTask(String.format("#%02d", i), 5000L));
       final CountDownJobListener jobListener = new CountDownJobListener();
       job.addJobListener(jobListener);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> submitting job");
       client.submitJob(job);
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for all tasks to be dispatched");
       jobListener.await(); // wait until all tasks have been dispatched to the server
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> waiting for job to be queued in the driver");
+      jobQueuedJmxListener.await();
+      BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> all tasks dispatched, job queued, closing client");
     }
-    // driver is closed, wait until job has completed on the server side
-    jobJmxListener.await();
+    // client is closed, wait until job has completed on the server side
+    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> awaiting %s notification", jobEndedJmxListener.getExpectedEvent());
+    jobEndedJmxListener.await();
+    BaseTestHelper.printToAll(jmx, true, true, true, false, false, ">>> got %s notification", jobEndedJmxListener.getExpectedEvent());
     Thread.sleep(200L);
     final List<Task<?>> tasks = job.getJobTasks();
     assertTrue(MyJobTasksListener.DISPATCHED_FILE.exists());
@@ -230,11 +245,11 @@ public class TestJobTasksListener extends Setup1D1N {
   /** */
   private static void configure() {
     JPPFConfiguration.set(JPPFProperties.DRIVERS, new String[] {"driver1"})
-    .setString("driver1.jppf.server.host", "localhost")
-    .setInt("driver1.jppf.server.port", 11101)
-    .setString("jppf.load.balancing.algorithm", "manual")
-    .setString("jppf.load.balancing.profile", "manual")
-    .setInt("jppf.load.balancing.profile.manual.size", 1000000);
+      .setString("driver1.jppf.server.host", "localhost")
+      .setInt("driver1.jppf.server.port", 11101)
+      .setString("jppf.load.balancing.algorithm", "manual")
+      .setString("jppf.load.balancing.profile", "manual")
+      .setInt("jppf.load.balancing.profile.manual.size", 1000000);
   }
 
   /**
@@ -250,11 +265,17 @@ public class TestJobTasksListener extends Setup1D1N {
       final List<String> lines = FileUtils.textFileAsLines(reader);
       if (sort) Collections.sort(lines);
       final StringBuilder sb = new StringBuilder("content of '").append(file).append("': {\n");
-      for (String s: lines) sb.append("  ").append(s).append('\n');
+      for (final String s: lines) sb.append("  ").append(s).append('\n');
       sb.append('}');
       print(true, false, sb.toString());
       final List<Result> results = new ArrayList<>(lines.size());
-      for (String line: lines) results.add(new Result(line));
+      final StringBuilder sb2 = new StringBuilder("results for '").append(file).append("':");
+      lines.forEach(line -> {
+        final Result r = new Result(line);
+        results.add(r);
+        sb2.append("\n  ").append(r);
+      });
+      print(false, false, sb2.toString());
       return results;
     } finally {
       MyJobTasksListener.releaseLock();
@@ -272,7 +293,7 @@ public class TestJobTasksListener extends Setup1D1N {
      * @param semiColumnSeparated .
      * @throws Exception if any error occurs.
      */
-    public Result(final String semiColumnSeparated) throws Exception {
+    public Result(final String semiColumnSeparated) {
       final String[] fields = semiColumnSeparated.split(";");
       this.jobUuid = fields[0];
       this.jobName = fields[1];
@@ -281,7 +302,18 @@ public class TestJobTasksListener extends Setup1D1N {
       this.expirationCount = Integer.valueOf(fields[4]);
       this.resubmitCount = Integer.valueOf(fields[5]);
       this.maxResubmits = Integer.valueOf(fields[6]);
-      
+    }
+
+    @Override
+    public String toString() {
+      return new StringBuilder(getClass().getSimpleName()).append('[')
+        .append("jobName=").append(jobName)
+        .append(", taskId=").append(taskId)
+        .append(", taskResult=").append(taskResult)
+        .append(", expirationCount=").append(expirationCount)
+        .append(", resubmitCount=").append(resubmitCount)
+        .append(", maxResubmits=").append(maxResubmits)
+        .append(']').toString();
     }
   }
 

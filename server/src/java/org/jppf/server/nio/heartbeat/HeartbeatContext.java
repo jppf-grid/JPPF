@@ -34,7 +34,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChannelHandler {
+class HeartbeatContext extends StatelessNioContext {
   /**
    * Logger for this class.
    */
@@ -48,10 +48,6 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
    */
   static final AtomicLong messageSequence = new AtomicLong(0L);
   /**
-   * The current message to send or the last read one.
-   */
-  private HeartbeatMessage heartbeatMessage;
-  /**
    * Whether this channel has been scheduled for emitting heartbeat messages.
    */
   private final AtomicBoolean submitted = new AtomicBoolean(false);
@@ -59,14 +55,6 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
    * The server that handles this context.
    */
   final HeartbeatNioServer server;
-  /**
-   * The socket channel's interest ops.
-   */
-  private int interestOps;
-  /**
-   * Selection key for the associated socket channel and nio server selector.
-   */
-  private SelectionKey selectionKey;
 
   /**
    * @param server the server that handles this context.
@@ -78,28 +66,32 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
   }
 
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
+  public boolean readMessage() throws Exception {
     if (message == null) message = new SimpleNioMessage(this);
+    byteCount = message.getChannelReadCount();
     final boolean b = message.read();
-    if (b) deserializeData();
+    byteCount = message.getChannelReadCount() - byteCount;
     return b;
   }
 
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    if (message == null) createMessage(newHeartbeatMessage());
-    return message.write();
+  public boolean writeMessage() throws Exception {
+    if (writeMessage == null) createWriteMessage(newHeartbeatMessage());
+    writeByteCount = writeMessage.getChannelWriteCount();
+    final boolean b = writeMessage.write();
+    writeByteCount = writeMessage.getChannelWriteCount() - writeByteCount;
+    return b;
   }
 
   /**
    * Deserialize the heartbeat data from the last read message.
+   * @param message the message to deserialize.
    * @return the deserialized data.
    * @throws Exception if any error occurs.
    */
-  HeartbeatMessage deserializeData() throws Exception {
+  HeartbeatMessage deserializeData(final NioMessage message) throws Exception {
     if (message == null) return null;
-    if (heartbeatMessage == null) heartbeatMessage = (HeartbeatMessage) IOHelper.unwrappedData(((SimpleNioMessage) message).getCurrentDataLocation());
-    return getHeartbeatMessage();
+    return (HeartbeatMessage) IOHelper.unwrappedData(((SimpleNioMessage) message).getCurrentDataLocation());
   }
 
   /**
@@ -108,11 +100,10 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
    * @return the newly created message.
    * @throws Exception if any error occurs.
    */
-  public NioMessage createMessage(final HeartbeatMessage data) throws Exception {
-    heartbeatMessage = data;
-    message = new SimpleNioMessage(this);
-    ((SimpleNioMessage) message).setCurrentDataLocation(IOHelper.serializeData(data));
-    return message;
+  public NioMessage createWriteMessage(final HeartbeatMessage data) throws Exception {
+    writeMessage = new SimpleNioMessage(this);
+    ((SimpleNioMessage) writeMessage).setCurrentDataLocation(IOHelper.serializeData(data));
+    return writeMessage;
   }
 
   /**
@@ -146,32 +137,17 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
       driver.getClientNioServer().removeConnections(uuid);
       driver.getClientClassServer().removeProviderConnections(uuid);
     }
-    handleException(getChannel(), null);
+    handleException(null);
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+  public void handleException(final Exception e) {
     if (e == null) log.info("closing heartbeat channel {}", this);
     else {
       if (debugEnabled) log.debug("closing heartbeat channel {} due to exception:\n{}", this, ExceptionUtils.getStackTrace(e));
       else log.warn("closing heartbeat channel {} due to exception: {}", this, ExceptionUtils.getMessage(e));
     }
     server.closeConnection(this);
-  }
-
-  /**
-   * @return the current message to send or the last read one.
-   */
-  public HeartbeatMessage getHeartbeatMessage() {
-    return heartbeatMessage;
-  }
-
-  /**
-   * Set the current message.
-   * @param heartbeatMessage the current message to set.
-   */
-  void setHeartbeatMessage(final HeartbeatMessage heartbeatMessage) {
-    this.heartbeatMessage = heartbeatMessage;
   }
 
   /**
@@ -182,33 +158,13 @@ class HeartbeatContext extends AbstractNioContext<EmptyEnum> implements NioChann
   }
 
   @Override
-  public int getInterestOps() {
-    return interestOps;
-  }
-
-  @Override
-  public void setInterestOps(final int interestOps) {
-    this.interestOps = interestOps;
-  }
-
-  @Override
-  public SelectionKey getSelectionKey() {
-    return selectionKey;
-  }
-
-  @Override
-  public void setSelectionKey(final SelectionKey selectionKey) {
-    this.selectionKey = selectionKey;
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", state=").append(getState());
     sb.append(", ssl=").append(ssl);
-    sb.append(", interestOps=").append(interestOps);
-    sb.append(", socketChannel=").append(socketChannel);
+    sb.append(", interestOps=").append(getInterestOps());
+    sb.append(", socketChannel=").append(getSocketChannel());
     return sb.append(']').toString();
   }
 }

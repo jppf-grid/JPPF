@@ -33,6 +33,14 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
   protected TaskBundle bundle = null;
 
   /**
+   * Initialize this nio message with the specified context.
+   * @param context the context to read from or write to.
+   */
+  public AbstractTaskBundleMessage(final NioContext<?> context) {
+    super(context, false);
+  }
+
+  /**
    * Initialize this nio message with the specified sll flag.
    * @param channel the channel to read from or write to.
    */

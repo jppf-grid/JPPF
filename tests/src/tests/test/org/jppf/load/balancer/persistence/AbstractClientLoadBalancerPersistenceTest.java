@@ -71,9 +71,12 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
   public void testNonPersistentAlgos() throws Exception {
     final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
     final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
     assertNotNull(mgt);
     final String method = ReflectionUtils.getCurrentMethodName();
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "manual", "nodethreads" };
       final int nbTasks = 100;
       for (final String algo: algos) {
@@ -85,6 +88,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
         assertTrue(checkEmptyChannels(mgt));
       }
     } finally {
+      pool.setMaxJobs(maxJobs);
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -99,8 +103,11 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
     final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
     final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
     final String method = ReflectionUtils.getCurrentMethodName();
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
       for (final String algo: algos) {
@@ -129,6 +136,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       }
       assertTrue(checkEmptyChannels(mgt));
     } finally {
+      pool.setMaxJobs(maxJobs);
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -143,7 +151,10 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
     final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
     final String method = ReflectionUtils.getCurrentMethodName();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
       for (int i=0; i<algos.length; i++) {
@@ -190,6 +201,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       }
       assertTrue(checkEmptyChannels(mgt));
     } finally {
+      pool.setMaxJobs(maxJobs);
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -204,7 +216,10 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
     final LoadBalancerPersistenceManagement mgt = client.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
     final String method = ReflectionUtils.getCurrentMethodName();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
     try {
+      pool.setMaxJobs(1);
       final String algo = "proportional";
       final int nbTasks = 100;
       client.setLoadBalancerSettings(algo, lbi.getParameters());
@@ -231,6 +246,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       }
       assertTrue(checkEmptyChannels(mgt));
     } finally {
+      pool.setMaxJobs(maxJobs);
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -247,8 +263,10 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
     assertNotNull(mgt);
     final String method = ReflectionUtils.getCurrentMethodName();
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
     try {
       client.setLocalExecutionEnabled(false);
+      pool.setMaxJobs(1);
       pool.setSize(2);
       pool.awaitWorkingConnections(Operator.EQUAL, 2);
       final JobManagerClient jmc = (JobManagerClient) client.getJobManager();
@@ -286,6 +304,7 @@ public abstract class AbstractClientLoadBalancerPersistenceTest extends Abstract
       assertTrue(checkEmptyChannels(mgt));
     } finally {
       client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
+      pool.setMaxJobs(maxJobs);
       pool.setSize(1);
       pool.awaitWorkingConnections(Operator.EQUAL, 1);
       client.setLocalExecutionEnabled(localEnabled);

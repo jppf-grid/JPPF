@@ -25,7 +25,7 @@ import java.nio.channels.SocketChannel;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public interface NioContext<S extends Enum<S>> {
+public interface NioContext<S extends Enum<S>> extends NioChannelHandler, CloseableContext {
   /**
    * Get the current state of the channel this context is associated with.
    * @return a state enum value.
@@ -56,23 +56,22 @@ public interface NioContext<S extends Enum<S>> {
   boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception;
 
   /**
-   * Get the uuid for this node context.
+   * Get the uuid of the node or client for this context.
    * @return the uuid as a string.
    */
   String getUuid();
 
   /**
-   * Set the uuid for this node context.
+   * Set the uuid of the node or client for this context.
    * @param uuid the uuid as a string.
    */
   void setUuid(String uuid);
 
   /**
    * Handle the cleanup when an exception occurs on the channel.
-   * @param channel the channel that threw the exception.
    * @param e exception.
    */
-  void handleException(ChannelWrapper<?> channel, final Exception e);
+  void handleException(final Exception e);
 
   /**
    * Get the associated channel.

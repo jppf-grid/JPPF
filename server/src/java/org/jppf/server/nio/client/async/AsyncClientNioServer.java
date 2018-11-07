@@ -16,28 +16,32 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.heartbeat;
+package org.jppf.server.nio.client.async;
 
 import java.io.EOFException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
+import java.util.List;
 
 import javax.net.ssl.*;
 
 import org.jppf.nio.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.client.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
- * The NIO server that handles heartbeat connections.
+ * The NIO server that handles asynchronous client connections, which can handle multiple jobs concurrently.
  * @author Laurent Cohen
  */
-public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContext> {
+public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientContext> {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(HeartbeatNioServer.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncClientNioServer.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -45,21 +49,27 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
   /**
    * The message handler for this server.
    */
-  private final HeartbeatMessageHandler messageHandler;
+  private final AsyncClientMessageHandler messageHandler;
 
   /**
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if any error occurs.
    */
-  public HeartbeatNioServer(final int identifier, final boolean useSSL) throws Exception {
+  public AsyncClientNioServer(final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
-    messageHandler = new HeartbeatMessageHandler(this);
+    messageHandler = new AsyncClientMessageHandler();
+  }
+
+  @Override
+  protected void initReaderAndWriter() {
+    messageReader = new AsyncClientMessageReader(this);
+    messageWriter = new AsyncClientMessageWriter(this);
   }
 
   @Override
   protected void handleSelectionException(final SelectionKey key, final Exception e) {
-    final HeartbeatContext context = (HeartbeatContext) key.attachment();
+    final AsyncClientContext context = (AsyncClientContext) key.attachment();
     if (e instanceof CancelledKeyException) {
       if ((context != null) && !context.isClosed()) {
         log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
@@ -67,24 +77,23 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
       }
     } else if (e instanceof EOFException) {
       if (debugEnabled) log.debug("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-      closeConnection(context);
+      context.handleException(e);
     } else {
       log.error("error on {} :\n{}", context, ExceptionUtils.getStackTrace(e));
-      if (context != null) closeConnection(context);
+      if (context != null) context.handleException(e);
     }
   }
 
   @Override
-  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl,
-    final boolean peer, final Object... params) {
+  public ChannelWrapper<?> accept(final ServerSocketChannel serverSocketChannel, final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl, final boolean peer, final Object... params) {
     try {
       if (debugEnabled) log.debug("accepting socketChannel = {}", channel);
-      final HeartbeatContext context = createContext(channel, ssl);
+      final AsyncClientContext context = createContext(channel, ssl);
       registerChannel(context, channel);
-      messageHandler.addChannel(context);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
+    JPPFDriver.getInstance().getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
     return null;
   }
 
@@ -92,13 +101,13 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
    * Create a new channel context.
    * @param channel the associated socket channel.
    * @param ssl whether the connection is secure.
-   * @return a new {@link HeartbeatContext} instance.
+   * @return a new {@link AsyncClientContext} instance.
    * @throws Exception if any error occurs.
    */
-  private HeartbeatContext createContext(final SocketChannel channel, final boolean ssl)
+  private AsyncClientContext createContext(final SocketChannel channel, final boolean ssl)
     throws Exception {
-    final HeartbeatContext context = createNioContext(channel);
-    if (debugEnabled) log.debug("creating channel wrapper for ssl={}, context={}", ssl, context);
+    final AsyncClientContext context = createNioContext(channel);
+    if (debugEnabled) log.debug("creating context for channel={}, ssl={}: {}", channel, ssl, context);
     context.setSsl(ssl);
     if (ssl) {
       if (debugEnabled) log.debug("creating SSLEngine for {}", context);
@@ -113,10 +122,10 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private static void configureSSL(final HeartbeatContext context) throws Exception {
+  private static void configureSSL(final AsyncClientContext context) throws Exception {
     if (debugEnabled) log.debug("configuring SSL for {}", context);
     final SocketChannel channel = context.getSocketChannel();
-    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL);
+    final SSLContext sslContext = SSLHelper.getSSLContext(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
     final InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
     final SSLEngine engine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
     final SSLParameters params = SSLHelper.getSSLParameters();
@@ -128,25 +137,45 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
   }
 
   @Override
-  public HeartbeatContext createNioContext(final Object...params) {
-    return new HeartbeatContext(this, (SocketChannel) params[0]);
+  public AsyncClientContext createNioContext(final Object...params) {
+    return new AsyncClientContext(this, (SocketChannel) params[0]);
   }
-
 
   /**
    * Close the specified channel.
    * @param context the channel to close.
    */
-  void closeConnection(final HeartbeatContext context) {
+  static void closeConnection(final AsyncClientContext context) {
+    if (debugEnabled) log.debug("closing {}", context);
     try {
-      messageHandler.removeChannel(context);
-      final SelectionKey key = context.getSocketChannel().keyFor(selector);
+      final SelectionKey key = context.getSelectionKey();
       if (key != null) {
         key.cancel();
         key.channel().close();
       }
+      final String uuid = context.getUuid();
+      if (uuid != null) {
+        final ClientClassNioServer classServer = JPPFDriver.getInstance().getClientClassServer();
+        final List<ClientClassContext> list = classServer.getProviderContexts(uuid);
+        if (debugEnabled) log.debug("found {} provider connections for clientUuid={}; context={}", list.size(), uuid, context);
+        if (!list.isEmpty()) {
+          for (ClientClassContext ctx: list) {
+            if (ctx.getConnectionUuid().equals(context.getConnectionUuid())) {
+              if (debugEnabled) log.debug("found provider connection with connectionUuid={} : {}", context.getConnectionUuid(), ctx);
+              try {
+                ClientClassNioServer.closeConnection(ctx.getChannel(), false);
+              } catch (final Exception e2) {
+                log.error(e2.getMessage(), e2);
+              }
+              break;
+            }
+          }
+        }
+      }
     } catch (final Exception e) {
       log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
+    } finally {
+      JPPFDriver.getInstance().getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
     }
   }
 
@@ -159,13 +188,7 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
   /**
    * @return the message handler for this server.
    */
-  public HeartbeatMessageHandler getMessageHandler() {
+  public AsyncClientMessageHandler getMessageHandler() {
     return messageHandler;
-  }
-
-  @Override
-  protected void initReaderAndWriter() {
-    messageReader = new HeartbeatMessageReader(this);
-    messageWriter = new HeartbeatMessageWriter(this);
   }
 }

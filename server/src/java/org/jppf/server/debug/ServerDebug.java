@@ -18,6 +18,7 @@
 
 package org.jppf.server.debug;
 
+import java.nio.channels.*;
 import java.util.*;
 
 import org.jppf.nio.ChannelWrapper;
@@ -26,7 +27,8 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -77,6 +79,14 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String clientDataChannels() {
+    final boolean async = JPPFConfiguration.get(JPPFProperties.CLIENT_ASYNCHRONOUS);
+    if (async) {
+      final Selector selector = driver.getAsyncClientNioServer().getSelector();
+      final Set<SelectionKey> keys = new HashSet<>(selector.keys());
+      final StringBuilder sb = new StringBuilder();
+      for (final SelectionKey key: keys)  sb.append(key.attachment()).append('\n');
+      return sb.toString();
+    }
     return viewChannels(clientSet());
   }
 

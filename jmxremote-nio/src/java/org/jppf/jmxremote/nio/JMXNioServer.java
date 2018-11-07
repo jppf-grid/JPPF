@@ -47,7 +47,7 @@ import org.slf4j.*;
  * The NIO server that handles client-side and server-side JMX connections.
  * @author Laurent Cohen
  */
-public final class JMXNioServer extends StatelessNioServer implements JMXNioServerMBean {
+public final class JMXNioServer extends StatelessNioServer<JMXContext> implements JMXNioServerMBean {
   /**
    * Logger for this class.
    */
@@ -123,7 +123,7 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
   }
 
   @Override
-  protected void handleSelectionException(final SelectionKey key, final Exception e) throws Exception {
+  protected void handleSelectionException(final SelectionKey key, final Exception e) {
     final ChannelsPair pair = (ChannelsPair) key.attachment();
     if (e instanceof CancelledKeyException) {
       if ((pair != null) && !pair.isClosing() && !pair.isClosed()) {
@@ -410,5 +410,9 @@ public final class JMXNioServer extends StatelessNioServer implements JMXNioServ
    */
   public JPPFStatistics getStats() {
     return stats;
+  }
+
+  @Override
+  protected void initReaderAndWriter() {
   }
 }

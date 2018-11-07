@@ -19,9 +19,10 @@
 package org.jppf.server.nio.client;
 
 import org.jppf.io.IOHelper;
-import org.jppf.nio.ChannelWrapper;
+import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.server.protocol.ServerTaskBundleClient;
 
 /**
  * Representation of a message sent or received by a remote node.
@@ -29,11 +30,27 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  */
 public class ClientMessage extends AbstractTaskBundleMessage {
   /**
-   * Initialize this nio message with the specified ssl flag.
+   * The actual client task bundle from which this message is created
+   */
+  private final ServerTaskBundleClient clientBundle;
+
+  /**
+   * Initialize this nio message with the specified context.
+   * @param context the context to read from or write to.
+   * @param clientBundle the actual client task bundle from which this message is created.
+   */
+  public ClientMessage(final NioContext<?> context, final ServerTaskBundleClient clientBundle) {
+    super(context);
+    this.clientBundle = clientBundle;
+  }
+
+  /**
+   * Initialize this nio message with the specified channel.
    * @param channel the channel to read from or write to.
    */
   public ClientMessage(final ChannelWrapper<?> channel) {
     super(channel);
+    this.clientBundle = null;
   }
 
   /**
@@ -66,5 +83,12 @@ public class ClientMessage extends AbstractTaskBundleMessage {
     sb.append(", currentLength=").append(currentLength);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * @return the actual client task bundle from which this message is created
+   */
+  public ServerTaskBundleClient getClientBundle() {
+    return clientBundle;
   }
 }

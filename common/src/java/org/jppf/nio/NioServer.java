@@ -301,7 +301,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
         }
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
-        if (context != null) context.handleException(context.getChannel(), e);
+        if (context != null) context.handleException(e);
         if (!(key.channel() instanceof ServerSocketChannel)) try {
           key.channel().close();
         } catch (final Exception e2) {
@@ -532,6 +532,22 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     engine.setUseClientMode(true);
     engine.setSSLParameters(params);
     final SSLHandler sslHandler = new SSLHandlerImpl(channel, engine);
+    context.setSSLHandler(sslHandler);
+  }
+
+  /**
+   * Configure the SSL options for the specified channel.
+   * @param context the channel context for which to configure SSL.
+   * @throws Exception if any error occurs.
+   */
+  public void configurePeerSSL(final NioContext<?> context) throws Exception {
+    final SocketChannel socketChannel = context.getSocketChannel();
+    final Socket socket = socketChannel.socket();
+    final SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
+    final SSLParameters params = SSLHelper.getSSLParameters();
+    engine.setUseClientMode(true);
+    engine.setSSLParameters(params);
+    final SSLHandler sslHandler = new SSLHandlerImpl(socketChannel, engine);
     context.setSSLHandler(sslHandler);
   }
 

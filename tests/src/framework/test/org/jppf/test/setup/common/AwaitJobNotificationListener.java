@@ -50,6 +50,10 @@ public class AwaitJobNotificationListener implements NotificationListener {
    */
   private boolean eventReceived;
   /**
+   * 
+   */
+  private final JMXDriverConnectionWrapper jmx;
+  /**
    * P'roxy to the job management MBean.
    */
   private final DriverJobManagementMBean jobManager;
@@ -59,25 +63,17 @@ public class AwaitJobNotificationListener implements NotificationListener {
   private boolean listenerRemoved;
 
   /**
-   * @param jobManager the mbean proxy to which to add a listener.
-   * @param eventType the type of event to wait for.
-   * @throws Exception if any error occurs.
-   */
-  public AwaitJobNotificationListener(final DriverJobManagementMBean jobManager, final JobEventType eventType) throws Exception {
-    this.expectedEvent = eventType;
-    this.eventReceived = false;
-    this.listenerRemoved = false;
-    this.jobManager = jobManager;
-    this.jobManager.addNotificationListener(this, null, null);
-  }
-
-  /**
    * @param jmx represents the connection to the mbean proxy to which to add a listener.
    * @param eventType the type of event to wait for.
    * @throws Exception if any error occurs.
    */
   public AwaitJobNotificationListener(final JMXDriverConnectionWrapper jmx, final JobEventType eventType) throws Exception {
-    this(jmx.getJobManager(), eventType);
+    this.jmx = jmx;
+    this.expectedEvent = eventType;
+    this.eventReceived = false;
+    this.listenerRemoved = false;
+    this.jobManager = jmx.getJobManager();
+    this.jobManager.addNotificationListener(this, null, null);
   }
 
   /**
@@ -86,7 +82,7 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public AwaitJobNotificationListener(final JPPFClient client, final JobEventType eventType) throws Exception {
-    this(BaseSetup.getJobManagementProxy(client), eventType);
+    this(BaseSetup.getJMXConnection(client), eventType);
   }
 
   @Override
@@ -103,34 +99,35 @@ public class AwaitJobNotificationListener implements NotificationListener {
         }
       }
     } catch (final Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
   /**
    * Wait for the specified event.
+   * @return whether the expected event was effectively received.
    * @throws Exception if any error occurs.
    */
-  public void await() throws Exception {
+  public boolean await() throws Exception {
     synchronized (this) {
-      if (listenerRemoved) return;
-      while (!eventReceived) wait(100L);
+      if (listenerRemoved) return true;
+      while (true) {
+        if (!jmx.isConnected() || eventReceived) break;
+        wait(100L);
+      }
       if (debugEnabled) log.debug("finished waiting for expected event {}", expectedEvent);
       listenerRemoved = true;
-      ThreadUtils.startDaemonThread(new Runnable() {
-        @Override
-        public void run() {
+      ThreadUtils.startDaemonThread(() -> {
           try {
             jobManager.removeNotificationListener(AwaitJobNotificationListener.this);
           } catch (final Exception e) {
             log.error(e.getMessage(), e);
-            e.printStackTrace();
           }
           if (debugEnabled) log.debug("removed notification listener");
-        }
-      }, "remove AwaitJobNotificationListener");
+        }, "remove AwaitJobNotificationListener");
       wait(100L);
     }
+    return eventReceived;
   }
 
   /**
@@ -139,5 +136,12 @@ public class AwaitJobNotificationListener implements NotificationListener {
    */
   public synchronized boolean isListenerRemoved() {
     return listenerRemoved;
+  }
+
+  /**
+   * @return the expected event.
+   */
+  public JobEventType getExpectedEvent() {
+    return expectedEvent;
   }
 }

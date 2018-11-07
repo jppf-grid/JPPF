@@ -63,10 +63,7 @@ class SendingPeerHandshakeState extends ClientServerState {
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    if (channel.isReadable()) {
-      throw new ConnectException("client " + channel + " has been disconnected");
-    }
-
+    if (channel.isReadable()) throw new ConnectException("client " + channel + " has been disconnected");
     final ClientContext context = (ClientContext) channel.getContext();
     if (context.getMessage() == null) {
       final TaskBundle header = new JPPFTaskBundle();

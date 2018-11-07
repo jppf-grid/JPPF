@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.utils.*;
@@ -30,7 +30,7 @@ import org.slf4j.*;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S>, CloseableContext {
+public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S> {
   /**
    * Logger for this class.
    */
@@ -99,6 +99,14 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Outbound traffic statistics snapshot.
    */
   protected JPPFSnapshot outSnapshot;
+  /**
+   * The socket channel's interest ops.
+   */
+  private int interestOps;
+  /**
+   * Selection key for the associated socket channel and nio server selector.
+   */
+  private SelectionKey selectionKey;
 
   @Override
   public S getState() {
@@ -272,5 +280,25 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public SocketChannel getSocketChannel() {
     return socketChannel;
+  }
+
+  @Override
+  public int getInterestOps() {
+    return interestOps;
+  }
+
+  @Override
+  public void setInterestOps(final int interestOps) {
+    this.interestOps = interestOps;
+  }
+
+  @Override
+  public SelectionKey getSelectionKey() {
+    return selectionKey;
+  }
+
+  @Override
+  public void setSelectionKey(final SelectionKey selectionKey) {
+    this.selectionKey = selectionKey;
   }
 }

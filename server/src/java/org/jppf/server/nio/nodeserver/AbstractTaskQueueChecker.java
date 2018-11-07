@@ -163,7 +163,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
           }
           wakeUp();
         }
-        else channel.handleException(channel.getChannel(), null);
+        else channel.handleException(null);
       }
     });
   }

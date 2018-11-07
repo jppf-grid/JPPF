@@ -92,7 +92,7 @@ class PeerNode extends AbstractPeerConnectionHandler {
     if (debugEnabled) log.debug("closing {}, context={} ", this, context);
     if (context != null) {
       context.setOnCloseAction(null);
-      context.handleException(context.getChannel(), null);
+      context.handleException(null);
       context = null;
     }
   }

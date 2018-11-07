@@ -39,7 +39,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class AcceptorNioServer extends StatelessNioServer {
+public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   /**
    * Logger for this class.
    */
@@ -88,7 +88,7 @@ public class AcceptorNioServer extends StatelessNioServer {
   }
 
   @Override
-  protected void handleSelectionException(final SelectionKey key, final Exception e) throws Exception {
+  protected void handleSelectionException(final SelectionKey key, final Exception e) {
     log.error(e.getMessage(), e);
     if (!(key.channel() instanceof ServerSocketChannel)) {
       try {
@@ -243,5 +243,9 @@ public class AcceptorNioServer extends StatelessNioServer {
    */
   public JPPFStatistics getStats() {
     return stats;
+  }
+
+  @Override
+  protected void initReaderAndWriter() {
   }
 }

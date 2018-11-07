@@ -119,6 +119,9 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
     postInit();
   }
 
+  @Override
+  public abstract void close();
+
   /**
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.

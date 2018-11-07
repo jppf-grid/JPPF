@@ -93,7 +93,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
         if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
         else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
       }
-      if (e instanceof Exception) ctx.handleException(channel, (Exception) e);
+      if (e instanceof Exception) ctx.handleException((Exception) e);
       else throw (Error) e;
     }
   }

@@ -453,7 +453,7 @@ public class JPPFProperties {
   /** A default client-side execution policy to associate with submitted jobs when they don't have one. */
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
   /** Whether client connections are asynchronous and can handle multiple jobs concurrently. */
-  public static final JPPFProperty<Boolean> CLIENT_ASYNCHRONOUS = new BooleanProperty("jppf.client.asynchronous", false);
+  public static final JPPFProperty<Boolean> CLIENT_ASYNCHRONOUS = new BooleanProperty("jppf.client.asynchronous", true);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManagement;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -80,11 +80,14 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
   @Test(timeout = 10000)
   public void testNonPersistentAlgos() throws Exception {
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
+    final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "manual", "nodethreads" };
       final int nbTasks = 100;
       for (final String algo: algos) {
@@ -96,6 +99,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
         assertTrue(checkEmptyChannels(mgt));
       }
     } finally {
+      pool.setMaxJobs(maxJobs);
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -108,11 +112,14 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
   @Test(timeout = 10000)
   public void testPersistentAlgos() throws Exception {
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
+    final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
       for (final String algo: algos) {
@@ -141,6 +148,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       }
       assertTrue(checkEmptyChannels(mgt));
     } finally {
+      pool.setMaxJobs(maxJobs);
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }
@@ -152,11 +160,14 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
   @Test(timeout = 10000)
   public void testDifferentAlgosPerNode() throws Exception {
     final String method = ReflectionUtils.getCurrentMethodName();
-    final JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+    final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    final int maxJobs = pool.getMaxJobs();
+    final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
     final LoadBalancingInformation lbi = jmx.loadBalancerInformation();
     final LoadBalancerPersistenceManagement mgt = jmx.getLoadBalancerPersistenceManagement();
     assertNotNull(mgt);
     try {
+      pool.setMaxJobs(1);
       final String[] algos = { "proportional", "autotuned", "rl2" };
       final int nbTasks = 100;
       for (int i=0; i<algos.length; i++) {
@@ -204,6 +215,7 @@ public abstract class AbstractDriverLoadBalancerPersistenceTest extends Abstract
       }
       assertTrue(checkEmptyChannels(mgt));
     } finally {
+      pool.setMaxJobs(maxJobs);
       jmx.changeLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
     }
   }

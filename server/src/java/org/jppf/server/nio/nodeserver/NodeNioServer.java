@@ -186,7 +186,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
           if (channel.isOpen()) updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
         }
       }
-      if (!channel.isOpen()) nodeContext.handleException(channel, null);
+      if (!channel.isOpen()) nodeContext.handleException(null);
     } catch(final Exception e) {
       if (debugEnabled) log.debug("error adding connection {} : {}", nodeContext, e);
     }
@@ -434,7 +434,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
       final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
       if (debugEnabled) log.debug("about to close channel = {} with uuid = {}", channel, context.getUuid());
       removeConnection(context.getUuid());
-      context.handleException(context.getChannel(), null);
+      context.handleException(null);
     }
   }
 
@@ -488,7 +488,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
         if (info != null) nodeConnectionHandler.fireNodeConnected(info);
       }
     }
-    if (!context.getChannel().isOpen()) context.handleException(context.getChannel(), null);
+    if (!context.getChannel().isOpen()) context.handleException(null);
   }
 
   /**

@@ -28,14 +28,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.io.IOHelper;
 import org.jppf.jmxremote.message.*;
 import org.jppf.nio.*;
-import org.jppf.utils.EmptyEnum;
 import org.slf4j.*;
 
 /**
  * Context associated with a {@link JMXChannelWrapper}.
  * @author Laurent Cohen
  */
-public class JMXContext extends SimpleNioContext<EmptyEnum> {
+public class JMXContext extends StatelessNioContext {
   /**
    * Logger for this class.
    */
@@ -87,7 +86,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
+  public void handleException(final Exception exception) {
     try {
       server.closeConnection(getChannels(), exception, false);
     } catch (final Exception e) {
@@ -183,15 +182,16 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
   /**
    * @return the channel's selection key.
    */
+  @Override
   public SelectionKey getSelectionKey() {
     if (selectionKey == null) selectionKey = socketChannel.keyFor(server.getSelector());
     return selectionKey;
   }
 
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
+  public boolean readMessage() throws Exception {
     if (message == null) message = new SimpleNioMessage(this);
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+    byteCount = message.getChannelReadCount();
     boolean b = false;
     try {
       b = message.read();
@@ -199,15 +199,15 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
       updateTrafficStats();
       throw e;
     }
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
+    byteCount = message.getChannelReadCount() - byteCount;
     if (debugEnabled) log.debug("read {} bytes", byteCount);
     if (b) updateTrafficStats();
     return b;
   }
 
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+  public boolean writeMessage() throws Exception {
+    byteCount = message.getChannelWriteCount();
     boolean b = false;
     try {
       b = message.write();
@@ -215,7 +215,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
       updateTrafficStats();
       throw e;
     }
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
+    byteCount = message.getChannelWriteCount() - byteCount;
     if (debugEnabled) log.debug("wrote {} bytes", byteCount);
     if (b) updateTrafficStats();
     return b;

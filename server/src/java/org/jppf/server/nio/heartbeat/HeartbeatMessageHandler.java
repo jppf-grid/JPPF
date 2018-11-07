@@ -118,7 +118,7 @@ class HeartbeatMessageHandler {
       while ((nbTries < maxTries) && !done) {
         nbTries++;
         final HeartbeatMessage data = context.newHeartbeatMessage();
-        context.createMessage(data);
+        context.createWriteMessage(data);
         synchronized(map) {
           map.put(data.getMessageID(), data);
         }

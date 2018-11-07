@@ -16,25 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.heartbeat;
-
-import org.jppf.nio.*;
-
 /**
- * Writes all messages in the channel's context queue, if any, or keeps writing the current message until the socket send buffer is full.
- * @author Laurent Cohen
+ * Support for heartbeat messages betwen server and nodes.
+ * @exclude
  */
-public class HeartbeatMessageWriter extends NioMessageWriter<HeartbeatContext> {
-  /**
-   * Initialize this message writer.
-   * @param server the nio server.
-   */
-  public HeartbeatMessageWriter(final StatelessNioServer<HeartbeatContext> server) {
-    super(server);
-    
-  }
-
-  @Override
-  protected void postWrite(final HeartbeatContext context, final NioMessage data) throws Exception {
-  }
-}
+package org.jppf.server.nio.client.async;

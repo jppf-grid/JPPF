@@ -30,7 +30,7 @@ import org.slf4j.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
+public class AcceptorContext extends StatelessNioContext {
   /**
    * Logger for this class.
    */
@@ -59,10 +59,6 @@ public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
    * The server socket channel that accepted the connection.
    */
   private final ServerSocketChannel serverSocketChannel;
-  /**
-   * The socket channel's interest ops.
-   */
-  private int interestOps;
 
   /**
    * 
@@ -80,13 +76,12 @@ public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
 
   /**
    * Read data from a channel. This method reads a single integer which identifies the type of the channel.
-   * @param wrapper the channel to read the data from.
    * @return true if all the data has been read, false otherwise.
    * @throws Exception if an error occurs while reading the data.
    * @see org.jppf.utils.JPPFIdentifiers
    */
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
+  public boolean readMessage() throws Exception {
     if (nioObject == null) nioObject = new PlainNioObject(socketChannel, 4);
     boolean b = false;
     try {
@@ -107,7 +102,7 @@ public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+  public void handleException(final Exception e) {
   }
 
   /**
@@ -125,18 +120,8 @@ public class AcceptorContext extends SimpleNioContext<EmptyEnum> {
     return serverSocketChannel;
   }
 
-  /**
-   * @return the socket channel's interest ops.
-   */
-  public int getInterestOps() {
-    return interestOps;
-  }
-
-  /**
-   * Set the socket channel's interest ops.
-   * @param interestOps the interest ops to set.
-   */
-  public void setInterestOps(final int interestOps) {
-    this.interestOps = interestOps;
+  @Override
+  public boolean writeMessage() throws Exception {
+    return false;
   }
 }

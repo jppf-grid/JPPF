@@ -160,7 +160,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
       try {
         final NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
         final AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
-        if (ctx != null) ctx.handleException(ctx.getChannel(), null);
+        if (ctx != null) ctx.handleException(null);
       } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(e.getMessage());

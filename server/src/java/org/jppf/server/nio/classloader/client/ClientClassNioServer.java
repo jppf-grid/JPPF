@@ -162,6 +162,21 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   }
 
   /**
+   * Get all the provider connections for the specified client uuid.
+   * @param uuid the uuid of the client for which to get connections.
+   * @return a list of connection contexts, possibly empty but never {@code null}.
+   */
+  public List<ClientClassContext> getProviderContexts(final String uuid) {
+    final Collection<ChannelWrapper<?>> channels = providerConnections.getValues(uuid);
+    if ((channels != null) && !channels.isEmpty()) {
+      final List<ClientClassContext> result = new ArrayList<>(channels.size());
+      channels.forEach(channel -> result.add((ClientClassContext) channel.getContext()));
+      return result;
+    }
+    return Collections.emptyList();
+  }
+
+  /**
    * Remove all the provider connections for the specified client uuid.
    * @param uuid the uuid of the client for which to remove connections.
    */

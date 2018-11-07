@@ -17,27 +17,25 @@
  */
 package org.jppf.server.peer;
 
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 
 import org.jppf.JPPFRuntimeException;
-import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.classloader.client.*;
+import org.jppf.server.nio.client.async.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * This class represents an initializer for the connection to the class server of a remote JPPF driver (peer driver).
+ * Instances of this class represent the initializer for the job data channel of a peer driver connection.
  * @author Laurent Cohen
+ * @author Domingos Creado
  * @author Martin JANDA
  */
-class PeerResourceProvider extends AbstractPeerConnectionHandler {
+class AsyncPeerNode extends AbstractPeerConnectionHandler {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncPeerNode.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -45,11 +43,11 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
   /**
    * The NioServer to which the channel is registered.
    */
-  private final ClientClassNioServer server;
+  private final AsyncClientNioServer server;
   /**
    * Context attached to the channel.
    */
-  private ClientClassContext context;
+  private AsyncClientContext context;
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -59,9 +57,10 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
    * @param secure {@code true} if the connection is established over SSL, {@code false} otherwise.
    * @param connectionUuid the connection uuid, common to client class server and job server connections.
    */
-  public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClientClassNioServer server, final boolean secure, final String connectionUuid) {
-    super(peerNameBase, connectionInfo, secure, connectionUuid, JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+  public AsyncPeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final AsyncClientNioServer server, final boolean secure, final String connectionUuid) {
+    super(peerNameBase, connectionInfo, secure, connectionUuid, JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
     this.server = server;
+    printConnectionMessage = true;
   }
 
   @Override
@@ -69,25 +68,19 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
     try {
       final SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      final ChannelWrapper<?> channel = server.accept(null, socketChannel, null, secure, true);
-      context = (ClientClassContext) channel.getContext();
+      socketChannel.configureBlocking(false);
+      server.accept(null, socketChannel, null, secure, true);
+      final SelectionKey key = socketChannel.keyFor(server.getSelector());
+      context = (AsyncClientContext) key.attachment();
       context.setPeer(true);
       context.setConnectionUuid(connectionUuid);
-      if (debugEnabled) log.debug("registered class server channel " + channel);
+      context.setOnCloseAction(onCloseAction);
+      if (debugEnabled) log.debug("registered peer client channel " + context);
       if (secure) {
         context.setSsl(true);
-        server.configurePeerSSL(channel);
+        server.configurePeerSSL(context);
       }
-      final JPPFResourceWrapper resource = new JPPFResourceWrapper();
-      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      final String uuid = JPPFDriver.getInstance().getUuid();
-      context.setConnectionUuid(connectionUuid);
-      resource.setData(ResourceIdentifier.NODE_UUID, uuid);
-      resource.setData(ResourceIdentifier.PEER, Boolean.TRUE);
-      resource.setProviderUuid(uuid);
-      context.setResource(resource);
-      context.serializeResource();
-      server.getTransitionManager().transitionChannel(channel, ClientClassTransition.TO_SENDING_PEER_INITIATION_REQUEST);
+      server.getMessageHandler().sendPeerHandshake(context);
       socketClient = null;
     } catch (final Exception e) {
       log.error(e.getMessage());

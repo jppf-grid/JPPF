@@ -125,7 +125,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
                   } catch (final Exception e) {
                     log.error("{}\nchannel={}\njob={}\nstack trace: {}", ExceptionUtils.getMessage(e), channel, nodeBundle, ExceptionUtils.getStackTrace(e));
                     channel.unclose();
-                    channel.handleException(channel.getChannel(), e);
+                    channel.handleException(e);
                   }
                 }
               }

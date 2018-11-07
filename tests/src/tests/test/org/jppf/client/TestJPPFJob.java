@@ -155,15 +155,15 @@ public class TestJPPFJob extends Setup1D1N {
     final int nbTasks = 1;
     final int nbJobs = 10;
     try (final JPPFClient client = BaseSetup.createClient("c1", true)) {
+      client.awaitWorkingConnectionPool().setMaxJobs(1);
       int totalCancelCount = 0;
       for (int i=1; i<=nbJobs; i++) {
         print(false, false, ">>> test iteration %d", i);
         final JPPFJob job = BaseTestHelper.createJob(name + "-" + i, "tci-" + i, false, false, nbTasks, LifeCycleTask.class, 1000L);
         client.submitJob(job);
-        Thread.sleep(1L);
+        //Thread.sleep(1L);
         print(false, false, ">>> cancelling job %d", i);
-        final boolean cancelled = job.cancel(true);
-        assertTrue(cancelled);
+        assertTrue(job.cancel(true));
         print(false, false, ">>> awaiting results for job %d", i);
         final List<Task<?>> results = job.awaitResults();
         print(false, false, ">>> checking results for job %d", i);

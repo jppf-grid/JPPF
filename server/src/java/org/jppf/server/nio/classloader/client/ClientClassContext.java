@@ -152,7 +152,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+  public void handleException(final Exception e) {
     ClientClassNioServer.closeConnection(channel);
     handleProviderError();
   }

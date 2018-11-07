@@ -151,13 +151,13 @@ public class BaseSetup {
     for (int i=0; i<nbDrivers; i++) {
       drivers[i] = new DriverProcessLauncher(i + 1, config.driver, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", drivers[i].getName());
-      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName() + "-processLauncher");
+      ThreadUtils.startDaemonThread(drivers[i], drivers[i].getName().trim() + "-Launcher");
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++) {
       nodes[i] = new NodeProcessLauncher(i + 1, config.node, new HashMap<>(bindings));
       BaseTest.print(true, false, "starting %s", nodes[i].getName());
-      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName() + "-processLauncher");
+      ThreadUtils.startDaemonThread(nodes[i], nodes[i].getName().trim() + "-Launcher");
     }
     if (createClient) {
       client = createClient(null, true, config, listeners);

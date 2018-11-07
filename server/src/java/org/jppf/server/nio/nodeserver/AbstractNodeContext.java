@@ -175,7 +175,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
+  public void handleException(final Exception exception) {
     if (closed.compareAndSet(false, true)) {
       if (debugEnabled) {
         if (exception != null) log.debug("handling '{}' for {}", ExceptionUtils.getMessage(exception), channel);
@@ -225,7 +225,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Called when the node sends a close channel command.
    */
   public void closeChannel() {
-    handleException(getChannel(), null);
+    handleException(null);
   }
 
   /**

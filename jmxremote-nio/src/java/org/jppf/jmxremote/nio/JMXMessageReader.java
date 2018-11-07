@@ -345,7 +345,7 @@ class JMXMessageReader {
           if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e2));
           else log.warn("error on channel: {}", ExceptionUtils.getMessage(e2));
         }
-        if (e instanceof Exception) context.handleException(null, (Exception) e);
+        if (e instanceof Exception) context.handleException((Exception) e);
         else throw (Error) e;
       }
     }

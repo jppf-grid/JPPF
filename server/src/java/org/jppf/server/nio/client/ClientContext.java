@@ -94,7 +94,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+  public void handleException(final Exception e) {
     if (getClosed().compareAndSet(false, true)) {
       if (debugEnabled && (e != null)) log.debug("exception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
       ClientNioServer.closeClient(channel);

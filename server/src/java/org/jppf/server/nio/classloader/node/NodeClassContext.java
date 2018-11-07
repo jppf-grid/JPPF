@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -147,7 +146,7 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+  public void handleException(final Exception e) {
     if (debugEnabled) log.debug("excception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
     NodeClassNioServer.closeConnection(channel);
   }

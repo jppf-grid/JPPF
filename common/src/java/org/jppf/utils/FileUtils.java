@@ -497,4 +497,18 @@ public final class FileUtils {
     if (idx <= 0) return new Pair<>(imageName, null);
     return new Pair<>(imageName.substring(0, idx), imageName.substring(idx + 1));
   }
+
+  /**
+   * Get a <code>Reader</code> for the specified file path, looked up first in the file system then in the classpath.
+   * @param path the path to the file to lookup.
+   * @return a <code>Reader</code> instance, or null if the file could not be found.
+   * @throws IOException if an IO error occurs while looking up the file.
+   */
+  public static BufferedReader getBufferedReader(final String path) throws IOException {
+    final File file = new File(path);
+    if (file.exists() && !file.isDirectory()) return new BufferedReader(new FileReader(file));
+    final InputStream is = getFileInputStream(path);
+    if (is == null) return null;
+    return new BufferedReader(new InputStreamReader(is));
+  }
 }

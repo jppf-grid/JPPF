@@ -313,6 +313,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     final JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
     try {
+      pool.setMaxJobs(1);
       client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", nbTasks / 2));
       pool.setSize(2);
       print(false, false, "awaiting 2 connections");
@@ -355,6 +356,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     } finally {
       if (lbi != null) client.setLoadBalancerSettings(lbi.getAlgorithm(), lbi.getParameters());
       if (pool != null) {
+        pool.setMaxJobs(Integer.MAX_VALUE);
         pool.setSize(1);
         pool.awaitActiveConnections(Operator.EQUAL, 1);
       }
