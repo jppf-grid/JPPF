@@ -128,9 +128,11 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
             case UPDATE:
               job = driver.getJob(jn.jobInformation.getJobUuid());
-              if (monitor.isJobUpdated(job.getJobInformation(), jn.jobInformation)) {
-                job.setJobInformation(jn.jobInformation);
-                monitor.jobUpdated(driver, job);
+              if (job != null) {
+                if (monitor.isJobUpdated(job.getJobInformation(), jn.jobInformation)) {
+                  job.setJobInformation(jn.jobInformation);
+                  monitor.jobUpdated(driver, job);
+                }
               }
               break;
           }
