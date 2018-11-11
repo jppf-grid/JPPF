@@ -151,14 +151,14 @@ public class TaskInformation implements Serializable {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-    sb.append('[');
-    sb.append("taskId=").append(id);
-    sb.append(", jobId=").append(jobId);
-    sb.append(", jobName=").append(jobName);
-    sb.append(", cpuTime=").append(cpuTime);
-    sb.append(", elapsedTime=").append(elapsedTime);
-    sb.append(", error=").append(error);
-    return sb.toString();
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("taskId=").append(id)
+      .append(", jobId=").append(jobId)
+      .append(", jobName=").append(jobName)
+      .append(", cpuTime=").append(cpuTime)
+      .append(", elapsedTime=").append(elapsedTime)
+      .append(", error=").append(error)
+      .append(", jobPosition=").append(jobPosition)
+      .append(']').toString();
   }
 }

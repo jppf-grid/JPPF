@@ -113,7 +113,6 @@ public class JobNotification extends Notification {
     sb.append(", objectName=").append(getSource());
     sb.append(", sequenceNumber=").append(getSequenceNumber());
     sb.append(", timeStamp=").append(getTimeStamp());
-    sb.append(", objectName=").append(getSource());
     sb.append(']');
     return sb.toString();
   }

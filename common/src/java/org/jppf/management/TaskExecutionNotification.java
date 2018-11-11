@@ -71,12 +71,12 @@ public class TaskExecutionNotification extends OffloadableNotification {
   }
 
   @Override
-  public Object getUserData() {
-    return super.getUserData();
-  }
-
-  @Override
-  public void setUserData(final Object userData) {
-    super.setUserData(userData);
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("source=").append(getSource())
+      .append(", type=").append(getType())
+      .append(", taskInfo=").append(taskInformation)
+      .append(", sequence=").append(getSequenceNumber())
+      .append(']').toString();
   }
 }
