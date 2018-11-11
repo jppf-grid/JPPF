@@ -424,6 +424,9 @@ public class BaseSetup {
     commonCP.add("../JPPF/lib/ApacheCommons/*");
     commonCP.add("../JPPF/lib/JNA/*");
     commonCP.add("../JPPF/lib/oshi/*");
+    commonCP.add("lib/xstream.jar");
+    commonCP.add("lib/xpp3_min.jar");
+    commonCP.add("lib/xmlpull.jar");
     
     final List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");

@@ -348,6 +348,39 @@ public final class ReflectionHelper {
   }
 
   /**
+   * Find the specified public method in the specified class or one of its implemented interfaces or in its super class hierarchy.
+   * @param className the class for which to find the method.
+   * @param methodName the name of the method to find.
+   * @param paramTypeNames the types of the parameters of the method, if any.
+   * @return the matching method, or {@code null} or null if no method matches.
+   * @throws Exception if any error occurs.
+   */
+  public static Method findMethod(final String className, final String methodName, final String...paramTypeNames) throws Exception {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    if (cl == null) cl = ReflectionHelper.class.getClassLoader();
+    final Class<?> clazz = Class.forName(className, true, cl);
+    final Class<?>[] paramTypes = (paramTypeNames == null) ? new Class<?>[0] : new Class<?>[paramTypeNames.length];
+    for (int i=0; i<paramTypes.length; i++) paramTypes[i] = Class.forName(paramTypeNames[i], true, cl);
+    return clazz.getMethod(methodName, paramTypes);
+  }
+
+  /**
+   * Find the specified public constructor in the specified class.
+   * @param className the class for which to find the constructor.
+   * @param paramTypeNames the types of the parameters of the constructor, if any.
+   * @return the matching method, or {@code null} or null if no method matches.
+   * @throws Exception if any error occurs.
+   */
+  public static Constructor<?> findConstructor(final String className, final String...paramTypeNames) throws Exception {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    if (cl == null) cl = ReflectionHelper.class.getClassLoader();
+    final Class<?> clazz = Class.forName(className, true, cl);
+    final Class<?>[] paramTypes = (paramTypeNames == null) ? new Class<?>[0] : new Class<?>[paramTypeNames.length];
+    for (int i=0; i<paramTypes.length; i++) paramTypes[i] = Class.forName(paramTypeNames[i], true, cl);
+    return clazz.getConstructor(paramTypes);
+  }
+
+  /**
    * Instantiate an object that implements the specified interface, whose class name is given by the specified property,
    * by calling either its default constructor or a oonstrcutor that take a String[].
    * @param inf the interface that must be implemented by the class.

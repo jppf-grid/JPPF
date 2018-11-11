@@ -33,7 +33,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher {
    */
   public DriverProcessLauncher(final int n, final TestConfiguration.ProcessConfig config, final Map<String, Object> bindings) {
     super(n, "driver", config, bindings);
-    addClasspathElement("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
+    addCP("../JPPF/lib/HikariCP/HikariCP-java7-2.4.11.jar");
     setMainClass("org.jppf.server.JPPFDriver");
   }
 }
