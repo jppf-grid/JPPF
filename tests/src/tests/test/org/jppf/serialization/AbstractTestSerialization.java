@@ -351,6 +351,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = TEST_TIMEOUT)
   public void testNotification() throws Exception {
+    //final ObjectName name = new ObjectName("domain:name=a");
     final String name = "domain:name=a";
     final Notification notif = new Notification("test", name, 1L, "message");
     notif.setUserData("data");
