@@ -136,41 +136,6 @@ public class ServerJob extends AbstractServerJobBase {
   }
 
   /**
-   * Called to notify that the results of a number of tasks have been received from the server.
-   * @param bundle  the executing job.
-   * @param results the list of tasks whose results have been received from the server.
-   */
-  public void resultsReceived2(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
-    if (debugEnabled) log.debug("received {} results from {}", (results == null ? "null" : results.size()), bundle);
-    if ((results != null) && results.isEmpty()) return;
-    final CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
-    lock.lock();
-    try {
-      final List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
-      if (isJobExpired() || isCancelled() || (bundle.isExpired() && bundle.isOffline())) {
-        for (final ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
-      } else if (results != null) {
-        for (int i=0; i<bundleTasks.size(); i++) {
-          final ServerTask task = bundleTasks.get(i);
-          if (task.getState() == TaskState.RESUBMIT) {
-            if (traceEnabled) log.trace("task to resubmit: {}", task);
-            task.setState(TaskState.PENDING);
-          } else {
-            final DataLocation location = results.get(i);
-            task.resultReceived(location);
-            map.putValue(task.getBundle(), task);
-          }
-        }
-      } else {
-        if (debugEnabled) log.debug("results are null, job is neither expired nor cancelled, node bundle not expired: {}", bundle);
-      }
-    } finally {
-      lock.unlock();
-    }
-    postResultsReceived(map, bundle, null);
-  }
-
-  /**
    * Called to notify that throwable eventually raised while receiving the results.
    * @param bundle    the finished job.
    * @param throwable the throwable that was raised while receiving the results.
