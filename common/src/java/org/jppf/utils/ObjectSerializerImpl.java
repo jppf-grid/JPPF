@@ -33,7 +33,7 @@ public class ObjectSerializerImpl implements ObjectSerializer {
   /**
    * 
    */
-  private JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
+  private final JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
 
   /**
    * The default constructor must be public to allow for instantiation through Java reflection.
