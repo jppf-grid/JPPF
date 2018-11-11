@@ -148,15 +148,15 @@ class WaitingResultsState extends NodeServerState {
       final List<DataLocation> data = received.data();
       if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
       if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
-      server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
-      nodeBundle.resultsReceived(data);
       final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
-      updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
       if (bundler == null) bundler = context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
       if (bundler instanceof BundlerEx) {
         final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
         BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
       } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
+      server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
+      nodeBundle.resultsReceived(data);
+      updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
     }
     final boolean requeue = newBundle.isRequeue();
     final JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
