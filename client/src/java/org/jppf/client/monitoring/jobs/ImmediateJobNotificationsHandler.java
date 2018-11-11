@@ -21,6 +21,7 @@ package org.jppf.client.monitoring.jobs;
 import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
+import org.slf4j.*;
 
 /**
  * This class publishes each JMX notification as a job monitor event.
@@ -29,6 +30,15 @@ import org.jppf.management.JPPFManagementInfo;
  * @exclude
  */
 class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ImmediateJobNotificationsHandler.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+
   /**
    * Initialize with the specified job monitor.
    * @param monitor an instance of {@link JobMonitor}.
@@ -39,6 +49,7 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
 
   @Override
   void handleNotificationAsync(final JobNotification notif) {
+    if (traceEnabled) log.trace("handling {} notification: {}", notif.getEventType(), notif);
     final JobInformation jobInfo = notif.getJobInformation();
     final JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
     if (driver == null) return;

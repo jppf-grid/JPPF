@@ -66,13 +66,14 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
    * @param monitor an instance of {@link JobMonitor}.
    */
   AbstractJobNotificationsHandler(final JobMonitor monitor) {
+    if (debugEnabled) log.debug("initializing {} with {}", getClass().getSimpleName(), monitor);
     this.monitor = monitor;
     monitor.getTopologyManager().addTopologyListener(driverListener = new DriverListener());
   }
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    //if (log.isTraceEnabled()) log.trace("got jmx notification: {}", notification);
+    if (log.isTraceEnabled()) log.trace("got jmx notification: {}", notification);
     executor.execute(new NotificationHandlingTask((JobNotification) notification));
   }
 
@@ -110,7 +111,12 @@ abstract class AbstractJobNotificationsHandler implements NotificationListener, 
 
     @Override
     public void run() {
-      handleNotificationAsync(notif);
+      try {
+        if (log.isTraceEnabled()) log.trace("handling {}", notif);
+        handleNotificationAsync(notif);
+      } catch (final Throwable t) {
+        log.error(t.getMessage(), t);
+      }
     }
   }
 
