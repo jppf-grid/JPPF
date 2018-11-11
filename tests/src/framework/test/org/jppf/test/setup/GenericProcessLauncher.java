@@ -129,16 +129,14 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
-    addClasspathElement("../jmxremote/classes");
-    addClasspathElement("../jmxremote-nio/classes");
-    addClasspathElement("../common/classes");
-    addClasspathElement("../node/classes");
+    addCP("../jmxremote/classes").addCP("../jmxremote-nio/classes").addCP("../common/classes").addCP("../node/classes");
+    addCP("lib/xstream.jar").addCP("lib/xpp3_min.jar").addCP("lib/xmlpull.jar");
     final String libDir = "../JPPF/lib/";
-    addClasspathElement(libDir + "slf4j/slf4j-api-1.7.25.jar");
-    addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.7.25.jar");
-    addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
-    addClasspathElement(libDir + "LZ4/lz4-1.3.0.jar");
-    addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
+    addCP(libDir + "slf4j/slf4j-api-1.7.25.jar");
+    addCP(libDir + "slf4j/slf4j-log4j12-1.7.25.jar");
+    addCP(libDir + "log4j/log4j-1.2.15.jar");
+    addCP(libDir + "LZ4/lz4-1.3.0.jar");
+    addCP(libDir + "ApacheCommons/commons-io-2.4.jar");
   }
 
   /**
@@ -242,9 +240,20 @@ public class GenericProcessLauncher extends ThreadSynchronization implements Run
   /**
    * Add an element (jar or folder) to the classpath.
    * @param element the classpath element to add.
+   * @return this launcher, for method call chaining.
    */
-  public void addClasspathElement(final String element) {
+  public GenericProcessLauncher addClasspathElement(final String element) {
     classpath.add(element);
+    return this;
+  }
+
+  /**
+   * Add an element (jar or folder) to the classpath.
+   * @param element the classpath element to add.
+   * @return this launcher, for method call chaining.
+   */
+  public GenericProcessLauncher addCP(final String element) {
+    return addClasspathElement(element);
   }
 
   /**

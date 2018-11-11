@@ -340,9 +340,12 @@
   <property name="scala.version" value="2.11.8"/>
 
   <target name="dependencies" description="download libs">
-    <get.maven.lib g="org.scala-lang" a="scala-library" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-library.jar"/>
-    <get.maven.lib g="org.scala-lang" a="scala-reflect" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-reflect.jar"/>
-    <get.maven.lib g="com.h2database" a="h2"            v="${h2.version}"    dest="${basedir}/lib" destfile="${basedir}/lib/h2.jar"/>
+    <get.maven.lib g="org.scala-lang"           a="scala-library" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-library.jar"/>
+    <get.maven.lib g="org.scala-lang"           a="scala-reflect" v="${scala.version}" dest="${basedir}/lib" destfile="${basedir}/lib/scala-reflect.jar"/>
+    <get.maven.lib g="com.h2database"           a="h2"            v="${h2.version}"    dest="${basedir}/lib" destfile="${basedir}/lib/h2.jar"/>
+    <get.maven.lib g="com.thoughtworks.xstream" a="xstream"       v="1.4.11.1"         dest="${basedir}/lib" destfile="${basedir}/lib/xstream.jar"/>
+    <get.maven.lib g="xpp3"                     a="xpp3_min"      v="1.1.4c"           dest="${basedir}/lib" destfile="${basedir}/lib/xpp3_min.jar"/>
+    <get.maven.lib g="xmlpull"                  a="xmlpull"       v="1.1.3.1"          dest="${basedir}/lib" destfile="${basedir}/lib/xmlpull.jar"/>
   </target>
 
 </project> 

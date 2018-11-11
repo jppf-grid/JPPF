@@ -20,14 +20,14 @@ package test.org.jppf.serialization;
 
 import static org.junit.Assert.*;
 
-import java.io.NotSerializableException;
+import java.io.*;
 import java.util.Arrays;
 
-import javax.management.ObjectName;
+import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.ObjectSerializerImpl;
+import org.jppf.serialization.*;
+import org.jppf.utils.SystemUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.AbstractNonStandardSetup;
@@ -134,12 +134,6 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
     testObject(new Character((char) 145));
     testObject(Character.MIN_CODE_POINT);
     testObject(Character.MAX_CODE_POINT);
-    testObject(Character.MIN_HIGH_SURROGATE);
-    testObject(Character.MAX_HIGH_SURROGATE);
-    testObject(Character.MIN_LOW_SURROGATE);
-    testObject(Character.MAX_LOW_SURROGATE);
-    testObject(Character.MIN_SURROGATE);
-    testObject(Character.MAX_SURROGATE);
     testObject(Character.MIN_VALUE);
     testObject(Character.MAX_VALUE);
   }
@@ -241,8 +235,7 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    */
   @Test(timeout = TEST_TIMEOUT)
   public void testCharArray() throws Exception {
-    final char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_HIGH_SURROGATE, Character.MAX_HIGH_SURROGATE,
-      Character.MIN_LOW_SURROGATE, Character.MAX_LOW_SURROGATE, Character.MIN_SURROGATE, Character.MAX_SURROGATE, Character.MIN_VALUE, Character.MAX_VALUE };
+    final char[] array1 = { 'F', 145, Character.MIN_CODE_POINT, (char) Character.MAX_CODE_POINT, Character.MIN_VALUE, Character.MAX_VALUE };
     final char[] array2 = (char[]) copyBySerialization(array1);
     assertTrue(Arrays.equals(array1, array2));
   }
@@ -334,8 +327,11 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
     final ObjectName name = new ObjectName("domain:name=a");
     final TaskExecutionNotification notif = new TaskExecutionNotification(name, 1L, new TaskInformation("a", "b", "c", 2L, 3L, true, 4), "d", true);
     final TaskExecutionNotification notif2 = (TaskExecutionNotification) copyBySerialization(notif);
+    print(false, false, "notif  = %s", notif);
+    print(false, false, "notif2 = %s", notif2);
     assertTrue(notif != notif2);
-    assertEquals(name, notif2.getSource());
+    //assertEquals(name, notif2.getSource());
+    assertEquals("task.monitor", notif2.getType());
     assertEquals(1L, notif2.getSequenceNumber());
     final TaskInformation ti = notif2.getTaskInformation();
     assertEquals("a", ti.getId());
@@ -347,6 +343,26 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
     assertEquals(4, ti.getJobPosition());
     assertEquals("d", notif2.getUserData());
     assertTrue(notif2.isUserNotification());
+  }
+
+  /**
+   * Test the serialization and deserialization of a {@link Notification} object.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = TEST_TIMEOUT)
+  public void testNotification() throws Exception {
+    final String name = "domain:name=a";
+    final Notification notif = new Notification("test", name, 1L, "message");
+    notif.setUserData("data");
+    final Notification notif2 = (Notification) copyBySerialization(notif);
+    print(false, false, "notif  = %s", notif);
+    print(false, false, "notif2 = %s", notif2);
+    assertTrue(notif != notif2);
+    //assertEquals(name, notif2.getSource());
+    assertEquals("test", notif2.getType());
+    assertEquals(1L, notif2.getSequenceNumber());
+    assertEquals("message", notif2.getMessage());
+    assertEquals("data", notif2.getUserData());
   }
 
   /**
@@ -365,9 +381,20 @@ public abstract class AbstractTestSerialization extends AbstractNonStandardSetup
    * @throws Exception if any error occurs.
    */
   private static Object copyBySerialization(final Object src) throws Exception {
-    final ObjectSerializer ser = new ObjectSerializerImpl();
-    final byte[] bytes = ser.serialize(src).buffer;
-    return ser.deserialize(bytes);
+    final JPPFSerialization ser = JPPFSerialization.Factory.getSerialization();
+    print(false, false, "serializing %s", SystemUtils.getSystemIdentityName(src));
+    byte[] bytes = null;
+    try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      ser.serialize(src, baos);
+      bytes = baos.toByteArray();
+    }
+    if (ser instanceof XstreamSerialization) print(false, false, "XML form:\n%s", (bytes == null) ? "null" : new String(bytes));
+    print(false, false, "deserializing byte[%d]", (bytes == null) ? -1 : bytes.length);
+    Object o = null;
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes)) {
+      o = ser.deserialize(bais);
+    }
+    return o;
   }
 
   /**
