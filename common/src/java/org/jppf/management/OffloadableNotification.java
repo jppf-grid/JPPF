@@ -46,7 +46,7 @@ public class OffloadableNotification extends Notification {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * 
+   * Heap usage, in bytes, beyond which offloading is triggered.
    */
   private static final long THRESHOLD = parseThreshold();
   /**
