@@ -38,15 +38,6 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
   }
 
   /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   * @param debug to enable debug-level logging.
-   */
-  protected RemoteNodeMessage(final ChannelWrapper<?> channel, final boolean debug) {
-    super(channel, debug);
-  }
-
-  /**
    * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */
@@ -71,7 +62,6 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);
-    sb.append(", length=").append(length);
     sb.append(", count=").append(count);
     sb.append(", currentLength=").append(currentLength);
     sb.append(", currentLengthObject=").append(currentLengthObject);

@@ -37,7 +37,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
    * @param context the context to read from or write to.
    */
   public AbstractTaskBundleMessage(final NioContext<?> context) {
-    super(context, false);
+    super(context);
   }
 
   /**
@@ -46,15 +46,6 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
    */
   public AbstractTaskBundleMessage(final ChannelWrapper<?> channel) {
     super(channel);
-  }
-
-  /**
-   * Initialize this nio message with the specified sll flag.
-   * @param channel the channel to read from or write to.
-   * @param debug to enable debug-level logging.
-   */
-  protected AbstractTaskBundleMessage(final ChannelWrapper<?> channel, final boolean debug) {
-    super(channel, debug);
   }
 
   /**
@@ -79,7 +70,6 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage {
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);
-    sb.append(", length=").append(length);
     sb.append(", count=").append(count);
     sb.append(", currentLength=").append(currentLength);
     sb.append(", bundle=").append(bundle);

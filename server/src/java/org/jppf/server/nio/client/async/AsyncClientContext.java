@@ -200,7 +200,10 @@ public class AsyncClientContext extends StatelessNioContext {
     final List<String> entriesToRemove = new ArrayList<>(entryMap.size());
     entryMap.forEach((id, entry) -> {
       cancelJobOnClose(entry);
-      if (entry.getInitialBundleWrapper().getSLA().isCancelUponClientDisconnect()) entriesToRemove.add(id);
+      if (entry.getInitialBundleWrapper().getSLA().isCancelUponClientDisconnect()) {
+        entriesToRemove.add(id);
+        entry.initialBundleWrapper = null;
+      }
     });
     entriesToRemove.forEach(id -> entryMap.remove(id));
   }
@@ -231,7 +234,6 @@ public class AsyncClientContext extends StatelessNioContext {
           final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
           driver.getQueue().removeBundle(job);
-          jobEntry.initialBundleWrapper = null;
         } catch(final Exception e) {
           log.error(e.getMessage(), e);
         }

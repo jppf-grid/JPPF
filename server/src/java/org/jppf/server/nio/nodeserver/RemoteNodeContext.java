@@ -20,17 +20,12 @@ package org.jppf.server.nio.nodeserver;
 
 import org.jppf.nio.StateTransitionManager;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
 public class RemoteNodeContext extends AbstractNodeContext {
-  /**
-   * 
-   */
-  private static final boolean DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.nio.message.debug", false);
   /**
    * Determines whether the node works in offline mode.
    */
@@ -46,7 +41,7 @@ public class RemoteNodeContext extends AbstractNodeContext {
 
   @Override
   public AbstractTaskBundleMessage newMessage() {
-    return new RemoteNodeMessage(getChannel(), DEBUG);
+    return new RemoteNodeMessage(getChannel());
   }
 
   @Override

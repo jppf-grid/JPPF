@@ -28,7 +28,7 @@ public class BaseNioMessage extends AbstractNioMessage {
    * @param channel the channel to read from or write to.
    */
   public BaseNioMessage(final NioContext<?> channel) {
-    super(channel, false);
+    super(channel);
   }
 
   /**

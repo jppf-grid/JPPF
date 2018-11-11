@@ -71,10 +71,6 @@ public abstract class AbstractNioMessageBase implements NioMessage {
    */
   protected final MultipleBuffersLocation lengthBuf = new MultipleBuffersLocation(4);
   /**
-   * Determines whteher some low-level traces should be logged.
-   */
-  protected final boolean debug;
-  /**
    * 
    */
   protected long sslHandlerReadCount, sslHandlerWriteCount;
@@ -82,13 +78,11 @@ public abstract class AbstractNioMessageBase implements NioMessage {
   /**
    * Initialize this nio message.
    * @param channel the channel to read from or write to.
-   * @param debug to enable debug-level logging.
    */
-  protected AbstractNioMessageBase(final NioContext<?> channel, final boolean debug) {
+  protected AbstractNioMessageBase(final NioContext<?> channel) {
     this.channel = channel;
     this.sslHandler = channel.getSSLHandler();
     this.ssl = sslHandler != null;
-    this.debug = debug;
     if (ssl) {
       sslHandlerReadCount = sslHandler.getChannelReadCount();
       sslHandlerWriteCount = sslHandler.getChannelWriteCount();

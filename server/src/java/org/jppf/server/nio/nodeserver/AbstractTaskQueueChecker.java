@@ -147,24 +147,23 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
       throw new IllegalStateException(message);
     }
     if (debugEnabled) log.debug("request to add idle channel {}", channel);
-    channelsExecutor.execute(new Runnable() {
-      @Override
-      public void run() {
-        if (debugEnabled) log.debug("adding idle channel {}", channel);
-        if (channel.getChannel().isOpen()) {
-          synchronized(idleChannels) {
-            if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
-            if (idleChannels.add(channel)) {
-              channel.idle.set(true);
-              final JPPFSystemInformation info = channel.getSystemInformation();
-              if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
-              stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
-            }
-          }
-          wakeUp();
+    channelsExecutor.execute(() -> {
+      if (debugEnabled) log.debug("adding idle channel {}", channel);
+      if (channel.getChannel().isOpen()) {
+        if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
+        boolean added = false;
+        synchronized(idleChannels) {
+          added = idleChannels.add(channel);
         }
-        else channel.handleException(null);
+        if (added) {
+          channel.idle.set(true);
+          final JPPFSystemInformation info = channel.getSystemInformation();
+          if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
+          stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+        }
+        wakeUp();
       }
+      else channel.handleException(null);
     });
   }
 
@@ -175,13 +174,15 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    */
   C removeIdleChannel(final C channel) {
     if (debugEnabled) log.debug("removing idle channel {}", channel);
+    boolean removed = false;
     synchronized(idleChannels) {
-      if (idleChannels.remove(channel)) {
-        channel.idle.set(false);
-        final JPPFSystemInformation info = channel.getSystemInformation();
-        if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
-        stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
-      } // else log.warn("could not remove idle channel {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());
+      removed = idleChannels.remove(channel);
+    }
+    if (removed) {
+      channel.idle.set(false);
+      final JPPFSystemInformation info = channel.getSystemInformation();
+      if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
+      stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     }
     return channel;
   }
@@ -189,16 +190,10 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   /**
    * Asynchronously remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
-   * @return a futrue on the removal request task.
    */
-  Future<?> removeIdleChannelAsync(final C channel) {
+  void removeIdleChannelAsync(final C channel) {
     if (debugEnabled) log.debug("request to remove idle channel {}", channel);
-    return channelsExecutor.submit(new Runnable() {
-      @Override
-      public void run() {
-        removeIdleChannel(channel);
-      }
-    });
+    channelsExecutor.execute(() -> removeIdleChannel(channel));
   }
 
   /**

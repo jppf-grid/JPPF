@@ -22,7 +22,6 @@ import static org.jppf.node.protocol.BundleParameter.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
@@ -113,57 +112,51 @@ class WaitingResultsState extends NodeServerState {
     Bundler<?> bundler = context.getBundler();
     final ServerTaskBundleNode nodeBundle = context.getBundle();
     final ServerJob job = nodeBundle.getClientJob();
-    final Lock lock = job.getLock();
-    lock.lock();
-    try {
-      if (t != null) {
-        if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
-        nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
-        nodeBundle.resultsReceived(t);
-      } else if (job.isCancelled()) {
-        if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled job: {}", received.second().size(), received.bundle());
-        if (!nodeBundle.isCancelled()) {
-          if (debugEnabled) log.debug("node bundle was not cancelled: {}", nodeBundle);
-          job.cancelDispatch(nodeBundle);
+    if (t != null) {
+      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
+      nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
+      nodeBundle.resultsReceived(t);
+    } else if (job.isCancelled()) {
+      if (debugEnabled) log.debug("received bundle with {} tasks for already cancelled job: {}", received.second().size(), received.bundle());
+      if (!nodeBundle.isCancelled()) {
+        if (debugEnabled) log.debug("node bundle was not cancelled: {}", nodeBundle);
+        job.cancelDispatch(nodeBundle);
+      }
+    } else {
+      if (debugEnabled) log.debug("received bundle with {} tasks, taskCount={}: {}", received.second().size(), newBundle.getTaskCount(), received.bundle());
+      if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
+      if (!nodeBundle.isExpired()) {
+        Set<Integer> resubmitSet = null;
+        final int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
+        if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
+        if (resubmitPositions != null) {
+          resubmitSet = new HashSet<>();
+          for (int n: resubmitPositions) resubmitSet.add(n);
+          if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
         }
-      } else {
-        if (debugEnabled) log.debug("received bundle with {} tasks, taskCount={}: {}", received.second().size(), newBundle.getTaskCount(), received.bundle());
-        if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
-        if (!nodeBundle.isExpired()) {
-          Set<Integer> resubmitSet = null;
-          final int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
-          if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
-          if (resubmitPositions != null) {
-            resubmitSet = new HashSet<>();
-            for (int n: resubmitPositions) resubmitSet.add(n);
-            if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
-          }
-          int count = 0;
-          for (final ServerTask task: nodeBundle.getTaskList()) {
-            if ((resubmitSet != null) && resubmitSet.contains(task.getJobPosition())) {
-              if (task.incResubmitCount() <= task.getMaxResubmits()) {
-                task.resubmit();
-                count++;
-              }
+        int count = 0;
+        for (final ServerTask task: nodeBundle.getTaskList()) {
+          if ((resubmitSet != null) && resubmitSet.contains(task.getJobPosition())) {
+            if (task.incResubmitCount() <= task.getMaxResubmits()) {
+              task.resubmit();
+              count++;
             }
           }
-          if (count > 0) context.updateStatsUponTaskResubmit(count);
-        } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
-        final List<DataLocation> data = received.data();
-        if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
-        if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
-        server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
-        nodeBundle.resultsReceived(data);
-        final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
-        updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
-        if (bundler == null) bundler = context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
-        if (bundler instanceof BundlerEx) {
-          final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
-          BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
-        } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
-      }
-    } finally {
-      lock.unlock();
+        }
+        if (count > 0) context.updateStatsUponTaskResubmit(count);
+      } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
+      final List<DataLocation> data = received.data();
+      if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
+      if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
+      server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
+      nodeBundle.resultsReceived(data);
+      final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
+      updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
+      if (bundler == null) bundler = context.checkBundler(server.getBundlerFactory(), server.getJPPFContext());
+      if (bundler instanceof BundlerEx) {
+        final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
+        BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+      } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
     }
     final boolean requeue = newBundle.isRequeue();
     final JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);

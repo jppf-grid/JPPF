@@ -78,7 +78,6 @@ public class ClientMessage extends AbstractTaskBundleMessage {
     sb.append("nb locations=").append(locations == null ? -1 : locations.size());
     sb.append(", position=").append(position);
     sb.append(", nbObjects=").append(nbObjects);
-    sb.append(", length=").append(length);
     sb.append(", count=").append(count);
     sb.append(", currentLength=").append(currentLength);
     sb.append(']');
