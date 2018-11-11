@@ -191,7 +191,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (message == null) message = new SimpleNioMessage(this);
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+    byteCount = message.getChannelReadCount();
     boolean b = false;
     try {
       b = message.read();
@@ -199,7 +199,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
       updateTrafficStats();
       throw e;
     }
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
+    byteCount = message.getChannelReadCount() - byteCount;
     if (debugEnabled) log.debug("read {} bytes", byteCount);
     if (b) updateTrafficStats();
     return b;
@@ -207,7 +207,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount();
+    byteCount = message.getChannelWriteCount();
     boolean b = false;
     try {
       b = message.write();
@@ -215,7 +215,7 @@ public class JMXContext extends SimpleNioContext<EmptyEnum> {
       updateTrafficStats();
       throw e;
     }
-    byteCount = ((SimpleNioMessage) message).getChannelReadCount() - byteCount;
+    byteCount = message.getChannelWriteCount() - byteCount;
     if (debugEnabled) log.debug("wrote {} bytes", byteCount);
     if (b) updateTrafficStats();
     return b;

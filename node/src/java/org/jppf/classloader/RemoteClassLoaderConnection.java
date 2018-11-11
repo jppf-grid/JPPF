@@ -40,11 +40,11 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractClassLoaderConnection.class);
+  private static final Logger log = LoggerFactory.getLogger(RemoteClassLoaderConnection.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -124,6 +124,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
     } catch (final IOException e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (final Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }
