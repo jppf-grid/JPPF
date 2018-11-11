@@ -336,7 +336,8 @@ public class TestStandaloneConnectorAuth extends AbstractTestStandaloneConnector
    * @param array the elements of the array to provide.
    * @return an array of the specified type.
    */
-  static <T> T[] arrayOf(@SuppressWarnings("unchecked") final T...array) {
+  @SafeVarargs
+  static <T> T[] arrayOf(final T...array) {
     return array;
   }
 }
