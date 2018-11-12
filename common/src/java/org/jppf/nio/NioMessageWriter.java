@@ -40,34 +40,36 @@ public abstract class NioMessageWriter<C extends StatelessNioContext> {
   /**
    * Write to the specified channel.
    * @param context the context to write to.
+   * @return {@code true} if there is more to write, but the socket send buffer is full, {@code false} otherwise.
    * @throws Exception if any errort occurs.
    */
-  protected void write(final C context) throws Exception {
+  protected boolean write(final C context) throws Exception {
     if (context.isSsl()) {
       synchronized(context.getSocketChannel()) {
-        doWrite(context);
+        return doWrite(context);
       }
     }
-    doWrite(context);
+    return doWrite(context);
   }
 
   /**
    * Write to the specified channel.
    * @param context the context to write to.
+   * @return {@code true} if there is more to write, but the socket send buffer is full, {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
-  protected  void doWrite(final C context) throws Exception {
+  protected  boolean doWrite(final C context) throws Exception {
     while (true) {
       NioMessage data = context.getWriteMessage();
       if (data == null) {
         data = context.nextMessageToSend();
-        if (data == null) break;
+        if (data == null) return false;
         context.setWriteMessage(data);
       }
       if (context.writeMessage()) {
         context.setWriteMessage(null);
         postWrite(context, data);
-      } else if (context.writeByteCount <= 0L) break;
+      } else if (context.writeByteCount <= 0L) return true;
     }
   }
 

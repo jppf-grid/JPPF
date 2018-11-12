@@ -21,7 +21,7 @@ package org.jppf.server.nio.client.async;
 import java.io.EOFException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
-import java.util.List;
+import java.util.*;
 
 import javax.net.ssl.*;
 
@@ -47,6 +47,10 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+  /**
    * The message handler for this server.
    */
   private final AsyncClientMessageHandler messageHandler;
@@ -58,6 +62,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    */
   public AsyncClientNioServer(final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
+    selectTimeout = 1000L;
     messageHandler = new AsyncClientMessageHandler();
   }
 
@@ -65,6 +70,22 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   protected void initReaderAndWriter() {
     messageReader = new AsyncClientMessageReader(this);
     messageWriter = new AsyncClientMessageWriter(this);
+  }
+
+  @Override
+  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
+    if (traceEnabled) {
+      int writable = 0, readable = 0, invalid = 0;
+      for (final SelectionKey key: selectedKeys) {
+        if (!key.isValid()) invalid++;
+        else {
+          if (key.isReadable()) readable++;
+          if (key.isWritable()) writable++;
+        }
+      }
+      log.trace("nb keys = {}, readable = {}, writable = {}, invalid = {}", selectedKeys.size(), readable, writable, invalid);
+    }
+    super.go(selectedKeys);
   }
 
   @Override

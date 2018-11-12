@@ -163,8 +163,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
     updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, false);
     @SuppressWarnings("unchecked")
     final C context = (C) key.attachment();
-    messageWriter.write(context);
-    updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, true);
+    if (messageWriter.write(context)) updateInterestOpsNoWakeup(key, SelectionKey.OP_WRITE, true);
   }
 
   /**

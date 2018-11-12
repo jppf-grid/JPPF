@@ -44,7 +44,6 @@ public class AsyncClientMessageWriter extends NioMessageWriter<AsyncClientContex
    */
   public AsyncClientMessageWriter(final StatelessNioServer<AsyncClientContext> server) {
     super(server);
-    
   }
 
   @Override
