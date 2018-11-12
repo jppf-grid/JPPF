@@ -63,7 +63,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   /**
    * The list of idle node channels.
    */
-  private final CollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new DescendingIntegerComparator());
+  private final LinkedListSortedMap<Integer, ChannelWrapper> idleChannels = new LinkedListSortedMap<>(new DescendingIntegerComparator());
   /**
    * Holds information about the execution context.
    */
@@ -157,7 +157,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       return;
     }
     pendingActions.offer(() -> {
-      if (debugEnabled) log.debug("Adding idle channel from synchronized block: {}", channel);
+      if (debugEnabled) log.debug("Adding idle channel {}", channel);
       idleChannels.putValue(channel.getPriority(), channel);
     });
     wakeUp();
@@ -171,7 +171,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     if (debugEnabled) log.debug("removing chhanel {}", channel);
     if ((channelsExecutor == null) || channelsExecutor.isShutdown() || isStopped()) return;
     pendingActions.offer(() -> {
-      if (debugEnabled) log.debug("Removing idle channel from synchronized block: {}", channel);
+      if (debugEnabled) log.debug("Removing idle channel {}", channel);
       idleChannels.removeValue(channel.getPriority(), channel);
     });
     wakeUp();
