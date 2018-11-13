@@ -41,7 +41,7 @@ import org.slf4j.*;
  * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
-public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Future<List<Task<?>>> {
+public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?>>, Future<List<Task<?>>> {
   /**
    * Logger for this class.
    */

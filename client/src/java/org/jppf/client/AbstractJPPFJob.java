@@ -32,9 +32,10 @@ import org.slf4j.*;
 /**
  * Instances of this class represent a JPPF job and hold all the required elements:
  * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
+ * @param <J> the type of job.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJob, JobStatusHandler {
+public abstract class AbstractJPPFJob<J extends AbstractJPPFJob<J>> implements Serializable, JPPFDistributedJob, JobStatusHandler {
   /**
    * Logger for this class.
    */
@@ -55,7 +56,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * The container for data shared between tasks.
    * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
    */
-  DataProvider dataProvider = null;
+  DataProvider dataProvider;
   /**
    * Determines whether the execution of this job is blocking on the client side.
    */
@@ -63,7 +64,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * The user-defined display name for this job.
    */
-  String name = null;
+  String name;
   /**
    * The universal unique id for this job.
    */
@@ -91,7 +92,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
-  transient JobPersistence<?> persistenceManager = null;
+  transient JobPersistence<?> persistenceManager;
   /**
    * The client that submitted this job.
    */
@@ -146,9 +147,10 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @param name the display name as a string.
    * @return this job, for method chaining.
    */
-  public AbstractJPPFJob setName(final String name) {
+  @SuppressWarnings("unchecked")
+  public J setName(final String name) {
     this.name = name;
-    return this;
+    return (J) this;
   }
 
   @Override
@@ -165,7 +167,8 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   public boolean equals(final Object obj) {
     if (this == obj) return true;
     if (!(obj instanceof AbstractJPPFJob)) return false;
-    final AbstractJPPFJob other = (AbstractJPPFJob) obj;
+    @SuppressWarnings("unchecked")
+    final AbstractJPPFJob<J> other = (AbstractJPPFJob<J>) obj;
     return (uuid == null) ? other.uuid == null : uuid.equals(other.uuid);
   }
 
@@ -208,9 +211,10 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @param dataProvider a <code>DataProvider</code> instance.
    * @return this job, for method chaining.
    */
-  public AbstractJPPFJob setDataProvider(final DataProvider dataProvider) {
+  @SuppressWarnings("unchecked")
+  public J setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
-    return this;
+    return (J) this;
   }
 
   /**
@@ -226,9 +230,10 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @param blocking true if the execution is blocking, false otherwise.
    * @return this job, for method chaining.
    */
-  public AbstractJPPFJob setBlocking(final boolean blocking) {
+  @SuppressWarnings("unchecked")
+  public J setBlocking(final boolean blocking) {
     this.blocking = blocking;
-    return this;
+    return (J) this;
   }
 
   @Override
