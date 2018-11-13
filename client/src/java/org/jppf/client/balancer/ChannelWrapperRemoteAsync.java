@@ -112,6 +112,15 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * Also handles exceptions and failover and recovery scenarios when the driver connection breaks.
    */
   private class RemoteSender implements Runnable {
+    /**
+     * Logger for this class.
+     */
+    private Logger thisLog = LoggerFactory.getLogger(RemoteSender.class);
+    /**
+     * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+     */
+    private boolean thisDebugEnabled = LoggingUtils.isDebugEnabled(thisLog);
+
     @Override
     public void run() {
       while (!channel.isClosed()) {
@@ -121,7 +130,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           clientBundle = bundleQueue.take();
           final List<Task<?>> tasks = clientBundle.getTasksL();
           final JPPFJob newJob = createNewJob(clientBundle, tasks);
-          if (debugEnabled) log.debug("{} executing {} tasks of job {} with bundleId = {}", ChannelWrapperRemoteAsync.this, tasks.size(), newJob, clientBundle.getBundleId());
+          if (thisDebugEnabled) thisLog.debug("{} executing {} tasks of job {} with bundleId = {}", ChannelWrapperRemoteAsync.this, tasks.size(), newJob, clientBundle.getBundleId());
           final Collection<ClassLoader> loaders = registerClassLoaders(newJob);
           final TaskBundle bundle = createBundle(newJob, clientBundle.getBundleId());
           bundle.setUuid(uuid);
@@ -132,11 +141,11 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           final RemoteResponse response = new RemoteResponse(clientBundle, 0, cl, ser, start);
           synchronized(response) {
             if (response.currentCount < response.taskCount) responseMap.put(clientBundle.getBundleId(), response);
-            if (debugEnabled) log.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
+            if (thisDebugEnabled) thisLog.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
             final List<Task<?>> notSerializableTasks = channel.sendTasks(ser, cl, bundle, newJob);
             clientBundle.jobDispatched(ChannelWrapperRemoteAsync.this);
             if (!notSerializableTasks.isEmpty()) {
-              if (debugEnabled) log.debug("got {} non-serializable tasks for {}", notSerializableTasks.size(), clientBundle);
+              if (thisDebugEnabled) thisLog.debug("got {} non-serializable tasks for {}", notSerializableTasks.size(), clientBundle);
               response.currentCount = notSerializableTasks.size();
               clientBundle.resultsReceived(notSerializableTasks);
             }
@@ -153,6 +162,15 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * Thread which receives the task results from the driver.
    */
   private class RemoteReceiver implements Runnable {
+    /**
+     * Logger for this class.
+     */
+    private Logger thisLog = LoggerFactory.getLogger(RemoteReceiver.class);
+    /**
+     * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+     */
+    private boolean thisDebugEnabled = LoggingUtils.isDebugEnabled(thisLog);
+
     @Override
     public void run() {
       while (!channel.isClosed()) {
@@ -162,17 +180,17 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         try {
           awaitStatus();
           final TaskBundle bundle = channel.receiveHeader(null, null);
-          if (debugEnabled) log.debug("received bundle {}", bundle);
+          if (thisDebugEnabled) thisLog.debug("received bundle {}", bundle);
           final long bundleId = bundle.getParameter(BundleParameter.CLIENT_BUNDLE_ID);
           final RemoteResponse response = responseMap.remove(bundleId);
           if (response == null) {
-            log.debug("response object no longer in queue for bundleId = {}", bundleId);
+            thisLog.debug("response object no longer in queue for bundleId = {}", bundleId);
             continue;
           }
           synchronized(response) {
             clientBundle = response.clientBundle;
             final List<Task<?>> tasks = channel.receiveTasks(bundle, response.ser, response.cl);
-            if (debugEnabled) log.debug("received {} tasks for {}", tasks.size(), clientBundle);
+            if (thisDebugEnabled) thisLog.debug("received {} tasks for {}", tasks.size(), clientBundle);
             response.handleResults(tasks);
             if (response.currentCount < response.taskCount) {
               responseMap.put(bundleId, response);
@@ -263,8 +281,8 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * @return an eventual exception to use in job results processing.
    */
   private Exception handleThrowable(final ClientTaskBundle clientBundle, final Throwable t, final boolean fromSender) {
-    if (debugEnabled) log.debug("handling throwable for {}: ", clientBundle, t);
-    else log.warn("handling throwable for {}: {}", clientBundle, t);
+    if (debugEnabled) log.debug("handling throwable for {}:\bchannel = {}", clientBundle, this, t);
+    else log.warn("handling throwable for {}: {}, channel = {}", clientBundle, t, this);
     final boolean channelClosed = channel.isClosed();
     if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
     if (channelClosed && !resetting) return null;
@@ -375,5 +393,22 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   @Override
   public int getMaxJobs() {
     return channel.getPool().getMaxJobs();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("bundleQueue=").append(bundleQueue.size())
+      .append(", responseMap=").append(responseMap.size())
+      .append(", joBCount=").append(getCurrentNbJobs())
+      .append(", resetting=").append(resetting)
+      .append(", bundlerAlgorithm=").append(bundlerAlgorithm)
+      .append(", channel=");
+    try {
+      sb.append(channel);
+    } catch (final Exception e) {
+      sb.append(ExceptionUtils.getMessage(e));
+    }
+    return sb.append(']').toString();
   }
 }
