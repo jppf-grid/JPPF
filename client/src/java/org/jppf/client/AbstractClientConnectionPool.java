@@ -448,7 +448,7 @@ public abstract class AbstractClientConnectionPool extends AbstractConnectionPoo
 
   /**
    * Set the maximum number of jobs that can be processed concurrently by each connection.
-   * If the provided {@code maxJobs} is <= 0, this method has no effect.
+   * If the provided {@code maxJobs} is less than 1, this method has no effect.
    * @param maxJobs the maximum number of jobs to set.
    * @return the new maximum number of jobs.
    */
