@@ -53,9 +53,11 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     client.submitJob(job);
     BaseTestHelper.printToAll(client, true, true, true, false, "waiting for JOB_DISPATCH notification");
     listener.await();
+    BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver");
     restartDriver(driver, 100L, 1000L);
     BaseTestHelper.printToAll(client, true, true, true, false, "getting job results");
     final List<Task<?>> results = job.awaitResults();
+    BaseTestHelper.printToAll(client, true, true, true, false, "checking job results");
     checkResults(results, nbTasks);
   }
 
@@ -64,7 +66,6 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
-  //@Test()
   public void testRestartDriverWhenIdle() throws Exception {
     final int nbTasks = 1;
     final long duration = 1L;
@@ -72,11 +73,14 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
     final String jobNamePrefix = ReflectionUtils.getCurrentMethodName();
     print(false, false, "submitting job 1");
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(jobNamePrefix + "-1", true, false, nbTasks, LifeCycleTask.class, duration));
+    print(false, false, "checking job 1 results");
     checkResults(results, nbTasks);
+    print(false, false, "awaiting working connection pool");
     final JPPFClientConnection conn = client.awaitWorkingConnectionPool().awaitWorkingConnection();
     final MyClientListener clientListener = new MyClientListener();
     conn.addClientConnectionStatusListener(clientListener);
     try {
+      BaseTestHelper.printToAll(client, true, true, true, false, "restarting driver");
       restartDriver(driver, 100L, 1000L);
       print(false, false, "waiting for 0 connection");
       while (!client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses()).isEmpty()) Thread.sleep(10L);
@@ -84,6 +88,7 @@ public class TestJPPFDriverAdminMBean2 extends Setup1D1N1C {
       while (client.awaitWorkingConnectionPool() == null) Thread.sleep(10L);
       print(false, false, "submitting job 2");
       results = client.submitJob(BaseTestHelper.createJob(jobNamePrefix + "-2", true, false, nbTasks, LifeCycleTask.class, duration));
+      BaseTestHelper.printToAll(client, true, true, true, false, "checking job 2 results");
       checkResults(results, nbTasks);
     } finally {
       conn.removeClientConnectionStatusListener(clientListener);

@@ -300,19 +300,22 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           resubmitBundle(clientBundle, exception);
         }
         if (debugEnabled) log.debug("{} resubmitting all queued jobs", this);
-        if (fromSender) {
-          bundleQueue.forEach(bundle -> resubmitBundle(bundle, exception));
-          bundleQueue.clear();
-        } else {
-          final Map<Long, RemoteResponse> map = new ConcurrentHashMap<>(responseMap);
-          responseMap.clear();
-          map.forEach((id, response) -> resubmitBundle(response.clientBundle, exception));
-        }
+        final Set<ClientTaskBundle> resubmitted = new HashSet<>(jobCount.get());
+        final Set<Long> resubmittedIds = new HashSet<>(jobCount.get());
+        bundleQueue.drainTo(resubmitted);
+        resubmitted.forEach(bundle -> {
+          resubmittedIds.add(bundle.getBundleId());
+          resubmitBundle(bundle, exception);
+        });
+        jobCount.set(0);
+        final Map<Long, RemoteResponse> map = new ConcurrentHashMap<>(responseMap);
+        responseMap.clear();
+        map.forEach((id, response) -> { if (!resubmittedIds.contains(id)) resubmitBundle(response.clientBundle, exception); });
         reconnect();
       }
     } finally {
       if ((clientBundle != null)) {
-        jobCount.decrementAndGet();
+        if (jobCount.get() > 0) jobCount.decrementAndGet();
         if ((getStatus() == JPPFClientConnectionStatus.EXECUTING) && (getCurrentNbJobs() < getMaxJobs())) setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
@@ -325,7 +328,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * @param e an eventual exception that might have cause the resubmission.
    */
   private void resubmitBundle(final ClientTaskBundle clientBundle, final Exception e) {
-    if (debugEnabled) log.debug("resubmitting {}", clientBundle);
+    if (debugEnabled) log.debug("resubmitting {} with exception {}", clientBundle, e);
     clientBundle.resubmit();
     clientBundle.taskCompleted(e);
     clientBundle.getClientJob().removeChannel(this);
