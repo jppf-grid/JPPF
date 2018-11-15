@@ -120,12 +120,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   void submitProvisioningRequest(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
     if (requestedSlaves < 0) return;
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        shrinkOrGrowSlaves(requestedSlaves, interruptIfRunning, configOverrides);
-      }
-    });
+    executor.execute(() -> shrinkOrGrowSlaves(requestedSlaves, interruptIfRunning, configOverrides));
   }
 
   /**
@@ -143,7 +138,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       if (debugEnabled) log.debug("stopping all processes");
       this.configOverrides = configOverrides;
       synchronized(slaves) {
-        for (SlaveNodeLauncher slave: slaves.values()) {
+        for (final SlaveNodeLauncher slave: slaves.values()) {
           synchronized(slave) {
             if (slave.isStarted()) slave.sendActionCommand(action);
             else {

@@ -27,8 +27,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -79,8 +78,7 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String clientDataChannels() {
-    final boolean async = JPPFConfiguration.get(JPPFProperties.CLIENT_ASYNCHRONOUS);
-    if (async) {
+    if (driver.isAsyncClient()) {
       final Selector selector = driver.getAsyncClientNioServer().getSelector();
       final Set<SelectionKey> keys = new HashSet<>(selector.keys());
       final StringBuilder sb = new StringBuilder();
