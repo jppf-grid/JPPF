@@ -72,23 +72,30 @@ public class DeleteFileVisitor extends SimpleFileVisitor<Path> {
 
   @Override
   public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-    if ((fileMatcher == null) || fileMatcher.matches(file)) {
-      if (debugEnabled) log.debug("deleting file = {}", file);
-      Files.delete(file);
+    try {
+      if ((fileMatcher == null) || fileMatcher.matches(file)) {
+        if (debugEnabled) log.debug("deleting file = {}", file);
+        Files.delete(file);
+      }
+    } catch (final NoSuchFileException e) {
+      if (debugEnabled) log.debug("error trying to delete file '{}':\n{}", file, ExceptionUtils.getStackTrace(e));
+      else log.warn("error trying to delete file '{}': {}", file, ExceptionUtils.getMessage(e));
     }
     return FileVisitResult.CONTINUE;
   }
 
   @Override
   public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
-    if (e != null) throw e;
-    if ((dir.toFile().listFiles().length <= 0) && ((dirMatcher == null) || dirMatcher.matches(dir))) {
-      if (debugEnabled) {
-        if ("lb_persistence_driver1".equals(dir.toString())) log.debug("deleting dir = {}, from callstack:\n{}", dir, ExceptionUtils.getCallStack());
-        else log.debug("deleting dir = {}", dir);
+    try {
+      if ((dir.toFile().listFiles().length <= 0) && ((dirMatcher == null) || dirMatcher.matches(dir))) {
+        if (debugEnabled)  log.debug("deleting dir = {}", dir);
+        Files.delete(dir);
       }
-      Files.delete(dir);
+    } catch (final NoSuchFileException e2) {
+      if (debugEnabled) log.debug("error trying to delete directory '{}':\n{}", dir, ExceptionUtils.getStackTrace(e2));
+      else log.warn("error trying to delete directory '{}': {}", dir, ExceptionUtils.getMessage(e2));
     }
+    if (e != null) throw e;
     return FileVisitResult.CONTINUE;
   }
 }
