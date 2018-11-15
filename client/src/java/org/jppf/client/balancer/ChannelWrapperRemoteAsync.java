@@ -268,7 +268,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
       elapsed = System.nanoTime() - start;
       final int n = results.size();
       currentCount += n;
-      if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
+      if (debugEnabled) log.debug("received {} tasks from server{}", n, (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
       clientBundle.resultsReceived(results);
     }
   }
@@ -282,13 +282,16 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    */
   private Exception handleThrowable(final ClientTaskBundle clientBundle, final Throwable t, final boolean fromSender) {
     if (debugEnabled) log.debug("handling throwable for {}:\bchannel = {}", clientBundle, this, t);
-    else log.warn("handling throwable for {}: {}, channel = {}", clientBundle, t, this);
     final boolean channelClosed = channel.isClosed();
     if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
     if (channelClosed && !resetting) return null;
+    if (!channelClosed) {
+      final String jobMsg = (clientBundle == null) ? "" : " while handling job " + clientBundle;
+      if (debugEnabled) log.debug("Throwable was raised{} on channel {}\n{}", jobMsg, this, ExceptionUtils.getStackTrace(t));
+      else log.warn("Throwable was raised{} on channel {} : {}", jobMsg, this, ExceptionUtils.getMessage(t));
+    }
     final Exception exception = (t == null) ? null : ((t instanceof Exception) ? (Exception) t : new JPPFException(t));
     try {
-      //if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
       if (t instanceof NotSerializableException) {
         if (clientBundle != null) clientBundle.resultsReceived(t);
       } else {
@@ -308,7 +311,10 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         reconnect();
       }
     } finally {
-      jobCount.decrementAndGet();
+      if ((clientBundle != null)) {
+        jobCount.decrementAndGet();
+        if ((getStatus() == JPPFClientConnectionStatus.EXECUTING) && (getCurrentNbJobs() < getMaxJobs())) setStatus(JPPFClientConnectionStatus.ACTIVE);
+      }
     }
     return exception;
   }
@@ -333,11 +339,11 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   private void handleBundleComplete(final ClientTaskBundle clientBundle, final Exception exception) {
     try {
       final boolean channelClosed = channel.isClosed();
-      if (debugEnabled) log.debug("finally: channelClosed={}, resetting={}", channelClosed, resetting);
+      if (debugEnabled) log.debug("channelClosed={}, resetting={}, bundle={}, exception={}", channelClosed, resetting, clientBundle, exception);
       if (!channelClosed || resetting) {
         if (clientBundle != null) clientBundle.taskCompleted(exception instanceof IOException ? null : exception);
       }
-      if (clientBundle != null) clientBundle.getClientJob().removeChannel(ChannelWrapperRemoteAsync.this);
+      if (clientBundle != null) clientBundle.getClientJob().removeChannel(this);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     } finally {
