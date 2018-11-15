@@ -18,14 +18,14 @@
 
 package org.jppf.client;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.discovery.ClientConnectionPoolInfo;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.*;
 import org.jppf.utils.Operator;
-import org.jppf.utils.concurrent.ThreadUtils;
+import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
 /**
@@ -194,6 +194,29 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
    */
   public JPPFClientConnection awaitConnection(final JPPFClientConnectionStatus...statuses) {
     return awaitConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
+  }
+
+  /**
+   * Wait for the specified number of connections to be in one of the specified states, or the specified timeout to expire, whichever happens first.
+   * This method will increase or decrease the number of connections in this pool as needed.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param nbConnections the number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections to wait for.
+   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @since 5.0
+   */
+  public List<JPPFClientConnection> awaitConnections(final ComparisonOperator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final ComparisonOperator op = operator == null ? Operator.EQUAL : operator;
+    if (debugEnabled) log.debug("awaiting {} connections with operator={} and status in {}", nbConnections, op, Arrays.asList(statuses));
+    final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections);
+      }
+    }, timeout);
+    if (debugEnabled) log.debug("got expected connections: " + ref.get());
+    return ref.get();
   }
 
   /**
