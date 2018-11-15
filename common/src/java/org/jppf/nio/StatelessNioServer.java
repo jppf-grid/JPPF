@@ -239,4 +239,83 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
   public static boolean isKeyValid(final SelectionKey key) {
     return key.isValid() && key.channel().isOpen();
   }
+
+  /**
+   * Get all connections accepted by this server.
+   * @return a list of {@link ChannelWrapper} instances.
+   */
+  public Map<String, C> getAllContexts() {
+    Set<SelectionKey> keys = null;
+    sync.wakeUpAndSetOrIncrement();
+    try {
+      keys  = new HashSet<>(selector.keys());
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      sync.decrement();
+    }
+    if (keys == null) return Collections.emptyMap();
+    final Map<String, C> channels = new HashMap<>(keys.size());
+    for (final SelectionKey key: keys) {
+      @SuppressWarnings("unchecked")
+      final C context = (C) key.attachment();
+      channels.put(context.getUuid(), context);
+    }
+    return channels;
+  }
+
+
+  /**
+   * Perform the specified action on the contexts that pass the specified filter.
+   * @param filter the context filter, may be {@code null}.
+   * @param action the action to execute, may be {@code null}..
+   * @return a list of {@link ChannelWrapper} instances.
+   */
+  public Map<String, C> performContextAction(final ContextFilter<C> filter, final ContextAction<C> action) {
+    Set<SelectionKey> keys = null;
+    sync.wakeUpAndSetOrIncrement();
+    try {
+      keys  = new HashSet<>(selector.keys());
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      sync.decrement();
+    }
+    if (keys == null) return Collections.emptyMap();
+    final Map<String, C> channels = new HashMap<>(keys.size());
+    for (final SelectionKey key: keys) {
+      @SuppressWarnings("unchecked")
+      final C context = (C) key.attachment();
+      if ((filter == null) || filter.accepts(context)) {
+        try {
+          if (action != null) action.execute(context);
+        } catch (final Exception e) {
+          log.error("error trying to close {}", context, e);
+        }
+        channels.put(context.getUuid(), context);
+      }
+    }
+    return channels;
+  }
+
+  /**
+   * @param <C> the type of connection context.
+   */
+  public interface ContextFilter<C extends StatelessNioContext> {
+    /**
+     * @param context the context to check.
+     * @return {@code true} if the context is accepted, {@code false} otherwise.
+     */
+    boolean accepts(C context);
+  }
+
+  /**
+   * @param <C> the type of connection context.
+   */
+  public interface ContextAction<C extends StatelessNioContext> {
+    /**
+     * @param context the context on which to execute the action.
+     */
+    void execute(C context);
+  }
 }

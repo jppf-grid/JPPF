@@ -71,8 +71,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected int[] sslPorts;
   /**
-   * Timeout for the select() operations. A value of 0 means no timeout, i.e.
-   * the <code>Selector.select()</code> will be invoked without parameters.
+   * Timeout for the select() operations. A value of 0 means no timeout, i.e. the {@code Selector.select()} method will be invoked without parameters.
    */
   protected long selectTimeout;
   /**
@@ -110,12 +109,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    *
    */
-  protected final Runnable wakeUpAction = new Runnable() {
-    @Override
-    public void run() {
-      getSelector().wakeup();
-    }
-  };
+  protected final Runnable wakeUpAction = () -> getSelector().wakeup();
   /**
    * Used to synchronize on th selector for blocking operations.
    */

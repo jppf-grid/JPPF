@@ -24,6 +24,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.client.async.AsyncClientNioServer;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -127,7 +128,9 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
     }
     if (removeJobConnection) {
       final String connectionUuid = context.getConnectionUuid();
-      JPPFDriver.getInstance().getClientNioServer().closeClientConnection(connectionUuid);
+      final JPPFDriver driver = JPPFDriver.getInstance();
+      if (driver.isAsyncClient()) driver.getAsyncClientNioServer().performContextAction(ctx -> connectionUuid.equals(ctx.getConnectionUuid()), AsyncClientNioServer::closeConnection);
+      else driver.getClientNioServer().closeClientConnection(connectionUuid);
     }
   }
 

@@ -25,6 +25,7 @@ import org.jppf.comm.recovery.HeartbeatMessage;
 import org.jppf.io.IOHelper;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.client.async.AsyncClientNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -134,7 +135,8 @@ class HeartbeatContext extends StatelessNioContext {
       final ChannelWrapper<?> nodeClassChannel = driver.getNodeClassServer().getNodeConnection(uuid);
       if (nodeClassChannel != null) driver.getNodeClassServer().connectionFailed(nodeClassChannel);
     } else {
-      driver.getClientNioServer().removeConnections(uuid);
+      if (driver.isAsyncClient()) driver.getAsyncClientNioServer().performContextAction(ctx -> uuid.equals(ctx.getUuid()), AsyncClientNioServer::closeConnection);
+      else driver.getClientNioServer().removeConnections(uuid);
       driver.getClientClassServer().removeProviderConnections(uuid);
     }
     handleException(null);

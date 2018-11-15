@@ -21,9 +21,8 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.concurrent.ThreadUtils;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 
@@ -116,7 +115,7 @@ public class JPPFPeerInitializer implements Runnable {
         if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, JPPFDriver.getInstance().getClientClassServer(), secure, connectionUuid);
         provider.init();
         if (node == null) {
-          node = (JPPFConfiguration.get(JPPFProperties.CLIENT_ASYNCHRONOUS))
+          node = driver.isAsyncClient()
             ? new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid)
             : new PeerNode(peerName, connectionInfo, driver.getClientNioServer(), secure, connectionUuid);
         }

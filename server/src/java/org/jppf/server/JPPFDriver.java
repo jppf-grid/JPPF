@@ -161,6 +161,10 @@ public class JPPFDriver {
    * System ibnformation for this driver.
    */
   private JPPFSystemInformation systemInformation;
+  /**
+   * Whether the client job channel is the asynchronous implementation.
+   */
+  private boolean asyncClient;
 
   /**
    * Initialize this JPPFDriver.
@@ -168,6 +172,7 @@ public class JPPFDriver {
    */
   protected JPPFDriver() {
     config = JPPFConfiguration.getProperties();
+    asyncClient = config.get(JPPFProperties.CLIENT_ASYNCHRONOUS);
     final String s;
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
@@ -203,8 +208,7 @@ public class JPPFDriver {
     }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
-    if (JPPFConfiguration.get(JPPFProperties.CLIENT_ASYNCHRONOUS))
-      NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
+    if (isAsyncClient()) NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
     else NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(new NodeNioServer(this, taskQueue, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
@@ -551,5 +555,13 @@ public class JPPFDriver {
    */
   public boolean isShuttingDown() {
     return shuttingDown.get();
+  }
+
+  /**
+   * @return whether the client job channel is the asynchronous implementation.
+   * @exclude
+   */
+  public boolean isAsyncClient() {
+    return asyncClient;
   }
 }

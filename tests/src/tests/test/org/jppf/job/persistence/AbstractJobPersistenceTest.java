@@ -51,13 +51,9 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
-  /**
-   * 
-   */
+  /** */
   private static final long WAIT_TIME_EMPTY_UUIDS = 5000L;
-  /**
-   * 
-   */
+  /** */
   private int dumpSequence;
 
   /** */

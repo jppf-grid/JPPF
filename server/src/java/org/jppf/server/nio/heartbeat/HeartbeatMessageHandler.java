@@ -164,7 +164,6 @@ class HeartbeatMessageHandler {
   }
 
   /**
-   * 
    * @return the executor service that handles the channels heartbeats.
    */
   private ExecutorService initExecutor() {

@@ -166,7 +166,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * Close the specified channel.
    * @param context the channel to close.
    */
-  static void closeConnection(final AsyncClientContext context) {
+  public static void closeConnection(final AsyncClientContext context) {
     if (debugEnabled) log.debug("closing {}", context);
     try {
       final SelectionKey key = context.getSelectionKey();
