@@ -53,7 +53,7 @@ public class LongProperty extends NumberProperty<Long> {
 
   @Override
   public Long valueOf(final String value) {
-    return validate(Double.valueOf(value).longValue());
+    return validate(Double.valueOf(sanitizeValue(value)).longValue());
   }
 
   @Override

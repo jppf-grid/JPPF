@@ -111,4 +111,13 @@ public abstract class NumberProperty<T extends Number> extends AbstractJPPFPrope
     if ((value != null) && hasMinAndMax() && ((cv.compareTo((T) minValue) < 0) || (cv.compareTo((T) maxValue) > 0))) return getDefaultValue();
     return value;
   }
+
+  /**
+   * Sanitize the specified string value.
+   * @param value the value to sanitize.
+   * @return the sanitized value.
+   */
+  String sanitizeValue(final String value) {
+    return (value == null) ? null : PropertiesHelper.removeUnderscores(value.trim());
+  }
 }

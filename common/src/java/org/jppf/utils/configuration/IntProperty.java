@@ -53,7 +53,7 @@ public class IntProperty extends NumberProperty<Integer> {
 
   @Override
   public Integer valueOf(final String value) {
-    return validate(Double.valueOf(value).intValue());
+    return validate(Double.valueOf(sanitizeValue(value)).intValue());
   }
 
   @Override

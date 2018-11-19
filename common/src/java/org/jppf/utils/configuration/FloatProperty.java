@@ -53,7 +53,7 @@ public class FloatProperty extends NumberProperty<Float> {
 
   @Override
   public Float valueOf(final String value) {
-    return validate(Float.valueOf(value));
+    return validate(Float.valueOf(sanitizeValue(value)));
   }
 
   @Override

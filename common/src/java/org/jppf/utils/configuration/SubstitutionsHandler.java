@@ -283,9 +283,9 @@ public class SubstitutionsHandler {
     }
 
     /**
-     * Get the value for the spciefied key.
-     * @param key the name of the property or variable to lookup^.
-     * @return the vakue for th espeicifed key or {@code null} if the value could not be found.
+     * Get the value for the specified key.
+     * @param key the name of the property or variable to lookup.
+     * @return the vakue for the specified key or {@code null} if the value could not be found.
      */
     abstract String getValue(final String key);
   }

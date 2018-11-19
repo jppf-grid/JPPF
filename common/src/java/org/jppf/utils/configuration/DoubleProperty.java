@@ -53,7 +53,7 @@ public class DoubleProperty extends NumberProperty<Double> {
 
   @Override
   public Double valueOf(final String value) {
-    return validate(Double.valueOf(value));
+    return validate(Double.valueOf(sanitizeValue(value)));
   }
 
   @Override
