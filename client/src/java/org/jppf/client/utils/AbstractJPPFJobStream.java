@@ -23,6 +23,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class provide a stream of JPPF jobs.
@@ -40,6 +41,10 @@ import org.jppf.client.event.*;
  * }</pre>
  */
 public abstract class AbstractJPPFJobStream extends JobListenerAdapter implements Iterable<JPPFJob>, Iterator<JPPFJob>, AutoCloseable {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AbstractJPPFJobStream.class);
   /**
    * The maximum number of jobs submitted concurrently.
    */
@@ -102,7 +107,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
         try {
           concurrencyLimitCondition.await();
         } catch (final InterruptedException e) {
-          e.printStackTrace();
+          log.error(e.getMessage(), e);
         }
       }
       return buildJob();
