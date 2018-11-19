@@ -26,12 +26,12 @@ import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.pooling.DirectBufferPool;
 
 /**
- * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
+ * Input source backed by a {@link ReadableByteChannel}.
  * @author Laurent Cohen
  */
 public class ChannelInputSource implements InputSource {
   /**
-   * The backing <code>ReadableByteChannel</code>.
+   * The backing {@link ReadableByteChannel}.
    */
   protected ReadableByteChannel channel = null;
 
@@ -58,8 +58,7 @@ public class ChannelInputSource implements InputSource {
 
   /**
    * Read data from this input source into a byte buffer.
-   * <p>
-   * <b>Implementation details</b>:<br/>
+   * <p><b>Implementation details</b>:<br/>
    * We read the data by small chunks of max {@link IO#TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer, to work around the fact that Sun NIO implementation of SocketChannelImpl.read() attempts
    * to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case), <i>if the destination ByteBuffer is not direct</i>.<br/>
    * This implementation can result in a &quot;OutOfMemoryError: Direct buffer space&quot; when the size of the data to read is too large.<br/>
