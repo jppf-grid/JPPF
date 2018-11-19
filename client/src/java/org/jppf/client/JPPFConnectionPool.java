@@ -226,9 +226,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     int currentSize = getSize();
     if (currentSize == newSize) return currentSize;
     if (debugEnabled) log.debug("requesting new size={}, current size={}", newSize, currentSize);
-    int diff = newSize - currentSize;
-    int size = connectionCount();
+    final int diff = newSize - currentSize;
+    final int size = connectionCount();
     if (diff < 0) {
+      if (debugEnabled) log.debug("attempting to removing {} connections from pool {}", -diff, this);
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
@@ -244,6 +245,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
         this.size -= actual;
       }
     } else {
+      if (debugEnabled) log.debug("adding {} connections to pool {}", diff, this);
       synchronized(this) {
         this.size += diff;
       }

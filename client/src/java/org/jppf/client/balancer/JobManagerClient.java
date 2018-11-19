@@ -193,6 +193,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     synchronized(wrapperMap) {
       wrapper = wrapperMap.get(cnn);
     }
+    if (debugEnabled) log.debug("cached wrapper is {}", wrapper);
     if (wrapper == null) {
       try {
         wrapper = new ChannelWrapperRemote(cnn);
@@ -208,6 +209,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       } catch (Throwable e) {
         log.error("Error while adding connection " + cnn, e);
       } finally {
+        if (debugEnabled) log.debug("adding wrapper to cache: {}", wrapper);
         synchronized(wrapperMap) {
           wrapperMap.put(cnn, wrapper);
         }
