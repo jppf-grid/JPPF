@@ -20,7 +20,7 @@ package org.jppf.utils.streams;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
+import java.nio.channels.*;
 
 import org.jppf.utils.pooling.DirectBufferPool;
 
@@ -37,8 +37,10 @@ public class ChannelOutputStream extends OutputStream {
   /**
    * Initialize this output stream with the specified writeable channel.
    * @param channel the channel to write to.
+   * @throws IllegalBlockingModeException if the channel is a {@link SelectableChannel} not configured in blocking mode.
    */
-  public ChannelOutputStream(final WritableByteChannel channel) {
+  public ChannelOutputStream(final WritableByteChannel channel) throws IllegalBlockingModeException {
+    if ((channel instanceof SelectableChannel) && !((SelectableChannel) channel).isBlocking()) throw new IllegalBlockingModeException();
     this.channel = channel;
   }
 

@@ -37,8 +37,10 @@ public class ChannelInputStream extends InputStream {
   /**
    * Initialize this output stream with the specified writeable channel.
    * @param channel the channel to write to.
+   * @throws IllegalBlockingModeException if the channel is a {@link SelectableChannel} not configured in blocking mode.
    */
-  public ChannelInputStream(final ReadableByteChannel channel) {
+  public ChannelInputStream(final ReadableByteChannel channel) throws IllegalBlockingModeException {
+    if ((channel instanceof SelectableChannel) && !((SelectableChannel) channel).isBlocking()) throw new IllegalBlockingModeException();
     this.channel = channel;
   }
 
