@@ -65,11 +65,11 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     final RunOptions ro = new RunOptions();
-    print("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
+    print("Running with conccurencyLimit=,%d; streamDuration=%,d; nbJobs=%,d; tasksPerJob=%,d; taskDuration=%,d", ro.concurrencyLimit, ro.streamDuration, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
     final JMXDriverConnectionWrapper jmx;
-    try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
+    try (final JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       jmx = getJmxConnection(client);
       ro.callback = new ScriptedJobCallback();
       //ro.callback = new SystemExitCallback();

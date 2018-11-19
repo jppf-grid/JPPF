@@ -61,7 +61,7 @@ class AcceptorMessageReader {
   private static void doRead(final AcceptorContext context) throws Exception {
     if (log.isTraceEnabled()) log.trace("about to read from channel {}", context);
     while (true) {
-      if (context.readMessage(null)) {
+      if (context.readMessage()) {
         final int id = context.getId();
         if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), context);
         final NioServer<?, ?> server = NioHelper.getServer(id);
@@ -74,6 +74,7 @@ class AcceptorMessageReader {
         if (debugEnabled) log.debug("cancelling key for {}", context);
         final SocketChannel socketChannel = context.getSocketChannel();
         final SelectionKey key = socketChannel.keyFor(context.server.getSelector());
+        context.setClosed(true);
         key.cancel();
         if (debugEnabled) log.debug("transfering channel to new server {}", server);
         server.accept(context.getServerSocketChannel(), socketChannel, context.getSSLHandler(), context.isSsl(), false);

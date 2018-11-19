@@ -52,6 +52,10 @@ public class RunOptions {
   /**
    * Time interval in ms for un-provisioning of the slave nodes, when simulating node crashes
    */
+  public final long streamDuration = config.getLong("deadlock.streamDuration", -1L);
+  /**
+   * Time interval in ms for un-provisioning of the slave nodes, when simulating node crashes
+   */
   public final long waitTime = config.getLong("deadlock.waitTime", 15000L);
   /**
    * Wetehr to simulate slave nodes crashes.

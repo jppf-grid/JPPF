@@ -90,15 +90,46 @@ public class AcceptorContext extends StatelessNioContext {
       byteCount = nioObject.getChannelCount() - byteCount;
       if (debugEnabled) log.debug("read {} bytes from {}", byteCount, this);
     } catch (final Exception e) {
-      if (stats != null) stats.addValue(JPPFStatisticsHelper.JMX_IN_TRAFFIC, nioObject.getChannelCount());
+      updateStats(JPPFIdentifiers.UNKNOWN, nioObject.getChannelCount());
+      nioObject = null;
       throw e;
     }
     if (b) {
       id = SerializationUtils.readInt(nioObject.getData().getInputStream());
-      if (stats != null) stats.addValue(JPPFStatisticsHelper.JMX_IN_TRAFFIC, nioObject.getChannelCount());
+      updateStats(id, nioObject.getChannelCount());
       nioObject = null;
     }
     return b;
+  }
+
+  /**
+   * Update the traffic stats for the specified channel id.
+   * @param id the id of the channel type for which to update the stats.
+   * @param byteCount the update value.
+   */
+  private void updateStats(final int id, final long byteCount) {
+    if (stats != null) {
+      String snapshot = null;
+      switch(id) {
+        case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
+        case JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL:
+        case JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL:
+          snapshot = JPPFStatisticsHelper.CLIENT_IN_TRAFFIC;
+          break;
+        case JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL:
+        case JPPFIdentifiers.NODE_JOB_DATA_CHANNEL:
+        case JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL:
+          snapshot = JPPFStatisticsHelper.NODE_IN_TRAFFIC;
+          break;
+        case JPPFIdentifiers.JMX_REMOTE_CHANNEL:
+          snapshot = JPPFStatisticsHelper.JMX_IN_TRAFFIC;
+          break;
+        default:
+          snapshot = JPPFStatisticsHelper.UNKNOWN_IN_TRAFFIC;
+          break;
+      }
+      if (snapshot != null) stats.addValue(snapshot, byteCount);
+    }
   }
 
   @Override

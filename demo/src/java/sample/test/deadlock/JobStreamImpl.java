@@ -18,6 +18,9 @@
 
 package sample.test.deadlock;
 
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.utils.AbstractJPPFJobStream;
@@ -35,6 +38,14 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
    * Whether this job stream is stopped.
    */
   boolean stopped = false;
+  /**
+   * Whether streaming has started.
+   */
+  final AtomicBoolean started = new AtomicBoolean(false);
+  /**
+   * Streaming start time.
+   */
+  long start;
 
   /**
    * Initialize this job provider.
@@ -47,7 +58,16 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
 
   @Override
   public boolean hasNext() {
-    return !isStopped() && (getJobCount() < options.nbJobs);
+    if (started.compareAndSet(false, true)) start = System.nanoTime();
+    if (isStopped()) return false;
+    if ((options.nbJobs > 0) && (getJobCount() >= options.nbJobs)) return false;
+    return ((options.streamDuration <= 0L) || ((System.nanoTime() - start) / 1_000_000L < options.streamDuration));
+  }
+
+  @Override
+  public JPPFJob next() throws NoSuchElementException {
+    if (started.compareAndSet(false, true)) start = System.nanoTime();
+    return super.next();
   }
 
   @Override

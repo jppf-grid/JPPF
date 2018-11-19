@@ -65,11 +65,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * The ports this server is listening to.
    */
-  protected int[] ports;
+  protected int[] ports = {};
   /**
    * The SSL ports this server is listening to.
    */
-  protected int[] sslPorts;
+  protected int[] sslPorts = {};
   /**
    * Timeout for the select() operations. A value of 0 means no timeout, i.e. the {@code Selector.select()} method will be invoked without parameters.
    */
@@ -144,6 +144,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     factory = createFactory();
     transitionManager.setFactory(factory);
     if (useSSL) createSSLContext();
+    init();
   }
 
   /**
@@ -178,7 +179,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Initialize the underlying server sockets.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  protected final void init() throws Exception {
+  protected void init() throws Exception {
     if ((ports != null) && (ports.length != 0)) init(ports, false);
     if ((sslPorts != null) && (sslPorts.length != 0)) init(sslPorts, true);
   }

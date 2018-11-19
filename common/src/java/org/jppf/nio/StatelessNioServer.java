@@ -20,13 +20,14 @@ package org.jppf.nio;
 
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.Future;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * 
- * @param <C> the type of connection context.
+ * @param <C> the type of connection context, a subclass of {@link StatelessNioContext}.
  * @author Laurent Cohen
  */
 public abstract class StatelessNioServer<C extends StatelessNioContext> extends NioServer<EmptyEnum, EmptyEnum> {
@@ -34,10 +35,6 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(StatelessNioServer.class);
-  /**
-   * Determines whether debug logging level is enabled.
-   */
-  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether trace logging level is enabled.
    */
@@ -50,6 +47,10 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * The nio message writer.
    */
   protected NioMessageWriter<C> messageWriter;
+  /**
+   * 
+   */
+  protected KeysetHandler<C> acceptHandler, readHandler, writeHandler;
 
   /**
    * @param identifier the channel identifier for channels handled by this server.
@@ -58,7 +59,6 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    */
   public StatelessNioServer(final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
-    initReaderAndWriter();
   }
 
   /**
@@ -70,7 +70,6 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    */
   protected StatelessNioServer(final String name, final int identifier, final boolean useSSL) throws Exception {
     super(name, identifier, useSSL);
-    initReaderAndWriter();
   }
 
   /**
@@ -82,7 +81,28 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    */
   public StatelessNioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
     super(ports, sslPorts, identifier);
+  }
+
+  @Override
+  protected final void init() throws Exception {
+    super.init();
+    initNioHandlers();
     initReaderAndWriter();
+  }
+
+  /**
+   * 
+   */
+  protected void initNioHandlers() {
+    acceptHandler = (server, key) -> {
+      if (key.isAcceptable()) server.doAccept(key);
+    };
+    readHandler = (server, key) -> {
+      if (key.isReadable()) server.handleRead(key);
+    };
+    writeHandler = (server, key) -> {
+      if (key.isWritable()) server.handleWrite(key);
+    };
   }
 
   /**
@@ -116,6 +136,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
     }
   }
 
+  /*
   @Override
   protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
     final Iterator<SelectionKey> it = selectedKeys.iterator();
@@ -123,7 +144,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
       final SelectionKey key = it.next();
       it.remove();
       if (!isKeyValid(key)) {
-        if (debugEnabled) log.debug("invalid key for {}", key.attachment());
+        if (log.isDebugEnabled()) log.debug("invalid key for {}", key.attachment());
         continue;
       }
       try {
@@ -141,6 +162,82 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
         transitionManager.execute(() -> handleSelectionException(key, e));
       }
     }
+  }
+  */
+
+  @Override
+  protected void go(final Set<SelectionKey> selectedKeys) throws Exception {
+    final List<Future<?>> futures = new ArrayList<>();
+    try {
+      if (acceptHandler != null) futures.add(doOperation(selectedKeys, acceptHandler));
+      if (readHandler   != null) futures.add(doOperation(selectedKeys, readHandler));
+      if (writeHandler  != null) futures.add(doOperation(selectedKeys, writeHandler));
+    } finally {
+      for (final Future<?> f: futures) {
+        try {
+          f.get();
+        } catch (final Exception e) {
+          log.error(e.getMessage(), e);
+        }
+      }
+      selectedKeys.clear();
+    }
+  }
+
+  /**
+   * Perform an operation on all eligible channels.
+   * @param selectedKeys set of selected keys from which to extract the eligible ones.
+   * @param handler .
+   * @return a future the result of the channels read performed in a separate thread.
+   * @throws Exception if any error occurs.
+   */
+  protected Future<?> doOperation(final Set<SelectionKey> selectedKeys, final KeysetHandler<C> handler) throws Exception {
+    return transitionManager.submit(() -> handler.handle(this, selectedKeys));
+  }
+
+  /**
+   * A fuctional interface wrapping an operation on a set of selected channels.
+   * @param <C> the type of context associated with the channels.
+   */
+  @FunctionalInterface
+  protected interface KeysetHandler<C extends StatelessNioContext> {
+    /**
+     * Logger for this class.
+     */
+    Logger log2 = LoggerFactory.getLogger(KeysetHandler.class);
+
+    /**
+     * Handle the operation on a set of channels.
+     * @param server the associated nio server.
+     * @param selectedKeys the set of channels to handle.
+     */
+    default void handle(final StatelessNioServer<C> server, final Set<SelectionKey> selectedKeys) {
+      for (final SelectionKey key: selectedKeys) {
+        try {
+          if (key.attachment() instanceof CloseableContext) {
+            final CloseableContext context = (CloseableContext) key.attachment();
+            if (context.isClosed()) continue;
+          }
+          if (!isKeyValid(key)) {
+            if (log2.isDebugEnabled()) log2.debug("invalid key for {}", key.attachment());
+            continue;
+          }
+          handleKey(server, key);
+        } catch (final Exception e) {
+          key.cancel();
+          if (log2.isDebugEnabled()) log2.debug("error on {}", StatelessNioServer.toString(key), e);
+          server.getTransitionManager().execute(() -> server.handleSelectionException(key, e));
+        }
+      }
+    }
+
+    /**
+     * Handle the operation on a single channel.
+     * @param server the associated nio server.
+     * @param key the channel to handle.
+     * @throws Exception if any error occurs.
+     */
+    void handleKey(final StatelessNioServer<C> server, SelectionKey key) throws Exception;
   }
 
   /**
@@ -242,34 +339,18 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
 
   /**
    * Get all connections accepted by this server.
-   * @return a list of {@link ChannelWrapper} instances.
+   * This method is a shorthand for {@link #performContextAction(ContextFilter, ContextAction) performContextAction(null, null)}.
+   * @return a list of {@link C} instances that passed the filter, possibly empty but never {@code null}.
    */
   public Map<String, C> getAllContexts() {
-    Set<SelectionKey> keys = null;
-    sync.wakeUpAndSetOrIncrement();
-    try {
-      keys  = new HashSet<>(selector.keys());
-    } catch (final Exception e) {
-      log.error(e.getMessage(), e);
-    } finally {
-      sync.decrement();
-    }
-    if (keys == null) return Collections.emptyMap();
-    final Map<String, C> channels = new HashMap<>(keys.size());
-    for (final SelectionKey key: keys) {
-      @SuppressWarnings("unchecked")
-      final C context = (C) key.attachment();
-      channels.put(context.getUuid(), context);
-    }
-    return channels;
+    return performContextAction(null, null);
   }
-
 
   /**
    * Perform the specified action on the contexts that pass the specified filter.
-   * @param filter the context filter, may be {@code null}.
-   * @param action the action to execute, may be {@code null}..
-   * @return a list of {@link ChannelWrapper} instances.
+   * @param filter the context filter, may be {@code null}, in which case all contexts are accepted.
+   * @param action the action to execute, may be {@code null}, in which case no action is performed.
+   * @return a list of {@link C} instances that passed the filter, possibly empty but never {@code null}.
    */
   public Map<String, C> performContextAction(final ContextFilter<C> filter, final ContextAction<C> action) {
     Set<SelectionKey> keys = null;
@@ -290,7 +371,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
         try {
           if (action != null) action.execute(context);
         } catch (final Exception e) {
-          log.error("error trying to close {}", context, e);
+          log.error("error trying to run action {} on {}", action, context, e);
         }
         channels.put(context.getUuid(), context);
       }
@@ -299,6 +380,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
   }
 
   /**
+   * Interface for context filtering.
    * @param <C> the type of connection context.
    */
   public interface ContextFilter<C extends StatelessNioContext> {
@@ -310,6 +392,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
   }
 
   /**
+   * An action ot execute on a context.
    * @param <C> the type of connection context.
    */
   public interface ContextAction<C extends StatelessNioContext> {
@@ -317,5 +400,19 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
      * @param context the context on which to execute the action.
      */
     void execute(C context);
+  }
+
+  /**
+   * 
+   * @param key the selection key to describe.
+   * @return a string description of the selection key.
+   */
+  public static String toString(final SelectionKey key) {
+    if (key == null) return "null";
+    return new StringBuilder(SelectionKey.class.getName()).append('[')
+      .append("valid=").append(key.isValid())
+      .append(", channel=").append(key.channel())
+      .append(", attachment=").append(key.attachment())
+      .append(']').toString();
   }
 }

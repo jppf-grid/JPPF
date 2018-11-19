@@ -89,14 +89,22 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
 
   @Override
   protected void handleSelectionException(final SelectionKey key, final Exception e) {
-    log.error(e.getMessage(), e);
-    if (!(key.channel() instanceof ServerSocketChannel)) {
-      try {
-        key.channel().close();
-      } catch (final Exception e2) {
-        log.error(e2.getMessage(), e2);
+    boolean logError = true;
+    final SelectableChannel channel = key.channel();
+    if (!(channel instanceof ServerSocketChannel)) {
+      final AcceptorContext context = (AcceptorContext) key.attachment();
+      if (e instanceof CancelledKeyException) {
+        if (!context.isClosed()) {
+          context.setClosed(true);
+          try {
+            if (!channel.isOpen()) channel.close();
+          } catch (final Exception e2) {
+            log.error("error trying to close " + channel, e2);
+          }
+        } else logError = false;
       }
     }
+    if (logError) log.error(e.getMessage(), e);
   }
 
   @Override
@@ -223,7 +231,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   }
 
   /**
-   * Remove the server identified by the local port it is listneing to.
+   * Remove the server identified by the local port it is listening to.
    * @param port the port the sever is listening to.
    * @throws IOException if any error occurs closing the specified server socket channel.
    */
@@ -239,7 +247,7 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
   }
 
   /**
-   * @return the statsistics to update, if any.
+   * @return the statistics to update, if any.
    */
   public JPPFStatistics getStats() {
     return stats;
@@ -247,5 +255,11 @@ public class AcceptorNioServer extends StatelessNioServer<AcceptorContext> {
 
   @Override
   protected void initReaderAndWriter() {
+  }
+
+  @Override
+  protected void initNioHandlers() {
+    super.initNioHandlers();
+    writeHandler = null;
   }
 }

@@ -168,4 +168,10 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
     messageReader = new HeartbeatMessageReader(this);
     messageWriter = new HeartbeatMessageWriter(this);
   }
+
+  @Override
+  protected void initNioHandlers() {
+    super.initNioHandlers();
+    acceptHandler = null;
+  }
 }

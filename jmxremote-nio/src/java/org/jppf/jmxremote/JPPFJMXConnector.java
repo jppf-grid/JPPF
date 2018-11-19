@@ -356,4 +356,13 @@ public class JPPFJMXConnector implements JMXConnector {
       this.handback = handback;
     }
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("connectionID=").append(connectionID)
+      .append(", secure=").append(secure)
+      .append(", address=").append(address)
+      .append(']').toString();
+  }
 }

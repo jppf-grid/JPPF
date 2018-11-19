@@ -212,4 +212,10 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   public AsyncClientMessageHandler getMessageHandler() {
     return messageHandler;
   }
+
+  @Override
+  protected void initNioHandlers() {
+    super.initNioHandlers();
+    acceptHandler = null;
+  }
 }
