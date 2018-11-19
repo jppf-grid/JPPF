@@ -122,13 +122,21 @@ public final class JPPFStatisticsHelper {
    */
   public static final String PEER_OUT_TRAFFIC = "peer.traffic.out";
   /**
-   * Bytes received from unidentified remote peers.
+   * Bytes received from JMX remote peers.
    */
   public static final String JMX_IN_TRAFFIC = "jmx.traffic.in";
   /**
-   * Bytes sent to unidentified remote peers.
+   * Bytes sent to JMX remote peers.
    */
   public static final String JMX_OUT_TRAFFIC = "jmx.traffic.out";
+  /**
+   * Bytes received from unidentified remote peers.
+   */
+  public static final String UNKNOWN_IN_TRAFFIC = "unknwon.traffic.in";
+  /**
+   * Bytes sent to unidentified remote peers.
+   */
+  public static final String UNKNOWN_OUT_TRAFFIC = "unknwon.traffic.out";
 
   /**
    * Determine wether the specified snapshot is a single value snapshot.
@@ -210,7 +218,7 @@ public final class JPPFStatisticsHelper {
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
     statistics.createSingleValueSnapshots(TASK_QUEUE_TOTAL, JOB_TOTAL, NODE_IN_TRAFFIC, NODE_OUT_TRAFFIC, CLIENT_IN_TRAFFIC, CLIENT_OUT_TRAFFIC,
-        PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, JMX_IN_TRAFFIC, JMX_OUT_TRAFFIC);
+        PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, JMX_IN_TRAFFIC, JMX_OUT_TRAFFIC, UNKNOWN_IN_TRAFFIC, UNKNOWN_OUT_TRAFFIC);
     return statistics;
   }
 }
