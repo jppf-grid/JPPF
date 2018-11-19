@@ -1,0 +1,11 @@
+/.metadata/
+/x-*/
+*.txt
+/*.bat
+*.zip
+/.recommenders/
+/logs/
+/**/classes/
+/**/classes2/
+/**/classes-client/
+/**/classes-node/
