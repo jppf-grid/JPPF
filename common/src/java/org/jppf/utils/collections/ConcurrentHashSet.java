@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A concurrent et implementation backed by a ConcurrentHashMap.
+ * A concurrent {@link Set set} implementation backed by a {@link ConcurrentHashMap}.
  * @param <E> the type of objects in the set.
  * @author Laurent Cohen
  */
@@ -98,7 +98,7 @@ public class ConcurrentHashSet<E> implements Set<E> {
 
   @Override
   public boolean add(final E e) {
-    return map.put(e, Boolean.TRUE) != null;
+    return map.put(e, Boolean.TRUE) == null;
   }
 
   @Override
@@ -114,8 +114,7 @@ public class ConcurrentHashSet<E> implements Set<E> {
   @Override
   public boolean addAll(final Collection<? extends E> c) {
     boolean result = false;
-    for (E e: c)
-      result |= add(e);
+    for (E e: c) result |= add(e);
     return result;
   }
 
