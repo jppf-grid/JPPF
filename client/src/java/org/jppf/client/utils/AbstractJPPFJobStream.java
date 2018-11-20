@@ -74,6 +74,10 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
    * Used to wait for number of concurrent jobs to be less than the concurrentcy limit.
    */
   private final Condition concurrencyLimitCondition = lock.newCondition();
+  /**
+   * Used to wait for the stream to end.
+   */
+  private final Condition endOfStreamCondition = lock.newCondition();
 
   /**
    * Initialize this job provider.
@@ -102,7 +106,10 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   public JPPFJob next() throws NoSuchElementException {
     lock.lock();
     try {
-      if (!hasNext()) throw new NoSuchElementException();
+      if (!hasNext()) {
+        endOfStreamCondition.signalAll();
+        throw new NoSuchElementException();
+      }
       while (currentNbJobs >= concurrencyLimit) {
         try {
           concurrencyLimitCondition.await();
@@ -163,6 +170,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
       currentNbJobs--;
       executedJobCount++;
       concurrencyLimitCondition.signalAll();
+      endOfStreamCondition.signalAll();
     } finally {
       lock.unlock();
     }
@@ -239,6 +247,23 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
     lock.lock();
     try {
       return taskCount;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get the number of submitted task.
+   * @return {@code true} if the end of stream has been reached, false if the current thread was interrupted before the end of stream occurred.
+   */
+  public boolean awaitEndOfStream() {
+    lock.lock();
+    try {
+      while (hasNext() || hasPendingJob()) endOfStreamCondition.await();
+      return true;
+    } catch (final InterruptedException e) {
+      log.warn("thread interrupted while awaiting end-of-stream", e);
+      return false;
     } finally {
       lock.unlock();
     }
