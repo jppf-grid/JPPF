@@ -26,13 +26,11 @@ import org.jppf.client.event.*;
 import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.Operator;
 
 /**
  * An illustration of the patterns for submitting multiple jobs in parallel.
  */
 public class ConcurrentJobs {
-
   /**
    * Entry point for this demo.
    * @param args the first argument is a function number that determines which method to call.
@@ -41,7 +39,9 @@ public class ConcurrentJobs {
     try {
       // parse the function number from the first command line argument
       final int function = Integer.parseInt(args[0]);
-      if ((function < 1) || (function > 4)) throw new IllegalArgumentException("function number must be between 1 and 4");
+      if ((function < 1) || (function > 4)) {
+        throw new IllegalArgumentException("function number must be between 1 and 4");
+      }
       final ConcurrentJobs runner = new ConcurrentJobs();
       // call the appropriate method based on the function number
       switch(function) {
@@ -72,7 +72,7 @@ public class ConcurrentJobs {
     final ExecutorService executor = Executors.newFixedThreadPool(nbJobs);
     try (final JPPFClient jppfClient = new JPPFClient()) {
       // make sure the client has enough connections
-      ensureSufficientConnections(jppfClient, nbJobs);
+      ensureConcurrency(jppfClient, nbJobs);
       final List<Future<JPPFJob>> futures = new ArrayList<>(nbJobs);
       // delegate the job submissions to separate threads
       for (int i=1; i<=nbJobs; i++) {
@@ -133,7 +133,7 @@ public class ConcurrentJobs {
     final int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
       // make sure the client has enough connections
-      ensureSufficientConnections(jppfClient, nbJobs);
+      ensureConcurrency(jppfClient, nbJobs);
       final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=0; i<nbJobs; i++) {
         // create the job and its tasks
@@ -158,7 +158,7 @@ public class ConcurrentJobs {
     final int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
       // make sure the client has enough connections
-      ensureSufficientConnections(jppfClient, nbJobs);
+      ensureConcurrency(jppfClient, nbJobs);
       // synchronization helper that tells us when all jobs have completed
       final CountDownLatch countDown = new CountDownLatch(nbJobs);
       for (int i=1; i<=nbJobs; i++) {
@@ -193,14 +193,12 @@ public class ConcurrentJobs {
     try (final JPPFClient jppfClient = new JPPFClient();
         AbstractJPPFJobStream jobProvider = new JobProvider(concurrencyLimit)) {
       // make sure the client has enough connections
-      ensureSufficientConnections(jppfClient, concurrencyLimit);
+      ensureConcurrency(jppfClient, concurrencyLimit);
       // build and submit the provided jobs until no more is available
-      for (final JPPFJob job: jobProvider) {
-        if (job != null) jppfClient.submitJob(job);
-      }
-      // wait until no more job is executing before exiting
-      while (jobProvider.hasPendingJob()) Thread.sleep(10L);
-      System.out.printf("*** executed a total of %d jobs and %d tasks%n", jobProvider.getJobCount(), jobProvider.getTaskCount());
+      jobProvider.forEach(job -> jppfClient.submitJob(job));
+      // wait until no more job is pending or executing before exiting
+      jobProvider.awaitEndOfStream();
+      System.out.printf("*** executed a total of %,d jobs and %,d tasks%n", jobProvider.getJobCount(), jobProvider.getTaskCount());
     }
   }
 
@@ -247,15 +245,15 @@ public class ConcurrentJobs {
   /**
    * Ensure that the JPPF client has the specified number of connections.
    * @param jppfClient the jppf client.
-   * @param nbConnections the desried number of connections.
+   * @param nbJobs the desired number of concurrent jobs.
    * @throws Exception if any error occurs.
    */
-  private static void ensureSufficientConnections(final JPPFClient jppfClient, final int nbConnections) throws Exception {
+  private static void ensureConcurrency(final JPPFClient jppfClient, final int nbJobs) throws Exception {
     // wait until a connection pool is available
     final JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
-    // make sure the pool has enough connections and wait until all connections are active
-    pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
-    // alternatively with a single method call: wait until there is a connection pool with at least <nbConnections> active connections, for as long as it takes
-    //jppfClient.awaitConnectionPools(Operator.AT_LEAST, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
+    // if the concurrency is not sufficient, increase it to the desired level
+    if (pool.getMaxJobs() < nbJobs) {
+      pool.setMaxJobs(nbJobs);
+    }
   }
 }
