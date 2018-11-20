@@ -93,7 +93,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   }
 
   /**
-   * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.node.protocol.Task Task},
+   * Add a task to this job. This method is for adding a task that is either an instance of {@link Task},
    * annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
    * @param taskObject the task to add to this job.
    * @param args arguments to use with a JPPF-annotated class.
@@ -144,7 +144,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Add a {@link Runnable} task to this job.
    * <p><b>Note:</b> it is recommended to use {@link #add(JPPFRunnableTask)} whenever possible instead. This ensures that the provided {@link Runnable} is {@link java.io.Serializable serializable}.
    * @param runnable the runnable task to add to this job.
-   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
+   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link org.jppf.node.protocol.AbstractTask AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 5.0
    */
@@ -155,7 +155,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   /**
    * Add a {@link JPPFRunnableTask} task to this job.
    * @param runnable the runnable task to add to this job.
-   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
+   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link org.jppf.node.protocol.AbstractTask AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 6.1
    */
@@ -167,7 +167,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
    * Add a {@link Callable} task to this job.
    * <p><b>Note:</b> it is recommended to use {@link #add(JPPFCallable)} whenever possible instead. This ensures that the provided {@link Callable} is {@link java.io.Serializable serializable}.
    * @param callable the callable task to add to this job.
-   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
+   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link org.jppf.node.protocol.AbstractTask AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 5.0
    */
@@ -178,7 +178,7 @@ public class JPPFJob extends AbstractJPPFJob<JPPFJob> implements Iterable<Task<?
   /**
    * Add a {@link Callable} task to this job.
    * @param callable the callable task to add to this job.
-   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link AbstractTask}, or a wrapper around the input object in the other cases.
+   * @return an instance of {@link Task} that is either the same as the input if the input is a subclass of {@link org.jppf.node.protocol.AbstractTask AbstractTask}, or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a {@code Task} or a JPPF-annotated class.
    * @since 6.1
    */
