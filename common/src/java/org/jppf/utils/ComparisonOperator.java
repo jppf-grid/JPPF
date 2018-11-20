@@ -22,8 +22,8 @@ package org.jppf.utils;
  * Interface for numerical binary comparison operators.
  * @author Laurent Cohen
  */
+@FunctionalInterface
 public interface ComparisonOperator {
-
   /**
    * Evaluate the condition based on the actual and expected numbers.
    * @param actual the actual number.
@@ -31,5 +31,4 @@ public interface ComparisonOperator {
    * @return true if the condition is matched, false otherwise.
    */
   boolean evaluate(long actual, long expected);
-
 }
