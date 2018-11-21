@@ -28,6 +28,7 @@ for (i=0; i<n; i++) {
   var idx = path.lastIndexOf("/");
   task.setDynamicAttribute("in", file.getCanonicalPath());
   task.setDynamicAttribute("lang", lang);
-  task.setDynamicAttribute("title", path.substring(idx + 1));
+  //task.setDynamicAttribute("title", path.substring(idx + 1));
+  task.setDynamicAttribute("title", file.getName());
   task.perform();
 }

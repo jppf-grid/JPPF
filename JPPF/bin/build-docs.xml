@@ -19,7 +19,7 @@
 <project name="JPPF-docs" basedir="..">
 
   <!-- ========================================================================= -->
-  <!--                     Build the web site content                            -->
+  <!-- Build the web site content                                                -->
   <!-- ========================================================================= -->
 
   <!--<target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>-->
@@ -57,7 +57,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                 Generate the User Guide redistributable                   -->
+  <!-- Generate the User Guide redistributable                                   -->
   <!-- ========================================================================= -->
 
   <target name="user.guide">
@@ -84,7 +84,7 @@
   <property name="javadoc.bottom"><![CDATA[<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2018 JPPF Team.</i></font>]]></property>
 
   <!-- ========================================================================= -->
-  <!--  Generate the Javadoc                                                     -->
+  <!-- Generate the Javadoc                                                      -->
   <!-- ========================================================================= -->
 
   <target name="javadoc" depends="compile.doclet" description="Generate all javadoc">
@@ -175,7 +175,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--  Macrodefs                                                                -->
+  <!-- Macrodefs                                                                 -->
   <!-- ========================================================================= -->
 
   <!--
