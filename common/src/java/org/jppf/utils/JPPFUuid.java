@@ -18,8 +18,8 @@
 package org.jppf.utils;
 
 import java.io.Serializable;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+import java.security.SecureRandom;
+import java.util.*;
 
 /**
  * Instances of this class serve as unique identifiers for messages sent to and from
@@ -37,10 +37,6 @@ public class JPPFUuid implements Serializable {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Sequence number added to the seed of the Random object definition to ensure unicity within the JVM.
-   */
-  private static final AtomicLong SEED_SEQUENCE = new AtomicLong(0L);
   /**
    * Set of characters used to compose a uuid, including more than alphanumeric characters.
    */
@@ -83,9 +79,7 @@ public class JPPFUuid implements Serializable {
    * Instantiate this JPPFUuid with a generated unique identifier.
    */
   public JPPFUuid() {
-    this.codes_char = HEXADECIMAL_UPPER_CHAR;
-    this.length = 36;
-    this.uuid = generateNormalUuid();
+    this.uuid = UUID.randomUUID().toString().toUpperCase();
   }
 
   /**
@@ -110,20 +104,6 @@ public class JPPFUuid implements Serializable {
     return sb.toString();
   }
 
-  /**
-   * Generate a unique uuid.
-   * @return the uuid as a string.
-   */
-  private String generateNormalUuid() {
-    final int len = codes_char.length;
-    final char[] uuidChars = new char[length];
-    for (int i=0; i<length; i++) {
-      if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) uuidChars[i] = '-';
-      else uuidChars[i] = codes_char[rand.nextInt(len)];
-    }
-    return new String(uuidChars);
-  }
-
   @Override
   public String toString() {
     return uuid;
@@ -134,7 +114,7 @@ public class JPPFUuid implements Serializable {
    * @return a {@link Random} instance.
    */
   private static Random createRandom() {
-    return new Random(System.nanoTime() + SEED_SEQUENCE.incrementAndGet());
+    return new SecureRandom();
   }
 
   /**
@@ -142,6 +122,6 @@ public class JPPFUuid implements Serializable {
    * @return a normalized UUID represented as a string.
    */
   public static String normalUUID() {
-    return new JPPFUuid().toString();
+    return UUID.randomUUID().toString().toUpperCase();
   }
 }
