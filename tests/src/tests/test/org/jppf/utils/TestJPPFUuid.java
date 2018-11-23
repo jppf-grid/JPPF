@@ -36,50 +36,75 @@ public class TestJPPFUuid extends BaseTest {
   /**
    * Test that JPPFuuid does not generate uuid collisions in multithreaded execution.<br/>
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-207">JPPF-207 JPPFUuid generates uuid collisions in multithreaded mode</a>
+   * and bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-561">JPPF-561 JPPFUuid generates uuid collisions</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=20_000L)
   public void testUuidCollisions() throws Exception {
     int nbThreads = Runtime.getRuntime().availableProcessors();
     if (nbThreads < 2) nbThreads = 2;
-    int nbTasks = 1000;
-    ThreadPoolExecutor executor = null;
-    try {
-      executor = new ThreadPoolExecutor(nbThreads, nbThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-      executor.prestartAllCoreThreads();
-      for (int i=0; i<10; i++) performExecution(nbTasks, executor);
-    } finally {
-      if (executor != null) executor.shutdownNow();
-    }
+    testCollisions(nbThreads, 100_000, new MyCallable() {
+      @Override
+      public String call() {
+        return JPPFUuid.normalUUID();
+      }
+    });
   }
 
   /**
    * Test that JPPFuuid does not generate uuid collisions in multithreaded execution.
-   * @param nbTasks number of uuid generations to submit.
-   * @param executor the multithreaded executor to submit the tasks to.
+   * @param nbThreads numbe of threads to run.
+   * @param nbTasks number of tasks per thread.
+   * @param callable the callable that generates a uuid.
    * @throws Exception if any error occurs
    */
-  public void performExecution(final int nbTasks, final ExecutorService executor) throws Exception {
-    List<Future<String>> futures = new ArrayList<>(nbTasks);
-    Map<String, Boolean> map = new ConcurrentHashMap<>(nbTasks);
-    for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new UuidTask()));
+  private void testCollisions(final int nbThreads, final int nbTasks, final MyCallable callable) throws Exception {
+    print(false, false, "executing %,d tasks per thread on %d threads", nbTasks, nbThreads);
+    final MyThread[] threads = new MyThread[nbThreads];
+    for (int i=0; i<nbThreads; i++) threads[i] = new MyThread(nbTasks, callable);
+    for (int i=0; i<nbThreads; i++) threads[i].start();
+    for (int i=0; i<nbThreads; i++) threads[i].join();
+    final Map<String, Boolean> allUuids = new HashMap<>(nbThreads * nbTasks);
     int count = 0;
-    for (Future<String> future: futures) {
-      String uuid = future.get();
-      Boolean prevValue = map.put(uuid, Boolean.TRUE);
-      if (prevValue != null) {
-        System.out.println("uuid collision for " + uuid);
-        count++;
+    for (final MyThread thread: threads) {
+      for (final String uuid: thread.uuids) {
+        if (allUuids.containsKey(uuid)) {
+          print(false, false, "uuid collision for %s", uuid);
+          count++;
+        } else allUuids.put(uuid, Boolean.TRUE);
       }
     }
-    assertEquals("found " + count  + " collisions", 0, count);
+    assertEquals(String.format("found %,d collisions out of %,d generated uuids", count, nbThreads * nbTasks), 0, count);
   }
 
   /** */
-  private static class UuidTask implements Callable<String> {
-    @Override
-    public String call() throws Exception {
-      return JPPFUuid.normalUUID();
+  class MyThread extends Thread {
+    /** */
+    final int nbTasks;
+    /** */
+    final MyCallable callable;
+    /** */
+    final List<String> uuids;
+
+    /**
+     * @param nbTasks number of tasks per thread.
+     * @param callable the callable that generates a uuid.
+     */
+    MyThread(final int nbTasks, final MyCallable callable) {
+      this.nbTasks = nbTasks;
+      this.callable = callable;
+      this.uuids = new ArrayList<>(nbTasks);
     }
+
+    @Override
+    public void run() {
+      for (int i=0; i<nbTasks; i++) uuids.add(callable.call());
+    }
+  }
+
+  /** */
+  interface MyCallable extends Callable<String> {
+    @Override
+    String call();
   }
 }
