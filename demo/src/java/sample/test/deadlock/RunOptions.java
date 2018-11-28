@@ -44,7 +44,7 @@ public class RunOptions {
   /**
    * Total number of jobs to execute.
    */
-  public final int nbJobs = config.getInt("deadlock.nbJobs", 10);
+  public final int nbJobs = config.getInt("deadlock.nbJobs", -1);
   /**
    * Number of tasks per job.
    */
