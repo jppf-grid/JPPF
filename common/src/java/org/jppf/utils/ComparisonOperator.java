@@ -18,12 +18,14 @@
 
 package org.jppf.utils;
 
+import java.io.Serializable;
+
 /**
  * Interface for numerical binary comparison operators.
  * @author Laurent Cohen
  */
 @FunctionalInterface
-public interface ComparisonOperator {
+public interface ComparisonOperator extends Serializable {
   /**
    * Evaluate the condition based on the actual and expected numbers.
    * @param actual the actual number.
@@ -31,4 +33,18 @@ public interface ComparisonOperator {
    * @return true if the condition is matched, false otherwise.
    */
   boolean evaluate(long actual, long expected);
+
+  /*
+  default ComparisonOperator and(final ComparisonOperator operator) {
+    return (actual, expected) -> evaluate(actual, expected) && operator.evaluate(actual, expected);
+  }
+
+  default ComparisonOperator or(final ComparisonOperator operator) {
+    return (actual, expected) -> evaluate(actual, expected) || operator.evaluate(actual, expected);
+  }
+
+  static ComparisonOperator not(final ComparisonOperator operator) {
+    return (actual, expected) -> !operator.evaluate(actual, expected);
+  }
+  */
 }
