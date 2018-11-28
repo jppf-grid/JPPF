@@ -65,7 +65,8 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     final RunOptions ro = new RunOptions();
-    print("Running with conccurencyLimit=,%d; streamDuration=%,d; nbJobs=%,d; tasksPerJob=%,d; taskDuration=%,d", ro.concurrencyLimit, ro.streamDuration, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
+    print("Running with conccurencyLimit=%,d; streamDuration=%,d; nbJobs=%,d; tasksPerJob=%,d; taskDuration=%,d",
+      ro.concurrencyLimit, ro.streamDuration, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
     final JMXDriverConnectionWrapper jmx;
@@ -99,7 +100,8 @@ public class DeadlockRunner {
           count++;
           //requestNodeShutdown(client);
         }
-        while (jobProvider.hasPendingJob()) Thread.sleep(10L);
+        //while (jobProvider.hasPendingJob()) Thread.sleep(10L);
+        jobProvider.awaitEndOfStream();
         printStats(jmx, jobProvider, marker);
       } finally {
         if (ro.simulateNodeCrashes) {

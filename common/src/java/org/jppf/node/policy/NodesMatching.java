@@ -118,7 +118,9 @@ public class NodesMatching extends ExecutionPolicy {
   public String toString(final int n) {
     final StringBuilder sb = new StringBuilder();
     sb.append(indent(n)).append('<').append(XML_TAG);
-    sb.append(" operator=\"").append(operator.name()).append("\" expected=\"").append(expectedNodes.getExpression().replace("\"", "&quot;")).append("\">\n");
+    sb.append(" operator=\"").append(operator.name())
+      .append("\" expected=\"").append(expectedNodes.getExpression().replace("\"", "&quot;"))
+      .append("\">\n");
     if (nodePolicy != null) sb.append(nodePolicy.toString(n + 1));
     sb.append(indent(n)).append("</").append(XML_TAG).append(">\n");
     return sb.toString();

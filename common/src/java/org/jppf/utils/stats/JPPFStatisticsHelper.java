@@ -209,11 +209,8 @@ public final class JPPFStatisticsHelper {
    */
   public static JPPFStatistics createServerStatistics() {
     final JPPFStatistics statistics = new JPPFStatistics();
-    final Iterator<JPPFFilteredStatisticsListener> it = ServiceFinder.lookupProviders(JPPFFilteredStatisticsListener.class);
-    while (it.hasNext()) {
-      final JPPFFilteredStatisticsListener listener = it.next();
-      statistics.addListener(listener, listener.getFilter());
-    }
+    new ServiceFinder().findProviders(JPPFFilteredStatisticsListener.class)
+      .forEach(listener -> statistics.addListener(listener, listener.getFilter()));
     statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);

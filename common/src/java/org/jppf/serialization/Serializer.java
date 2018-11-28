@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**

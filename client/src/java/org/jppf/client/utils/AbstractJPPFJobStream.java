@@ -32,12 +32,8 @@ import org.slf4j.*;
  * int concurrency = 4;
  * try (JPPFClient client = new JPPFClient();
  *   AbstractJPPFJobStream jobStream = new MyJobStreamImplementation(concurrency)) {
- *   // set the connection pool size appropriately
- *   client.awaitWorkingConnectionPool().setSize(concurrency);
- *   for (JPPFJob job: jobStream) {
- *     if (job != null)
- *       client.submitJob(job);
- *   }
+ *   jobStream.forEach(job -> client.submitJob(job));
+ *   jobsStream.awaitEndOfStream();
  * }</pre>
  */
 public abstract class AbstractJPPFJobStream extends JobListenerAdapter implements Iterable<JPPFJob>, Iterator<JPPFJob>, AutoCloseable {
@@ -253,7 +249,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   }
 
   /**
-   * Get the number of submitted task.
+   * Wait until this job stream has finished procesing all of its jobs.
    * @return {@code true} if the end of stream has been reached, false if the current thread was interrupted before the end of stream occurred.
    */
   public boolean awaitEndOfStream() {
