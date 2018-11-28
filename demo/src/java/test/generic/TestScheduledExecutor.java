@@ -91,11 +91,11 @@ public class TestScheduledExecutor {
    * @throws Exception if any error occurs.
    */
   public static void perform2() throws Exception {
-    System.out.println(" Test JPPF uuid = " + new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+    System.out.println(" Test JPPF uuid = " + JPPFUuid.normalUUID(false));
     long start = System.nanoTime();
     for (int i = 0; i < n * million; i++) {
       //String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
-      new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+      JPPFUuid.normalUUID(false);
       //String uuid = new JPPFUuid().toString();
     }
     final long elapsed1 = System.nanoTime() - start;
@@ -135,13 +135,13 @@ public class TestScheduledExecutor {
     try {
       System.out.println(StringUtils.padRight("", '-', 40));
       System.out.println("Running test with nbThreads = " + nbThreads + ", runs per thread = " + nf.format(n * million));
-      System.out.println("Test JPPF uuid = " + new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+      System.out.println("Test JPPF uuid = " + JPPFUuid.normalUUID(false));
       final Runnable task1 = new Runnable() {
         @Override
         public void run() {
           for (int i = 0; i < n * million; i++) {
             //String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
-            new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+            JPPFUuid.normalUUID(false);
             //String uuid = new JPPFUuid().toString();
           }
         }

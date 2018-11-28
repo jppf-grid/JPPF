@@ -190,7 +190,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug("{} sending handshake job, uuidPath={}", toDebugString(), uuidPath);
-    header.setUuid(new JPPFUuid().toString());
+    header.setUuid(JPPFUuid.normalUUID());
     header.setName("handshake job");
     header.setHandshake(true);
     header.setUuid(header.getName());

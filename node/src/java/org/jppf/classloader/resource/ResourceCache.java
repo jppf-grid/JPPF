@@ -61,7 +61,7 @@ public class ResourceCache {
   /**
    * The unique identifier for this resource cache.
    */
-  private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+  private final String uuid = JPPFUuid.hexUUID(false);
   /**
    * Reference ot the shutdown hook created by this cache.
    */

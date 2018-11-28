@@ -69,7 +69,7 @@ public class TestUuid {
    * @return a uuid represented as a string.
    */
   public String generate1() {
-    return new JPPFUuid().toString();
+    return JPPFUuid.normalUUID();
   }
 
   /**

@@ -71,7 +71,7 @@ class SendingPeerHandshakeState extends ClientServerState {
       uuidPath.add(driver.getUuid());
       header.setUuidPath(uuidPath);
       if (debugEnabled) log.debug("sending handshake job, uuidPath=" + uuidPath);
-      header.setUuid(new JPPFUuid().toString());
+      header.setUuid(JPPFUuid.normalUUID());
       header.setName("handshake job");
       header.setHandshake(true);
       header.setUuid(header.getName());

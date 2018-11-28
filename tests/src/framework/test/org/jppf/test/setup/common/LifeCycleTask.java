@@ -132,7 +132,7 @@ public class LifeCycleTask extends AbstractTask<String> {
       synchronized(config) {
         nodeUuid = config.getString("jppf.node.uuid");
         if (nodeUuid == null) {
-          nodeUuid = new JPPFUuid().toString();
+          nodeUuid = JPPFUuid.normalUUID();
           config.setProperty("jppf.node.uuid", nodeUuid);
         }
       }

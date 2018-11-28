@@ -52,7 +52,7 @@ public class ScriptedMouseListener implements MouseListener {
   /**
    * The unique id of this scripted listener.
    */
-  private final String uuid = new JPPFUuid().toString();
+  private final String uuid = JPPFUuid.normalUUID();
   /**
    * Contains the text of the script, after its first execution.
    */

@@ -51,7 +51,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener {
   /**
    * The unique id of this scripted listener.
    */
-  private String uuid = new JPPFUuid().toString();
+  private String uuid = JPPFUuid.normalUUID();
   /**
    * Contains the text of the script, after its first execution.
    */
