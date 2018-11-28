@@ -37,7 +37,8 @@ class StatsSystemInformationUpdater implements JPPFStatisticsListener {
    * @param info he system information to keep up to date with statistics events.
    */
   StatsSystemInformationUpdater(final JPPFSystemInformation info) {
-    this.statsProperties = info.getStats();
+    final TypedProperties props = info.getStats();
+    this.statsProperties = (props == null) ? new TypedProperties() : props;
   }
 
   @Override
@@ -47,7 +48,9 @@ class StatsSystemInformationUpdater implements JPPFStatisticsListener {
 
   @Override
   public void snapshotRemoved(final JPPFStatisticsEvent event) {
-    statsProperties.remove(event.getSnapshot().getLabel());
+    synchronized(statsProperties) {
+      statsProperties.remove(event.getSnapshot().getLabel());
+    }
   }
 
   @Override
@@ -60,6 +63,8 @@ class StatsSystemInformationUpdater implements JPPFStatisticsListener {
    * @param snapshot the snapshot to update from.
    */
   private void update(final JPPFSnapshot snapshot) {
-    JPPFStatisticsHelper.toProperties(statsProperties, snapshot);
+    synchronized(statsProperties) {
+      JPPFStatisticsHelper.toProperties(statsProperties, snapshot);
+    }
   }
 }
