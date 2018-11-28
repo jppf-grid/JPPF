@@ -139,8 +139,8 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $tag1 = "v_6_0";
-        $ver1 = "6.0";
+        $tag1 = "v_6_0_1";
+        $ver1 = "6.0.1";
         $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -204,8 +204,9 @@
   <div class="column_right" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver2 = "5.2.9";
-        $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver2 . "/";
+        $tag2 = "v_5_2_10";
+        $ver2 = "5.2.10";
+        $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag2 . "/";
       ?>
       <a name="<?php echo $ver2 ?>"></a>
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
@@ -219,28 +220,28 @@
       </ul>
       <h3>Deployable module binaries</h3>
       <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node.zip/download'; ?>">JPPF node distribution</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-application-template.zip/download'; ?>">JPPF application template</a>.</li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-driver.zip'; ?>">JPPF server/driver distribution</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node.zip'; ?>">JPPF node distribution</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-admin-ui.zip'; ?>">JPPF administration and monitoring console</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-application-template.zip'; ?>">JPPF application template</a>.</li>
       </ul>
       <h3>Deployable .Net binaries</h3>
       <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-dotnet.zip/download'; ?>">JPPF .Net demo application</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-dotnet.zip/download'; ?>">JPPF .Net-enabled node distribution</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-dotnet.zip'; ?>">JPPF .Net demo application</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-dotnet.zip'; ?>">JPPF .Net-enabled node distribution</a></li>
       </ul>
       <h3>Android Node</h3>
       <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a></li>
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-android-redist.zip'; ?>">Android node app binaries and dependencies</a></li>
+        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-node-android-src.zip'; ?>">Full source as a Gradle/Android Studio project</a></li>
         <li style="padding: 5px 0px">
           <table cellpadding="0"><tr>
             <td valign="bottom">
-              <a href="<?php echo $base . 'JPPF-' . $ver2 . '-AndroidNode.apk/download'; ?>">You may also download the<br>APK directly to a device:</a>
+              <a href="<?php echo $base . 'JPPF-' . $ver2 . '-AndroidNode.apk'; ?>">You may also download the<br>APK directly to a device:</a>
             </td>
             <td>&nbsp;</td>
             <td valign="middle" style="white-space: nowrap">
-              <a class="yhd2" href="<?php echo $base . 'JPPF-' . $ver2 . '-AndroidNode.apk/download'; ?>">
+              <a class="yhd2" href="<?php echo $base . 'JPPF-' . $ver2 . '-AndroidNode.apk'; ?>">
                <span style="vertical-align: top">Node APK</span>
               </a><br>
             </td>
@@ -249,9 +250,9 @@
       </ul>
       <h3>Sources and documentation</h3>
       <ul class="list_nomargin">
-        <li><a href="<?php echo $base . 'JPPF-' . $ver2 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a></li>
-        <li>User Guide: <a href="/doc/5.2">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver2 . '-User-Guide.zip/download'; ?>">download the PDF</a></li>
-        <li>API documentation: <a href="/api-5">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver2 . '-api.zip/download'; ?>">download</a></li>
+        <li><a href="<?php echo 'https://github.com/lolocohen/JPPF/archive/' . $tag2 . '.zip'; ?>">Full source code distribution</a></li>
+        <li>User Guide: <a href="/doc/5.2">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver2 . '-User-Guide.zip'; ?>">download the PDF</a></li>
+        <li>API documentation: <a href="/javadoc/5.2">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver2 . '-api.zip'; ?>">download</a></li>
       </ul>
       <h3>Connectors and add-ons</h3>
       <ul class="list_nomargin">

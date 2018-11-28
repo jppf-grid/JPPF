@@ -87,9 +87,10 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     $template{name="title-with-icon" img="images/icons/news.png" title="Latest News" heading="h3"}$
     <?php
-      for ($i=1; $i<=3; $i++) {
-        $line = mysql_fetch_array($result, MYSQL_ASSOC);
+      $i = 1;
+      while (($line = mysql_fetch_array($result, MYSQL_ASSOC)) && ($i <= 5)) {
         printf("<a href='news.php#news%d' style='font-size: 10pt'><span style='white-space: nowrap'>%s %s</span></a><br>", $i, date("n/j/Y", strtotime($line["date"])), $line["title"]);
+        $i++;
       }
       mysql_free_result($result);
       mysql_close($link);
