@@ -81,7 +81,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
       if (debugEnabled) log.debug("read resource request {} from node: {}", res, channel);
       if (res.getState() == JPPFResourceWrapper.State.CLOSE_CHANNEL) {
         if (debugEnabled) log.debug("processing channel close request for node {}", channel);
-        NodeClassNioServer.closeConnection(channel);
+        server.closeConnection(channel);
         if (context.isPeer()) {
           final String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
           final AbstractNodeContext ctx = driver.getNodeNioServer().getConnection(uuid);

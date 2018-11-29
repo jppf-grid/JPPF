@@ -21,7 +21,7 @@ import java.nio.channels.*;
 
 import org.jppf.JPPFRuntimeException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.server.nio.client.async.*;
+import org.jppf.server.nio.client.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

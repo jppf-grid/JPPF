@@ -70,7 +70,10 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
         final S concrete = hookInstance.getInstance();
         try {
           final Object mbean = hookInstance.invoke("createMBean", createParams);
-          if (mbean == null) continue;
+          if (mbean == null) {
+            log.warn("an MBean implementation of type {} could not be created", (concrete == null) ? "null" : concrete.getClass().getName());
+            continue;
+          }
           final String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
           final Class<?> inf = Class.forName(infName, true, loader);
           final String mbeanName = (String) hookInstance.invoke("getMBeanName");

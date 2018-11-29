@@ -1,6 +1,6 @@
 // get info on discovered peer drivers
 function retrieve() {
-  var driver = org.jppf.server.JPPFDriver.getInstance();
+  var driver = serverDebug.getDriver();
   var peers = new java.util.ArrayList(driver.getInitializer().getDiscoveredPeers());
   if (peers.size() != 1) return "ko: size=" + peers.size();
   var peer = peers.get(0); 
@@ -26,5 +26,4 @@ function retrieve() {
   }
   return sb.toString();
 }
-
 retrieve();

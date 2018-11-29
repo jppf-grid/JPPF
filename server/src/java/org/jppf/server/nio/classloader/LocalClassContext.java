@@ -20,6 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.node.NodeClassContext;
 import org.slf4j.*;
 
@@ -36,6 +37,13 @@ public class LocalClassContext extends NodeClassContext {
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
+
+  /**
+   * @param driver reference to the JPPF driver.
+   */
+  public LocalClassContext(final JPPFDriver driver) {
+    super(driver);
+  }
 
   @Override
   public void serializeResource() throws Exception {

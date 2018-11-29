@@ -19,6 +19,7 @@
 package org.jppf.job.persistence;
 
 import org.jppf.management.spi.JPPFDriverMBeanProvider;
+import org.jppf.server.JPPFDriver;
 
 /**
  * Provider for the default JPPF driver management and monitoring features.
@@ -33,11 +34,16 @@ public class PersistedJobsManagerMBeanProvider implements JPPFDriverMBeanProvide
 
   @Override
   public Object createMBean() {
-    return new PersistedJobsManager();
+    return null;
   }
 
   @Override
   public String getMBeanName() {
     return PersistedJobsManagerMBean.MBEAN_NAME;
+  }
+
+  @Override
+  public Object createMBean(final JPPFDriver driver) {
+    return new PersistedJobsManager(driver);
   }
 }

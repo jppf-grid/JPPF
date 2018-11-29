@@ -63,7 +63,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   /**
    * Reference to the JPPF driver.
    */
-  final JPPFDriver driver = JPPFDriver.getInstance();
+  final JPPFDriver driver;
   /**
    * Manages the forwarding of node notifications to the registered clients.
    */
@@ -83,9 +83,11 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   /**
    * Initialize this MBean implementation.
+   * @param driver reference to the JPPF driver.
    */
-  public JPPFNodeForwarding() {
-    selectionHelper = new NodeSelectionHelper();
+  public JPPFNodeForwarding(final JPPFDriver driver) {
+    this.driver = driver;
+    selectionHelper = new NodeSelectionHelper(driver);
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
     //@SuppressWarnings("unused")

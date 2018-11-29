@@ -33,10 +33,6 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
    * Reads resource files from the classpath.
    */
   protected ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
-  /**
-   * Reference to the driver.
-   */
-  protected final JPPFDriver driver;
 
   /**
    * Initialize this class server.
@@ -46,10 +42,8 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
    * @throws Exception if the underlying server socket can't be opened.
    */
   public ClassNioServer(final int identifier, final JPPFDriver driver, final boolean useSSL) throws Exception {
-    super(identifier, useSSL);
+    super(identifier, useSSL, driver);
     if (driver == null) throw new IllegalArgumentException("driver is null");
-
-    this.driver = driver;
     selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
@@ -58,7 +52,7 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
    * @return an instance of {@link ClassCache}.
    */
   public ClassCache getClassCache() {
-    return driver.getInitializer().getClassCache();
+    return getDriver().getInitializer().getClassCache();
   }
 
   /**
@@ -67,5 +61,12 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
    */
   public ResourceProvider getResourceProvider() {
     return resourceProvider;
+  }
+
+  /**
+   * @return a reference to the driver.
+   */
+  public JPPFDriver getDriver() {
+    return (JPPFDriver) attachment;
   }
 }

@@ -37,11 +37,17 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
    * Whether this listener was close.
    */
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * Reference tot he JPPF driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this listener.
+   * @param driver a reference tot he JPPF driver.
    */
-  PeerDriverDiscoveryListener() {
+  PeerDriverDiscoveryListener(final JPPFDriver driver) {
+    this.driver = driver;
   }
 
   @Override
@@ -54,7 +60,7 @@ class PeerDriverDiscoveryListener implements DriverDiscoveryListener<DriverConne
     }
     if (!hasPool) {
       final JPPFConnectionInformation connectionInfo = DriverDiscoveryHandler.toJPPFConnectionInformation(info);
-      JPPFDriver.getInstance().getInitializer().getPeerConnectionPoolHandler().newPool(info.getName(), info.getPoolSize(), connectionInfo, info.isSecure(), false);
+      driver.getInitializer().getPeerConnectionPoolHandler().newPool(info.getName(), info.getPoolSize(), connectionInfo, info.isSecure(), false);
     }
     return !hasPool;
   }

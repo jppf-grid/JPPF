@@ -21,6 +21,7 @@ package org.jppf.utils.collections;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
+import java.util.function.BiConsumer;
 
 /**
  * Interface for maps whose values are collections of a given component type.
@@ -145,4 +146,12 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
    * @return a collection of all values in this map.
    */
   List<V> allValues();
+
+  /**
+   * Default {@code forEach} implementation.
+   * @param consumer the {@code BiConsumer} function.
+   */
+  default void forEach(final BiConsumer<K, Collection<V>> consumer) {
+    for (Map.Entry<K, Collection<V>> entry: entrySet()) consumer.accept(entry.getKey(), entry.getValue()); 
+  }
 }

@@ -20,46 +20,30 @@ package org.jppf.server.spi;
 
 import org.jppf.management.*;
 import org.jppf.management.spi.JPPFDriverMBeanProvider;
+import org.jppf.server.JPPFDriver;
 
 /**
  * Provider for the default JPPF driver management and monitoring features.
  * @author Laurent Cohen
  */
-public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider
-{
-  /**
-   * Return the fully qualified name of the management interface defined by this provider.
-   * @return the fully qualified interface name as a string.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
-   */
+public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider {
   @Override
-  public String getMBeanInterfaceName()
-  {
+  public String getMBeanInterfaceName() {
     return JPPFDriverAdminMBean.class.getName();
   }
 
-  /**
-   * Return a concrete MBean.<br>
-   * The class of this MBean must implement the interface defined by {@link #getMBeanInterfaceName() getMBeanInterfaceName()}.
-   * @return an <code>Object</code> that is an implementation of the MBean interface.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.MonitoredNode)
-   */
   @Override
-  public Object createMBean()
-  {
-    return new JPPFDriverAdmin();
+  public Object createMBean() {
+    return null;
   }
 
-  /**
-   * Return the name of the specified MBean.<br>
-   * This is the name under which the MBean will be registered with the MBean server.
-   * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
-   * @return the MBean name for this MBean provider.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
-   */
   @Override
-  public String getMBeanName()
-  {
+  public Object createMBean(final JPPFDriver driver) {
+    return new JPPFDriverAdmin(driver);
+  }
+
+  @Override
+  public String getMBeanName() {
     return JPPFDriverAdminMBean.MBEAN_NAME;
   }
 }

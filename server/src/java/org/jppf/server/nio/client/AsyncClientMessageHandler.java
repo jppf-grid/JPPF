@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client.async;
+package org.jppf.server.nio.client;
 
 import java.util.*;
 
@@ -25,7 +25,6 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
-import org.jppf.server.nio.client.ClientMessage;
 import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.*;
@@ -47,7 +46,15 @@ public class AsyncClientMessageHandler {
   /**
    * Reference to the singleton JPPF driver.
    */
-  private static final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
+
+  /**
+   * 
+   * @param driver reference to the driver.
+   */
+  public AsyncClientMessageHandler(final JPPFDriver driver) {
+    this.driver = driver;
+  }
 
   /**
    * Called when a job is received from a client.
@@ -78,7 +85,7 @@ public class AsyncClientMessageHandler {
       clientBundle.bundleEnded();
     }
     context.addEntry(clientBundle);
-    JPPFDriver.getInstance().getQueue().addBundle(clientBundle);
+    context.driver.getQueue().addBundle(clientBundle);
   }
 
   /**
@@ -198,7 +205,7 @@ public class AsyncClientMessageHandler {
    * @param uuid the uuid of the client.
    * @throws Exception if any error occurs.
    */
-  private static void awaitClassProvider(final String uuid) throws Exception {
+  private void awaitClassProvider(final String uuid) throws Exception {
     final ClientClassNioServer classServer = driver.getClientClassServer();
     List<ClientClassContext> list = classServer.getProviderContexts(uuid);
     while ((list == null) || list.isEmpty()) {

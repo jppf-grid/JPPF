@@ -39,19 +39,16 @@ import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
-import org.jppf.server.nio.client.ClientNioServer;
-import org.jppf.server.nio.client.async.AsyncClientNioServer;
+import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -82,10 +79,6 @@ public class JPPFDriver {
    */
   public static final boolean JPPF_DEBUG = JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED);
   /**
-   * Singleton instance of the JPPFDriver.
-   */
-  private static JPPFDriver instance;
-  /**
    * Used for serialization / deserialization.
    */
   private static final ObjectSerializer serializer = new ObjectSerializerImpl();
@@ -97,10 +90,6 @@ public class JPPFDriver {
    * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
    */
   private final JPPFPriorityQueue taskQueue;
-  /**
-   * Serves the execution requests coming from client applications.
-   */
-  private ClientNioServer clientNioServer;
   /**
    * Serves the execution requests coming from client applications.
    */
@@ -161,18 +150,13 @@ public class JPPFDriver {
    * System ibnformation for this driver.
    */
   private JPPFSystemInformation systemInformation;
-  /**
-   * Whether the client job channel is the asynchronous implementation.
-   */
-  private boolean asyncClient;
 
   /**
    * Initialize this JPPFDriver.
-   * @exclude
+   * @param config this driver's configuration.
    */
-  protected JPPFDriver() {
-    config = JPPFConfiguration.getProperties();
-    asyncClient = config.get(JPPFProperties.CLIENT_ASYNCHRONOUS);
+  public JPPFDriver(final TypedProperties config) {
+    this.config = config;
     final String s;
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
@@ -185,7 +169,7 @@ public class JPPFDriver {
     statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
     initializer = new DriverInitializer(this, config);
     initializer.initDatasources();
-    jobManager = new JPPFJobManager();
+    jobManager = new JPPFJobManager(this);
     taskQueue = new JPPFPriorityQueue(this, jobManager);
   }
 
@@ -208,22 +192,21 @@ public class JPPFDriver {
     }
     NioHelper.putServer(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, clientClassServer = startServer(new ClientClassNioServer(this, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, nodeClassServer = startServer(new NodeClassNioServer(this, useSSL)));
-    if (isAsyncClient()) NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
-    else NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, clientNioServer = startServer(new ClientNioServer(this, useSSL)));
+    NioHelper.putServer(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, asyncClientNioServer = startServer(new AsyncClientNioServer(this, JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, nodeNioServer = startServer(new NodeNioServer(this, taskQueue, useSSL)));
     NioHelper.putServer(JPPFIdentifiers.ACCEPTOR_CHANNEL, acceptorServer = new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts, statistics));
     jobManager.loadTaskReturnListeners();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
     initializer.initJmxServer();
-    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
+    initializer.initStartups();
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     startServer(acceptorServer);
 
     if (config.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
-      final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
+      final LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext(this));
       localClassChannel.getContext().setChannel(localClassChannel);
-      final LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
+      final LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer));
       localNodeChannel.getContext().setChannel(localNodeChannel);
       final boolean offline = JPPFConfiguration.get(JPPFProperties.NODE_OFFLINE);
       localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
@@ -239,29 +222,12 @@ public class JPPFDriver {
   }
 
   /**
-   * Get the singleton instance of the JPPFDriver.
-   * @return a <code>JPPFDriver</code> instance.
-   */
-  public static JPPFDriver getInstance() {
-    return instance;
-  }
-
-  /**
    * Get the queue that handles the tasks to execute.
    * @return a JPPFQueue instance.
    * @exclude
    */
   public JPPFPriorityQueue getQueue() {
     return taskQueue;
-  }
-
-  /**
-   * Get the JPPF client server.
-   * @return a {@link ClientNioServer} instance.
-   * @exclude
-   */
-  public ClientNioServer getClientNioServer() {
-    return clientNioServer;
   }
 
   /**
@@ -362,7 +328,7 @@ public class JPPFDriver {
     if (clientClassServer != null) clientClassServer.shutdown();
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
-    if (clientNioServer != null) clientNioServer.shutdown();
+    if (asyncClientNioServer != null) asyncClientNioServer.shutdown();
     NioHelper.shutdown(true);
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
@@ -405,15 +371,11 @@ public class JPPFDriver {
   public static void main(final String...args) {
     try {
       if (debugEnabled) log.debug("starting the JPPF driver");
-      if ((args == null) || (args.length <= 0))
-        throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
-      if (!"noLauncher".equals(args[0])) {
-        final int port = Integer.parseInt(args[0]);
-        new LauncherListener(port).start();
-      }
-      instance = new JPPFDriver();
+      if ((args == null) || (args.length <= 0)) throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
+      if (!"noLauncher".equals(args[0])) new LauncherListener(Integer.parseInt(args[0])).start();
+      final JPPFDriver driver = new JPPFDriver(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("Driver system properties: {}", SystemUtils.printSystemProperties());
-      instance.run();
+      driver.run();
     } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
@@ -428,8 +390,8 @@ public class JPPFDriver {
    * @return the created server.
    * @throws Exception if any error occurs.
    */
-  private static HeartbeatNioServer initHeartbeatServer(final int identifier, final boolean useSSL) throws Exception {
-    final HeartbeatNioServer server = startServer(new HeartbeatNioServer(identifier, useSSL));
+  private HeartbeatNioServer initHeartbeatServer(final int identifier, final boolean useSSL) throws Exception {
+    final HeartbeatNioServer server = startServer(new HeartbeatNioServer(this, identifier, useSSL));
     NioHelper.putServer(identifier, server);
     return server;
   }
@@ -555,13 +517,5 @@ public class JPPFDriver {
    */
   public boolean isShuttingDown() {
     return shuttingDown.get();
-  }
-
-  /**
-   * @return whether the client job channel is the asynchronous implementation.
-   * @exclude
-   */
-  public boolean isAsyncClient() {
-    return asyncClient;
   }
 }

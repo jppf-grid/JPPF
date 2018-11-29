@@ -18,6 +18,7 @@
 
 package org.jppf.server.queue;
 
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -38,13 +39,19 @@ class JobExpirationAction implements Runnable {
    * The bundle wrapper encapsulating the job.
    */
   private final ServerJob serverJob;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this action with the specified bundle wrapper.
+   * @param driver reference to the JPPF driver.
    * @param serverJob the bundle wrapper encapsulating the job.
    */
-  public JobExpirationAction(final ServerJob serverJob) {
+  public JobExpirationAction(final JPPFDriver driver, final ServerJob serverJob) {
     if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
+    this.driver = driver;
     this.serverJob = serverJob;
   }
 
@@ -58,7 +65,7 @@ class JobExpirationAction implements Runnable {
     try {
       if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
       serverJob.jobExpired();
-      serverJob.cancel(true);
+      serverJob.cancel(driver, true);
     } catch (final Exception e) {
       log.error("Error while cancelling job id = " + jobId, e);
     }

@@ -21,6 +21,7 @@ package org.jppf.server.queue;
 import java.text.ParseException;
 
 import org.jppf.scheduling.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -74,9 +75,10 @@ class ScheduleManager {
 
   /**
    * Process the expiration schedule specified in the job SLA.
+   * @param driver reference to the JPPF driver.
    * @param serverJob the job to process.
    */
-  void handleExpirationJobSchedule(final ServerJob serverJob) {
+  void handleExpirationJobSchedule(final JPPFDriver driver, final ServerJob serverJob) {
     final String uuid = serverJob.getUuid();
     if (jobExpirationHandler.hasAction(uuid)) return;
     final JPPFSchedule schedule = serverJob.getSLA().getJobExpirationSchedule();
@@ -85,7 +87,7 @@ class ScheduleManager {
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
       final long dt = serverJob.getJobReceivedTime();
       try {
-        jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(serverJob), dt);
+        jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(driver, serverJob), dt);
       } catch (final ParseException e) {
         log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }

@@ -194,7 +194,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
     if (wrapper == null) {
       try {
-        wrapper = client.getConfig().get(JPPFProperties.CLIENT_ASYNCHRONOUS) ? new ChannelWrapperRemoteAsync(cnn) : new ChannelWrapperRemote(cnn);
+        wrapper = new ChannelWrapperRemoteAsync(cnn);
         final JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
         final JPPFConnectionPool pool = cnn.getConnectionPool();

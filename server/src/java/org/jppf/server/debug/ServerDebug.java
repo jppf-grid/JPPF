@@ -44,9 +44,17 @@ public class ServerDebug implements ServerDebugMBean {
    */
   private static final Logger log = LoggerFactory.getLogger(ServerDebug.class);
   /**
-   *
+   * Reference to the JPPF driver.
    */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
+
+  /**
+   * 
+   * @param driver reference to the JPPF driver.
+   */
+  public ServerDebug(final JPPFDriver driver) {
+    this.driver = driver;
+  }
 
   @Override
   public String clientClassLoaderChannels() {
@@ -78,14 +86,11 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String clientDataChannels() {
-    if (driver.isAsyncClient()) {
-      final Selector selector = driver.getAsyncClientNioServer().getSelector();
-      final Set<SelectionKey> keys = new HashSet<>(selector.keys());
-      final StringBuilder sb = new StringBuilder();
-      for (final SelectionKey key: keys)  sb.append(key.attachment()).append('\n');
-      return sb.toString();
-    }
-    return viewChannels(clientSet());
+    final Selector selector = driver.getAsyncClientNioServer().getSelector();
+    final Set<SelectionKey> keys = new HashSet<>(selector.keys());
+    final StringBuilder sb = new StringBuilder();
+    for (final SelectionKey key: keys)  sb.append(key.attachment()).append('\n');
+    return sb.toString();
   }
 
   @Override
@@ -146,8 +151,7 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String dumpQueue() {
-    JPPFDriver.getInstance();
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = driver.getQueue();
     final Set<String> set = queue.getAllJobIds();
     final StringBuilder sb = new StringBuilder();
     for (final String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
@@ -156,15 +160,13 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String dumpQueueDetails() {
-    JPPFDriver.getInstance();
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = driver.getQueue();
     return dumpJobDetails(queue.getAllJobIds());
   }
 
   @Override
   public String dumpQueueDetailsFromPriorityMap() {
-    JPPFDriver.getInstance();
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = driver.getQueue();
     return dumpJobDetails(queue.getAllJobIdsFromPriorityMap());
   }
 
@@ -173,8 +175,8 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set of job uuids.
    * @return .
    */
-  private static String dumpJobDetails(final Set<String> set) {
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+  private String dumpJobDetails(final Set<String> set) {
+    final JPPFPriorityQueue queue = driver.getQueue();
     final StringBuilder sb = new StringBuilder();
     final String hr = StringUtils.padRight("", '-', 80) + '\n';
     for (final String uuid: set) {
@@ -232,14 +234,6 @@ public class ServerDebug implements ServerDebugMBean {
     return set;
   }
 
-  /**
-   * Get the set of client class loader connections.
-   * @return a set of {@link ChannelWrapper} instances.
-   */
-  private Set<ChannelWrapper<?>> clientSet() {
-    return new HashSet<>(driver.getClientNioServer().getAllConnections());
-  }
-
   @Override
   public String taskQueueCheckerChannels() {
     final List<AbstractNodeContext> list = driver.getNodeNioServer().getIdleChannels();
@@ -289,8 +283,9 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
-    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
-    return new ScriptDefinition(language, script).evaluate();
+    final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("serverDebug", ServerDebug.this); }};
+    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script with binding=%s:%n%s", language, bindings, script));
+    return new ScriptDefinition(language, script, bindings).evaluate();
   }
 
   @Override
@@ -313,5 +308,12 @@ public class ServerDebug implements ServerDebugMBean {
    * Trigger method for the profiler to stop profiling.
    */
   public static void endProf() {
+  }
+
+  /**
+   * @return a reference to the JPPF driver.
+   */
+  public JPPFDriver getDriver() {
+    return driver;
   }
 }

@@ -42,11 +42,18 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   /**
    * Reference to the driver.
    */
-  protected final JPPFDriver driver = JPPFDriver.getInstance();
+  protected final JPPFDriver driver;
   /**
    * Time at which the current request was received.
    */
   protected long requestStartTime = 0L;
+
+  /**
+   * @param driver reference to the JPPF driver.
+   */
+  public AbstractClassContext(final JPPFDriver driver) {
+    this.driver = driver;
+  }
 
   /**
    * Deserialize a resource wrapper from an array of bytes.

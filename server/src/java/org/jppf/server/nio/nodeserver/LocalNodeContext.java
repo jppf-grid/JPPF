@@ -39,10 +39,10 @@ public class LocalNodeContext extends AbstractNodeContext {
 
   /**
    * Default constructor.
-   * @param transitionManager instance of transition manager used by this node context.
+   * @param server the NIO server that created this context.
    */
-  public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    super(transitionManager);
+  public LocalNodeContext(final NodeNioServer server) {
+    super(server);
   }
 
   @Override

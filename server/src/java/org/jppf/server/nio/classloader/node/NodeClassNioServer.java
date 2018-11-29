@@ -90,7 +90,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
 
   @Override
   public NioContext<NodeClassState> createNioContext(final Object...params) {
-    return new NodeClassContext();
+    return new NodeClassContext(getDriver());
   }
 
   @Override
@@ -141,12 +141,12 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel) {
+  public void closeConnection(final ChannelWrapper<?> channel) {
     if (channel == null) {
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    final NodeClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
+    final NodeClassNioServer server = getDriver().getNodeClassServer();
     final NodeClassContext context = (NodeClassContext) channel.getContext();
     final String uuid = context.getUuid();
     if (uuid != null) server.removeNodeConnection(uuid);
@@ -158,7 +158,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
     }
     if (context.isPeer()) {
       try {
-        final NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
+        final NodeNioServer jobNodeServer = getDriver().getNodeNioServer();
         final AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
         if (ctx != null) ctx.handleException(null);
       } catch(final Exception e) {

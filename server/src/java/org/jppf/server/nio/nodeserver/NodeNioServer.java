@@ -81,10 +81,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
    */
   private final Map<String, AbstractNodeContext> allConnections = new ConcurrentHashMap<>();
   /**
-   * Reference to the driver.
-   */
-  private final JPPFDriver driver;
-  /**
    * The thread polling the local channel.
    */
   private ChannelSelectorThread selectorThread = null;
@@ -132,7 +128,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
    * @throws Exception if the underlying server socket can't be opened.
    */
   public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue, final boolean useSSL) throws Exception {
-    super(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL);
+    super(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL, driver);
     if (driver == null) throw new IllegalArgumentException("driver is null");
     if (queue == null) throw new IllegalArgumentException("queue is null");
 
@@ -146,7 +142,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
     bundlerHandler = new LoadBalancerPersistenceManager(bundlerFactory);
     INITIAL_BUNDLE_UUID = driver.getUuid();
-    this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     taskQueueChecker = new TaskQueueChecker<>(this, queue, driver.getStatistics(), bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
@@ -297,7 +292,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
   public void postAccept(final ChannelWrapper<?> channel) {
     //statsManager.newNodeConnection();
     if (debugEnabled) log.debug("performing post-accept for {}", channel);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
+    getDriver().getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
     final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     try {
       context.setBundle(getInitialBundle());
@@ -312,7 +307,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
 
   @Override
   public AbstractNodeContext createNioContext(final Object...params) {
-    final RemoteNodeContext context = new RemoteNodeContext(getTransitionManager());
+    final RemoteNodeContext context = new RemoteNodeContext(this);
     context.setOnClose(new Runnable() {
       @Override
       public void run() {
@@ -346,7 +341,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
       final TaskBundle bundle = new JPPFTaskBundle();
       bundle.setName("server handshake");
       bundle.setUuid(INITIAL_BUNDLE_UUID);
-      bundle.getUuidPath().add(driver.getUuid());
+      bundle.getUuidPath().add(getDriver().getUuid());
       bundle.setTaskCount(0);
       bundle.setHandshake(true);
       final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
@@ -385,7 +380,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
         if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
         nodeConnectionHandler.fireNodeDisconnected(info);
       }
-      driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);
+      getDriver().getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);
       removeConnection(context);
     } catch (final Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -546,5 +541,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
    */
   public LoadBalancerPersistenceManager getBundlerHandler() {
     return bundlerHandler;
+  }
+
+  /**
+   * @return a reference to the driver. 
+   */
+  public JPPFDriver getDriver() {
+    return (JPPFDriver) attachment;
   }
 }

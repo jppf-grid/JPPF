@@ -60,7 +60,7 @@ public class TestJobTasksListener extends Setup1D1N {
     assertTrue("failed to connect to " + jmx, jmx.connectAndWait(10_000L));
     final String script = new StringBuilder()
       .append("function addListener() {\n")
-      .append("  var driver = org.jppf.server.JPPFDriver.getInstance();\n")
+      .append("  var driver = serverDebug.getDriver();\n")
       .append("  var listener = org.jppf.test.addons.jobtaskslistener.MyJobTasksListener.getInstance();\n")
       .append("  driver.getJobTasksListenerManager().addJobTasksListener(listener);\n")
       .append("  return \"ok\";\n")
@@ -79,7 +79,7 @@ public class TestJobTasksListener extends Setup1D1N {
     if (jmx != null) {
       final String script = new StringBuilder()
         .append("function removeListener() {\n")
-        .append("  var driver = org.jppf.server.JPPFDriver.getInstance();\n")
+        .append("  var driver = serverDebug.getDriver();\n")
         .append("  var listener = org.jppf.test.addons.jobtaskslistener.MyJobTasksListener.getInstance();\n")
         .append("  driver.getJobTasksListenerManager().removeJobTasksListener(listener);\n")
         .append("  return \"ok\";\n")

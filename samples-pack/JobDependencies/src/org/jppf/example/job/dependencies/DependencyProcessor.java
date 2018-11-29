@@ -45,6 +45,10 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
    * Proxy to the job management MBean, used to suspend/resume jobs and register for job notifications.
    */
   DriverJobManagementMBean jobManager;
+  /**
+   * A refeence to the JPPF driver.
+   */
+  private JPPFDriver driver;
 
   /**
    * Default contructor.
@@ -104,8 +108,8 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
    * @param jobUuid the uuid of the job to lookup.
    * @return a {@link JPPFDistributedJob} object, or {@code null} if there is no job with this uuid.
    */
-  private static JPPFDistributedJob getJob(final String jobUuid) {
-    return JPPFDriver.getInstance().getJob(jobUuid);
+  private JPPFDistributedJob getJob(final String jobUuid) {
+    return driver.getJob(jobUuid);
   }
 
   // Implementation of the JPPFDriverStartupSPI interface
@@ -125,5 +129,15 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
     } catch (final Exception e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Set the reference to the JPPF driver.
+   * This method is invoked by the JPPF driver before calling the {@code run()} method.
+   * @param driver the JPPF driver to set.
+   */
+  public void setDriver(final JPPFDriver driver) {
+    Utils.print("Setting the JPPF driver onto %s", getClass().getSimpleName());
+    this.driver = driver;
   }
 }

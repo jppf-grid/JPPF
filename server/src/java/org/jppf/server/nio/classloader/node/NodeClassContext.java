@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -47,6 +48,13 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
    * Used to synchronize pending responses performed by multiple threads.
    */
   private final Lock lockResponse = new ReentrantLock();
+
+  /**
+   * @param driver reference to the JPPF driver.
+   */
+  public NodeClassContext(final JPPFDriver driver) {
+    super(driver);
+  }
 
   @Override
   public boolean isProvider() {
@@ -148,7 +156,7 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
   @Override
   public void handleException(final Exception e) {
     if (debugEnabled) log.debug("excception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
-    NodeClassNioServer.closeConnection(channel);
+    driver.getNodeClassServer().closeConnection(channel);
   }
 
 

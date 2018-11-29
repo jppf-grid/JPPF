@@ -21,6 +21,7 @@ package org.jppf.server;
 import static org.jppf.utils.configuration.JPPFProperties.*;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
@@ -40,9 +41,11 @@ import org.jppf.server.nio.classloader.ClassCache;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.peer.*;
+import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.*;
+import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -125,7 +128,7 @@ public class DriverInitializer {
   public DriverInitializer(final JPPFDriver driver, final TypedProperties config) {
     this.driver = driver;
     this.config = config;
-    this.peerConnectionPoolHandler = new PeerConnectionPoolHandler(config);
+    this.peerConnectionPoolHandler = new PeerConnectionPoolHandler(driver, config);
   }
 
   /**
@@ -140,7 +143,7 @@ public class DriverInitializer {
       if (debugEnabled) log.debug("registering debug mbean");
       try {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        serverDebug = new ServerDebug();
+        serverDebug = new ServerDebug(driver);
         final StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
         server.registerMBean(mbean, ObjectNameCache.getObjectName(ServerDebugMBean.MBEAN_NAME));
       } catch (final Exception e) {
@@ -155,7 +158,7 @@ public class DriverInitializer {
    */
   void registerProviderMBeans() throws Exception {
     final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
+    new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server, driver);
     registerNodeConfigListener();
   }
 
@@ -262,7 +265,7 @@ public class DriverInitializer {
       }
     }
     if (peerDiscoveryThread != null) ThreadUtils.startThread(peerDiscoveryThread, "PeerDiscovery");
-    discoveryListener = new PeerDriverDiscoveryListener();
+    discoveryListener = new PeerDriverDiscoveryListener(driver);
     discoveryHandler.register(discoveryListener.open()).start();
   }
 
@@ -449,5 +452,24 @@ public class DriverInitializer {
    */
   public PeerConnectionPoolHandler getPeerConnectionPoolHandler() {
     return peerConnectionPoolHandler;
+  }
+
+  /**
+   * 
+   */
+  void initStartups() {
+    final Hook<JPPFDriverStartupSPI> hook = HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null);
+    for (final HookInstance<JPPFDriverStartupSPI> hookInstance: hook.getInstances()) {
+      final JPPFDriverStartupSPI instance = hookInstance.getInstance();
+      final Method m = ReflectionUtils.getSetter(instance.getClass(), "setJPPFDriver");
+      if ((m != null) &&(JPPFDriver.class.isAssignableFrom(m.getParameterTypes()[0]))) {
+        try {
+          m.invoke(instance, driver);
+        } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          log.error("error seting JPPFDriver on startup of type {}", instance.getClass().getName(), e);
+        }
+      }
+      hookInstance.invoke("run");
+    }
   }
 }

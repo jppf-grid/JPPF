@@ -101,7 +101,7 @@ class WaitInitialBundleState extends NodeServerState {
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
-          final DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
+          final DriverInitializer initializer = server.getDriver().getInitializer();
           final JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }

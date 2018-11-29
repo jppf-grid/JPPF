@@ -25,6 +25,7 @@ import java.nio.channels.*;
 import javax.net.ssl.*;
 
 import org.jppf.nio.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,14 +47,20 @@ public final class HeartbeatNioServer extends StatelessNioServer<HeartbeatContex
    * The message handler for this server.
    */
   private final HeartbeatMessageHandler messageHandler;
+  /**
+   * Reference to the driver.
+   */
+  final JPPFDriver driver;
 
   /**
+   * @param driver reference to the driver.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if any error occurs.
    */
-  public HeartbeatNioServer(final int identifier, final boolean useSSL) throws Exception {
+  public HeartbeatNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
+    this.driver = driver;
     messageHandler = new HeartbeatMessageHandler(this);
   }
 

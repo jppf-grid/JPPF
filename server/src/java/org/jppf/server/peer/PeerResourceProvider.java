@@ -23,7 +23,6 @@ import org.jppf.JPPFRuntimeException;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -80,7 +79,7 @@ class PeerResourceProvider extends AbstractPeerConnectionHandler {
       }
       final JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      final String uuid = JPPFDriver.getInstance().getUuid();
+      final String uuid = server.getDriver().getUuid();
       context.setConnectionUuid(connectionUuid);
       resource.setData(ResourceIdentifier.NODE_UUID, uuid);
       resource.setData(ResourceIdentifier.PEER, Boolean.TRUE);

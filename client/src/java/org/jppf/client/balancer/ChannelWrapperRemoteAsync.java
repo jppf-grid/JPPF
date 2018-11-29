@@ -281,7 +281,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * @return an eventual exception to use in job results processing.
    */
   private Exception handleThrowable(final ClientTaskBundle clientBundle, final Throwable t, final boolean fromSender) {
-    if (debugEnabled) log.debug("handling throwable for {}:\bchannel = {}", clientBundle, this, t);
+    if (debugEnabled) log.debug("handling throwable for {}:\nchannel = {}", clientBundle, this, t);
     final boolean channelClosed = channel.isClosed();
     if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
     if (channelClosed && !resetting) return null;

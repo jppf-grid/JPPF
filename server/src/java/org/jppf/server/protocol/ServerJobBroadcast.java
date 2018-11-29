@@ -22,6 +22,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
@@ -199,11 +200,11 @@ public class ServerJobBroadcast extends ServerJob {
   }
 
   @Override
-  public boolean addBundle(final ServerTaskBundleClient clientBundle) {
+  public boolean addBundle(final JPPFDriver driver, final ServerTaskBundleClient clientBundle) {
     lock.lock();
     try {
       if (parentJob == null) {
-        final boolean b = super.addBundle(clientBundle);
+        final boolean b = super.addBundle(driver, clientBundle);
         final List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
@@ -235,7 +236,7 @@ public class ServerJobBroadcast extends ServerJob {
   }
 
   @Override
-  public boolean cancel(final boolean mayInterruptIfRunning) {
+  public boolean cancel(final JPPFDriver driver, final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel " + this);
     lock.lock();
     try {
@@ -245,11 +246,11 @@ public class ServerJobBroadcast extends ServerJob {
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
         broadcastSet.clear();
-        for (final ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
+        for (final ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(driver, false);
         jobEnded();
         return true;
       } else {
-        return super.cancel(mayInterruptIfRunning);
+        return super.cancel(driver, mayInterruptIfRunning);
       }
     } finally {
       lock.unlock();

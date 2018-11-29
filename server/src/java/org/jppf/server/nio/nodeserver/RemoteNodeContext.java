@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.nio.StateTransitionManager;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 
 /**
@@ -33,10 +32,10 @@ public class RemoteNodeContext extends AbstractNodeContext {
 
   /**
    * Default constructor.
-   * @param transitionManager instance of transition manager used by this node context.
+   * @param server the NIO server that created this context.
    */
-  public RemoteNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    super(transitionManager);
+  public RemoteNodeContext(final NodeNioServer server) {
+    super(server);
   }
 
   @Override

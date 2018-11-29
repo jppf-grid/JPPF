@@ -19,6 +19,7 @@
 package org.jppf.server.peer;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.server.JPPFDriver;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -40,12 +41,18 @@ public class PeerConnectionPoolHandler {
    * The number of connected nodes below which the driver load-balances to other peer drivers.
    */
   private final int loadBalanceThreshold;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this connection pool handler.
+   * @param driver reference to the JPPF driver.
    * @param config the driver configuration properties.
    */
-  public PeerConnectionPoolHandler(final TypedProperties config) {
+  public PeerConnectionPoolHandler(final JPPFDriver driver, final TypedProperties config) {
+    this.driver = driver;
     final int n = config.get(JPPFProperties.PEERS_LOAD_BALANCE_THRESHOLD);
     this.loadBalanceThreshold = (n < 0) ? 0 : n;
   }
@@ -61,7 +68,7 @@ public class PeerConnectionPoolHandler {
    */
   public PeerConnectionPool newPool(final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
     if (debugEnabled) log.debug("creating PeerConnectionPool with peerName={}, size={}, connectionInfo={}, secure={}, fromDiscovery={}", peerName, size, connectionInfo, secure, fromDiscovery);
-    final PeerConnectionPool pool = new PeerConnectionPool(peerName, size, connectionInfo, secure, fromDiscovery);
+    final PeerConnectionPool pool = new PeerConnectionPool(driver, peerName, size, connectionInfo, secure, fromDiscovery);
     return pool;
   }
 

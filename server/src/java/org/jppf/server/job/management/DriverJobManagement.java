@@ -49,12 +49,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Reference to the driver.
    */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
 
   /**
    * Initialize this MBean.
+   * @param driver reference to the JPPF driver.
    */
-  public DriverJobManagement() {
+  public DriverJobManagement(final JPPFDriver driver) {
+    this.driver = driver;
     driver.getJobManager().addJobManagerListener(new JobEventNotifier());
   }
 
@@ -71,7 +73,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   private void cancelJob(final ServerJob job) throws Exception {
     if (job != null) {
       if (debugEnabled) log.debug("Request to cancel job '{}'", job.getJob().getName());
-      job.cancel(false);
+      job.cancel(driver, false);
       final JPPFStatistics stats = driver.getStatistics();
       stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -job.getTaskCount());
     } else if (debugEnabled) log.debug("job is null");
@@ -139,7 +141,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
   @Override
   public String[] getAllJobUuids() throws Exception {
-    final Set<String> ids = JPPFDriver.getInstance().getQueue().getAllJobIds();
+    final Set<String> ids = driver.getQueue().getAllJobIds();
     return ids.toArray(new String[ids.size()]);
   }
 
@@ -187,7 +189,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public void updatePriority(final String jobUuid, final Integer newPriority) {
     if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
-    JPPFDriver.getInstance().getQueue().updatePriority(jobUuid, newPriority);
+    driver.getQueue().updatePriority(jobUuid, newPriority);
   }
 
   /**
@@ -308,8 +310,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param selector determines for which jobs to return the uuid.
    * @return a set of uuids, possibly empty.
    */
-  private static List<ServerJob> selectJobs(final JobSelector selector) {
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+  private List<ServerJob> selectJobs(final JobSelector selector) {
+    final JPPFPriorityQueue queue = driver.getQueue();
     final List<ServerJob> allJobs = queue.getAllJobs();
     final List<ServerJob> list = new ArrayList<>(allJobs.size());
     for (final ServerJob job: allJobs) {
@@ -330,7 +332,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public void updateJobs(final JobSelector selector, final JobSLA sla, final JobMetadata metadata) {
     if ((sla == null) && (metadata == null)) return;
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
+    final JPPFPriorityQueue queue = driver.getQueue();
     final List<ServerJob> jobs = queue.selectJobs(selector);
     if (debugEnabled) log.debug("updating sla and metadata for " + jobs.size() + " jobs");
     if (jobs.isEmpty()) return;
@@ -342,7 +344,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
         final int oldPriority = job.getSLA().getPriority();
         if (oldPriority != newPriority) queue.updatePriority(job.getUuid(), newPriority);
       }
-      job.update(sla, metadata);
+      job.update(driver, sla, metadata);
     }
     driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }

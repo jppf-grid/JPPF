@@ -24,7 +24,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.client.async.AsyncClientNioServer;
+import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -75,7 +75,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
 
   @Override
   public NioContext<ClientClassState> createNioContext(final Object...params) {
-    return new ClientClassContext();
+    return new ClientClassContext(getDriver());
   }
 
   @Override
@@ -100,7 +100,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel) {
+  public void closeConnection(final ChannelWrapper<?> channel) {
     closeConnection(channel, true);
   }
 
@@ -109,17 +109,19 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * @param channel the channel representing the connection.
    * @param removeJobConnection <code>true</code> to remove the corresponding job connection as well, <code>false</code> otherwise.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel, final boolean removeJobConnection) {
+  public void closeConnection(final ChannelWrapper<?> channel, final boolean removeJobConnection) {
     if (channel == null) {
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    final ClientClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
     final ClientClassContext context = (ClientClassContext) channel.getContext();
     if (debugEnabled) log.debug("closing {}", context);
-    final String uuid = context.getUuid();
-    if (uuid != null) server.removeProviderConnection(uuid, channel);
-    else if (debugEnabled) log.debug("null uuid for {}", context);
+    //if (!getDriver().isAsyncClient()) {
+      final String uuid = context.getUuid();
+      final ClientClassNioServer server = getDriver().getClientClassServer();
+      if (uuid != null) server.removeProviderConnection(uuid, channel);
+      else if (debugEnabled) log.debug("null uuid for {}", context);
+    //}
     try {
       channel.close();
     } catch(final Exception e) {
@@ -128,9 +130,8 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
     }
     if (removeJobConnection) {
       final String connectionUuid = context.getConnectionUuid();
-      final JPPFDriver driver = JPPFDriver.getInstance();
-      if (driver.isAsyncClient()) driver.getAsyncClientNioServer().performContextAction(ctx -> connectionUuid.equals(ctx.getConnectionUuid()), AsyncClientNioServer::closeConnection);
-      else driver.getClientNioServer().closeClientConnection(connectionUuid);
+      final AsyncClientNioServer clientJobServer = getDriver().getAsyncClientNioServer();
+      clientJobServer.performContextAction(ctx -> connectionUuid.equals(ctx.getConnectionUuid()), clientJobServer::closeConnection);
     }
   }
 

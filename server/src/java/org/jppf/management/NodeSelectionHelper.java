@@ -43,7 +43,15 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   /**
    * Reference to the JPPF driver.
    */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
+
+  /**
+   * 
+   * @param driver reference to the JPPF driver.
+   */
+  public NodeSelectionHelper(final JPPFDriver driver) {
+    this.driver = driver;
+  }
 
   /**
    * Determine whether the specified selector accepts the specified node.

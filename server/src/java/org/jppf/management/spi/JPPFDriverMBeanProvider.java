@@ -18,17 +18,27 @@
 
 package org.jppf.management.spi;
 
+import org.jppf.server.JPPFDriver;
 
 /**
  * Service provider interface for pluggable management beans for JPPF drivers.
  * @author Laurent Cohen
  */
-public interface JPPFDriverMBeanProvider extends JPPFMBeanProvider
-{
+public interface JPPFDriverMBeanProvider extends JPPFMBeanProvider {
   /**
    * Return a concrete MBean.<br>
    * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
    * @return an <code>Object</code> that is an implementation of the MBean interface.
    */
   Object createMBean();
+
+  /**
+   * Return a concrete MBean.<br>
+   * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
+   * @param driver a reference to the JPPF driver that holds this mbean.
+   * @return an <code>Object</code> that is an implementation of the MBean interface.
+   */
+  default Object createMBean(@SuppressWarnings("unused") final JPPFDriver driver) {
+    return createMBean();
+  }
 }

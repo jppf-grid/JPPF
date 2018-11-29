@@ -24,7 +24,6 @@ import java.util.*;
 import org.jppf.io.*;
 import org.jppf.job.persistence.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.*;
@@ -317,7 +316,7 @@ public class PersistenceHandler {
    * @return {@code true} if the persistence is available, {@code false} otherwise.
    */
   private boolean isPersistenceReady() {
-    return (persistence != null) && !JPPFDriver.getInstance().isShuttingDown();
+    return (persistence != null) && !queue.driver.isShuttingDown();
   }
 
   /**

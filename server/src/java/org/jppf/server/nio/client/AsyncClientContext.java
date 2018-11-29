@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client.async;
+package org.jppf.server.nio.client;
 
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
@@ -29,11 +29,12 @@ import org.jppf.io.*;
 import org.jppf.nio.StatelessNioContext;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.client.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
+
+import com.sun.xml.internal.ws.api.policy.PolicyResolver.ClientContext;
 
 /**
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
@@ -55,7 +56,7 @@ public class AsyncClientContext extends StatelessNioContext {
   /**
    * Reference to the driver.
    */
-  protected static final JPPFDriver driver = JPPFDriver.getInstance();
+  final JPPFDriver driver;
   /**
    * The server that handles this context.
    */
@@ -75,6 +76,7 @@ public class AsyncClientContext extends StatelessNioContext {
    */
   AsyncClientContext(final AsyncClientNioServer server, final SocketChannel socketChannel) {
     this.server = server;
+    this.driver = server.getDriver();
     this.socketChannel = socketChannel;
   }
 
@@ -226,12 +228,12 @@ public class AsyncClientContext extends StatelessNioContext {
           if (job != null) {
             taskCount = job.getTaskCount();
             if (debugEnabled) log.debug("cancelling job {}", job);
-            job.cancel(true);
+            job.cancel(driver, true);
           }
           final int tasksToSend2 = jobEntry.nbTasksToSend;
           final int n = tasksToSend - tasksToSend2 - taskCount;
           if (debugEnabled) log.debug("tasksToSend={}, tasksToSend2={}, n={}, taskCount={}, serverJob={}", new Object[] {tasksToSend, tasksToSend2, n, taskCount, job});
-          final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+          final JPPFStatistics stats = driver.getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -taskCount);
           driver.getQueue().removeBundle(job);
         } catch(final Exception e) {
@@ -252,8 +254,8 @@ public class AsyncClientContext extends StatelessNioContext {
    */
   private void updateTrafficStats(final ClientMessage message) {
     if (message != null) {
-      if (inSnapshot == null) inSnapshot = JPPFDriver.getInstance().getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : CLIENT_IN_TRAFFIC);
-      if (outSnapshot == null) outSnapshot = JPPFDriver.getInstance().getStatistics().getSnapshot(peer ? PEER_OUT_TRAFFIC : CLIENT_OUT_TRAFFIC);
+      if (inSnapshot == null) inSnapshot = driver.getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : CLIENT_IN_TRAFFIC);
+      if (outSnapshot == null) outSnapshot = driver.getStatistics().getSnapshot(peer ? PEER_OUT_TRAFFIC : CLIENT_OUT_TRAFFIC);
       double value = message.getChannelReadCount();
       if (value > 0d) inSnapshot.addValues(value, 1L);
       value = message.getChannelWriteCount();

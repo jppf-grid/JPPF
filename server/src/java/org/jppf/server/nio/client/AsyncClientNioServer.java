@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client.async;
+package org.jppf.server.nio.client;
 
 import java.io.EOFException;
 import java.net.InetSocketAddress;
@@ -54,16 +54,22 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * The message handler for this server.
    */
   private final AsyncClientMessageHandler messageHandler;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver;
 
   /**
+   * @param driver reference to the driver.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if any error occurs.
    */
-  public AsyncClientNioServer(final int identifier, final boolean useSSL) throws Exception {
+  public AsyncClientNioServer(final JPPFDriver driver, final int identifier, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
+    this.driver = driver;
     selectTimeout = 1000L;
-    messageHandler = new AsyncClientMessageHandler();
+    messageHandler = new AsyncClientMessageHandler(driver);
   }
 
   @Override
@@ -114,7 +120,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-    JPPFDriver.getInstance().getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
     return null;
   }
 
@@ -166,7 +172,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
    * Close the specified channel.
    * @param context the channel to close.
    */
-  public static void closeConnection(final AsyncClientContext context) {
+  public void closeConnection(final AsyncClientContext context) {
     if (debugEnabled) log.debug("closing {}", context);
     try {
       final SelectionKey key = context.getSelectionKey();
@@ -176,7 +182,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
       }
       final String uuid = context.getUuid();
       if (uuid != null) {
-        final ClientClassNioServer classServer = JPPFDriver.getInstance().getClientClassServer();
+        final ClientClassNioServer classServer = driver.getClientClassServer();
         final List<ClientClassContext> list = classServer.getProviderContexts(uuid);
         if (debugEnabled) log.debug("found {} provider connections for clientUuid={}; context={}", list.size(), uuid, context);
         if (!list.isEmpty()) {
@@ -184,7 +190,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
             if (ctx.getConnectionUuid().equals(context.getConnectionUuid())) {
               if (debugEnabled) log.debug("found provider connection with connectionUuid={} : {}", context.getConnectionUuid(), ctx);
               try {
-                ClientClassNioServer.closeConnection(ctx.getChannel(), false);
+                driver.getClientClassServer().closeConnection(ctx.getChannel(), false);
               } catch (final Exception e2) {
                 log.error(e2.getMessage(), e2);
               }
@@ -196,7 +202,7 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
     } catch (final Exception e) {
       log.error("error closing channel {}: {}", context, ExceptionUtils.getStackTrace(e));
     } finally {
-      JPPFDriver.getInstance().getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
+      driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
     }
   }
 
@@ -217,5 +223,12 @@ public final class AsyncClientNioServer extends StatelessNioServer<AsyncClientCo
   protected void initNioHandlers() {
     super.initNioHandlers();
     acceptHandler = null;
+  }
+
+  /**
+   * @return a reference to the driver.
+   */
+  JPPFDriver getDriver() {
+    return driver;
   }
 }

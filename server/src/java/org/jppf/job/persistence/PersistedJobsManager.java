@@ -66,9 +66,10 @@ public class PersistedJobsManager implements PersistedJobsManagerMBean {
 
   /**
    * Initialize this MBean.
+   * @param driver the JPPF driver that holds this manager.
    */
-  public PersistedJobsManager() {
-    handler = JPPFDriver.getInstance().getQueue().getPersistenceHandler();
+  public PersistedJobsManager(final JPPFDriver driver) {
+    handler = driver.getQueue().getPersistenceHandler();
   }
 
   @Override

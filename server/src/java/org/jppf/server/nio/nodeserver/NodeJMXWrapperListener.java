@@ -19,7 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import org.jppf.management.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -51,7 +50,7 @@ class NodeJMXWrapperListener implements JMXWrapperListener {
    */
   NodeJMXWrapperListener(final AbstractNodeContext context) {
     this.context = context;
-    this.server = JPPFDriver.getInstance().getNodeNioServer();
+    this.server = context.server;
   }
 
   @Override

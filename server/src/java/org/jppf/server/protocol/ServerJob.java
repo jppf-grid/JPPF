@@ -171,10 +171,9 @@ public class ServerJob extends AbstractServerJobBase {
     }
     taskCompleted(bundle, throwable);
     if (getJob().getParameter(BundleParameter.FROM_PERSISTENCE, false)) {
-      for (final Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-        final ServerTaskBundleClient clientBundle = entry.getKey();
+      map.forEach((clientBundle, tasks) -> {
         if (clientBundle.getPendingTasksCount() <= 0) clientBundle.bundleEnded();
-      }
+      });
     }
   }
 
@@ -243,7 +242,7 @@ public class ServerJob extends AbstractServerJobBase {
       map = new HashMap<>(dispatchSet);
     }
     if (debugEnabled) log.debug("cancelling {} dispatches for {}", map.size(), this);
-    for (final Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) cancelDispatch(entry.getValue());
+    map.forEach((id, nodeBundle) -> cancelDispatch(nodeBundle));
   }
 
   /**
@@ -274,15 +273,16 @@ public class ServerJob extends AbstractServerJobBase {
         clientMap.putValue(task.getBundle(), task);
       }
     }
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: clientMap.entrySet()) entry.getKey().resultReceived(entry.getValue());
+    clientMap.forEach((clientBundle, tasks) -> clientBundle.resultReceived(tasks));
   }
 
   /**
    * Cancel this job.
+   * @param driver reference to the JPPF driver.
    * @param mayInterruptIfRunning <code>true</code> if the job may be interrupted.
    * @return <code>true</code> if the job was effectively cncelled, <code>false</code> if it was already cancelled previously.
    */
-  public boolean cancel(final boolean mayInterruptIfRunning) {
+  public boolean cancel(final JPPFDriver driver, final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel {}", this);
     boolean result = false;
     lock.lock();
@@ -292,7 +292,7 @@ public class ServerJob extends AbstractServerJobBase {
         if (!getSLA().isBroadcastJob()) handleCancelledTasks();
         setSubmissionStatus(SubmissionStatus.COMPLETE);
         //taskCompleted(null, null);
-        JPPFDriver.getInstance().getNodeNioServer().getNodeReservationHandler().onJobCancelled(this);
+        driver.getNodeNioServer().getNodeReservationHandler().onJobCancelled(this);
         result = true;
       }
     } finally {
@@ -326,10 +326,11 @@ public class ServerJob extends AbstractServerJobBase {
 
   /**
    * Update this job with the specified sla and metadata.
+   * @param driver reference to the JPPF driver.
    * @param sla the SLA to update with.
    * @param metadata the metadata to update with.
    */
-  public void update(final JobSLA sla, final JobMetadata metadata) {
+  public void update(final JPPFDriver driver, final JobSLA sla, final JobMetadata metadata) {
     if (debugEnabled) log.debug("request to update {}", this);
     boolean updated = false;
     lock.lock();
@@ -337,7 +338,7 @@ public class ServerJob extends AbstractServerJobBase {
       if (sla != null) {
         this.sla = sla;
         job.setSLA(sla);
-        JPPFDriver.getInstance().getQueue().updateSchedules(this);
+        driver.getQueue().updateSchedules(this);
         updated = true;
       }
       if (metadata != null) {

@@ -114,15 +114,20 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Used to synchronize on th selector for blocking operations.
    */
   protected final SelectorSynchronizer sync;
+  /**
+   * An arbitrary object attached to this server.
+   */
+  protected final Object attachment;
 
   /**
    * Initialize this server with a specified identifier and name.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
+   * @param attachment an arbitrary object attached to this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final int identifier, final boolean useSSL) throws Exception {
-    this(JPPFIdentifiers.serverName(identifier), identifier, useSSL);
+  protected NioServer(final int identifier, final boolean useSSL, final Object attachment) throws Exception {
+    this(JPPFIdentifiers.serverName(identifier), identifier, useSSL, attachment);
   }
 
   /**
@@ -130,14 +135,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param name the name of this thread.
    * @param identifier the channel identifier for channels handled by this server.
    * @param useSSL determines whether an SSLContext should be created for this server.
+   * @param attachment an arbitrary object attached to this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name, final int identifier, final boolean useSSL) throws Exception {
+  protected NioServer(final String name, final int identifier, final boolean useSSL, final Object attachment) throws Exception {
     super(name);
     setDaemon(true);
     if (debugEnabled) log.debug("starting {} with identifier={} and useSSL={}", getClass().getSimpleName(), JPPFIdentifiers.serverName(identifier), useSSL);
     log.info("initializing {}({})", getClass().getSimpleName(), getName());
     this.identifier = identifier;
+    this.attachment = attachment;
     selector = Selector.open();
     sync = new SelectorSynchronizerLock(selector);
     transitionManager = createStateTransitionManager();
@@ -155,7 +162,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if the underlying server socket can't be opened.
    */
   public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
-    this(identifier, false);
+    this(identifier, false, null);
     if (debugEnabled) log.debug("starting {} with ports={} and sslPorts={}", getClass().getSimpleName(), Arrays.toString(ports), Arrays.toString(sslPorts));
     this.ports = ports;
     this.sslPorts = sslPorts;

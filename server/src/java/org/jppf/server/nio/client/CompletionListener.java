@@ -20,11 +20,9 @@ package org.jppf.server.nio.client;
 
 import java.util.List;
 
-import org.jppf.nio.*;
-import org.jppf.server.JPPFDriver;
+import org.jppf.nio.StatelessNioServer;
 import org.jppf.server.protocol.*;
-import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -42,40 +40,29 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The transition manager for the server to client channels.
-   */
-  private final StateTransitionManager<ClientState, ClientTransition> transitionManager;
-  /**
    * The client channel.
    */
-  private final ChannelWrapper<?> channel;
+  private final AsyncClientContext context;
 
   /**
    * Initialize this completion listener with the specified channel.
-   * @param channel the client channel.
-   * @param transitionManager the channel's transition manager.
+   * @param context the client channel.
    */
-  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager<ClientState, ClientTransition> transitionManager) {
-    if (channel == null) throw new IllegalArgumentException("channel is null");
-    if (transitionManager == null) throw new IllegalArgumentException("transitionManager is null");
-
-    this.channel = channel;
-    this.transitionManager = transitionManager;
+  public CompletionListener(final AsyncClientContext context) {
+    if (context == null) throw new IllegalArgumentException("channel is null");
+    this.context = context;
   }
 
   @Override
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
-    if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
+    if (bundle == null) throw new IllegalStateException("bundler is null");
     if (!isChannelValid()) {
-      if (debugEnabled) log.debug("channel is invalid: {}", channel);
-      final ClientContext context = (ClientContext) channel.getContext();
-      context.setNbTasksToSend(context.getNbTasksToSend() - results.size());
-      transitionManager.execute(new Runnable() {
-        @Override
-        public void run() {
-          removeJobFromQueue(bundle);
-        }
-      });
+      if (debugEnabled) log.debug("channel is invalid: {}", context);
+      try {
+        context.server.getMessageHandler().jobResultsSent(context, bundle);
+      } catch (final Exception e) {
+        log.error("Error sending job results for {}:\n", bundle, e);
+      }
       return;
     }
     if (results.isEmpty()) {
@@ -85,18 +72,10 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
     if (bundle.isCancelled()) bundle.removeCompletionListener(this);
     else {
-      final ClientContext context = (ClientContext) channel.getContext();
-      context.offerCompletedBundle(bundle);
-      synchronized(channel) {
-        if (debugEnabled) log.debug("*** context state=" + context.getState() + " for " + bundle + ", channel=" + channel);
-        if (context.getState() == ClientState.IDLE) {
-          try {
-            transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-          } catch(final Exception e) {
-            if (debugEnabled) log.debug("error while transitioning {} : {}", channel, ExceptionUtils.getStackTrace(e));
-            else log.info("error while transitioning {} : {}", channel, ExceptionUtils.getMessage(e));
-          }
-        }
+      try {
+        context.server.getMessageHandler().sendJobResults(context, bundle);
+      } catch (final Exception e) {
+        log.error("Error sending job results for {}:\n", bundle, e);
       }
     }
   }
@@ -108,25 +87,9 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
 
   /**
    * Determine whether the channel is valid at the time this method is called.
-   * @return <code>true</code> if the channel is valid, <code>false</code> otherwise.
+   * @return {@code true} if the channel is valid, {@code false} otherwise.
    */
   private boolean isChannelValid() {
-    if (channel instanceof SelectionKeyWrapper) return ((SelectionKeyWrapper) channel).getChannel().isValid();
-    return true;
-  }
-
-  /**
-   * Remove the specified job from the queue.
-   * @param bundle the job to remove.
-   */
-  private void removeJobFromQueue(final ServerTaskBundleClient bundle) {
-    final String uuid = bundle.getUuid();
-    final JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
-    final ServerJob job = queue.getBundleForJob(uuid);
-    if (job != null) {
-      if (debugEnabled) log.debug("job {} : status={}, submissionStatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});
-      final ClientContext context = (ClientContext) channel.getContext();
-      if (job.isDone() || (context.getNbTasksToSend() <= 0)) queue.removeBundle(job);
-    }
+    return StatelessNioServer.isKeyValid(context.getSelectionKey());
   }
 }

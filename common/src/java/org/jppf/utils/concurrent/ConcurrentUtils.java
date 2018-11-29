@@ -226,6 +226,7 @@ public final class ConcurrentUtils {
   /**
    * This interface represents a condition to evaluate to either {@code true} or {@code false}.
    */
+  @FunctionalInterface
   public static interface Condition {
     /**
      * Evaluate this condition.

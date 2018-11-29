@@ -35,7 +35,7 @@ abstract class AbstractPeerConnectionHandler implements AutoCloseable {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(PeerNode.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractPeerConnectionHandler.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */

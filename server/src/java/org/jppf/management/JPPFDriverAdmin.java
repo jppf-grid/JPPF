@@ -55,7 +55,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   /**
    * Reference to the driver.
    */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
   /**
    * The latest load-balancing information set via JMX.
    */
@@ -67,7 +67,16 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   /**
    *
    */
-  private final NodeSelectionHelper selectionHelper = new NodeSelectionHelper();
+  private final NodeSelectionHelper selectionHelper;
+
+  /**
+   * 
+   * @param driver the jppf driver that holds this mbean.
+   */
+  public JPPFDriverAdmin(final JPPFDriver driver) {
+    this.driver = driver;
+    selectionHelper = new NodeSelectionHelper(driver);
+  }
 
   @Override
   public Integer nbNodes() throws Exception {

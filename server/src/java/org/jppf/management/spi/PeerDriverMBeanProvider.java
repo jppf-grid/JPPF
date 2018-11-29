@@ -19,6 +19,7 @@
 package org.jppf.management.spi;
 
 import org.jppf.management.*;
+import org.jppf.server.JPPFDriver;
 
 /**
  * 
@@ -38,6 +39,11 @@ public class PeerDriverMBeanProvider implements JPPFDriverMBeanProvider {
 
   @Override
   public Object createMBean() {
-    return PeerDriver.getInstance();
+    return null;
+  }
+
+  @Override
+  public Object createMBean(final JPPFDriver driver) {
+    return new PeerDriver(driver);
   }
 }

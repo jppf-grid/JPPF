@@ -84,7 +84,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Performs all operations that relate to channel states.
    */
-  private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
+  final NodeNioServer server;
   /**
    * Provides access to the management functions of the node.
    */
@@ -120,10 +120,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   /**
    * Initialized abstract node context.
-   * @param transitionManager instance of transition manager used by this node context.
+   * @param server the NIO server that created this context.
    */
-  protected AbstractNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    this.transitionManager = transitionManager;
+  protected AbstractNodeContext(final NodeNioServer server) {
+    this.server = server;
   }
 
   /**
@@ -164,7 +164,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         bundler.dispose();
         if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
       }
-      final Pair<String, Bundler<?>> pair = JPPFDriver.getInstance().getNodeNioServer().getBundlerHandler().loadBundler(nodeIdentifier);
+      final Pair<String, Bundler<?>> pair = server.getBundlerHandler().loadBundler(nodeIdentifier);
       bundler = pair.second();
       bundlerAlgorithm = pair.first();
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(jppfContext);
@@ -182,7 +182,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         else log.debug("handling null for {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());
       }
       final ServerTaskBundleNode tmpBundle = bundle;
-      final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
       try {
         if (tmpBundle != null) {
           server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
@@ -233,7 +232,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void cleanup() {
     if (debugEnabled) log.debug("handling cleanup for {}", channel);
-    final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     if (reservationTansition == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
     final Bundler<?> bundler = getBundler();
     if (bundler != null) {
@@ -467,7 +465,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     setBundle(nodeBundle);
     nodeBundle.setOffline(isOffline());
     nodeBundle.setChannel(this);
-    transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
+    server.getTransitionManager().transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
     nodeBundle.checkTaskCount();
     return new NodeContextFuture(this);
@@ -529,8 +527,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   private void updateTrafficStats() {
     if (message != null) {
-      if (inSnapshot == null) inSnapshot = JPPFDriver.getInstance().getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC);
-      if (outSnapshot == null) outSnapshot = JPPFDriver.getInstance().getStatistics().getSnapshot(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC);
+      if (inSnapshot == null) inSnapshot = server.getDriver().getStatistics().getSnapshot(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC);
+      if (outSnapshot == null) outSnapshot = server.getDriver().getStatistics().getSnapshot(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC);
       double value = message.getChannelReadCount();
       if (value > 0d) inSnapshot.addValues(value, 1L);
       value = message.getChannelWriteCount();
@@ -543,7 +541,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param resubmittedTaskCount the number of tasks to resubmit.
    */
   void updateStatsUponTaskResubmit(final int resubmittedTaskCount) {
-    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = server.getDriver().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, resubmittedTaskCount);
   }
 

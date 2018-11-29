@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Abstract superclass for all possible states of a class server connection.
  * @author Laurent Cohen
  */
-public abstract class NodeClassServerState extends NioState<NodeClassTransition>
-{
+public abstract class NodeClassServerState extends NioState<NodeClassTransition> {
   /**
    * Logger for this class.
    */
@@ -47,15 +46,15 @@ public abstract class NodeClassServerState extends NioState<NodeClassTransition>
   /**
    * Reference to the driver.
    */
-  protected final JPPFDriver driver = JPPFDriver.getInstance();
+  protected final JPPFDriver driver;
 
   /**
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public NodeClassServerState(final NodeClassNioServer server)
-  {
+  public NodeClassServerState(final NodeClassNioServer server) {
     this.server = server;
+    this.driver = server.getDriver();
   }
 
   /**

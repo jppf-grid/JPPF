@@ -73,16 +73,22 @@ public class PeerConnectionPool implements HeartbeatConnectionListener {
    * Connection to the recovery server.
    */
   private HeartbeatConnection recoveryConnection;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this connection pool.
+   * @param driver reference to the JPPF driver.
    * @param size the size of this pool.
    * @param peerName name of the peer in the configuration file.
    * @param connectionInfo the peer connection information.
    * @param secure determines whether communication with remote peer servers should be secure.
    * @param fromDiscovery whether this connection and its pool were created by the discovery mechanism.
    */
-  public PeerConnectionPool(final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
+  public PeerConnectionPool(final JPPFDriver driver, final String peerName, final int size, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
+    this.driver = driver;
     this.peerName = peerName;
     this.size = size < 1 ? 1 : size;
     this.connectionInfo = connectionInfo;
@@ -141,7 +147,7 @@ public class PeerConnectionPool implements HeartbeatConnectionListener {
     connectionSequence.set(0);
     for (int i=1; i<=size; i++) {
       final String name = String.format("%s-%d", peerName, connectionSequence.incrementAndGet());
-      final JPPFPeerInitializer initializer = new JPPFPeerInitializer(name, connectionInfo, secure, fromDiscovery);
+      final JPPFPeerInitializer initializer = new JPPFPeerInitializer(driver, name, connectionInfo, secure, fromDiscovery);
       initializers.add(initializer);
       initializer.start();
     }
@@ -154,7 +160,7 @@ public class PeerConnectionPool implements HeartbeatConnectionListener {
   void initHeartbeat() {
     if (recoveryConnection == null) {
       if (debugEnabled) log.debug("Initializing recovery");
-      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, JPPFDriver.getInstance().getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure);
+      recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, driver.getUuid(), connectionInfo.host, connectionInfo.getValidPort(secure), secure);
       recoveryConnection.addClientConnectionListener(this);
       ThreadUtils.startThread(recoveryConnection, getPeerName() + "-Heartbeat");
     }

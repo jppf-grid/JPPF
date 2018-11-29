@@ -56,7 +56,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * The driver.
    */
-  private final JPPFDriver driver;
+  final JPPFDriver driver;
   /**
    * The list of registered job listeners.
    */
@@ -116,7 +116,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
             jobManager.jobQueued(serverJob);
           } else if (debugEnabled) log.debug("job already queued");
           try {
-            added = serverJob.addBundle(clientBundle);
+            added = serverJob.addBundle(driver, clientBundle);
             done = true;
           } catch (final JPPFJobEndedException e) {
             if (debugEnabled) log.debug("caught {}, awaiting removal of {}", ExceptionUtils.getMessage(e), serverJob);
@@ -186,7 +186,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     if (!clientBundle.getSLA().isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
       if (debugEnabled) log.debug("adding bundle with {}", clientBundle);
       scheduleManager.handleStartJobSchedule(serverJob);
-      scheduleManager.handleExpirationJobSchedule(serverJob);
+      scheduleManager.handleExpirationJobSchedule(driver, serverJob);
     }
     return serverJob;
   }
@@ -300,7 +300,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       boolean res = job != null;
       if (res) {
         decrementSizeCount(getSize(job));
-        res &= job.cancel(false);
+        res &= job.cancel(driver, false);
       }
       return res;
     } finally {
@@ -504,7 +504,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     final JobSLA sla = job.getSLA();
     scheduleManager.clearSchedules(job.getUuid());
     if (sla.getJobSchedule() != null) scheduleManager.handleStartJobSchedule(job);
-    if (sla.getJobExpirationSchedule() != null) scheduleManager.handleExpirationJobSchedule(job);
+    if (sla.getJobExpirationSchedule() != null) scheduleManager.handleExpirationJobSchedule(driver, job);
   }
 
   /**

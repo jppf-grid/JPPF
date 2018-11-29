@@ -27,7 +27,6 @@ import org.jppf.node.NodeRunner;
 import org.jppf.process.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
-import org.jppf.utils.concurrent.ConcurrentUtils.Condition;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -190,11 +189,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     }
     if (REQUEST_CHECK_TIMEOUT > 0) {
       final long start = System.nanoTime();
-      final boolean check = ConcurrentUtils.awaitCondition(new Condition() {
-        @Override public boolean evaluate() {
-          return nbSlaves() == requestedSlaves;
-        }
-      }, REQUEST_CHECK_TIMEOUT);
+      final boolean check = ConcurrentUtils.awaitCondition(() -> nbSlaves() == requestedSlaves, REQUEST_CHECK_TIMEOUT);
       final long elapsed = (System.nanoTime() - start) / 1_000_000L;
       if (debugEnabled) log.debug(String.format("fullfilment check for provisioning request for %d slaves %s after %,d ms", requestedSlaves, (check ? "succeeded" : "timed out"), elapsed));
     }
@@ -233,6 +228,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     // get the JPPF config, apply the overrides, then save it to the slave's folder
     final TypedProperties config = JPPFConfiguration.getProperties();
     final TypedProperties props = new TypedProperties(config);
+    props.remove("jppf.node.uuid");
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.set(JPPFProperties.PROVISIONING_MASTER, false);
     props.set(JPPFProperties.PROVISIONING_SLAVE, true);

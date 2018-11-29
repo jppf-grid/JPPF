@@ -52,10 +52,6 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   protected final List<ServerTaskBundleClient> clientBundles = new ArrayList<>();
   /**
-   * Listener for handling completed bundles.
-   */
-  protected final ServerTaskBundleClient.CompletionListener bundleCompletionListener = new BundleCompletionListener();
-  /**
    * Set of all dispatched bundles in this job.
    */
   protected final Map<Long, ServerTaskBundleNode> dispatchSet = new LinkedHashMap<>();
@@ -72,7 +68,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * Initialized client job with task bundle and list of tasks to execute.
    * @param lock used to synchronized access to job.
    * @param notificationEmitter an <code>ChangeListener</code> instance that fires job notifications.
-   * @param job   underlying task bundle.
+   * @param job  underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
   public AbstractServerJobBase(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
@@ -151,7 +147,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
 
   /**
    * Called when all or part of a job is returned from node.
-   * @param bundle  the returned job.
+   * @param bundle the returned job.
    */
   public void jobReturned(final ServerTaskBundleNode bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
@@ -221,11 +217,12 @@ public class AbstractServerJobBase extends AbstractServerJob {
 
   /**
    * Add received bundle to this server job.
+   * @param driver reference to the JPPF driver.
    * @param bundle the bundle to add.
    * @return {@code true} when bundle was added to job. {@code false} when job is {@code COMPLETE}.
    * @throws JPPFJobEndedException if the job is already {@code ENDED}.
    */
-  public boolean addBundle(final ServerTaskBundleClient bundle) throws JPPFJobEndedException {
+  public boolean addBundle(final JPPFDriver driver, final ServerTaskBundleClient bundle) throws JPPFJobEndedException {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     lock.lock();
     try {
@@ -236,7 +233,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
       } else {
         clientBundles.add(bundle);
         this.tasks.addAll(bundle.getTaskList());
-        bundle.addCompletionListener(bundleCompletionListener);
+        bundle.addCompletionListener(new BundleCompletionListener(driver, this));
         fireJobUpdated(false);
         return true;
       }
@@ -275,41 +272,5 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public int getNbBundles() {
     return clientBundles.size();
-  }
-
-  /**
-   * Listener for handling completed bundles.
-   */
-  private class BundleCompletionListener implements ServerTaskBundleClient.CompletionListener {
-    @Override
-    public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
-      if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    }
-
-    @Override
-    public void bundleEnded(final ServerTaskBundleClient bundle) {
-      if (bundle == null) throw new IllegalArgumentException("bundle is null");
-      final Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          if (debugEnabled) log.debug("bundle ended: {}", bundle);
-          SubmissionStatus newStatus = null;
-          lock.lock();
-          try {
-            bundle.removeCompletionListener(BundleCompletionListener.this);
-            clientBundles.remove(bundle);
-            tasks.removeAll(bundle.getTaskList());
-            if (completionBundles != null) completionBundles.remove(bundle);
-            if (clientBundles.isEmpty() && tasks.isEmpty()) newStatus = SubmissionStatus.ENDED;
-          } catch(final Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-          } finally {
-            lock.unlock();
-          }
-          if (newStatus != null) setSubmissionStatus(newStatus);
-        }
-      };
-      JPPFDriver.getInstance().getNodeNioServer().getTransitionManager().execute(r);
-    }
   }
 }

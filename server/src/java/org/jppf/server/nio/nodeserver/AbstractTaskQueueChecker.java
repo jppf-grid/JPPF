@@ -109,8 +109,8 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
     this.bundlerFactory = bundlerFactory;
-    this.driverInfo = JPPFDriver.getInstance().getSystemInformation();
-    this.peerLoadBalanceThreshold = JPPFDriver.getInstance().getInitializer().getPeerConnectionPoolHandler().getLoadBalanceThreshold();
+    this.driverInfo = server.getDriver().getSystemInformation();
+    this.peerLoadBalanceThreshold = server.getDriver().getInitializer().getPeerConnectionPoolHandler().getLoadBalanceThreshold();
   }
 
   /**

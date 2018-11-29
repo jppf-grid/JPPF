@@ -17,7 +17,7 @@
  */
 
 /**
- * Support for heartbeat messages betwen server and nodes.
- * @exclude
+ * Support for service provider interface, to provide <a href="https://www.jppf.org/doc/@version@/index.php?title=JPPF_startup_classes">pluggable startup classes</a> for nodes and drivers.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
-package org.jppf.server.nio.client.async;
+package org.jppf.startup;

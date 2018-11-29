@@ -77,48 +77,50 @@ public class JPPFPeerInitializer implements Runnable {
    * 
    */
   final String connectionUuid;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this peer initializer from a specified peerName.
+   * @param driver reference to the JPPF driver.
    * @param peerName the name of the peer in the configuration file.
    * @param connectionInfo peer connection information.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final boolean secure) {
-    this(peerName, connectionInfo, secure, false);
+  public JPPFPeerInitializer(final JPPFDriver driver, final String peerName, final JPPFConnectionInformation connectionInfo, final boolean secure) {
+    this(driver, peerName, connectionInfo, secure, false);
   }
 
   /**
    * Initialize this peer initializer from a specified peerName.
+   * @param driver reference to the JPPF driver.
    * @param peerName the name of the peer in the configuration file.
    * @param connectionInfo peer connection information.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    * @param fromDiscovery determines whether the connection info was obtained from the auto-discovery mechanism.
    */
-  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
+  public JPPFPeerInitializer(final JPPFDriver driver, final String peerName, final JPPFConnectionInformation connectionInfo, final boolean secure, final boolean fromDiscovery) {
     if (peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+    this.driver         = driver;
     this.peerName       = peerName;
     this.connectionInfo = connectionInfo;
     this.secure         = secure;
     this.fromDiscovery  = fromDiscovery;
-    this.connectionUuid = JPPFDriver.getInstance().getUuid() + '-' + SEQUENCE.incrementAndGet();
+    this.connectionUuid = driver.getUuid() + '-' + SEQUENCE.incrementAndGet();
     log.debug("created new peer initializer {}", this);
   }
 
   @Override
   public synchronized void run() {
     if (debugEnabled) log.debug("start initialization of peer [{}]", peerName);
-    final JPPFDriver driver = JPPFDriver.getInstance();
     try {
       if (connecting.compareAndSet(false, true)) {
-        if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, JPPFDriver.getInstance().getClientClassServer(), secure, connectionUuid);
+        if (provider == null) provider = new PeerResourceProvider(peerName, connectionInfo, driver.getClientClassServer(), secure, connectionUuid);
         provider.init();
-        if (node == null) {
-          node = driver.isAsyncClient()
-            ? new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid)
-            : new PeerNode(peerName, connectionInfo, driver.getClientNioServer(), secure, connectionUuid);
-        }
+        if (node == null) node = new AsyncPeerNode(peerName, connectionInfo, driver.getAsyncClientNioServer(), secure, connectionUuid);
         node.onCloseAction = () -> start();
         node.init();
       }

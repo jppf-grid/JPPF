@@ -71,12 +71,17 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Peak count of notifications in the executor's quueue.
    */
   private final AtomicInteger notifMax = new AtomicInteger(0);
+  /**
+   * Reference to the JPPF driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Default constructor.
+   * @param driver reference to the JPPF driver.
    */
-  public JPPFJobManager() {
-    //executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobManager"));
+  public JPPFJobManager(final JPPFDriver driver) {
+    this.driver = driver;
     executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JobManager")) {
       @Override
       protected void afterExecute(final Runnable r, final Throwable t) {
@@ -156,7 +161,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     if (!isBroadcastDispatch(serverJob)) {
       submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
     }
-    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
     stats.addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
@@ -176,11 +181,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       jobMap.removeValues(jobUuid);
     }
     if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
-    if (serverJob.getSLA().getDesiredNodeConfiguration() != null) JPPFDriver.getInstance().getNodeNioServer().getNodeReservationHandler().removeJobReservations(serverJob.getUuid());
+    if (serverJob.getSLA().getDesiredNodeConfiguration() != null) driver.getNodeNioServer().getNodeReservationHandler().removeJobReservations(serverJob.getUuid());
     if (!isBroadcastDispatch(serverJob)) {
       submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     }
-    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    final JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
@@ -188,7 +193,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public void jobUpdated(final AbstractServerJob job, final boolean headerUpdated) {
     //if (debugEnabled) log.debug("jobId '{}' updated", job.getName());
-    if (headerUpdated) JPPFDriver.getInstance().getQueue().getPersistenceHandler().updateJobHeader((ServerJob) job);
+    if (headerUpdated) driver.getQueue().getPersistenceHandler().updateJobHeader((ServerJob) job);
     submitEvent(JobEventType.JOB_UPDATED, (ServerJob) job, null);
   }
 
@@ -278,7 +283,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public String getEmitterUuid() {
-    return JPPFDriver.getInstance().getUuid();
+    return driver.getUuid();
   }
 
   /**
@@ -308,7 +313,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param tasks the job's tasks for which there are results.
    */
   public synchronized void jobResultsReceived(final ExecutorChannel<?> channel, final ServerJob job, final Collection<ServerTask> tasks) {
-    JPPFDriver.getInstance().getQueue().getPersistenceHandler().storeResults(job, tasks);
+    driver.getQueue().getPersistenceHandler().storeResults(job, tasks);
     if (!taskReturnListeners.isEmpty()) {
       if (debugEnabled) log.debug("results received with channel={}, job={}, nb Tasks={}", channel, job, tasks.size());
       final JobTasksEvent event = createJobTasksEvent(channel, job, tasks);

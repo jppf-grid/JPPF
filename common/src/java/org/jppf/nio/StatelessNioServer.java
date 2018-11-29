@@ -58,7 +58,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * @throws Exception if any error occurs.
    */
   public StatelessNioServer(final int identifier, final boolean useSSL) throws Exception {
-    super(identifier, useSSL);
+    super(identifier, useSSL, null);
   }
 
   /**
@@ -69,7 +69,7 @@ public abstract class StatelessNioServer<C extends StatelessNioContext> extends 
    * @throws Exception if the underlying server socket can't be opened.
    */
   protected StatelessNioServer(final String name, final int identifier, final boolean useSSL) throws Exception {
-    super(name, identifier, useSSL);
+    super(name, identifier, useSSL, null);
   }
 
   /**

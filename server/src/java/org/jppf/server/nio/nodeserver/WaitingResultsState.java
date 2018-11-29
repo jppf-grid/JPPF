@@ -29,7 +29,6 @@ import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
@@ -173,8 +172,8 @@ class WaitingResultsState extends NodeServerState {
    * @param elapsed server/node round trip time.
    * @param elapsedInNode time spent in the node.
    */
-  private static void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
-    final JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+  private void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
+    final JPPFStatistics stats = server.getDriver().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_DISPATCH, nbTasks);
     stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);
     stats.addValues(JPPFStatisticsHelper.NODE_EXECUTION, elapsedInNode, nbTasks);

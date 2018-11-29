@@ -37,16 +37,21 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
   /**
    * The JPPF driver.
    */
-  private static JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver;
   /**
    * Singleton instance of this class.
    */
-  private static final PeerDriver instance = new PeerDriver();
+  private static PeerDriver instance;
 
   /**
    * Direct instantiation not permitted.
+   * @param driver reference to the JPPF driver.
    */
-  private PeerDriver() {
+  public PeerDriver(final JPPFDriver driver) {
+    this.driver = driver;
+    synchronized(getClass()) {
+      if (instance == null) instance = this;
+    }
   }
 
   @Override

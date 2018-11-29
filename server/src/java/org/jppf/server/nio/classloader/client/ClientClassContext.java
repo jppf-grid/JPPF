@@ -28,6 +28,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.classloader.JPPFResourceWrapper.State;
 import org.jppf.nio.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.node.*;
 import org.jppf.utils.LoggingUtils;
@@ -58,6 +59,13 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * Used to synchronize pending requests performed by multiple threads.
    */
   private final Lock lockRequest = new ReentrantLock();
+
+  /**
+   * @param driver reference to the JPPF driver.
+   */
+  public ClientClassContext(final JPPFDriver driver) {
+    super(driver);
+  }
 
   @Override
   public boolean isProvider() {
@@ -153,7 +161,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
 
   @Override
   public void handleException(final Exception e) {
-    ClientClassNioServer.closeConnection(channel);
+    driver.getClientClassServer().closeConnection(channel);
     handleProviderError();
   }
 

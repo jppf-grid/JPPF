@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client.async;
+package org.jppf.server.nio.client;
 
 import org.jppf.server.protocol.ServerTaskBundleClient;
 

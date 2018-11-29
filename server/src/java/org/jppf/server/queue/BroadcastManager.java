@@ -26,9 +26,8 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.queue.QueueEvent;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
@@ -130,13 +129,13 @@ public class BroadcastManager {
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
       broadcastJob.addOnDone(new RemoveBundleAction(queue, broadcastJob));
       jobMap.put(jobUuid, broadcastJob);
-      broadcastJob.addBundle(clientBundle);
+      broadcastJob.addBundle(queue.driver, clientBundle);
       queue.scheduleManager.handleStartJobSchedule(broadcastJob);
-      queue.scheduleManager.handleExpirationJobSchedule(broadcastJob);
+      queue.scheduleManager.handleExpirationJobSchedule(queue.driver, broadcastJob);
       queue.jobManager.jobQueued(broadcastJob);
       pendingBroadcasts.put(jobUuid, broadcastJob);
       //processPendingBroadcasts();
-    } else serverJob.addBundle(clientBundle);
+    } else serverJob.addBundle(queue.driver, clientBundle);
   }
 
   /**
@@ -197,7 +196,7 @@ public class BroadcastManager {
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
           final JPPFManagementInfo info = connection.getManagementInfo();
           final ExecutionPolicy policy = sla.getExecutionPolicy();
-          TaskQueueChecker.preparePolicy(policy, broadcastJob, JPPFDriver.getInstance().getStatistics(), 0);
+          TaskQueueChecker.preparePolicy(policy, broadcastJob, queue.driver.getStatistics(), 0);
           if ((policy != null) && !policy.evaluate(info.getSystemInfo())) {
             if (debugEnabled) log.debug("node uuid={} refused for broadcast {}", uuid, broadcastJob);
             continue;
@@ -241,11 +240,11 @@ public class BroadcastManager {
     queue.getPriorityMap().putValue(broadcastJob.getSLA().getPriority(), broadcastJob);
     if (debugEnabled) log.debug("adding bundle with " + broadcastJob);
     queue.scheduleManager.handleStartJobSchedule(broadcastJob);
-    queue.scheduleManager.handleExpirationJobSchedule(broadcastJob);
+    queue.scheduleManager.handleExpirationJobSchedule(queue.driver, broadcastJob);
     jobMap.put(jobUuid, broadcastJob);
     queue.updateLatestMaxSize();
     queue.jobManager.jobQueued(broadcastJob);
     queue.fireBundleAdded(new QueueEvent<>(queue, broadcastJob, false));
-    JPPFDriver.getInstance().getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, broadcastJob.getTaskCount());
+    queue.driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, broadcastJob.getTaskCount());
   }
 }

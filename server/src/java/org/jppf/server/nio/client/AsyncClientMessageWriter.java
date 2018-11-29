@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client.async;
+package org.jppf.server.nio.client;
 
 import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.nio.client.ClientMessage;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.slf4j.*;
 

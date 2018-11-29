@@ -33,7 +33,7 @@ public abstract class ClientClassServerState extends NioState<ClientClassTransit
   /**
    * Reference to the driver.
    */
-  protected final JPPFDriver driver = JPPFDriver.getInstance();
+  protected final JPPFDriver driver;
 
   /**
    * Initialize this state.
@@ -41,5 +41,6 @@ public abstract class ClientClassServerState extends NioState<ClientClassTransit
    */
   public ClientClassServerState(final ClientClassNioServer server) {
     this.server = server;
+    this.driver = server.getDriver();
   }
 }
