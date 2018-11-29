@@ -47,9 +47,9 @@ public abstract class AbstractTypedProperties extends Properties {
    */
   public AbstractTypedProperties(final Map<?, ?> map) {
     if (map != null) {
-      for (Map.Entry<?, ?> entry: map.entrySet()) {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) setProperty((String) entry.getKey(), (String) entry.getValue());
-      }
+      map.forEach((key, value) -> {
+        if ((key instanceof String) && (value instanceof String)) setProperty((String) key, (String) value);
+      });
     }
   }
 
@@ -59,7 +59,7 @@ public abstract class AbstractTypedProperties extends Properties {
    */
   public String asString() {
     String result = "";
-    try (Writer writer = new StringWriter()) {
+    try (final Writer writer = new StringWriter()) {
       store(writer, null);
       result = writer.toString();
     } catch(final Exception e) {
