@@ -31,6 +31,7 @@ import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -75,6 +76,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Reference to the JPPF driver.
    */
   private final JPPFDriver driver;
+  /**
+   * 
+   */
+  private final boolean jppfDebug;
 
   /**
    * Default constructor.
@@ -82,10 +87,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public JPPFJobManager(final JPPFDriver driver) {
     this.driver = driver;
+    jppfDebug = driver.getConfig().get(JPPFProperties.DEBUG_ENABLED);
     executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JobManager")) {
       @Override
       protected void afterExecute(final Runnable r, final Throwable t) {
-        if (JPPFDriver.JPPF_DEBUG) notifCount.decrementAndGet();
+        if (jppfDebug) notifCount.decrementAndGet();
       }
     };
   }
@@ -210,7 +216,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel<?> channel) {
     executor.execute(new JobEventTask(this, eventType, bundle, null, channel));
-    if (JPPFDriver.JPPF_DEBUG) incNotifCount();
+    if (jppfDebug) incNotifCount();
   }
 
   /**
@@ -221,7 +227,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel<?> channel) {
     executor.execute(new JobEventTask(this, eventType, null, job, channel));
-    if (JPPFDriver.JPPF_DEBUG) incNotifCount();
+    if (jppfDebug) incNotifCount();
   }
 
   /**

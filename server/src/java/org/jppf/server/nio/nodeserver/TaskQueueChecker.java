@@ -51,7 +51,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
   /**
    * Whether bias towards local node is enabled.
    */
-  private final boolean localNodeBiasEnabled = JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_BIAS);
+  private final boolean localNodeBiasEnabled;
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -62,6 +62,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    */
   TaskQueueChecker(final NodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     super(server, queue, stats, bundlerFactory);
+    this.localNodeBiasEnabled = server.getDriver().getConfig().get(JPPFProperties.LOCAL_NODE_BIAS);
   }
 
   /**

@@ -77,7 +77,7 @@ public class JPPFDriver {
    * Flag indicating whether collection of debug information is available via JMX.
    * @exclude
    */
-  public static final boolean JPPF_DEBUG = JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED);
+  public final boolean jppfDebug;
   /**
    * Used for serialization / deserialization.
    */
@@ -157,6 +157,7 @@ public class JPPFDriver {
    */
   public JPPFDriver(final TypedProperties config) {
     this.config = config;
+    this.jppfDebug = config.get(JPPFProperties.DEBUG_ENABLED);
     final String s;
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
@@ -171,14 +172,18 @@ public class JPPFDriver {
     initializer.initDatasources();
     jobManager = new JPPFJobManager(this);
     taskQueue = new JPPFPriorityQueue(this, jobManager);
+    if (debugEnabled) {
+      log.debug("JPPF Driver system properties: {}", SystemUtils.printSystemProperties());
+      log.debug("JPPF Driver configuration:\n{}", config.asString());
+    }
   }
 
   /**
    * Initialize and start this driver.
+   * @return this driver.
    * @throws Exception if the initialization fails.
-   * @exclude
    */
-  public void run() throws Exception {
+  public JPPFDriver run() throws Exception {
     if (debugEnabled) log.debug("starting JPPF driver");
     final JPPFConnectionInformation info = initializer.getConnectionInformation();
     initializer.handleDebugActions();
@@ -186,7 +191,7 @@ public class JPPFDriver {
     final int[] sslPorts = extractValidPorts(info.sslServerPorts);
     final boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
     if (debugEnabled) log.debug("starting nio servers");
-    if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED)) {
+    if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
       nodeHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, useSSL);
       clientHeartbeatServer = initHeartbeatServer(JPPFIdentifiers.CLIENT_HEARTBEAT_CHANNEL, useSSL);
     }
@@ -208,7 +213,7 @@ public class JPPFDriver {
       localClassChannel.getContext().setChannel(localClassChannel);
       final LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer));
       localNodeChannel.getContext().setChannel(localNodeChannel);
-      final boolean offline = JPPFConfiguration.get(JPPFProperties.NODE_OFFLINE);
+      final boolean offline = config.get(JPPFProperties.NODE_OFFLINE);
       localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
       nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
@@ -219,6 +224,7 @@ public class JPPFDriver {
     taskQueue.getPersistenceHandler().loadPersistedJobs();
     if (debugEnabled) log.debug("JPPF Driver initialization complete");
     System.out.println("JPPF Driver initialization complete");
+    return this;
   }
 
   /**
@@ -374,7 +380,6 @@ public class JPPFDriver {
       if ((args == null) || (args.length <= 0)) throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) new LauncherListener(Integer.parseInt(args[0])).start();
       final JPPFDriver driver = new JPPFDriver(JPPFConfiguration.getProperties());
-      if (debugEnabled) log.debug("Driver system properties: {}", SystemUtils.printSystemProperties());
       driver.run();
     } catch(final Exception e) {
       e.printStackTrace();
@@ -517,5 +522,12 @@ public class JPPFDriver {
    */
   public boolean isShuttingDown() {
     return shuttingDown.get();
+  }
+
+  /**
+   * @return the configuration for this driver.
+   */
+  public TypedProperties getConfig() {
+    return config;
   }
 }

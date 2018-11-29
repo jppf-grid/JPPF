@@ -72,7 +72,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    * @param localChannel the local channel to use.
    */
   public void initLocalChannel(final ChannelWrapper<?> localChannel) {
-    if (JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
+    if (getDriver().getConfig().get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       this.localChannel = localChannel;
       final ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);

@@ -43,7 +43,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Interval for removal cleanup.
    */
-  private static final long REMOVAL_CLEANUP_INTERVAL = JPPFConfiguration.get(JPPFProperties.PEER_DISCOVERY_REMOVAL_CLEANUP_INTERVAL);
+  private final long removalCleanupInternal;
   /**
    * Contains the set of retrieved connection information objects.
    */
@@ -72,19 +72,26 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    * Last time a cleanup was performed.
    */
   private long lastCleanupTime = 0L;
+  /**
+   * The driver configuration.
+   */
+  private final TypedProperties config;
 
   /**
    * Default constructor.
+   * @param config the driver configuration.
    * @param connectionHandler handler for adding new connection
    * @param ipFilter for accepted IP addresses
    * @param localInfo Connection information for this JPPF driver.
    */
-  public PeerDiscoveryThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final JPPFConnectionInformation localInfo) {
+  public PeerDiscoveryThread(final TypedProperties config, final IPFilter ipFilter, final JPPFConnectionInformation localInfo, final ConnectionHandler connectionHandler) {
     if (localInfo == null) throw new IllegalArgumentException("localInfo is null");
     if (connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
+    this.config = config;
     this.connectionHandler = connectionHandler;
     this.ipFilter = ipFilter;
     this.localInfo = localInfo;
+    this.removalCleanupInternal = config.get(JPPFProperties.PEER_DISCOVERY_REMOVAL_CLEANUP_INTERVAL);
   }
 
   /**
@@ -98,11 +105,11 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
       while (!isStopped()) {
         final JPPFConnectionInformation info = receiver.receive();
         synchronized(this) {
-          if (lastCleanupTime + REMOVAL_CLEANUP_INTERVAL >= System.currentTimeMillis()) cleanRemovals();
+          if (lastCleanupTime + removalCleanupInternal >= System.currentTimeMillis()) cleanRemovals();
         }
         if ((info != null) && !hasConnectionInformation(info) && !wasRecentlyRemoved(info)) {
           if (debugEnabled) log.debug("Found peer connection information: " + info + ", infoSet=" + infoSet);
-          info.recoveryEnabled &= JPPFConfiguration.get(JPPFProperties.PEER_RECOVERY_ENABLED);
+          info.recoveryEnabled &= config.get(JPPFProperties.PEER_RECOVERY_ENABLED);
           addConnectionInformation(info);
           onNewConnection("Peer-" + count.incrementAndGet(), info);
         }
@@ -179,7 +186,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
     final long now = System.currentTimeMillis();
     final List<String> toRemove = new ArrayList<>();
     for (final Map.Entry<String, Long> entry: removalMap.entrySet()) {
-      if (entry.getValue() + REMOVAL_CLEANUP_INTERVAL <= now) toRemove.add(entry.getKey());
+      if (entry.getValue() + removalCleanupInternal <= now) toRemove.add(entry.getKey());
     }
     for (String uuid: toRemove) removalMap.remove(uuid);
   }
@@ -196,6 +203,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Defines a callback for objects wishing to be notified of discovery events.
    */
+  @FunctionalInterface
   public interface ConnectionHandler {
     /**
      * Called when a new connection is discovered.

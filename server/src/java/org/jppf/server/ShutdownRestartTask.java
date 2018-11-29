@@ -17,10 +17,9 @@
  */
 package org.jppf.server;
 
-import java.util.*;
+import java.util.TimerTask;
 
 import org.jppf.JPPFError;
-import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -78,7 +77,7 @@ class ShutdownRestartTask extends TimerTask {
     if (driver.shuttingDown.compareAndSet(false, true)) {
       log.info("Initiating shutdown");
       driver.shutdown();
-      if (JPPFConfiguration.get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
+      if (driver.getConfig().get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
         if (!restart) {
           log.info("Performing requested exit");
           System.exit(0);

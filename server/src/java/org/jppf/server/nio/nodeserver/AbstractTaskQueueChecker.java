@@ -49,7 +49,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   /**
    * Whether to allow dispatching to peer drivers without any node attached, defaults to {@code false}.
    */
-  static final boolean disptachtoPeersWithoutNode = JPPFConfiguration.get(JPPFProperties.PEER_ALLOW_ORPHANS);
+  final boolean disptachtoPeersWithoutNode;
   /**
    * Random number generator used to randomize the choice of idle channel.
    */
@@ -106,6 +106,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   AbstractTaskQueueChecker(final NodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     this.server = server;
     this.queue = queue;
+    this.disptachtoPeersWithoutNode = server.getDriver().getConfig().get(JPPFProperties.PEER_ALLOW_ORPHANS);
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
     this.bundlerFactory = bundlerFactory;

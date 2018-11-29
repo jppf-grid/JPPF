@@ -110,7 +110,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
   /**
    * The peer handler.
    */
-  private final PeerAttributesHandler peerHandler = new PeerAttributesHandler();
+  private final PeerAttributesHandler peerHandler;
   /**
    * Handles reservation of nodes to jobs.
    */
@@ -139,6 +139,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
         return getAllChannels();
       }
     });
+    this.peerHandler = new PeerAttributesHandler(Math.max(1, driver.getConfig().getInt("jppf.peer.handler.threads", 1)));
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
     bundlerHandler = new LoadBalancerPersistenceManager(bundlerFactory);
     INITIAL_BUNDLE_UUID = driver.getUuid();
@@ -345,7 +346,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
       bundle.setTaskCount(0);
       bundle.setHandshake(true);
       final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-      final TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties config = getDriver().getConfig();
       final Map<String, TypedProperties> defMap = new HashMap<>();
       defMap.putAll(factory.extractDefinitions(config, JPPFDatasourceFactory.Scope.REMOTE));
       bundle.setParameter(BundleParameter.DATASOURCE_DEFINITIONS, defMap);

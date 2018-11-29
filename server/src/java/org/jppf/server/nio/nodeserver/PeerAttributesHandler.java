@@ -70,9 +70,9 @@ public class PeerAttributesHandler implements NotificationListener {
 
   /**
    * Initialize this handler.
+   * @param nbThreads the number of threads in the thread pool.
    */
-  public PeerAttributesHandler() {
-    final int nbThreads = Math.max(1, JPPFConfiguration.getProperties().getInt("jppf.peer.handler.threads", 1));
+  public PeerAttributesHandler(final int nbThreads) {
     executor = Executors.newFixedThreadPool(nbThreads, new JPPFThreadFactory("PeerHandler"));
   }
 

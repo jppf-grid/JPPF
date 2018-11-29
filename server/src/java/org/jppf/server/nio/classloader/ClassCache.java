@@ -38,10 +38,6 @@ public class ClassCache {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Determines whether this cache is enabled.
-   */
-  private boolean enabled = JPPFConfiguration.getProperties().getBoolean("jppf.server.class.cache.enabled", true);
-  /**
    * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it uses
    * a soft map to minimize the OutOfMemory.
    */
@@ -62,7 +58,6 @@ public class ClassCache {
    * @param content content of the resource.
    */
   public void setCacheContent(final String uuid, final String name, final byte[] content) {
-    if (!enabled) return;
     if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + ']');
     final CacheClassContent cacheContent = new CacheClassContent(content);
     final CacheClassKey cacheKey = new CacheClassKey(uuid, name);
@@ -78,7 +73,6 @@ public class ClassCache {
    * @return the content of the resource as an array of bytes.
    */
   public byte[] getCacheContent(final String uuid, final String name) {
-    if (!enabled) return null;
     final CacheClassContent content;
     final boolean contentNull;
     synchronized (classCache) {

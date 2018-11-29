@@ -49,7 +49,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */
-  private static final boolean FILE_LOOKUP = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
+  private final boolean isFileLookup;
   /**
    * 
    */
@@ -65,6 +65,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   public WaitingNodeRequestState(final NodeClassNioServer server) {
     super(server);
+    this.isFileLookup = server.getDriver().getConfig().get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   }
 
   /**
@@ -124,7 +125,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
     final TraversalList<String> uuidPath = resource.getUuidPath();
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
-      final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
+      final boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && isFileLookup;
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
         final List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, (ClassLoader) null, fileLookup);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));

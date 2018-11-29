@@ -75,7 +75,7 @@ class HeartbeatMessageHandler {
    */
   HeartbeatMessageHandler(final HeartbeatNioServer server) {
     this.server = server;
-    final TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = server.driver.getConfig();
     timeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
     maxTries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
     if (debugEnabled) log.debug("configuring HeartbeatMessageHandler with timeout = {}, maxTries = {}", timeout, maxTries);
@@ -167,7 +167,7 @@ class HeartbeatMessageHandler {
    * @return the executor service that handles the channels heartbeats.
    */
   private ExecutorService initExecutor() {
-    final TypedProperties config = JPPFConfiguration.getProperties();
+    final TypedProperties config = server.driver.getConfig();
     final int core = config.get(JPPFProperties.RECOVERY_REAPER_POOL_SIZE);
     return ConcurrentUtils.newFixedExecutor(core, timeout, "HeartbeatServer");
   }

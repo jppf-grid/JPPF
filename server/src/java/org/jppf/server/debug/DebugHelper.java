@@ -20,7 +20,6 @@ package org.jppf.server.debug;
 
 import java.util.*;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerTask;
 import org.jppf.utils.collections.*;
 
@@ -41,7 +40,6 @@ public final class DebugHelper {
    * @return a list of tasks that were already stored in this helper (duplicates).
    */
   public static List<ServerTask> addResults(final String jobUuid, final Collection<ServerTask> results) {
-    if (!JPPFDriver.JPPF_DEBUG) return null;
     List<ServerTask> list = null;
     synchronized(resultsMap) {
       final Collection<Integer> positions = resultsMap.getValues(jobUuid);
@@ -66,7 +64,6 @@ public final class DebugHelper {
    * @param jobUuid the job uuid.
    */
   public static void clearResults(final String jobUuid) {
-    if (!JPPFDriver.JPPF_DEBUG) return;
     synchronized(resultsMap) {
       resultsMap.removeKey(jobUuid);
     }
@@ -77,7 +74,6 @@ public final class DebugHelper {
    * @return a string representing all the entries in the multimap.
    */
   public static String showResults() {
-    if (!JPPFDriver.JPPF_DEBUG) return null;
     final StringBuilder sb = new StringBuilder(resultsMap.getClass().getSimpleName()).append("[");
     synchronized(resultsMap) {
       for (Map.Entry<String, Collection<Integer>> entry: resultsMap.entrySet()) {
@@ -95,7 +91,6 @@ public final class DebugHelper {
    * @return a list of tasks that were already stored in this helper (duplicates).
    */
   public static List<ServerTask> checkResults(final String jobUuid, final Collection<ServerTask> results) {
-    if (!JPPFDriver.JPPF_DEBUG) return null;
     List<ServerTask> list = null;
     synchronized(resultsMap) {
       final Collection<Integer> positions = resultsMap.getValues(jobUuid);

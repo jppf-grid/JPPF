@@ -75,7 +75,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   /**
    * Number of executor threads.
    */
-  private static final int core = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
+  private final int core;
   /**
    * Use to send management/monitoring requests in parallel with regards to the nodes.
    */
@@ -90,7 +90,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     selectionHelper = new NodeSelectionHelper(driver);
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
-    //@SuppressWarnings("unused")
+    this.core = driver.getConfig().get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
     executor = ConcurrentUtils.newFixedExecutor(core, "NodeForwarding");
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }

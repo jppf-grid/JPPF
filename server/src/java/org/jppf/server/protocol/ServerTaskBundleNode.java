@@ -43,10 +43,6 @@ public class ServerTaskBundleNode {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Flag indicating whether collection of debug information is available via JMX.
-   */
-  private static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
-  /**
    * Count of instances of this class.
    */
   private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
@@ -122,7 +118,7 @@ public class ServerTaskBundleNode {
     this.taskBundle.setCurrentTaskCount(size);
     this.dataProvider = job.getDataProvider();
     this.taskCount = size;
-    if (JPPF_DEBUG) this.taskBundle.setParameter("node.bundle.id", this.id);
+    this.taskBundle.setParameter("node.bundle.id", this.id);
     checkTaskCount();
   }
 
