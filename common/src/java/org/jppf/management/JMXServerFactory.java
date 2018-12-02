@@ -40,19 +40,20 @@ public class JMXServerFactory {
 
   /**
    * Create a JMXServer instance based on the specified parameters.
+   * @param config the configuration to use.
    * @param uuid the server's unique identifier.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @return an instance of {@link JMXServer}.
    * @throws Exception if the server could not be created.
    */
-  public static JMXServer createServer(final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception {
-    final String protocol = JPPFConfiguration.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
+  public static JMXServer createServer(final TypedProperties config, final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception {
+    final String protocol = config.get(JPPFProperties.JMX_REMOTE_PROTOCOL);
     JMXServer server = null;
     if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) {
-      server = new JPPFJMXServer(uuid, ssl, portProperty);
+      server = new JPPFJMXServer(config, uuid, ssl, portProperty);
     } else {
-      server = new JMXMPServer(uuid, ssl, portProperty);
+      server = new JMXMPServer(config, uuid, ssl, portProperty);
     }
     if (debugEnabled) log.debug("created JMX server: " + server);
     return server;

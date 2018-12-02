@@ -76,8 +76,8 @@ class ShutdownRestartTask extends TimerTask {
     cancel();
     if (driver.shuttingDown.compareAndSet(false, true)) {
       log.info("Initiating shutdown");
-      driver.shutdown();
-      if (driver.getConfig().get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
+      driver.shutdownNow();
+      if (driver.getConfiguration().get(JPPFProperties.SERVER_EXIT_ON_SHUTDOWN)) {
         if (!restart) {
           log.info("Performing requested exit");
           System.exit(0);

@@ -58,7 +58,7 @@ class WaitInitialBundleState extends NodeServerState {
    */
   public WaitInitialBundleState(final NodeNioServer server) {
     super(server);
-    this.resolveIPs = server.getDriver().getConfig().get(JPPFProperties.RESOLVE_ADDRESSES);
+    this.resolveIPs = server.getDriver().getConfiguration().get(JPPFProperties.RESOLVE_ADDRESSES);
   }
 
   /**
@@ -96,7 +96,7 @@ class WaitInitialBundleState extends NodeServerState {
       String host = NodeServerUtils.getChannelHost(channel);
       final HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
       final boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-      final boolean hasJmx = server.getDriver().getConfig().get(JPPFProperties.MANAGEMENT_ENABLED);
+      final boolean hasJmx = server.getDriver().getConfiguration().get(JPPFProperties.MANAGEMENT_ENABLED);
       final String masterUuid = bundle.getParameter(NODE_PROVISIONING_MASTER_UUID);
       int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
       if (hasJmx && (uuid != null) && !offline && (port >= 0)) {

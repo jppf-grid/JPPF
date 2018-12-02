@@ -77,7 +77,7 @@ public class TestJMXMPServer extends BaseTest {
     try {
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT);
       JPPFConfiguration.remove(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
-      server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertNull(mbsf);
@@ -103,7 +103,7 @@ public class TestJMXMPServer extends BaseTest {
     try {
       JPPFConfiguration.set(JPPFProperties.MANAGEMENT_PORT, PORT)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder1.class.getName()}, PARAMS));
-      server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertTrue(mbsf instanceof Forwarder1);
@@ -161,7 +161,7 @@ public class TestJMXMPServer extends BaseTest {
       JPPFConfiguration
         .set(JPPFProperties.MANAGEMENT_PORT, PORT)
         .set(JPPFProperties.MANAGEMENT_SERVER_FORWARDER, CollectionUtils.concatArrays(new String[] {Forwarder2.class.getName()}, PARAMS));
-      server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+      server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
       server.start(getClass().getClassLoader());
       final MBeanServerForwarder mbsf = server.getMBeanServerForwarder();
       assertTrue(mbsf instanceof Forwarder2);

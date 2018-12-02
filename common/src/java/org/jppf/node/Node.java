@@ -18,6 +18,7 @@
 package org.jppf.node;
 
 import org.jppf.management.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Interface for a node that provides information about its activity.
@@ -93,4 +94,10 @@ public interface Node extends Runnable {
    * @throws Exception if any error occurs.
    */
   JMXServer getJmxServer() throws Exception;
+
+  /**
+   * Get the configuration of this node.
+   * @return the node configuration as a {@link TypedProperties} instance.
+   */
+  TypedProperties getConfiguration();
 }

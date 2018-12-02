@@ -18,6 +18,8 @@
 
 package org.jppf.node;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
@@ -34,17 +36,17 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * Utility for deserialization and serialization.
    * @exclude
    */
-  protected SerializationHelper helper = null;
+  protected SerializationHelper helper;
   /**
    * Utility for deserialization and serialization.
    * @exclude
    */
-  protected ObjectSerializer serializer = null;
+  protected ObjectSerializer serializer;
   /**
    * Total number of tasks executed.
    * @exclude
    */
-  private int taskCount = 0;
+  private int taskCount;
   /**
    * Used to synchronize access to the task count.
    */
@@ -53,17 +55,33 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * This node's universal identifier.
    * @exclude
    */
-  protected String uuid = null;
+  protected final String uuid;
   /**
    * This node's system information.
    * @exclude
    */
-  protected JPPFSystemInformation systemInformation = null;
+  protected JPPFSystemInformation systemInformation;
   /**
    * Get the connection used by this node.
    * @exclude
    */
-  protected NodeConnection<?> nodeConnection = null;
+  protected NodeConnection<?> nodeConnection;
+  /**
+   * Determines whether this node is currently shutting down.
+   */
+  private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
+  /**
+   * The main node class loader.
+   */
+  private AbstractJPPFClassLoader jppfClassLoader;
+
+  /**
+   * Initialize this node.
+   * @param uuid this node's uuid.
+   */
+  public AbstractNode(final String uuid) {
+    this.uuid = uuid;
+  }
 
   /**
    * {@inheritDoc}
@@ -135,7 +153,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @exclude
    */
   protected void updateSystemInformation() {
-    this.systemInformation = new JPPFSystemInformation(uuid, isLocal(), true);
+    this.systemInformation = new JPPFSystemInformation(getConfiguration(), uuid, isLocal(), true);
   }
 
   @Override
@@ -157,5 +175,30 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   @Override
   public boolean isAndroid() {
     return false;
+  }
+
+  /**
+   * Determine whether this node is currently shutting down.
+   * @return an {@link AtomicBoolean} instance whose value is {@code true</code> if the node is shutting down, <code>false} otherwise.
+   */
+  public AtomicBoolean getShuttingDown() {
+    return shuttingDown;
+  }
+
+  /**
+   * @return the main node class loader.
+   * @exclude
+   */
+  public AbstractJPPFClassLoader getJPPFClassLoader() {
+    return jppfClassLoader;
+  }
+
+  /**
+   * 
+   * @param jppfClassLoader the main node class loader.
+   * @exclude
+   */
+  public void setJPPFClassLoader(final AbstractJPPFClassLoader jppfClassLoader) {
+    this.jppfClassLoader = jppfClassLoader;
   }
 }

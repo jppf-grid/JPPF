@@ -106,7 +106,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   AbstractTaskQueueChecker(final NodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     this.server = server;
     this.queue = queue;
-    this.disptachtoPeersWithoutNode = server.getDriver().getConfig().get(JPPFProperties.PEER_ALLOW_ORPHANS);
+    this.disptachtoPeersWithoutNode = server.getDriver().getConfiguration().get(JPPFProperties.PEER_ALLOW_ORPHANS);
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
     this.bundlerFactory = bundlerFactory;

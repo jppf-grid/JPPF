@@ -131,7 +131,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   @Override
   public void triggerConfigChanged() {
     super.triggerConfigChanged();
-    NodeConfigNotifier.getInstance().sendNotification(node.getUuid(), JPPFConfiguration.getProperties());
+    NodeConfigNotifier.getInstance().sendNotification(node.getUuid(), node.getConfiguration());
   }
 
   @Override

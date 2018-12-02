@@ -35,6 +35,7 @@ public class PropertiesHelper {
 
   /**
    * Store the specified properties into the specified writer.
+   * This implementation stores the properties in lexicographic order (alphabetical sort).
    * @param props the properties to store.
    * @param writer the writer to store with.
    * @throws IOException if any error occurs.

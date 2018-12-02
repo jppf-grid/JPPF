@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import org.jppf.job.persistence.impl.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -36,21 +36,19 @@ public final class JobPersistenceFactory {
    */
   private static Logger log = LoggerFactory.getLogger(JobPersistenceFactory.class);
   /**
-   * Singleton instance of this class.
-   */
-  private static final JobPersistenceFactory INSTANCE = new JobPersistenceFactory();
-  /**
    * The configured persistence.
    */
   private final JobPersistence persistence;
 
   /**
    * Not instantiable from another class.
+   * @param config the configuration to use.
    */
-  private JobPersistenceFactory() {
+  private JobPersistenceFactory(final TypedProperties config) {
     JobPersistence tmp = null;
     try {
-      tmp = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, JPPFProperties.JOB_PERSISTENCE);
+      final JPPFProperty<String[]> prop = JPPFProperties.JOB_PERSISTENCE;
+      tmp = ReflectionHelper.invokeDefaultOrStringArrayConstructor(JobPersistence.class, prop.getName(), config.get(prop));
     } catch (final Exception e) {
       log.error("error creating JobPersistence configured as {} = {}, falling back to {}\n{}", JPPFProperties.JOB_PERSISTENCE.getName(),
         Arrays.toString(JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE)), DefaultFilePersistence.class.getName(), ExceptionUtils.getStackTrace(e));
@@ -64,10 +62,11 @@ public final class JobPersistenceFactory {
   }
 
   /**
+   * @param config the configuration to use.
    * @return the singleton instance of this class.
    */
-  public static JobPersistenceFactory getInstance() {
-    return INSTANCE;
+  public static JobPersistenceFactory newInstance(final TypedProperties config) {
+    return new JobPersistenceFactory(config);
   }
 
   /**

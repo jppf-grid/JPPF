@@ -19,7 +19,6 @@
 package test.jmx.canceljob;
 
 import org.jppf.management.JMXServer;
-import org.jppf.node.NodeRunner;
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -83,7 +82,7 @@ public class LifeCycleTask extends AbstractTask<String> {
     start = System.nanoTime();
     try {
       Thread.sleep(500L);
-      final JMXServer server = NodeRunner.getNode().getJmxServer();
+      final JMXServer server = getNode().getJmxServer();
       final int id = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_ID);
       final String type = (id < 0) ? "master" : String.format("slave.id = %2d", id);
       final String s = String.format("%s-%s:%d (%-13s)", MSG, server.getManagementHost(), server.getManagementPort(), type);

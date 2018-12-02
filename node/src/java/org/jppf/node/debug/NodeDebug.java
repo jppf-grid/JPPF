@@ -18,7 +18,9 @@
 
 package org.jppf.node.debug;
 
-import org.jppf.node.NodeRunner;
+import java.util.*;
+
+import org.jppf.node.Node;
 import org.jppf.scripting.*;
 import org.jppf.server.node.JPPFNode;
 import org.slf4j.*;
@@ -36,6 +38,17 @@ public class NodeDebug implements NodeDebugMBean {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(NodeDebug.class);
+  /**
+   * The debugged node.
+   */
+  private final Node node;
+
+  /**
+   * @param node the debugged node.
+   */
+  public NodeDebug(final Node node) {
+    this.node = node;
+  }
 
   @Override
   public void log(final String... messages) {
@@ -46,13 +59,13 @@ public class NodeDebug implements NodeDebugMBean {
 
   @Override
   public void cancel() {
-    final JPPFNode node = (JPPFNode) NodeRunner.getNode();
-    node.getExecutionManager().cancelAllTasks(true, false);
+    ((JPPFNode) node).getExecutionManager().cancelAllTasks(true, false);
   }
 
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
+    final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("node", node); }};
     if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
-    return new ScriptDefinition(language, script).evaluate();
+    return new ScriptDefinition(language, script, bindings).evaluate();
   }
 }

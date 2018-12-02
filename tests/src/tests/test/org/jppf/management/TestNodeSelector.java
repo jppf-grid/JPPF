@@ -180,7 +180,7 @@ public class TestNodeSelector extends BaseTest {
      * @param uuid the uuid to assign.
      */
     public MySystemInfo(final String uuid) {
-      super(uuid, false, false);
+      super(JPPFConfiguration.getProperties(), uuid, false, false);
       final TypedProperties test = new TypedProperties();
       for (int i=1; i<=5; i++) test.setString("prop." + i, "value " + i);
       this.addProperties("test", test);

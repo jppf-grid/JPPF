@@ -64,9 +64,11 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
 
   /**
    * Initialize with the required information to connect to the server.
+   * @param uuid this node's uuid.
    * @param connectionInfo he server conenction information.
    */
-  public RemoteClassLoaderConnection(final DriverConnectionInfo connectionInfo) {
+  public RemoteClassLoaderConnection(final String uuid, final DriverConnectionInfo connectionInfo) {
+    super(uuid);
     this.connectionInfo = connectionInfo;
   }
 

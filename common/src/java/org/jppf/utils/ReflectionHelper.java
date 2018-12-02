@@ -22,7 +22,6 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 
 import org.jppf.JPPFException;
-import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -378,20 +377,6 @@ public final class ReflectionHelper {
     final Class<?>[] paramTypes = (paramTypeNames == null) ? new Class<?>[0] : new Class<?>[paramTypeNames.length];
     for (int i=0; i<paramTypes.length; i++) paramTypes[i] = Class.forName(paramTypeNames[i], true, cl);
     return clazz.getConstructor(paramTypes);
-  }
-
-  /**
-   * Instantiate an object that implements the specified interface, whose class name is given by the specified property,
-   * by calling either its default constructor or a oonstrcutor that take a String[].
-   * @param inf the interface that must be implemented by the class.
-   * @param prop the property that provides the class name and optional parameters for its String[] constructor,
-   * along with an optional default implementation of the interface. 
-   * @param <T> the type of the interface.
-   * @return an instance of the specified interface.
-   * @throws Exception if any error occurs.
-   */
-  public static <T> T invokeDefaultOrStringArrayConstructor(final Class<T> inf, final JPPFProperty<String[]> prop) {
-    return invokeDefaultOrStringArrayConstructor(inf, prop.getName(), JPPFConfiguration.get(prop));
   }
 
   /**

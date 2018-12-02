@@ -26,7 +26,7 @@ import javax.management.MBeanServer;
 import javax.management.remote.*;
 
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -80,6 +80,18 @@ public abstract class AbstractJMXServer implements JMXServer {
    * An optional {@link MBeanServerForwarder} associated with the {@code JMXConnectorServer}.
    */
   protected MBeanServerForwarder forwarder;
+  /**
+   * The configuration to use.
+   */
+  protected final TypedProperties config;
+
+  /**
+   * 
+   * @param config the configuration to use.
+   */
+  protected AbstractJMXServer(final TypedProperties config) {
+    this.config = config;
+  }
 
   @Override
   public void stop() throws Exception {
@@ -150,7 +162,8 @@ public abstract class AbstractJMXServer implements JMXServer {
     int nbTries = 0;
     JMXServiceURL url = null;
     if (debugEnabled) log.debug("starting {} for protocol={}", getClass().getSimpleName(), protocol);
-    forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
+    final JPPFProperty<String[]> prop = JPPFProperties.MANAGEMENT_SERVER_FORWARDER;
+    forwarder = ReflectionHelper.invokeDefaultOrStringArrayConstructor(MBeanServerForwarder.class, prop.getName(), config.get(prop));
     while (!found) {
       try {
         url = new JMXServiceURL(protocol,  null, managementPort);

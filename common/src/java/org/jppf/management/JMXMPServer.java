@@ -50,12 +50,14 @@ public class JMXMPServer extends AbstractJMXServer {
 
   /**
    * Initialize this JMX server with the specified uuid.
+   * @param config the configuration to use.
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @exclude
    */
-  public JMXMPServer(final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
+  public JMXMPServer(final TypedProperties config, final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
+    super(config);
     this.uuid = id;
     this.ssl = ssl;
     if (portProperty == null) this.portProperty = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_SSL_PORT;

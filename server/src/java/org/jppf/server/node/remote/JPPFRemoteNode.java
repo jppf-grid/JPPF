@@ -19,7 +19,7 @@ package org.jppf.server.node.remote;
 
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.persistence.JPPFDatasourceFactory;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
@@ -28,10 +28,12 @@ import org.jppf.utils.JPPFConfiguration;
 public class JPPFRemoteNode extends AbstractRemoteNode {
   /**
    * Default constructor.
+   * @param uuid this node's uuid.
+   * @param configuration the configuration of this node.
    * @param connectionInfo the server connection information.
    */
-  public JPPFRemoteNode(final DriverConnectionInfo connectionInfo) {
-    super(connectionInfo);
+  public JPPFRemoteNode(final String uuid, final TypedProperties configuration, final DriverConnectionInfo connectionInfo) {
+    super(uuid, configuration, connectionInfo);
   }
 
   @Override
@@ -43,6 +45,6 @@ public class JPPFRemoteNode extends AbstractRemoteNode {
   protected synchronized void init() throws Exception {
     super.init();
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    factory.configure(JPPFConfiguration.getProperties(), JPPFDatasourceFactory.Scope.LOCAL, getSystemInformation());
+    factory.configure(configuration, JPPFDatasourceFactory.Scope.LOCAL, getSystemInformation());
   }
 }

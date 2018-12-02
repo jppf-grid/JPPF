@@ -36,9 +36,9 @@ public class JPPFProperties {
   /** Server port. */
   public static final JPPFProperty<Integer> SERVER_PORT = new IntProperty("jppf.server.port", 11111);
   /** Server port number for secure connections. */
-  public static final JPPFProperty<Integer> SERVER_SSL_PORT = new IntProperty("jppf.ssl.server.port", 11143);
+  public static final JPPFProperty<Integer> SERVER_SSL_PORT = new IntProperty("jppf.ssl.server.port", -1);
   /** Same name as {@link #SERVER_PORT} but with default value of 11143. */
-  public static final JPPFProperty<Integer> SERVER_SSL_PORT_NODE = new IntProperty("jppf.server.port", 11143);
+  public static final JPPFProperty<Integer> SERVER_SSL_PORT_NODE = new IntProperty("jppf.server.port", -1);
   /** Whether to exit the JVM when shutting the driver down. */
   public static final JPPFProperty<Boolean> SERVER_EXIT_ON_SHUTDOWN = new BooleanProperty("jppf.server.exitOnShutdown", true);
   /** Whether to resolve IP addresses. */

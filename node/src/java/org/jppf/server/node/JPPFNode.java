@@ -24,7 +24,6 @@ import java.util.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.execute.ExecutionManager;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.nio.*;
@@ -36,10 +35,8 @@ import org.jppf.node.provisioning.SlaveNodeManager;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
-import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
-import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -57,64 +54,71 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The task execution manager for this node.
-   * @exclude
-   */
-  protected ExecutionManager executionManager = null;
-  /**
    * The object responsible for this node's I/O.
    * @exclude
    */
-  protected NodeIO nodeIO = null;
+  protected NodeIO nodeIO;
   /**
    * Determines whether JMX management and monitoring is enabled for this node.
    */
-  private boolean jmxEnabled = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+  private boolean jmxEnabled;
   /**
    * Determines whether this node can execute .Net tasks.
    */
-  private final boolean dotnetCapable = JPPFConfiguration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
+  private final boolean dotnetCapable;
   /**
    * The default node's management MBean.
    */
-  private JPPFNodeAdminMBean nodeAdmin = null;
+  private JPPFNodeAdminMBean nodeAdmin;
   /**
    * The jmx server that handles administration and monitoring functions for this node.
    */
-  private static JMXServer jmxServer = null;
+  private static JMXServer jmxServer;
   /**
    * Manager for the MBean defined through the service provider interface.
    */
-  private JPPFMBeanProviderManager<?> providerManager = null;
+  private JPPFMBeanProviderManager<?> providerManager;
   /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
-   * @exclude
    */
-  protected LifeCycleEventHandler lifeCycleEventHandler = null;
+  private LifeCycleEventHandler lifeCycleEventHandler;
   /**
    * The connection checker for this node.
-   * @exclude
    */
-  protected NodeConnectionChecker connectionChecker = null;
+  private NodeConnectionChecker connectionChecker;
   /**
    * Determines whether the node connection checker should be used.
-   * @exclude
    */
-  protected final boolean checkConnection = JPPFConfiguration.get(JPPFProperties.NODE_CHECK_CONNECTION);
+  private final boolean checkConnection;
   /**
    * The bundle currently processed in offline mode.
+   */
+  private Pair<TaskBundle, List<Task<?>>> currentBundle;
+  /**
+   * The configuration of this node.
    * @exclude
    */
-  protected Pair<TaskBundle, List<Task<?>>> currentBundle  = null;
+  protected final TypedProperties configuration;
+  /**
+   * The slave node manager.
+   */
+  private final SlaveNodeManager slaveManager;
 
   /**
    * Default constructor.
+   * @param uuid this node's uuid.
+   * @param configuration the configuration of this node.
    */
-  public JPPFNode() {
-    uuid = NodeRunner.getUuid();
+  public JPPFNode(final String uuid, final TypedProperties configuration) {
+    super(uuid);
+    this.configuration = configuration;
+    jmxEnabled = configuration.get(JPPFProperties.MANAGEMENT_ENABLED);
+    dotnetCapable = configuration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
+    checkConnection = configuration.get(JPPFProperties.NODE_CHECK_CONNECTION);
     executionManager = new NodeExecutionManager(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
     updateSystemInformation();
+    slaveManager = new SlaveNodeManager(this);
   }
 
   /**
@@ -128,7 +132,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("Start of node main loop, nodeUuid=" + uuid);
     while (!isStopped()) {
       try {
-        if (!isLocal() && NodeRunner.getShuttingDown().get()) break;
+        if (!isLocal() && getShuttingDown().get()) break;
         init();
         if (!initialized) {
           System.out.println("Node successfully initialized");
@@ -223,7 +227,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       checkInitialBundle(bundle);
       currentBundle = null;
       processResults(bundle, taskList);
-      if (isMasterNode()) SlaveNodeManager.handleStartup();
+      if (isMasterNode()) slaveManager.handleStartup();
     }
   }
 
@@ -269,7 +273,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       final TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
-      jppf.putAll(JPPFConfiguration.getProperties());
+      jppf.putAll(configuration);
       bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
     }
     nodeIO.writeResults(bundle, taskList);
@@ -313,7 +317,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         log.error("Error creating the JMX server", e);
       }
     }
-    HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, null).invoke("run");
+    initStartups();
     initDataChannel();
     if (checkConnection) {
       connectionChecker = createConnectionChecker();
@@ -329,7 +333,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if an error is raised during initialization.
    * @exclude
    */
-  public abstract void initDataChannel() throws Exception;
+  protected abstract void initDataChannel() throws Exception;
 
   /**
    * Initialize this node's data channel.
@@ -373,11 +377,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     this.nodeAdmin = nodeAdmin;
   }
 
-  @Override
-  public ExecutionManager getExecutionManager() {
-    return executionManager;
-  }
-
   /**
    * Determines whether JMX management and monitoring is enabled for this node.
    * @return true if JMX is enabled, false otherwise.
@@ -387,7 +386,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Stop this node and release the resources it is using.
    * @exclude
    */
   @Override
@@ -408,6 +406,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       setStopped(true);
       lifeCycleEventHandler.fireNodeEnding();
       NodeRunner.shutdown(this, restart);
+    } else {
+      if (debugEnabled) log.debug("shutting down local node");
+      stopNode();
     }
   }
 
@@ -451,10 +452,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     synchronized(this) {
       if ((jmxServer == null) || jmxServer.isStopped()) {
         if (debugEnabled) log.debug("starting JMX server");
-        final boolean ssl = JPPFConfiguration.get(JPPFProperties.SSL_ENABLED);
+        final boolean ssl = configuration.get(JPPFProperties.SSL_ENABLED);
         JPPFProperty<Integer> jmxProp = null;
         jmxProp = MANAGEMENT_PORT_NODE;
-        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, jmxProp);
+        jmxServer = JMXServerFactory.createServer(configuration, uuid, ssl, jmxProp);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
       }
@@ -465,7 +466,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Stop the jmx server.
    * @throws Exception if any error occurs.
-   * @since 5.0
    * @exclude
    */
   public void stopJmxServer() throws Exception {
@@ -473,7 +473,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -495,22 +494,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public void triggerConfigChanged() {
     updateSystemInformation();
     executionManager.triggerConfigChanged();
-  }
-
-  @Override
-  public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
-    final TaskBundle bundle = executionManager.getBundle();
-    if (bundle == null) return null;
-    try {
-      final List<String> uuidPath = bundle.getUuidPath().getList();
-      final boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
-      final AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);
-      newCL.setRemoteClassLoadingDisabled(remoteClassLoadingDisabled);
-      return newCL;
-    } catch (final Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-    }
-    return null;
   }
 
   @Override
@@ -540,8 +523,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Check whether this node is stopped or shutting down.
-   * If not, an unchecked {@code IllegalStateException} is thrown.
+   * Check whether this node is stopped or shutting down. If not, an unchecked {@code IllegalStateException} is thrown.
    * @return {@code true} if the node is stopped or shutting down.
    */
   private boolean checkStopped() {
@@ -552,5 +534,18 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @Override
   public boolean isDotnetCapable() {
     return dotnetCapable;
+  }
+
+  @Override
+  public TypedProperties getConfiguration() {
+    return configuration;
+  }
+
+  /**
+   * @return the slave node manager.
+   * @exclude
+   */
+  public SlaveNodeManager getSlaveManager() {
+    return slaveManager;
   }
 }

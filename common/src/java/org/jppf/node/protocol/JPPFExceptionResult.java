@@ -66,7 +66,6 @@ public class JPPFExceptionResult extends AbstractTask<Object> {
 
   /**
    * Display the error context captured in this task.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run() {
@@ -76,7 +75,6 @@ public class JPPFExceptionResult extends AbstractTask<Object> {
   /**
    * Construct a string representation of this object.
    * @return a string representing this JPPFExceptionResult.
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {

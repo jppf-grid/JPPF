@@ -135,8 +135,8 @@ public class DriverInitializer {
    * Register the MBean that collects debug/troubleshooting information.
    */
   void handleDebugActions() {
-    if (driver.getConfig().get(JPPFProperties.DEBUG_ENABLED)) {
-      if (driver.getConfig().getBoolean("jppf.deadlock.detector.enabled", true)) {
+    if (driver.getConfiguration().get(JPPFProperties.DEBUG_ENABLED)) {
+      if (driver.getConfiguration().getBoolean("jppf.deadlock.detector.enabled", true)) {
         if (debugEnabled) log.debug("registering deadlock detector");
         DeadlockDetector.setup("driver");
       }
@@ -221,13 +221,13 @@ public class DriverInitializer {
    */
   void initPeers(final ClientClassNioServer classServer) {
     boolean initPeers;
-    final TypedProperties props = driver.getConfig();
+    final TypedProperties props = driver.getConfiguration();
     final boolean ssl = props.get(PEER_SSL_ENABLED);
     final boolean enabled = props.get(PEER_DISCOVERY_ENABLED);
     if (debugEnabled) log.debug("{} = {}", PEER_DISCOVERY_ENABLED.getName(), enabled);
     if (enabled) {
       if (debugEnabled) log.debug("starting peers discovery");
-      peerDiscoveryThread = new PeerDiscoveryThread(driver.getConfig(),  new IPFilter(props, true), getConnectionInformation(), (name, info) -> {
+      peerDiscoveryThread = new PeerDiscoveryThread(driver.getConfiguration(),  new IPFilter(props, true), getConnectionInformation(), (name, info) -> {
         peerDiscoveryThread.addConnectionInformation(info);
         getPeerConnectionPoolHandler().newPool(name, config.get(PEER_POOL_SIZE), info, ssl, false);
       });
@@ -313,13 +313,13 @@ public class DriverInitializer {
       // default is false for ssl, true for plain connection
       if (config.get(MANAGEMENT_ENABLED)) {
         if (debugEnabled) log.debug("initializing {}management", tmp);
-        final String protocol = driver.getConfig().get(JMX_REMOTE_PROTOCOL);
+        final String protocol = driver.getConfiguration().get(JMX_REMOTE_PROTOCOL);
         JPPFProperty<Integer> jmxProp = null;
         if (JMXHelper.JPPF_JMX_PROTOCOL.equals(protocol)) jmxProp = ssl ? SERVER_SSL_PORT : SERVER_PORT;
         else jmxProp = ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT;
-        final int port = driver.getConfig().get(jmxProp);
+        final int port = driver.getConfiguration().get(jmxProp);
         if (port < 0) return null;
-        server = JMXServerFactory.createServer(driver.getUuid(), ssl, jmxProp);
+        server = JMXServerFactory.createServer(driver.configuration, driver.getUuid(), ssl, jmxProp);
         server.start(getClass().getClassLoader());
         final String msg = String.format("%smanagement initialized and listening on port %s", tmp, server.getManagementPort());
         System.out.println(msg);
@@ -440,7 +440,7 @@ public class DriverInitializer {
    */
   void initDatasources() {
     final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-    factory.configure(driver.getConfig(), JPPFDatasourceFactory.Scope.LOCAL);
+    factory.configure(driver.getConfiguration(), JPPFDatasourceFactory.Scope.LOCAL);
   }
 
   /**
@@ -457,7 +457,7 @@ public class DriverInitializer {
     final Hook<JPPFDriverStartupSPI> hook = HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null);
     for (final HookInstance<JPPFDriverStartupSPI> hookInstance: hook.getInstances()) {
       final JPPFDriverStartupSPI instance = hookInstance.getInstance();
-      final Method m = ReflectionUtils.getSetter(instance.getClass(), "setJPPFDriver");
+      final Method m = ReflectionUtils.getSetter(instance.getClass(), "setDriver");
       if ((m != null) &&(JPPFDriver.class.isAssignableFrom(m.getParameterTypes()[0]))) {
         try {
           m.invoke(instance, driver);

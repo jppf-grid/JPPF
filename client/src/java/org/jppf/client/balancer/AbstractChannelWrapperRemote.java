@@ -63,7 +63,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
     final JPPFConnectionPool pool = channel.getConnectionPool();
     this.uuid = pool.getDriverUuid();
     priority = pool.getPriority();
-    systemInfo = new JPPFSystemInformation(this.uuid, false, true);
+    systemInfo = new JPPFSystemInformation(channel.getConnectionPool().getClient().getConfig(), this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", "remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
     managementInfo.setSystemInfo(systemInfo);
   }

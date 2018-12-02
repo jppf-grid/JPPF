@@ -34,10 +34,11 @@ import org.slf4j.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
+ * @param <N> the type of node.
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractNodeIO implements NodeIO {
+public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements NodeIO {
   /**
    * Logger for this class.
    */
@@ -53,7 +54,7 @@ public abstract class AbstractNodeIO implements NodeIO {
   /**
    * The node who owns this TaskIO.
    */
-  protected final JPPFNode node;
+  protected final N node;
   /**
    * The task bundle currently being processed.
    */
@@ -67,7 +68,7 @@ public abstract class AbstractNodeIO implements NodeIO {
    * Initialize this TaskIO with the specified node.
    * @param node - the node who owns this TaskIO.
    */
-  public AbstractNodeIO(final JPPFNode node) {
+  public AbstractNodeIO(final N node) {
     this.node = node;
     HookFactory.registerConfigSingleHook(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
   }

@@ -71,7 +71,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
   /**
    * Used to create bundler instances.
    */
-  private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
+  private final JPPFBundlerFactory bundlerFactory;
   /**
    * Task that dispatches queued jobs to available nodes.
    */
@@ -139,8 +139,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
         return getAllChannels();
       }
     });
-    this.peerHandler = new PeerAttributesHandler(Math.max(1, driver.getConfig().getInt("jppf.peer.handler.threads", 1)));
+    this.peerHandler = new PeerAttributesHandler(Math.max(1, driver.getConfiguration().getInt("jppf.peer.handler.threads", 1)));
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
+    bundlerFactory = new JPPFBundlerFactory(driver.getConfiguration());
     bundlerHandler = new LoadBalancerPersistenceManager(bundlerFactory);
     INITIAL_BUNDLE_UUID = driver.getUuid();
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
@@ -254,7 +255,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
     localChannel.setSelector(channelSelector);
     selectorThread = new ChannelSelectorThread(channelSelector, this, 1L);
     localChannel.setInterestOps(0);
-    ThreadUtils.startThread(selectorThread, "NodeChannelSelector");
+    ThreadUtils.startDaemonThread(selectorThread, "NodeChannelSelector");
     postAccept(localChannel);
   }
 
@@ -346,7 +347,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> {
       bundle.setTaskCount(0);
       bundle.setHandshake(true);
       final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
-      final TypedProperties config = getDriver().getConfig();
+      final TypedProperties config = getDriver().getConfiguration();
       final Map<String, TypedProperties> defMap = new HashMap<>();
       defMap.putAll(factory.extractDefinitions(config, JPPFDatasourceFactory.Scope.REMOTE));
       bundle.setParameter(BundleParameter.DATASOURCE_DEFINITIONS, defMap);

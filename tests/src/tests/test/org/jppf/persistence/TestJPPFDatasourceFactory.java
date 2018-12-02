@@ -28,7 +28,6 @@ import javax.sql.DataSource;
 
 import org.h2.tools.Script;
 import org.jppf.client.JPPFJob;
-import org.jppf.node.NodeRunner;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.persistence.JPPFDatasourceFactory;
@@ -363,7 +362,7 @@ public class TestJPPFDatasourceFactory extends AbstractDatabaseSetup {
     @Override
     public void run() {
       dsNames = JPPFDatasourceFactory.getInstance().getDataSourceNames();
-      nodeUuid = NodeRunner.getUuid();
+      nodeUuid = getNode().getUuid();
     }
   }
 }

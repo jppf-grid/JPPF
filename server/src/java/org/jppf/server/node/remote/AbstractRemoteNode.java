@@ -51,10 +51,12 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
 
   /**
    * Default constructor.
+   * @param uuid this node's uuid.
+   * @param configuration the configuration of this node.
    * @param connectionInfo the server connection information.
    */
-  public AbstractRemoteNode(final DriverConnectionInfo connectionInfo) {
-    super();
+  public AbstractRemoteNode(final String uuid, final TypedProperties configuration, final DriverConnectionInfo connectionInfo) {
+    super(uuid, configuration);
     this.connectionInfo = connectionInfo;
     initClassLoaderManager();
   }
@@ -65,11 +67,10 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
   protected abstract void initClassLoaderManager();
 
   @Override
-  public void initDataChannel() throws Exception {
-    final TypedProperties config = JPPFConfiguration.getProperties();
+  protected void initDataChannel() throws Exception {
     (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
-    if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
+    if (configuration.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
         recoveryConnection = new HeartbeatConnection(JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL, uuid, connectionInfo.getHost(), connectionInfo.getPort(), connectionInfo.isSecure());
@@ -97,7 +98,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
     try {
       if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
       reconnectionNotification = new JPPFNodeReconnectionNotification("The heartbeat mechanism failed to receive a message from the server", null, ConnectionReason.HEARTBEAT_FAILURE);
-      executionManager.cancelAllTasks(false, false);
+      getExecutionManager().cancelAllTasks(false, false);
       closeDataChannel();
     } catch (final Exception e) {
       log.error(e.getMessage(), e);

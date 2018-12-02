@@ -32,7 +32,6 @@ import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -257,7 +256,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
       else if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
     }
-    message.addLocation(IOHelper.serializeData(taskBundle, JPPFDriver.getSerializer()));
+    message.addLocation(IOHelper.serializeData(taskBundle, server.getDriver().getSerializer()));
     message.addLocation(bundle.getDataProvider());
     for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getInitialTask());
     message.setBundle(bundle.getJob());

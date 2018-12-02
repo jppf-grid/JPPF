@@ -87,7 +87,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public JPPFJobManager(final JPPFDriver driver) {
     this.driver = driver;
-    jppfDebug = driver.getConfig().get(JPPFProperties.DEBUG_ENABLED);
+    jppfDebug = driver.getConfiguration().get(JPPFProperties.DEBUG_ENABLED);
     executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JobManager")) {
       @Override
       protected void afterExecute(final Runnable r, final Throwable t) {

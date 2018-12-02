@@ -65,7 +65,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   public WaitingNodeRequestState(final NodeClassNioServer server) {
     super(server);
-    this.isFileLookup = server.getDriver().getConfig().get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
+    this.isFileLookup = server.getDriver().getConfiguration().get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   }
 
   /**

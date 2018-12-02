@@ -109,7 +109,7 @@ public class AsyncClientContext extends StatelessNioContext {
       header.setParameter(BundleParameter.TASK_POSITIONS, positions);
       header.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
     }
-    message.addLocation(IOHelper.serializeData(header, JPPFDriver.getSerializer()));
+    message.addLocation(IOHelper.serializeData(header, driver.getSerializer()));
     if (tasks != null) for (ServerTask task: tasks) message.addLocation(task.getResult());
     message.setBundle(header);
     return message;

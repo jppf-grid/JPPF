@@ -21,7 +21,6 @@ package org.jppf.server.nio.nodeserver;
 import org.jppf.io.IOHelper;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 
 /**
@@ -43,7 +42,8 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
    */
   @Override
   protected void afterFirstRead() throws Exception {
-    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), JPPFDriver.getSerializer());
+    final AbstractNodeContext context = (AbstractNodeContext) this.channel;
+    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), context.server.getDriver().getSerializer());
     nbObjects = bundle.getTaskCount() + 1;
   }
 

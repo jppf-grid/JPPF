@@ -24,7 +24,7 @@ import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistence;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -129,15 +129,16 @@ public class JPPFBundlerFactory {
 
   /**
    * Default constructor.
+   * @param config the configuration used to extract the load-balancer settings.
    */
-  public JPPFBundlerFactory() {
-    this(Defaults.SERVER, JPPFConfiguration.getProperties());
+  public JPPFBundlerFactory(final TypedProperties config) {
+    this(Defaults.SERVER, config);
   }
 
   /**
    * Default constructor.
    * @param def the default values to use if nothing is specified in the JPPF configuration.
-   * @param config he configuration used to extract the load-balancer settings.
+   * @param config the configuration used to extract the load-balancer settings.
    */
   public JPPFBundlerFactory(final Defaults def, final TypedProperties config) {
     this.config = config;
@@ -366,9 +367,10 @@ public class JPPFBundlerFactory {
    * Not instantiable from another class.
    * @return {@link LoadBalancerPersistence} implementation based on the configuration.
    */
-  private static LoadBalancerPersistence initPersistence() {
+  private LoadBalancerPersistence initPersistence() {
     try {
-      return ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, JPPFProperties.LOAD_BALANCING_PERSISTENCE);
+      final JPPFProperty<String[]> prop = JPPFProperties.LOAD_BALANCING_PERSISTENCE;
+      return ReflectionHelper.invokeDefaultOrStringArrayConstructor(LoadBalancerPersistence.class, prop.getName(), config.get(prop));
     } catch (final Exception e) {
       log.error("error creating LoadBalancerPersistence configured as {} = {}, load-balancer persistence is disabled\n{}",
         JPPFProperties.LOAD_BALANCING_PERSISTENCE.getName(), JPPFConfiguration.get(JPPFProperties.JOB_PERSISTENCE), ExceptionUtils.getStackTrace(e));

@@ -56,7 +56,7 @@ public class CancelJob {
     final My my = new My();
     mbeanServer.registerMBean(my, objName);
     System.out.println("starting JMXMP server");
-    final JMXMPServer server = new JMXMPServer("clientTest", false, JPPFProperties.MANAGEMENT_PORT);
+    final JMXMPServer server = new JMXMPServer(JPPFConfiguration.getProperties(), "clientTest", false, JPPFProperties.MANAGEMENT_PORT);
     server.start(CancelJob.class.getClassLoader());
     System.out.println("connecting JMX client");
     try (JMXConnectionWrapper client = new JMXConnectionWrapper("localhost", port, false)) {
@@ -67,7 +67,7 @@ public class CancelJob {
       client.addNotificationListener(name, listener);
       System.out.println("sending notification");
       final Notification notif = new Notification("type", "source", 1L, "message");
-      final JPPFSystemInformation info = new JPPFSystemInformation("uuid", true, false);
+      final JPPFSystemInformation info = new JPPFSystemInformation(JPPFConfiguration.getProperties(), "uuid", true, false);
       notif.setUserData(info);
       my.sendNotification(notif);
       Thread.sleep(1000L);

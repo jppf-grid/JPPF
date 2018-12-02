@@ -114,7 +114,7 @@ class HeartbeatContext extends StatelessNioContext {
   public HeartbeatMessage newHeartbeatMessage() {
     final HeartbeatMessage data = new HeartbeatMessage(messageSequence.incrementAndGet());
     if (uuid == null) {
-      final TypedProperties config = server.driver.getConfig();
+      final TypedProperties config = server.driver.getConfiguration();
       final TypedProperties props = data.getProperties();
       props.set(JPPFProperties.RECOVERY_MAX_RETRIES, config.get(JPPFProperties.RECOVERY_MAX_RETRIES));
       props.set(JPPFProperties.RECOVERY_READ_TIMEOUT, config.get(JPPFProperties.RECOVERY_READ_TIMEOUT));

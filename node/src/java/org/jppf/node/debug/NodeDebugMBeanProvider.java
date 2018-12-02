@@ -42,7 +42,7 @@ public class NodeDebugMBeanProvider implements JPPFNodeMBeanProvider {
 
   @Override
   public Object createMBean(final Node node) {
-    return JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED) ? new NodeDebug() : null;
+    return JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED) ? new NodeDebug(node) : null;
   }
 
   @Override

@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.*;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.BaseTest;
@@ -81,7 +81,7 @@ public class TestIsInIPv4Subnet extends BaseTest {
    */
   @Test(timeout=5000)
   public void testMatches() throws Exception {
-    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
+    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFConfiguration.getProperties(), JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     info.getJppf().setString("string.1", "192.168");
     info.getJppf().setString("string.2", ".1.14");

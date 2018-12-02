@@ -62,7 +62,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    */
   TaskQueueChecker(final NodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     super(server, queue, stats, bundlerFactory);
-    this.localNodeBiasEnabled = server.getDriver().getConfig().get(JPPFProperties.LOCAL_NODE_BIAS);
+    this.localNodeBiasEnabled = server.getDriver().getConfiguration().get(JPPFProperties.LOCAL_NODE_BIAS);
   }
 
   /**

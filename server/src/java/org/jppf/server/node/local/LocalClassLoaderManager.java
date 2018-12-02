@@ -29,19 +29,13 @@ import org.jppf.server.node.*;
  * Concrete implementation of {@link AbstractClassLoaderManager} for a local node.
  * @author Laurent Cohen
  */
-class LocalClassLoaderManager extends AbstractClassLoaderManager {
-  /**
-   * The node that holds this class loader manager.
-   */
-  private final JPPFLocalNode node;
-
+class LocalClassLoaderManager extends AbstractClassLoaderManager<JPPFLocalNode> {
   /**
    * Initialize this class loader manager with the specified I/O handler.
    * @param node the node that holds this class loader manager..
    */
   LocalClassLoaderManager(final JPPFLocalNode node) {
-    if (node == null) throw new IllegalArgumentException("node is null");
-    this.node = node;
+    super(node);
   }
 
   @Override

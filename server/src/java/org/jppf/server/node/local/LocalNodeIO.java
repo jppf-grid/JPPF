@@ -35,7 +35,7 @@ import org.slf4j.*;
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class LocalNodeIO extends AbstractNodeIO {
+public class LocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
   /**
    * Logger for this class.
    */
@@ -57,7 +57,7 @@ public class LocalNodeIO extends AbstractNodeIO {
    * Initialize this TaskIO with the specified node.
    * @param node - the node who owns this TaskIO.
    */
-  public LocalNodeIO(final JPPFNode node) {
+  public LocalNodeIO(final JPPFLocalNode node) {
     super(node);
     this.channel = ((LocalNodeConnection) node.getNodeConnection()).getChannel();
   }

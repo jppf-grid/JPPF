@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.jppf.classloader.*;
 import org.jppf.execute.ExecutionInfo;
-import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadUtils;
@@ -156,13 +155,14 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    * @since 5.0
    */
   private void shutdownOrRestart(final boolean interrupt, final boolean restart) throws Exception {
-    if (node.isLocal()) return;
+    //if (node.isLocal()) return;
     final String s = restart ? "restart" : "shutdown";
     final String msg = String.format("%s node %s requested", (interrupt ? "immediate" : "deferred"), s);
     System.out.println(msg);
     log.info(msg);
     if (interrupt || !node.isExecuting()) {
-      if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
+      if (node.getShuttingDown().compareAndSet(false, true)) {
+        if (debugEnabled) log.debug("scheduling immediate {}", s);
         final Runnable r = new Runnable() {
           @Override
           public void run() {
@@ -235,7 +235,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     // we don't allow the node uuid to be overriden
     if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
     final TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
-    JPPFConfiguration.getProperties().putAll(overrides);
+    node.getConfiguration().putAll(overrides);
     new ConfigurationOverridesHandler().save(overrides);
     node.triggerConfigChanged();
     //if (restart) triggerReconnect();

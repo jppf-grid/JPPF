@@ -18,16 +18,20 @@
 
 package org.jppf.server.node;
 
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.execute.ExecutionManager;
 import org.jppf.management.JMXServer;
-import org.jppf.node.AbstractNode;
+import org.jppf.node.*;
 import org.jppf.node.protocol.*;
+import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -47,7 +51,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Manages the class loaders and how they are used.
    * @exclude
    */
-  protected AbstractClassLoaderManager classLoaderManager = null;
+  protected AbstractClassLoaderManager<?> classLoaderManager;
   /**
    * Flag which determines whether a reset of the resource caches
    * should be performed at the next opportunity.
@@ -86,6 +90,18 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * @exclude
    */
   protected JPPFReconnectionNotification reconnectionNotification;
+  /**
+   * The task execution manager for this node.
+   */
+  ExecutionManager executionManager;
+
+  /**
+   * Initialize this node.
+   * @param uuid this node's uuid.
+   */
+  public AbstractCommonNode(final String uuid) {
+    super(uuid);
+  }
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.
@@ -266,7 +282,47 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * @return an {@link AbstractClassLoaderManager} instance.
    * @exclude
    */
-  public AbstractClassLoaderManager getClassLoaderManager() {
+  public AbstractClassLoaderManager<?> getClassLoaderManager() {
     return classLoaderManager;
+  }
+
+  @Override
+  public ExecutionManager getExecutionManager() {
+    return executionManager;
+  }
+
+  @Override
+  public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
+    final TaskBundle bundle = executionManager.getBundle();
+    if (bundle == null) return null;
+    try {
+      final List<String> uuidPath = bundle.getUuidPath().getList();
+      final boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
+      final AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);
+      newCL.setRemoteClassLoadingDisabled(remoteClassLoadingDisabled);
+      return newCL;
+    } catch (final Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return null;
+  }
+
+  /**
+   * 
+   */
+  void initStartups() {
+    final Hook<JPPFNodeStartupSPI> hook = HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, null);
+    for (final HookInstance<JPPFNodeStartupSPI> hookInstance: hook.getInstances()) {
+      final JPPFNodeStartupSPI instance = hookInstance.getInstance();
+      final Method m = ReflectionUtils.getSetter(instance.getClass(), "setNode");
+      if ((m != null) &&(Node.class.isAssignableFrom(m.getParameterTypes()[0]))) {
+        try {
+          m.invoke(instance, this);
+        } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          log.error("error setting Node on startup of type {}", instance.getClass().getName(), e);
+        }
+      }
+      hookInstance.invoke("run");
+    }
   }
 }

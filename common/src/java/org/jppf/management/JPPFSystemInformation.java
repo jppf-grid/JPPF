@@ -72,30 +72,39 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * An optional statistics object from which events can be received so the corresponding properties can be kept up to date.
    */
   private transient JPPFStatistics stats;
+  /**
+   * The JPPF configuration.
+   */
+  private transient TypedProperties jppfConfig;
 
   /**
    * Initialize this system information object with the specified uuid.
+   * @param jppfConfig the JPPF configuration.
    * @param uuid the uuid of the corresponding JPPF component.
    * @param local {@code true} if the JPPF component is local (local node or local client executor), {@code false} otherwise.
    * @param resolveInetAddressesNow if {@code true}, then name resolution for {@code InetAddress}es should occur immediately,
    * otherwise it is different and executed in a separate thread.
+   * @exclude
    */
-  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow) {
-    this(uuid, local, resolveInetAddressesNow, null);
+  public JPPFSystemInformation(final TypedProperties jppfConfig, final String uuid, final boolean local, final boolean resolveInetAddressesNow) {
+    this(jppfConfig, uuid, local, resolveInetAddressesNow, null);
   }
 
   /**
    * Initialize this system information object with the specified uuid.
+   * @param jppfConfig the JPPF configuration.
    * @param uuid the uuid of the corresponding JPPF component.
    * @param local {@code true} if the JPPF component is local (local node or local client executor), {@code false} otherwise.
    * @param resolveInetAddressesNow if {@code true}, then name resolution for {@code InetAddress}es should occur immediately,
    * otherwise it is different and executed in a separate thread.
    * @param stats an optional statistics object from which events can be received so the corresponding properties can be kept up to date.
+   * @exclude
    */
-  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow, final JPPFStatistics stats) {
+  public JPPFSystemInformation(final TypedProperties jppfConfig, final String uuid, final boolean local, final boolean resolveInetAddressesNow, final JPPFStatistics stats) {
     this.local = local;
     this.resolveInetAddressesNow = resolveInetAddressesNow;
     this.stats = stats;
+    this.jppfConfig = jppfConfig;
     final TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
     uuidProps.setInt("jppf.pid", SystemUtils.getPID());
@@ -281,7 +290,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("system", SystemUtils.getSystemProperties());
     addProperties("runtime", SystemUtils.getRuntimeInformation());
     addProperties("env", SystemUtils.getEnvironment());
-    addProperties("jppf", new TypedProperties(JPPFConfiguration.getProperties()));
+    addProperties("jppf", new TypedProperties((jppfConfig == null) ? JPPFConfiguration.getProperties() : jppfConfig));
     getJppf().setProperty("jppf.channel.local", String.valueOf(local));
     final Runnable r = new Runnable() {
       @Override

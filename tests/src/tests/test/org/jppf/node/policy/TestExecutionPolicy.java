@@ -50,7 +50,7 @@ public class TestExecutionPolicy extends BaseTest {
   /** @throws Exception if any error occurs. */
   @BeforeClass
   public static void setup() throws Exception {
-    systemInfo = new JPPFSystemInformation("test", true, false);
+    systemInfo = new JPPFSystemInformation(JPPFConfiguration.getProperties(), "test", true, false);
     final TypedProperties test = new TypedProperties()
       .setInt("int.1", 1).setInt("int.2", 2).setInt("int.3", 3).setInt("int.10", 10)
       .setString("string", "string").setString("string.tr", "tr").setString("string.ue", "ue")
@@ -322,7 +322,7 @@ public class TestExecutionPolicy extends BaseTest {
    */
   @Test(timeout=5000)
   public void testMatches() throws Exception {
-    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
+    final JPPFSystemInformation info = new JPPFSystemInformation(JPPFConfiguration.getProperties(), JPPFUuid.normalUUID(), false, false);
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     final TestCustomPolicy tcp = new TestCustomPolicy();
     final ExecutionPolicy policy = new Contains("jppf.uuid", true, "AB").and(tcp);

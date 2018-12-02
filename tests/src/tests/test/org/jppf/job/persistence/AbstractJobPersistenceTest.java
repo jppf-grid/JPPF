@@ -249,7 +249,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
     job.getSLA().setCancelUponClientDisconnect(false);
     job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(true).setDeleteOnCompletion(false);
     print(false, false, "getting JMX connection");
-    try (JMXDriverConnectionWrapper jmx = newJmx(client)) {
+    try (final JMXDriverConnectionWrapper jmx = newJmx(client)) {
       jmx.setReconnectOnError(false);
       final PersistedJobsManagerMBean mgr = jmx.getPersistedJobsManager();
       final AwaitJobNotificationListener listener = new AwaitJobNotificationListener(jmx, JobEventType.JOB_DISPATCHED);

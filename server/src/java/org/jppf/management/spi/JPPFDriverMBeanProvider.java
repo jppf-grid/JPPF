@@ -26,17 +26,17 @@ import org.jppf.server.JPPFDriver;
  */
 public interface JPPFDriverMBeanProvider extends JPPFMBeanProvider {
   /**
-   * Return a concrete MBean.<br>
-   * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
-   * @return an <code>Object</code> that is an implementation of the MBean interface.
+   * Return a concrete MBean. The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
+   * @return an {@code Object} that is an implementation of the MBean interface.
    */
   Object createMBean();
 
   /**
-   * Return a concrete MBean.<br>
-   * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
-   * @param driver a reference to the JPPF driver that holds this mbean.
-   * @return an <code>Object</code> that is an implementation of the MBean interface.
+   * Return a concrete MBean. The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
+   * <p>This default implementation simply calls {@link #createMBean()} without using the {@code driver} parameter.
+   * @param driver a reference to the JPPF driver that registered this mbean. MBean provider implementations that wish to use the
+   * {@link JPPFDriver} API should override this method.
+   * @return an {@code Object} that is an implementation of the MBean interface.
    */
   default Object createMBean(@SuppressWarnings("unused") final JPPFDriver driver) {
     return createMBean();

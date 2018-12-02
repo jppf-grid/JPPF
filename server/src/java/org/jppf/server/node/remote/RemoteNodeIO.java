@@ -37,7 +37,7 @@ import org.slf4j.*;
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class RemoteNodeIO extends AbstractNodeIO {
+public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
   /**
    * Logger for this class.
    */
@@ -55,7 +55,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
    * Initialize this TaskIO with the specified node.
    * @param node the node who owns this TaskIO.
    */
-  public RemoteNodeIO(final JPPFNode node) {
+  public RemoteNodeIO(final AbstractRemoteNode node) {
     super(node);
   }
 

@@ -72,13 +72,13 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    * @param localChannel the local channel to use.
    */
   public void initLocalChannel(final ChannelWrapper<?> localChannel) {
-    if (getDriver().getConfig().get(JPPFProperties.LOCAL_NODE_ENABLED)) {
+    if (getDriver().getConfiguration().get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       this.localChannel = localChannel;
       final ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
       localChannel.setInterestOps(0);
-      ThreadUtils.startThread(selectorThread, "ClassChannelSelector");
+      ThreadUtils.startDaemonThread(selectorThread, "ClassChannelSelector");
       postAccept(localChannel);
     }
   }

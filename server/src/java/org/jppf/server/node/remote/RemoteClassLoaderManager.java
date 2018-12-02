@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
-import org.jppf.node.NodeRunner;
 import org.jppf.server.node.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -32,7 +31,7 @@ import org.slf4j.*;
  * Concrete implementation of {@link AbstractClassLoaderManager} for a remote node.
  * @author Laurent Cohen
  */
-public class RemoteClassLoaderManager extends AbstractClassLoaderManager {
+public class RemoteClassLoaderManager extends AbstractClassLoaderManager<JPPFRemoteNode> {
   /**
    * Logger for this class.
    */
@@ -41,24 +40,19 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager {
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * The node that holds this class loader manager.
-   */
-  private final JPPFRemoteNode node;
 
   /**
    * Initialize this class loader manager with the specified node.
    * @param node the node that holds this class loader manager.
    */
-  RemoteClassLoaderManager(final JPPFNode node) {
-    if (node == null) throw new IllegalArgumentException("node is null");
-    this.node = (JPPFRemoteNode) node;
+  RemoteClassLoaderManager(final JPPFRemoteNode node) {
+    super(node);
   }
 
   @Override
   protected AbstractJPPFClassLoader createClassLoader() {
     if (debugEnabled) log.debug("Initializing classloader");
-    return NodeRunner.getJPPFClassLoader();
+    return node.getJPPFClassLoader();
   }
 
   @Override

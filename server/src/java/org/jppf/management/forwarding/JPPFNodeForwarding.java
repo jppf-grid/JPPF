@@ -90,7 +90,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     selectionHelper = new NodeSelectionHelper(driver);
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
-    this.core = driver.getConfig().get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
+    this.core = driver.getConfiguration().get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
     executor = ConcurrentUtils.newFixedExecutor(core, "NodeForwarding");
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }

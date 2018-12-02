@@ -18,6 +18,8 @@
 
 package org.jppf.node.provisioning;
 
+import org.jppf.node.Node;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -34,9 +36,10 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
 
   /**
    * Initialize this MBean.
+   * @param node the JPPF node that holds this manager.
    */
-  public JPPFNodeProvisioning() {
-    slaveManager = SlaveNodeManager.INSTANCE;
+  public JPPFNodeProvisioning(final Node node) {
+    slaveManager = ((JPPFNode) node).getSlaveManager();
   }
 
   @Override

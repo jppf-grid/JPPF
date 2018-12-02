@@ -29,10 +29,11 @@ import org.slf4j.*;
 
 /**
  * Instances of this class manage the node's class loader and associated operations.
+ * @param <N> the type of node.
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractClassLoaderManager {
+public abstract class AbstractClassLoaderManager<N extends JPPFNode> {
   /**
    * Logger for this class.
    */
@@ -57,13 +58,19 @@ public abstract class AbstractClassLoaderManager {
    * A list retaining the container in chronological order of their creation.
    */
   private final LinkedList<JPPFContainer> containerList = new LinkedList<>();
+  /**
+   * The associated node.
+   */
+  protected final N node;
 
   /**
    * Default constructor for class loader manager.
+   * @param node the associated node.
    */
-  protected AbstractClassLoaderManager() {
-    final TypedProperties config = JPPFConfiguration.getProperties();
-    this.maxContainers = config.get(JPPFProperties.CLASSLOADER_CACHE_SIZE);
+  protected AbstractClassLoaderManager(final N node) {
+    if (node == null) throw new IllegalArgumentException("node is null");
+    this.node = node;
+    this.maxContainers = node.getConfiguration().get(JPPFProperties.CLASSLOADER_CACHE_SIZE);
   }
 
   /**

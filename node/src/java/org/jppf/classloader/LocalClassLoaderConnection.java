@@ -28,9 +28,11 @@ import static org.jppf.utils.StringUtils.build;
 public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<LocalClassLoaderChannel> {
   /**
    * Initialize this connection with the specified channel.
+   * @param uuid this node's uuid.
    * @param channel the local channel to use.
    */
-  public LocalClassLoaderConnection(final LocalClassLoaderChannel channel) {
+  public LocalClassLoaderConnection(final String uuid, final LocalClassLoaderChannel channel) {
+    super(uuid);
     this.channel = channel;
   }
 

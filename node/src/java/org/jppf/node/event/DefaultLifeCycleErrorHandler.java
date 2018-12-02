@@ -39,10 +39,6 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * If <code>true</code> (the default), then {@link Error}s caught in the listeners methods will be propagated, otherwise they will be just logged.
-   */
-  protected static final boolean propagateErrors = JPPFConfiguration.getProperties().getBoolean("jppf.node.listener.errors.propagate", true);
-  /**
    * Mapping of event type to listener method name.
    */
   public static final Map<NodeLifeCycleEventType, String> methodsNamesMap = generateMethodsNamesMap();
@@ -60,6 +56,7 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
     final String s = StringUtils.build("error executing ", methodsNamesMap.get(event.getType()), " on an instance of ", listener.getClass(), ", event=", event, ", listener=", listener, " : ");
     if (debugEnabled) log.debug(s, t);
     else log.error(s + ExceptionUtils.getMessage(t));
+    final boolean propagateErrors = event.getNode().getConfiguration().getBoolean("jppf.node.listener.errors.propagate", true);
     if (propagateErrors && (t instanceof Error)) throw (Error) t;
   }
 

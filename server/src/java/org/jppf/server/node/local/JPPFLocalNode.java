@@ -20,13 +20,13 @@ package org.jppf.server.node.local;
 
 import org.jppf.classloader.LocalClassLoaderConnection;
 import org.jppf.server.node.*;
+import org.jppf.utils.*;
 
 /**
  * Local (in-VM) node implementation.
  * @author Laurent Cohen
  */
-public class JPPFLocalNode extends JPPFNode
-{
+public class JPPFLocalNode extends JPPFNode {
   /**
    * Wraps the connection to the driver's class server.
    */
@@ -34,45 +34,50 @@ public class JPPFLocalNode extends JPPFNode
 
   /**
    * Initialize this local node with the specified I/O handler.
+   * @param configuration the configuration of this node.
    * @param nodeConnection wraps the connection to the driver's job server.
    * @param classLoaderConnection wraps the connection to the driver's class server.
    */
-  public JPPFLocalNode(final LocalNodeConnection nodeConnection, final LocalClassLoaderConnection classLoaderConnection)
-  {
+  public JPPFLocalNode(final TypedProperties configuration, final LocalNodeConnection nodeConnection, final LocalClassLoaderConnection classLoaderConnection) {
+    super(uuidFromConfig(configuration), configuration);
     this.nodeConnection = nodeConnection;
     this.classLoaderConnection = classLoaderConnection;
     classLoaderManager = new LocalClassLoaderManager(this);
   }
 
   @Override
-  public void initDataChannel() throws Exception
-  {
+  protected void initDataChannel() throws Exception {
     nodeIO = new LocalNodeIO(this);
   }
 
   @Override
-  public void closeDataChannel() throws Exception
-  {
+  public void closeDataChannel() throws Exception {
   }
 
   /**
    * Get the connection to the driver's class server.
    * @return a {@link LocalClassLoaderConnection} instance.
    */
-  LocalClassLoaderConnection getClassLoaderConnection()
-  {
+  LocalClassLoaderConnection getClassLoaderConnection() {
     return classLoaderConnection;
   }
 
   @Override
-  protected NodeConnectionChecker createConnectionChecker()
-  {
+  protected NodeConnectionChecker createConnectionChecker() {
     return new LocalNodeConnectionChecker();
   }
 
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return true;
+  }
+
+  /**
+   * Get the nodes uuid from its configuration, create it if needed.
+   * @param configuration the configuration to search in.
+   * @return the node uuid.
+   */
+  private static String uuidFromConfig(final TypedProperties configuration) {
+    return configuration.getString("jppf.node.uuid", JPPFUuid.normalUUID());
   }
 }

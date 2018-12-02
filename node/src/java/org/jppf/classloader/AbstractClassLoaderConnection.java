@@ -46,7 +46,19 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   /**
    * The object which sends the class laoding requests and receives the responses.
    */
-  protected ClassLoaderRequestHandler requestHandler = null;
+  protected ClassLoaderRequestHandler requestHandler;
+  /**
+   * This node's uuid.
+   */
+  protected final String uuid;
+
+  /**
+   * 
+   * @param uuid this node's uuid.
+   */
+  protected AbstractClassLoaderConnection(final String uuid) {
+    this.uuid = uuid;
+  }
 
   /**
    * Perform the part of the handshake common to remote and local nodes. This consists in:
@@ -61,7 +73,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       if (debugEnabled) log.debug("sending node initiation message");
       final JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
+      request.setData(ResourceIdentifier.NODE_UUID, uuid);
       requestRunner.setRequest(request);
       requestRunner.run();
       final Throwable t = requestRunner.getThrowable();
@@ -89,7 +101,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       if (debugEnabled) log.debug("sending close channel command");
       final JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.CLOSE_CHANNEL);
-      request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
+      request.setData(ResourceIdentifier.NODE_UUID, uuid);
       requestRunner.setRequest(request);
       requestRunner.run();
       final Throwable t = requestRunner.getThrowable();

@@ -58,8 +58,8 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   private static final String NODE_RESET_SCRIPT = new StringBuilder()
     .append("org.jppf.utils.JPPFConfiguration.reset();\n")
-    .append("org.jppf.node.NodeRunner.getNode().triggerConfigChanged();\n")
-    .append("java.lang.System.out.println(\"reset configuration on node \" + org.jppf.node.NodeRunner.getUuid());\n")
+    .append("node.triggerConfigChanged();\n")
+    .append("java.lang.System.out.println(\"reset configuration on node \" + node.getUuid());\n")
     .toString();
   /**
    * Waits for a JOB_DISPATCHED notification.

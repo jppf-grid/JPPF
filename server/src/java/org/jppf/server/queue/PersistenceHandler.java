@@ -57,7 +57,7 @@ public class PersistenceHandler {
    */
   public PersistenceHandler(final JPPFPriorityQueue queue) {
     this.queue = queue;
-    persistence = JobPersistenceFactory.getInstance().getPersistence();
+    persistence = JobPersistenceFactory.newInstance(queue.driver.getConfiguration()).getPersistence();
   }
 
   /**
