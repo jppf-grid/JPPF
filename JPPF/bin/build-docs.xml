@@ -111,12 +111,9 @@
 
   <target name="javadoc.anttask">
     <echo message="Generating javadoc in ${javadoc}"/>
-    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.8"
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" source="1.8" locale="en_US"
       stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
-      <!--
-      <arg value="-J-Xrunjdwp:transport=dt_socket,address=localhost:8000,server=y,suspend=y"/>
-      -->
       <arg value="-linksource"/>
       <arg value="-quiet"/>
       <packageset dir="${node}/src/java"/>
