@@ -33,6 +33,24 @@ public class ConfigurationOverridesHandler {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ConfigurationOverridesHandler.class);
+  /**
+   * The node configuration.
+   */
+  private final TypedProperties config;
+
+  /**
+   * 
+   */
+  public ConfigurationOverridesHandler() {
+    this(JPPFConfiguration.getProperties());
+  }
+
+  /**
+   * @param config the node configuration.
+   */
+  public ConfigurationOverridesHandler(final TypedProperties config) {
+    this.config = config;
+  }
 
   /**
    * Save the configuration overrides file.
@@ -41,7 +59,7 @@ public class ConfigurationOverridesHandler {
   public void save(final TypedProperties overrides) {
     if ((overrides == null) || overrides.isEmpty()) return;
     try {
-      File file = JPPFConfiguration.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
+      File file = config.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
       if (file != null) {
         file = file.getAbsoluteFile();
         if (file.exists()) file.delete();
@@ -64,7 +82,7 @@ public class ConfigurationOverridesHandler {
   public TypedProperties load(final boolean delete) {
     final TypedProperties overrides = new TypedProperties();
     try {
-      final File file = JPPFConfiguration.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
+      final File file = config.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
       if ((file != null) && file.exists()) {
         try {
           try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

@@ -20,6 +20,7 @@ package test.org.jppf.server.protocol;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,9 +58,20 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * 
    */
   private static final String NODE_RESET_SCRIPT = new StringBuilder()
-    .append("org.jppf.utils.JPPFConfiguration.reset();\n")
+    .append("node.getConfiguration().reset();\n")
     .append("node.triggerConfigChanged();\n")
     .append("java.lang.System.out.println(\"reset configuration on node \" + node.getUuid());\n")
+    .append("node.getConfiguration().asString(\"_|_\");")
+    .toString();
+  /**
+   * 
+   */
+  private static final String SERVER_RESET_SCRIPT = new StringBuilder()
+    .append("var driver = serverDebug.getDriver();\n")
+    .append("var nodeServer = driver.getNodeNioServer();\n")
+    .append("var ctx = nodeServer.getConnection(\"${uuid}\");\n")
+    .append("var config = ctx.getSystemInformation().getJppf();\n")
+    .append("config.fromString(\"${cfg}\", \"_|_\");")
     .toString();
   /**
    * Waits for a JOB_DISPATCHED notification.
@@ -94,13 +106,10 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Before
   public void showIdleNodes() throws Exception {
     BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
-    RetryUtils.runWithRetryTimeout(5000L, 500L, new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        final int n;
-        if ((n = jmx.nbIdleNodes()) != BaseSetup.nbNodes()) throw new IllegalStateException(String.format("expected <%d> nodes but got <%d>", BaseSetup.nbNodes(), n));
-        return true;
-      }
+    RetryUtils.runWithRetryTimeout(5000L, 500L, () -> {
+      final int n;
+      if ((n = jmx.nbIdleNodes()) != BaseSetup.nbNodes()) throw new IllegalStateException(String.format("expected <%d> nodes but got <%d>", BaseSetup.nbNodes(), n));
+      return true;
     });
   }
 
@@ -113,6 +122,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     if ((jobNotificationListener != null) && !jobNotificationListener.isListenerRemoved()) jmx.getJobManager().removeNotificationListener(jobNotificationListener);
     jobNotificationListener = null;
     myNodeListener.reset();
+    FileUtils.deletePath(new File("config"), true);
   }
 
   /**
@@ -391,7 +401,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
             return null;
           }
         });
-        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "before resetting nodes configurations");
+        BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "before resetting nodes configurations");
         final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
         final Map<String, Object> result = forwarder.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "executeScript",
           new Object[] { "javascript", NODE_RESET_SCRIPT }, new String[] { "java.lang.String", "java.lang.String" });
@@ -399,13 +409,19 @@ public class TestJobReservation extends AbstractNonStandardSetup {
         final String[] uuids = new String[n];
         for (int i=0; i<n; i++) uuids[i] = "n" + (i + 1);
         for (final Map.Entry<String, Object> entry: result.entrySet()) {
-          assertTrue(StringUtils.isOneOf(entry.getKey(), false, uuids));
-          if (entry.getValue() instanceof Throwable) {
-            print(false, false, "throwable raised by node %s: %s", entry.getKey(), ExceptionUtils.getStackTrace((Throwable) entry.getValue()));
-          }
-          assertFalse(entry.getValue() instanceof Throwable);
+          final String key = entry.getKey();
+          final Object value = entry.getValue();
+          print(false, false, "read config for node '%s' : %s", key, value);
+          assertTrue(StringUtils.isOneOf(key, false, uuids));
+          if (entry.getValue() instanceof Throwable) print(false, false, "throwable raised by node %s: %s", key, ExceptionUtils.getStackTrace((Throwable) value));
+          assertFalse(value instanceof Throwable);
+          assertTrue(value instanceof String);
+          final String script = SERVER_RESET_SCRIPT.replace("${uuid}", key).replace("${cfg}", (String) value);
+          BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "resetting config of node '%s' in the server, using script:\n%s", key, script);
+          final Object o = executeScriptOnServer(jmx, script);
+          BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "config reset for node '%s' done in the server, returned config: %s", key, o);
         }
-        BaseTestHelper.printToAll(BaseSetup.getClient(), false, "after resetting nodes configurations");
+        BaseTestHelper.printToAll(BaseSetup.getClient(), true, true, true, false, "after resetting nodes configurations");
         //while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
         myNodeListener.map.clear();
       } catch (final Exception e) {

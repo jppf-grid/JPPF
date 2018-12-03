@@ -112,6 +112,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public JPPFNode(final String uuid, final TypedProperties configuration) {
     super(uuid);
     this.configuration = configuration;
+    if (debugEnabled) log.debug("creating node with config=\n{}", configuration);
     jmxEnabled = configuration.get(JPPFProperties.MANAGEMENT_ENABLED);
     dotnetCapable = configuration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
     checkConnection = configuration.get(JPPFProperties.NODE_CHECK_CONNECTION);
@@ -144,7 +145,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (!isStopped()) reset(true);
         throw new JPPFError(e);
       } catch(final IOException e) {
-        log.error(e.getMessage(), e);
+        if (!getShuttingDown().get()) log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) {
           reset(true);
@@ -270,7 +271,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     currentBundle = null;
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged() || bundle.isHandshake() || isOffline()) {
-      if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
+      if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server, config=\n{}", configuration);
       final TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
       jppf.putAll(configuration);

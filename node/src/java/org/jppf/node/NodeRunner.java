@@ -103,7 +103,14 @@ public class NodeRunner {
    */
   public NodeRunner(final TypedProperties configuration) {
     this.configuration = configuration;
+    if (configuration.getDefaults() != null) {
+      this.initialConfig = (TypedProperties) configuration.getDefaults();
+    } else {
+      this.initialConfig = new TypedProperties(configuration);
+      configuration.setDefaults(initialConfig);
+    }
     this.uuid = this.configuration.getString("jppf.node.uuid", JPPFUuid.normalUUID());
+    if (debugEnabled && this.configuration.get(JPPFProperties.DEBUG_ENABLED)) log.debug("starting node with configuration:\n{}", configuration);
     this.offline = this.configuration.get(JPPFProperties.NODE_OFFLINE);
     this.android = this.configuration.get(JPPFProperties.NODE_ANDROID);
   }
@@ -114,9 +121,16 @@ public class NodeRunner {
    */
   public static void main(final String...args) {
     try {
+      final TypedProperties config = JPPFConfiguration.getProperties();
+      final TypedProperties defaults = new TypedProperties(config);
       final TypedProperties overrides = new ConfigurationOverridesHandler().load(true);
-      if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
-      final NodeRunner runner = new NodeRunner(JPPFConfiguration.getProperties());
+      if (overrides != null) {
+        if (debugEnabled) log.debug("starting with overrides = {}", overrides);
+        config.putAll(overrides);
+        config.setBoolean("jppf.node.overrides.set", true);
+      }
+      config.setDefaults(defaults);
+      final NodeRunner runner = new NodeRunner(config);
       runner.start(args);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
@@ -155,7 +169,10 @@ public class NodeRunner {
         try {
           if (debugEnabled) log.debug("initializing configuration");
           if (initialConfig == null) initialConfig = new TypedProperties(configuration);
-          else restoreInitialConfig();
+          else {
+            if (!configuration.getBoolean("jppf.node.overrides.set", false)) restoreInitialConfig();
+            else configuration.remove("jppf.node.overrides.set");
+          }
           if (debugEnabled) log.debug("creating node");
           node = createNode(context);
           if (launcherListener != null) launcherListener.setActionHandler(new ShutdownRestartNodeProtocolHandler(node));
@@ -187,7 +204,7 @@ public class NodeRunner {
    * @exclude
    */
   private JPPFNode createNode(final ConnectionContext connectionContext) throws Exception {
-    if (debugEnabled) log.debug("creating node with connectionContext = {}", connectionContext);
+    if (debugEnabled) log.debug("creating node with connectionContext = {}, configuration=\n{}", connectionContext, configuration);
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
     SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
@@ -199,7 +216,7 @@ public class NodeRunner {
     final Constructor<?> c = clazz.getConstructor(String.class, TypedProperties.class, DriverConnectionInfo.class);
     final JPPFNode node = (JPPFNode) c.newInstance(uuid, configuration, currentConnectionInfo);
     node.setJPPFClassLoader(loader);
-    if (debugEnabled) log.debug("Created new node instance: " + node);
+    if (debugEnabled) log.debug("Created new node instance: {}, config =\n{}", node, node.getConfiguration());
     return node;
   }
 

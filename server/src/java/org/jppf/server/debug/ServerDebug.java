@@ -21,6 +21,7 @@ package org.jppf.server.debug;
 import java.nio.channels.*;
 import java.util.*;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.scripting.*;
 import org.jppf.server.JPPFDriver;
@@ -283,9 +284,17 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
-    final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("serverDebug", ServerDebug.this); }};
-    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script with binding=%s:%n%s", language, bindings, script));
-    return new ScriptDefinition(language, script, bindings).evaluate();
+    try {
+      final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("serverDebug", ServerDebug.this); }};
+      if (log.isTraceEnabled()) log.trace("request to execute {} script with binding={}:\n{}", language, bindings, script);
+      final Object result = new ScriptDefinition(language, script, bindings).evaluate();
+      if (log.isTraceEnabled()) log.trace("script execution result: {}", result);
+      return result;
+    } catch (final JPPFScriptingException e) {
+      throw e;
+    } catch (final Throwable e) {
+      throw new JPPFRuntimeException(e);
+    }
   }
 
   @Override

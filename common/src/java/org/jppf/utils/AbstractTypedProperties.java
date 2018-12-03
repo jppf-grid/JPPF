@@ -33,6 +33,10 @@ public abstract class AbstractTypedProperties extends Properties {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * The default (initial) properties, if any.
+   */
+  private AbstractTypedProperties initialProps;
 
   /**
    * Default constructor.
@@ -54,21 +58,6 @@ public abstract class AbstractTypedProperties extends Properties {
   }
 
   /**
-   * Convert this set of properties into a string.
-   * @return a representation of this object as a string.
-   */
-  public String asString() {
-    String result = "";
-    try (final Writer writer = new StringWriter()) {
-      store(writer, null);
-      result = writer.toString();
-    } catch(final Exception e) {
-      return String.format("error converting properties to string: %s", e);
-    }
-    return result;
-  }
-
-  /**
    * Load the properties from the specified reader.
    * The properties are first loaded, then includes are resolved, variable substitutions are resolved, and finally scripted values are computed.
    * @param <T> the type of object returned by this method.
@@ -85,6 +74,30 @@ public abstract class AbstractTypedProperties extends Properties {
   }
 
   /**
+   * Convert this set of properties into a string.
+   * @return a representation of this object as a string.
+   */
+  public String asString() {
+    return asString(null);
+  }
+
+  /**
+   * Convert this set of properties into a string.
+   * @param delimiter the delimiter between two properties definitions.
+   * @return a representation of this object as a string.
+   */
+  public String asString(final String delimiter) {
+    String result = "";
+    try (final Writer writer = new StringWriter()) {
+      store(writer, null);
+      result = writer.toString();
+    } catch(final Exception e) {
+      return String.format("error converting properties to string: %s", e);
+    }
+    return (delimiter == null) ? result : result.replace("\n", delimiter);
+  }
+
+  /**
    * Populate this propertis object from a string source.
    * @param <T> the type of object returned by this method.
    * @param source the source to read the properties from.
@@ -92,10 +105,66 @@ public abstract class AbstractTypedProperties extends Properties {
    */
   @SuppressWarnings("unchecked")
   public <T extends AbstractTypedProperties> T fromString(final String source) {
+    return fromString(source, null);
+  }
+
+  /**
+   * Populate this propertis object from a string source.
+   * @param <T> the type of object returned by this method.
+   * @param source the source to read the properties from.
+   * @param delimiter the delimiter between two properties definitions.
+   * @return this properties object.
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends AbstractTypedProperties> T fromString(final String source, final String delimiter) {
     clear();
-    try (Reader reader = new StringReader(source)) {
+    try (final Reader reader = new StringReader((delimiter == null) ? source : source.replace(delimiter, "\n"))) {
       loadAndResolve(reader);
-    } catch (@SuppressWarnings("unused") final Exception e) { }
+    } catch (@SuppressWarnings("unused") final Exception e) {
+    }
     return (T) this;
+  }
+
+  /**
+   * 
+   * @return the default (initial) properties, if any.
+   * @exclude
+   */
+  public AbstractTypedProperties getDefaults() {
+    return initialProps;
+  }
+
+  /**
+   * @param defaults the default (initial) properties, if any.
+   * @exclude
+   */
+  public void setDefaults(final AbstractTypedProperties defaults) {
+    this.initialProps = defaults;
+  }
+
+  /**
+   * @exclude
+   */
+  public void reset() {
+    if (initialProps != null) {
+      clear();
+      putAll(initialProps);
+    }
+  }
+
+  @Override
+  public synchronized String toString() {
+    final Set<String> set = new TreeSet<>();
+    forEach((k, v) -> {
+      if ((k instanceof String) && (v instanceof String)) set.add((String) k + '=' + v);
+    });
+    final StringBuilder sb = new StringBuilder("{");
+    int count = 0;
+    for (final String s: set) {
+      if (count > 0) sb.append(", ");
+      sb.append(s);
+      count++;
+    }
+    return sb.append('}').toString();
   }
 }

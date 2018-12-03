@@ -175,9 +175,10 @@ public class TestMultiServer extends AbstractNonStandardSetup {
     final LoadBalancingInformation lbi = client.getLoadBalancerSettings();
     final Map<JMXDriverConnectionWrapper, LoadBalancingInformation> lbiMap = new HashMap<>();
     try {
-      final TypedProperties props = new TypedProperties().setInt("performanceCacheSize", 1000).setInt("proportionalityFactor", 1).setInt("initialSize", 10).setDouble("initialMeanTime", 3e10);
-      client.setLoadBalancerSettings("proportional", props);
-      final TypedProperties propsDriver = new TypedProperties().setInt("size", 10);
+      //final TypedProperties props = new TypedProperties().setInt("performanceCacheSize", 1000).setInt("proportionalityFactor", 1).setInt("initialSize", 10).setDouble("initialMeanTime", 3e10);
+      //client.setLoadBalancerSettings("proportional", props);
+      client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 10));
+      final TypedProperties propsDriver = new TypedProperties().setInt("size", 5);
       final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.EQUAL, 2, Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.workingStatuses());
       for (final JPPFConnectionPool pool: pools) {
         final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();

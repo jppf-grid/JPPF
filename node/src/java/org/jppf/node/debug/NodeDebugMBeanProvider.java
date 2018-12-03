@@ -20,7 +20,6 @@ package org.jppf.node.debug;
 
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.Node;
-import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.JPPFProperties;
 
 /**
@@ -42,7 +41,7 @@ public class NodeDebugMBeanProvider implements JPPFNodeMBeanProvider {
 
   @Override
   public Object createMBean(final Node node) {
-    return JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED) ? new NodeDebug(node) : null;
+    return node.getConfiguration().get(JPPFProperties.DEBUG_ENABLED) ? new NodeDebug(node) : null;
   }
 
   @Override

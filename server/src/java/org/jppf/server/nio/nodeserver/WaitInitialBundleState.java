@@ -112,7 +112,10 @@ class WaitInitialBundleState extends NodeServerState {
         if ((systemInfo != null) && (systemInfo.getJppf().get(JPPFProperties.NODE_ANDROID))) type |= JPPFManagementInfo.ANDROID;
         final JPPFManagementInfo info = new JPPFManagementInfo(hostIP.hostName(), hostIP.ipAddress(), port, uuid, type, sslEnabled, masterUuid);
         if (debugEnabled) log.debug("configuring management for node {}", info);
-        if (systemInfo != null) info.setSystemInfo(systemInfo);
+        if (systemInfo != null) {
+          info.setSystemInfo(systemInfo);
+          if (debugEnabled) log.debug("node has following configuration:\n{}", systemInfo.getJppf());
+        }
         context.setManagementInfo(info);
       } else {
         if (offline || (port < 0)) {

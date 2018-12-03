@@ -231,13 +231,15 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
     if (configOverrides == null) return;
-    if (debugEnabled) log.debug("node request to change configuration, restart={}, interruptIfRunning={}", restart, interruptIfRunning);
+    if (debugEnabled) log.debug("node request to change configuration, restart={}, interruptIfRunning={}, configOverrides={}", restart, interruptIfRunning, configOverrides);
     // we don't allow the node uuid to be overriden
     if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
-    final TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
-    node.getConfiguration().putAll(overrides);
-    new ConfigurationOverridesHandler().save(overrides);
-    node.triggerConfigChanged();
+    if (!configOverrides.isEmpty()) {
+      final TypedProperties overrides = new TypedProperties(configOverrides);
+      new ConfigurationOverridesHandler(node.getConfiguration()).save(overrides);
+      node.getConfiguration().putAll(overrides);
+      node.triggerConfigChanged();
+    }
     //if (restart) triggerReconnect();
     if (restart) shutdownOrRestart(interruptIfRunning, true);
   }
