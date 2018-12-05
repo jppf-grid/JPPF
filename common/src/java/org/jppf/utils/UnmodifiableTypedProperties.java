@@ -23,10 +23,11 @@ import java.util.*;
 
 /**
  * This class is an extension of {@link TypedProperties} which does not allow modifying the properties it contains.
- * The methods in the super class that modify the properties have been overriden such that they do nothing, without
- * rasing any exception.
+ * The methods in the super class that modify the properties have been overriden such that they do nothing, without rasing any exception.
+ * @deprecated this class is no longer useful, use its superclass {@link TypedProperties} instead.
  * @author Laurent Cohen
  */
+@Deprecated
 public class UnmodifiableTypedProperties extends TypedProperties {
   /**
    * Explicit serialVersionUID.

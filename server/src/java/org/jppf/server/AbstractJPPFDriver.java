@@ -146,7 +146,7 @@ abstract class AbstractJPPFDriver {
     this.uuid = (s = configuration.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-    new OutputRedirectHook().initializing(new UnmodifiableTypedProperties(configuration));
+    new OutputRedirectHook().initializing(configuration);
     VersionUtils.logVersionInformation("driver", uuid);
     SystemUtils.printPidAndUuid("driver", uuid);
     statistics = createServerStatistics();

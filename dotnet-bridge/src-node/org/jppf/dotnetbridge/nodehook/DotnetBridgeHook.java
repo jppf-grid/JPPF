@@ -31,7 +31,7 @@ import org.jppf.utils.*;
  */
 public class DotnetBridgeHook implements InitializationHook {
   @Override
-  public void initializing(final UnmodifiableTypedProperties config) {
+  public void initializing(final TypedProperties config) {
     if (!SystemUtils.isWindows()) return;
     try {
       //Bridge.setDebug(true);

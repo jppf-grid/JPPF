@@ -205,7 +205,7 @@ public class NodeRunner {
    */
   private JPPFNode createNode(final ConnectionContext connectionContext) throws Exception {
     if (debugEnabled) log.debug("creating node with connectionContext = {}, configuration=\n{}", connectionContext, configuration);
-    HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
+    HookFactory.invokeHook(InitializationHook.class, "initializing", initialConfig);
     SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();

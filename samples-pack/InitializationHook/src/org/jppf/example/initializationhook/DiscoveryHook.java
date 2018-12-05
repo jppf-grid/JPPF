@@ -39,11 +39,15 @@ public class DiscoveryHook implements InitializationHook {
   /**
    * The currently configured server.
    */
-  private String currentServer = null;
+  private String currentServer;
   /**
    * The next server, to which the node will fall back if the current server fails.
    */
-  private String nextServer = null;
+  private String nextServer;
+  /**
+   * The JPPF configuration passed on to this initialization hook.
+   */
+  private TypedProperties jppfConfig;
 
   /**
    * This method is called at node startup and each time the connection to the driver fails,
@@ -51,7 +55,7 @@ public class DiscoveryHook implements InitializationHook {
    * @param initialConfiguration the initial configuration, such as read from the config file or configuration input source.
    */
   @Override
-  public void initializing(final UnmodifiableTypedProperties initialConfiguration) {
+  public void initializing(final TypedProperties initialConfiguration) {
     // fetch the server to configure and put it back to the tail of the queue
     currentServer = servers.poll();
     servers.offer(currentServer);
@@ -93,8 +97,7 @@ public class DiscoveryHook implements InitializationHook {
    * Set the specified server config in the current JPPF configuration.
    * @param server the server to configure.
    */
-  private static void configureServer(final String server) {
-    final TypedProperties jppfConfig = JPPFConfiguration.getProperties();
+  private void configureServer(final String server) {
     final String[] tokens = server.split(":");
     // modify the node configuration so it will ocnnect to the specified server
     jppfConfig.setProperty("jppf.server.host", tokens[0]);

@@ -41,7 +41,7 @@ public class OutputRedirectHook implements InitializationHook {
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   @Override
-  public void initializing(final UnmodifiableTypedProperties config) {
+  public void initializing(final TypedProperties config) {
     handleStream(config, true);
     handleStream(config, false);
   }
@@ -51,7 +51,7 @@ public class OutputRedirectHook implements InitializationHook {
    * @param config the un-modified configuration properties of the node at startup time.
    * @param isOut whetehr to handle the output console (System.out) or the error console (System.err).
    */
-  private static void handleStream(final UnmodifiableTypedProperties config, final boolean isOut) {
+  private static void handleStream(final TypedProperties config, final boolean isOut) {
     try {
       final JPPFProperty<File> pathProp = isOut ? JPPFProperties.REDIRECT_OUT : JPPFProperties.REDIRECT_ERR;
       final File outFile = config.get(pathProp);

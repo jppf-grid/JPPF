@@ -36,8 +36,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @since 4.0
  */
-public class ScreenSaverMain implements InitializationHook
-{
+public class ScreenSaverMain implements InitializationHook {
   /**
    * The singleton instance of this class.
    */
@@ -65,7 +64,7 @@ public class ScreenSaverMain implements InitializationHook
   }
 
   @Override
-  public void initializing(final UnmodifiableTypedProperties initialConfiguration) {
+  public void initializing(final TypedProperties initialConfiguration) {
     try {
       if (instance != null) return;
       if (initialConfiguration.get(SCREENSAVER_ENABLED)) startScreenSaver(initialConfiguration);
@@ -139,11 +138,7 @@ public class ScreenSaverMain implements InitializationHook
     frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
-    java.awt.EventQueue.invokeLater(new Runnable() {
-      @Override public void run() {
-        frame.toFront();
-      }
-    });
+    java.awt.EventQueue.invokeLater(() -> frame.toFront());
   }
 
   /**

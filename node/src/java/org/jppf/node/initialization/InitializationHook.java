@@ -18,21 +18,32 @@
 
 package org.jppf.node.initialization;
 
-import org.jppf.utils.UnmodifiableTypedProperties;
+import org.jppf.utils.*;
 
 /**
  * Interface for custom discovery of the driver to connect to.
- * <p>By definition, an initialization hook must be deployed in the node's classpath,
- * since it must be known before the node connects to the driver, which means that
- * it cannot be downloaded from the driver.
+ * <p>By definition, an initialization hook must be deployed in the node's classpath, since it must be known before the node connects to the driver, which means that it cannot be downloaded from the driver.
  * @author Laurent Cohen
  */
-public interface InitializationHook
-{
+public interface InitializationHook {
   /**
    * This method is called each time the node is about to attempt to connect to a driver.
-   * It can be used to modify the current configuration via {@link org.jppf.utils.JPPFConfiguration#getProperties()}.
+   * The provided configuration can be modified.
    * @param initialConfiguration the un-modified configuration properties of the node at startup time.
+   * @deprecated the class {@link UnmodifiableTypedProperties} is deprecated, use {@link #initializing(TypedProperties)} instead.
+   * @exclude
    */
-  void initializing(UnmodifiableTypedProperties initialConfiguration);
+  @Deprecated
+  default void initializing(UnmodifiableTypedProperties initialConfiguration) {
+  }
+
+  /**
+   * This method is called each time the node is about to attempt to connect to a driver.
+   * The provided configuration can be modified.
+   * @param initialConfiguration the configuration properties of the node at startup time.
+   */
+  @SuppressWarnings("deprecation")
+  default void initializing(final TypedProperties initialConfiguration) {
+    initializing(new UnmodifiableTypedProperties(initialConfiguration));
+  };
 }
