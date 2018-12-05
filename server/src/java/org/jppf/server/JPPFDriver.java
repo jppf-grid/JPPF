@@ -19,7 +19,7 @@ package org.jppf.server;
 
 import java.util.Timer;
 
-import org.jppf.*;
+import org.jppf.JPPFException;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.discovery.PeerDriverDiscovery;
@@ -62,6 +62,10 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * Determines whether debug-level logging is enabled.
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Whether the driver was started via the {@link #main(Sttring[]) main()} method.
+   */
+  private static boolean startedfromMain = false;
 
   /**
    * Initialize this JPPFDriver.
@@ -199,9 +203,9 @@ public class JPPFDriver extends AbstractJPPFDriver {
     try {
       if (debugEnabled) log.debug("starting the JPPF driver");
       if ((args == null) || (args.length <= 0)) throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
+      startedfromMain = true;
       if (!"noLauncher".equals(args[0])) new LauncherListener(Integer.parseInt(args[0])).start();
-      final JPPFDriver driver = new JPPFDriver(JPPFConfiguration.getProperties());
-      driver.run();
+      new JPPFDriver(JPPFConfiguration.getProperties()).start();
     } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
@@ -308,7 +312,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
     if (debugEnabled) log.debug("closing client job server");
     if (asyncClientNioServer != null) asyncClientNioServer.shutdown();
     if (debugEnabled) log.debug("closing global executor");
-    NioHelper.shutdown(true);
+    if (startedfromMain) NioHelper.shutdown(true);
     if (debugEnabled) log.debug("closing broadcaster");
     initializer.stopBroadcaster();
     if (debugEnabled) log.debug("stopping peer discovery");

@@ -18,6 +18,7 @@
 
 package org.jppf.utils.hooks;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import org.jppf.utils.*;
@@ -81,8 +82,36 @@ public class Hook<E> {
 
   /**
    * Register a hook defined via a configuration property, of which a single instance is discovered and invoked.
+   * @param property the name of the property used to specify the hook implementation class name.
    * @param infClass the class of the hook's interface.
    * @param defaultImpl the default implementation, which may be null.
+   * @param loader the class loader used to load the implemntation.
+   * @param paramTypes types of the parameters to pass to the constructor.
+   * @param params the parameters to pass to the constructor.
+   */
+  @SuppressWarnings("unchecked")
+  public Hook(final JPPFProperty<String> property, final Class<E> infClass, final E defaultImpl, final ClassLoader loader, final Class<?>[] paramTypes, final Object...params) {
+    if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
+    this.infName = infClass.getName();
+    this.type = HookType.CONFIG_SINGLE_INSTANCE;
+    final ClassLoader cl = findClassLoader(loader);
+    final String fqn = JPPFConfiguration.get(property);
+    if ((fqn != null) && !"".equals(fqn.trim())) {
+      try {
+        final Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
+        final Constructor<E> c = (Constructor<E>) ReflectionHelper.findConstructor(clazz, paramTypes);
+        processConcreteInstance((c == null) ? clazz.newInstance() : c.newInstance(params), false);
+      } catch (final Exception e) {
+        log.warn("failed to instantiate concrete class for {}, {}={}, exception=\n{}", this, property, fqn, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    processConcreteInstance(defaultImpl, true);
+  }
+
+  /**
+   * Register a hook defined via SPI.
+   * @param infClass the class of the hook's interface.
+   * @param defaultImpl the default implementation, which may be {@code null}.
    * @param loader the class loader used to load the implemntation.
    * @param single determines whether only the first looked up implementation should be used, or all the instances found.
    */
@@ -93,6 +122,37 @@ public class Hook<E> {
     final ClassLoader cl = findClassLoader(loader);
     final Iterator<E> it = ServiceFinder.lookupProviders(infClass, cl, single);
     while (it.hasNext()) processConcreteInstance(it.next(), false);
+    processConcreteInstance(defaultImpl, true);
+  }
+
+  /**
+   * Register a hook defined via SPI.
+   * @param infClass the class of the hook's interface.
+   * @param defaultImpl the default implementation, which may be {@code null}.
+   * @param loader the class loader used to load the implemntation.
+   * @param single determines whether only the first looked up implementation should be used, or all the instances found.
+   * @param paramTypes types of the parameters to pass to the constructor.
+   * @param params the parameters to pass to the constructor.
+   */
+  @SuppressWarnings("unchecked")
+  public Hook(final Class<E> infClass, final E defaultImpl, final ClassLoader loader, final boolean single, final Class<?>[] paramTypes, final Object...params) {
+    if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
+    this.infName = infClass.getName();
+    this.type = single ? HookType.SPI_SINGLE_INSTANCE : HookType.SPI_MULTIPLE_INSTANCES;
+    final ClassLoader cl = findClassLoader(loader);
+    final List<String> implClassNames = new ServiceFinder().findServiceDefinitions("META-INF/services/" + infClass.getName(), cl);
+    for (int i=0; i<implClassNames.size(); i++) {
+      if (single && i > 0) break;
+      final String name = implClassNames.get(i);
+      try {
+        final Class<E> clazz = (Class<E>) Class.forName(name, true, cl);
+        final Constructor<E> c = (Constructor<E>) ReflectionHelper.findConstructor(clazz, paramTypes);
+        processConcreteInstance((c == null) ? clazz.newInstance() : c.newInstance(params), false);
+      } catch(final Exception e) {
+        log.warn("error instantiating class '{}' implementing interface '{}', with single={}\nparamTypes={}\nparams={}\n{}",
+          name, infClass.getName(), single, Arrays.toString(paramTypes), Arrays.toString(params), ExceptionUtils.getStackTrace(e));
+      }
+    }
     processConcreteInstance(defaultImpl, true);
   }
 

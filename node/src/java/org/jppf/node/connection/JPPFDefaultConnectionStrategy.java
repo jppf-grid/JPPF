@@ -34,10 +34,30 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFDefaultConnectionStrategy.class);
+  /**
+   * The node configuration.
+   */
+  private final TypedProperties config;
+
+  /**
+   * Create this connection strategy.
+   */
+  public JPPFDefaultConnectionStrategy() {
+    this(JPPFConfiguration.getProperties());
+    log.info("created {} with global config", getClass().getSimpleName());
+  }
+
+  /**
+   * Create this connection strategy.
+   * @param config the node configuration.
+   */
+  public JPPFDefaultConnectionStrategy(final TypedProperties config) {
+    this.config = config;
+  }
 
   @Override
   public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
-    return JPPFConfiguration.get(JPPFProperties.DISCOVERY_ENABLED) ? discoverDriver() : connectionFromManualConfiguration();
+    return config.get(JPPFProperties.DISCOVERY_ENABLED) ? discoverDriver() : connectionFromManualConfiguration();
   }
 
   /**
@@ -47,8 +67,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
    * the static information in the configuration file.
    * @return the discovered connection information.
    */
-  private static DriverConnectionInfo discoverDriver() {
-    final TypedProperties config = JPPFConfiguration.getProperties();
+  private DriverConnectionInfo discoverDriver() {
     final JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));
     final JPPFConnectionInformation info = receiver.receive();
     receiver.setStopped(true);
@@ -66,8 +85,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
    * Determine the connection information specified manually in the configuration.
    * @return the configured connection information.
    */
-  private static DriverConnectionInfo connectionFromManualConfiguration() {
-    final TypedProperties config = JPPFConfiguration.getProperties();
+  private DriverConnectionInfo connectionFromManualConfiguration() {
     final boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
     final String host = config.get(JPPFProperties.SERVER_HOST);
     final int port = config.get(ssl ? JPPFProperties.SERVER_SSL_PORT_NODE : JPPFProperties.SERVER_PORT);

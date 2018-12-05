@@ -151,7 +151,8 @@ public class NodeRunner {
       VersionUtils.logVersionInformation("node", uuid);
       if (debugEnabled) log.debug("registering hooks");
       HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
-      HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
+      HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(configuration), null,
+        new Class<?>[] { TypedProperties.class}, configuration);
       if ((args != null) && (args.length > 0) && !"noLauncher".equals(args[0])) {
         if (debugEnabled) log.debug("setting up connection with parent process");
         final int port = Integer.parseInt(args[0]);
@@ -201,7 +202,6 @@ public class NodeRunner {
    * @param connectionContext provides context information on the new connection request to the driver.
    * @return the node that was started, as a {@code JPPFNode} instance.
    * @throws Exception if the node failed to run or couldn't connect to the server.
-   * @exclude
    */
   private JPPFNode createNode(final ConnectionContext connectionContext) throws Exception {
     if (debugEnabled) log.debug("creating node with connectionContext = {}, configuration=\n{}", connectionContext, configuration);
@@ -324,11 +324,11 @@ public class NodeRunner {
    */
   public static class ShutdownOrRestart implements Runnable {
     /**
-     * True if the node is to be restarted, false to only shut it down.
+     * {@code true} if the node is to be restarted, {@code false} to only shut it down.
      */
     private boolean restart;
     /**
-     * True if the node is to be restarted, false to only shut it down.
+     * The node to shutdon and/or restart.
      */
     private final NodeInternal node;
 

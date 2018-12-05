@@ -21,7 +21,7 @@ package org.jppf.node.connection;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.jppf.utils.RegexUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,11 +42,24 @@ public abstract class AbstractCsvConnectionStrategy implements DriverConnectionS
    * The fallback strategy to use in case the CSV file is not found or none of the driver defintions it contains is valid. 
    */
   final DriverConnectionStrategy fallbackStrategy;
+  /**
+   * The node configuration.
+   */
+  protected final TypedProperties config;
 
   /**
    * Find and read the CSV data.
    */
   public AbstractCsvConnectionStrategy() {
+    this(JPPFConfiguration.getProperties());
+  }
+
+  /**
+   * Find and read the CSV data.
+   * @param config the node configuration.
+   */
+  public AbstractCsvConnectionStrategy(final TypedProperties config) {
+    this.config = config;
     readAllConnectionInfo();
     fallbackStrategy = queue.isEmpty() ? new JPPFDefaultConnectionStrategy() : null;
     if (log.isDebugEnabled()) {

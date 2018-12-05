@@ -20,7 +20,7 @@ package org.jppf.node.connection;
 
 import java.util.*;
 
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -65,10 +65,18 @@ public class JPPFCsvPropertyConnectionStrategy extends AbstractCsvConnectionStra
     super();
   }
 
+  /**
+   * Find and read the connection information.
+   * @param config the node configuration.
+   */
+  public JPPFCsvPropertyConnectionStrategy(final TypedProperties config) {
+    super(config);
+  }
+
   @Override
   List<String> getConnectionInfoAsLines() {
     try {
-      String content = JPPFConfiguration.getProperties().getString("jppf.server.connection.strategy.definitions");
+      String content = config.getString("jppf.server.connection.strategy.definitions");
       if ((content != null) && !(content = content.trim()).isEmpty()) {
         final String[] lines = content.split("\\|");
         if ((lines != null) && (lines.length > 0)) {

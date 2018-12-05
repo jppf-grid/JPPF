@@ -46,6 +46,22 @@ public class HookFactory {
   }
 
   /**
+   * Register a hook defined via a configuration property, of which a single instance is discovered and invoked.
+   * @param <T> the type of the hook interface.
+   * @param property the name of the property used to specify the hook implementation class name.
+   * @param infClass the class of the hook's interface.
+   * @param defaultImpl the default implementation, which may be null.
+   * @param classLoader the class loader used to load the implementation.
+   * @param paramTypes types of the parameters to pass to the constructor.
+   * @param params the parameters to pass to the constructor.
+   * @return the registered hook as a {@link Hook} instance.
+   */
+  public static <T> Hook<T> registerConfigSingleHook(final JPPFProperty<String> property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader,
+    final Class<?>[] paramTypes, final Object...params) {
+    return register(new Hook<>(property, infClass, defaultImpl, classLoader, paramTypes, params));
+  }
+
+  /**
    * Register a hook defined via SPI, of which a single instance is discovered and invoked.
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
@@ -58,6 +74,20 @@ public class HookFactory {
   }
 
   /**
+   * Register a hook defined via SPI, of which a single instance is discovered and invoked.
+   * @param <T> the type of the hook interface.
+   * @param infClass the class of the hook's interface.
+   * @param defaultImpl the default implementation, which may be null.
+   * @param classLoader the class loader used to load the implementation.
+   * @param paramTypes types of the parameters to pass to the constructor.
+   * @param params the parameters to pass to the constructor.
+   * @return the registered hook as a {@link Hook} instance.
+   */
+  public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader, final Class<?>[] paramTypes, final Object...params) {
+    return register(new Hook<>(infClass, defaultImpl, classLoader, true, paramTypes, params));
+  }
+
+  /**
    * Register a hook defined via SPI, for which all looked up instances are discovered and invoked.
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
@@ -67,6 +97,20 @@ public class HookFactory {
    */
   public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader) {
     return register(new Hook<>(infClass, defaultImpl, classLoader, false));
+  }
+
+  /**
+   * Register a hook defined via SPI, for which all looked up instances are discovered and invoked.
+   * @param <T> the type of the hook interface.
+   * @param infClass the class of the hook's interface.
+   * @param defaultImpl the default implementation, which may be null.
+   * @param classLoader the class loader used to load the implementation.
+   * @param paramTypes types of the parameters to pass to the constructor.
+   * @param params the parameters to pass to the constructor.
+   * @return the registered hook as a {@link Hook} instance.
+   */
+  public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader, final Class<?>[] paramTypes, final Object...params) {
+    return register(new Hook<>(infClass, defaultImpl, classLoader, false, paramTypes, params));
   }
 
   /**

@@ -58,10 +58,18 @@ public class JPPFCsvFileConnectionStrategy extends AbstractCsvConnectionStrategy
     super();
   }
 
+  /**
+   * Find and read the CSV file.
+   * @param config the node configuration.
+   */
+  public JPPFCsvFileConnectionStrategy(final TypedProperties config) {
+    super(config);
+  }
+
   @Override
   List<String> getConnectionInfoAsLines() {
     try {
-      String path = JPPFConfiguration.getProperties().getString("jppf.server.connection.strategy.file");
+      String path = config.getString("jppf.server.connection.strategy.file");
       if ((path != null) && !(path = path.trim()).isEmpty()) {
         final Reader reader = FileUtils.getFileReader(path);
         if (reader != null) return FileUtils.textFileAsLines(reader);
