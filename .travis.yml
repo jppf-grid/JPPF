@@ -5,7 +5,8 @@ language: java
 install: true
 
 before_script:
-  - _JAVA_OPTIONS=
+#  - _JAVA_OPTIONS=
+   - env -u _JAVA_OPTIONS
 
 script:
 - ant build
@@ -14,7 +15,7 @@ script:
 jdk:
   - openjdk8
 
-after_script:
-- curl --ftp-create-dirs
-       -T tests/all_results.zip
-       ${CURL_URL_BASE}/build/all_results_master.zip
+#after_script:
+#- curl --ftp-create-dirs
+#       -T tests/all_results.zip
+#       ${CURL_URL_BASE}/build/all_results_master.zip
