@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.node.NodeRunner;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
@@ -284,21 +283,25 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testTaskResubmit() throws Exception {
-    final int nbTasks = 1;
-    final int nbRuns = 5;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
-    // ensure the job is only executed in a single specific node
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    final String nodeUuid = coll.iterator().next().getUuid();
-    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
-    job.getSLA().setMaxTaskResubmits(Integer.MAX_VALUE);
-    final List<Task<?>> results = client.submitJob(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    final ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertNotNull(task.getResult());
-    assertEquals(Integer.valueOf(nbRuns), task.getResult());
+    try {
+      final int nbTasks = 1;
+      final int nbRuns = 5;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+      // ensure the job is only executed in a single specific node
+      final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+      final String nodeUuid = coll.iterator().next().getUuid();
+      job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+      job.getSLA().setMaxTaskResubmits(Integer.MAX_VALUE);
+      final List<Task<?>> results = client.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      final ResubmittingTask task = (ResubmittingTask) results.get(0);
+      assertNotNull(task.getResult());
+      assertEquals(Integer.valueOf(nbRuns), task.getResult());
+    } finally {
+      resetNodeCOunter();
+    }
   }
 
   /**
@@ -307,22 +310,26 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testMaxTaskResubmits() throws Exception {
-    final int nbTasks = 1;
-    final int maxResubmits = 2;
-    final int nbRuns = 5;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
-    // ensure the job is only executed in a single specific node
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    final String nodeUuid = coll.iterator().next().getUuid();
-    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
-    job.getSLA().setMaxTaskResubmits(maxResubmits);
-    final List<Task<?>> results = client.submitJob(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    final ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertNotNull(task.getResult());
-    assertEquals(Integer.valueOf(maxResubmits + 1), task.getResult());
+    try {
+      final int nbTasks = 1;
+      final int maxResubmits = 2;
+      final int nbRuns = 5;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+      // ensure the job is only executed in a single specific node
+      final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+      final String nodeUuid = coll.iterator().next().getUuid();
+      job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+      job.getSLA().setMaxTaskResubmits(maxResubmits);
+      final List<Task<?>> results = client.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      final ResubmittingTask task = (ResubmittingTask) results.get(0);
+      assertNotNull(task.getResult());
+      assertEquals(Integer.valueOf(maxResubmits + 1), task.getResult());
+    } finally {
+      resetNodeCOunter();
+    }
   }
 
   /**
@@ -331,33 +338,44 @@ public class TestJPPFTask extends Setup1D1N1C {
    */
   @Test(timeout=10000)
   public void testMaxTaskResubmitsWithTaskOverride() throws Exception {
-    final int nbTasks = 1;
-    final int slaMaxResubmits = 2;
-    final int taskMaxResubmits = slaMaxResubmits + 1;
-    final int nbRuns = 5;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
-    job.getJobTasks().get(0).setMaxResubmits(taskMaxResubmits);
-    // ensure the job is only executed in a single specific node
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
-    final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
-    final String nodeUuid = coll.iterator().next().getUuid();
-    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
-    job.getSLA().setMaxTaskResubmits(slaMaxResubmits);
-    final List<Task<?>> results = client.submitJob(job);
-    assertNotNull(results);
-    assertEquals(results.size(), nbTasks);
-    final ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertNotNull(task.getResult());
-    assertEquals(Integer.valueOf(taskMaxResubmits + 1), task.getResult());
+    try {
+      final int nbTasks = 1;
+      final int slaMaxResubmits = 2;
+      final int taskMaxResubmits = slaMaxResubmits + 1;
+      final int nbRuns = 5;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+      job.getJobTasks().get(0).setMaxResubmits(taskMaxResubmits);
+      // ensure the job is only executed in a single specific node
+      final Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+      final String nodeUuid = coll.iterator().next().getUuid();
+      job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+      job.getSLA().setMaxTaskResubmits(slaMaxResubmits);
+      final List<Task<?>> results = client.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      final ResubmittingTask task = (ResubmittingTask) results.get(0);
+      assertNotNull(task.getResult());
+      assertEquals(Integer.valueOf(taskMaxResubmits + 1), task.getResult());
+    } finally {
+      resetNodeCOunter();
+    }
+  }
+
+  /**
+   * Submit a broadcast job that resets {@link ResubmittingTask#counter} to {@code null}.
+   * @throws Exception if any errror occurs.
+   */
+  private static void resetNodeCOunter() throws Exception {
+    print(false, false, "resetting ResubmittingTask.counter to null");
+    client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentClassName() + ":resetCounter", true, false, 1, CounterResetTask.class));
   }
 
   /**
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
     /**
      * The class name for the callable to invoke.
@@ -368,15 +386,12 @@ public class TestJPPFTask extends Setup1D1N1C {
      */
     public String uuidFromNode = null, nodeUuid = null;
 
-    /**
-     * Initialize this task.
-     */
+    /** */
     public MyComputeCallableTask() {
       this.callableClassName = null;
     }
 
     /**
-     * Iitialize this task.
      * @param callableClassName the class name for the callable to invoke.
      */
     public MyComputeCallableTask(final String callableClassName) {
@@ -399,7 +414,7 @@ public class TestJPPFTask extends Setup1D1N1C {
           printOut("isInNode() = %b", b);
           setResult(b);
         }
-        nodeUuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid");
+        nodeUuid = isInNode() ? getNode().getConfiguration().getString("jppf.node.uuid") : JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         if (isInNode()) uuidFromNode = getNode().getUuid();
         printOut("this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
       } catch (final Exception e) {
@@ -412,9 +427,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A simple <code>JPPFCallable</code>.
    */
   public static class MyComputeCallable implements JPPFCallable<String> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -428,9 +441,7 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A <code>JPPFCallable</code> whixh throws an exception in its <code>call()</code> method..
    */
   public static class MyExceptionalCallable implements JPPFCallable<String> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -461,12 +472,10 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
 
   /**
-   * An extension of LifeCycleTask which sets the result before calling {@link super.run()}.
+   * An extension of LifeCycleTask which sets the result before calling {code super.run()}.
    */
   public static class MyTask extends LifeCycleTask {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
     /**
@@ -486,31 +495,21 @@ public class TestJPPFTask extends Setup1D1N1C {
 
   /** */
   public static class NotifyingTask extends AbstractTask<Object> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
     @Override
     public void run() {
       for (int i=1; i<=3; i++) {
         final int n = i;
-        final Callable<Object> callable = new Callable<Object>() {
-          @Override
-          public Object call() throws Exception {
-            return "task notification " + n;
-          }
-        };
-        fireNotification(callable, false);
+        fireNotification((Callable<Object>) () -> "task notification " + n, false);
       }
     }
   }
 
   /** */
   public static class NotifyingTask2 extends AbstractTask<Object> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -526,14 +525,14 @@ public class TestJPPFTask extends Setup1D1N1C {
    * until the counter has reached a specified value.
    */
   public static class ResubmittingTask extends AbstractTask<Integer> {
-    /**
-     * Explicit serialVersionUID.
-     */
+    /** */
     private static final long serialVersionUID = 1L;
     /**
      * Maximum number of runs for this task = max resubmit + 1.
      */
     private final int nbRuns;
+    /** */
+    public static AtomicInteger counter;
 
     /**
      * Initialie this task.
@@ -545,16 +544,27 @@ public class TestJPPFTask extends Setup1D1N1C {
 
     @Override
     public void run() {
-      final String key = getId() + "counter";
-      AtomicInteger counter = (AtomicInteger) NodeRunner.getPersistentData(key);
       if (counter == null) {
+        System.out.printf("ResubmittingTask: creating counter\n");
         counter = new AtomicInteger(0);
-        NodeRunner.setPersistentData(key, counter);
       }
       final int n = counter.incrementAndGet();
+      System.out.printf("ResubmittingTask: counter = %d\n", n);
       if (n < nbRuns) setResubmit(true);
-      else NodeRunner.removePersistentData(key);
+      else counter = null;
+      System.out.printf("ResubmittingTask: resubmit = %b\n", isResubmit());
       setResult(n);
+    }
+  }
+
+  /** */
+  public static class CounterResetTask extends AbstractTask<Object> {
+    /** */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void run() {
+      ResubmittingTask.counter = null;
     }
   }
 }

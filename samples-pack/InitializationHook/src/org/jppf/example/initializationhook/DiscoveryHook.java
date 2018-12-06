@@ -21,9 +21,8 @@ package org.jppf.example.initializationhook;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.jppf.node.NodeRunner;
 import org.jppf.node.initialization.InitializationHook;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * A node initialization hook that implements a simple failover scheme for the connection to a driver.
@@ -35,15 +34,11 @@ public class DiscoveryHook implements InitializationHook {
   /**
    * A queue containing an ordered set of servers to connect/fallback to.
    */
-  private Queue<String> servers = populateServers();
+  private static Queue<String> serversQueue;
   /**
    * The currently configured server.
    */
   private String currentServer;
-  /**
-   * The next server, to which the node will fall back if the current server fails.
-   */
-  private String nextServer;
   /**
    * The JPPF configuration passed on to this initialization hook.
    */
@@ -56,41 +51,38 @@ public class DiscoveryHook implements InitializationHook {
    */
   @Override
   public void initializing(final TypedProperties initialConfiguration) {
+    jppfConfig = initialConfiguration;
+    populateServers();
     // fetch the server to configure and put it back to the tail of the queue
-    currentServer = servers.poll();
-    servers.offer(currentServer);
-    nextServer = servers.peek();
+    currentServer = serversQueue.poll();
+    serversQueue.offer(currentServer);
     configureServer(currentServer);
-    // save the current and next server so they can be used by other plugins
-    NodeRunner.setPersistentData("current.server", currentServer);
-    NodeRunner.setPersistentData("next.server", nextServer);
   }
 
   /**
    * Read the servers from the configuration.
    * @return a {@link Queue} of <i<>host:port</i> strings.
    */
-  private static Queue<String> populateServers() {
-    @SuppressWarnings("unchecked")
-    Queue<String> queue = (Queue<String>) NodeRunner.getPersistentData("jppf.servers");
-    if (queue == null) {
-      queue = new ConcurrentLinkedQueue<>();
-      // servers are configured via the property "jppf.drivers.discovery" in the node's configuration
-      final String s = JPPFConfiguration.getProperties().getString("jppf.drivers.discovery", "").trim();
-      if (!"".equals(s)) {
-        // servers are defined as a space-separated list of host:port strings
-        // this defines both the servers and the order in which the node will try
-        // to connect to them.
-        final String[] ids = s.split("\\s");
-        System.out.println("*** found " + ids.length + " servers ***");
-        for (final String id : ids) {
-          queue.offer(id);
-          System.out.println("  registered server " + id);
+  private Queue<String> populateServers() {
+    synchronized(getClass()) {
+      if (serversQueue == null) {
+        serversQueue = new ConcurrentLinkedQueue<>();
+        // servers are configured via the property "jppf.drivers.discovery" in the node's configuration
+        final String s = jppfConfig.getString("jppf.drivers.discovery", "").trim();
+        if (!s.isEmpty()) {
+          // servers are defined as a space-separated list of host:port strings
+          // this defines both the servers and the order in which the node will try
+          // to connect to them.
+          final String[] ids = s.split("\\s");
+          System.out.println("*** found " + ids.length + " servers ***");
+          for (final String id : ids) {
+            serversQueue.offer(id);
+            System.out.println("  registered server " + id);
+          }
         }
       }
-      NodeRunner.setPersistentData("jppf.servers", queue);
     }
-    return queue;
+    return serversQueue;
   }
 
   /**

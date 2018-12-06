@@ -44,7 +44,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   /**
    * The icon displayed in the system tray.
    */
-  private TrayIcon trayIcon = null;
+  private static TrayIcon trayIcon;
   /**
    * The icons displayed.
    */
@@ -52,11 +52,11 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   /**
    * The wrapper used to access management functionalities.
    */
-  private JMXNodeConnectionWrapper wrapper = null;
+  private JMXNodeConnectionWrapper wrapper;
   /**
    * Proxy to the task monitor MBean.
    */
-  private JPPFNodeTaskMonitorMBean taskMonitor = null;
+  private JPPFNodeTaskMonitorMBean taskMonitor;
   /**
    * Used to synchronize tooltip and icon updates.
    */
@@ -64,22 +64,25 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   /**
    * The JMX server used by the node for management and monitoring.
    */
-  private JMXServer jmxServer = null;
+  private JMXServer jmxServer;
 
   /**
    * Default constructor.
    */
   public NodeSystemTray() {
     try {
-      final SystemTray tray = SystemTray.getSystemTray();
-      final TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
-      if (oldTrayIcon != null) tray.remove(oldTrayIcon);
-      trayIcon = new TrayIcon(images[1]);
-      trayIcon.setImageAutoSize(true);
-      tray.add(trayIcon);
-      NodeRunner.setPersistentData("JPPFNodeTrayIcon", trayIcon);
       initJMX();
-      trayIcon.setToolTip(generateTooltipText());
+      final SystemTray tray = SystemTray.getSystemTray();
+      lock.lock();
+      try {
+        if (trayIcon != null) tray.remove(trayIcon);
+        trayIcon = new TrayIcon(images[1]);
+        trayIcon.setImageAutoSize(true);
+        tray.add(trayIcon);
+        trayIcon.setToolTip(generateTooltipText());
+      } finally {
+        lock.unlock();
+      }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -91,8 +94,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   private void initJMX() {
     try {
       wrapper = new JMXNodeConnectionWrapper();
-      wrapper.connectAndWait(5000);
-      trayIcon.setImage(images[1]);
+      wrapper.connectAndWait(5000L);
       taskMonitor = wrapper.getJPPFNodeTaskMonitorProxy();
       taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
     } catch (final Exception e) {

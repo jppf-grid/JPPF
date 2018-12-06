@@ -230,8 +230,6 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> PARAM_PEER_RECOVERY_ENABLED = new BooleanProperty("jppf.peer.<peer_name>.recovery.enabled", false);
   /** Heartbeat enabled flag for a manually configured peer client connection (parametrized). */
   public static final JPPFProperty<Boolean> PARAM_RECOVERY_ENABLED = new BooleanProperty("<driver_name>.jppf.recovery.enabled", false);
-  /** Path to the security policy file. */
-  public static final JPPFProperty<String> POLICY_FILE = new StringProperty("jppf.policy.file", null);
   /** Connection pool size for server connections discovered via UDP multicast. */
   public static final JPPFProperty<Integer> POOL_SIZE = new IntProperty("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
   /** Manually defined maximum number of jobs that can be handled concurrently by a single connection. */

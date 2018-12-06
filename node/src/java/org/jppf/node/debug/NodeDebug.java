@@ -64,8 +64,13 @@ public class NodeDebug implements NodeDebugMBean {
 
   @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
-    final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("node", node); }};
-    if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
-    return new ScriptDefinition(language, script, bindings).evaluate();
+    try {
+      final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("node", node); }};
+      if (log.isTraceEnabled()) log.trace(String.format("request to execute %s script:%n%s", language, script));
+      return new ScriptDefinition(language, script, bindings).evaluate();
+    } catch (final JPPFScriptingException e) {
+      log.error("error exeuting script: ", e);
+      throw e;
+    }
   }
 }

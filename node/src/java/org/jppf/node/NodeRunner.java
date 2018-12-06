@@ -19,7 +19,7 @@ package org.jppf.node;
 
 import java.lang.reflect.Constructor;
 import java.security.*;
-import java.util.*;
+import java.util.Map;
 
 import org.jppf.*;
 import org.jppf.classloader.*;
@@ -27,7 +27,6 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.node.connection.*;
 import org.jppf.node.initialization.InitializationHook;
 import org.jppf.process.LauncherListener;
-import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.*;
@@ -51,14 +50,6 @@ public class NodeRunner {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Determine whether a security manager has already been set.
-   */
-  private static boolean securityManagerSet = false;
-  /**
-   * Container for data stored at the JVM level.
-   */
-  private static Hashtable<Object, Object> persistentData = new Hashtable<>();
   /**
    * The ClassLoader used for loading the classes of the framework.
    */
@@ -185,7 +176,6 @@ public class NodeRunner {
           if (classLoader != null) classLoader.close();
           classLoader = null;
           if (node != null) node.stopNode();
-          unsetSecurity();
         } finally {
           if ((node == null) || node.getShuttingDown().get()) break;
         }
@@ -208,7 +198,6 @@ public class NodeRunner {
     HookFactory.invokeHook(InitializationHook.class, "initializing", initialConfig);
     SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
-    setSecurity();
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     final String className = configuration.get(JPPFProperties.NODE_CLASS);
     final AbstractJPPFClassLoader loader = getJPPFClassLoader();
@@ -233,37 +222,6 @@ public class NodeRunner {
   }
 
   /**
-   * Set the security manager with the permissions granted in the policy file.
-   * @throws Exception if the security could not be set.
-   */
-  private void setSecurity() throws Exception {
-    if (!securityManagerSet) {
-      final String s = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
-      if (s != null) {
-        if (debugEnabled) log.debug("setting security");
-        Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));
-        System.setSecurityManager(new SecurityManager());
-        securityManagerSet = true;
-      }
-    }
-  }
-
-  /**
-   * Set the security manager with the permissions granted in the policy file.
-   */
-  private static void unsetSecurity() {
-    if (securityManagerSet) {
-      if (debugEnabled) log.debug("un-setting security");
-      final PrivilegedAction<Object> action = () -> {
-        System.setSecurityManager(null);
-        return null;
-      };
-      AccessController.doPrivileged(action);
-      securityManagerSet = false;
-    }
-  }
-
-  /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @return a {@code AbstractJPPFClassLoader} used for loading the classes of the framework.
    * @exclude
@@ -278,33 +236,6 @@ public class NodeRunner {
       }
       return classLoader;
     }
-  }
-
-  /**
-   * Set a persistent object with the specified key.
-   * @param key the key associated with the object's value.
-   * @param value the object to persist.
-   */
-  public static void setPersistentData(final Object key, final Object value) {
-    persistentData.put(key, value);
-  }
-
-  /**
-   * Get a persistent object given its key.
-   * @param key the key used to retrieve the persistent object.
-   * @return the value associated with the key.
-   */
-  public static Object getPersistentData(final Object key) {
-    return persistentData.get(key);
-  }
-
-  /**
-   * Remove a persistent object.
-   * @param key the key associated with the object to remove.
-   * @return the value associated with the key, or null if the key was not found.
-   */
-  public static Object removePersistentData(final Object key) {
-    return persistentData.remove(key);
   }
 
   /**
