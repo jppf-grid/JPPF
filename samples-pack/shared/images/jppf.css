@@ -1,6 +1,6 @@
 /*
   JPPF
-  Copyright (C) 2005-2013 JPPF Team. 
+  Copyright (C) 2005-2018 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,11 +27,11 @@ a { text-decoration: none; font-weight: normal; }
 a:hover { text-decoration: underline; color: red; }
 div { margin: 0px; padding; 0px; }
 
-.gwrapper { width: 900px; max-width: 900px; background: white; }
+.gwrapper { width: 1024px; max-width: 1024px; background: white; }
 .sidebar  { width:  90px; float: left; padding-left: 0px; background-color: white; }
 
 .jppf_content {
-  width: 766px;
+  width: 890px;
   float: right;
   padding-left: 10px;
   padding-right: 10px;
@@ -40,12 +40,12 @@ div { margin: 0px; padding; 0px; }
 }
 
 .column_right {
-  width: 373px;
+  width: 435px;
   float: right;
 }
 
 .column_left  {
-  width: 373px;
+  width: 435px;
   float: left;
 }
 .jppfheader { background: #E8EAFD; }
@@ -53,7 +53,7 @@ div { margin: 0px; padding; 0px; }
 .headerMenuItem, .headerMenuItem2 {
   font-family: Arial, Helvetica, sans-serif
 }
-.headerMenuItem, a.headerMenuItem:visited {
+.headerMenuItem, a.headerMenuItem, a.headerMenuItem:visited {
   color: white;
   font-size: 12pt;
   background-color: #6D78B6;
@@ -78,7 +78,7 @@ div.u_link > a { text-decoration: underline; font-weight: normal }
 
 .navlink { color: #6D78B6; text-decoration: none; font-size: 95% }
 
-.tablewidth { width: 900px }
+.tablewidth { width: 1024px }
 
 .pageTitle { font-family: Arial, Helvetica, sans-serif; font-size: 24pt; font-weight: bold; text-align: center;
             color: #9B9DFD; background-color: #FFFFC0 } /* (155, 157, 253); (255, 255, 192) */
@@ -104,6 +104,8 @@ table  {font-size: 10pt; font-family: Arial, Verdana, sans-serif; margin: 0px }
 hr { margin: 2px; border: 5 px solid #E2E4F0; color: #E2E4F0; background-color: #E2E4F0; }
 .blockHeader { font-size: 14pt; color: yellow;  color: white; font-weight: bold; font-family: Arial, Verdana, Sans-serif }
 .simpleList { list-style: none; text-indent: -20 }
+
+sub { font-size: 0.8em; }
 
 .news { font-size: 9pt; font-family: Times New Roman, Times, serif;  color: #6D78B6 }
 .links { color: #000060; font-size: 10pt; font-family: Arial, Verdana, sans-serif }
@@ -181,6 +183,9 @@ ol.samplesList { margin-left: 15px; padding-left: 10px; }
 ul.samplesNestedList { margin-top: 1px; margin-bottom: 1px; list-style-type: disc }
 pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
 
+ul.list_nomargin { margin-left: 5px; margin-top: 0px; padding-left: 10px; }
+
+
 .like {
   border: none;
   overflow: hidden;
@@ -215,16 +220,22 @@ pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
 
 .blockWithHighlightedTitle {
   box-shadow: inset -3px -3px 4px #A5B0D0;
-  /*
-  box-shadow: inset -3px -3px 4px #B5C0E0;
-  box-shadow: inset -3px -3px 4px #6D78B6;
-  */
-  border: solid 1px #6D78B6;
+  border: solid 1px #E8EAFD;
   border-radius: 10px;
   padding: 0px;
   padding-left: 5px;
   padding-right: 8px;
   background-color: #E8EAFD;
+}
+
+.darkBlockWithHighlightedTitle {
+  box-shadow: inset -3px -3px 4px #4D5896;
+  border: solid 1px #6D78B6;
+  border-radius: 10px;
+  padding: 0px;
+  padding-left: 5px;
+  padding-right: 8px;
+  background-color: #6D78B6;
 }
 
 .blockWithHighlightedTitle_noshadow {
@@ -238,7 +249,6 @@ pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
   padding: 5px;
   background-color: white;
   border-radius: 10px;
-  /*box-shadow: inset -3px -3px 5px #6D78B6;*/
 }
 
 .patch_cell {
@@ -278,6 +288,22 @@ pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
   padding-right: 3px;
 }
 
+.frame_top {
+  width: 100%;
+  height: 10px;
+  background-color: #6D78B6;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.frame_bottom {
+  width: 100%;
+  height: 10px;
+  background-color: #6D78B6;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
 .shadow {
   box-shadow: 3px 3px 4px #6D78B6;
 }
@@ -301,10 +327,83 @@ div#mw-content-text li a {
   /*font-size: 11pt;*/
 }
 
-.yellow_highlight {
-  background-color: yellow;
+.yh {
+  color: white;
+  background-color: #6D78B6;
   font-weight: bold;
-  padding: 10px;
+  font-style: italic;
+  padding: 10px 10px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 4px #444;
+}
+
+a.yellow_highlight:hover {
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.yhd, .yhd2 {
+  color: white;
+  background-color: #6D78B6;
+  font-size: 16pt;
+  font-style: italic;
+  font-weight: bold;
+  padding: 5px 10px;
   margin: 0px;
-  border-radius: 10px
+  border-radius: 10px;
+  box-shadow: 4px 4px 4px #222;
+
+  animation-name: glow_effect;
+  animation-delay: 0s;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+.yhd2 {
+  font-size: 12pt;
+}
+
+@keyframes glow_effect {
+  from {
+    /*
+    */
+    background-color: #6D78B6;
+    color: white;
+  }
+  to {
+    /*
+    background-color: #7590B0;
+    background-color: #B5C0E0;
+    */
+    background-color: #95A0E0;
+    color: #DDD;
+  }
+}
+
+a.yhd:hover {
+  text-decoration: none;
+  color: #E8EAFD;
+  box-shadow: inset 2px 2px 2px #444;
+  /*padding-left: 19px;*/
+}
+
+div#bodyContent div h2 {
+  margin-top: 0.6em;
+}
+
+.wiki_note, .wiki_note_margin {
+  background-color: #FFFD94;
+  border: solid 1px #8D98D6;
+  padding: 3px 2px;
+  margin: 0px;
+  /*padding-bottom: 5px;*/
+  line-height: 1em;
+  font-size: 10pt;
+}
+
+.wiki_note_margin {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

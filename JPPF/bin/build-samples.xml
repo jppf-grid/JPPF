@@ -62,6 +62,7 @@
     <include.code sample="ConfigurationProperties" include="**/*.java"/>
     <include.code sample="CustomLoadBalancer" include="**/*.java"/>
     <include.code sample="DataEncryption" include="**/*.java"/>
+    <include.code sample="EmbeddedGrid" include="**/*.java"/>
     <include.code sample="ExtendedClassLoading" include="**/*.java"/>
     <include.code sample="FTPServer" include="**/*.java"/>
     <include.code sample="GPU" include="**/*.java,**/*.c"/>
@@ -142,25 +143,43 @@
   <!-- Convert Readme.html into Readme.md                                        -->
   <!-- ========================================================================= -->
 
+  <!--
+    Usage from the command line: ant -Dsamples=<samples_pattern> samples.generate.md
+  -->
   <target name="samples.generate.md">
-    <delete dir="${samples-pack}" quiet="true" includes="**/*.md" excludes="Readme.md"/>
-    <resourcecount>
-      <fileset dir="${samples-pack}" includes="**/Readme.html"/>
-    </resourcecount>
-    <copy todir="${samples-pack}" enablemultiplemappings="true">
-      <fileset dir="${samples-pack}" includes="**/Readme.html"/>
-      <globmapper from="*.html" to="*.md"/>
-    </copy>
-
-    <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
-      <fileset dir="${samples-pack}" includes="**/*.md"/>
-    </replaceregexp>
-    <replace token="$template{name=&quot;sample-readme-html-footer&quot;}$" value="" dir="${samples-pack}" includes="**/*.md"/>
-    <replace token=".java.html"       value=".java"       dir="${samples-pack}" includes="**/*.md"/>
-    <replace token=".properties.html" value=".properties" dir="${samples-pack}" includes="**/*.md"/>
-    <replace token=".xml.html"        value=".xml"        dir="${samples-pack}" includes="**/*.md"/>
-    <replace token=".c.html"          value=".c"          dir="${samples-pack}" includes="**/*.md"/>
+    <sample.md samples="${samples}"/>
   </target>
+
+  <!--
+    Create a sample's Readme.md by copying and converting its Readme.html.
+    Usage: <sample.md samples="samples_pattern"/>
+    Parameters/Attributes:
+      - samples: a pattern for the names of the samples whose Readme.md to (re)create.
+        examples: **, MySample, *Demo*
+  -->
+  <macrodef name="sample.md">
+    <attribute name="samples" default="**"/>
+    <sequential>
+      <delete dir="${samples-pack}" quiet="true" includes="@{samples}/*.md" excludes="Readme.md"/>
+      <resourcecount>
+        <fileset dir="${samples-pack}" includes="@{samples}/Readme.html"/>
+      </resourcecount>
+      <copy todir="${samples-pack}" enablemultiplemappings="true">
+        <fileset dir="${samples-pack}" includes="@{samples}/Readme.html"/>
+        <globmapper from="*.html" to="*.md"/>
+      </copy>
+  
+      <replaceregexp match="\$template\{name=&quot;sample-readme-html-header&quot; title=&quot;(.*)&quot;\}\$" replace="# \1${line.separator}" flags="g">
+        <fileset dir="${samples-pack}" includes="@{samples}/*.md"/>
+      </replaceregexp>
+      <replace token="$template{name=&quot;sample-readme-html-footer&quot;}$" value="" dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replace token=".java.html"       value=".java"       dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replace token=".properties.html" value=".properties" dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replace token=".xml.html"        value=".xml"        dir="${samples-pack}" includes="@{samples}/*.md"/>
+      <replace token=".c.html"          value=".c"          dir="${samples-pack}" includes="@{samples}/*.md"/>
+    </sequential>
+  </macrodef>
+  
 
   <!-- ========================================================================= -->
   <!-- Download the samples' dependencies                                        -->
