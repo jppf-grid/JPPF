@@ -89,15 +89,14 @@ public interface Node extends Runnable {
   boolean isAndroid();
 
   /**
-   * Get the JMX connector server associated with the node.
-   * @return a JMXServer instance.
-   * @throws Exception if any error occurs.
-   */
-  JMXServer getJmxServer() throws Exception;
-
-  /**
    * Get the configuration of this node.
    * @return the node configuration as a {@link TypedProperties} instance.
    */
   TypedProperties getConfiguration();
+
+  /**
+   * Get the management information for this node.
+   * @return a {@link JPPFManagementInfo} object.
+   */
+  JPPFManagementInfo getManagementInfo();
 }

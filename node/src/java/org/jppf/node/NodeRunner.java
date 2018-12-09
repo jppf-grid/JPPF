@@ -20,6 +20,7 @@ package org.jppf.node;
 import java.lang.reflect.Constructor;
 import java.security.*;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.*;
 import org.jppf.classloader.*;
@@ -45,11 +46,11 @@ public class NodeRunner {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NodeRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(NodeRunner.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The ClassLoader used for loading the classes of the framework.
    */
@@ -87,9 +88,17 @@ public class NodeRunner {
    * The configuration of the node.
    */
   private final TypedProperties configuration;
+  /**
+   * 
+   */
+  final AtomicBoolean embeddedShutdown = new AtomicBoolean(false);
+  /**
+   * 
+   */
+  boolean startedFromMain;
 
   /**
-   * Initialize this node runner.
+   * Initialize this node runner with the specified configuration.
    * @param configuration the configuration of the node.
    */
   public NodeRunner(final TypedProperties configuration) {
@@ -109,6 +118,7 @@ public class NodeRunner {
   /**
    * Run a node as a standalone application.
    * @param args not used.
+   * @exclude
    */
   public static void main(final String...args) {
     try {
@@ -122,6 +132,7 @@ public class NodeRunner {
       }
       config.setDefaults(defaults);
       final NodeRunner runner = new NodeRunner(config);
+      runner.startedFromMain = true;
       runner.start(args);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
@@ -130,9 +141,13 @@ public class NodeRunner {
   }
 
   /**
-   * Run a node as a standalone application.
-   * @param args the first argument, if any must represent a valid TCP port to a socket
-   * opened by the porcess that launched this node.
+   * Run a node embedded in the current JVM.
+   * <br><div class="note_tip"><b>Important note:</b> <i>when starting a node programmatically, you should ensure that this method is called from a separate thread,
+   * to avoid the current thread being blocked indefinitely. For example:</i>
+   * <pre> TypedProperties nodeConfig = ...;
+   * NodeRunner nodeRunner = new NodeRunner(nodeConfig);
+   * new Thread(() -> nodeRunner.start());</pre></div>
+   * @param args the first argument, if any, must represent a valid TCP port to a socket opened by the process that launched this node.
    */
   public void start(final String...args) {
     try {
@@ -177,7 +192,7 @@ public class NodeRunner {
           classLoader = null;
           if (node != null) node.stopNode();
         } finally {
-          if ((node == null) || node.getShuttingDown().get()) break;
+          if ((node == null) || node.getShuttingDown().get() || embeddedShutdown.get()) break;
         }
       }
     } catch(final Exception e) {
@@ -205,6 +220,7 @@ public class NodeRunner {
     final Constructor<?> c = clazz.getConstructor(String.class, TypedProperties.class, DriverConnectionInfo.class);
     final JPPFNode node = (JPPFNode) c.newInstance(uuid, configuration, currentConnectionInfo);
     node.setJPPFClassLoader(loader);
+    node.setStartedFromMain(startedFromMain);
     if (debugEnabled) log.debug("Created new node instance: {}, config =\n{}", node, node.getConfiguration());
     return node;
   }
@@ -239,76 +255,35 @@ public class NodeRunner {
   }
 
   /**
-   * Shutdown and eventually restart the node.
-   * @param node the node to shutdown or restart.
-   * @param restart determines whether this node should be restarted by the node launcher.
-   * @exclude
+   * Shutdown the node.
    */
-  public static void shutdown(final NodeInternal node, final boolean restart) {
-    //executor.submit(new ShutdownOrRestart(restart));
-    new ShutdownOrRestart(restart, node).run();
-  }
-
-  /**
-   * Task used to terminate the JVM.
-   * @exclude
-   */
-  public static class ShutdownOrRestart implements Runnable {
-    /**
-     * {@code true} if the node is to be restarted, {@code false} to only shut it down.
-     */
-    private boolean restart;
-    /**
-     * The node to shutdon and/or restart.
-     */
-    private final NodeInternal node;
-
-    /**
-     * Initialize this task.
-     * @param restart true if the node is to be restarted, false to only shut it down.
-     * @param node this node.
-     */
-    public ShutdownOrRestart(final boolean restart, final NodeInternal node) {
-      this.restart = restart;
-      this.node = node;
-    }
-
-    @Override
-    public void run() {
-      AccessController.doPrivileged(new PrivilegedAction<Object>() {
-        @Override
-        public Object run() {
-          if (debugEnabled) log.debug("stopping the node");
-          node.stopNode();
-          // close the JMX server connection to avoid request being sent again by the client.
-          if (debugEnabled) log.debug("stopping the JMX server");
-          try {
-            ((JPPFNode) node).stopJmxServer();
-            Thread.sleep(500L);
-          } catch(@SuppressWarnings("unused") final Exception ignore) {
-          }
-          final int exitCode = restart ? 2 : 0;
-          log.info("exiting the node with exit code {}", exitCode);
-          System.exit(exitCode);
-          return null;
-        }
-      });
+  public void shutdown() {
+    if (embeddedShutdown.compareAndSet(false, true)) {
+      new ShutdownOrRestart(false, false, node).run();
     }
   }
 
   /**
-   * This node's universal identifier.
+   * Get the node's universal unique identifier.
    * @return a uuid as a string.
    */
   public String getUuid() {
-    return node.getUuid();
+    return (node== null) ? null : node.getUuid();
   }
 
   /**
-   * Get the offline node flag.
+   * Determine whether the node is <a href="https://www.jppf.org/doc/6.1/index.php?title=Offline_nodes">offline</a>.
    * @return {@code true} if the node is offline, {@code false} otherwise.
    */
   public boolean isOffline() {
-    return node.isOffline();
+    return (node== null) ? false: node.isOffline();
+  }
+
+  /**
+   * Get the actual node started by this node runner, if any.
+   * @return the current JPPF node, or {@code null} if no node is started.
+   */
+  public Node getNode() {
+    return node;
   }
 }

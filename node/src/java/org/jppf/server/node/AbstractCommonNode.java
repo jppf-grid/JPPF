@@ -94,6 +94,10 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * The task execution manager for this node.
    */
   ExecutionManager executionManager;
+  /**
+   * Whether this node was sdtarted from {@code NodeRunner.main()} (standalone) or not (embedded).
+   */
+  boolean startedFromMain;
 
   /**
    * Initialize this node.
@@ -324,5 +328,21 @@ public abstract class AbstractCommonNode extends AbstractNode {
       }
       hookInstance.invoke("run");
     }
+  }
+
+  /**
+   * @return whether this node was sdtarted from {@code NodeRunner.main()} (standalone) or not (embedded).
+   * @exclude
+   */
+  public boolean isStartedFromMain() {
+    return startedFromMain;
+  }
+
+  /**
+   * @param startedFromMain whether this node was sdtarted from {@code NodeRunner.main()} (standalone) or not (embedded).
+   * @exclude
+   */
+  public void setStartedFromMain(final boolean startedFromMain) {
+    this.startedFromMain = startedFromMain;
   }
 }

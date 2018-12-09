@@ -46,10 +46,8 @@ import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
- * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
- * across the JVM, to the tasks execution queue.
- * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
- * to handle requests to and from remote class loaders.
+ * This class serves as an initializer for the entire JPPF driver.
+ * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server to handle requests to and from remote class loaders.
  * @author Laurent Cohen
  * @author Lane Schwartz (dynamically allocated server port) 
  */
@@ -63,12 +61,12 @@ public class JPPFDriver extends AbstractJPPFDriver {
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Whether the driver was started via the {@link #main(Sttring[]) main()} method.
+   * Whether the driver was started via the {@link #main(String[]) main()} method.
    */
-  private static boolean startedfromMain = false;
+  boolean startedfromMain = false;
 
   /**
-   * Initialize this JPPFDriver.
+   * Initialize this JPPF driver with the specified configuration.
    * @param configuration this driver's configuration.
    */
   public JPPFDriver(final TypedProperties configuration) {
@@ -134,17 +132,6 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Initialize and start this driver.
-   * @return this driver.
-   * @throws Exception if the initialization fails.
-   * @deprecated use {@link #start()} instead.
-   */
-  @Deprecated
-  public JPPFDriver run() throws Exception {
-    return start();
-  }
-
-  /**
    * Get this driver's unique identifier.
    * @return the uuid as a string.
    */
@@ -166,12 +153,12 @@ public class JPPFDriver extends AbstractJPPFDriver {
    * Initialize this task with the specified parameters.<br>
    * The shutdown is initiated after the specified shutdown delay has expired.<br>
    * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
-   * @param shutdownDelay delay, in milliseconds, after which the server shutdown is initiated. A value of 0 or less
+   * @param shutdownDelay delay, in milliseconds, after which the driver shutdown is initiated. A value of 0 or less
    * means an immediate shutdown.
-   * @param restart determines whether the server should restart after shutdown is complete.
+   * @param restart determines whether the driver should restart after shutdown is complete.
    * If set to false, then the JVM will exit.
-   * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
-   * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
+   * @param restartDelay delay, starting from shutdown completion, after which the driver is restarted.
+   * A value of 0 or less means the driver is restarted immediately after the shutdown is complete.
    * @exclude
    */
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
@@ -195,7 +182,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Start the JPPF server.
+   * Start the JPPF driver.
    * @param args not used.
    * @exclude
    */
@@ -203,9 +190,10 @@ public class JPPFDriver extends AbstractJPPFDriver {
     try {
       if (debugEnabled) log.debug("starting the JPPF driver");
       if ((args == null) || (args.length <= 0)) throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
-      startedfromMain = true;
+      final JPPFDriver driver = new JPPFDriver(JPPFConfiguration.getProperties());
+      driver.startedfromMain = true;
       if (!"noLauncher".equals(args[0])) new LauncherListener(Integer.parseInt(args[0])).start();
-      new JPPFDriver(JPPFConfiguration.getProperties()).start();
+      driver.start();
     } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
@@ -243,15 +231,6 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Get the jmx server used to manage and monitor this driver.
-   * @param secure specifies whether to get the ssl-based connector server. 
-   * @return a {@link JMXServer} instance.
-   */
-  public JMXServer getJMXServer(final boolean secure) {
-    return initializer.getJmxServer(secure);
-  }
-
-  /**
    * Add a custom peer driver discovery mechanism to those already registered, if any.
    * @param discovery the driver discovery to add.
    */
@@ -268,7 +247,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Determine whether this server has initiated a shutdown, in which case it does not accept connections anymore.
+   * Determine whether this driver has initiated a shutdown, in which case it does not accept connections anymore.
    * @return {@code true} if a shutdown is initiated, {@code false} otherwise.
    */
   public boolean isShuttingDown() {
@@ -284,7 +263,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Shutdown this server and all its components.
+   * Shutdown this driver and all its components.
    */
   public void shutdown() {
     if (shuttingDown.compareAndSet(false, true)) {
@@ -293,7 +272,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
   }
 
   /**
-   * Shutdown this server and all its components.
+   * Shutdown this driver and all its components.
    */
   void shutdownNow() {
     log.info("Shutting down");

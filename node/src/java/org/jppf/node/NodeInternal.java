@@ -19,6 +19,7 @@
 package org.jppf.node;
 
 import org.jppf.execute.ExecutionManager;
+import org.jppf.management.JMXServer;
 import org.jppf.node.event.LifeCycleEventHandler;
 
 /**
@@ -26,8 +27,7 @@ import org.jppf.node.event.LifeCycleEventHandler;
  * @author Laurent Cohen
  * @exclude
  */
-public interface NodeInternal extends Node
-{
+public interface NodeInternal extends Node {
   /**
    * Get the connection used by this node.
    * @return a {@link NodeConnection} instance.
@@ -50,4 +50,11 @@ public interface NodeInternal extends Node
    * @return a <code>NodeExecutionManager</code> instance.
    */
   ExecutionManager getExecutionManager();
+
+  /**
+   * Get the JMX connector server associated with the node.
+   * @return a JMXServer instance.
+   * @throws Exception if any error occurs.
+   */
+  JMXServer getJmxServer() throws Exception;
 }

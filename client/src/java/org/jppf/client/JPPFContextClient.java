@@ -25,9 +25,9 @@ import org.jppf.queue.JPPFQueue;
 /**
  * Context associated with a client.
  * @author Martin JANDA
+ * @exclude
  */
-public class JPPFContextClient extends JPPFContext
-{
+public class JPPFContextClient extends JPPFContext {
   /**
    * Reference to the job queue.
    */
@@ -35,21 +35,16 @@ public class JPPFContextClient extends JPPFContext
 
   /**
    * Default initializer.
-   * @param queue        the reference queue to use.
+   * @param queue the reference queue to use.
    */
-  public JPPFContextClient(final JPPFQueue<ClientJob, ClientJob, ClientTaskBundle> queue)
-  {
+  public JPPFContextClient(final JPPFQueue<ClientJob, ClientJob, ClientTaskBundle> queue) {
     if (queue == null) throw new IllegalArgumentException("queue is null");
 
     this.queue = queue;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public int getMaxBundleSize()
-  {
+  public int getMaxBundleSize() {
     return queue.getMaxBundleSize();
   }
 }

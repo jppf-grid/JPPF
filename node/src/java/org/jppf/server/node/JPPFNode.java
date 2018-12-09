@@ -27,7 +27,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.nio.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.ShutdownOrRestart;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
@@ -406,7 +406,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (!isLocal()) {
       setStopped(true);
       lifeCycleEventHandler.fireNodeEnding();
-      NodeRunner.shutdown(this, restart);
+      //NodeRunner.shutdown(this, restart);
+      new ShutdownOrRestart(restart, startedFromMain, this).run();
     } else {
       if (debugEnabled) log.debug("shutting down local node");
       stopNode();

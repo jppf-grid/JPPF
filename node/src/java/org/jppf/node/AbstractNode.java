@@ -18,6 +18,8 @@
 
 package org.jppf.node;
 
+import static org.jppf.management.JPPFManagementInfo.*;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFUnsupportedOperationException;
@@ -25,13 +27,20 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.serialization.*;
+import org.jppf.utils.NetworkUtils;
 import org.jppf.utils.concurrent.ThreadSynchronization;
+import org.jppf.utils.configuration.JPPFProperties;
+import org.slf4j.*;
 
 /**
  * Abstract implementation of the {@link Node} interface.
  * @author Laurent Cohen
  */
 public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(AbstractNode.class);
   /**
    * Utility for deserialization and serialization.
    * @exclude
@@ -200,5 +209,23 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   public void setJPPFClassLoader(final AbstractJPPFClassLoader jppfClassLoader) {
     this.jppfClassLoader = jppfClassLoader;
+  }
+
+  @Override
+  public JPPFManagementInfo getManagementInfo() {
+    try {
+      final JMXServer server = getJmxServer();
+      final int type = NODE
+        | (isMasterNode() ? MASTER : (isSlaveNode() ? SLAVE : 0))
+        | (isAndroid() ? ANDROID : 0)
+        | (isDotnetCapable() ? DOTNET : 0)
+        | (isLocal() ? LOCAL :0);
+      final String host = server.getManagementHost();
+      final String ip = (getConfiguration().get(JPPFProperties.RESOLVE_ADDRESSES)) ? NetworkUtils.getHostIP(host).ipAddress() : host;
+      return new JPPFManagementInfo(host, ip, server.getManagementPort(), getUuid(), type, getConfiguration().get(JPPFProperties.SSL_ENABLED), getMasterNodeUuid());
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return null;
   }
 }

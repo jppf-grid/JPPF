@@ -40,7 +40,7 @@ public class JPPFProperties {
   /** Same name as {@link #SERVER_PORT} but with default value of 11143. */
   public static final JPPFProperty<Integer> SERVER_SSL_PORT_NODE = new IntProperty("jppf.server.port", -1);
   /** Whether to exit the JVM when shutting the driver down. */
-  public static final JPPFProperty<Boolean> SERVER_EXIT_ON_SHUTDOWN = new BooleanProperty("jppf.server.exitOnShutdown", true);
+  public static final JPPFProperty<Boolean> SERVER_EXIT_ON_SHUTDOWN = new BooleanProperty("jppf.server.exitOnShutdown", false);
   /** Whether to resolve IP addresses. */
   public static final JPPFProperty<Boolean> RESOLVE_ADDRESSES = new BooleanProperty("jppf.resolve.addresses", true, "org.jppf.resolve.addresses");
   /** Interval between updates of the JVM health data. */

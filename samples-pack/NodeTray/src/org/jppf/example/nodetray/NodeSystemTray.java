@@ -25,7 +25,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.node.*;
 import org.jppf.node.event.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -52,7 +51,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   /**
    * The wrapper used to access management functionalities.
    */
-  private JMXNodeConnectionWrapper wrapper;
+  private JMXNodeConnectionWrapper jmx;
   /**
    * Proxy to the task monitor MBean.
    */
@@ -62,9 +61,9 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
    */
   private ReentrantLock lock = new ReentrantLock();
   /**
-   * The JMX server used by the node for management and monitoring.
+   * The node's management information.
    */
-  private JMXServer jmxServer;
+  private JPPFManagementInfo jmxInfo;
 
   /**
    * Default constructor.
@@ -93,9 +92,9 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
    */
   private void initJMX() {
     try {
-      wrapper = new JMXNodeConnectionWrapper();
-      wrapper.connectAndWait(5000L);
-      taskMonitor = wrapper.getJPPFNodeTaskMonitorProxy();
+      jmx = new JMXNodeConnectionWrapper();
+      jmx.connect();
+      taskMonitor = jmx.getJPPFNodeTaskMonitorProxy();
       taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
@@ -109,7 +108,7 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   private String generateTooltipText() {
     final StringBuilder sb = new StringBuilder();
     sb.append("Node ");
-    if (jmxServer != null) sb.append(jmxServer.getManagementHost()).append(':').append(jmxServer.getManagementPort());
+    if (jmxInfo != null) sb.append(jmxInfo.getHost()).append(':').append(jmxInfo.getPort());
     sb.append('\n');
     if (taskMonitor != null) {
       sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
@@ -129,7 +128,6 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
      * Handle task-level notifications. Here, we simply update the tray icon's tooltip text.
      * @param notification the notification.
      * @param handback not used.
-     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
      */
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
@@ -147,9 +145,9 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
     trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
-    if (jmxServer == null) {
+    if (jmxInfo == null) {
       try {
-        jmxServer = ((AbstractNode) event.getNode()).getJmxServer();
+        jmxInfo = event.getNode().getManagementInfo();
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
@@ -175,18 +173,6 @@ public class NodeSystemTray extends NodeLifeCycleListenerAdapter {
     } finally {
       lock.unlock();
     }
-  }
-
-  @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
-  }
-
-  @Override
-  public void jobStarting(final NodeLifeCycleEvent event) {
-  }
-
-  @Override
-  public void jobEnding(final NodeLifeCycleEvent event) {
   }
 
   /**

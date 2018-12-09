@@ -29,6 +29,14 @@ public class HostIP extends Pair<String, String> {
   private static final long serialVersionUID = 1L;
 
   /**
+   * Initialize this HostIP object with the specified host name / IP address.
+   * @param hostName the host name or IP address.
+   */
+  public HostIP(final String hostName) {
+    this(hostName, hostName);
+  }
+
+  /**
    * Initialize this HostIP object with the specified host name and IP address.
    * @param hostName the host name.
    * @param ipAddress the corresponding IP address.
