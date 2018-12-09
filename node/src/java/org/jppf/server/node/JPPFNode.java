@@ -145,7 +145,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (!isStopped()) reset(true);
         throw new JPPFError(e);
       } catch(final IOException e) {
-        if (!getShuttingDown().get()) log.error(e.getMessage(), e);
+        if (!getShuttingDown().get() && !isStopped()) log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         if (!isStopped()) {
           reset(true);

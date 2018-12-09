@@ -8,6 +8,7 @@
 	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>
 	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
 	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
+	<classpathentry kind="src" output="EmbeddedGrid/classes" path="EmbeddedGrid/src"/>
 	<classpathentry kind="src" output="ExtendedClassLoading/classes" path="ExtendedClassLoading/src"/>
 	<classpathentry kind="src" output="ExtendedClassLoading/classes2" path="ExtendedClassLoading/src2"/>
 	<classpathentry kind="src" output="ForkJoinNodeExecutor/classes" path="ForkJoinNodeExecutor/src"/>
@@ -73,5 +74,7 @@
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.42.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-shaded-4.0.2.jar" sourcepath="C:/Users/lcohen/AppData/Local/Temp/.org.sf.feeling.decompiler1540100587978/source/kryo-shaded-4.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/objenesis-2.1.jar" sourcepath="C:/Users/lcohen/AppData/Local/Temp/.org.sf.feeling.decompiler1540100587978/source/objenesis-2.1-sources.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-node-6.1-alpha.jar"/>
+	<classpathentry kind="lib" path="shared/lib/jppf-server-6.1-alpha.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>
