@@ -78,7 +78,6 @@ $template{name="about-page-header" title="Documentation"}$
         <ul class="samplesList">
           <li><a href="/doc/6.1">JPPF 6.1 User Guide</a></li>
           <li><a href="/javadoc/6.1">JPPF 6.1 Javadoc</a></li>
-          <li><a href="/csdoc/6.1">JPPF 6.1 C-Sharp Doc</a></li>
         </ul>
       <br></div>
     </div>

@@ -9,21 +9,10 @@ $template{name="about-page-header" title="Downloads"}$
     <table style="padding: 2px"><tr>
       <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
       <td><h4>All JPPF releases:</h4></td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="https://search.maven.org/#search|ga|1|g:org.jppf"><b>JPPF on Maven Central</b></a></li>
-        </ul>
-      </td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="https://github.com/jppf-grid/JPPF/tags"><b>JPPF releases on Github</b></a></li>
-        </ul>
-      </td>
-      <td style="vertical-align: middle">
-        <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>Older releases on SourceForge</b></a></li>
-        </ul>
-      </td>
+      $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
+      $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
+      $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
+      $template{name="download-link" label="JPPF 6.1 alpha preview" link="downloads-unstable.php"}$
     </tr></table>
   </div>
   <br>
