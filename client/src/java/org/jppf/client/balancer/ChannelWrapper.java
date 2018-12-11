@@ -82,6 +82,10 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * 
    */
   final AtomicInteger jobCount = new AtomicInteger(0);
+  /**
+   * The previous status, if any.
+   */
+  protected JPPFClientConnectionStatus oldStatus = JPPFClientConnectionStatus.NEW;
 
   /**
    * Default constructor.
@@ -275,5 +279,23 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   @Override
   public int getCurrentNbJobs() {
     return jobCount.get();
+  }
+
+  /**
+   * @return the previous status, if any.
+   */
+  public JPPFClientConnectionStatus getOldStatus() {
+    synchronized(getMonitor()) {
+      return oldStatus;
+    }
+  }
+
+  /**
+   * @param oldStatus the previous status, if any.
+   */
+  public void setOldStatus(final JPPFClientConnectionStatus oldStatus) {
+    synchronized(getMonitor()) {
+      this.oldStatus = oldStatus;
+    }
   }
 }

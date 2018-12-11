@@ -172,7 +172,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     try {
       final JPPFClientConnectionStatus status = wrapper.getStatus();
       if (!status.isTerminatedStatus()) updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
-      else updateConnectionStatus(wrapper, JPPFClientConnectionStatus.ACTIVE, wrapper.getStatus());
+      else updateConnectionStatus(wrapper, wrapper.getOldStatus(), wrapper.getStatus());
     } finally {
       synchronized(allConnections) {
         allConnections.remove(wrapper);
@@ -224,7 +224,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     synchronized(wrapperMap) {
       wrapper = wrapperMap.remove(connection);
     }
-    if (wrapper != null) removeConnection(wrapper);
+    if (wrapper != null) {
+      if (debugEnabled) log.debug("removing connection {}", connection);
+      removeConnection(wrapper);
+    }
     return wrapper;
   }
 
@@ -328,7 +331,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       synchronized(priorityCounts) {
         final Integer n = priorityCounts.get(priority);
         priorityCounts.put(priority, (n == null) ? 1 : n + 1);
-        taskQueueChecker.setHighestPriority(priorityCounts.lastKey());
+        final int highest = priorityCounts.lastKey();
+        if (debugEnabled) log.debug("setting highest priority {} for oldStatus={}, newStatus={}, channel={}", highest, oldStatus, newStatus, wrapper);
+        taskQueueChecker.setHighestPriority(highest);
       }
       workingConnections.put(wrapper.getConnectionUuid(), wrapper);
     } else if (!bNew && bOld) {
@@ -337,7 +342,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         if (n != null) {
           if (n <= 1) priorityCounts.remove(priority);
           else priorityCounts.put(priority, n - 1);
-          taskQueueChecker.setHighestPriority(priorityCounts.isEmpty() ? Integer.MIN_VALUE : priorityCounts.lastKey());
+          final int highest = priorityCounts.isEmpty() ? Integer.MIN_VALUE : priorityCounts.lastKey();
+          if (debugEnabled) log.debug("setting highest priority {} for oldStatus={}, newStatus={}, channel={}", highest, oldStatus, newStatus, wrapper);
+          taskQueueChecker.setHighestPriority(highest);
         }
       }
       workingConnections.remove(wrapper.getConnectionUuid());

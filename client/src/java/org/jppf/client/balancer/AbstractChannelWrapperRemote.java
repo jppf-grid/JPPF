@@ -118,6 +118,7 @@ public abstract class AbstractChannelWrapperRemote extends ChannelWrapper implem
 
   @Override
   public void setStatus(final JPPFClientConnectionStatus status) {
+    setOldStatus(getStatus());
     channel.setStatus(status);
   }
 

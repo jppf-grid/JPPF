@@ -105,6 +105,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public void setStatus(final JPPFClientConnectionStatus status) {
     synchronized(getMonitor()) {
       if (closed) return;
+      this.oldStatus = this.status;
       final ExecutorStatus oldExecutionStatus = getExecutionStatus();
       final JPPFClientConnectionStatus oldValue = this.status;
       if (debugEnabled) log.debug("status changing from {} to {} for {}", oldValue, status, this);
