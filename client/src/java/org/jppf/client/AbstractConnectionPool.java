@@ -141,11 +141,11 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
       final List<E> connections = getConnections();
       for (final E connection: connections) {
         try {
-          connection.close();
+          if (connection != null) connection.close();
         } catch(final Exception e) {
           final String format = "error while closing connection {} : {}";
-          if (debugEnabled) log.debug(format, connection, ExceptionUtils.getMessage(e));
-          else log.warn(format, connection, ExceptionUtils.getStackTrace(e));
+          if (debugEnabled) log.debug(format, connection, ExceptionUtils.getStackTrace(e));
+          else log.warn(format, connection, ExceptionUtils.getMessage(e));
         }
       }
       synchronized(this) {

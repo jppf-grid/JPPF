@@ -233,6 +233,7 @@ public class ClientJob extends AbstractClientJob {
    */
   public void jobRequeued() {
     updateStatus(EXECUTING, NEW);
+    if (debugEnabled) log.debug("job requeued: {}", this);
   }
 
   /**
@@ -310,7 +311,7 @@ public class ClientJob extends AbstractClientJob {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception) {
-    if (debugEnabled) log.debug("bundle=" + bundle + ", exception=" + exception + " for " + this);
+    if (debugEnabled) log.debug("bundle={}, exception={} for {}", bundle, exception, this);
     final boolean empty;
     synchronized (bundleMap) {
       final ChannelWrapper channel = bundleMap.remove(bundle);
@@ -361,6 +362,7 @@ public class ClientJob extends AbstractClientJob {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
           requeue = merge(list, false);
+          if (debugEnabled) log.debug("requeue = {}, resubmit list = {}", requeue, list.size());
         }
       }
     }
@@ -381,6 +383,7 @@ public class ClientJob extends AbstractClientJob {
       }
       setJobStatus(JobStatus.COMPLETE);
     }
+    if (debugEnabled) log.debug("finished taskCOmpleted() for {}", this);
   }
 
   /**

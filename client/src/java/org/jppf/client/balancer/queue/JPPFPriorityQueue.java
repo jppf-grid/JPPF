@@ -108,6 +108,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     lock.lock();
     try {
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+      if (debugEnabled) log.debug("requeueing job {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
       incrementSizeCount(getSize(job));
       fireBundleAdded(new QueueEvent<>(this, job, true));
@@ -126,12 +127,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       final int size = getSize(bundleWrapper);
       decrementSizeCount(size);
       if (nbTasks >= bundleWrapper.getTaskCount()) {
-        bundleWrapper.setOnRequeue(new Runnable() {
-          @Override
-          public void run() {
-            requeue(bundleWrapper);
-          }
-        });
+        bundleWrapper.setOnRequeue(() -> requeue(bundleWrapper));
         result = bundleWrapper.copy(bundleWrapper.getTaskCount());
         removeBundle(bundleWrapper);
       } else {

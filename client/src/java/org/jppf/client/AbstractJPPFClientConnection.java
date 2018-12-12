@@ -42,7 +42,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Count of instnces of this class.
    */
@@ -160,8 +160,8 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   @Override
   public void close() {
     if (!closed.compareAndSet(false, true)) return;
+    if (debugEnabled) log.debug("closing connection {}", this);
     if (!getStatus().isTerminatedStatus()) setStatus(CLOSED);
-    if (debugEnabled) log.debug("closing connection " + toDebugString());
     listeners.clear();
     try {
       sendCloseConnectionCommand();

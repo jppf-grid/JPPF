@@ -123,6 +123,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
 
     @Override
     public void run() {
+      if (debugEnabled) log.debug("entering sender loop for {}", ChannelWrapperRemoteAsync.this);
       while (!channel.isClosed()) {
         ClientTaskBundle clientBundle = null;
         try {
@@ -155,6 +156,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           handleThrowable(clientBundle, t, true);
         }
       }
+      if (debugEnabled) log.debug("exiting sender loop for {}", ChannelWrapperRemoteAsync.this);
     }
   }
 
@@ -173,6 +175,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
 
     @Override
     public void run() {
+      if (debugEnabled) log.debug("entering receiver loop for {}", ChannelWrapperRemoteAsync.this);
       while (!channel.isClosed()) {
         ClientTaskBundle clientBundle = null;
         Exception exception = null;
@@ -206,6 +209,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           if (complete) handleBundleComplete(clientBundle, exception);
         }
       }
+      if (debugEnabled) log.debug("exiting receiver loop for {}", ChannelWrapperRemoteAsync.this);
     }
   }
 
@@ -281,7 +285,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
    * @return an eventual exception to use in job results processing.
    */
   private Exception handleThrowable(final ClientTaskBundle clientBundle, final Throwable t, final boolean fromSender) {
-    if (debugEnabled) log.debug("handling throwable for {}:\nchannel = {}", clientBundle, this, t);
+    if (debugEnabled) log.debug("handling throwable from {} for {}:\nchannel = {}", fromSender ? "sender" : "receiver", clientBundle, this, t);
     final boolean channelClosed = channel.isClosed();
     if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
     if (channelClosed && !resetting) return null;
@@ -297,7 +301,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
       } else {
         if (clientBundle != null) {
           if (debugEnabled) log.debug("resubmitting {}", clientBundle);
-          resubmitBundle(clientBundle, exception);
+          resubmitBundle(clientBundle, null);
         }
         if (debugEnabled) log.debug("{} resubmitting all queued jobs", this);
         final Set<ClientTaskBundle> resubmitted = new HashSet<>(jobCount.get());
@@ -305,12 +309,18 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         bundleQueue.drainTo(resubmitted);
         resubmitted.forEach(bundle -> {
           resubmittedIds.add(bundle.getBundleId());
-          resubmitBundle(bundle, exception);
+          if (debugEnabled) log.debug("resubmitting {}", bundle);
+          resubmitBundle(bundle, null);
         });
         jobCount.set(0);
         final Map<Long, RemoteResponse> map = new ConcurrentHashMap<>(responseMap);
         responseMap.clear();
-        map.forEach((id, response) -> { if (!resubmittedIds.contains(id)) resubmitBundle(response.clientBundle, exception); });
+        map.forEach((id, response) -> {
+          if (!resubmittedIds.contains(id)) {
+            if (debugEnabled) log.debug("resubmitting {}", response.clientBundle);
+            resubmitBundle(response.clientBundle, null);
+          }
+        });
         reconnect();
       }
     } finally {
@@ -330,7 +340,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
   private void resubmitBundle(final ClientTaskBundle clientBundle, final Exception e) {
     if (debugEnabled) log.debug("resubmitting {} with exception {}", clientBundle, e);
     clientBundle.resubmit();
-    clientBundle.taskCompleted(e);
+    clientBundle.taskCompleted(null);
     clientBundle.getClientJob().removeChannel(this);
   }
 
@@ -409,7 +419,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[')
       .append("bundleQueue=").append(bundleQueue.size())
       .append(", responseMap=").append(responseMap.size())
-      .append(", joBCount=").append(getCurrentNbJobs())
+      .append(", jobCount=").append(getCurrentNbJobs())
       .append(", resetting=").append(resetting)
       .append(", bundlerAlgorithm=").append(bundlerAlgorithm)
       .append(", channel=");

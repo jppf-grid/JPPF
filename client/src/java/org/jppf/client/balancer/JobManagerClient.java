@@ -337,7 +337,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     } else if (!bNew && bOld) {
       synchronized(workingConnections) {
         workingConnections.removeValue(wrapper.getPriority(), wrapper);
-        taskQueueChecker.setHighestPriority(workingConnections.firstKey());
+        if (!workingConnections.isEmpty()) taskQueueChecker.setHighestPriority(workingConnections.firstKey());
       }
     }
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) {

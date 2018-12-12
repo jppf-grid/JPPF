@@ -150,7 +150,7 @@ public class TestJobListener extends BaseTest {
       print(false, false, "waiting for task start notification");
       taskListener.await();
       BaseTestHelper.printToAll(jppfClient, true, true, true, false, false, "resetting client");
-      jppfClient.reset();
+      jppfClient.reset(jppfClient.getConfig());
       print(false, false, "getting job results");
       final List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
