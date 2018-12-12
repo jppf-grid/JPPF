@@ -19,7 +19,6 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
@@ -31,6 +30,7 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -79,7 +79,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * A list of all the connections.
    */
-  private final List<ChannelWrapper> allConnections = new ArrayList<>();
+  private final CollectionSortedMap<Integer, ChannelWrapper> allConnections = new LinkedListSortedMap<>(new DescendingIntegerComparator());
+  //private final List<ChannelWrapper> allConnections = new ArrayList<>();
   /**
    * Listener used for monitoring state changes.
    */
@@ -104,15 +105,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Holds the current connections with ACTIVE or EXECUTING status.
    */
-  private final ConcurrentHashMap<String, ChannelWrapper> workingConnections = new ConcurrentHashMap<>();
+  private final CollectionSortedMap<Integer, ChannelWrapper> workingConnections = new LinkedListSortedMap<>(new DescendingIntegerComparator());
+  //private final ConcurrentHashMap<String, ChannelWrapper> workingConnections = new ConcurrentHashMap<>();
   /**
    * Determines whether this job manager has been closed.
    */
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  /**
-   * Counts the number of connections for each priority value.
-   */
-  private final SortedMap<Integer, Integer> priorityCounts = new TreeMap<>();
   /**
    * The JPPF client.
    */
@@ -158,7 +156,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     if (log.isDebugEnabled()) log.debug("adding connection " + wrapper);
     synchronized(allConnections) {
-      allConnections.add(wrapper);
+      allConnections.putValue(wrapper.getPriority(), wrapper);
     }
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
   }
@@ -175,7 +173,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       else updateConnectionStatus(wrapper, wrapper.getOldStatus(), wrapper.getStatus());
     } finally {
       synchronized(allConnections) {
-        allConnections.remove(wrapper);
+        allConnections.removeValue(wrapper.getPriority(), wrapper);
       }
     }
   }
@@ -237,7 +235,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    */
   public List<ChannelWrapper> getAllConnections() {
     synchronized(allConnections) {
-      return new ArrayList<>(allConnections);
+      return new ArrayList<>(allConnections.allValues());
     }
   }
 
@@ -246,7 +244,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @return a list of {@link ChannelWrapper} instances.
    */
   public List<ChannelWrapper> getWorkingConnections() {
-    return new ArrayList<>(workingConnections.values());
+    synchronized(workingConnections) {
+      return new ArrayList<>(workingConnections.allValues());
+    }
   }
 
   /**
@@ -273,7 +273,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @return {@code true} if there is at least one connection, {@code false} otherwise.
    */
   public boolean hasWorkingConnection() {
-    return !workingConnections.isEmpty();
+    synchronized(workingConnections) {
+      return !workingConnections.isEmpty();
+    }
   }
 
   /**
@@ -326,28 +328,17 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if ((wrapper == null) || (oldStatus == newStatus)) return;
     final boolean bNew = newStatus.isWorkingStatus();
     final boolean bOld = oldStatus.isWorkingStatus();
-    final int priority = wrapper.getPriority();
+    //final int priority = wrapper.getPriority();
     if (bNew && !bOld) {
-      synchronized(priorityCounts) {
-        final Integer n = priorityCounts.get(priority);
-        priorityCounts.put(priority, (n == null) ? 1 : n + 1);
-        final int highest = priorityCounts.lastKey();
-        if (debugEnabled) log.debug("setting highest priority {} for oldStatus={}, newStatus={}, channel={}", highest, oldStatus, newStatus, wrapper);
-        taskQueueChecker.setHighestPriority(highest);
+      synchronized(workingConnections) {
+        workingConnections.putValue(wrapper.getPriority(), wrapper);
+        taskQueueChecker.setHighestPriority(workingConnections.firstKey());
       }
-      workingConnections.put(wrapper.getConnectionUuid(), wrapper);
     } else if (!bNew && bOld) {
-      synchronized(priorityCounts) {
-        final Integer n = priorityCounts.get(priority);
-        if (n != null) {
-          if (n <= 1) priorityCounts.remove(priority);
-          else priorityCounts.put(priority, n - 1);
-          final int highest = priorityCounts.isEmpty() ? Integer.MIN_VALUE : priorityCounts.lastKey();
-          if (debugEnabled) log.debug("setting highest priority {} for oldStatus={}, newStatus={}, channel={}", highest, oldStatus, newStatus, wrapper);
-          taskQueueChecker.setHighestPriority(highest);
-        }
+      synchronized(workingConnections) {
+        workingConnections.removeValue(wrapper.getPriority(), wrapper);
+        taskQueueChecker.setHighestPriority(workingConnections.firstKey());
       }
-      workingConnections.remove(wrapper.getConnectionUuid());
     }
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) {
       if (debugEnabled) log.debug("processing active status for {}", wrapper);

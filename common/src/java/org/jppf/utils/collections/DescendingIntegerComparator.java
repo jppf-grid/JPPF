@@ -18,7 +18,7 @@
 
 package org.jppf.utils.collections;
 
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * This comparator defines a descending value order for integers.
@@ -36,5 +36,20 @@ public class DescendingIntegerComparator implements Comparator<Integer> {
     if (o1 == null) return (o2 == null) ? 0 : 1;
     else if (o2 == null) return -1;
     return o2.compareTo(o1);
+  }
+
+  /**
+   * To quickly test this comparator.
+   * @param args not used.
+   */
+  public static void main(final String...args) {
+    try {
+      final SortedSet<Integer> set = new TreeSet<>(new DescendingIntegerComparator());
+      final int[] values = { 10, 1, 15, 4, 17 };
+      for (int i=0; i<values.length; i++) set.add(values[i]);
+      System.out.println("sorted set: " + set);
+    } catch (final Exception e) {
+      e.printStackTrace();
+    }
   }
 }

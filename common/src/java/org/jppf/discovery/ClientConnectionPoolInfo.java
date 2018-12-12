@@ -183,6 +183,7 @@ public class ClientConnectionPoolInfo extends DriverConnectionInfo {
       .append(", poolSize=").append(poolSize)
       .append(", jmxPoolSize=").append(jmxPoolSize)
       .append(", heartbeatEnabled=").append(heartbeatEnabled)
+      .append(", maxJobs=").append(maxJobs)
       .append(']').toString();
   }
 }

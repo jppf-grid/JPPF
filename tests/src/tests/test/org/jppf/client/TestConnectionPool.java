@@ -237,13 +237,17 @@ public class TestConnectionPool extends Setup1D1N {
     final List<JPPFJob> jobs = new ArrayList<>(nbJobs);
     final MyJobListener listener = new MyJobListener();
     for (int i=1; i<=nbJobs; i++) {
-      final JPPFJob job = BaseTestHelper.createJob(prefix + i, false, false, 1, LifeCycleTask.class, 0L);
+      final JPPFJob job = BaseTestHelper.createJob(prefix + "-" + i, false, false, 1, LifeCycleTask.class, 0L);
       job.addJobListener(listener);
       jobs.add(job);
     }
-    for (final JPPFJob job: jobs) client.submitJob(job);
+    for (final JPPFJob job: jobs) {
+      print(false, false, "submitting job %s", job);
+      client.submitJob(job);
+    }
     for (final JPPFJob job: jobs) {
       final List<Task<?>> result = job.awaitResults();
+      print(false, false, "testing results for job %s", job);
       testJobResults(1, result);
       final String name = listener.jobToPool.get(job.getUuid());
       assertNotNull(name);
@@ -278,8 +282,8 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private static void awaitConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int nbPools) throws Exception {
-    if (jmx == null) print(false, false, "waiting for working pools %s %d", operator, nbPools);
-    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for working pools %s %d", operator, nbPools);
+    if (jmx == null) print(false, false, "waiting for %s %d working pools", operator, nbPools);
+    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for %s %d working pools", operator, nbPools);
     final List<JPPFConnectionPool> list = client.awaitConnectionPools(operator, nbPools, Operator.EQUAL, 1, 5000L, JPPFClientConnectionStatus.workingStatuses());
     if (!operator.evaluate(list.size(), nbPools)) throw new IllegalStateException(String.format("failed to obtain %s %d pools (got %d)", operator, nbPools, list.size()));
   }
@@ -293,8 +297,8 @@ public class TestConnectionPool extends Setup1D1N {
    * @throws Exception if any error occurs.
    */
   private static void awaitIdleConnections(final JPPFClient client, final JMXDriverConnectionWrapper jmx, final ComparisonOperator operator, final int expected) throws Exception {
-    if (jmx == null) print(false, false, "waiting for idle conenctions %s %d", operator, expected);
-    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for idle conenctions %s %d", operator, expected);
+    if (jmx == null) print(false, false, "waiting for %s %d idle connections", operator, expected);
+    else BaseTestHelper.printToAll(jmx, true, true, true, false, false, "waiting for %s %d idle connections", operator, expected);
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override
       public boolean evaluate() {
@@ -312,7 +316,10 @@ public class TestConnectionPool extends Setup1D1N {
 
     @Override
     public void jobDispatched(final JobEvent event) {
-      jobToPool.put(event.getJob().getUuid(), event.getConnection().getConnectionPool().getName());
+      final JPPFJob job = event.getJob();
+      final JPPFConnectionPool pool = event.getConnection().getConnectionPool();
+      print(false, false, "job %s disptached to %s", job.getName(), pool);
+      jobToPool.put(job.getUuid(), pool.getName());
     }
   }
 
@@ -343,7 +350,7 @@ public class TestConnectionPool extends Setup1D1N {
      */
     public synchronized void emitPool(final String name, final int priority) {
       print(false, false, ">>> emitting %s with priority %d", name, priority);
-      queue.offer(new ClientConnectionPoolInfo(name, false, "localhost", 11101, priority, 1, 1));
+      queue.offer(new ClientConnectionPoolInfo(name, false, "localhost", 11101, priority, 1, 1, false, 1));
       notifyAll();
     }
 

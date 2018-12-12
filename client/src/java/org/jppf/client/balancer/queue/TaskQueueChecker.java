@@ -288,7 +288,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     if (channels == null) return null;
     for (final ChannelWrapper ch: channels) {
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
-        if (debugEnabled) log.debug("channel is not opened: " + ch);
+        if (debugEnabled) log.debug("channel is not opened, removing it: {}", ch);
+        idleChannels.removeValue(ch.getPriority(), ch);
         continue;
       }
       if (ch.getCurrentNbJobs() >= ch.getMaxJobs()) continue;
