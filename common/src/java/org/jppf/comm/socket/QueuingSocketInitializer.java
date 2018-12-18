@@ -65,8 +65,9 @@ class QueuingSocketInitializer extends SocketInitializerImpl {
       return f.get();
     } catch (final Exception e) {
       if (lastException == null) lastException = e;
-      if (e instanceof InterruptedException) log.warn(e.toString());
-      else log.error(e.getMessage(), e);
+      if ((e instanceof InterruptedException)) {
+        if (log.isTraceEnabled()) log.trace(e.toString());
+      } else log.error(e.getMessage(), e);
     }
     return false;
   }

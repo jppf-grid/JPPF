@@ -134,7 +134,7 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
       if (cl == null) cl = getClass().getClassLoader();
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, cl);
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, cl);
-      if (debugEnabled) log.debug("created AbstractJMXConnectionWrapper with sslEnabled={}, url={}, env={}", this.sslEnabled, url, env);
+      if (debugEnabled) log.debug("created {} with sslEnabled={}, url={}, env={}", getClass().getSimpleName(), this.sslEnabled, url, env);
     } catch(final Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -194,11 +194,8 @@ public abstract class AbstractJMXConnectionWrapper extends ThreadSynchronization
     synchronized(connectionLock) {
       if (jmxc == null) {
         jmxc = JMXConnectorFactory.newJMXConnector(url, env);
-        jmxc.addConnectionNotificationListener(new NotificationListener() {
-          @Override
-          public void handleNotification(final Notification notification, final Object handback) {
-            if (JMXConnectionNotification.FAILED.equals(notification.getType())) reset();
-          }
+        jmxc.addConnectionNotificationListener((notification, handback) -> {
+          if (JMXConnectionNotification.FAILED.equals(notification.getType())) reset();
         }, null, null);
       }
       jmxc.connect();

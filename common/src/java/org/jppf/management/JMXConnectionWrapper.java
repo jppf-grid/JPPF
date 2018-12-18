@@ -118,7 +118,7 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     if (closed.compareAndSet(false, true)) {
       connected.compareAndSet(true, false);
       listeners.clear();
@@ -130,14 +130,11 @@ public class JMXConnectionWrapper extends AbstractJMXConnectionWrapper {
       if (jmxc != null) {
         final JMXConnector connector = jmxc;
         jmxc = null;
-        final Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              connector.close();
-            } catch (final Exception e) {
-              if (debugEnabled) log.debug(e.getMessage(), e);
-            }
+        final Runnable r = () -> {
+          try {
+            connector.close();
+          } catch (final Exception e) {
+            if (debugEnabled) log.debug(e.getMessage(), e);
           }
         };
         ThreadUtils.startThread(r, getDisplayName() + " closing");
