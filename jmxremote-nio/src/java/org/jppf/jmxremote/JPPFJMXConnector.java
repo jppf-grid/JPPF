@@ -137,7 +137,7 @@ public class JPPFJMXConnector implements JMXConnector {
 
   @Override
   public void close() throws IOException {
-    mbsc.close();
+    if (mbsc != null) mbsc.close();
   }
 
   @Override
