@@ -180,15 +180,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Get the set of ids for all the jobs currently queued or executing.
-   * @return an array of ids as strings.
-   * @throws Exception if any error occurs.
-   */
-  public String[] getAllJobIds() throws Exception {
-    return (String[]) getAttribute(DriverJobManagementMBean.MBEAN_NAME, "AllJobIds");
-  }
-
-  /**
    * Get an object describing the job with the specified id.
    * @param jobId the id of the job to get information about.
    * @return an instance of <code>JobInformation</code>.
