@@ -59,7 +59,7 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
   @Override
   protected Object[] deserializeObjects() throws Exception {
     Object[] result = null;
-    synchronized(channel.getNodeLock()) {
+    synchronized(channel.getLocalNodeLock()) {
       if (debugEnabled) log.debug("waiting for next request");
       // wait until a message has been sent by the server
       currentMessage = (LocalNodeMessage) channel.takeNextMessageToSend();
@@ -89,7 +89,7 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
       message.addLocation(location);
     }
     message.setBundle(bundle);
-    synchronized(channel.getNodeLock()) {
+    synchronized(channel.getLocalNodeLock()) {
       if (debugEnabled) log.debug("wrote full results");
       // wait until the message has been read by the server
       final AsyncNodeMessageHandler handler = channel.getServer().getMessageHandler();

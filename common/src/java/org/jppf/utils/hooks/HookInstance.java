@@ -63,6 +63,7 @@ public class HookInstance<E> {
    * @return the return value of th emethod, or <code>null</code> if the method does not return anything.
    */
   public Object invoke(final String methodName, final Object... parameters) {
+    if (debugEnabled) log.debug("invoking '{}' on {}", methodName, instance);
     final int nbArgs = (parameters == null) ? 0 : parameters.length;
     try {
       final String key = methodName + ':' + nbArgs;

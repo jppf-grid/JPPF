@@ -30,7 +30,7 @@ import org.jppf.io.*;
 import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.nio.StatelessNioContext;
+import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
@@ -64,7 +64,7 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
    */
   private final AsyncNodeNioServer server;
   /**
-   * 
+   * Mappings of job uuids to a collection of ids of bundles that are distributed to the node.
    */
   private final CollectionMap<String, Long> jobToBundlesIds = new ArrayListHashMap<>();
   /**
@@ -76,13 +76,13 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
    */
   private final BlockingQueue<AbstractTaskBundleMessage> sendQueue = new LinkedBlockingQueue<>();
   /**
-   * 
+   * Common node attributes and operations.
    */
   final NodeContextAttributes attributes;
   /**
-   * 
+   * Lock to synchronize I/O on a local node.
    */
-  private final ThreadSynchronization nodeLock;
+  private final ThreadSynchronization localNodeLock;
 
   /**
    * @param server the server that handles this context.
@@ -94,7 +94,7 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
     this.driver = server.getDriver();
     this.socketChannel = socketChannel;
     this.local = (socketChannel == null);
-    this.nodeLock = local ? new ThreadSynchronization() : null;
+    this.localNodeLock = local ? new ThreadSynchronization() : null;
     this.attributes = new NodeContextAttributes(this, server.getBundlerHandler(), server);
     this.attributes.setDriver(server.getDriver());
   }
@@ -206,31 +206,33 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   @Override
   public boolean readMessage() throws Exception {
     if (message == null) message = newMessage();
+    final NioMessage msg = message;
     byteCount = message.getChannelReadCount();
     boolean b = false;
     try {
-      b = message.read();
+      b = msg.read();
     } catch (final Exception e) {
-      updateTrafficStats((AbstractTaskBundleMessage) message);
+      updateTrafficStats((AbstractTaskBundleMessage) msg);
       throw e;
     }
-    byteCount = message.getChannelReadCount() - byteCount;
-    if (b) updateTrafficStats((AbstractTaskBundleMessage) message);
+    byteCount = msg.getChannelReadCount() - byteCount;
+    if (b) updateTrafficStats((AbstractTaskBundleMessage) msg);
     return b;
   }
 
   @Override
   public boolean writeMessage() throws Exception {
-    writeByteCount = writeMessage.getChannelWriteCount();
+    final NioMessage msg = writeMessage;
+    writeByteCount = msg.getChannelWriteCount();
     boolean b = false;
     try {
-      b = writeMessage.write();
+      b = msg.write();
     } catch (final Exception e) {
-      updateTrafficStats((AbstractTaskBundleMessage) writeMessage);
+      updateTrafficStats((AbstractTaskBundleMessage) msg);
       throw e;
     }
-    writeByteCount = writeMessage.getChannelWriteCount() - writeByteCount;
-    if (b) updateTrafficStats((AbstractTaskBundleMessage) writeMessage);
+    writeByteCount = msg.getChannelWriteCount() - writeByteCount;
+    if (b) updateTrafficStats((AbstractTaskBundleMessage) msg);
     return b;
   }
 
@@ -322,7 +324,6 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
-    sb.append(", connectionUuid=").append(connectionUuid);
     sb.append(", peer=").append(peer);
     sb.append(", ssl=").append(ssl);
     sb.append(", local=").append(local);
@@ -436,7 +437,7 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   /**
    * @return a lock used to synchronize I/O with a local node.
    */
-  public ThreadSynchronization getNodeLock() {
-    return nodeLock;
+  public ThreadSynchronization getLocalNodeLock() {
+    return localNodeLock;
   }
 }
