@@ -28,7 +28,7 @@ import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.*;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.AbstractBaseNodeContext;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -85,8 +85,8 @@ class WaitingNodeRequestState extends NodeClassServerState {
         server.closeConnection(channel);
         if (context.isPeer()) {
           final String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
-          final AbstractNodeContext ctx = driver.getNodeNioServer().getConnection(uuid);
-          if (ctx != null) ctx.closeChannel();
+          final AbstractBaseNodeContext<?> ctx = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(uuid) : driver.getNodeNioServer().getConnection(uuid);
+          if (ctx != null) ctx.handleException(null);
         }
         return null;
       }

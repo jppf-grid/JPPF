@@ -144,25 +144,19 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @Test(timeout = TIMEOUT)
   public void testTopologyMonitoring() throws Exception {
-    client.awaitConnectionPools(Operator.EQUAL, 2, Operator.AT_LEAST, 1, TIMEOUT - 500, JPPFClientConnectionStatus.workingStatuses());
+    final long start = System.currentTimeMillis();
+    client.awaitConnectionPools(Operator.EQUAL, 2, Operator.AT_LEAST, 1, TIMEOUT - 500L, JPPFClientConnectionStatus.workingStatuses());
     try (final TopologyManager mgr = new TopologyManager(client)) {
-      final ConcurrentUtils.Condition cond = new ConcurrentUtils.Condition() {
-        @Override
-        public boolean evaluate() {
-          final List<TopologyDriver> drivers = mgr.getDrivers();
-          if ((drivers != null) && (drivers.size() == 2)) {
-            for (final TopologyDriver driver: drivers) {
-              final List<TopologyPeer> peers = driver.getPeers();
-              if ((peers == null) || (peers.size() != 1)) return false;
-            }
-            return true;
-          }
-          return false;
+      final ConcurrentUtils.Condition cond = () -> {
+        final List<TopologyDriver> drivers = mgr.getDrivers();
+        if ((drivers == null) || (drivers.size() != 2)) return false;
+        for (final TopologyDriver driver: drivers) {
+          final List<TopologyPeer> peers = driver.getPeers();
+          if ((peers == null) || (peers.size() != 1)) return false;
         }
+        return true;
       };
-      do {
-        Thread.sleep(50L);
-      } while (!cond.evaluate());
+      ConcurrentUtils.awaitCondition(cond, TIMEOUT - (System.currentTimeMillis() - start), 100L, true);
     }
   }
 

@@ -19,7 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import org.jppf.io.IOHelper;
-import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 
@@ -30,16 +29,15 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
 public class LocalNodeMessage extends AbstractTaskBundleMessage {
   /**
    * Build this nio message.
-   * @param channel the channel to read from or write to.
+   * @param context the channel to read from or write to.
    */
-  public LocalNodeMessage(final ChannelWrapper<?> channel) {
-    super(channel);
+  public LocalNodeMessage(final AbstractBaseNodeContext<?> context) {
+    super(context);
   }
 
   @Override
   public boolean read() throws Exception {
-    final AbstractNodeContext context = (AbstractNodeContext) this.channel;
-    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), context.server.getDriver().getSerializer());
+    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), ((AbstractNodeContext) channel).server.getDriver().getSerializer());
     return true;
   }
 

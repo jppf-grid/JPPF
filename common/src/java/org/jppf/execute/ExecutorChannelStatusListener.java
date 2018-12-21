@@ -25,8 +25,8 @@ import java.util.EventListener;
  * @author Martin JANDA
  * @exclude
  */
-public interface ExecutorChannelStatusListener extends EventListener
-{
+@FunctionalInterface
+public interface ExecutorChannelStatusListener extends EventListener {
   /**
    * Invoked to notify of a executions status change event on a channel.
    * @param event the event to notify of.

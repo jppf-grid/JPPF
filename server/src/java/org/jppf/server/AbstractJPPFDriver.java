@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.JPPFInitializer;
 import org.jppf.logging.jmx.JmxMessageNotifier;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.nio.*;
+import org.jppf.management.*;
+import org.jppf.nio.NioServer;
 import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.serialization.ObjectSerializer;
@@ -35,6 +35,7 @@ import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
 import org.jppf.server.nio.nodeserver.NodeNioServer;
+import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -48,7 +49,8 @@ import org.slf4j.*;
  * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
  * to handle requests to and from remote class loaders.
  * @author Laurent Cohen
- * @author Lane Schwartz (dynamically allocated server port) 
+ * @author Lane Schwartz (dynamically allocated server port)
+ * @exclude
  */
 abstract class AbstractJPPFDriver {
   // this static block must be the first thing executed when this class is loaded
@@ -83,6 +85,10 @@ abstract class AbstractJPPFDriver {
    * Serves the JPPF nodes.
    */
   NodeNioServer nodeNioServer;
+  /**
+   * Serves the JPPF nodes.
+   */
+  AsyncNodeNioServer asyncNodeNioServer;
   /**
    * Serves class loading requests from the JPPF nodes.
    */
@@ -135,6 +141,10 @@ abstract class AbstractJPPFDriver {
    * System ibnformation for this driver.
    */
   JPPFSystemInformation systemInformation;
+  /**
+   * MBean handling changes in number of nodes/processing threads.
+   */
+  PeerDriver peerDriver;
 
   /**
    * Initialize this JPPFDriver.
@@ -197,6 +207,15 @@ abstract class AbstractJPPFDriver {
    */
   public NodeNioServer getNodeNioServer() {
     return nodeNioServer;
+  }
+
+  /**
+   * Get the JPPF nodes server.
+   * @return a <code>NodeNioServer</code> instance.
+   * @exclude
+   */
+  public AsyncNodeNioServer getAsyncNodeNioServer() {
+    return asyncNodeNioServer;
   }
 
   /**
@@ -297,5 +316,20 @@ abstract class AbstractJPPFDriver {
    */
   public ObjectSerializer getSerializer() {
     return serializer;
+  }
+
+  /**
+   * @return the MBean handling changes in number of nodes/processing threads.
+   */
+  public PeerDriver getPeerDriver() {
+    return peerDriver;
+  }
+
+  /**
+   * 
+   * @param peerDriver the MBean handling changes in number of nodes/processing threads.
+   */
+  public void setPeerDriver(final PeerDriver peerDriver) {
+    this.peerDriver = peerDriver;
   }
 }

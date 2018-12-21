@@ -35,9 +35,8 @@ import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
- * @param <C> type of the <code>ExecutorChannel</code>.
  */
-abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynchronization implements Runnable {
+abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -65,7 +64,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
   /**
    * The list of idle node channels.
    */
-  final Set<C> idleChannels = new LinkedHashSet<>();
+  final Set<AbstractBaseNodeContext<?>> idleChannels = new LinkedHashSet<>();
   /**
    * Holds information about the execution context.
    */
@@ -118,7 +117,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * Get the corresponding node's context information.
    * @return a {@link JPPFContext} instance.
    */
-  JPPFContext getJPPFContext() {
+  public JPPFContext getJPPFContext() {
     return jppfContext;
   }
 
@@ -136,7 +135,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  void addIdleChannel(final C channel) {
+  public void addIdleChannel(final AbstractBaseNodeContext<?> channel) {
     if (channel == null) {
       final String message  = "channel is null";
       log.error(message);
@@ -157,7 +156,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
           added = idleChannels.add(channel);
         }
         if (added) {
-          channel.idle.set(true);
+          ((AbstractNodeContext) channel).getIdle().set(true);
           final JPPFSystemInformation info = channel.getSystemInformation();
           if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
           stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
@@ -173,14 +172,14 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  C removeIdleChannel(final C channel) {
+  AbstractBaseNodeContext<?> removeIdleChannel(final AbstractBaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("removing idle channel {}", channel);
     boolean removed = false;
     synchronized(idleChannels) {
       removed = idleChannels.remove(channel);
     }
     if (removed) {
-      channel.idle.set(false);
+      ((AbstractNodeContext) channel).getIdle().set(false);
       final JPPFSystemInformation info = channel.getSystemInformation();
       if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
       stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
@@ -192,7 +191,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * Asynchronously remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
    */
-  void removeIdleChannelAsync(final C channel) {
+  public void removeIdleChannelAsync(final AbstractBaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("request to remove idle channel {}", channel);
     channelsExecutor.execute(() -> removeIdleChannel(channel));
   }
@@ -201,7 +200,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  List<C> getIdleChannels() {
+  public List<AbstractBaseNodeContext<?>> getIdleChannels() {
     synchronized (idleChannels) {
       return new ArrayList<>(idleChannels);
     }

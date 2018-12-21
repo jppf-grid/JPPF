@@ -41,19 +41,19 @@ public abstract class AbstractLocalChannelWrapper<S, T extends AbstractNioContex
   /**
    * This channel's key ops.
    */
-  protected int keyOps = 0;
+  protected int keyOps;
   /**
    * This channel's ready ops.
    */
-  protected int readyOps = 0;
+  protected int readyOps;
   /**
    * The resource passed to the node.
    */
-  protected S nodeResource = null;
+  protected S nodeResource;
   /**
    * The resource passed to the server.
    */
-  protected S serverResource = null;
+  protected S serverResource;
   /**
    * Object used to synchronize threads when reading/writing the node message.
    */

@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.server.node.JPPFContainer;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -37,6 +38,10 @@ public class JPPFRemoteContainer extends JPPFContainer {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -70,6 +75,7 @@ public class JPPFRemoteContainer extends JPPFContainer {
    */
   @Override
   public int deserializeObjects(final Object[] list, final int count, final ExecutorService executor) throws Throwable {
+    if (debugEnabled) log.debug("deserializing {} objects", count);
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(classLoader);
@@ -81,14 +87,21 @@ public class JPPFRemoteContainer extends JPPFContainer {
         completionService.submit(new ObjectDeserializationTask(dl, i));
       }
       Throwable t = null;
+      int throwableCount = 0;
       for (int i=0; i<count; i++) {
         final Future<ObjectDeserializationTask> f = completionService.take();
         final ObjectDeserializationTask task = f.get();
         final Object o = task.getObject();
-        if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
+        if (o instanceof Throwable) {
+          throwableCount++;
+          if (t == null) t = (Throwable) o;
+        }
         list[task.getIndex() + 1] = o;
       }
-      if (t != null) throw t;
+      if (t != null) {
+        if (debugEnabled) log.debug("tasks deserialization resulted in {} errors, first throwable = {}", throwableCount, ExceptionUtils.getMessage(t));
+        throw t;
+      }
       return 0;
     } finally {
       Thread.currentThread().setContextClassLoader(cl);

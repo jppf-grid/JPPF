@@ -45,7 +45,7 @@ public class JPPFLocalContainer extends JPPFContainer {
   /**
    * The message to deserialize.
    */
-  private LocalNodeMessage currentMessage = null;
+  private LocalNodeMessage currentMessage;
 
   /**
    * Initialize this container with a specified application uuid.
@@ -117,7 +117,6 @@ public class JPPFLocalContainer extends JPPFContainer {
     }
 
     /**
-     * Execute this task.
      * @return this task, holding a deserialized object.
      */
     @Override
@@ -126,9 +125,9 @@ public class JPPFLocalContainer extends JPPFContainer {
       try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
         object = IOHelper.unwrappedData(dl, helper.getSerializer());
-        if (traceEnabled) log.debug("deserialized object index = " + index);
+        if (traceEnabled) log.trace("deserialized object index {}", index);
       } catch (final Throwable t) {
-        log.error(t.getMessage() + " [object index: " + index + ']', t);
+        log.error(t.getMessage() + " [object index: {}]", index, t);
         object = t;
       } finally {
         Thread.currentThread().setContextClassLoader(cl);

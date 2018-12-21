@@ -47,7 +47,7 @@ public class LocalNodeContext extends AbstractNodeContext {
 
   @Override
   public AbstractTaskBundleMessage newMessage() {
-    return new LocalNodeMessage(getChannel());
+    return new LocalNodeMessage(this);
   }
 
   @Override
@@ -85,7 +85,7 @@ public class LocalNodeContext extends AbstractNodeContext {
   }
 
   @Override
-  protected boolean isOffline() {
+  public boolean isOffline() {
     return false;
   }
 }

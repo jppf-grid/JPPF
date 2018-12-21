@@ -396,6 +396,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> THREAD_MANAGER_CLASS = new StringProperty("jppf.thread.manager.class", "default");
   /** Internal use. The class of node to instantiate upon node startup. For instance Java and Android nodes use a different class. */
   public static final JPPFProperty<String> NODE_CLASS = new StringProperty("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
+  /** Maximum number of jobs that can be handled concurrently by a node. */
+  public static final JPPFProperty<Integer> NODE_MAX_JOBS = new IntProperty("jppf.node.max.jobs", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
   /** Default script language for scripted property values. */
   public static final JPPFProperty<String> SCRIPT_DEFAULT_LANGUAGE = new StringProperty("jppf.script.default.language", "javascript");
   /** Fully qualified name of a class implementing {@link org.jppf.node.connection.DriverConnectionStrategy DriverConnectionStrategy}. */
@@ -450,6 +452,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.sla.default.policy", null);
   /** A default client-side execution policy to associate with submitted jobs when they don't have one. */
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
+  /** Whether to use async nodes. */
+  public static final JPPFProperty<Boolean> ASYNC_NODE = new BooleanProperty("jppf.async.node", true);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

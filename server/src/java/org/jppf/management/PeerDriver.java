@@ -38,10 +38,6 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
    * The JPPF driver.
    */
   private final JPPFDriver driver;
-  /**
-   * Singleton instance of this class.
-   */
-  private static PeerDriver instance;
 
   /**
    * Direct instantiation not permitted.
@@ -49,25 +45,15 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
    */
   public PeerDriver(final JPPFDriver driver) {
     this.driver = driver;
-    synchronized(getClass()) {
-      if (instance == null) instance = this;
-    }
+    driver.setPeerDriver(this);
   }
 
   @Override
   public TypedProperties getPeerProperties() {
     final TypedProperties props = new TypedProperties();
-    final PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
+    final PeerAttributesHandler peerHandler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getPeerHandler() : driver.getNodeNioServer().getPeerHandler();
     props.setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());
     props.setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
     return props;
-  }
-
-  /**
-   * Get the singleton instance of this class.
-   * @return a {@link PeerDriver} object.
-   */
-  public static PeerDriver getInstance() {
-    return instance;
   }
 }

@@ -61,7 +61,7 @@ class WaitingResultsState extends NodeServerState {
     //if (debugEnabled) log.debug("exec() for " + channel);
     final AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.readMessage(channel)) {
-      final BundleResults received = context.deserializeBundle();
+      final NodeBundleResults received = context.deserializeBundle();
       return process(received, context);
     }
     return TO_WAITING_RESULTS;
@@ -74,7 +74,7 @@ class WaitingResultsState extends NodeServerState {
    * @return the enxt transition to perform.
    * @throws Exception if any error occurs.
    */
-  public NodeTransition process(final BundleResults received, final AbstractNodeContext context) throws Exception {
+  public NodeTransition process(final NodeBundleResults received, final AbstractNodeContext context) throws Exception {
     final ServerTaskBundleNode nodeBundle = context.getBundle();
     server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
     //server.getNodeReservationHandler().removeReservation(context);
@@ -104,7 +104,7 @@ class WaitingResultsState extends NodeServerState {
    * @return A boolean requeue indicator.
    * @throws Exception if any error occurs.
    */
-  private boolean processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
+  private boolean processResults(final AbstractNodeContext context, final NodeBundleResults received) throws Exception {
     final TaskBundle newBundle = received.bundle();
     // if an exception prevented the node from executing the tasks or sending back the results
     final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
@@ -153,7 +153,7 @@ class WaitingResultsState extends NodeServerState {
         final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
         BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
       } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
-      server.getBundlerHandler().storeBundler(context.nodeIdentifier, bundler, context.bundlerAlgorithm);
+      server.getBundlerHandler().storeBundler(context.getNodeIdentifier(), bundler, context.getBundlerAlgorithm());
       nodeBundle.resultsReceived(data);
       updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
     }

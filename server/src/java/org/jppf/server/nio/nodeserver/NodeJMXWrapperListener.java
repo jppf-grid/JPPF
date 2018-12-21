@@ -26,7 +26,7 @@ import org.slf4j.*;
  *
  * @author Laurent Cohen
  */
-class NodeJMXWrapperListener implements JMXWrapperListener {
+public class NodeJMXWrapperListener implements JMXWrapperListener {
   /**
    * Logger for this class.
    */
@@ -38,19 +38,20 @@ class NodeJMXWrapperListener implements JMXWrapperListener {
   /**
    * The node context.
    */
-  private final AbstractNodeContext context;
+  private final AbstractBaseNodeContext<?> context;
   /**
-   * The node server.
+   * 
    */
-  private final NodeNioServer server;
+  private final NodeConnectionCompletionListener listener;
 
   /**
    * Initialize this listener.
    * @param context the node context.
+   * @param listener the listener to conneciton completion event.
    */
-  NodeJMXWrapperListener(final AbstractNodeContext context) {
+  public NodeJMXWrapperListener(final AbstractBaseNodeContext<?> context, final NodeConnectionCompletionListener listener) {
     this.context = context;
-    this.server = context.server;
+    this.listener = listener;
   }
 
   @Override
@@ -58,7 +59,7 @@ class NodeJMXWrapperListener implements JMXWrapperListener {
     if (debugEnabled) log.debug("JMX connection established from {}, for {}", this, context);
     if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXWrapperListener(this);
     else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXWrapperListener(this);
-    server.nodeConnected(context);
+    listener.nodeConnected(context);
   }
 
   @Override
@@ -66,8 +67,8 @@ class NodeJMXWrapperListener implements JMXWrapperListener {
     if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}", context);
     if (context.getJmxConnection() != null) context.getJmxConnection().removeJMXWrapperListener(this);
     else if (context.getPeerJmxConnection() != null) context.getPeerJmxConnection().removeJMXWrapperListener(this);
-    context.jmxConnection = null;
-    context.peerJmxConnection = null;
-    server.nodeConnected(context);
+    context.setJmxConnection(null);
+    context.setPeerJmxConnection(null);
+    listener.nodeConnected(context);
   }
 }

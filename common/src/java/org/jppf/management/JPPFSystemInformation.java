@@ -323,9 +323,10 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("local=").append(local);
+    sb.append("uuid=").append(getUuid().getString("jppf.uuid"));
+    sb.append(", local=").append(local);
     sb.append(", resolveInetAddressesNow=").append(resolveInetAddressesNow);
-    sb.append(", map=").append(map);
+    //sb.append(", map=").append(map);
     return sb.append(']').toString();
   }
 

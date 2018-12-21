@@ -96,6 +96,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     final LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
     if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
       taskList, dataProvider);
+    if (debugEnabled) log.debug("finished setting up bundle {}", bundle);
   }
 
   /**
@@ -103,6 +104,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    */
   @Override
   protected void cleanup() {
+    if (debugEnabled) log.debug("cleaning up bundle {}", bundle);
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     final ClassLoader cl = usedClassLoader.getClassLoader();
     final LifeCycleEventHandler handler = node.getLifeCycleEventHandler();

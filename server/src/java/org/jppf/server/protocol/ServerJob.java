@@ -29,6 +29,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.job.management.NodeJobInformation;
+import org.jppf.server.nio.nodeserver.NodeReservationHandler;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -292,7 +293,8 @@ public class ServerJob extends AbstractServerJobBase {
         if (!getSLA().isBroadcastJob()) handleCancelledTasks();
         setSubmissionStatus(SubmissionStatus.COMPLETE);
         //taskCompleted(null, null);
-        driver.getNodeNioServer().getNodeReservationHandler().onJobCancelled(this);
+        final NodeReservationHandler handler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler() : driver.getNodeNioServer().getNodeReservationHandler();
+        handler.onJobCancelled(this);
         result = true;
       }
     } finally {

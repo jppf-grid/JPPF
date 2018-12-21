@@ -21,10 +21,9 @@ package org.jppf.server.queue;
 import org.jppf.server.protocol.ServerJob;
 
 /**
-* @author Martin JANDA
-*/
-class RequeueBundleAction implements Runnable
-{
+ * @author Martin JANDA
+ */
+class RequeueBundleAction implements Runnable {
   /**
    * Reference to the job queue.
    */
@@ -39,8 +38,7 @@ class RequeueBundleAction implements Runnable
    * @param queue the reference queue to use.
    * @param serverJob the reference to job to use.
    */
-  public RequeueBundleAction(final JPPFPriorityQueue queue, final ServerJob serverJob)
-  {
+  public RequeueBundleAction(final JPPFPriorityQueue queue, final ServerJob serverJob) {
     if (queue == null) throw new IllegalArgumentException("queue is null");
     if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
 
@@ -49,8 +47,7 @@ class RequeueBundleAction implements Runnable
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     queue.requeue(serverJob);
   }
 }

@@ -88,18 +88,18 @@ class SendingBundleState extends NodeServerState {
           return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
         }
         nodeBundle.getJob().setExecutionStartTime(System.nanoTime());
-        context.serializeBundle(channel);
+        context.serializeBundle();
       } else {
         if (debugEnabled) log.debug("null bundle for node " + channel);
         return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
       }
     }
     if (context.writeMessage(channel)) {
-      if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
+      if (debugEnabled) log.debug("sent entire bundle {} to node {}", context.getBundle(), channel);
       final ServerTaskBundleNode nodeBundle = context.getBundle();
       final JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
       if (schedule != null) {
-        final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server, nodeBundle, context.isOffline() ? null : context);
+        final NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server.getOfflineNodeHandler(), nodeBundle, context.isOffline() ? null : context);
         server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
       }
       context.setMessage(null);
@@ -109,7 +109,6 @@ class SendingBundleState extends NodeServerState {
     return TO_SENDING_BUNDLE;
   }
 
-  
   /**
    * Process an offline request from the node.
    * @param context the current context associated with the channel.

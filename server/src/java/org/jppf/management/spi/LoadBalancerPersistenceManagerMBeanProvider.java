@@ -44,6 +44,6 @@ public class LoadBalancerPersistenceManagerMBeanProvider implements JPPFDriverMB
 
   @Override
   public Object createMBean(final JPPFDriver driver) {
-    return driver.getNodeNioServer().getBundlerHandler();
+    return driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getBundlerHandler() : driver.getNodeNioServer().getBundlerHandler();
   }
 }

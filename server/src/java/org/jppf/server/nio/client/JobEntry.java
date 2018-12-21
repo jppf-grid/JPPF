@@ -30,11 +30,6 @@ class JobEntry {
    */
   ServerTaskBundleClient clientBundle;
   /**
-   * List of completed bundles to send to the client.
-   */
-  //protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<>();
-  //protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<>();
-  /**
    * The job as initially submitted by the client.
    */
   ServerTaskBundleClient initialBundleWrapper;
@@ -74,22 +69,6 @@ class JobEntry {
   public ServerTaskBundleClient getInitialBundleWrapper() {
     return initialBundleWrapper;
   }
-
-  /**
-   * Get the next bundle in the queue.
-   * @return A {@link ServerJob} instance, or null if the queue is empty.
-  public ServerTaskBundleClient pollCompletedBundle() {
-    return completedBundles.poll();
-  }
-   */
-
-  /**
-   * Determine whether list of completed bundles is empty.
-   * @return whether list of <code>ServerJob</code> instances is empty.
-  public boolean isCompletedBundlesEmpty() {
-    return completedBundles.isEmpty();
-  }
-   */
 
   /**
    * @return the uuid of the current job, if any.

@@ -9,7 +9,8 @@ function retrieve() {
   sb.append("port=").append(peer.getPort()).append("\n");
   sb.append("name=").append(peer.getName()).append("\n");
   sb.append("secure=").append(peer.isSecure()).append("\n");
-  var channels = driver.getNodeNioServer().getAllChannels();
+  var asyncNode = driver.isAsyncNode();
+  var channels = asyncNode ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
   var size = channels.size();
   if (size != 2) return "ko: nbChannels = " + size;
   var peerCount = 0;
@@ -19,7 +20,7 @@ function retrieve() {
       peerCount++;
       if (peerCount > 1) return "ko: peerCount = " + peerCount;
       sb.append("channel.secure=").append(channel.isSecure()).append("\n");
-      var key = channel.getChannel().getChannel();
+      var key = asyncNode ? channel.getSelectionKey() : channel.getChannel().getChannel();
       var port = key.channel().socket().getLocalPort();
       sb.append("channel.local.port=").append(port).append("\n");
     }

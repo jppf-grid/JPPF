@@ -63,7 +63,7 @@ class SendInitialBundleState extends NodeServerState {
     if (context.getMessage() == null) {
       if (debugEnabled) log.debug("serializing initial bundle for " + channel);
       context.setBundle(server.getInitialBundle());
-      context.serializeBundle(channel);
+      context.serializeBundle();
     }
     if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent handshake job for channel id = {}", context.getChannel().getId());

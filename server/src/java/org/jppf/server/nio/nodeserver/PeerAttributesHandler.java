@@ -25,6 +25,7 @@ import javax.management.*;
 
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.JPPFThreadFactory;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -67,12 +68,18 @@ public class PeerAttributesHandler implements NotificationListener {
    * Notification sequence number.
    */
   private final AtomicLong notifCount = new AtomicLong(0L);
+  /**
+   * The JPPF driver.
+   */
+  private final JPPFDriver driver;
 
   /**
    * Initialize this handler.
+   * @param driver reference to the JPPF driver.
    * @param nbThreads the number of threads in the thread pool.
    */
-  public PeerAttributesHandler(final int nbThreads) {
+  public PeerAttributesHandler(final JPPFDriver driver, final int nbThreads) {
+    this.driver = driver;
     executor = Executors.newFixedThreadPool(nbThreads, new JPPFThreadFactory("PeerHandler"));
   }
 
@@ -97,10 +104,11 @@ public class PeerAttributesHandler implements NotificationListener {
    * @param peer the peer to update.
    * @param props the updated attributes.
    */
-  private static void updatePeer(final AbstractNodeContext peer, final TypedProperties props) {
+  private static void updatePeer(final AbstractBaseNodeContext<?> peer, final TypedProperties props) {
     final int newNodes = props.getInt(PEER_TOTAL_NODES, 0);
     final int newThreads = props.getInt(PEER_TOTAL_THREADS, 0);
     final JPPFSystemInformation info = peer.getSystemInformation();
+    if (debugEnabled) log.debug("updating peer with newNodes={}, newThreads={}, systemInfo={}, peer={}", newNodes, newThreads, info, peer);
     if (info != null) {
       final TypedProperties jppf = info.getJppf();
       final int nodes = jppf.getInt(PEER_TOTAL_NODES);
@@ -118,7 +126,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Called when a node gets closed.
    * @param context the node context.
    */
-  void onCloseNode(final AbstractNodeContext context) {
+  public void onCloseNode(final AbstractBaseNodeContext<?> context) {
     if (!context.isPeer()) {
       totalNodes.decrementAndGet();
       final JPPFSystemInformation sys = context.getSystemInformation();
@@ -143,7 +151,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Called when a node gets connected to the server.
    * @param context the node context.
    */
-  void onNodeConnected(final AbstractNodeContext context) {
+  public void onNodeConnected(final AbstractBaseNodeContext<?> context) {
     if (!context.isPeer()) {
       totalNodes.incrementAndGet();
       final JPPFSystemInformation sys = context.getSystemInformation();
@@ -157,8 +165,17 @@ public class PeerAttributesHandler implements NotificationListener {
       final JMXDriverConnectionWrapper jmx = context.getPeerJmxConnection();
       if (jmx != null) {
         try {
+          if (debugEnabled) log.debug("registered peer attributes handler notification listener on node {}", context);
+          executor.execute(() -> {
+            try {
+              updatePeer(context, (TypedProperties) jmx.getAttribute(PeerDriverMBean.MBEAN_NAME, "PeerProperties"));
+            } catch (final Exception e) {
+              if (debugEnabled) log.debug("getting peer config for {}", context, e);
+            }
+          });
           jmx.addNotificationListener(PeerDriverMBean.MBEAN_NAME, this, null, context);
-        } catch (@SuppressWarnings("unused") final Exception ignore) {
+        } catch (final Exception e) {
+          if (debugEnabled) log.debug("error registering notification listener", e);
         }
       }
     }
@@ -173,7 +190,7 @@ public class PeerAttributesHandler implements NotificationListener {
     props.setInt(PEER_TOTAL_NODES, totalNodes.get());
     props.setInt(PEER_TOTAL_THREADS, totalThreads.get());
     notif.setUserData(props);
-    PeerDriver.getInstance().sendNotification(notif);
+    driver.getPeerDriver().sendNotification(notif);
   }
 
   /**
@@ -185,12 +202,10 @@ public class PeerAttributesHandler implements NotificationListener {
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        final TypedProperties props = (TypedProperties) notification.getUserData();
-        updatePeer((AbstractNodeContext) handback, props);
-      }
+    if (debugEnabled) log.debug("received notification {} for {}", notification.getUserData(), handback);
+    executor.execute(() -> {
+      final TypedProperties props = (TypedProperties) notification.getUserData();
+      updatePeer((AbstractBaseNodeContext<?>) handback, props);
     });
   }
 }

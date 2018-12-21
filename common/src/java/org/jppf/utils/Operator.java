@@ -29,6 +29,8 @@ public enum Operator implements ComparisonOperator {
   EQUAL {
     @Override
     public boolean evaluate(final long actual, final long expected) { return actual == expected; }
+    @Override
+    public String toString() { return "equal to"; }
   },
   /**
    * The number of connections is different from the expected number.
@@ -36,6 +38,8 @@ public enum Operator implements ComparisonOperator {
   NOT_EQUAL {
     @Override
     public boolean evaluate(final long actual, final long expected) { return actual != expected; }
+    @Override
+    public String toString() { return "not equal to"; }
   },
   /**
    * The number of connections is at least the expected number.
@@ -65,4 +69,9 @@ public enum Operator implements ComparisonOperator {
     @Override
     public boolean evaluate(final long actual, final long expected) { return actual < expected; }
   };
+
+  @Override
+  public String toString() {
+    return name().toLowerCase().replace("_", " ");
+  }
 }

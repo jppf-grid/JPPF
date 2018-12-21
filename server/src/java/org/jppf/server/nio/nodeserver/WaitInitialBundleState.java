@@ -73,7 +73,7 @@ class WaitInitialBundleState extends NodeServerState {
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("received handshake response for channel id = {}", context.getChannel().getId());
-      final BundleResults received = context.deserializeBundle();
+      final NodeBundleResults received = context.deserializeBundle();
       final TaskBundle bundle = received.bundle();
       final boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
       if (offline) ((RemoteNodeContext) context).setOffline(true);
@@ -82,8 +82,8 @@ class WaitInitialBundleState extends NodeServerState {
       final String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
       final JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
-      context.nodeIdentifier = NodeServerUtils.getNodeIdentifier(server.getBundlerFactory(), channel, systemInfo);
-      if (debugEnabled) log.debug("nodeID = {} for node = {}", context.nodeIdentifier, context);
+      context.setNodeIdentifier(NodeServerUtils.getNodeIdentifier(server.getBundlerFactory(), channel, systemInfo));
+      if (debugEnabled) log.debug("nodeID = {} for node = {}", context.getNodeIdentifier(), context);
       final boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (systemInfo != null) {
@@ -192,7 +192,7 @@ class WaitInitialBundleState extends NodeServerState {
    * @return the next transition to process.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition processOfflineReopen(final BundleResults received, final AbstractNodeContext context) throws Exception {
+  private NodeTransition processOfflineReopen(final NodeBundleResults received, final AbstractNodeContext context) throws Exception {
     final TaskBundle bundle = received.bundle();
     final String jobUuid = bundle.getParameter(JOB_UUID);
     final long id = bundle.getParameter(NODE_BUNDLE_ID);

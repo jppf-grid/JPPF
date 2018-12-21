@@ -39,7 +39,7 @@ import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.classloader.ClassCache;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.peer.*;
 import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
@@ -386,7 +386,7 @@ public class DriverInitializer {
           final String nodeUuid = (String) notif.getSource();
           final TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
           if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
-          final AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
+          final AbstractBaseNodeContext<?> node = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(nodeUuid) : driver.getNodeNioServer().getConnection(nodeUuid);
           if (node == null) return;
           synchronized(node.getMonitor()) {
             final TypedProperties oldConfig = node.getSystemInformation().getJppf();

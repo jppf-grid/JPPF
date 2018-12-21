@@ -202,6 +202,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private void processNextJob() throws Exception {
     final Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
+    if (debugEnabled) log.debug("received bundle");
     TaskBundle bundle = pair.first();
     List<Task<?>> taskList = pair.second();
     if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
@@ -222,6 +223,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       } else processResults(bundle, taskList);
     } else {
       if (currentBundle != null) {
+        if (!isOffline()) currentBundle.first().setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getParameter(BundleParameter.NODE_BUNDLE_ID));
         bundle = currentBundle.first();
         taskList = currentBundle.second();
       }

@@ -33,6 +33,10 @@ public abstract class StatelessNioContext extends AbstractNioContext<EmptyEnum> 
    * The message to write, if any.
    */
   protected NioMessage writeMessage;
+  /**
+   * Whether this is a local channel.
+   */
+  protected boolean local;
 
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
@@ -78,4 +82,19 @@ public abstract class StatelessNioContext extends AbstractNioContext<EmptyEnum> 
    * @throws Exception if any error occurs.
    */
   public abstract boolean writeMessage() throws Exception;
+
+  /**
+   * @return whether this is a local channel.
+   */
+  public boolean isLocal() {
+    return local;
+  }
+
+  /**
+   * 
+   * @param local whether this is a local channel.
+   */
+  public void setLocal(final boolean local) {
+    this.local = local;
+  }
 }

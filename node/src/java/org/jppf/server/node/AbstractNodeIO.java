@@ -80,18 +80,23 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    */
   @Override
   public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
-    final Object[] result = readObjects();
-    currentBundle = (TaskBundle) result[0];
-    final List<Task<?>> taskList = new ArrayList<>(result.length - 2);
-    if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
-      final DataProvider dataProvider = (DataProvider) result[1];
-      for (int i=0; i<currentBundle.getTaskCount(); i++) {
-        final Task<?> task = (Task<?>) result[2 + i];
-        task.setDataProvider(dataProvider).setInNode(true).setNode(node);
-        taskList.add(task);
+    try {
+      final Object[] result = readObjects();
+      currentBundle = (TaskBundle) result[0];
+      final List<Task<?>> taskList = new ArrayList<>(result.length - 2);
+      if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
+        final DataProvider dataProvider = (DataProvider) result[1];
+        for (int i=0; i<currentBundle.getTaskCount(); i++) {
+          final Task<?> task = (Task<?>) result[2 + i];
+          task.setDataProvider(dataProvider).setInNode(true).setNode(node);
+          taskList.add(task);
+        }
       }
+      return new Pair<>(currentBundle, taskList);
+    } catch (final Exception|Error e) {
+      if (debugEnabled) log.debug("error in readTask:", e);
+      throw e;
     }
-    return new Pair<>(currentBundle, taskList);
   }
 
   /**

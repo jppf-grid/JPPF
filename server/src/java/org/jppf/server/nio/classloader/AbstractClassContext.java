@@ -34,11 +34,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   /**
    * The resource read from or written to the associated channel.
    */
-  protected JPPFResourceWrapper resource = null;
-  /**
-   * Contains the JPPF peer identifier written to the socket channel.
-   */
-  protected NioObject nioObject = null;
+  protected JPPFResourceWrapper resource;
   /**
    * Reference to the driver.
    */
@@ -46,7 +42,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   /**
    * Time at which the current request was received.
    */
-  protected long requestStartTime = 0L;
+  protected long requestStartTime;
 
   /**
    * @param driver reference to the JPPF driver.

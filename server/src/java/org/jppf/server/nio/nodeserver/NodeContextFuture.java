@@ -26,7 +26,7 @@ import org.slf4j.*;
 /**
  * Future associated with a context which handles the job cancellation.
  */
-class NodeContextFuture extends FutureTask<Object> {
+public class NodeContextFuture extends FutureTask<Object> {
   /**
    * Logger for this class.
    */
@@ -42,11 +42,7 @@ class NodeContextFuture extends FutureTask<Object> {
   /**
    * Dummy runnable used for bundle execution.
    */
-  private static final Runnable NOOP_RUNNABLE = new Runnable() {
-    @Override
-    public void run() {
-    }
-  };
+  private static final Runnable NOOP_RUNNABLE = () -> {};
 
   /**
    * Initialize witht he specified runnable and result object.

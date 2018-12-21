@@ -26,6 +26,7 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.nodeserver.NodeReservationHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
@@ -187,7 +188,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       jobMap.removeValues(jobUuid);
     }
     if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
-    if (serverJob.getSLA().getDesiredNodeConfiguration() != null) driver.getNodeNioServer().getNodeReservationHandler().removeJobReservations(serverJob.getUuid());
+    if (serverJob.getSLA().getDesiredNodeConfiguration() != null) {
+      final NodeReservationHandler handler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler() : driver.getNodeNioServer().getNodeReservationHandler();
+      handler.removeJobReservations(serverJob.getUuid());
+    }
     if (!isBroadcastDispatch(serverJob)) {
       submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     }

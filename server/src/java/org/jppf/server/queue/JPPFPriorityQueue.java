@@ -30,7 +30,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.AbstractBaseNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
@@ -456,7 +456,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  public void setCallableAllConnections(final Callable<List<AbstractNodeContext>> callableAllConnections) {
+  public void setCallableAllConnections(final Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections) {
     broadcastManager.setCallableAllConnections(callableAllConnections);
   }
 

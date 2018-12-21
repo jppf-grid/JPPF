@@ -75,7 +75,11 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     } finally {
       node.setReading(false);
     }
-    if (node.isOffline() && !bundle.isHandshake()) waitChannelClosed(getSocketWrapper());
+    if (node.isOffline() && !bundle.isHandshake()) {
+      if (debugEnabled) log.debug("waiting for channel closed");
+      waitChannelClosed(getSocketWrapper());
+      if (debugEnabled) log.debug("channel closed");
+    }
     return result;
   }
 

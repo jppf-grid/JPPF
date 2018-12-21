@@ -65,18 +65,9 @@ public class BroadcastManager {
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
   /**
-   * Default callback for getting all available connections. returns an empty collection.
-   */
-  private static final Callable<List<AbstractNodeContext>> CALLABLE_ALL_CONNECTIONS_EMPTY = new Callable<List<AbstractNodeContext>>() {
-    @Override
-    public List<AbstractNodeContext> call() throws Exception {
-      return Collections.emptyList();
-    }
-  };
-  /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
-  private Callable<List<AbstractNodeContext>> callableAllConnections = CALLABLE_ALL_CONNECTIONS_EMPTY;
+  private Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections = () -> Collections.emptyList();
   /**
    * 
    */
@@ -96,8 +87,8 @@ public class BroadcastManager {
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  void setCallableAllConnections(final Callable<List<AbstractNodeContext>> callableAllConnections) {
-    if (callableAllConnections == null) this.callableAllConnections = CALLABLE_ALL_CONNECTIONS_EMPTY;
+  void setCallableAllConnections(final Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections) {
+    if (callableAllConnections == null) this.callableAllConnections = () -> Collections.emptyList();
     else this.callableAllConnections = callableAllConnections;
   }
 
@@ -164,7 +155,7 @@ public class BroadcastManager {
    */
   public void processPendingBroadcasts() {
     if (nbWorkingConnections.get() <= 0) return;
-    List<AbstractNodeContext> connections;
+    List<AbstractBaseNodeContext<?>> connections;
     try {
       connections = callableAllConnections.call();
     } catch (@SuppressWarnings("unused") final Throwable e) {
@@ -183,13 +174,13 @@ public class BroadcastManager {
    * @param connections the list of all available connections.
    * @param broadcastJob the job to dispatch to connections.
    */
-  private void processPendingBroadcast(final List<AbstractNodeContext> connections, final ServerJobBroadcast broadcastJob) {
+  private void processPendingBroadcast(final List<AbstractBaseNodeContext<?>> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     if (pendingBroadcasts.remove(broadcastJob.getUuid()) == null) return;
     final JobSLA sla = broadcastJob.getSLA();
     final List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     final Set<String> uuidSet = new HashSet<>();
-    for (final AbstractNodeContext connection : connections) {
+    for (final AbstractBaseNodeContext<?> connection : connections) {
       final ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
         final String uuid = connection.getUuid();

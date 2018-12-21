@@ -174,7 +174,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
     assertNotNull(mgt);
     final String method = ReflectionUtils.getCurrentMethodName();
     try {
-      client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", NB_TASKS / 2));
+      client.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 10));
       final String[] algos = { "proportional", "autotuned", "rl2" };
       for (int i=0; i<algos.length; i++) {
         final String algo = algos[i];
@@ -191,9 +191,9 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         assertNotNull(channels);
         if (i == 0) {
-          assertTrue(channels.size() >= 3);
+          assertCompare(Operator.AT_LEAST, channels.size(), 3);
         } else {
-          assertTrue(channels.size() > 0);
+          assertCompare(Operator.MORE_THAN, channels.size(), 0);
           uuidToChannelID.put(i, channels.get(0));
         }
       }

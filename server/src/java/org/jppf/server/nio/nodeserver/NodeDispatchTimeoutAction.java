@@ -30,7 +30,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-class NodeDispatchTimeoutAction implements Runnable {
+public class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Logger for this class.
    */
@@ -42,7 +42,7 @@ class NodeDispatchTimeoutAction implements Runnable {
   /**
    * The server handling the node to which the bundle was sent.
    */
-  private final NodeNioServer server;
+  private final OfflineNodeHandler server;
   /**
    * The bundle sent to the node.
    */
@@ -50,7 +50,7 @@ class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Context for the dispatch node.
    */
-  private final AbstractNodeContext context;
+  private final AbstractBaseNodeContext<?> context;
 
   /**
    * Initialize this action with the specified server and nodBundle.
@@ -58,7 +58,7 @@ class NodeDispatchTimeoutAction implements Runnable {
    * @param nodeBundle the bundle sent to the node.
    * @param context the context for the dispatch node, may be null  for an offline node.
    */
-  NodeDispatchTimeoutAction(final NodeNioServer server, final ServerTaskBundleNode nodeBundle, final AbstractNodeContext context) {
+  public NodeDispatchTimeoutAction(final OfflineNodeHandler server, final ServerTaskBundleNode nodeBundle, final AbstractBaseNodeContext<?> context) {
     if (server == null) throw new IllegalArgumentException("server cannot be null");
     if (nodeBundle == null) throw new IllegalArgumentException("node bundle cannot be null");
     this.server = server;
@@ -69,11 +69,11 @@ class NodeDispatchTimeoutAction implements Runnable {
   @Override
   public void run() {
     if (!nodeBundle.getJob().isHandshake()) {
-      if (debugEnabled) log.debug("node dispatch expiring : {}", nodeBundle);
+      if (debugEnabled) log.debug("node dispatch expiring : {}, context={}", nodeBundle, context);
       nodeBundle.expire();
       final String jobUuid = nodeBundle.getJob().getUuid();
       if (context == null) {
-        server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
+        server.removeNodeBundle(jobUuid, nodeBundle.getId());
         nodeBundle.setJobReturnReason(JobReturnReason.DISPATCH_TIMEOUT);
         nodeBundle.resultsReceived((List<DataLocation>) null);
       } else {

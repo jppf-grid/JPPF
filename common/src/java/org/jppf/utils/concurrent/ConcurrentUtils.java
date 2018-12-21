@@ -86,7 +86,7 @@ public final class ConcurrentUtils {
    */
   public static boolean awaitCondition(final Condition condition, final long millis, final long sleepInterval, final boolean throwExceptionOnTImeout)
     throws IllegalArgumentException, JPPFTimeoutException {
-    if (sleepInterval < 0L) throw new IllegalArgumentException("sleepInterval must be > 0");
+    if (sleepInterval < 0L) throw new IllegalArgumentException("sleepInterval must be >= 0");
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
     final long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
@@ -238,6 +238,7 @@ public final class ConcurrentUtils {
   /**
    * This abstrat class handles exceptions raised by its {@code evaluate()} method and returns {@code false} when it happens.
    */
+  @FunctionalInterface
   public static interface ConditionFalseOnException extends Condition {
     @Override
     default boolean evaluate() {

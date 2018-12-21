@@ -158,8 +158,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
     }
     if (context.isPeer()) {
       try {
-        final NodeNioServer jobNodeServer = getDriver().getNodeNioServer();
-        final AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
+        final AbstractBaseNodeContext<?> ctx = getDriver().isAsyncNode() ? getDriver().getAsyncNodeNioServer().getConnection(uuid) : getDriver().getNodeNioServer().getConnection(uuid);
         if (ctx != null) ctx.handleException(null);
       } catch(final Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);

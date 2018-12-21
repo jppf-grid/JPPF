@@ -24,7 +24,7 @@ import java.util.concurrent.locks.*;
 import javax.management.*;
 
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -52,7 +52,7 @@ class ForwardingNotificationDispatcher {
   /**
    * Connection to the node.
    */
-  private final AbstractNodeContext node;
+  private final AbstractBaseNodeContext<?> node;
   /**
    * The node uuid.
    */
@@ -79,7 +79,7 @@ class ForwardingNotificationDispatcher {
    * Initialize this dispatcher with the specified node uuid.
    * @param node connection to the node.
    */
-  public ForwardingNotificationDispatcher(final AbstractNodeContext node) {
+  public ForwardingNotificationDispatcher(final AbstractBaseNodeContext<?> node) {
     this.node = node;
     this.nodeUuid = node.getUuid();
   }

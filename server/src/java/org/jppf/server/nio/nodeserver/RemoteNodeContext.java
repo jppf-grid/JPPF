@@ -26,11 +26,6 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
  */
 public class RemoteNodeContext extends AbstractNodeContext {
   /**
-   * Determines whether the node works in offline mode.
-   */
-  private boolean offline = false;
-
-  /**
    * Default constructor.
    * @param server the NIO server that created this context.
    */
@@ -46,18 +41,5 @@ public class RemoteNodeContext extends AbstractNodeContext {
   @Override
   public boolean isLocal() {
     return false;
-  }
-
-  @Override
-  public boolean isOffline() {
-    return offline;
-  }
-
-  /**
-   * Specify whether the node works in offline mode.
-   * @param offline <code>true</code> if the node is in offline mode, <code>false</code> otherwise.
-   */
-  public void setOffline(final boolean offline) {
-    this.offline = offline;
   }
 }

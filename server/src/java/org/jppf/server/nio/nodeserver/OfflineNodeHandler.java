@@ -27,7 +27,7 @@ import org.jppf.server.protocol.ServerTaskBundleNode;
  * 
  * @author Laurent Cohen
  */
-class OfflineNodeHandler {
+public class OfflineNodeHandler {
   /**
    * Mapping of job uuid + node bundle id to <code>ServerTaskBundleNode</code> instances.
    */
@@ -37,7 +37,7 @@ class OfflineNodeHandler {
    * Add the specified node bundle to the map.
    * @param nodeBundle the bundle to add.
    */
-  void addNodeBundle(final ServerTaskBundleNode nodeBundle) {
+  public void addNodeBundle(final ServerTaskBundleNode nodeBundle) {
     bundleMap.put(ServerTaskBundleNode.makeKey(nodeBundle), nodeBundle);
   }
 
@@ -47,7 +47,7 @@ class OfflineNodeHandler {
    * @param bundleId the id of the bundle to remove.
    * @return the removed node bundle.
    */
-  ServerTaskBundleNode removeNodeBundle(final String jobUuid, final long bundleId) {
+  public ServerTaskBundleNode removeNodeBundle(final String jobUuid, final long bundleId) {
     return bundleMap.remove(ServerTaskBundleNode.makeKey(jobUuid, bundleId));
   }
 }

@@ -18,7 +18,6 @@
 
 package org.jppf.server.node.local;
 
-import org.jppf.node.AbstractNodeConnection;
 import org.jppf.server.nio.nodeserver.LocalNodeChannel;
 
 /**
@@ -26,24 +25,12 @@ import org.jppf.server.nio.nodeserver.LocalNodeChannel;
  * @author Laurent Cohen
  * @exclude
  */
-public class LocalNodeConnection extends AbstractNodeConnection<LocalNodeChannel>
-{
+public class LocalNodeConnection extends AbstractLocalNodeConnection<LocalNodeChannel> {
   /**
    * Initialize this connection with the specified serializer.
    * @param channel the communicationchannel to use.
    */
-  public LocalNodeConnection(final LocalNodeChannel channel)
-  {
-    this.channel = channel;
-  }
-
-  @Override
-  public void init() throws Exception
-  {
-  }
-
-  @Override
-  public void close() throws Exception
-  {
+  public LocalNodeConnection(final LocalNodeChannel channel) {
+    super(channel);
   }
 }

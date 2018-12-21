@@ -154,6 +154,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       if (!isJobCancelled()) {
         int count = 0;
         final ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
+        if (debugEnabled) log.debug("submitting {} tasks of bundle {}", taskList.size(), bundle);
         synchronized(taskWrapperList) {
           for (final Task<?> task : taskList) {
             if (!(task instanceof JPPFExceptionResult)) {
@@ -165,6 +166,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
             }
           }
         }
+        if (debugEnabled) log.debug("getting execution results for {} tasks of bundle {}", taskList.size(), bundle);
         for (int i=0; i<count; i++) {
           try {
             final Future<NodeTaskWrapper> future = ecs.take();

@@ -22,10 +22,10 @@ import java.nio.channels.*;
 import java.util.*;
 
 import org.jppf.JPPFRuntimeException;
-import org.jppf.nio.ChannelWrapper;
+import org.jppf.nio.*;
 import org.jppf.scripting.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.StringUtils;
@@ -82,7 +82,7 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String nodeDataChannels() {
-    return viewChannels(nodeSet());
+    return viewContexts(nodeSet());
   }
 
   @Override
@@ -96,13 +96,12 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public String nodeMessages() {
-    final Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
+    final Set<NioContext<?>> set = new HashSet<>(nodeSet());
     final StringBuilder sb = new StringBuilder();
-    for (ChannelWrapper<?> ch: set) {
-      final long id = ch.getId();
-      final AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
+    for (NioContext<?> ch: set) {
+      final AbstractNodeContext ctx = (AbstractNodeContext) ch;
       final String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
-      sb.append("channelId=").append(id).append(", message=").append(s).append('\n');
+      sb.append("uuid=").append(ch.getUuid()).append(", message=").append(s).append('\n');
     }
     return sb.toString();
   }
@@ -128,10 +127,10 @@ public class ServerDebug implements ServerDebugMBean {
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private static String viewChannels(final Set<ChannelWrapper<?>> set) {
+  private static String viewContexts(final Set<NioContext<?>> set) {
     final StringBuilder sb = new StringBuilder();
     synchronized(set) {
-      for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
+      for (NioContext<?> channel: set) sb.append(channel.toString()).append('\n');
     }
     return sb.toString();
   }
@@ -228,18 +227,17 @@ public class ServerDebug implements ServerDebugMBean {
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> nodeSet() {
-    final List<AbstractNodeContext> list = driver.getNodeNioServer().getAllChannels();
-    final Set<ChannelWrapper<?>> set = new HashSet<>();
-    for (final AbstractNodeContext ctx: list) set.add(ctx.getChannel());
+  private Set<NioContext<?>> nodeSet() {
+    final List<AbstractBaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
+    final Set<NioContext<?>> set = new HashSet<>(list);
     return set;
   }
 
   @Override
   public String taskQueueCheckerChannels() {
-    final List<AbstractNodeContext> list = driver.getNodeNioServer().getIdleChannels();
+    final List<AbstractBaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getTaskQueueChecker().getIdleChannels() : driver.getNodeNioServer().getIdleChannels();
     final StringBuilder sb = new StringBuilder();
-    for (final AbstractNodeContext ctx: list) sb.append(ctx).append('\n');
+    for (final AbstractBaseNodeContext<?> ctx: list) sb.append(ctx).append('\n');
     return sb.toString();
   }
 
@@ -260,18 +258,18 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public Map<String, Set<String>> getAllReservations() {
-    return driver.getNodeNioServer().getNodeReservationHandler().getReservations();
+    return driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservations() : driver.getNodeNioServer().getNodeReservationHandler().getReservations();
   }
 
   @Override
   public String[] getReservedJobs() {
-    final Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
+    final Set<String> set = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedJobs() : driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
     return set.toArray(new String[set.size()]);
   }
 
   @Override
   public String[] getReservedNodes() {
-    final Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
+    final Set<String> set = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedNodes() : driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
     return set.toArray(new String[set.size()]);
   }
 
