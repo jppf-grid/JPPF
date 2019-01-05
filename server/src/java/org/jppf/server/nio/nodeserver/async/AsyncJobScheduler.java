@@ -227,7 +227,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
       }
     }
     if (!toRemove.isEmpty()) {
-      for (final BaseNodeContext<?> c: toRemove) removeIdleChannelAsync(c);
+      for (final BaseNodeContext<?> c: toRemove) removeIdleChannel(c);
     }
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     return selectChannel(acceptableChannels);

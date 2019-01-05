@@ -205,7 +205,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);
-        assertTrue(channelAlgos.size() >= 1);
+        assertFalse(channelAlgos.isEmpty());
       }
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);

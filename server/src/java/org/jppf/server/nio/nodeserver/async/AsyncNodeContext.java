@@ -339,6 +339,7 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
     sb.append(", jobEntries=").append(entryMap.size());
     sb.append(", sendQueue size=").append(sendQueue.size());
     sb.append(", interestOps=").append(getInterestOps());
+    sb.append(", executionStatus=").append(getExecutionStatus());
     sb.append(']');
     return sb.toString();
   }
