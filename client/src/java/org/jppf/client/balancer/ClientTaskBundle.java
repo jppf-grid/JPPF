@@ -230,7 +230,8 @@ public class ClientTaskBundle extends JPPFTaskBundle {
   /**
    * @return the id for this bundle.
    */
-  public long getBundleId() {
+  @Override
+  public Long getBundleId() {
     return bundleId;
   }
 }

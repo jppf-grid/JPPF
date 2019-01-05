@@ -27,5 +27,5 @@ public interface NodeConnectionCompletionListener {
    * Called when a channel is connected.
    * @param context the connected channel.
    */
-  void nodeConnected(AbstractBaseNodeContext<?> context);
+  void nodeConnected(BaseNodeContext<?> context);
 }

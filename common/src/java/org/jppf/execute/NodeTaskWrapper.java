@@ -18,8 +18,9 @@
 package org.jppf.execute;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.JPPFReconnectionNotification;
+import org.jppf.execute.async.JobProcessingEntry;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.utils.ExceptionUtils;
@@ -37,11 +38,11 @@ public class NodeTaskWrapper implements Runnable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NodeTaskWrapper.class);
+  private static final Logger log = LoggerFactory.getLogger(NodeTaskWrapper.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Timer managing the tasks timeout.
    */
@@ -49,19 +50,19 @@ public class NodeTaskWrapper implements Runnable {
   /**
    * Indicator whether task was cancelled;
    */
-  private boolean cancelled = false;
+  private boolean cancelled;
   /**
    * Indicator whether <code>onCancel</code> should be called when cancelled.
    */
-  private boolean callOnCancel = false;
+  private boolean callOnCancel;
   /**
    * Indicator whether task timeout.
    */
-  private boolean timeout = false;
+  private boolean timeout;
   /**
    * Indicator that task was started.
    */
-  private boolean started = false;
+  private boolean started;
   /**
    * The task to execute within a try/catch block.
    */
@@ -70,15 +71,11 @@ public class NodeTaskWrapper implements Runnable {
   /**
    * The future created by the executor service.
    */
-  private Future<?> future = null;
-  /**
-   * 
-   */
-  private JPPFReconnectionNotification reconnectionNotification = null;
+  private Future<?> future;
   /**
    * Holds the used cpu time for this task.
    */
-  private ExecutionInfo executionInfo = null;
+  private ExecutionInfo executionInfo;
   /**
    * The elapsed time for this task's execution.
    */
@@ -87,18 +84,37 @@ public class NodeTaskWrapper implements Runnable {
    * The class loader that was used to load the task class.
    */
   private final ClassLoader taskClassLoader;
+  /**
+   * Encapsulates information about the job the task is a part of.
+   */
+  private final JobProcessingEntry jobEntry;
+  /**
+   * Whether this task has ended.
+   */
+  private final AtomicBoolean ended = new AtomicBoolean(false);
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param task the task to execute within a try/catch block.
    * @param taskClassLoader the class loader that was used to load the task class.
    * @param timeoutHandler handles the timeout for this task.
-   * @param cpuTimeEnabled whether cpu time is supported/enabled.
    */
-  public NodeTaskWrapper(final Task<?> task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler, final boolean cpuTimeEnabled) {
+  public NodeTaskWrapper(final Task<?> task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler) {
+    this(null, task, taskClassLoader, timeoutHandler);
+  }
+
+  /**
+   * Initialize this task wrapper with a specified JPPF task.
+   * @param jobEntry encapsulates information about the job the task is a part of.
+   * @param task the task to execute within a try/catch block.
+   * @param taskClassLoader the class loader that was used to load the task class.
+   * @param timeoutHandler handles the timeout for this task.
+   */
+  public NodeTaskWrapper(final JobProcessingEntry jobEntry, final Task<?> task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler) {
     this.task = task;
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
+    this.jobEntry = jobEntry;
   }
 
   /**
@@ -145,8 +161,7 @@ public class NodeTaskWrapper implements Runnable {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void run()
-  {
+  public void run() {
     if (traceEnabled) log.trace(toString());
     started = true;
     final long id = Thread.currentThread().getId();
@@ -158,8 +173,6 @@ public class NodeTaskWrapper implements Runnable {
       Thread.currentThread().setContextClassLoader(taskClassLoader);
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
-    } catch(final JPPFReconnectionNotification t) {
-      reconnectionNotification = t;
     } catch(final Throwable t) {
       task.setThrowable(t);
       if (t instanceof UnsatisfiedLinkError) task.setResult(ExceptionUtils.getStackTrace(t));
@@ -169,20 +182,18 @@ public class NodeTaskWrapper implements Runnable {
       try {
         elapsedTime = System.nanoTime() - startTime;
         if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
-      } catch(final JPPFReconnectionNotification t) {
-        if (reconnectionNotification == null) reconnectionNotification = t;
-      } catch(@SuppressWarnings("unused") final Throwable ignore) {
+      } catch(final Throwable e) {
+        if (traceEnabled) log.trace("error in finally of {}", this, e);
       }
       try {
         silentTimeout();
         silentCancel();
-      } catch(final JPPFReconnectionNotification t) {
-        if (reconnectionNotification == null) reconnectionNotification = t;
       } catch (final Throwable t) {
         task.setThrowable(t);
       }
       if (task.getThrowable() instanceof InterruptedException) task.setThrowable(null);
       cancelTimeoutAction();
+      taskEnded();
     }
   }
 
@@ -265,14 +276,6 @@ public class NodeTaskWrapper implements Runnable {
   }
 
   /**
-   * Get the reconnection notification thrown by the atysk execution, if any.
-   * @return a {@link JPPFReconnectionNotification} or <code>null</code>.
-   */
-  JPPFReconnectionNotification getReconnectionNotification() {
-    return reconnectionNotification;
-  }
-
-  /**
    * Remove the specified future from the pending set and notify
    * all threads waiting for the end of the execution.
    */
@@ -294,5 +297,19 @@ public class NodeTaskWrapper implements Runnable {
    */
   public long getElapsedTime() {
     return elapsedTime;
+  }
+
+  /**
+   * @return the object which encapsulates information about the job the task is a part of.
+   */
+  public JobProcessingEntry getJobEntry() {
+    return jobEntry;
+  }
+
+  /**
+   * called when a task terminates.
+   */
+  public void taskEnded() {
+    if (ended.compareAndSet(false, true)) jobEntry.executionManager.taskEnded(this);
   }
 }

@@ -87,7 +87,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
     try {
       queue.getBroadcastManager().processPendingBroadcasts();
       if (queue.isEmpty()) return false;
-      AbstractBaseNodeContext<?> channel = null;
+      BaseNodeContext<?> channel = null;
       ServerTaskBundleNode nodeBundle = null;
       synchronized(idleChannels) {
         if (idleChannels.isEmpty()) return false;
@@ -152,7 +152,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private AbstractBaseNodeContext<?> retrieveChannel(final ServerJob job) throws Exception {
+  private BaseNodeContext<?> retrieveChannel(final ServerJob job) throws Exception {
     return checkJobState(job) ? findIdleChannelIndex(job) : null;
   }
 
@@ -162,7 +162,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param selectedJob the job to dispatch.
    * @return the task bundle to dispatch to the specified node.
    */
-  private ServerTaskBundleNode prepareJobDispatch(final AbstractBaseNodeContext<?> channel, final ServerJob selectedJob) {
+  private ServerTaskBundleNode prepareJobDispatch(final BaseNodeContext<?> channel, final ServerJob selectedJob) {
     if (debugEnabled) log.debug("dispatching jobUuid=" + selectedJob.getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try {
@@ -181,7 +181,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param nodeBundle the job to dispatch.
    * @throws Exception if any error occurs.
    */
-  private static void dispatchJobToChannel(final AbstractBaseNodeContext<?> channel, final ServerTaskBundleNode nodeBundle) throws Exception {
+  private static void dispatchJobToChannel(final BaseNodeContext<?> channel, final ServerTaskBundleNode nodeBundle) throws Exception {
     if (debugEnabled) log.debug("dispatching {} tasks of job '{}' to node {}", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid());
     synchronized(channel.getMonitor()) {
       final Future<?> future = channel.submit(nodeBundle);
@@ -194,22 +194,22 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param job the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private AbstractBaseNodeContext<?> findIdleChannelIndex(final ServerJob job) {
+  private BaseNodeContext<?> findIdleChannelIndex(final ServerJob job) {
     final JobSLA sla = job.getJob().getSLA();
     final ExecutionPolicy policy = sla.getExecutionPolicy();
     final JPPFNodeConfigSpec spec =  sla.getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + job + " has an execution policy:\n" + policy);
-    List<AbstractBaseNodeContext<?>> acceptableChannels = new ArrayList<>(idleChannels.size());
-    final List<AbstractBaseNodeContext<?>> toRemove = new LinkedList<>();
+    List<BaseNodeContext<?>> acceptableChannels = new ArrayList<>(idleChannels.size());
+    final List<BaseNodeContext<?>> toRemove = new LinkedList<>();
     final List<String> uuidPath = job.getJob().getUuidPath().getList();
-    final Iterator<AbstractBaseNodeContext<?>> iterator = idleChannels.iterator();
+    final Iterator<BaseNodeContext<?>> iterator = idleChannels.iterator();
     final int nbJobChannels = job.getNbChannels();
     final int nbReservedNodes = reservationHandler.getNbReservedNodes(job.getUuid());
     final Collection<String> readyNodes = (spec == null) ? null : reservationHandler.getReadyNodes(job.getUuid());
     if (debugEnabled) log.debug("jobUuid={}, readyNodes={}", job.getUuid(), readyNodes);
     while (iterator.hasNext()) {
-      final AbstractBaseNodeContext<?> channel = iterator.next();
+      final BaseNodeContext<?> channel = iterator.next();
       synchronized(channel.getMonitor()) {
         if ((channel.getExecutionStatus() != ExecutorStatus.ACTIVE) || !channel.getChannel().isOpen() || channel.isClosed() || !channel.isEnabled()) {
           if (debugEnabled) log.debug("channel is not opened: " + channel);
@@ -261,13 +261,13 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
       }
     }
     if (!toRemove.isEmpty()) {
-      for (AbstractBaseNodeContext<?> c: toRemove) removeIdleChannelAsync(c);
+      for (BaseNodeContext<?> c: toRemove) removeIdleChannelAsync(c);
     }
     //if ((desiredConfiguration != null) && !reservationHandler.hasPendingNode(job.getUuid())) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     if (!acceptableChannels.isEmpty() && (desiredConfiguration != null)) acceptableChannels = filterLowestDistances(job, acceptableChannels);
     final int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    final AbstractBaseNodeContext<?> channel = (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
+    final BaseNodeContext<?> channel = (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
     return channel;
   }
 
@@ -306,7 +306,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param job the bundle from which to get the job information.
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
-  private static boolean checkMaxNodeGroups(final AbstractBaseNodeContext<?> currentNode, final ServerJob job) {
+  private static boolean checkMaxNodeGroups(final BaseNodeContext<?> currentNode, final ServerJob job) {
     final JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
     if (currentInfo == null) return true;
     final String currentMasterUuid = getMasterUuid(currentInfo);
@@ -347,7 +347,7 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param taskBundle the job.
    * @param context the current node context.
    */
-  private void updateBundler(final TaskBundle taskBundle, final AbstractBaseNodeContext<?> context) {
+  private void updateBundler(final TaskBundle taskBundle, final BaseNodeContext<?> context) {
     context.checkBundler(bundlerFactory, jppfContext);
     final Bundler<?> ctxBundler = context.getBundler();
     if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJob(taskBundle);
@@ -374,12 +374,12 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
    * @param channels the list of eligible channels.
    * @return one or more channels with the minimum computed score.
    */
-  private List<AbstractBaseNodeContext<?>> filterLowestDistances(final ServerJob job, final List<AbstractBaseNodeContext<?>> channels) {
+  private List<BaseNodeContext<?>> filterLowestDistances(final ServerJob job, final List<BaseNodeContext<?>> channels) {
     final JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
     final TypedProperties desiredConfiguration = (spec == null) ? null : spec.getConfiguration();
-    final CollectionSortedMap<Integer, AbstractBaseNodeContext<?>> scoreMap = new SetSortedMap<>();
+    final CollectionSortedMap<Integer, BaseNodeContext<?>> scoreMap = new SetSortedMap<>();
     if (debugEnabled) log.debug("computing scores for job '{}', uuid={}", job.getName(), job.getUuid());
-    for (final AbstractBaseNodeContext<?> channel: channels) {
+    for (final BaseNodeContext<?> channel: channels) {
       if (!channel.isLocal() && !channel.isOffline() && !channel.isPeer()) {
         final String reservedJobUuid = server.getNodeReservationHandler().getPendingJobUUID(channel);
         if ((reservedJobUuid != null) && reservedJobUuid.equals(job.getUuid())) continue;
@@ -393,12 +393,12 @@ public class TaskQueueChecker extends AbstractTaskQueueChecker {
     }
     if (debugEnabled) {
       final CollectionMap<Integer, String> map = new SetSortedMap<>();
-      for (Map.Entry<Integer, Collection<AbstractBaseNodeContext<?>>> entry: scoreMap.entrySet()) {
-        for (final AbstractBaseNodeContext<?> c: entry.getValue()) map.putValue(entry.getKey(), c.getUuid());
+      for (Map.Entry<Integer, Collection<BaseNodeContext<?>>> entry: scoreMap.entrySet()) {
+        for (final BaseNodeContext<?> c: entry.getValue()) map.putValue(entry.getKey(), c.getUuid());
       }
       log.debug("computed scores: {}", map);
     }
     final int n = scoreMap.firstKey();
-    return (scoreMap.isEmpty()) ? Collections.<AbstractBaseNodeContext<?>>emptyList() : new ArrayList<>(scoreMap.getValues(n));
+    return (scoreMap.isEmpty()) ? Collections.<BaseNodeContext<?>>emptyList() : new ArrayList<>(scoreMap.getValues(n));
   }
 }

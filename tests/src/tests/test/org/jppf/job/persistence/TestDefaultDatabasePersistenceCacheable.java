@@ -36,7 +36,6 @@ public class TestDefaultDatabasePersistenceCacheable extends AbstractJobPersiste
     final String prefix = "job_persistence";
     final TestConfiguration config = dbSetup(prefix);
     config.driver.jppf = "classes/tests/config/" + prefix + "/driver_cacheable_db.properties";
-    config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.template.properties";
     client = BaseSetup.setup(1, 2, true, true, config);
   }
 }

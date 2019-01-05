@@ -57,7 +57,7 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
     if (node.isAndroid()) return;
     if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
     AbstractJPPFClassLoader cl = event.getTaskClassLoader();
-    if (classpath.isForceClassLoaderReset() || !classpath.isEmpty()) cl = (AbstractJPPFClassLoader) node.resetTaskClassLoader();
+    if (classpath.isForceClassLoaderReset() || !classpath.isEmpty()) cl = (AbstractJPPFClassLoader) node.resetTaskClassLoader(event.getJob());
     if (!classpath.isEmpty()) {
       for (final ClassPathElement elt: classpath) {
         boolean validated = false;

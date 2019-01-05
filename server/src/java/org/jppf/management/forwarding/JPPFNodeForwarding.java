@@ -97,7 +97,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   @Override
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    final Set<AbstractBaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
+    final Set<BaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
     if (debugEnabled) log.debug("invoking {}() on mbean={} for selector={} ({} channels)", new Object[] {methodName, name, selector, channels.size()});
     return forward(JMXHelper.INVOKE, channels, name, methodName, params, signature);
   }
@@ -109,13 +109,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   @Override
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
-    final Set<AbstractBaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
+    final Set<BaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
     return forward(JMXHelper.GET_ATTRIBUTE, channels, name, attribute);
   }
 
   @Override
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
-    final Set<AbstractBaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
+    final Set<BaseNodeContext<?>> channels = selectionHelper.getChannels(selector);
     return forward(JMXHelper.SET_ATTRIBUTE, channels, name, attribute, value);
   }
 
@@ -297,13 +297,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * Additionally, each result may be {@code null}, in particular if the invoked method has a {@code void} return type.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forward(final byte type, final Set<AbstractBaseNodeContext<?>> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
+  Map<String, Object> forward(final byte type, final Set<BaseNodeContext<?>> nodes, final String mbeanName, final String memberName, final Object...params) throws Exception {
     try {
       final int size = nodes.size();
       if (size <= 0) return Collections.<String, Object>emptyMap();
       final ForwardCallback callback = new ForwardCallback(size);
       AbstractForwardingTask task;
-      for (final AbstractBaseNodeContext<?> node: nodes) {
+      for (final BaseNodeContext<?> node: nodes) {
         final JMXConnectionWrapper jmx = node.getJmxConnection();
         switch(type) {
           case JMXHelper.INVOKE:

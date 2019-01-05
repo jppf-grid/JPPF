@@ -45,10 +45,11 @@ public class ClientExecutionManager extends AbstractExecutionManager {
 
   /**
    * Initialize this execution manager.
+   * @param config the configuration to get the thread manager properties from.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
-  public ClientExecutionManager(final JPPFProperty<Integer> nbThreadsProperty) {
-    super(nbThreadsProperty);
+  public ClientExecutionManager(final TypedProperties config, final JPPFProperty<Integer> nbThreadsProperty) {
+    super(config, nbThreadsProperty);
   }
 
   /**
@@ -58,7 +59,8 @@ public class ClientExecutionManager extends AbstractExecutionManager {
    */
   @Override
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
-    taskNotificationDispatcher.setBundle(this.bundle = bundle);
+    this.bundle = bundle;
+    //taskNotificationDispatcher.setBundle(bundle);
     this.taskList = taskList;
     this.taskWrapperList = new ArrayList<>(taskList.size());
     this.dataProvider = taskList.get(0).getDataProvider();
@@ -84,7 +86,7 @@ public class ClientExecutionManager extends AbstractExecutionManager {
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;
-    taskNotificationDispatcher.setBundle(this.bundle = null);
+    //taskNotificationDispatcher.setBundle(this.bundle = null);
     this.taskList = null;
     this.uuidList = null;
     setJobCancelled(false);

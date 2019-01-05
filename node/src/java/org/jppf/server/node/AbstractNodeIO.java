@@ -22,11 +22,8 @@ import static org.jppf.node.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InvalidClassException;
 import java.util.*;
-import java.util.concurrent.Callable;
 
-import org.jppf.io.*;
 import org.jppf.node.protocol.*;
-import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
@@ -48,21 +45,9 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The node who owns this TaskIO.
    */
   protected final N node;
-  /**
-   * The task bundle currently being processed.
-   */
-  protected TaskBundle currentBundle = null;
-  /**
-   * Used to serialize/deserialize tasks and data providers.
-   */
-  protected ObjectSerializer serializer = null;
 
   /**
    * Initialize this TaskIO with the specified node.
@@ -73,22 +58,17 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
     HookFactory.registerConfigSingleHook(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
   }
 
-  /**
-   * Read a task from the socket connection, along with its header information.
-   * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
-   * @throws Exception if an error is raised while reading the task data.
-   */
   @Override
-  public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
+  public Pair<TaskBundle, List<Task<?>>> readJob() throws Exception {
     try {
       final Object[] result = readObjects();
-      currentBundle = (TaskBundle) result[0];
+      final TaskBundle currentBundle = (TaskBundle) result[0];
       final List<Task<?>> taskList = new ArrayList<>(result.length - 2);
       if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
         final DataProvider dataProvider = (DataProvider) result[1];
         for (int i=0; i<currentBundle.getTaskCount(); i++) {
           final Task<?> task = (Task<?>) result[2 + i];
-          task.setDataProvider(dataProvider).setInNode(true).setNode(node);
+          task.setDataProvider(dataProvider).setInNode(true).setNode(node).setJob(currentBundle);
           taskList.add(task);
         }
       }
@@ -99,31 +79,15 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
     }
   }
 
-  /**
-   * Deserialize the objects read from the socket, and reload the appropriate classes if any class change is detected.<br>
-   * A class change is triggered when an <code>InvalidClassException</code> is caught. Upon catching this exception,
-   * the class loader is reinitialized and the class are reloaded.
-   * @return an array of objects deserialized from the socket stream.
-   * @throws Exception if the classes could not be reloaded or an error occurred during deserialization.
-   */
-  protected Object[] readObjects() throws Exception {
-    Object[] result = null;
-    boolean reload = false;
+  @Override
+  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     try {
-      result = deserializeObjects();
-    } catch(final IncompatibleClassChangeError err) {
-      reload = true;
-      if (debugEnabled) log.debug(err.getMessage() + "; reloading classes", err);
-    } catch(final InvalidClassException e) {
-      reload = true;
-      if (debugEnabled) log.debug(e.getMessage() + "; reloading classes", e);
+      bundle.setSLA(null);
+      bundle.setMetadata(null);
+      sendResults(bundle, tasks);
+    } finally {
+      postSendResults(bundle);
     }
-    if (reload) {
-      if (debugEnabled) log.debug("reloading classes");
-      handleReload();
-      result = deserializeObjects();
-    }
-    return result;
   }
 
   /**
@@ -152,26 +116,36 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    * @param bundle the task wrapper to send along.
    * @param tasks the list of tasks with their result field updated.
    * @throws Exception if an error occurs while writing to the socket stream.
-   */
-  @Override
-  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
-    try {
-      bundle.setSLA(null);
-      bundle.setMetadata(null);
-      sendResults(bundle, tasks);
-    } finally {
-      postSendResults(bundle);
-    }
-  }
-
-  /**
-   * Write the execution results to the socket stream.
-   * @param bundle the task wrapper to send along.
-   * @param tasks the list of tasks with their result field updated.
-   * @throws Exception if an error occurs while writing to the socket stream.
    * @since 4.2
    */
   protected abstract void sendResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
+
+  /**
+   * Deserialize the objects read from the socket, and reload the appropriate classes if any class change is detected.<br>
+   * A class change is triggered when an <code>InvalidClassException</code> is caught. Upon catching this exception,
+   * the class loader is reinitialized and the class are reloaded.
+   * @return an array of objects deserialized from the socket stream.
+   * @throws Exception if the classes could not be reloaded or an error occurred during deserialization.
+   */
+  protected Object[] readObjects() throws Exception {
+    Object[] result = null;
+    boolean reload = false;
+    try {
+      result = deserializeObjects();
+    } catch(final IncompatibleClassChangeError err) {
+      reload = true;
+      if (debugEnabled) log.debug(err.getMessage() + "; reloading classes", err);
+    } catch(final InvalidClassException e) {
+      reload = true;
+      if (debugEnabled) log.debug(e.getMessage() + "; reloading classes", e);
+    }
+    if (reload) {
+      if (debugEnabled) log.debug("reloading classes");
+      handleReload();
+      result = deserializeObjects();
+    }
+    return result;
+  }
 
   /**
    * Perform some cleanup after sending the results.
@@ -214,81 +188,10 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
       for (int n: resubmitSet) resubmitPos[count++] = n;
       bundle.setParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, resubmitPos);
     }
-  }
-
-  /**
-   * A pairing of a list of buffers and the total length of their usable data.
-   * @exclude
-   */
-  protected static class BufferList extends Pair<List<JPPFBuffer>, Integer> {
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Initialize this pairing with the specified list of buffers and length.
-     * @param first the list of buffers.
-     * @param second the total data length.
-     */
-    public BufferList(final List<JPPFBuffer> first, final Integer second) {
-      super(first, second);
-    }
-  }
-
-  /**
-   * The goal of this class is to serialize an object before sending it back to the server,
-   * and catch an eventual exception.
-   */
-  protected class ObjectSerializationTask implements Callable<DataLocation> {
-    /**
-     * The data to send over the network connection.
-     */
-    private final Object object;
-    /**
-     * Used to serialize the object.
-     */
-    private final ObjectSerializer ser;
-    /**
-     * The context class loader to use.
-     */
-    private final ClassLoader contextCL;
-
-    /**
-     * Initialize this task with the specified data buffer.
-     * @param object the object to serialize.
-     * @param serializer used to serialize the object.
-     * @param contextCL the context class loader to use.
-     */
-    public ObjectSerializationTask(final Object object, final ObjectSerializer serializer, final ClassLoader contextCL) {
-      this.object = object;
-      this.ser = serializer;
-      this.contextCL = contextCL;
-    }
-
-    @Override
-    public DataLocation call() {
-      DataLocation dl = null;
-      final int p = (object instanceof Task) ? ((Task<?>) object).getPosition() : -1;
-      try {
-        Thread.currentThread().setContextClassLoader(contextCL);
-        if (traceEnabled) log.trace("before serialization of object at position " + p);
-        dl = IOHelper.serializeData(object, ser);
-        final int size = dl.getSize();
-        if (traceEnabled) log.trace("serialized object at position " + p + ", size = " + size);
-      } catch(final Throwable t) {
-        log.error(t.getMessage(), t);
-        try {
-          final JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
-          result.setPosition(p);
-          dl = IOHelper.serializeData(result, ser);
-        } catch(final Exception e2) {
-          log.error(e2.getMessage(), e2);
-        }
-      } finally {
-        Thread.currentThread().setContextClassLoader(contextCL);
-      }
-      return dl;
+    if (!node.isOffline() && node.getConfiguration().containsProperty(JPPFProperties.NODE_MAX_JOBS)) {
+      final int maxJobs = node.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS);
+      if (debugEnabled) log.debug("sending node max jobs = {}", maxJobs);
+      bundle.setParameter(BundleParameter.NODE_MAX_JOBS, maxJobs);
     }
   }
 }

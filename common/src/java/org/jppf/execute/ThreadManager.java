@@ -20,13 +20,16 @@ package org.jppf.execute;
 
 import java.util.concurrent.*;
 
+import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
+import org.slf4j.*;
+
 /**
  * Interface for all thread managers.
  * @author Laurent Cohen
  * @exclude
  */
-public interface ThreadManager
-{
+public interface ThreadManager {
   /**
    * Set the size of the node's thread pool.
    * @param size the size as an int.
@@ -41,14 +44,14 @@ public interface ThreadManager
 
   /**
    * Computes the total CPU time used by the execution threads.
-   * @return a <code>NodeExecutionInfo</code> instance.
+   * @return a {@code NodeExecutionInfo} instance.
    */
   ExecutionInfo computeExecutionInfo();
 
   /**
    * Computes the CPU time used by thread identified by threadID.
    * @param threadID the thread ID.
-   * @return a <code>NodeExecutionInfo</code> instance.
+   * @return a {@code NodeExecutionInfo} instance.
    */
   ExecutionInfo computeExecutionInfo(final long threadID);
 
@@ -84,9 +87,57 @@ public interface ThreadManager
   boolean isCpuTimeEnabled();
 
   /**
+   * Create the thread manager instance. Default is {@link ThreadManagerThreadPool}.
+   * @param config the configuration to get the thread manager properties from.
+   * @param nbThreadsProperty the name of the property which configures the number of threads.
+   * @return an instance of {@link ThreadManager}.
+   */
+  static ThreadManager newInstance(final TypedProperties config, JPPFProperty<Integer> nbThreadsProperty) {
+    final Logger log = LoggerFactory.getLogger(ThreadManager.class);
+    ThreadManager result = null;
+    final int poolSize = computePoolSize(config, nbThreadsProperty);
+    config.set(nbThreadsProperty, poolSize);
+    final String s = config.get(JPPFProperties.THREAD_MANAGER_CLASS);
+    if (!"default".equalsIgnoreCase(s) && !ThreadManagerThreadPool.class.getName().equals(s) && s != null) {
+      try {
+        final Class<?> clazz = Class.forName(s);
+        final Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
+        if (instance instanceof ThreadManager) {
+          result = (ThreadManager) instance;
+          log.info("Using custom thread manager: {}", s);
+        }
+      } catch(final Exception e) {
+        log.error(e.getMessage(), e);
+      }
+    }
+    if (result == null) {
+      log.info("Using default thread manager");
+      return new ThreadManagerThreadPool(poolSize);
+    }
+    //config.set(JPPFProperties.PROCESSING_THREADS, result.getPoolSize());
+    log.info("Node running {} processing thread{}", poolSize, poolSize > 1 ? "s" : "");
+    final boolean cpuTimeEnabled = result.isCpuTimeEnabled();
+    config.setBoolean("cpuTimeSupported", cpuTimeEnabled);
+    log.info("Thread CPU time measurement is {}supported", cpuTimeEnabled ? "" : "not ");
+    return result;
+  }
+
+  /**
+   * Compute a pool size based on the specified configuration and size property.
+   * @param config the config to read the rpoerty from.
+   * @param nbThreadsProperty the property that configures the pool size.
+   * @return the computed size.
+   */
+  static int computePoolSize(final TypedProperties config, JPPFProperty<Integer> nbThreadsProperty) {
+    int poolSize = config.get(nbThreadsProperty);
+    if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
+    return poolSize;
+  }
+
+  /**
    * Use class loader in this thread manager.
-   * @param classLoader  a <code>ClassLoader</code> instance.
-   * @return a <code>UsedClassLoader</code> instance. Never return <code>null</code>.
+   * @param classLoader  a {@code ClassLoader} instance.
+   * @return a {@code UsedClassLoader} instance. Never return {@code null}.
    */
   UsedClassLoader useClassLoader(final ClassLoader classLoader);
 
@@ -94,25 +145,23 @@ public interface ThreadManager
    * Helper class for managing used class loaders.
    * @exclude
    */
-  public static abstract class UsedClassLoader
-  {
+  public static abstract class UsedClassLoader {
     /**
-     * A <code>ClassLoader</code> instance.
+     * A {@code ClassLoader} instance.
      */
     private final ClassLoader classLoader;
 
     /**
      *
-     * @param classLoader a <code>ClassLoader</code> instance.
+     * @param classLoader a {@code ClassLoader} instance.
      */
-    protected UsedClassLoader(final ClassLoader classLoader)
-    {
+    protected UsedClassLoader(final ClassLoader classLoader) {
       this.classLoader = classLoader;
     }
 
     /**
      * Get a class loader instance.
-     * @return a <code>ClassLoader</code> instance.
+     * @return a {@code ClassLoader} instance.
      */
     public ClassLoader getClassLoader() {
       return classLoader;

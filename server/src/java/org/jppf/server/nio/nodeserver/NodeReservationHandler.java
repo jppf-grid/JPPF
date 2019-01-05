@@ -96,7 +96,7 @@ public class NodeReservationHandler {
    * @param job the job for which the node is to be reserved.
    * @param node the node to restart and reserve.
    */
-  public void doReservation(final ServerJob job, final AbstractBaseNodeContext<?> node) {
+  public void doReservation(final ServerJob job, final BaseNodeContext<?> node) {
     if (debugEnabled) log.debug("reserving node {} for job {}", node.getUuid(), job.getUuid());
     synchronized(this) {
       pendingMap.put(node.getUuid(), job.getUuid());
@@ -109,7 +109,7 @@ public class NodeReservationHandler {
    * Remove the job reservation for the specified job, if any.
    * @param node the node for which to remove the reservation.
    */
-  public synchronized void removeReservation(final AbstractBaseNodeContext<?> node) {
+  public synchronized void removeReservation(final BaseNodeContext<?> node) {
     if (node == null) return;
     final String nodeUuid = node.getUuid();
     if (nodeUuid == null) return;
@@ -157,7 +157,7 @@ public class NodeReservationHandler {
    * @param node the node to check.
    * @return the UUID of the corresponding job, or {@code null} if the node doesn't have a pending reservation.
    */
-  public synchronized String getPendingJobUUID(final AbstractBaseNodeContext<?> node) {
+  public synchronized String getPendingJobUUID(final BaseNodeContext<?> node) {
     return pendingMap.get(node.getUuid());
   }
 
@@ -166,7 +166,7 @@ public class NodeReservationHandler {
    * @param node the node to check.
    * @return the UUID of the corresponding job, or {@code null} if the node is not reserved.
    */
-  public synchronized String getReadyJobUUID(final AbstractBaseNodeContext<?> node) {
+  public synchronized String getReadyJobUUID(final BaseNodeContext<?> node) {
     return readyMap.get(node.getUuid());
   }
 
@@ -216,7 +216,7 @@ public class NodeReservationHandler {
    * @param node .
    * @return .
    */
-  public boolean transitionReservation(final AbstractBaseNodeContext<?> node) {
+  public boolean transitionReservation(final BaseNodeContext<?> node) {
     final TypedProperties config = node.getSystemInformation().getJppf();
     final String reservedJobUuid = config.get(JPPFProperties.NODE_RESERVED_JOB);
     if (reservedJobUuid != null) {
@@ -291,14 +291,14 @@ public class NodeReservationHandler {
     /**
      * The node to restart and reserve.
      */
-    private final AbstractBaseNodeContext<?> node;
+    private final BaseNodeContext<?> node;
 
     /**
      * Initialize this task with the specified node for the specified job.
      * @param job the job for which the node is to be reserved.
      * @param node the node to restart and reserve.
      */
-    public NodeReservationTask(final ServerJob job, final AbstractBaseNodeContext<?> node) {
+    public NodeReservationTask(final ServerJob job, final BaseNodeContext<?> node) {
       this.job = job;
       this.node = node;
     }

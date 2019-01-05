@@ -37,11 +37,11 @@ import org.slf4j.*;
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  */
-abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization implements Runnable {
+abstract class AbstractAsyncJobScheduler extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(AbstractAsyncTaskQueueChecker.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractAsyncJobScheduler.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -65,7 +65,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
   /**
    * The list of idle node channels.
    */
-  final Set<AbstractBaseNodeContext<?>> idleChannels = new LinkedHashSet<>();
+  final Set<BaseNodeContext<?>> idleChannels = new LinkedHashSet<>();
   /**
    * Holds information about the execution context.
    */
@@ -95,6 +95,10 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * The number of connected nodes below which the driver load-balances to other peer drivers.
    */
   final int peerLoadBalanceThreshold;
+  /**
+   * Whether bias towards local node is enabled.
+   */
+  final boolean localNodeBiasEnabled;
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -103,7 +107,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * @param stats reference to the statistics.
    * @param bundlerFactory the load-balancer factory.
    */
-  AbstractAsyncTaskQueueChecker(final AsyncNodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
+  AbstractAsyncJobScheduler(final AsyncNodeNioServer server, final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     this.server = server;
     this.queue = queue;
     this.disptachtoPeersWithoutNode = server.getDriver().getConfiguration().get(JPPFProperties.PEER_ALLOW_ORPHANS);
@@ -112,6 +116,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
     this.bundlerFactory = bundlerFactory;
     this.driverInfo = server.getDriver().getSystemInformation();
     this.peerLoadBalanceThreshold = server.getDriver().getInitializer().getPeerConnectionPoolHandler().getLoadBalanceThreshold();
+    this.localNodeBiasEnabled = server.getDriver().getConfiguration().get(JPPFProperties.LOCAL_NODE_BIAS);
   }
 
   /**
@@ -136,7 +141,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final AbstractBaseNodeContext<?> channel) {
+  public void addIdleChannel(final BaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("request to add idle channel {}", channel);
     if (channel == null) {
       final String message  = "channel is null";
@@ -152,7 +157,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
       if (debugEnabled) log.debug("adding idle channel {}", channel);
       if (!channel.isClosed()) {
         if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
-        boolean added = false;
+        final boolean added;
         synchronized(idleChannels) {
           added = idleChannels.add(channel);
         }
@@ -173,9 +178,9 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  AbstractBaseNodeContext<?> removeIdleChannel(final AbstractBaseNodeContext<?> channel) {
+  BaseNodeContext<?> removeIdleChannel(final BaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("removing idle channel {}", channel);
-    boolean removed = false;
+    final boolean removed;
     synchronized(idleChannels) {
       removed = idleChannels.remove(channel);
     }
@@ -192,7 +197,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * Asynchronously remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
    */
-  public void removeIdleChannelAsync(final AbstractBaseNodeContext<?> channel) {
+  public void removeIdleChannelAsync(final BaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("request to remove idle channel {}", channel);
     channelsExecutor.execute(() -> removeIdleChannel(channel));
   }
@@ -201,7 +206,7 @@ abstract class AbstractAsyncTaskQueueChecker extends ThreadSynchronization imple
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<AbstractBaseNodeContext<?>> getIdleChannels() {
+  public List<BaseNodeContext<?>> getIdleChannels() {
     synchronized (idleChannels) {
       return new ArrayList<>(idleChannels);
     }

@@ -22,12 +22,11 @@ import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.*;
-import org.jppf.management.NodeConfigNotifier;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -56,36 +55,21 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param node the node that uses this execution manager.
    */
   public NodeExecutionManager(final NodeInternal node) {
-    this(node, JPPFProperties.PROCESSING_THREADS);
-  }
-
-  /**
-   * Initialize this execution manager with the specified node.
-   * @param node the node that uses this execution manager.
-   * @param nbThreadsProperty the name of the property which configures the number of threads.
-   */
-  public NodeExecutionManager(final NodeInternal node, final JPPFProperty<Integer> nbThreadsProperty) {
-    super(nbThreadsProperty);
-    if (node == null) throw new IllegalArgumentException("node is null");
+    super(node.getConfiguration(), JPPFProperties.PROCESSING_THREADS);
     this.node = node;
   }
 
-  /**
-   * Prepare this execution manager for executing the tasks of a bundle.
-   * @param bundle the bundle whose tasks are to be executed.
-   * @param taskList the list of tasks to execute.
-   */
   @Override
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
     if (debugEnabled) log.debug("setting up bundle {}", bundle);
-    taskNotificationDispatcher.setBundle(this.bundle = bundle);
+    //taskNotificationDispatcher.setBundle(this.bundle = bundle);
     this.taskList = taskList;
     this.taskWrapperList = new ArrayList<>(taskList.size());
     this.dataProvider = taskList.get(0).getDataProvider();
     this.uuidList = bundle.getUuidPath().getList();
     ClassLoader taskClassLoader = null;
     try {
-      taskClassLoader = node instanceof ClassLoaderProvider ? ((ClassLoaderProvider) node).getClassLoader(uuidList) : getTaskClassLoader(taskList.get(0));
+      taskClassLoader = node instanceof ClassLoaderProvider ? ((ClassLoaderProvider) node).getClassLoader(uuidList) : taskList.get(0).getTaskClassLoader();
       usedClassLoader = threadManager.useClassLoader(taskClassLoader);
     } catch (final Exception e) {
       final String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
@@ -99,9 +83,6 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     if (debugEnabled) log.debug("finished setting up bundle {}", bundle);
   }
 
-  /**
-   * Cleanup method invoked when all tasks for the current bundle have completed.
-   */
   @Override
   protected void cleanup() {
     if (debugEnabled) log.debug("cleaning up bundle {}", bundle);
@@ -112,7 +93,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;
-    taskNotificationDispatcher.setBundle(this.bundle = null);
+    //taskNotificationDispatcher.setBundle(this.bundle = null);
     this.taskList = null;
     this.uuidList = null;
     setJobCancelled(false);
@@ -121,24 +102,15 @@ public class NodeExecutionManager extends AbstractExecutionManager {
     if (debugEnabled) log.debug("cleaned up bundle {}", bundle);
   }
 
-  /**
-   * Get the appropiate class loader for the specfied task.
-   * @param task the task from which to get the class laoder.
-   * @return an instance of {@link ClassLoader}.
-   */
-  private static ClassLoader getTaskClassLoader(final Task<?> task) {
-    return task.getTaskClassLoader();
-  }
-
   @Override
   public void triggerConfigChanged() {
     super.triggerConfigChanged();
-    NodeConfigNotifier.getInstance().sendNotification(node.getUuid(), node.getConfiguration());
+    node.getNodeConfigNotifier().sendNotification(node.getUuid(), node.getConfiguration());
   }
 
   @Override
   protected void taskEnded(final NodeTaskWrapper taskWrapper) {
-    // Workaoround for the Android issue https://code.google.com/p/android/issues/detail?id=211596
+    // Workaround for the Android issue https://code.google.com/p/android/issues/detail?id=211596
     final Task<?> task = taskWrapper.getTask();
     final Throwable t = task.getThrowable();
     if (node.isAndroid() && (t instanceof ReflectiveOperationException)) {

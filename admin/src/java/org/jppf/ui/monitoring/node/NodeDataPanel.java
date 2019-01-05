@@ -192,7 +192,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     final DefaultMutableTreeNode nodeNode = TopologyUtils.addNode(model, driverData, nodeData);
     if (nodeNode != null) {
       final DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) nodeNode.getParent();
-      if ((driverNode.getChildCount() == 1) && !treeTable.isCollapsed(driverNode)) treeTable.expand(driverNode);
+      //if ((driverNode.getChildCount() == 1) && !treeTable.isCollapsed(driverNode)) treeTable.expand(driverNode);
+      if (driverNode.getChildCount() == 1) treeTable.expand(driverNode);
     }
   }
 

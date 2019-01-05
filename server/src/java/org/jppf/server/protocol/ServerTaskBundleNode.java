@@ -209,7 +209,7 @@ public class ServerTaskBundleNode {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final Throwable exception) {
-    if (debugEnabled && (exception != null)) log.debug("received exception for {} : {}\ncall stack:\n{}", this, ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack());
+    if (debugEnabled && (exception != null)) log.debug("received exception for {} :\n{}\ncall stack:\n{}", this, ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack());
     try {
       job.jobReturned(this);
     } finally {

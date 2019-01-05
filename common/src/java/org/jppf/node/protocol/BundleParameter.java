@@ -77,6 +77,10 @@ public enum BundleParameter {
    */
   NODE_BUNDLE_ELAPSED_PARAM,
   /**
+   * Maxium number of concurrent jobs.
+   */
+  NODE_MAX_JOBS,
+  /**
    * Flag indicating whether the node is in offline mode.
    */
   NODE_OFFLINE,
@@ -85,9 +89,9 @@ public enum BundleParameter {
    */
   NODE_OFFLINE_OPEN_REQUEST,
   /**
-   * Id of the task bundle sent to the node.
+   * Id of the task bundle sent to the node or local client executor.
    */
-  NODE_BUNDLE_ID,
+  TASK_BUNDLE_ID,
   /**
    * Uuid of a job executed offline.
    */

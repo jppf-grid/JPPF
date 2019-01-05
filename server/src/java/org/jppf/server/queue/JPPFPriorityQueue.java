@@ -22,7 +22,7 @@ import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.*;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
@@ -30,7 +30,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
-import org.jppf.server.nio.nodeserver.AbstractBaseNodeContext;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
@@ -77,6 +77,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Handles the persistence of jobs.
    */
   final PersistenceHandler persistenceHandler;
+  /**
+   * 
+   */
+  private final Map<String, Condition> jobRemovalConditions = new HashMap<>();
+  /**
+   * 
+   */
+  private final boolean testJobRemoval;
 
   /**
    * Initialize this queue.
@@ -88,6 +96,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     this.jobManager = jobManager;
     broadcastManager = new BroadcastManager(this);
     this.persistenceHandler = new PersistenceHandler(this);
+    this.testJobRemoval = driver.getConfiguration().getBoolean("jppf.test.job.removal", false);
   }
 
   @Override
@@ -120,7 +129,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
             done = true;
           } catch (final JPPFJobEndedException e) {
             if (debugEnabled) log.debug("caught {}, awaiting removal of {}", ExceptionUtils.getMessage(e), serverJob);
-            awaitJobRemoved(serverJob, true);
+            awaitJobRemoved(serverJob);
           }
         }
         if (added) {
@@ -153,16 +162,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * 
    * @param serverJob the job to remove.
-   * @param handleLock whther o handle the queue lock.
    */
-  void awaitJobRemoved(final ServerJob serverJob, final boolean handleLock) {
+  void awaitJobRemoved(final ServerJob serverJob) {
     if (debugEnabled) log.debug("awaiting removal of {}", serverJob);
-    while (jobMap.get(serverJob.getUuid()) != null) {
+    final String uuid = serverJob.getUuid();
+    while (jobMap.get(uuid) != null) {
       try {
-        if (handleLock) lock.unlock();
-        serverJob.getRemovalCondition().goToSleep(100L);
-      } finally {
-        if (handleLock) lock.lock();
+        Condition cond = jobRemovalConditions.get(uuid);
+        if (cond == null) {
+          cond = lock.newCondition();
+          jobRemovalConditions.put(uuid, cond);
+        }
+        cond.await();
+      } catch(final InterruptedException e) {
+        log.error(e.getMessage(), e);
       }
     }
   }
@@ -175,8 +188,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   private ServerJob createServerJob(final ServerTaskBundleClient clientBundle) {
     final TaskBundle header = clientBundle.getJob();
     header.setDriverQueueTaskCount(header.getTaskCount());
-    //final Lock jobLock = ConcurrentUtils.newLock("ServerJob[name=" + header.getName() + ", uuid=" + header.getUuid() + "]");
-    //final Lock jobLock = ConcurrentUtils.newLock();
     final Lock jobLock = ConcurrentUtils.newLock("job-" + header.getName());
     final ServerJob serverJob = new ServerJob(jobLock, jobManager, header, clientBundle.getDataProvider());
     serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
@@ -251,14 +262,25 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap) {
     if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
+    // TODO: remove start
+    if (testJobRemoval) {
+      try {
+        Thread.sleep(10L);
+      } catch (final Exception e) {
+        log.error(e.getMessage(), e);
+      }
+    }
+    // TODO: remove end
     lock.lock();
     try {
       if (removeFromJobMap) {
-        if (jobMap.remove(serverJob.getUuid()) != null) {
+        final String uuid = serverJob.getUuid();
+        if (jobMap.remove(uuid) != null) {
           scheduleManager.clearSchedules(serverJob.getUuid());
           jobManager.jobEnded(serverJob);
         }
-        serverJob.getRemovalCondition().wakeUp();
+        final Condition cond = jobRemovalConditions.remove(uuid);
+        if (cond != null) cond.signalAll();
       }
       if (debugEnabled) log.debug("removing job from queue, jobName= {}, removeFromJobMap={}", serverJob.getName(), removeFromJobMap);
       if (priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob)) {
@@ -456,7 +478,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  public void setCallableAllConnections(final Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections) {
+  public void setCallableAllConnections(final Callable<List<BaseNodeContext<?>>> callableAllConnections) {
     broadcastManager.setCallableAllConnections(callableAllConnections);
   }
 

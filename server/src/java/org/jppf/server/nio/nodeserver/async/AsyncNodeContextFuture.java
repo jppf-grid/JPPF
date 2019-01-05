@@ -50,7 +50,7 @@ public class AsyncNodeContextFuture extends FutureTask<Object> {
   private static final Runnable NOOP_RUNNABLE = () -> {};
 
   /**
-   * Initialize witht he specified runnable and result object.
+   * Initialize with the specified runnable and result object.
    * @param context the node context.
    * @param bundle the node bundle to process.
    */

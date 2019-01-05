@@ -51,7 +51,7 @@ public class AsyncNodeMessageWriter extends NioMessageWriter<AsyncNodeContext> {
     final TaskBundle header = msg.getBundle();
     if (debugEnabled) log.debug("fully sent message {} for job [uuid={}, name={}, handshake={}] from context {}", data, header.getUuid(), header.getName(), header.isHandshake(), context);
     if (!header.isHandshake()) {
-      final NodeJobEntry entry = context.getJobEntry(header.getUuid(), header.getParameter(BundleParameter.NODE_BUNDLE_ID));
+      final NodeJobEntry entry = context.getJobEntry(header.getUuid(), header.getBundleId());
       context.getServer().getMessageHandler().bundleSent(context, entry.nodeBundle);
     }
   }

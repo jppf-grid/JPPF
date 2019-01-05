@@ -57,23 +57,17 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager<JPPFRem
 
   @Override
   protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl, final boolean clientAccess) throws Exception {
-    return new JPPFRemoteContainer((RemoteNodeConnection) node.getNodeConnection(), uuidPath, cl, clientAccess);
+    return new JPPFRemoteContainer(node, uuidPath, cl, clientAccess);
   }
 
   @Override
   protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath, final Object...params) {
-    return new Callable<AbstractJPPFClassLoader>() {
-      @Override
-      public AbstractJPPFClassLoader call() {
-        final PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>() {
-          @Override
-          public AbstractJPPFClassLoader run() {
-            final AbstractJPPFClassLoader parent = getClassLoader();
-            return new JPPFClassLoader(parent.getConnection(), parent, uuidPath);
-          }
-        };
-        return AccessController.doPrivileged(pa);
-      }
+    return () -> {
+      final PrivilegedAction<AbstractJPPFClassLoader> pa = () -> {
+        final AbstractJPPFClassLoader parent = getClassLoader();
+        return new JPPFClassLoader(parent.getConnection(), parent, uuidPath);
+      };
+      return AccessController.doPrivileged(pa);
     };
   }
 }

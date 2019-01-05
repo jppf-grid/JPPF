@@ -52,7 +52,7 @@ class ForwardingNotificationDispatcher {
   /**
    * Connection to the node.
    */
-  private final AbstractBaseNodeContext<?> node;
+  private final BaseNodeContext<?> node;
   /**
    * The node uuid.
    */
@@ -79,7 +79,7 @@ class ForwardingNotificationDispatcher {
    * Initialize this dispatcher with the specified node uuid.
    * @param node connection to the node.
    */
-  public ForwardingNotificationDispatcher(final AbstractBaseNodeContext<?> node) {
+  public ForwardingNotificationDispatcher(final BaseNodeContext<?> node) {
     this.node = node;
     this.nodeUuid = node.getUuid();
   }

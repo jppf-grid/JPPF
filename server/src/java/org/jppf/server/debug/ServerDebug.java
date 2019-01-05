@@ -228,16 +228,16 @@ public class ServerDebug implements ServerDebugMBean {
    * @return a set of {@link ChannelWrapper} instances.
    */
   private Set<NioContext<?>> nodeSet() {
-    final List<AbstractBaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
+    final List<BaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
     final Set<NioContext<?>> set = new HashSet<>(list);
     return set;
   }
 
   @Override
   public String taskQueueCheckerChannels() {
-    final List<AbstractBaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getTaskQueueChecker().getIdleChannels() : driver.getNodeNioServer().getIdleChannels();
+    final List<BaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getJobScheduler().getIdleChannels() : driver.getNodeNioServer().getIdleChannels();
     final StringBuilder sb = new StringBuilder();
-    for (final AbstractBaseNodeContext<?> ctx: list) sb.append(ctx).append('\n');
+    for (final BaseNodeContext<?> ctx: list) sb.append(ctx).append('\n');
     return sb.toString();
   }
 

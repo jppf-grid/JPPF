@@ -64,7 +64,6 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
     final String prefix = "lb_persistence_p2p";
     final TestConfiguration config = dbSetup(prefix, useDB);
     config.driver.jppf = "classes/tests/config/" + prefix + "/" + driverConfigFile;
-    config.driver.log4j = "classes/tests/config/" + prefix + "/log4j-driver.properties";
     client = BaseSetup.setup(2, 2, true, false, config);
     checkPeers(15_000L, false, true);
   }
@@ -178,25 +177,30 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       final String[] algos = { "proportional", "autotuned", "rl2" };
       for (int i=0; i<algos.length; i++) {
         final String algo = algos[i];
+        print(false, false, ">>> algo=%-12s", algo);
         for (int j=0; j<jmxList.size(); j++) jmxList.get(j).changeLoadBalancerSettings(algo, lbis.get(j).getParameters());
         final JPPFJob job = BaseTestHelper.createJob(method + "-" + algo, true, false, NB_TASKS, LifeCycleTask.class, 1L);
         job.getClientSLA().setMaxChannels(2);
-        if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.driver.uuid", true, "d" + i));
+        if (i > 0) job.getClientSLA().setExecutionPolicy(new Equal("jppf.driver.uuid", true, "d" + (2 - i % 2)));
+        print(false, false, ">>> submitting job %s", job.getName());
         final List<Task<?>> results = client.submitJob(job);
+        print(false, false, ">>> checking job results");
         checkJobResults(NB_TASKS, results, false);
       }
+      print(false, false, ">>> check 1");
       awaitNoMorePendingOperations(mgt);
       final Map<Integer, String> uuidToChannelID = new HashMap<>();
       for (int i=0; i<algos.length; i++) {
         final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         assertNotNull(channels);
         if (i == 0) {
-          assertCompare(Operator.AT_LEAST, channels.size(), 3);
+          assertCompare(Operator.AT_LEAST, 3, channels.size());
         } else {
-          assertCompare(Operator.MORE_THAN, channels.size(), 0);
+          assertCompare(Operator.MORE_THAN, 0, channels.size());
           uuidToChannelID.put(i, channels.get(0));
         }
       }
+      print(false, false, ">>> check 2");
       // check that channel1 has algos[0] + algos[1] and channel2 has algos[0] + algos[2]
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
@@ -206,6 +210,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
       // delete algos[0] from all nodes and re-check that node1 has only algos[1] and node2 has only algos[2]
       mgt.deleteAlgorithm(algos[0]);
       awaitNoMorePendingOperations(mgt);
+      print(false, false, ">>> check 3");
       for (final Map.Entry<Integer, String> entry: uuidToChannelID.entrySet()) {
         final List<String> channelAlgos = mgt.listAlgorithms(entry.getValue());
         assertNotNull(channelAlgos);

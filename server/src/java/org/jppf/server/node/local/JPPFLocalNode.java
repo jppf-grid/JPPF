@@ -47,7 +47,7 @@ public class JPPFLocalNode extends JPPFNode {
   }
 
   @Override
-  protected void initDataChannel() throws Exception {
+  public void initDataChannel() throws Exception {
     if (nodeConnection.getChannel() instanceof AsyncNodeContext) nodeIO = new AsyncLocalNodeIO(this);
     else nodeIO = new LocalNodeIO(this);
   }
@@ -62,11 +62,6 @@ public class JPPFLocalNode extends JPPFNode {
    */
   LocalClassLoaderConnection getClassLoaderConnection() {
     return classLoaderConnection;
-  }
-
-  @Override
-  protected NodeConnectionChecker createConnectionChecker() {
-    return new LocalNodeConnectionChecker();
   }
 
   @Override

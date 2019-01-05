@@ -34,21 +34,16 @@ public class NodeConfigNotifier extends NotificationBroadcasterSupport implement
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Singleton instance of this class.
-   */
-  private static final NodeConfigNotifier instance = new NodeConfigNotifier();
-  /**
    * AN incrementing sequence number.
    */
   private static final AtomicLong sequence = new AtomicLong(0L);
 
   /**
-   * Get the singleton instance of this class.
-   * @return a {@code NodeThreadsNotifier} instance.
+   * 
    */
-  public static NodeConfigNotifier getInstance() {
-    return instance;
+  public NodeConfigNotifier() {
   }
+  
 
   /**
    * Send a notification of changes in the configuration.

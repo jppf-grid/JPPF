@@ -25,7 +25,7 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.LocalNodeMessage;
 import org.jppf.server.nio.nodeserver.async.*;
-import org.jppf.server.node.JPPFContainer;
+import org.jppf.server.node.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -59,7 +59,7 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
   @Override
   protected Object[] deserializeObjects() throws Exception {
     Object[] result = null;
-    synchronized(channel.getLocalNodeLock()) {
+    synchronized(channel.getLocalNodeReadLock()) {
       if (debugEnabled) log.debug("waiting for next request");
       // wait until a message has been sent by the server
       currentMessage = (LocalNodeMessage) channel.takeNextMessageToSend();
@@ -68,7 +68,6 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
     final DataLocation location = currentMessage.getLocations().get(0);
     final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
-    node.getExecutionManager().setBundle(bundle);
     result = deserializeObjects(bundle);
     if (debugEnabled) log.debug("got all data");
     return result;
@@ -77,19 +76,20 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
   @Override
   protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing {} results for {}", tasks.size(), bundle);
-    final ExecutorService executor = node.getExecutionManager().getExecutor();
+    final ExecutorService executor = node.getSerializationExecutor();
     finalizeBundleData(bundle, tasks);
     final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
-    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
+    int submitCount = 0;
+    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, submitCount++)));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, submitCount++)));
     final LocalNodeMessage message = (LocalNodeMessage) channel.newMessage();
     for (final Future<DataLocation> f: futureList) {
       final DataLocation location = f.get();
       message.addLocation(location);
     }
     message.setBundle(bundle);
-    synchronized(channel.getLocalNodeLock()) {
+    synchronized(channel.getLocalNodeWriteLock()) {
       if (debugEnabled) log.debug("wrote full results");
       // wait until the message has been read by the server
       final AsyncNodeMessageHandler handler = channel.getServer().getMessageHandler();

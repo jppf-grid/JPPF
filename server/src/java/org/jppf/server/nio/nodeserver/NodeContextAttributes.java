@@ -99,7 +99,7 @@ public class NodeContextAttributes {
   /**
    * 
    */
-  private final AbstractBaseNodeContext<?> context;
+  private final BaseNodeContext<?> context;
   /**
    * The load-balancer persistence manager.
    */
@@ -127,7 +127,7 @@ public class NodeContextAttributes {
    * @param bundlerHandler the load-balancer persistence manager.
    * @param listener the listener to conneciton completion event.
    */
-  public NodeContextAttributes(final AbstractBaseNodeContext<?> context, final LoadBalancerPersistenceManager bundlerHandler, final NodeConnectionCompletionListener listener) {
+  public NodeContextAttributes(final BaseNodeContext<?> context, final LoadBalancerPersistenceManager bundlerHandler, final NodeConnectionCompletionListener listener) {
     this.context = context;
     this.bundlerHandler = bundlerHandler;
     this.listener = listener;
@@ -393,6 +393,7 @@ public class NodeContextAttributes {
    */
   public void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
     if (oldValue == newValue) return;
+    if (debugEnabled) log.debug("changing execution status from {} to {} on {}", oldValue, newValue, this);
     final ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(context, oldValue, newValue);
     for (final ExecutorChannelStatusListener listener : executorChannelListeners) listener.executionStatusChanged(event);
   }

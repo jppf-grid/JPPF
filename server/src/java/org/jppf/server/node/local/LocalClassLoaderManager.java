@@ -52,7 +52,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager<JPPFLocalNode> 
 
   @Override
   protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl, final boolean clientAccess) throws Exception {
-    return new JPPFLocalContainer(uuidPath, cl, clientAccess);
+    return new JPPFLocalContainer(node, uuidPath, cl, clientAccess);
   }
 
   @Override

@@ -25,7 +25,6 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.execute.ExecutorStatus;
-import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
@@ -63,7 +62,7 @@ public class AsyncNodeMessageHandler {
   protected final boolean resolveIPs;
 
   /**
-   * 
+   * COnstruct this object.
    * @param driver reference to the driver.
    */
   public AsyncNodeMessageHandler(final JPPFDriver driver) {
@@ -109,11 +108,14 @@ public class AsyncNodeMessageHandler {
     final NodeBundleResults received = context.deserializeBundle(message);
     if (debugEnabled) log.debug("received handshake response for channel {} : {}", context, received);
     final TaskBundle bundle = received.bundle();
-    //final Long bundleId = bundle.getParameter(BundleParameter.NODE_BUNDLE_ID);
-    //context.removeJobEntry(bundle.getUuid(), bundleId);
     final boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
-    if (offline) context.setOffline(true);
-    else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
+    if (offline) {
+      context.setOffline(true);
+      context.setMaxJobs(1);
+    } else {
+      updateMaxJobs(context, bundle);
+      if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
+    }
     if (debugEnabled) log.debug("read bundle for {}, bundle={}", context, bundle);
     final String uuid = bundle.getParameter(NODE_UUID_PARAM);
     context.setUuid(uuid);
@@ -163,7 +165,6 @@ public class AsyncNodeMessageHandler {
     }
     context.getServer().putConnection(context);
     if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) processOfflineReopen(received, context);
-    else finalizeTransition(context);
   }
 
   /**
@@ -178,14 +179,6 @@ public class AsyncNodeMessageHandler {
     process(received, context);
   }
 
-  /**
-   * Finalize the state transition processing and return the traznsition to the next state.
-   * @param context the context associated with the node channel.
-   * @throws Exception if any error occurs.
-   */
-  private static void finalizeTransition(final AsyncNodeContext context) throws Exception {
-    context.setMessage(null);
-  }
   /**
    * Resolve the host name for the specified channel.
    * @param context the channel from which to get the host information.
@@ -249,13 +242,9 @@ public class AsyncNodeMessageHandler {
   private void processOfflineReopen(final NodeBundleResults received, final AsyncNodeContext context) throws Exception {
     final TaskBundle bundle = received.bundle();
     final String jobUuid = bundle.getParameter(JOB_UUID);
-    final long id = bundle.getParameter(NODE_BUNDLE_ID);
+    final long id = bundle.getBundleId();
     final ServerTaskBundleNode nodeBundle = context.getServer().getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
-    // if the driver was restarted, we discard the results
-    if (nodeBundle == null) {
-      finalizeTransition(context);
-      return;
-    }
+    if (nodeBundle == null) return;
     if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
     context.addJobEntry(nodeBundle);
     process(received, context);
@@ -271,9 +260,9 @@ public class AsyncNodeMessageHandler {
    * @param context the channel from which the bundle was read.
    * @throws Exception if any error occurs.
    */
-  public void process(final NodeBundleResults received, final AsyncNodeContext context) throws Exception {
+  private void process(final NodeBundleResults received, final AsyncNodeContext context) throws Exception {
     final TaskBundle bundle = received.first();
-    final ServerTaskBundleNode nodeBundle = context.removeJobEntry(bundle.getUuid(), bundle.getParameter(BundleParameter.NODE_BUNDLE_ID)).nodeBundle;
+    final ServerTaskBundleNode nodeBundle = context.removeJobEntry(bundle.getUuid(), bundle.getBundleId()).nodeBundle;
     context.getServer().getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
     boolean requeue = false;
     try {
@@ -286,9 +275,12 @@ public class AsyncNodeMessageHandler {
       nodeBundle.resultsReceived(t);
     }
     if (requeue) nodeBundle.resubmit();
-    // there is nothing left to do, so this instance will wait for a task bundle
-    // make sure the context is reset so as not to resubmit the last bundle executed by the node.
-    context.setMessage(null);
+    //context.setMessage(null);
+    if (!context.isOffline()) updateMaxJobs(context, bundle);
+    if (context.getCurrentNbJobs() < context.getMaxJobs()) {
+      if (debugEnabled) log.debug("updating execution status to ACTIVE for {}", context);
+      context.setExecutionStatus(ExecutorStatus.ACTIVE);
+    }
   }
 
   /**
@@ -301,10 +293,9 @@ public class AsyncNodeMessageHandler {
    */
   private boolean processResults(final AsyncNodeContext context, final NodeBundleResults received, final ServerTaskBundleNode nodeBundle) throws Exception {
     final TaskBundle newBundle = received.bundle();
-    // if an exception prevented the node from executing the tasks or sending back the results
-    final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     Bundler<?> bundler = context.getBundler();
     final ServerJob job = nodeBundle.getClientJob();
+    final Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     if (t != null) {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
@@ -338,30 +329,38 @@ public class AsyncNodeMessageHandler {
         }
         if (count > 0) context.updateStatsUponTaskResubmit(count);
       } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
-      final List<DataLocation> data = received.data();
-      if (debugEnabled) log.debug("data received: size={}, content={}", data == null ? -1 : data.size(), data);
       if (debugEnabled) log.debug("nodeBundle={}", nodeBundle);
-      final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
-      if (bundler == null) bundler = context.checkBundler(context.getServer().getBundlerFactory(), context.getServer().getJPPFContext());
-      if (bundler instanceof BundlerEx) {
-        final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
-        BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
-      } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
-      if (debugEnabled) log.debug("updated bundler for {}", context);
-      context.getServer().getBundlerHandler().storeBundler(context.getNodeIdentifier(), bundler, context.getBundlerAlgorithm());
-      nodeBundle.resultsReceived(data);
-      updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
+      bundler = updateBundlerAndStats(context, bundler, nodeBundle, newBundle);
+      nodeBundle.resultsReceived(received.data());
       if (debugEnabled) log.debug("updated stats for {}", context);
     }
-    final boolean requeue = newBundle.isRequeue();
     final JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
     if (systemInfo != null) {
       context.setNodeInfo(systemInfo, true);
       if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
     }
-    if (debugEnabled) log.debug("updating execution status to ACTIVE for {}", context);
-    context.setExecutionStatus(ExecutorStatus.ACTIVE);
-    return requeue;
+    return newBundle.isRequeue();
+  }
+
+  /**
+   * 
+   * @param context the context for which to update the bundler
+   * @param currentBundler the current bundler for this context.
+   * @param nodeBundle the bundle that was dispatched to the node.
+   * @param newBundle the header of the bundle received from the node.
+   * @return the updated bundler;
+   */
+  private Bundler<?> updateBundlerAndStats(final AsyncNodeContext context, final Bundler<?> currentBundler, final ServerTaskBundleNode nodeBundle, final TaskBundle newBundle) {
+    final long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
+    final Bundler<?> bundler = (currentBundler == null) ? context.checkBundler(context.getServer().getBundlerFactory(), context.getServer().getJPPFContext()) : currentBundler;
+    if (bundler instanceof BundlerEx) {
+      final long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
+      BundlerHelper.updateBundler((BundlerEx<?>) bundler, newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+    } else BundlerHelper.updateBundler(bundler, newBundle.getTaskCount(), elapsed);
+    if (debugEnabled) log.debug("updated bundler for {}", context);
+    context.getServer().getBundlerHandler().storeBundler(context.getNodeIdentifier(), bundler, context.getBundlerAlgorithm());
+    updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
+    return bundler;
   }
 
   /**
@@ -376,5 +375,23 @@ public class AsyncNodeMessageHandler {
     stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);
     stats.addValues(JPPFStatisticsHelper.NODE_EXECUTION, elapsedInNode, nbTasks);
     stats.addValues(JPPFStatisticsHelper.TRANSPORT_TIME, elapsed - elapsedInNode, nbTasks);
+  }
+
+  /**
+   * 
+   * @param context the context for which to update the max number of jobs.
+   * @param bundle the header of the bundle received from the node.
+   */
+  private void updateMaxJobs(final AsyncNodeContext context, final TaskBundle bundle) {
+    final int n = context.getMaxJobs();
+    final Integer newMaxJobs = bundle.getParameter(BundleParameter.NODE_MAX_JOBS);
+    int maxJobs = 0;
+    if (n <= 0) {
+      maxJobs = (newMaxJobs == null) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
+    } else if (newMaxJobs != null) {
+      maxJobs = (newMaxJobs <= 0) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
+    }
+    if (debugEnabled) log.debug("n={}, newMaxJobs={}, computed maxJobs={}, context={}", n, newMaxJobs, maxJobs, context);
+    if (maxJobs > 0) context.setMaxJobs(maxJobs);
   }
 }

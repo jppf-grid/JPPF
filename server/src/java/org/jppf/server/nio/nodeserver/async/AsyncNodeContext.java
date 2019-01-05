@@ -23,7 +23,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.io.*;
@@ -46,7 +46,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-public class AsyncNodeContext extends StatelessNioContext implements AbstractBaseNodeContext<EmptyEnum> {
+public class AsyncNodeContext extends StatelessNioContext implements BaseNodeContext<EmptyEnum> {
   /**
    * Logger for this class.
    */
@@ -82,7 +82,15 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   /**
    * Lock to synchronize I/O on a local node.
    */
-  private final ThreadSynchronization localNodeLock;
+  private final ThreadSynchronization localNodeReadLock;
+  /**
+   * Lock to synchronize I/O on a local node.
+   */
+  private final ThreadSynchronization localNodeWriteLock;
+  /**
+   * The maximum number of concurrent jobs for this channel.
+   */
+  private final AtomicInteger maxJobs = new AtomicInteger(0);
 
   /**
    * @param server the server that handles this context.
@@ -94,7 +102,8 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
     this.driver = server.getDriver();
     this.socketChannel = socketChannel;
     this.local = (socketChannel == null);
-    this.localNodeLock = local ? new ThreadSynchronization() : null;
+    this.localNodeReadLock = local ? new ThreadSynchronization() : null;
+    this.localNodeWriteLock = local ? new ThreadSynchronization() : null;
     this.attributes = new NodeContextAttributes(this, server.getBundlerHandler(), server);
     this.attributes.setDriver(server.getDriver());
   }
@@ -166,7 +175,7 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
     bundle.checkTaskCount();
     final TaskBundle taskBundle = bundle.getJob();
     final AbstractTaskBundleMessage message = newMessage();
-    taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
+    taskBundle.setBundleId(bundle.getId());
     if (!taskBundle.isHandshake()) {
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
       else if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
@@ -206,33 +215,31 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   @Override
   public boolean readMessage() throws Exception {
     if (message == null) message = newMessage();
-    final NioMessage msg = message;
     byteCount = message.getChannelReadCount();
     boolean b = false;
     try {
-      b = msg.read();
+      b = message.read();
     } catch (final Exception e) {
-      updateTrafficStats((AbstractTaskBundleMessage) msg);
+      updateTrafficStats((AbstractTaskBundleMessage) message);
       throw e;
     }
-    byteCount = msg.getChannelReadCount() - byteCount;
-    if (b) updateTrafficStats((AbstractTaskBundleMessage) msg);
+    byteCount = message.getChannelReadCount() - byteCount;
+    if (b) updateTrafficStats((AbstractTaskBundleMessage) message);
     return b;
   }
 
   @Override
   public boolean writeMessage() throws Exception {
-    final NioMessage msg = writeMessage;
-    writeByteCount = msg.getChannelWriteCount();
+    writeByteCount = writeMessage.getChannelWriteCount();
     boolean b = false;
     try {
-      b = msg.write();
+      b = writeMessage.write();
     } catch (final Exception e) {
-      updateTrafficStats((AbstractTaskBundleMessage) msg);
+      updateTrafficStats((AbstractTaskBundleMessage) writeMessage);
       throw e;
     }
-    writeByteCount = msg.getChannelWriteCount() - writeByteCount;
-    if (b) updateTrafficStats((AbstractTaskBundleMessage) msg);
+    writeByteCount = writeMessage.getChannelWriteCount() - writeByteCount;
+    if (b) updateTrafficStats((AbstractTaskBundleMessage) writeMessage);
     return b;
   }
 
@@ -328,6 +335,7 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
     sb.append(", ssl=").append(ssl);
     sb.append(", local=").append(local);
     sb.append(", offline=").append(isOffline());
+    sb.append(", maxJobs=").append(getMaxJobs());
     sb.append(", jobEntries=").append(entryMap.size());
     sb.append(", sendQueue size=").append(sendQueue.size());
     sb.append(", interestOps=").append(getInterestOps());
@@ -367,8 +375,9 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
 
   @Override
   public Future<?> submit(final ServerTaskBundleNode nodeBundle) throws Exception {
-    setExecutionStatus(ExecutorStatus.EXECUTING);
     addJobEntry(nodeBundle);
+    if (debugEnabled) log.debug("submitting {} to {}", nodeBundle, this);
+    if (getCurrentNbJobs() >= getMaxJobs()) setExecutionStatus(ExecutorStatus.EXECUTING);
     nodeBundle.setOffline(isOffline());
     nodeBundle.setChannel(this);
     nodeBundle.getJob().setExecutionStartTime(System.nanoTime());
@@ -435,9 +444,29 @@ public class AsyncNodeContext extends StatelessNioContext implements AbstractBas
   }
 
   /**
-   * @return a lock used to synchronize I/O with a local node.
+   * @return a lock used to synchronize input I/O with a local node.
    */
-  public ThreadSynchronization getLocalNodeLock() {
-    return localNodeLock;
+  public ThreadSynchronization getLocalNodeReadLock() {
+    return localNodeReadLock;
+  }
+
+  /**
+   * @return a lock used to synchronize output I/O with a local node.
+   */
+  public ThreadSynchronization getLocalNodeWriteLock() {
+    return localNodeWriteLock;
+  }
+
+  @Override
+  public int getMaxJobs() {
+    return maxJobs.get();
+  }
+
+  /**
+   * Set the maximum number of concurrent jobs for this channel.
+   * @param maxJobs the max number of jobs to set.
+   */
+  public void setMaxJobs(final int maxJobs) {
+    this.maxJobs.set(maxJobs);
   }
 }

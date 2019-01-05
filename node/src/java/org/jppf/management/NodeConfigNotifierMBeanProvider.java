@@ -19,7 +19,7 @@
 package org.jppf.management;
 
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
-import org.jppf.node.Node;
+import org.jppf.node.*;
 
 /**
  *
@@ -38,6 +38,6 @@ public class NodeConfigNotifierMBeanProvider implements JPPFNodeMBeanProvider {
 
   @Override
   public Object createMBean(final Node node) {
-    return NodeConfigNotifier.getInstance();
+    return ((NodeInternal) node).getNodeConfigNotifier();
   }
 }

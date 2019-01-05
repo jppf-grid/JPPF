@@ -27,7 +27,8 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.serialization.*;
-import org.jppf.utils.NetworkUtils;
+import org.jppf.server.node.NodeIO;
+import org.jppf.utils.*;
 import org.jppf.utils.concurrent.ThreadSynchronization;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -83,13 +84,47 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * The main node class loader.
    */
   private AbstractJPPFClassLoader jppfClassLoader;
+  /**
+   * The object responsible for this node's I/O.
+   * @exclude
+   */
+  protected NodeIO nodeIO;
+  /**
+   * The configuration of this node.
+   * @exclude
+   */
+  protected final TypedProperties configuration;
+  /**
+   * Determines whether JMX management and monitoring is enabled for this node.
+   * @exclude
+   */
+  protected boolean jmxEnabled;
+  /**
+   * Determines whether this node can execute .Net tasks.
+   * @exclude
+   */
+  protected final boolean dotnetCapable;
+  /**
+   * Handles the firing of node life cycle events and the listeners that subscribe to these events.
+   * @exclude
+   */
+  protected LifeCycleEventHandler lifeCycleEventHandler;
+  /**
+   * The jmx server that handles administration and monitoring functions for this node.
+   * @exclude
+   */
+  protected JMXServer jmxServer;
 
   /**
    * Initialize this node.
    * @param uuid this node's uuid.
+   * @param configuration the configuration of this node.
    */
-  public AbstractNode(final String uuid) {
+  public AbstractNode(final String uuid, final TypedProperties configuration) {
     this.uuid = uuid;
+    this.configuration = configuration;
+    jmxEnabled = configuration.get(JPPFProperties.MANAGEMENT_ENABLED);
+    dotnetCapable = configuration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
   }
 
   /**
@@ -101,11 +136,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
     return nodeConnection;
   }
 
-  /**
-   * Get the total number of tasks executed.
-   * @return the number of tasks as an int.
-   */
-  public int getTaskCount() {
+  @Override
+  public int getExecutedTaskCount() {
     synchronized (taskCountLock) {
       return taskCount;
     }
@@ -116,7 +148,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @param taskCount the number of tasks as an int.
    * @exclude
    */
-  public void setTaskCount(final int taskCount) {
+  public void setExecutedTaskCount(final int taskCount) {
     synchronized (taskCountLock) {
       this.taskCount = taskCount;
     }
@@ -129,17 +161,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   public SerializationHelper getHelper() {
     return helper;
-  }
-
-  /**
-   * Default implementation
-   * @return this method always returns null.
-   * @see org.jppf.node.NodeInternal#getLifeCycleEventHandler()
-   * @exclude
-   */
-  @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler() {
-    return null;
   }
 
   /**
@@ -174,7 +195,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * This implementation does nothing.
    * @param params not used.
    * @return {@code null}.
-   * @exclude
    */
   @Override
   public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
@@ -189,6 +209,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   /**
    * Determine whether this node is currently shutting down.
    * @return an {@link AtomicBoolean} instance whose value is {@code true</code> if the node is shutting down, <code>false} otherwise.
+   * @exclude
    */
   public AtomicBoolean getShuttingDown() {
     return shuttingDown;
@@ -227,5 +248,48 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
       log.error(e.getMessage(), e);
     }
     return null;
+  }
+
+  @Override
+  public TypedProperties getConfiguration() {
+    return configuration;
+  }
+
+  /**
+   * Determines whether JMX management and monitoring is enabled for this node.
+   * @return true if JMX is enabled, false otherwise.
+   * @exclude
+   */
+  protected boolean isJmxEnabled() {
+    return jmxEnabled && !isOffline();
+  }
+
+  @Override
+  public boolean isDotnetCapable() {
+    return dotnetCapable;
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public LifeCycleEventHandler getLifeCycleEventHandler() {
+    return lifeCycleEventHandler;
+  }
+
+  @Override
+  public boolean isMasterNode() {
+    return !isOffline() && (systemInformation != null) && systemInformation.getJppf().get(JPPFProperties.PROVISIONING_MASTER);
+  }
+
+  @Override
+  public boolean isSlaveNode() {
+    return (systemInformation != null) && systemInformation.getJppf().get(JPPFProperties.PROVISIONING_SLAVE);
+  }
+
+  @Override
+  public String getMasterNodeUuid() {
+    if (systemInformation == null) return null;
+    return systemInformation.getJppf().get(JPPFProperties.PROVISIONING_MASTER_UUID);
   }
 }

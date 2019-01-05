@@ -77,7 +77,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   public ChannelWrapperLocal(final JPPFClient client) {
     this.client = client;
-    executionManager = new ClientExecutionManager(JPPFProperties.LOCAL_EXECUTION_THREADS);
+    executionManager = new ClientExecutionManager(client.getConfig(), JPPFProperties.LOCAL_EXECUTION_THREADS);
     priority = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
     systemInfo = new JPPFSystemInformation(client.getConfig(), getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", "local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);

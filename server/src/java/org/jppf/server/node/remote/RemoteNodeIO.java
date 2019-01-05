@@ -64,19 +64,13 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     final ObjectSerializer ser = node.getHelper().getSerializer();
     if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
     Object[] result = null;
-    TaskBundle bundle = null;
-    node.setReading(true);
-    try {
-      bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ser);
-      node.setExecuting(true);
-      if (debugEnabled) log.debug("got bundle " + bundle);
-      if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
-      result = deserializeObjects(bundle);
-    } finally {
-      node.setReading(false);
-    }
+    final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ser);
+    node.setExecuting(true);
+    if (debugEnabled) log.debug("got bundle " + bundle);
+    result = deserializeObjects(bundle);
     if (node.isOffline() && !bundle.isHandshake()) {
       if (debugEnabled) log.debug("waiting for channel closed");
+      // channel is closed by the driver
       waitChannelClosed(getSocketWrapper());
       if (debugEnabled) log.debug("channel closed");
     }
@@ -86,21 +80,19 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
     final int count = bundle.getTaskCount();
-    //List<Object> list = new ArrayList<>(count + 2);
     final Object[] list = new Object[count + 2];
     list[0] = bundle;
     try {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
-        //JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
         final JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
-        cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
+        cont.deserializeObjects(list, 1+count, node.getSerializationExecutor());
       }
       else  getSocketWrapper().receiveBytes(0); // skip null data provider
       if (debugEnabled) log.debug("got all data");
@@ -126,15 +118,15 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
   @Override
   protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
-    //System.out.println("writing results for " + bundle);
     final SocketWrapper socketWrapper = getSocketWrapper();
     if (socketWrapper == null) throw new SocketException("no connection to the server");
-    final ExecutorService executor = node.getExecutionManager().getExecutor();
+    final ExecutorService executor = node.getSerializationExecutor();
     finalizeBundleData(bundle, tasks);
     final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
-    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
+    int submitCount = 0;
+    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, submitCount++)));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, submitCount++)));
     final OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
     int count = 0;
     for (final Future<DataLocation> f: futureList) {
@@ -165,7 +157,7 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     } catch (final Error e) {
       if (debugEnabled) log.debug("error closing data channel: ", e);
     }
-    if (traceEnabled) log.trace("closed the data channel");
+    if (debugEnabled) log.debug("closed the data channel");
   }
 
   /**

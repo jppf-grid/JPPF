@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
-import org.jppf.server.node.JPPFContainer;
+import org.jppf.server.node.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -49,19 +49,19 @@ public class JPPFRemoteContainer extends JPPFContainer {
   /**
    * The socket connection wrapper.
    */
-  private RemoteNodeConnection nodeConnection = null;
+  private RemoteNodeConnection nodeConnection;
 
   /**
    * Initialize this container with a specified application uuid.
-   * @param nodeConnection the connection to the job server.
+   * @param node the node holding this container.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
    * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
-    super(uuidPath, classLoader, clientAccess);
-    this.nodeConnection = nodeConnection;
+  public JPPFRemoteContainer(final AbstractCommonNode node, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+    super(node, uuidPath, classLoader, clientAccess);
+    this.nodeConnection = (RemoteNodeConnection) node.getNodeConnection();
     //init();
   }
 
@@ -84,7 +84,7 @@ public class JPPFRemoteContainer extends JPPFContainer {
       for (int i = 0; i < count; i++) {
         final DataLocation dl = IOHelper.readData(is);
         if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
-        completionService.submit(new ObjectDeserializationTask(dl, i));
+        completionService.submit(new ObjectDeserializationTask(this, dl, i));
       }
       Throwable t = null;
       int throwableCount = 0;

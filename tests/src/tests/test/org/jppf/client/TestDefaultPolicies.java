@@ -207,7 +207,11 @@ public class TestDefaultPolicies extends Setup1D2N {
       assertTrue(ta instanceof LifeCycleTask);
       final LifeCycleTask task = (LifeCycleTask) ta;
       final Throwable t = task.getThrowable();
-      assertNull("task " + i + " has an exception " + t, t);
+      final String message = "task " + i + " has an exception; ";
+      if (t != null) {
+        print(false, false, "%s\n%s", message, ExceptionUtils.getStackTrace(t));
+        fail(message + t);
+      }
       assertEquals("result of task " + i + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
       assertEquals(job.getJobTasks().get(i).getId(), task.getId());
       assertEquals(i, task.getPosition());

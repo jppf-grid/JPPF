@@ -67,7 +67,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
   protected abstract void initClassLoaderManager();
 
   @Override
-  protected void initDataChannel() throws Exception {
+  public void initDataChannel() throws Exception {
     (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
     if (configuration.get(JPPFProperties.RECOVERY_ENABLED)) {
@@ -103,11 +103,6 @@ public abstract class AbstractRemoteNode extends JPPFNode implements HeartbeatCo
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
     }
-  }
-
-  @Override
-  protected NodeConnectionChecker createConnectionChecker() {
-    return new RemoteNodeConnectionChecker(this);
   }
 
   @Override

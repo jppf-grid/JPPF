@@ -18,15 +18,13 @@
 package org.jppf.server.node;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.io.*;
 import org.jppf.serialization.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -47,21 +45,17 @@ public abstract class JPPFContainer {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   * Utility for deserialization and serialization.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  protected SerializationHelper helper;
   /**
    * Utility for deserialization and serialization.
    */
-  protected SerializationHelper helper = null;
-  /**
-   * Utility for deserialization and serialization.
-   */
-  protected ObjectSerializer serializer = null;
+  protected ObjectSerializer serializer;
   /**
    * Class loader used for dynamic loading and updating of client classes.
    */
-  protected AbstractJPPFClassLoader classLoader = null;
+  protected AbstractJPPFClassLoader classLoader;
   /**
    * The unique identifier for the submitting application.
    */
@@ -69,11 +63,11 @@ public abstract class JPPFContainer {
   /**
    * Used to prevent parallel deserialization.
    */
-  private Lock lock = new ReentrantLock();
+  private final Lock lock = new ReentrantLock();
   /**
    * Determines whether tasks deserialization should be sequential rather than parallel.
    */
-  private final boolean sequentialDeserialization = JPPFConfiguration.get(JPPFProperties.SEQUENTIAL_SERIALiZATION);
+  private final boolean sequentialDeserialization;
   /**
    * Whether the node has access to the client that submitted the job.
    */
@@ -81,16 +75,18 @@ public abstract class JPPFContainer {
 
   /**
    * Initialize this container with a specified application uuid.
+   * @param node the node holding this container.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
    * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+  public JPPFContainer(final AbstractCommonNode node, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
     if (debugEnabled) log.debug("new JPPFContainer with uuidPath={}, classLoader={}, clientAccess={}", uuidPath, classLoader, clientAccess);
     this.uuidPath = uuidPath;
     this.classLoader = classLoader;
     this.clientAccess = clientAccess;
+    this.sequentialDeserialization = node.getConfiguration().get(JPPFProperties.SEQUENTIAL_SERIALiZATION);
     init();
   }
 
@@ -164,80 +160,24 @@ public abstract class JPPFContainer {
   }
 
   /**
-   * Instances of this class are used to deserialize objects from an
-   * incoming message in parallel.
-   */
-  protected class ObjectDeserializationTask implements Callable<ObjectDeserializationTask> {
-    /**
-     * The data received over the network connection.
-     */
-    private final DataLocation dl;
-    /**
-     * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
-     */
-    private final int index;
-    /**
-     * The deserialized object.
-     */
-    private Object object;
-
-    /**
-     * Initialize this task with the specified data buffer.
-     * @param dl the data read from the network connection, stored in a memory-sensitive location.
-     * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
-     */
-    public ObjectDeserializationTask(final DataLocation dl, final int index) {
-      this.dl = dl;
-      this.index = index;
-    }
-
-    /**
-     * Execute this task.
-     * @return a deserialized object.
-     */
-    @Override
-    public ObjectDeserializationTask call() {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      try {
-        Thread.currentThread().setContextClassLoader(getClassLoader());
-        if (traceEnabled) log.debug("deserializing object index = " + index);
-        if (sequentialDeserialization) lock.lock();
-        try {
-          object = IOHelper.unwrappedData(dl, serializer);
-        } finally {
-          if (sequentialDeserialization) lock.unlock();
-        }
-      } catch (final Throwable t) {
-        final String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
-        if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
-        else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
-        if (index > 0) object = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
-      } finally {
-        Thread.currentThread().setContextClassLoader(cl);
-      }
-      return this;
-    }
-
-    /**
-     * @return the index of the object to deserialize in the incoming IO message; used for debugging purposes.
-     */
-    public int getIndex() {
-      return index;
-    }
-
-    /**
-     * @return the deserialized object.
-     */
-    public Object getObject() {
-      return object;
-    }
-  }
-
-  /**
    * Return the utility object for serialization and deserialization.
    * @return an {@link ObjectSerializer} instance.
    */
   public ObjectSerializer getSerializer() {
     return serializer;
+  }
+
+  /**
+   * @return the lock for sequential deserialization.
+   */
+  public Lock getLock() {
+    return lock;
+  }
+
+  /**
+   * @return {@code true} if sequential serialization/serialization is enabled, {@code false} otherwise.
+   */
+  public boolean isSequentialDeserialization() {
+    return sequentialDeserialization;
   }
 }

@@ -87,7 +87,7 @@ public class NodeServerUtils {
    * @return a pair of string representing the clear string (keft side) and resulting unique string identifier for the node (right side).
    * @throws Exception if any error occurs.
    */
-  public static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final AbstractBaseNodeContext<?> channel, final JPPFSystemInformation info) throws Exception {
+  public static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final BaseNodeContext<?> channel, final JPPFSystemInformation info) throws Exception {
     final StringBuilder sb = new StringBuilder();
     final String ip = NetworkUtils.getNonLocalHostAddress();
     sb.append('[').append(ip == null ? "localhost" : ip);
@@ -134,7 +134,7 @@ public class NodeServerUtils {
    * @return the remote host name as a string.
    * @throws Exception if any error occurs.
    */
-  public static String getChannelHost(final AbstractBaseNodeContext<?> context) throws Exception {
+  public static String getChannelHost(final BaseNodeContext<?> context) throws Exception {
     if (!context.isLocal()) {
       final SocketChannel ch = context.getSocketChannel();
       return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();

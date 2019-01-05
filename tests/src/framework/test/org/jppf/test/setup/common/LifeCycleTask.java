@@ -42,23 +42,23 @@ public class LifeCycleTask extends AbstractTask<String> {
   /**
    * The duration of this task.
    */
-  protected long duration = 0L;
+  protected long duration;
   /**
    * used to store the task's execution start time in nanoseconds.
    */
-  protected double start = 0L;
+  protected double start;
   /**
    * Measures the time elapsed between the task execution start and its completion in nanoseconds.
    */
-  protected double elapsed = 0L;
+  protected double elapsed;
   /**
    * Determines whether this task was cancelled.
    */
-  protected boolean cancelled = false;
+  protected boolean cancelled;
   /**
    * Determines whether this task timed out.
    */
-  protected boolean timedout = false;
+  protected boolean timedout;
   /**
    * Determines whether this task was executed in a node or in the client's local executor.
    */
@@ -66,7 +66,7 @@ public class LifeCycleTask extends AbstractTask<String> {
   /**
    * The uuid of the node this task executes on.
    */
-  protected String nodeUuid = null;
+  protected String nodeUuid;
   /**
    * Whether this task can be interrupted upon cancellation or timeout.
    */
@@ -74,7 +74,7 @@ public class LifeCycleTask extends AbstractTask<String> {
   /**
    * Whether the thread running this task was interrupted upon cancellation or timeout.
    */
-  protected boolean interrupted = false;
+  protected boolean interrupted;
   /**
    * A message to send via JMX.
    */
@@ -82,7 +82,7 @@ public class LifeCycleTask extends AbstractTask<String> {
   /**
    * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
    */
-  protected String uuidFromNode = null;
+  protected String uuidFromNode;
 
   /**
    * Initialize this task.

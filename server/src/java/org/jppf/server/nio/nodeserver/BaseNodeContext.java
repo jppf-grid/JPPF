@@ -33,7 +33,7 @@ import org.jppf.utils.Pair;
  * @param <S> the type of state.
  * @author Laurent Cohen
  */
-public interface AbstractBaseNodeContext<S extends Enum<S>> extends NioContext<S>,  ExecutorChannel<ServerTaskBundleNode>  {
+public interface BaseNodeContext<S extends Enum<S>> extends NioContext<S>,  ExecutorChannel<ServerTaskBundleNode>  {
   /**
    * @return this node context's attributes.
    */

@@ -31,7 +31,7 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage {
    * Build this nio message.
    * @param context the channel to read from or write to.
    */
-  public LocalNodeMessage(final AbstractBaseNodeContext<?> context) {
+  public LocalNodeMessage(final BaseNodeContext<?> context) {
     super(context);
   }
 

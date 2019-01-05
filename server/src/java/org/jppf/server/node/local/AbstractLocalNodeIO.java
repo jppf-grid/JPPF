@@ -78,7 +78,7 @@ public abstract class AbstractLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> 
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.setCurrentMessage(currentMessage);
-        cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
+        cont.deserializeObjects(list, 1+count, node.getSerializationExecutor());
       } else {
         // skip null data provider
       }

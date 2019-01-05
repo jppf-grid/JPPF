@@ -60,7 +60,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
   public TestWatcher setup1D2N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
+      BaseTestHelper.printToAll(client, false, false, true, true, false, "start of method %s()", description.getMethodName());
     }
   };
 

@@ -18,43 +18,80 @@
 
 package org.jppf.node;
 
+import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.execute.ExecutionManager;
-import org.jppf.management.JMXServer;
+import org.jppf.execute.async.AsyncExecutionManager;
+import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.server.node.AbstractClassLoaderManager;
 
 /**
  * Internal interface for methods of a node that shoudln't be exposed in the public API.
  * @author Laurent Cohen
- * @exclude
  */
 public interface NodeInternal extends Node {
   /**
    * Get the connection used by this node.
    * @return a {@link NodeConnection} instance.
+   * @exclude
    */
   NodeConnection<?> getNodeConnection();
 
   /**
    * Stop this node and release the resources it is using.
+   * @exclude
    */
   void stopNode();
 
   /**
    * Get the object that manages the node life cycle events.
    * @return a {@link LifeCycleEventHandler} instance.
+   * @exclude
    */
   LifeCycleEventHandler getLifeCycleEventHandler();
 
   /**
    * Get the task execution manager for this node.
-   * @return a <code>NodeExecutionManager</code> instance.
+   * @return a {@link ExecutionManager} instance.
+   * @exclude
    */
-  ExecutionManager getExecutionManager();
+  AsyncExecutionManager getExecutionManager();
 
   /**
    * Get the JMX connector server associated with the node.
+   * <p>The default implementation throws a {@link JPPFUnsupportedOperationException}. It is up to concrete implementations to override it.
    * @return a JMXServer instance.
    * @throws Exception if any error occurs.
+   * @exclude
    */
-  JMXServer getJmxServer() throws Exception;
+  default JMXServer getJmxServer() throws Exception {
+    throw new JPPFUnsupportedOperationException("getJmxServer() is not supported on this type of node");
+  }
+
+  /**
+   * Initialize this node's data channel.
+   * @throws Exception if an error is raised during initialization.
+   * @exclude
+   */
+  void initDataChannel() throws Exception;
+
+  /**
+   * Initialize this node's data channel.
+   * @throws Exception if an error is raised during initialization.
+   * @exclude
+   */
+  void closeDataChannel() throws Exception;
+
+  /**
+   * Get the service that manages the class loaders and how they are used.
+   * @return an {@link AbstractClassLoaderManager} instance.
+   * @exclude
+   */
+  AbstractClassLoaderManager<?> getClassLoaderManager();
+
+  /**
+   * @return the mbean which sends notifications of configuration changes.
+   * @exclude
+   */
+  NodeConfigNotifier getNodeConfigNotifier();
 }

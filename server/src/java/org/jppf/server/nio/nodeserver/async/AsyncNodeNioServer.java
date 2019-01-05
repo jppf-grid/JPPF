@@ -81,7 +81,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
   /**
    * Task that dispatches queued jobs to available nodes.
    */
-  private final AsyncTaskQueueChecker taskQueueChecker;
+  private final AsyncJobScheduler jobScheduler;
   /**
    * A list of all the connections.
    */
@@ -130,24 +130,24 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     selectTimeout = 1000L;
     messageHandler = new AsyncNodeMessageHandler(driver);
     this.queue = driver.getQueue();
-    final Callable<List<AbstractBaseNodeContext<?>>> callable = () -> getAllChannels();
+    final Callable<List<BaseNodeContext<?>>> callable = () -> getAllChannels();
     this.queue.setCallableAllConnections(callable);
     this.peerHandler = new PeerAttributesHandler(driver, Math.max(1, driver.getConfiguration().getInt("jppf.peer.handler.threads", 1)));
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
     bundlerFactory = new JPPFBundlerFactory(driver.getConfiguration());
     bundlerHandler = new LoadBalancerPersistenceManager(bundlerFactory);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    taskQueueChecker = new AsyncTaskQueueChecker(this, queue, driver.getStatistics(), bundlerFactory);
+    jobScheduler = new AsyncJobScheduler(this, queue, driver.getStatistics(), bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
         if (debugEnabled) log.debug("received queue event {}", event);
-        taskQueueChecker.wakeUp();
+        jobScheduler.wakeUp();
       }
     });
     initialServerJob = NodeServerUtils.createInitialServerJob(driver);
     nodeReservationHandler = new NodeReservationHandler(driver);
-    ThreadUtils.startDaemonThread(taskQueueChecker, "TaskQueueChecker");
+    ThreadUtils.startDaemonThread(jobScheduler, "JobScheduler");
   }
 
   @Override
@@ -286,7 +286,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * @return a {@link JPPFContext} instance.
    */
   public JPPFContext getJPPFContext() {
-    return taskQueueChecker.getJPPFContext();
+    return jobScheduler.getJPPFContext();
   }
 
   /**
@@ -323,11 +323,11 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
 
   /**
    * Get the task that dispatches queued jobs to available nodes.
-   * @return a {@link AsyncTaskQueueChecker} object.
+   * @return a {@link AsyncJobScheduler} object.
    * @exclude
    */
-  public AsyncTaskQueueChecker getTaskQueueChecker() {
-    return taskQueueChecker;
+  public AsyncJobScheduler getJobScheduler() {
+    return jobScheduler;
   }
 
   /**
@@ -348,16 +348,16 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
 
   /**
    * Get all the node connections handled by this server.
-   * @return a list of {@link AbstractBaseNodeContext} instances.
+   * @return a list of {@link BaseNodeContext} instances.
    */
-  public List<AbstractBaseNodeContext<?>> getAllChannels() {
+  public List<BaseNodeContext<?>> getAllChannels() {
     return new ArrayList<>(allConnections.values());
   }
 
   /**
-   * @return a set of {@link AbstractBaseNodeContext} instances.
+   * @return a set of {@link BaseNodeContext} instances.
    */
-  public Set<AbstractBaseNodeContext<?>> getAllChannelsAsSet() {
+  public Set<BaseNodeContext<?>> getAllChannelsAsSet() {
     return new HashSet<>(allConnections.values());
   }
 
@@ -365,7 +365,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * Called when the node failed to respond to a heartbeat message.
    * @param context the channel to close.
    */
-  public void connectionFailed(final AbstractBaseNodeContext<?> context) {
+  public void connectionFailed(final BaseNodeContext<?> context) {
     if (context != null) {
       if (debugEnabled) log.debug("about to close channel = {} with uuid = {}", context, context.getUuid());
       removeConnection(context.getUuid());
@@ -429,7 +429,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
     if (debugEnabled) log.debug("removing connection {}", nodeContext);
     try {
-      taskQueueChecker.removeIdleChannelAsync(nodeContext);
+      jobScheduler.removeIdleChannelAsync(nodeContext);
       updateConnectionStatus(nodeContext, nodeContext.getExecutionStatus(), ExecutorStatus.DISABLED);
     } catch(final Exception e) {
       if (debugEnabled) log.debug("error removing connection {} : {}", nodeContext, e);
@@ -454,16 +454,16 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (nodeContext == null || oldStatus == newStatus) return;
     if (debugEnabled) log.debug("updating channel status from {} to {}: {}", oldStatus, newStatus, nodeContext);
-    if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannel(nodeContext);
+    if (newStatus == ExecutorStatus.ACTIVE) jobScheduler.addIdleChannel(nodeContext);
     else {
-      taskQueueChecker.removeIdleChannelAsync(nodeContext);
+      jobScheduler.removeIdleChannelAsync(nodeContext);
       if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) transitionManager.execute(() -> queue.getBroadcastManager().cancelBroadcastJobs(nodeContext.getUuid()));
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }
 
   @Override
-  public void nodeConnected(final AbstractBaseNodeContext<?> context) {
+  public void nodeConnected(final BaseNodeContext<?> context) {
     if (debugEnabled) log.debug("node connected: {}", context);
     final JPPFManagementInfo info = context.getManagementInfo();
     if (!context.isClosed()) {

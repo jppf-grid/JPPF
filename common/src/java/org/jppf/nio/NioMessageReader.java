@@ -36,7 +36,7 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The server handling the connections.
+   * The server handling the connections.d
    */
   protected final StatelessNioServer<C> server;
 

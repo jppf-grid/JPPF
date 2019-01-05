@@ -195,7 +195,7 @@ class WaitInitialBundleState extends NodeServerState {
   private NodeTransition processOfflineReopen(final NodeBundleResults received, final AbstractNodeContext context) throws Exception {
     final TaskBundle bundle = received.bundle();
     final String jobUuid = bundle.getParameter(JOB_UUID);
-    final long id = bundle.getParameter(NODE_BUNDLE_ID);
+    final long id = bundle.getBundleId();
     final ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
     // if the driver was restarted, we discard the results
     if (nodeBundle == null) return finalizeTransition(context);

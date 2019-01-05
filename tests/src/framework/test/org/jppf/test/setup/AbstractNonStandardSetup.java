@@ -117,7 +117,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs
    */
   protected void testSimpleJob(final ExecutionPolicy policy, final String nodePrefix) throws Exception {
-    System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection(client).loadBalancerInformation());
+    print(false, false, "driver load balancing config: %s", BaseSetup.getJMXConnection(client).loadBalancerInformation());
     final int tasksPerNode = 5;
     final int nbNodes = getNbNodes();
     final int nbTasks = tasksPerNode * nbNodes;
@@ -137,7 +137,7 @@ public class AbstractNonStandardSetup extends BaseTest {
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
     }
-    BaseTest.printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
+    printOut("%s : map = %s", name , CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
       final String key = nodePrefix + (i+1);
@@ -279,25 +279,32 @@ public class AbstractNonStandardSetup extends BaseTest {
    * @throws Exception if any error occurs.
    */
   protected static void awaitPeersInitialized(final long maxWait) throws Exception {
+    awaitPeersInitialized(maxWait, 2);
+  }
+
+  /**
+   * Wait for 2 servers with port = 11101 and 11102 to be initialized with at least one idle node attached.
+   * @param maxWait the maximum time to wait for completion of this method.
+   * @param nbDrivers number of drivers to expect.
+   * @throws Exception if any error occurs.
+   */
+  protected static void awaitPeersInitialized(final long maxWait, final int nbDrivers) throws Exception {
     final long start = System.currentTimeMillis();
     long timeout = maxWait;
-    print(false, false, ">>> awaiting 2 pools");
-    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, Operator.AT_LEAST, 1, timeout, JPPFClientConnectionStatus.workingStatuses());
-    if (pools.size() < 2) fail("timeout of " + timeout + " ms waiting for 2 pools expired");
-    final List<JMXDriverConnectionWrapper> jmxList = new ArrayList<>(2);
+    print(false, false, ">>> awaiting %d pools", nbDrivers);
+    final List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, nbDrivers, Operator.AT_LEAST, 1, timeout, JPPFClientConnectionStatus.workingStatuses());
+    if (pools.size() < nbDrivers) fail("timeout of " + timeout + " ms waiting for " + nbDrivers + " pools expired");
+    final List<JMXDriverConnectionWrapper> jmxList = new ArrayList<>(nbDrivers);
     for (final JPPFConnectionPool pool: pools) {
       print(false, false, ">>> awaiting JMX connection for %s", pool);
       final MutableReference<JMXDriverConnectionWrapper> jmx = new MutableReference<>();
       timeout = maxWait - (System.currentTimeMillis() - start);
       if (timeout < 0L) throw new JPPFTimeoutException("execeeded maxWait timeout of " + maxWait + " ms");
-      ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-        @Override
-        public boolean evaluate() {
-          final JMXDriverConnectionWrapper driver = pool.getJmxConnection(true);
-          if (driver == null) return false;
-          jmx.set(driver);
-          return true;
-        }
+      ConcurrentUtils.awaitCondition(() -> {
+        final JMXDriverConnectionWrapper driver = pool.getJmxConnection(true);
+        if (driver == null) return false;
+        jmx.set(driver);
+        return true;
       }, timeout, 500L, true);
       print(false, false, ">>> got JMX connection %s", jmx.get());
       jmxList.add(jmx.get());

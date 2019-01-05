@@ -28,7 +28,8 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.queue.QueueEvent;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.nio.nodeserver.BaseNodeContext;
+import org.jppf.server.nio.nodeserver.async.AsyncJobScheduler;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
@@ -67,7 +68,7 @@ public class BroadcastManager {
   /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
-  private Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections = () -> Collections.emptyList();
+  private Callable<List<BaseNodeContext<?>>> callableAllConnections = () -> Collections.emptyList();
   /**
    * 
    */
@@ -87,7 +88,7 @@ public class BroadcastManager {
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  void setCallableAllConnections(final Callable<List<AbstractBaseNodeContext<?>>> callableAllConnections) {
+  void setCallableAllConnections(final Callable<List<BaseNodeContext<?>>> callableAllConnections) {
     if (callableAllConnections == null) this.callableAllConnections = () -> Collections.emptyList();
     else this.callableAllConnections = callableAllConnections;
   }
@@ -155,7 +156,7 @@ public class BroadcastManager {
    */
   public void processPendingBroadcasts() {
     if (nbWorkingConnections.get() <= 0) return;
-    List<AbstractBaseNodeContext<?>> connections;
+    List<BaseNodeContext<?>> connections;
     try {
       connections = callableAllConnections.call();
     } catch (@SuppressWarnings("unused") final Throwable e) {
@@ -174,20 +175,20 @@ public class BroadcastManager {
    * @param connections the list of all available connections.
    * @param broadcastJob the job to dispatch to connections.
    */
-  private void processPendingBroadcast(final List<AbstractBaseNodeContext<?>> connections, final ServerJobBroadcast broadcastJob) {
+  private void processPendingBroadcast(final List<BaseNodeContext<?>> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     if (pendingBroadcasts.remove(broadcastJob.getUuid()) == null) return;
     final JobSLA sla = broadcastJob.getSLA();
     final List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     final Set<String> uuidSet = new HashSet<>();
-    for (final AbstractBaseNodeContext<?> connection : connections) {
+    for (final BaseNodeContext<?> connection : connections) {
       final ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
         final String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
           final JPPFManagementInfo info = connection.getManagementInfo();
           final ExecutionPolicy policy = sla.getExecutionPolicy();
-          TaskQueueChecker.preparePolicy(policy, broadcastJob, queue.driver.getStatistics(), 0);
+          AsyncJobScheduler.preparePolicy(policy, broadcastJob, queue.driver.getStatistics(), 0);
           if ((policy != null) && !policy.evaluate(info.getSystemInfo())) {
             if (debugEnabled) log.debug("node uuid={} refused for broadcast {}", uuid, broadcastJob);
             continue;

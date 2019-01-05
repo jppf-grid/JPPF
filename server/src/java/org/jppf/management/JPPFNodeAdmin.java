@@ -202,7 +202,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   @Override
   public synchronized void setTaskCounter(final Integer n) throws Exception {
     if (debugEnabled) log.debug("node tasks counter reset to " + n + " requested");
-    node.setTaskCount(n);
+    node.setExecutedTaskCount(n);
     nodeState.setNbTasksExecuted(n);
   }
 
@@ -264,12 +264,14 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    */
   @Override
   public void cancelJob(final String jobId, final Boolean requeue) throws Exception {
-    if (debugEnabled) log.debug("Request to cancel jobuUid = '{}', requeue = {}", jobId, requeue);
-    if (jobId == null) return;
-    if (jobId.equals(node.getExecutionManager().getCurrentJobId())) {
-      node.getExecutionManager().setJobCancelled(true);
-      node.getExecutionManager().cancelAllTasks(true, requeue);
-    } else if (debugEnabled) log.debug("request to cancel job with uuid = '{}' which is not currently executing", jobId);
+    try {
+      if (debugEnabled) log.debug("Request to cancel jobuUid = '{}', requeue = {}", jobId, requeue);
+      if (jobId == null) return;
+      node.getExecutionManager().cancelJob(jobId, true, requeue);
+    } catch (final RuntimeException e) {
+      log.debug("error cancelling job with uuid={}:", jobId, e);
+      throw e;
+    }
   }
 
   @Override

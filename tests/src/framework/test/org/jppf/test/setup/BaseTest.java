@@ -304,10 +304,11 @@ public class BaseTest {
   /**
    * Check the result of a comparison and throw an {@code AssertionError} if the comparison fails (i.e. return true).
    * @param op the comparison operator to use.
-   * @param actual the actual value to test.
    * @param expected the expected value to test against.
+   * @param actual the actual value to test.
    */
-  public static void assertCompare(final ComparisonOperator op, final long actual, final long expected) {
-    if (!op.evaluate(actual, expected)) Assert.fail(String.format("expected <%d> to be '%s' <%d>", actual, op, expected));
+  public static void assertCompare(final ComparisonOperator op, final long expected, final long actual) {
+    //if (!op.evaluate(actual, expected)) Assert.fail(String.format("expected <%d> to be '%s' <%d>", actual, op, expected));
+    if (!op.evaluate(actual, expected)) Assert.fail(String.format("expected: <%s %d> but was: <%d>", op, expected, actual));
   }
 }

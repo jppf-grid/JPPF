@@ -506,10 +506,11 @@ public class TypedProperties extends AbstractTypedProperties {
    * @since 5.2
    */
   public boolean containsProperty(final JPPFProperty<?> property) {
-    if (getProperty(property.getName()) != null) return true;
-    if (property.getAliases() != null) {
-      for (String name: property.getAliases()) {
-        if (getProperty(name) != null) return true;
+    if (containsKey(property.getName())) return true;
+    final String[] aliases = property.getAliases();
+    if (aliases != null) {
+      for (final String name: aliases) {
+        if (containsKey(name)) return true;
       }
     }
     return false;

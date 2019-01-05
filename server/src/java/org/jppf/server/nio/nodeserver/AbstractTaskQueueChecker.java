@@ -64,7 +64,7 @@ abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements
   /**
    * The list of idle node channels.
    */
-  final Set<AbstractBaseNodeContext<?>> idleChannels = new LinkedHashSet<>();
+  final Set<BaseNodeContext<?>> idleChannels = new LinkedHashSet<>();
   /**
    * Holds information about the execution context.
    */
@@ -135,7 +135,7 @@ abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final AbstractBaseNodeContext<?> channel) {
+  public void addIdleChannel(final BaseNodeContext<?> channel) {
     if (channel == null) {
       final String message  = "channel is null";
       log.error(message);
@@ -172,7 +172,7 @@ abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  AbstractBaseNodeContext<?> removeIdleChannel(final AbstractBaseNodeContext<?> channel) {
+  BaseNodeContext<?> removeIdleChannel(final BaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("removing idle channel {}", channel);
     boolean removed = false;
     synchronized(idleChannels) {
@@ -191,7 +191,7 @@ abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements
    * Asynchronously remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
    */
-  public void removeIdleChannelAsync(final AbstractBaseNodeContext<?> channel) {
+  public void removeIdleChannelAsync(final BaseNodeContext<?> channel) {
     if (debugEnabled) log.debug("request to remove idle channel {}", channel);
     channelsExecutor.execute(() -> removeIdleChannel(channel));
   }
@@ -200,7 +200,7 @@ abstract class AbstractTaskQueueChecker extends ThreadSynchronization implements
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<AbstractBaseNodeContext<?>> getIdleChannels() {
+  public List<BaseNodeContext<?>> getIdleChannels() {
     synchronized (idleChannels) {
       return new ArrayList<>(idleChannels);
     }

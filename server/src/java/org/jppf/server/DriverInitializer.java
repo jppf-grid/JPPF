@@ -386,7 +386,7 @@ public class DriverInitializer {
           final String nodeUuid = (String) notif.getSource();
           final TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
           if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
-          final AbstractBaseNodeContext<?> node = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(nodeUuid) : driver.getNodeNioServer().getConnection(nodeUuid);
+          final BaseNodeContext<?> node = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(nodeUuid) : driver.getNodeNioServer().getConnection(nodeUuid);
           if (node == null) return;
           synchronized(node.getMonitor()) {
             final TypedProperties oldConfig = node.getSystemInformation().getJppf();

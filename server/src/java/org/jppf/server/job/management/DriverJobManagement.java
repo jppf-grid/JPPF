@@ -116,7 +116,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to resume job '" + job.getJob().getName() + '\'');
     job.setSuspended(false, false);
-    if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().getTaskQueueChecker().wakeUp();
+    if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().getJobScheduler().wakeUp();
     else driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 
@@ -347,7 +347,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       }
       job.update(driver, sla, metadata);
     }
-    if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().getTaskQueueChecker().wakeUp();
+    if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().getJobScheduler().wakeUp();
     else driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 

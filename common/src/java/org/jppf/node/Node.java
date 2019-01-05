@@ -99,4 +99,10 @@ public interface Node extends Runnable {
    * @return a {@link JPPFManagementInfo} object.
    */
   JPPFManagementInfo getManagementInfo();
+
+  /**
+   * Get the total number of tasks executed.
+   * @return the number of tasks as an int.
+   */
+  int getExecutedTaskCount();
 }

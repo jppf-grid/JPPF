@@ -104,7 +104,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * @param peer the peer to update.
    * @param props the updated attributes.
    */
-  private static void updatePeer(final AbstractBaseNodeContext<?> peer, final TypedProperties props) {
+  private static void updatePeer(final BaseNodeContext<?> peer, final TypedProperties props) {
     final int newNodes = props.getInt(PEER_TOTAL_NODES, 0);
     final int newThreads = props.getInt(PEER_TOTAL_THREADS, 0);
     final JPPFSystemInformation info = peer.getSystemInformation();
@@ -126,7 +126,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Called when a node gets closed.
    * @param context the node context.
    */
-  public void onCloseNode(final AbstractBaseNodeContext<?> context) {
+  public void onCloseNode(final BaseNodeContext<?> context) {
     if (!context.isPeer()) {
       totalNodes.decrementAndGet();
       final JPPFSystemInformation sys = context.getSystemInformation();
@@ -151,7 +151,7 @@ public class PeerAttributesHandler implements NotificationListener {
    * Called when a node gets connected to the server.
    * @param context the node context.
    */
-  public void onNodeConnected(final AbstractBaseNodeContext<?> context) {
+  public void onNodeConnected(final BaseNodeContext<?> context) {
     if (!context.isPeer()) {
       totalNodes.incrementAndGet();
       final JPPFSystemInformation sys = context.getSystemInformation();
@@ -205,7 +205,7 @@ public class PeerAttributesHandler implements NotificationListener {
     if (debugEnabled) log.debug("received notification {} for {}", notification.getUserData(), handback);
     executor.execute(() -> {
       final TypedProperties props = (TypedProperties) notification.getUserData();
-      updatePeer((AbstractBaseNodeContext<?>) handback, props);
+      updatePeer((BaseNodeContext<?>) handback, props);
     });
   }
 }

@@ -226,5 +226,19 @@ public interface Task<T> extends Runnable, Serializable, Interruptibility {
    * @return this task, for method chaining.
    * @exclude
    */
-  public Task<T> setNode(final Node node);
+  Task<T> setNode(final Node node);
+
+  /**
+   * Get the job this task is a part of.
+   * @return the job as an instance of {@link JPPFDistributedJob}.
+   */
+  JPPFDistributedJob getJob();
+
+  /**
+   * set the job this task is a part of.
+   * @param job the job as an instance of {@link JPPFDistributedJob}.
+   * @return this task, for method call chaining.
+   * @exclude
+   */
+  Task<T> setJob(JPPFDistributedJob  job);
 }

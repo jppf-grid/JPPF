@@ -28,14 +28,13 @@ import org.jppf.utils.Pair;
  * @author Laurent Cohen
  * @exclude
  */
-public interface NodeIO
-{
+public interface NodeIO {
   /**
-   * Read a task from the socket connection, along with its header information.
-   * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
+   * Read a job from the socket connection, along with its header information.
+   * @return a pair of {@link JPPFTaskBundle} and a {@link List} of {@link Task} instances.
    * @throws Exception if an error is raised while reading the task data.
    */
-  Pair<TaskBundle, List<Task<?>>> readTask() throws Exception;
+  Pair<TaskBundle, List<Task<?>>> readJob() throws Exception;
 
   /**
    * Write the execution results to the socket stream.
@@ -44,5 +43,4 @@ public interface NodeIO
    * @throws Exception if an error occurs while writing to the socket stream.
    */
   void writeResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
-
 }

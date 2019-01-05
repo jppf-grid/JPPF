@@ -56,36 +56,36 @@ public class AbstractTask<T> implements Task<T> {
   /**
    * The result of the task execution.
    */
-  private T result = null;
+  private T result;
   /**
    * The <code>Throwable</code> that was raised by this task's execution.
    */
-  private Throwable throwable = null;
+  private Throwable throwable;
   /**
    * The provider of shared data for this task.
    */
-  private transient DataProvider dataProvider = null;
+  private transient DataProvider dataProvider;
   /**
    * The task timeout schedule configuration.
    */
-  private JPPFSchedule timeoutSchedule = null;
+  private JPPFSchedule timeoutSchedule;
   /**
    * Determines whether this task is executing within a node, or locally on the client side.
    */
-  private transient boolean inNode = false;
+  private transient boolean inNode;
   /**
    * A user-assigned id for this task.
    */
-  private String id = null;
+  private String id;
   /**
    * Dispatches notifications from this task.
    */
-  private transient TaskExecutionDispatcher executionDisptacher = null;
+  private transient TaskExecutionDispatcher executionDisptacher;
   /**
    * Whether this task should be resubmitted by the server.
    * @since 4.1
    */
-  private transient boolean resubmit = false;
+  private transient boolean resubmit;
   /**
    * The max number of times a task can resubmit itself.
    */
@@ -94,6 +94,10 @@ public class AbstractTask<T> implements Task<T> {
    * The node in which this task is executing, if any.
    */
   private transient Node node;
+  /**
+   * The job this task is a part of.
+   */
+  private transient JPPFDistributedJob  job;
 
   /**
    *
@@ -309,6 +313,17 @@ public class AbstractTask<T> implements Task<T> {
   @Override
   public Task<T> setNode(final Node node) {
     this.node = node;
+    return this;
+  }
+
+  @Override
+  public JPPFDistributedJob getJob() {
+    return job;
+  }
+
+  @Override
+  public Task<T> setJob(final JPPFDistributedJob job) {
+    this.job = job;
     return this;
   }
 }

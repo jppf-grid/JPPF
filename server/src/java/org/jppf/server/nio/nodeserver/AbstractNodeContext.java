@@ -41,7 +41,7 @@ import org.slf4j.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements AbstractBaseNodeContext<NodeState> {
+public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements BaseNodeContext<NodeState> {
   /**
    * Logger for this class.
    */
@@ -170,7 +170,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     final TaskBundle taskBundle = bundle.getJob();
     final AbstractTaskBundleMessage message = newMessage();
     if (!taskBundle.isHandshake()) {
-      taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
+      taskBundle.setBundleId(bundle.getId());
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
       else if (bundle.getServerJob().isPersistent()) taskBundle.setParameter(BundleParameter.ALREADY_PERSISTED_P2P, true);
     }

@@ -329,7 +329,7 @@ public class BaseSetup {
           if (!connectionMap.containsKey(pool.getDriverPort())) connectionMap.put(pool.getDriverPort(), pool);
         }
       }
-      if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
+      if (connectionMap.size() < nbDrivers) Thread.sleep(100L);
       else allConnected = true;
     }
     final Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();

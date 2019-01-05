@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.server.nio.nodeserver.LocalNodeMessage;
-import org.jppf.server.node.JPPFContainer;
+import org.jppf.server.node.*;
 import org.slf4j.*;
 
 /**
@@ -49,13 +49,14 @@ public class JPPFLocalContainer extends JPPFContainer {
 
   /**
    * Initialize this container with a specified application uuid.
+   * @param node the node holding this container.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
    * @param clientAccess whether the node has access to the client that submitted the job.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
-    super(uuidPath, classLoader, clientAccess);
+  public JPPFLocalContainer(final AbstractCommonNode node, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
+    super(node, uuidPath, classLoader, clientAccess);
   }
 
   /**

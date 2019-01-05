@@ -152,21 +152,24 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testUpdateThreadPriority(final NodeSelector selector, final String... expectedNodes) throws Exception {
-    Map<String, Object> result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
+    try {
+      Map<String, Object> result = nodeForwarder.state(selector);
+      checkNodes(result, JPPFNodeState.class, expectedNodes);
+      for (final Map.Entry<String, Object> entry : result.entrySet()) {
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+        assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
+      }
+      result = nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY);
+      checkNoException(result, expectedNodes);
+      result = nodeForwarder.state(selector);
+      checkNodes(result, JPPFNodeState.class, expectedNodes);
+      for (final Map.Entry<String, Object> entry : result.entrySet()) {
+        final JPPFNodeState state = (JPPFNodeState) entry.getValue();
+        assertEquals(Thread.MAX_PRIORITY, state.getThreadPriority());
+      }
+    } finally {
+      nodeForwarder.updateThreadsPriority(selector, Thread.NORM_PRIORITY);
     }
-    result = nodeForwarder.updateThreadsPriority(selector, Thread.MAX_PRIORITY);
-    checkNoException(result, expectedNodes);
-    result = nodeForwarder.state(selector);
-    checkNodes(result, JPPFNodeState.class, expectedNodes);
-    for (final Map.Entry<String, Object> entry : result.entrySet()) {
-      final JPPFNodeState state = (JPPFNodeState) entry.getValue();
-      assertEquals(Thread.MAX_PRIORITY, state.getThreadPriority());
-    }
-    nodeForwarder.updateThreadsPriority(selector, Thread.NORM_PRIORITY);
   }
 
   /**

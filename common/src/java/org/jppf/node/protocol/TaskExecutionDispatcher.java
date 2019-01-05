@@ -36,10 +36,6 @@ public class TaskExecutionDispatcher {
    */
   private final List<TaskExecutionListener> taskExecutionListeners = new CopyOnWriteArrayList<>();
   /**
-   * The bundle whose tasks are currently being executed.
-   */
-  private TaskBundle bundle = null;
-  /**
    * Class loader used to discover listeners via SPI.
    */
   private ClassLoader loader = null;
@@ -90,7 +86,9 @@ public class TaskExecutionDispatcher {
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    */
   public void fireTaskNotification(final Task<?> task, final Object userObject, final boolean sendViaJmx) {
-    final TaskExecutionEvent event = (bundle == null) ? new TaskExecutionEvent(task, null, null, userObject, sendViaJmx)
+    final TaskBundle bundle = (TaskBundle) task.getJob();
+    final TaskExecutionEvent event = (bundle == null)
+      ? new TaskExecutionEvent(task, null, null, userObject, sendViaJmx)
       : new TaskExecutionEvent(task, bundle.getUuid(), bundle.getName(), userObject, sendViaJmx);
     fireEvent(event);
   }
@@ -110,14 +108,6 @@ public class TaskExecutionDispatcher {
    * Release the resources used by this dispatcher.
    */
   public void close() {
-  }
-
-  /**
-   * Set the bundle whose tasks are currently being executed.
-   * @param bundle a {@link TaskBundle} instance.
-   */
-  public void setBundle(final TaskBundle bundle) {
-    this.bundle = bundle;
   }
 
   /**

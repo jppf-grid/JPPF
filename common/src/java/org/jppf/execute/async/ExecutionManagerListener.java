@@ -16,35 +16,22 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node.local;
+package org.jppf.execute.async;
 
-import org.jppf.server.node.AbstractNodeConnectionChecker;
+import java.util.List;
+
+import org.jppf.node.protocol.*;
 
 /**
- * This class does nothing.
+ * 
  * @author Laurent Cohen
- * @exclude
  */
-public class LocalNodeConnectionChecker extends AbstractNodeConnectionChecker
-{
-  @Override
-  public void start()
-  {
-  }
-
-  @Override
-  public void stop()
-  {
-  }
-
-  @Override
-  public void resume()
-  {
-  }
-
-  @Override
-  public void suspend()
-  {
-  }
-
+public interface ExecutionManagerListener {
+  /**
+   * Called when the execution of a task bundle has finished.
+   * @param bundle the TaskBundle which holds information on the job.
+   * @param tasks the tasks that were executed.
+   * @param t a {@link Throwable} that prevented or interrupted the job processing.
+   */
+  void bundleExecuted(final TaskBundle bundle, final List<Task<?>> tasks, final Throwable t);
 }

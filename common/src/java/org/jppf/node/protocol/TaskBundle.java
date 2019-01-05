@@ -164,4 +164,18 @@ public interface TaskBundle extends JPPFDistributedJob, Metadata {
    * @param handshake <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
    */
   void setHandshake(boolean handshake);
+
+  /**
+   * @return the id of the task bundle sent to the node or local client executor.
+   */
+  default Long getBundleId() {
+    return getParameter(BundleParameter.TASK_BUNDLE_ID);
+  }
+
+  /**
+   * @param id the id of the task bundle sent to the node or local client executor.
+   */
+  default void setBundleId(Long id) {
+    setParameter(BundleParameter.TASK_BUNDLE_ID, id);
+  }
 }

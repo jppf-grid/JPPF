@@ -40,7 +40,7 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
    * Initialize this nio message with the specified sll flag.
    * @param context the channel to read from or write to.
    */
-  public RemoteNodeMessage(final AbstractBaseNodeContext<?> context) {
+  public RemoteNodeMessage(final BaseNodeContext<?> context) {
     super(context);
   }
 
@@ -50,7 +50,7 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage {
    */
   @Override
   protected void afterFirstRead() throws Exception {
-    final AbstractBaseNodeContext<?> context = (AbstractBaseNodeContext<?>) this.channel;
+    final BaseNodeContext<?> context = (BaseNodeContext<?>) this.channel;
     bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), context.getDriver().getSerializer());
     nbObjects = bundle.getTaskCount() + 1;
   }

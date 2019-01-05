@@ -25,8 +25,7 @@ package org.jppf.node;
  * @author Laurent Cohen
  * @exclude
  */
-public interface NodeConnection<C>
-{
+public interface NodeConnection<C> {
   /**
    * Initialize this connection.
    * @throws Exception if any error occurs.
@@ -51,4 +50,3 @@ public interface NodeConnection<C>
    */
   C getChannel();
 }
-

@@ -124,9 +124,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (queue == null) throw new IllegalArgumentException("queue is null");
 
     this.queue = queue;
-    this.queue.setCallableAllConnections(new Callable<List<AbstractBaseNodeContext<?>>>() {
+    this.queue.setCallableAllConnections(new Callable<List<BaseNodeContext<?>>>() {
       @Override
-      public List<AbstractBaseNodeContext<?>> call() throws Exception {
+      public List<BaseNodeContext<?>> call() throws Exception {
         return getAllChannels();
       }
     });
@@ -356,7 +356,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public List<AbstractBaseNodeContext<?>> getAllChannels() {
+  public List<BaseNodeContext<?>> getAllChannels() {
     return new ArrayList<>(allConnections.values());
   }
 
@@ -364,7 +364,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a set of <code>ChannelWrapper</code> instances.
    */
-  public Set<AbstractBaseNodeContext<?>> getAllChannelsAsSet() {
+  public Set<BaseNodeContext<?>> getAllChannelsAsSet() {
     return new HashSet<>(allConnections.values());
   }
 
@@ -372,7 +372,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get the list of currently idle channels.
    * @return a list of <code>AbstractNodeContext</code> instances.
    */
-  public List<AbstractBaseNodeContext<?>> getIdleChannels() {
+  public List<BaseNodeContext<?>> getIdleChannels() {
     return taskQueueChecker.getIdleChannels();
   }
 
@@ -427,7 +427,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   @Override
-  public void nodeConnected(final AbstractBaseNodeContext<?> context) {
+  public void nodeConnected(final BaseNodeContext<?> context) {
     final JPPFManagementInfo info = context.getManagementInfo();
     if (context.getChannel().isOpen()) {
       peerHandler.onNodeConnected(context);

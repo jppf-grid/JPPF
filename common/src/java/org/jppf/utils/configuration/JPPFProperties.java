@@ -408,8 +408,6 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JAVA_PATH = new StringProperty("jppf.java.path", null);
   /** Path to the temporary config overrides properties file. */
   public static final JPPFProperty<File> CONFIG_OVERRIDES_PATH = new FileProperty("jppf.config.overrides.path", new File("config/config-overrides.properties"));
-  /** @exclude . */
-  public static final JPPFProperty<Boolean> NODE_CHECK_CONNECTION = new BooleanProperty("jppf.node.check.connection", false);
   /** The default thickness of the scrollbars in the GUI. */
   public static final JPPFProperty<Integer> DEFAULT_SCROLLBAR_THICKNESS = new IntProperty("jppf.ui.default.scrollbar.thickness", 10);
   /** Whether a node is idle. This property is only set within a server. */

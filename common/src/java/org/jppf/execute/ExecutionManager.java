@@ -57,7 +57,7 @@ public interface ExecutionManager {
 
   /**
    * Get the executor used by this execution manager.
-   * @return an <code>ExecutorService</code> instance.
+   * @return an {@code ExecutorService} instance.
    */
   ExecutorService getExecutor();
 
@@ -93,13 +93,13 @@ public interface ExecutionManager {
 
   /**
    * Determine whether the current job has been cancelled, including before starting its execution.
-   * @return <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
+   * @return {@code true} if the job has been cancelled, {@code false} otherwise.
    */
   boolean isJobCancelled();
 
   /**
    * Specify whether the current job has been cancelled, including before starting its execution.
-   * @param jobCancelled <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
+   * @param jobCancelled {@code true} if the job has been cancelled, {@code false} otherwise.
    */
   void setJobCancelled(boolean jobCancelled);
 
