@@ -120,7 +120,7 @@ public class JPPFDriver extends AbstractJPPFDriver {
 
     if (configuration.get(JPPFProperties.LOCAL_NODE_ENABLED)) initLocalNode();
     initializer.initBroadcaster();
-    initializer.initPeers(clientClassServer);
+    initializer.initPeers();
     taskQueue.getPersistenceHandler().loadPersistedJobs();
     if (debugEnabled) log.debug("JPPF Driver initialization complete");
     System.out.println("JPPF Driver initialization complete");
@@ -190,6 +190,13 @@ public class JPPFDriver extends AbstractJPPFDriver {
       driver.startedfromMain = true;
       if (!"noLauncher".equals(args[0])) new LauncherListener(Integer.parseInt(args[0])).start();
       driver.start();
+      final Object lock = new Object();
+      synchronized(lock) {
+        try {
+          while(true) lock.wait();
+        } catch (@SuppressWarnings("unused") final Exception e) {
+        }
+      }
     } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
