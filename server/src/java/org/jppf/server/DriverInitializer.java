@@ -37,7 +37,6 @@ import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.classloader.ClassCache;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
@@ -214,9 +213,8 @@ public class DriverInitializer {
 
   /**
    * Initialize this driver's peers.
-   * @param classServer JPPF class server
    */
-  void initPeers(final ClientClassNioServer classServer) {
+  void initPeers() {
     boolean initPeers;
     final TypedProperties props = JPPFConfiguration.getProperties();
     final boolean ssl = props.get(PEER_SSL_ENABLED);

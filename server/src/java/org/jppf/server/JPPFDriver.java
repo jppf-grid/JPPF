@@ -30,7 +30,7 @@ import org.jppf.job.JobTasksListenerManager;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.*;
 import org.jppf.nio.*;
-import org.jppf.nio.acceptor.*;
+import org.jppf.nio.acceptor.AcceptorNioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.process.LauncherListener;
@@ -221,7 +221,7 @@ public class JPPFDriver {
       ThreadUtils.startDaemonThread(localNode, "Local node");
     }
     initializer.initBroadcaster();
-    initializer.initPeers(clientClassServer);
+    initializer.initPeers();
     taskQueue.getPersistenceHandler().loadPersistedJobs();
     if (debugEnabled) log.debug("JPPF Driver initialization complete");
     System.out.println("JPPF Driver initialization complete");
@@ -394,6 +394,13 @@ public class JPPFDriver {
       instance = new JPPFDriver();
       if (debugEnabled) log.debug("Driver system properties: {}", SystemUtils.printSystemProperties());
       instance.run();
+      final Object lock = new Object();
+      synchronized(lock) {
+        try {
+          while(true) lock.wait();
+        } catch (@SuppressWarnings("unused") final Exception e) {
+        }
+      }
     } catch(final Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
