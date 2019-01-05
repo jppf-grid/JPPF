@@ -11,6 +11,7 @@ $template{name="about-page-header" title="License"}$
   <div align="justify">
     <p><b>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</b>
 
+    <a name="C1"></a>
     <p><b>1. Definitions.</b>
 
       <p>"License" shall mean the terms and conditions for use, reproduction,
@@ -70,6 +71,7 @@ $template{name="about-page-header" title="License"}$
       on behalf of whom a Contribution has been received by Licensor and
       subsequently incorporated within the Work.
 
+    <a name="C2"></a>
     <p><b>2. Grant of Copyright License.</b> Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
@@ -77,6 +79,7 @@ $template{name="about-page-header" title="License"}$
       publicly display, publicly perform, sublicense, and distribute the
       Work and such Derivative Works in Source or Object form.
 
+    <a name="C3"></a>
     <p><b>3. Grant of Patent License.</b> Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
@@ -93,6 +96,7 @@ $template{name="about-page-header" title="License"}$
       granted to You under this License for that Work shall terminate
       as of the date such litigation is filed.
 
+    <a name="C4"></a>
     <p><b>4. Redistribution.</b> You may reproduce and distribute copies of the
       Work or Derivative Works thereof in any medium, with or without
       modifications, and in Source or Object form, provided that You
@@ -134,6 +138,7 @@ $template{name="about-page-header" title="License"}$
       reproduction, and distribution of the Work otherwise complies with
       the conditions stated in this License.
 
+    <a name="C5"></a>
     <p><b>5. Submission of Contributions.</b> Unless You explicitly state otherwise,
       any Contribution intentionally submitted for inclusion in the Work
       by You to the Licensor shall be under the terms and conditions of
@@ -142,11 +147,13 @@ $template{name="about-page-header" title="License"}$
       the terms of any separate license agreement you may have executed
       with Licensor regarding such Contributions.
 
+    <a name="C6"></a>
     <p><b>6. Trademarks.</b> This License does not grant permission to use the trade
       names, trademarks, service marks, or product names of the Licensor,
       except as required for reasonable and customary use in describing the
       origin of the Work and reproducing the content of the NOTICE file.
 
+    <a name="C7"></a>
     <p><b>7. Disclaimer of Warranty.</b> Unless required by applicable law or
       agreed to in writing, Licensor provides the Work (and each
       Contributor provides its Contributions) on an "AS IS" BASIS,
@@ -157,6 +164,7 @@ $template{name="about-page-header" title="License"}$
       appropriateness of using or redistributing the Work and assume any
       risks associated with Your exercise of permissions under this License.
 
+    <a name="C8"></a>
     <p><b>8. Limitation of Liability.</b> In no event and under no legal theory,
       whether in tort (including negligence), contract, or otherwise,
       unless required by applicable law (such as deliberate and grossly
@@ -169,6 +177,7 @@ $template{name="about-page-header" title="License"}$
       other commercial damages or losses), even if such Contributor
       has been advised of the possibility of such damages.
 
+    <a name="C9"></a>
     <p><b>9. Accepting Warranty or Additional Liability.</b> While redistributing
       the Work or Derivative Works thereof, You may choose to offer,
       and charge a fee for, acceptance of support, warranty, indemnity,
@@ -180,8 +189,9 @@ $template{name="about-page-header" title="License"}$
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
-    <p>END OF TERMS AND CONDITIONS
+    <p><b>END OF TERMS AND CONDITIONS</b>
 
+    <a name="appendix"></a>
     <p><b>APPENDIX</b>: How to apply the Apache License to your work.
 
       <p>To apply the Apache License to your work, attach the following

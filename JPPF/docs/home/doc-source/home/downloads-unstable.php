@@ -1,5 +1,5 @@
 <?php
-  $currentPage = "Download";
+  $currentPage = "download-unstable";
   $tag1 = "v_6_1_alpha";
   $ver1 = "6.1-alpha";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
