@@ -85,7 +85,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
         server.closeConnection(channel);
         if (context.isPeer()) {
           final String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
-          final BaseNodeContext<?> ctx = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(uuid) : driver.getNodeNioServer().getConnection(uuid);
+          final BaseNodeContext ctx = driver.getAsyncNodeNioServer().getConnection(uuid);
           if (ctx != null) ctx.handleException(null);
         }
         return null;

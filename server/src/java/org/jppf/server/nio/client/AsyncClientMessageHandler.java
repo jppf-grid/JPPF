@@ -167,7 +167,7 @@ public class AsyncClientMessageHandler {
     header.setParameter(BundleParameter.NODE_UUID_PARAM, driver.getUuid());
     final JMXServer jmxServer = driver.getInitializer().getJmxServer(context.isSecure());
     header.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
-    final PeerAttributesHandler peerHandler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getPeerHandler() : driver.getNodeNioServer().getPeerHandler();
+    final PeerAttributesHandler peerHandler = driver.getAsyncNodeNioServer().getPeerHandler();
     final JPPFSystemInformation systemInformation = driver.getSystemInformation();
     systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
     systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());

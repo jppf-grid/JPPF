@@ -50,7 +50,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Context for the dispatch node.
    */
-  private final BaseNodeContext<?> context;
+  private final BaseNodeContext context;
 
   /**
    * Initialize this action with the specified server and nodBundle.
@@ -58,7 +58,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
    * @param nodeBundle the bundle sent to the node.
    * @param context the context for the dispatch node, may be null  for an offline node.
    */
-  public NodeDispatchTimeoutAction(final OfflineNodeHandler server, final ServerTaskBundleNode nodeBundle, final BaseNodeContext<?> context) {
+  public NodeDispatchTimeoutAction(final OfflineNodeHandler server, final ServerTaskBundleNode nodeBundle, final BaseNodeContext context) {
     if (server == null) throw new IllegalArgumentException("server cannot be null");
     if (nodeBundle == null) throw new IllegalArgumentException("node bundle cannot be null");
     this.server = server;

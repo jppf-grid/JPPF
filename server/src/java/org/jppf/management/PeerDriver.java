@@ -51,7 +51,7 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
   @Override
   public TypedProperties getPeerProperties() {
     final TypedProperties props = new TypedProperties();
-    final PeerAttributesHandler peerHandler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getPeerHandler() : driver.getNodeNioServer().getPeerHandler();
+    final PeerAttributesHandler peerHandler = driver.getAsyncNodeNioServer().getPeerHandler();
     props.setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());
     props.setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
     return props;

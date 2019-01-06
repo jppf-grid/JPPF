@@ -38,7 +38,7 @@ public class NodeJMXWrapperListener implements JMXWrapperListener {
   /**
    * The node context.
    */
-  private final BaseNodeContext<?> context;
+  private final BaseNodeContext context;
   /**
    * 
    */
@@ -49,7 +49,7 @@ public class NodeJMXWrapperListener implements JMXWrapperListener {
    * @param context the node context.
    * @param listener the listener to conneciton completion event.
    */
-  public NodeJMXWrapperListener(final BaseNodeContext<?> context, final NodeConnectionCompletionListener listener) {
+  public NodeJMXWrapperListener(final BaseNodeContext context, final NodeConnectionCompletionListener listener) {
     this.context = context;
     this.listener = listener;
   }

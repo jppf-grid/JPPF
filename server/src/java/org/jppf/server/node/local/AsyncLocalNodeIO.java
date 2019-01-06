@@ -18,6 +18,8 @@
 
 package org.jppf.server.node.local;
 
+import static org.jppf.node.protocol.BundleParameter.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,7 +35,7 @@ import org.slf4j.*;
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
+public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
   /**
    * Logger for this class.
    */
@@ -46,6 +48,10 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
    * The I/O channel for this node.
    */
   private AsyncNodeContext channel;
+  /**
+   * The message to deserialize.
+   */
+  protected LocalNodeMessage currentMessage;
 
   /**
    * Initialize this TaskIO with the specified node.
@@ -71,6 +77,46 @@ public class AsyncLocalNodeIO extends AbstractLocalNodeIO {
     result = deserializeObjects(bundle);
     if (debugEnabled) log.debug("got all data");
     return result;
+  }
+
+  /**
+   * Performs the actions required if reloading the classes is necessary.
+   * @throws Exception if any error occurs.
+   */
+  @Override
+  protected void handleReload() throws Exception {
+    node.setClassLoader(null);
+    node.initHelper();
+  }
+
+  @Override
+  protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
+    final int count = bundle.getTaskCount();
+    final Object[] list = new Object[count + 2];
+    list[0] = bundle;
+    try {
+      initializeBundleData(bundle);
+      if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
+      if (!bundle.isHandshake()) {
+        final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
+        final JPPFLocalContainer cont = (JPPFLocalContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
+        cont.getClassLoader().setRequestUuid(bundle.getUuid());
+        if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
+        node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
+        cont.setCurrentMessage(currentMessage);
+        cont.deserializeObjects(list, 1+count, node.getSerializationExecutor());
+      } else {
+        // skip null data provider
+      }
+      if (debugEnabled) log.debug("got all data");
+    } catch(final Throwable t) {
+      log.error("Exception occurred while deserializing the tasks", t);
+      bundle.setTaskCount(0);
+      bundle.setParameter(NODE_EXCEPTION_PARAM, t);
+    } finally {
+      currentMessage = null;
+    }
+    return list;
   }
 
   @Override

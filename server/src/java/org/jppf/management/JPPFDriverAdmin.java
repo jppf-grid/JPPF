@@ -101,9 +101,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector, final boolean includePeers) {
     try {
-      final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
+      final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
       final List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
-      for (final BaseNodeContext<?> context : nodes) {
+      for (final BaseNodeContext context : nodes) {
         final JPPFManagementInfo info = context.getManagementInfo();
         if (info != null) list.add(info);
       }
@@ -126,10 +126,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbIdleNodes(final NodeSelector selector, final boolean includePeers) throws Exception {
-    final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
+    final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers, false);
     if (nodes == null) return -1;
     int result = 0;
-    for (final BaseNodeContext<?> node: nodes) {
+    for (final BaseNodeContext node: nodes) {
       final boolean idle = node.getIdle().get();
       if (idle) result++;
     }
@@ -145,9 +145,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) {
     try {
-      final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
+      final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, false, false);
       final List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
-      for (final BaseNodeContext<?> node : nodes) {
+      for (final BaseNodeContext node : nodes) {
         if (node.getIdle().get()) {
           final JPPFManagementInfo info = node.getManagementInfo();
           if (info != null) list.add(info);
@@ -255,32 +255,30 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
    * @exclude
    */
   private JPPFBundlerFactory getBundlerFactory() {
-    return driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getBundlerFactory() : driver.getNodeNioServer().getBundlerFactory();
+    return driver.getAsyncNodeNioServer().getBundlerFactory();
   }
 
   @Override
   public void toggleActiveState(final NodeSelector selector) throws Exception {
-    final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    for (final BaseNodeContext<?> node: nodes) {
-      if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().activateNode(node.getUuid(), !node.isActive()); 
-      else driver.getNodeNioServer().activateNode(node.getUuid(), !node.isActive());
+    final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    for (final BaseNodeContext node: nodes) {
+      driver.getAsyncNodeNioServer().activateNode(node.getUuid(), !node.isActive()); 
     }
   }
 
   @Override
   public Map<String, Boolean> getActiveState(final NodeSelector selector) throws Exception {
-    final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
     final Map<String, Boolean> result = new HashMap<>(nodes.size());
-    for (final BaseNodeContext<?> node: nodes) result.put(node.getUuid(), node.isActive());
+    for (final BaseNodeContext node: nodes) result.put(node.getUuid(), node.isActive());
     return result;
   }
 
   @Override
   public void setActiveState(final NodeSelector selector, final boolean active) throws Exception {
-    final Set<BaseNodeContext<?>> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    for (final BaseNodeContext<?> node: nodes) {
-      if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().activateNode(node.getUuid(), active); 
-      else driver.getNodeNioServer().activateNode(node.getUuid(), active);
+    final Set<BaseNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    for (final BaseNodeContext node: nodes) {
+      driver.getAsyncNodeNioServer().activateNode(node.getUuid(), active); 
     }
   }
 

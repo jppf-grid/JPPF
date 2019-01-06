@@ -18,35 +18,378 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
-import org.jppf.nio.NioContext;
+import org.jppf.nio.StatelessNioContext;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.utils.Pair;
+import org.slf4j.*;
 
 /**
- * @param <S> the type of state.
  * @author Laurent Cohen
  */
-public interface BaseNodeContext<S extends Enum<S>> extends NioContext<S>,  ExecutorChannel<ServerTaskBundleNode>  {
+public abstract class BaseNodeContext extends StatelessNioContext implements  ExecutorChannel<ServerTaskBundleNode>  {
   /**
-   * @return this node context's attributes.
+   * Logger for this class.
    */
-  NodeContextAttributes getAttributes();
+  private static final Logger log = LoggerFactory.getLogger(BaseNodeContext.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Bundler used to schedule tasks for the corresponding node.
+   */
+  private  Bundler<?> bundler;
+  /**
+   * Represents the node system information.
+   */
+  private JPPFSystemInformation systemInfo;
+  /**
+   * Represents the management information.
+   */
+  private JPPFManagementInfo managementInfo;
+  /**
+   * List of execution status listeners for this channel.
+   */
+  private final List<ExecutorChannelStatusListener> executorChannelListeners = new CopyOnWriteArrayList<>();
+  /**
+   * The {@code Runnable} called when node context is closed.
+   */
+  private Runnable onClose;
+  /**
+   * Determines whether the node is active or inactive.
+   */
+  private final AtomicBoolean active = new AtomicBoolean(true);
+  /**
+   * Provides access to the management functions of the node.
+   */
+  private JMXNodeConnectionWrapper jmxConnection;
+  /**
+   * Provides access to the management functions of the peer driver.
+   */
+  private JMXDriverConnectionWrapper peerJmxConnection;
+  /**
+   * Execution status for the node.
+   */
+  private ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
+  /**
+   * Whether to remove any job reservation for this node.
+   */
+  private NodeReservationHandler.Transition reservationTansition = NodeReservationHandler.Transition.REMOVE;
+  /**
+   * The latest computed score for a given desired configuration.
+   */
+  private int reservationScore;
+  /**
+   * Unique node identfier reusable over node restarts.
+   */
+  private Pair<String, String> nodeIdentifier;
+  /**
+   * The algorithm name for the bundler.
+   */
+  private String bundlerAlgorithm;
+  /**
+   * The load-balancer persistence manager.
+   */
+  private final LoadBalancerPersistenceManager bundlerHandler;
+  /**
+   *
+   */
+  private final NodeConnectionCompletionListener listener;
+  /**
+   * Determines whether the node works in offline mode.
+   */
+  private boolean offline = false;
+  /**
+   * Reference to the JPPF driver.
+   */
+  protected final JPPFDriver driver;
+  /**
+   * The server that handles this context.
+   */
+  protected final AsyncNodeNioServer server;
+  /**
+   * Determines whether the node is idle or not.
+   */
+  private final AtomicBoolean idle = new AtomicBoolean(false);
 
+  /**
+   *
+   * @param server .
+   */
+  public BaseNodeContext(final AsyncNodeNioServer server) {
+    this.server = server;
+    this.driver = server.getDriver();
+    this.bundlerHandler = server.getBundlerHandler();
+    this.listener = server;
+  }
+
+  /**
+   * @return the bundler used to schedule tasks for the corresponding node.
+   */
   @Override
-  default void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
-    getAttributes().addExecutionStatusListener(listener);
+  public Bundler<?> getBundler() {
+    return bundler;
+  }
+
+  /**
+   *
+   * @param bundler the bundler used to schedule tasks for the corresponding node.
+   */
+  public void setBundler(final Bundler<?> bundler) {
+    this.bundler = bundler;
+  }
+
+  /**
+   * Check whether the bundler held by this context is up to date by comparison
+   * with the specified bundler.<br>
+   * If it is not, then it is replaced with a copy of the specified bundler, with a
+   * timestamp taken at creation time.
+   * @param factory the load-balancer factory.
+   * @param jppfContext execution context.
+   * @return the (possibly new) bundle for this executor channel.
+   */
+  @Override
+  public Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
+    if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
+    Bundler<?> bundler = getBundler();
+    if (bundler == null || bundler.getTimestamp() < factory.getLastUpdateTime()) {
+      if (bundler != null) {
+        bundler.dispose();
+        if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
+      }
+      final Pair<String, Bundler<?>> pair = bundlerHandler.loadBundler(nodeIdentifier);
+      setBundler(pair.second());
+      bundlerAlgorithm = pair.first();
+      bundler = pair.second();
+      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(jppfContext);
+      bundler.setup();
+      if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
+    }
+    return bundler;
   }
 
   @Override
-  default void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
-    getAttributes().removeExecutionStatusListener(listener);
+  public JPPFSystemInformation getSystemInformation() {
+    return systemInfo;
+  }
+
+  /**
+   * Set the node system information.
+   * @param systemInfo a {@link JPPFSystemInformation} instance.
+   * @param update a flag indicates whether update system information in management information.
+   */
+  public void setNodeInfo(final JPPFSystemInformation systemInfo, final boolean update) {
+    if (update && debugEnabled) log.debug("updating node information for {}", systemInfo);
+    this.systemInfo = systemInfo;
+    systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
+    if (update && managementInfo != null) managementInfo.setSystemInfo(systemInfo);
+  }
+
+  /**
+   * @return the management information.
+   */
+  @Override
+  public JPPFManagementInfo getManagementInfo() {
+    return managementInfo;
+  }
+
+  /**
+   *
+   * @param managementInfo the management information.
+   */
+  public void setManagementInfo(final JPPFManagementInfo managementInfo) {
+    if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
+    this.managementInfo = managementInfo;
+    if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
+    this.managementInfo = managementInfo;
+  }
+
+  /**
+   * @return the {@code Runnable} called when node context is closed.
+   */
+  public Runnable getOnClose() {
+    return onClose;
+  }
+
+  /**
+   *
+   * @param onClose the {@code Runnable} called when node context is closed.
+   */
+  public void setOnClose(final Runnable onClose) {
+    this.onClose = onClose;
+  }
+
+  /**
+   * @return the connection to the node's JMX server.
+   */
+  public JMXNodeConnectionWrapper getJmxConnection() {
+    return jmxConnection;
+  }
+
+  /**
+   *
+   * @param jmxConnection the connection to the node's JMX server.
+   */
+  public void setJmxConnection(final JMXNodeConnectionWrapper jmxConnection) {
+    this.jmxConnection = jmxConnection;
+  }
+
+  /**
+   * @return the connection to the perr driver's JMX server.
+   */
+  public JMXDriverConnectionWrapper getPeerJmxConnection() {
+    return peerJmxConnection;
+  }
+
+  /**
+   *
+   * @param peerJmxConnection the connection to the peer driver's JMX server.
+   */
+  public void setPeerJmxConnection(final JMXDriverConnectionWrapper peerJmxConnection) {
+    this.peerJmxConnection = peerJmxConnection;
+  }
+
+  /**
+   * Initialize the jmx connection using the specified jmx id.
+   */
+  public void initializeJmxConnection() {
+    if (!isClosed()) {
+      JMXConnectionWrapper jmx = null;
+      if (isLocal()) jmx = jmxConnection = new JMXNodeConnectionWrapper();
+      else {
+        final JPPFManagementInfo info = getManagementInfo();
+        if (debugEnabled) log.debug("establishing JMX connection for {}", info);
+        if (!isPeer()) jmx = jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+        else jmx = peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+      }
+      jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this, listener));
+      jmx.connect();
+    }
+  }
+
+  /**
+   * @return the execution status for the node.
+   */
+  @Override
+  public ExecutorStatus getExecutionStatus() {
+    return executionStatus;
+  }
+
+  /**
+   *
+   * @param newStatus the execution status for the node.
+   */
+  public void setExecutionStatus(final ExecutorStatus newStatus) {
+    final ExecutorStatus oldStatus = this.executionStatus;
+    this.executionStatus = newStatus;
+    fireExecutionStatusChanged(oldStatus, newStatus);
+  }
+
+  /**
+   * @return whether to remove any job reservation for this node.
+   */
+  public NodeReservationHandler.Transition getReservationTansition() {
+    return reservationTansition;
+  }
+
+  /**
+   *
+   * @param reservationTansition whether to remove any job reservation for this node.
+   */
+  public void setReservationTansition(final NodeReservationHandler.Transition reservationTansition) {
+    this.reservationTansition = reservationTansition;
+  }
+
+  /**
+   * @return the latest computed score for a given desired configuration.
+   */
+  public int getReservationScore() {
+    return reservationScore;
+  }
+
+  /**
+   *
+   * @param reservationScore the latest computed score for a given desired configuration.
+   */
+  public void setReservationScore(final int reservationScore) {
+    this.reservationScore = reservationScore;
+  }
+
+  /**
+   * @return the unique node identfier reusable over node restarts.
+   */
+  public Pair<String, String> getNodeIdentifier() {
+    return nodeIdentifier;
+  }
+
+  /**
+   *
+   * @param nodeIdentifier the unique node identfier reusable over node restarts.
+   */
+  public void setNodeIdentifier(final Pair<String, String> nodeIdentifier) {
+    this.nodeIdentifier = nodeIdentifier;
+  }
+
+  /**
+   * @return the algorithm name for the bundler.
+   */
+  public String getBundlerAlgorithm() {
+    return bundlerAlgorithm;
+  }
+
+  /**
+   *
+   * @param bundlerAlgorithm the algorithm name for the bundler.
+   */
+  public void setBundlerAlgorithm(final String bundlerAlgorithm) {
+    this.bundlerAlgorithm = bundlerAlgorithm;
+  }
+
+  /**
+   * @return whether the node is active.
+   */
+  @Override
+  public boolean isActive() {
+    return active.get();
+  }
+
+  /**
+   * @param active whether the node is active.
+   */
+  public void setActive(final boolean active) {
+    this.active.set(active);
+    if (managementInfo != null) managementInfo.setIsActive(active);
+  }
+
+  /**
+   * Add a execution status listener to this channel's list of listeners.
+   * @param listener the listener to add to the list.
+   */
+  @Override
+  public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+    executorChannelListeners.add(listener);
+  }
+
+  /**
+   * Remove a execution status listener from this channel's list of listeners.
+   * @param listener the listener to remove from the list.
+   */
+  @Override
+  public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+    executorChannelListeners.remove(listener);
   }
 
   /**
@@ -54,209 +397,40 @@ public interface BaseNodeContext<S extends Enum<S>> extends NioContext<S>,  Exec
    * @param oldValue the channel execution status before the change.
    * @param newValue the channel execution status after the change.
    */
-  default void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
-    getAttributes().fireExecutionStatusChanged(oldValue, newValue);
-  }
-
-  @Override
-  default ExecutorStatus getExecutionStatus() {
-    return getAttributes().getExecutionStatus();
-  }
-
-  /**
-   *
-   * @param executionStatus the execution status for the node.
-   */
-  default void setExecutionStatus(final ExecutorStatus executionStatus) {
-    getAttributes().setExecutionStatus(executionStatus);
-  }
-
-  @Override
-  default boolean isActive() {
-    return getAttributes().istActive();
-  }
-
-  /**
-   * Activate or deactivate the node.
-   * @param active {@code true} to activate the node, {@code false} to deactivate it.
-   */
-  default void setActive(final boolean active) {
-    getAttributes().setActive(active);
-  }
-
-  @Override
-  default Bundler<?> getBundler() {
-    return getAttributes().getBundler();
-  }
-
-  /**
-   * Set the bundler used to schedule tasks for the corresponding node.
-   * @param bundler a {@link Bundler} instance.
-   */
-  default void setBundler(final Bundler<?> bundler) {
-    getAttributes().setBundler(bundler);
-  }
-
-  @Override
-  default Bundler<?> checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
-    return getAttributes().checkBundler(factory, jppfContext);
-  }
-
-  @Override
-  default JPPFSystemInformation getSystemInformation() {
-    return getAttributes().getSystemInfo();
-  }
-
-  /**
-   * Set the management information.
-   * @param managementInfo a {@link JPPFManagementInfo} instance.
-   */
-  default void setManagementInfo(final JPPFManagementInfo managementInfo) {
-    getAttributes().setManagementInfo(managementInfo);
-  }
-
-  /**
-   * Set the node system information.
-   * @param nodeInfo a {@link JPPFSystemInformation} instance.
-   * @param update a flag indicates whether update system information in management information.
-   */
-  default void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update) {
-    getAttributes().setNodeInfo(nodeInfo, update);
-  }
-
-  @Override
-  default JPPFManagementInfo getManagementInfo() {
-    return getAttributes().getManagementInfo();
-  }
-
-  /**
-   * Get the object that provides access to the management functions of the node.
-   * @return a {@code JMXConnectionWrapper} instance.
-   */
-  default JMXNodeConnectionWrapper getJmxConnection() {
-    return getAttributes().getJmxConnection();
-  }
-
-  /**
-  *
-  * @param jmxConnection the connection to the node's JMX server.
-  */
- default void setJmxConnection(final JMXNodeConnectionWrapper jmxConnection) {
-   getAttributes().setJmxConnection(jmxConnection);
- }
-
- /**
-   * Get the object that provides access to the management functions of the driver.
-   * @return a {@code JMXConnectionWrapper} instance.
-   */
-  default JMXDriverConnectionWrapper getPeerJmxConnection() {
-    return getAttributes().getPeerJmxConnection();
-  }
-
-  /**
-   *
-   * @param peerJmxConnection the connection to the peer driver's JMX server.
-   */
-  default void setPeerJmxConnection(final JMXDriverConnectionWrapper peerJmxConnection) {
-    getAttributes().setPeerJmxConnection(peerJmxConnection);
-  }
-
- /**
-   * Set the {@code Runnable} that will be called when node context is closed.
-   * @return a {@code Runnable} called when node context is closed or {@code null}.
-   */
-  default Runnable getOnClose() {
-    return getAttributes().getOnClose();
-  }
-
-  /**
-   * Set the {@code Runnable} that will be called when node context is closed.
-   * @param onClose a {@code Runnable} called when node context is closed or {@code null}.
-   */
-  default void setOnClose(final Runnable onClose) {
-    getAttributes().setOnClose(onClose);
-  }
-
-  /**
-   * @return whether to remove any job reservation for this node.
-   */
-  default NodeReservationHandler.Transition getReservationTansition() {
-    return getAttributes().getReservationTansition();
-  }
-
-  /**
-   *
-   * @param reservationTansition whether to remove any job reservation for this node.
-   */
-  default void setReservationTansition(final NodeReservationHandler.Transition reservationTansition) {
-    getAttributes().setReservationTansition(reservationTansition);
-  }
-
-  /**
-   * @return the latest computed score for a given desired configuration.
-   */
-  default int getReservationScore() {
-    return getAttributes().getReservationScore();
-  }
-
-  /**
-   *
-   * @param reservationScore the latest computed score for a given desired configuration.
-   */
-  default void setReservationScore(final int reservationScore) {
-    getAttributes().setReservationScore(reservationScore);
-  }
-
-  /**
-   * @return the unique node identfier reusable over node restarts.
-   */
-  default Pair<String, String> getNodeIdentifier() {
-    return getAttributes().getNodeIdentifier();
-  }
-
-  /**
-   *
-   * @param nodeIdentifier the unique node identfier reusable over node restarts.
-   */
-  default void setNodeIdentifier(final Pair<String, String> nodeIdentifier) {
-    getAttributes().setNodeIdentifier(nodeIdentifier);
-  }
-
-  /**
-   * @return the algorithm name for the bundler.
-   */
-  default String getBundlerAlgorithm() {
-    return getAttributes().getBundlerAlgorithm();
-  }
-
-  /**
-   *
-   * @param bundlerAlgorithm the algorithm name for the bundler.
-   */
-  default void setBundlerAlgorithm(final String bundlerAlgorithm) {
-    getAttributes().setBundlerAlgorithm(bundlerAlgorithm);
+  public void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
+    if (oldValue == newValue) return;
+    if (debugEnabled) log.debug("changing execution status from {} to {} on {}", oldValue, newValue, this);
+    final ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
+    for (final ExecutorChannelStatusListener listener : executorChannelListeners) listener.executionStatusChanged(event);
   }
 
   /**
    * @return whether the node works in offline mode.
    */
-  default boolean isOffline() {
-    return getAttributes().isOffline();
+  public boolean isOffline() {
+    return offline;
   }
 
   /**
    * Specify whether the node works in offline mode.
    * @param offline <code>true</code> if the node is in offline mode, <code>false</code> otherwise.
    */
-  default void setOffline(final boolean offline) {
-    getAttributes().setOffline(offline);
+  public void setOffline(final boolean offline) {
+    this.offline = offline;
   }
 
   /**
    * @return a reference to the JPPF driver.
    */
-  default JPPFDriver getDriver() {
-    return getAttributes().getDriver();
+  public JPPFDriver getDriver() {
+    return driver;
+  }
+
+  /**
+   * @return whether the node is idle or not.
+   */
+  public AtomicBoolean getIdle() {
+    return idle;
   }
 
   /**
@@ -266,12 +440,5 @@ public interface BaseNodeContext<S extends Enum<S>> extends NioContext<S>,  Exec
    * @return a {@code true} when cancel was successful {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
-  boolean cancelJob(final String jobId, final boolean requeue) throws Exception;
-
-  /**
-   * @return whether the node is idle or not.
-   */
-  default AtomicBoolean getIdle() {
-    return getAttributes().getIdle();
-  }
+  public abstract boolean cancelJob(final String jobId, final boolean requeue) throws Exception;
 }

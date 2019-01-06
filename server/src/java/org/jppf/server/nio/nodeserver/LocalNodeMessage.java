@@ -31,13 +31,13 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage {
    * Build this nio message.
    * @param context the channel to read from or write to.
    */
-  public LocalNodeMessage(final BaseNodeContext<?> context) {
+  public LocalNodeMessage(final BaseNodeContext context) {
     super(context);
   }
 
   @Override
   public boolean read() throws Exception {
-    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), ((AbstractNodeContext) channel).server.getDriver().getSerializer());
+    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0), ((BaseNodeContext) channel).getDriver().getSerializer());
     return true;
   }
 

@@ -22,11 +22,13 @@ import static org.jppf.node.protocol.BundleParameter.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.net.*;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
@@ -120,7 +122,7 @@ public class AsyncNodeMessageHandler {
     final String uuid = bundle.getParameter(NODE_UUID_PARAM);
     context.setUuid(uuid);
     final JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
-    context.setNodeIdentifier(NodeServerUtils.getNodeIdentifier(context.getServer().getBundlerFactory(), context, systemInfo));
+    context.setNodeIdentifier(getNodeIdentifier(context.getServer().getBundlerFactory(), context, systemInfo));
     if (debugEnabled) log.debug("nodeID = {} for node = {}", context.getNodeIdentifier(), context);
     final boolean isPeer = bundle.getParameter(IS_PEER, false);
     context.setPeer(isPeer);
@@ -131,7 +133,7 @@ public class AsyncNodeMessageHandler {
     } else if (debugEnabled) log.debug("no system info received for node {}", context);
     final int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
     if (debugEnabled) log.debug("management port = {} for node = {}", port, context);
-    String host = NodeServerUtils.getChannelHost(context);
+    String host = getChannelHost(context);
     final HostIP hostIP = context.isLocal() ? new HostIP(host, host) : resolveHost(context);
     final boolean sslEnabled = !context.isLocal() && context.getSSLHandler() != null;
     final boolean hasJmx = driver.getConfiguration().get(JPPFProperties.MANAGEMENT_ENABLED);
@@ -187,7 +189,7 @@ public class AsyncNodeMessageHandler {
    * @since 5.0.2
    */
   private HostIP resolveHost(final AsyncNodeContext context) throws Exception {
-    String host = NodeServerUtils.getChannelHost(context);
+    String host = getChannelHost(context);
     String ip = host;
     try {
       final InetAddress addr = InetAddress.getByName(host);
@@ -262,7 +264,7 @@ public class AsyncNodeMessageHandler {
    */
   private void process(final NodeBundleResults received, final AsyncNodeContext context) throws Exception {
     final TaskBundle bundle = received.first();
-    final ServerTaskBundleNode nodeBundle = context.removeJobEntry(bundle.getUuid(), bundle.getBundleId()).nodeBundle;
+    final ServerTaskBundleNode nodeBundle = context.removeJobEntry(bundle.getUuid(), bundle.getBundleId());
     context.getServer().getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle), false);
     boolean requeue = false;
     try {
@@ -393,5 +395,51 @@ public class AsyncNodeMessageHandler {
     }
     if (debugEnabled) log.debug("n={}, newMaxJobs={}, computed maxJobs={}, context={}", n, newMaxJobs, maxJobs, context);
     if (maxJobs > 0) context.setMaxJobs(maxJobs);
+  }
+
+  /**
+   * Compute a repeatable unique identifier for a node, which can be reused over node restarts.
+   * @param factory bundler (load-balancer) factory.
+   * @param channel the channel that carries the host information.
+   * @param info the system information for the node.
+   * @return a pair of string representing the clear string (keft side) and resulting unique string identifier for the node (right side).
+   * @throws Exception if any error occurs.
+   */
+  private static Pair<String, String> getNodeIdentifier(final JPPFBundlerFactory factory, final BaseNodeContext channel, final JPPFSystemInformation info) throws Exception {
+    final StringBuilder sb = new StringBuilder();
+    final String ip = NetworkUtils.getNonLocalHostAddress();
+    sb.append('[').append(ip == null ? "localhost" : ip);
+    if (channel.getSocketChannel() != null) {
+      final SocketChannel ch = channel.getSocketChannel();
+      sb.append(':').append(ch.socket().getLocalPort()).append(']');
+      final InetSocketAddress isa = (InetSocketAddress) ch.getRemoteAddress();
+      sb.append(isa.getAddress().getHostAddress());
+    } else if (channel.isLocal()) {
+      sb.append( "local_channel").append(']');
+    }
+    final TypedProperties jppf = info.getJppf();
+    final boolean master = jppf.get(JPPFProperties.PROVISIONING_MASTER);
+    final boolean slave = jppf.get(JPPFProperties.PROVISIONING_SLAVE);
+    if (master || slave) {
+      sb.append(master ? "master" : "slave");
+      sb.append(jppf.get(JPPFProperties.PROVISIONING_SLAVE_PATH_PREFIX));
+      if (slave) sb.append(jppf.get(JPPFProperties.PROVISIONING_SLAVE_ID));
+    }
+    final String s = sb.toString();
+    return new Pair<>(s, CryptoUtils.computeHash(s, factory.getHashAlgorithm()));
+  }
+
+  /**
+   * Extract the remote host name from the specified channel.
+   * @param context the channel.
+   * @return the remote host name as a string.
+   * @throws Exception if any error occurs.
+   */
+  private static String getChannelHost(final BaseNodeContext context) throws Exception {
+    if (!context.isLocal()) {
+      final SocketChannel ch = context.getSocketChannel();
+      return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
+    }
+    else  return "localhost";
   }
 }

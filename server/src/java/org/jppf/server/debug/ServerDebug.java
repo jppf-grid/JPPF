@@ -95,18 +95,6 @@ public class ServerDebug implements ServerDebugMBean {
   }
 
   @Override
-  public String nodeMessages() {
-    final Set<NioContext<?>> set = new HashSet<>(nodeSet());
-    final StringBuilder sb = new StringBuilder();
-    for (NioContext<?> ch: set) {
-      final AbstractNodeContext ctx = (AbstractNodeContext) ch;
-      final String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
-      sb.append("uuid=").append(ch.getUuid()).append(", message=").append(s).append('\n');
-    }
-    return sb.toString();
-  }
-
-  @Override
   public String all() {
     final StringBuilder sb = new StringBuilder();
     sb.append("jobs in queue:").append('\n');
@@ -228,16 +216,16 @@ public class ServerDebug implements ServerDebugMBean {
    * @return a set of {@link ChannelWrapper} instances.
    */
   private Set<NioContext<?>> nodeSet() {
-    final List<BaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
+    final List<BaseNodeContext> list = driver.getAsyncNodeNioServer().getAllChannels();
     final Set<NioContext<?>> set = new HashSet<>(list);
     return set;
   }
 
   @Override
   public String taskQueueCheckerChannels() {
-    final List<BaseNodeContext<?>> list = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getJobScheduler().getIdleChannels() : driver.getNodeNioServer().getIdleChannels();
+    final List<BaseNodeContext> list = driver.getAsyncNodeNioServer().getJobScheduler().getIdleChannels();
     final StringBuilder sb = new StringBuilder();
-    for (final BaseNodeContext<?> ctx: list) sb.append(ctx).append('\n');
+    for (final BaseNodeContext ctx: list) sb.append(ctx).append('\n');
     return sb.toString();
   }
 
@@ -258,18 +246,18 @@ public class ServerDebug implements ServerDebugMBean {
 
   @Override
   public Map<String, Set<String>> getAllReservations() {
-    return driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservations() : driver.getNodeNioServer().getNodeReservationHandler().getReservations();
+    return driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservations();
   }
 
   @Override
   public String[] getReservedJobs() {
-    final Set<String> set = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedJobs() : driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
+    final Set<String> set = driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedJobs();
     return set.toArray(new String[set.size()]);
   }
 
   @Override
   public String[] getReservedNodes() {
-    final Set<String> set = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedNodes() : driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
+    final Set<String> set = driver.getAsyncNodeNioServer().getNodeReservationHandler().getReservedNodes();
     return set.toArray(new String[set.size()]);
   }
 

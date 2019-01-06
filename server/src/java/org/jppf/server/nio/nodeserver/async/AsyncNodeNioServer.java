@@ -23,17 +23,22 @@ import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
 import org.jppf.execute.*;
+import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.load.balancer.JPPFContext;
 import org.jppf.load.balancer.persistence.LoadBalancerPersistenceManager;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.nio.*;
+import org.jppf.node.protocol.*;
+import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.queue.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
+import org.jppf.serialization.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.nodeserver.*;
@@ -130,7 +135,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     selectTimeout = 1000L;
     messageHandler = new AsyncNodeMessageHandler(driver);
     this.queue = driver.getQueue();
-    final Callable<List<BaseNodeContext<?>>> callable = () -> getAllChannels();
+    final Callable<List<BaseNodeContext>> callable = () -> getAllChannels();
     this.queue.setCallableAllConnections(callable);
     this.peerHandler = new PeerAttributesHandler(driver, Math.max(1, driver.getConfiguration().getInt("jppf.peer.handler.threads", 1)));
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
@@ -145,7 +150,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
         jobScheduler.wakeUp();
       }
     });
-    initialServerJob = NodeServerUtils.createInitialServerJob(driver);
+    initialServerJob = createInitialServerJob(driver);
     nodeReservationHandler = new NodeReservationHandler(driver);
     ThreadUtils.startDaemonThread(jobScheduler, "JobScheduler");
   }
@@ -277,7 +282,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
   /**
    * @return a reference to the driver.
    */
-  JPPFDriver getDriver() {
+  public JPPFDriver getDriver() {
     return driver;
   }
 
@@ -350,14 +355,14 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * Get all the node connections handled by this server.
    * @return a list of {@link BaseNodeContext} instances.
    */
-  public List<BaseNodeContext<?>> getAllChannels() {
+  public List<BaseNodeContext> getAllChannels() {
     return new ArrayList<>(allConnections.values());
   }
 
   /**
    * @return a set of {@link BaseNodeContext} instances.
    */
-  public Set<BaseNodeContext<?>> getAllChannelsAsSet() {
+  public Set<BaseNodeContext> getAllChannelsAsSet() {
     return new HashSet<>(allConnections.values());
   }
 
@@ -365,7 +370,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
    * Called when the node failed to respond to a heartbeat message.
    * @param context the channel to close.
    */
-  public void connectionFailed(final BaseNodeContext<?> context) {
+  public void connectionFailed(final BaseNodeContext context) {
     if (context != null) {
       if (debugEnabled) log.debug("about to close channel = {} with uuid = {}", context, context.getUuid());
       removeConnection(context.getUuid());
@@ -463,7 +468,7 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
   }
 
   @Override
-  public void nodeConnected(final BaseNodeContext<?> context) {
+  public void nodeConnected(final BaseNodeContext context) {
     if (debugEnabled) log.debug("node connected: {}", context);
     final JPPFManagementInfo info = context.getManagementInfo();
     if (!context.isClosed()) {
@@ -495,5 +500,34 @@ public final class AsyncNodeNioServer extends StatelessNioServer<AsyncNodeContex
     if (nodeContext == null) return null;
     if (activate != nodeContext.isActive()) nodeContext.setActive(activate);
     return nodeContext;
+  }
+
+  /**
+   * Create the base server job used to generate the initial bundle sent to each node.
+   * @param driver the JPPF driver.
+   * @return a {@link ServerJob} instance, with no task in it.
+   */
+  private static ServerJob createInitialServerJob(final JPPFDriver driver) {
+    try {
+      final SerializationHelper helper = new SerializationHelperImpl();
+      // serializing a null data provider.
+      final JPPFBuffer buf = helper.getSerializer().serialize(null);
+      final byte[] lengthBytes = SerializationUtils.writeInt(buf.getLength());
+      final TaskBundle bundle = new JPPFTaskBundle();
+      bundle.setName("server handshake");
+      bundle.setUuid(driver.getUuid());
+      bundle.getUuidPath().add(driver.getUuid());
+      bundle.setTaskCount(0);
+      bundle.setHandshake(true);
+      final JPPFDatasourceFactory factory = JPPFDatasourceFactory.getInstance();
+      final TypedProperties config = driver.getConfiguration();
+      final Map<String, TypedProperties> defMap = new HashMap<>();
+      defMap.putAll(factory.extractDefinitions(config, JPPFDatasourceFactory.Scope.REMOTE));
+      bundle.setParameter(BundleParameter.DATASOURCE_DEFINITIONS, defMap);
+      return new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(lengthBytes), buf));
+    } catch(final Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return null;
   }
 }

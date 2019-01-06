@@ -130,11 +130,8 @@ class HeartbeatContext extends StatelessNioContext {
     if (debugEnabled) log.debug("node {} failed to respond to heartbeat messages, closing the associated node channels", this);
     final JPPFDriver driver = server.driver;
     if (server.getIdentifier() == JPPFIdentifiers.NODE_HEARTBEAT_CHANNEL) {
-      final BaseNodeContext<?> nodeContext = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(uuid) : driver.getNodeNioServer().getConnection(uuid);
-      if (nodeContext != null) {
-        if (driver.isAsyncNode()) driver.getAsyncNodeNioServer().connectionFailed(nodeContext);
-        driver.getNodeNioServer().connectionFailed(nodeContext.getChannel());
-      }
+      final BaseNodeContext nodeContext = driver.getAsyncNodeNioServer().getConnection(uuid);
+      if (nodeContext != null) driver.getAsyncNodeNioServer().connectionFailed(nodeContext);
       final ChannelWrapper<?> nodeClassChannel = driver.getNodeClassServer().getNodeConnection(uuid);
       if (nodeClassChannel != null) driver.getNodeClassServer().connectionFailed(nodeClassChannel);
     } else {

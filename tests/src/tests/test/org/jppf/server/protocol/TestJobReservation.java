@@ -68,7 +68,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   private static final String SERVER_RESET_SCRIPT = new StringBuilder()
     .append("var driver = serverDebug.getDriver();\n")
-    .append("var nodeServer = driver.isAsyncNode ? driver.getAsyncNodeNioServer() : driver.getNodeNioServer();\n")
+    .append("var nodeServer = driver.getAsyncNodeNioServer();\n")
     .append("var ctx = nodeServer.getConnection(\"${uuid}\");\n")
     .append("var config = ctx.getSystemInformation().getJppf();\n")
     .append("config.fromString(\"${cfg}\", \"_|_\");")

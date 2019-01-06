@@ -58,10 +58,10 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * Determine whether the specified selector accepts the specified node.
    * @param node the node to check.
    * @param selector the node selector used as a filter.
-   * @return a set of {@link AbstractNodeContext} instances.
+   * @return a set of {@link BaseNodeContext} instances.
    * @exclude
    */
-  public boolean isNodeAccepted(final BaseNodeContext<?> node, final NodeSelector selector) {
+  public boolean isNodeAccepted(final BaseNodeContext node, final NodeSelector selector) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof AllNodesSelector) return true;
     if (node.isPeer()) return false;
@@ -76,7 +76,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   @Override
   public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector) {
     if (nodeUuid == null) throw new IllegalArgumentException("node uuid cannot be null");
-    final BaseNodeContext<?> node = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getConnection(nodeUuid) : driver.getNodeNioServer().getConnection(nodeUuid);
+    final BaseNodeContext node = driver.getAsyncNodeNioServer().getConnection(nodeUuid);
     if (node == null) throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
     return isNodeAccepted(node, selector);
   }
@@ -84,9 +84,9 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
   /**
    * Get a set of channels based on a NodeSelector.
    * @param selector the node selector used as a filter.
-   * @return a set of {@link AbstractNodeContext} instances.
+   * @return a set of {@link BaseNodeContext} instances.
    */
-  public Set<BaseNodeContext<?>> getChannels(final NodeSelector selector) {
+  public Set<BaseNodeContext> getChannels(final NodeSelector selector) {
     return getChannels(selector, false, false);
   }
 
@@ -95,14 +95,14 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param selector the node selector used as a filter.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
-   * @return a set of {@link AbstractNodeContext} instances.
+   * @return a set of {@link BaseNodeContext} instances.
    */
-  public Set<BaseNodeContext<?>> getChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
+  public Set<BaseNodeContext> getChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof ExecutionPolicySelector) return getChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
-    final Set<BaseNodeContext<?>> fullSet = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannelsAsSet() : driver.getNodeNioServer().getAllChannelsAsSet();
-    final Set<BaseNodeContext<?>> result = new HashSet<>();
-    for (final BaseNodeContext<?> ctx : fullSet) {
+    final Set<BaseNodeContext> fullSet = driver.getAsyncNodeNioServer().getAllChannelsAsSet();
+    final Set<BaseNodeContext> result = new HashSet<>();
+    for (final BaseNodeContext ctx : fullSet) {
       if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result.add(ctx);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
@@ -114,15 +114,15 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
+   * @return a {@link Set} of {@link BaseNodeContext} instances.
    */
-  private Set<BaseNodeContext<?>> getChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
+  private Set<BaseNodeContext> getChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
     final ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) AsyncJobScheduler.preparePolicy(policy, null, driver.getStatistics(), 0);
-    final Set<BaseNodeContext<?>> result = new HashSet<>();
-    final List<BaseNodeContext<?>> allChannels = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
+    final Set<BaseNodeContext> result = new HashSet<>();
+    final List<BaseNodeContext> allChannels = driver.getAsyncNodeNioServer().getAllChannels();
     AsyncJobScheduler.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (final BaseNodeContext<?> context : allChannels) {
+    for (final BaseNodeContext context : allChannels) {
       if (nodeAccepted(selector, context, includePeers, forForwarding)) result.add(context);
     }
     if (traceEnabled) log.trace("got {} results", result.size());
@@ -134,7 +134,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param context the node for which to get the management info.
    * @return a {@link JPPFManagementInfo} instyance, or {@code null}.
    */
-  private static JPPFManagementInfo getManagementInfo(final BaseNodeContext<?> context) {
+  private static JPPFManagementInfo getManagementInfo(final BaseNodeContext context) {
     JPPFManagementInfo info = context.getManagementInfo();
     if (info == null) {
       final JPPFSystemInformation sysInfo = context.getSystemInformation();
@@ -151,15 +151,15 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param selector the node selector used as a filter.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
-   * @return a set of {@link AbstractNodeContext} instances.
+   * @return a set of {@link BaseNodeContext} instances.
    */
   public int getNbChannels(final NodeSelector selector, final boolean includePeers, final boolean forForwarding) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof ExecutionPolicySelector) return getNbChannels((ExecutionPolicySelector) selector, includePeers, forForwarding);
-    final Set<BaseNodeContext<?>> fullSet = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannelsAsSet() : driver.getNodeNioServer().getAllChannelsAsSet();
+    final Set<BaseNodeContext> fullSet = driver.getAsyncNodeNioServer().getAllChannelsAsSet();
     //if (selector instanceof AllNodesSelector) return fullSet.size();
     int result = 0;
-    for (final BaseNodeContext<?> ctx : fullSet) {
+    for (final BaseNodeContext ctx : fullSet) {
       if (nodeAccepted(selector, ctx, includePeers, forForwarding)) result++;
     }
     return result;
@@ -170,15 +170,15 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
+   * @return a {@link Set} of {@link BaseNodeContext} instances.
    */
   private int getNbChannels(final ExecutionPolicySelector selector, final boolean includePeers, final boolean forForwarding) {
     final ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) AsyncJobScheduler.preparePolicy(policy, null, driver.getStatistics(), 0);
     int result = 0;
-    final List<BaseNodeContext<?>> allChannels = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getAllChannels() : driver.getNodeNioServer().getAllChannels();
+    final List<BaseNodeContext> allChannels = driver.getAsyncNodeNioServer().getAllChannels();
     AsyncJobScheduler.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (final BaseNodeContext<?> context : allChannels) {
+    for (final BaseNodeContext context : allChannels) {
       if (nodeAccepted(selector, context, includePeers, forForwarding)) result++;
     }
     return result;
@@ -189,7 +189,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param ctx the context associated witht he node.
    * @return {@code true} if node has a working JMX connection, {@code false} otherwise.
    */
-  private static boolean hasWorkingJmxConnection(final BaseNodeContext<?> ctx) {
+  private static boolean hasWorkingJmxConnection(final BaseNodeContext ctx) {
     if (ctx.isPeer()) return true;
     final JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
     return (jmx != null) && jmx.isConnected();
@@ -203,7 +203,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    * @param forForwarding whether this is for a node forwarding request, in which case only nodes with a working jmx connection are selected.
    * @return {@code true} if the node is accepted, {@code false} otherwise.
    */
-  private static boolean nodeAccepted(final NodeSelector selector, final BaseNodeContext<?> context, final boolean includePeers, final boolean forForwarding) {
+  private static boolean nodeAccepted(final NodeSelector selector, final BaseNodeContext context, final boolean includePeers, final boolean forForwarding) {
     if (!includePeers && context.isPeer()) return false;
     final boolean hasJmx = hasWorkingJmxConnection(context);
     if (forForwarding && !hasJmx) return false;

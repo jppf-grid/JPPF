@@ -478,7 +478,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  public void setCallableAllConnections(final Callable<List<BaseNodeContext<?>>> callableAllConnections) {
+  public void setCallableAllConnections(final Callable<List<BaseNodeContext>> callableAllConnections) {
     broadcastManager.setCallableAllConnections(callableAllConnections);
   }
 

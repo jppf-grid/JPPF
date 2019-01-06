@@ -293,7 +293,7 @@ public class ServerJob extends AbstractServerJobBase {
         if (!getSLA().isBroadcastJob()) handleCancelledTasks();
         setSubmissionStatus(SubmissionStatus.COMPLETE);
         //taskCompleted(null, null);
-        final NodeReservationHandler handler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler() : driver.getNodeNioServer().getNodeReservationHandler();
+        final NodeReservationHandler handler = driver.getAsyncNodeNioServer().getNodeReservationHandler();
         handler.onJobCancelled(this);
         result = true;
       }

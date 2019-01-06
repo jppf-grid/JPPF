@@ -68,7 +68,7 @@ public class BroadcastManager {
   /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
-  private Callable<List<BaseNodeContext<?>>> callableAllConnections = () -> Collections.emptyList();
+  private Callable<List<BaseNodeContext>> callableAllConnections = () -> Collections.emptyList();
   /**
    * 
    */
@@ -88,7 +88,7 @@ public class BroadcastManager {
    * Set the callable source for all available connections.
    * @param callableAllConnections a {@link Callable} instance.
    */
-  void setCallableAllConnections(final Callable<List<BaseNodeContext<?>>> callableAllConnections) {
+  void setCallableAllConnections(final Callable<List<BaseNodeContext>> callableAllConnections) {
     if (callableAllConnections == null) this.callableAllConnections = () -> Collections.emptyList();
     else this.callableAllConnections = callableAllConnections;
   }
@@ -156,7 +156,7 @@ public class BroadcastManager {
    */
   public void processPendingBroadcasts() {
     if (nbWorkingConnections.get() <= 0) return;
-    List<BaseNodeContext<?>> connections;
+    List<BaseNodeContext> connections;
     try {
       connections = callableAllConnections.call();
     } catch (@SuppressWarnings("unused") final Throwable e) {
@@ -175,13 +175,13 @@ public class BroadcastManager {
    * @param connections the list of all available connections.
    * @param broadcastJob the job to dispatch to connections.
    */
-  private void processPendingBroadcast(final List<BaseNodeContext<?>> connections, final ServerJobBroadcast broadcastJob) {
+  private void processPendingBroadcast(final List<BaseNodeContext> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     if (pendingBroadcasts.remove(broadcastJob.getUuid()) == null) return;
     final JobSLA sla = broadcastJob.getSLA();
     final List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     final Set<String> uuidSet = new HashSet<>();
-    for (final BaseNodeContext<?> connection : connections) {
+    for (final BaseNodeContext connection : connections) {
       final ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
         final String uuid = connection.getUuid();

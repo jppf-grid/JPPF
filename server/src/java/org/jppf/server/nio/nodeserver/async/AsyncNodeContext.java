@@ -30,9 +30,7 @@ import org.jppf.io.*;
 import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
@@ -46,7 +44,7 @@ import org.slf4j.*;
  * Context or state information associated with a channel that exchanges heartbeat messages between the server and a node or client.
  * @author Laurent Cohen
  */
-public class AsyncNodeContext extends StatelessNioContext implements BaseNodeContext<EmptyEnum> {
+public class AsyncNodeContext extends BaseNodeContext {
   /**
    * Logger for this class.
    */
@@ -56,29 +54,17 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Reference to the driver.
-   */
-  final JPPFDriver driver;
-  /**
-   * The server that handles this context.
-   */
-  private final AsyncNodeNioServer server;
-  /**
    * Mappings of job uuids to a collection of ids of bundles that are distributed to the node.
    */
   private final CollectionMap<String, Long> jobToBundlesIds = new ArrayListHashMap<>();
   /**
    * A map of the client bundles sent over this connection.
    */
-  private final Map<String, NodeJobEntry> entryMap = new ConcurrentHashMap<>();
+  private final Map<String, ServerTaskBundleNode> entryMap = new ConcurrentHashMap<>();
   /**
    * This queue contains all the result bundles to send back to the client.
    */
   private final BlockingQueue<AbstractTaskBundleMessage> sendQueue = new LinkedBlockingQueue<>();
-  /**
-   * Common node attributes and operations.
-   */
-  final NodeContextAttributes attributes;
   /**
    * Lock to synchronize I/O on a local node.
    */
@@ -98,27 +84,24 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
    * @param local whether this channel context is local.
    */
   public AsyncNodeContext(final AsyncNodeNioServer server, final SocketChannel socketChannel, final boolean local) {
-    this.server = server;
-    this.driver = server.getDriver();
+    super(server);
     this.socketChannel = socketChannel;
     this.local = (socketChannel == null);
     this.localNodeReadLock = local ? new ThreadSynchronization() : null;
     this.localNodeWriteLock = local ? new ThreadSynchronization() : null;
-    this.attributes = new NodeContextAttributes(this, server.getBundlerHandler(), server);
-    this.attributes.setDriver(server.getDriver());
   }
 
   @Override
   public void handleException(final Exception exception) {
     if (!isClosed()) {
-      final Map<String, NodeJobEntry> allEntries;
+      final Map<String, ServerTaskBundleNode> allEntries;
       synchronized(jobToBundlesIds) {
         allEntries = new HashMap<>(entryMap);
       }
       if (debugEnabled) log.debug("handling exception on {}\n{}", this, ((exception == null) ? ExceptionUtils.getCallStack() : ExceptionUtils.getStackTrace(exception)));
       server.closeConnection(this);
-      for (final Map.Entry<String, NodeJobEntry> entry: allEntries.entrySet()) {
-        handleException(exception, entry.getValue().nodeBundle);
+      for (final Map.Entry<String, ServerTaskBundleNode> entry: allEntries.entrySet()) {
+        handleException(exception, entry.getValue());
       }
     }
   }
@@ -251,7 +234,7 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
     final String uuid = bundle.getJob().getUuid();
     synchronized(jobToBundlesIds) {
       jobToBundlesIds.putValue(uuid, bundle.getId());
-      entryMap.put(uuid + bundle.getId(), new NodeJobEntry(bundle));
+      entryMap.put(uuid + bundle.getId(), bundle);
     }
   }
 
@@ -259,9 +242,9 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
    * Retrieve the job entry with the specified id.
    * @param uuid the job uuid.
    * @param bundleId the id of the bundle to remove.
-   * @return a {@link NodeJobEntry} instance, or {@code null} if there is no entry with the specified id.
+   * @return a {@link ServerTaskBundleNode} instance, or {@code null} if there is no entry with the specified id.
    */
-  public NodeJobEntry getJobEntry(final String uuid, final long bundleId) {
+  public ServerTaskBundleNode getJobEntry(final String uuid, final long bundleId) {
     return entryMap.get(uuid + bundleId);
   }
 
@@ -269,9 +252,9 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
    * Remove the job entry with the specified id.
    * @param uuid the job uuid.
    * @param bundleId the id of the bundle to remove.
-   * @return the removed {@link NodeJobEntry} instance, or {@code null} if there is no entry with the specified id.
+   * @return the removed {@link ServerTaskBundleNode} instance, or {@code null} if there is no entry with the specified id.
    */
-  public NodeJobEntry removeJobEntry(final String uuid, final long bundleId) {
+  public ServerTaskBundleNode removeJobEntry(final String uuid, final long bundleId) {
     if (debugEnabled) log.debug("removing job entry for uuid={}, bundleId={}", uuid, bundleId);
     synchronized(jobToBundlesIds) {
       jobToBundlesIds.removeValue(uuid, bundleId);
@@ -421,11 +404,6 @@ public class AsyncNodeContext extends StatelessNioContext implements BaseNodeCon
     }
     if (getOnClose() != null) getOnClose().run();
     setMessage(null);
-  }
-
-  @Override
-  public NodeContextAttributes getAttributes() {
-    return attributes;
   }
 
   /**

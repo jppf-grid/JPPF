@@ -19,8 +19,7 @@
 package org.jppf.server.node.local;
 
 import org.jppf.classloader.LocalClassLoaderConnection;
-import org.jppf.server.nio.nodeserver.async.AsyncNodeContext;
-import org.jppf.server.node.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 
 /**
@@ -31,7 +30,7 @@ public class JPPFLocalNode extends JPPFNode {
   /**
    * Wraps the connection to the driver's class server.
    */
-  private LocalClassLoaderConnection classLoaderConnection = null;
+  private LocalClassLoaderConnection classLoaderConnection;
 
   /**
    * Initialize this local node with the specified I/O handler.
@@ -39,7 +38,7 @@ public class JPPFLocalNode extends JPPFNode {
    * @param nodeConnection wraps the connection to the driver's job server.
    * @param classLoaderConnection wraps the connection to the driver's class server.
    */
-  public JPPFLocalNode(final TypedProperties configuration, final AbstractLocalNodeConnection<?> nodeConnection, final LocalClassLoaderConnection classLoaderConnection) {
+  public JPPFLocalNode(final TypedProperties configuration, final AsyncLocalNodeConnection nodeConnection, final LocalClassLoaderConnection classLoaderConnection) {
     super(uuidFromConfig(configuration), configuration);
     this.nodeConnection = nodeConnection;
     this.classLoaderConnection = classLoaderConnection;
@@ -48,8 +47,7 @@ public class JPPFLocalNode extends JPPFNode {
 
   @Override
   public void initDataChannel() throws Exception {
-    if (nodeConnection.getChannel() instanceof AsyncNodeContext) nodeIO = new AsyncLocalNodeIO(this);
-    else nodeIO = new LocalNodeIO(this);
+    nodeIO = new AsyncLocalNodeIO(this);
   }
 
   @Override

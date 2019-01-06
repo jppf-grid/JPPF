@@ -18,6 +18,7 @@
 
 package org.jppf.server.node.local;
 
+import org.jppf.node.AbstractNodeConnection;
 import org.jppf.server.nio.nodeserver.async.AsyncNodeContext;
 
 /**
@@ -25,12 +26,20 @@ import org.jppf.server.nio.nodeserver.async.AsyncNodeContext;
  * @author Laurent Cohen
  * @exclude
  */
-public class AsyncLocalNodeConnection extends AbstractLocalNodeConnection<AsyncNodeContext> {
+public class AsyncLocalNodeConnection extends AbstractNodeConnection<AsyncNodeContext> {
   /**
    * Initialize this connection with the specified serializer.
    * @param channel the communicationchannel to use.
    */
   public AsyncLocalNodeConnection(final AsyncNodeContext channel) {
-    super(channel);
+    this.channel = channel;
+  }
+
+  @Override
+  public void init() throws Exception {
+  }
+
+  @Override
+  public void close() throws Exception {
   }
 }

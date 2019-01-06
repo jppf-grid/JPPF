@@ -450,8 +450,6 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JOB_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.sla.default.policy", null);
   /** A default client-side execution policy to associate with submitted jobs when they don't have one. */
   public static final JPPFProperty<String> JOB_CLIENT_SLA_DEFAULT_POLICY = new StringProperty("jppf.job.client.sla.default.policy", null);
-  /** Whether to use async nodes. */
-  public static final JPPFProperty<Boolean> ASYNC_NODE = new BooleanProperty("jppf.async.node", true);
   /** The list of all predefined properties. */
   private static List<JPPFProperty<?>> properties;
 

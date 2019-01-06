@@ -189,7 +189,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     }
     if (debugEnabled) log.debug("jobId '{}' ended", bundle.getName());
     if (serverJob.getSLA().getDesiredNodeConfiguration() != null) {
-      final NodeReservationHandler handler = driver.isAsyncNode() ? driver.getAsyncNodeNioServer().getNodeReservationHandler() : driver.getNodeNioServer().getNodeReservationHandler();
+      final NodeReservationHandler handler = driver.getAsyncNodeNioServer().getNodeReservationHandler();
       handler.removeJobReservations(serverJob.getUuid());
     }
     if (!isBroadcastDispatch(serverJob)) {

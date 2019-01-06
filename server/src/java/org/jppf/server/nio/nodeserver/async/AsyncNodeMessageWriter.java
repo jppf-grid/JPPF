@@ -19,8 +19,9 @@
 package org.jppf.server.nio.nodeserver.async;
 
 import org.jppf.nio.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.slf4j.*;
 
 /**
@@ -51,8 +52,8 @@ public class AsyncNodeMessageWriter extends NioMessageWriter<AsyncNodeContext> {
     final TaskBundle header = msg.getBundle();
     if (debugEnabled) log.debug("fully sent message {} for job [uuid={}, name={}, handshake={}] from context {}", data, header.getUuid(), header.getName(), header.isHandshake(), context);
     if (!header.isHandshake()) {
-      final NodeJobEntry entry = context.getJobEntry(header.getUuid(), header.getBundleId());
-      context.getServer().getMessageHandler().bundleSent(context, entry.nodeBundle);
+      final ServerTaskBundleNode nodeBundle = context.getJobEntry(header.getUuid(), header.getBundleId());
+      context.getServer().getMessageHandler().bundleSent(context, nodeBundle);
     }
   }
 }

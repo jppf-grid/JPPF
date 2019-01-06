@@ -34,7 +34,6 @@ import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.AsyncClientNioServer;
 import org.jppf.server.nio.heartbeat.HeartbeatNioServer;
-import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.queue.JPPFPriorityQueue;
@@ -81,10 +80,6 @@ abstract class AbstractJPPFDriver {
    * Serves the execution requests coming from client applications.
    */
   AsyncClientNioServer asyncClientNioServer;
-  /**
-   * Serves the JPPF nodes.
-   */
-  NodeNioServer nodeNioServer;
   /**
    * Serves the JPPF nodes.
    */
@@ -198,15 +193,6 @@ abstract class AbstractJPPFDriver {
    */
   public NodeClassNioServer getNodeClassServer() {
     return nodeClassServer;
-  }
-
-  /**
-   * Get the JPPF nodes server.
-   * @return a <code>NodeNioServer</code> instance.
-   * @exclude
-   */
-  public NodeNioServer getNodeNioServer() {
-    return nodeNioServer;
   }
 
   /**
