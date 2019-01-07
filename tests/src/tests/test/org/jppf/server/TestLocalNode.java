@@ -26,6 +26,7 @@ import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -46,15 +47,9 @@ public class TestLocalNode extends AbstractNonStandardSetup {
     config.driver.log4j = "classes/tests/config/localnode/log4j-driver.properties";
     client = BaseSetup.setup(1, 0, true, false, config);
     try (final JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper("localhost", DRIVER_MANAGEMENT_PORT_BASE + 1, false)) {
-      jmx.connectAndWait(5_000L);
-      final ConcurrentUtils.Condition cond = new ConcurrentUtils.ConditionFalseOnException() {
-        @Override
-        public boolean evaluateWithException() throws Exception {
-          return jmx.nbNodes() > 0;
-        }
-      };
+      assertTrue(jmx.connectAndWait(5_000L));
       print(false, false, "before wait for interruptible condition");
-      assertTrue(ConcurrentUtils.awaitCondition(cond, 10_000L, 100L, true));
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> jmx.nbNodes() > 0, 10_000L, 100L, true));
     }
   }
 

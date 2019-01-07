@@ -42,7 +42,7 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage {
   }
 
   @Override
-  protected synchronized boolean readNextObject() throws Exception {
+  protected boolean readNextObject() throws Exception {
     return true;
   }
 

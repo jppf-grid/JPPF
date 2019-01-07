@@ -23,6 +23,7 @@ import static org.jppf.node.protocol.BundleParameter.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.LocalNodeMessage;
@@ -48,10 +49,6 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
    * The I/O channel for this node.
    */
   private AsyncNodeContext channel;
-  /**
-   * The message to deserialize.
-   */
-  protected LocalNodeMessage currentMessage;
 
   /**
    * Initialize this TaskIO with the specified node.
@@ -65,6 +62,7 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
   @Override
   protected Object[] deserializeObjects() throws Exception {
     Object[] result = null;
+    LocalNodeMessage currentMessage = null;
     synchronized(channel.getLocalNodeReadLock()) {
       if (debugEnabled) log.debug("waiting for next request");
       // wait until a message has been sent by the server
@@ -74,7 +72,7 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
     final DataLocation location = currentMessage.getLocations().get(0);
     final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
-    result = deserializeObjects(bundle);
+    result = deserializeObjects(bundle, currentMessage);
     if (debugEnabled) log.debug("got all data");
     return result;
   }
@@ -91,12 +89,23 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
 
   @Override
   protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
+    throw new JPPFUnsupportedOperationException("method " + getClass().getName() + ".deserializeObjects(TaskBundle) should never be called for a local node");
+  }
+
+  /**
+   * Perform the deserialization of the objects received through the socket connection.
+   * @param bundle the message header that contains information about the tasks and data provider.
+   * @param currentMessage contains the tasks and data provider inserialized form.
+   * @return an array of objects deserialized from the socket stream.
+   * @throws Exception if an error occurs while deserializing.
+   */
+  protected Object[] deserializeObjects(final TaskBundle bundle, final LocalNodeMessage currentMessage) throws Exception {
     final int count = bundle.getTaskCount();
     final Object[] list = new Object[count + 2];
     list[0] = bundle;
     try {
       initializeBundleData(bundle);
-      if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
+      if (debugEnabled) log.debug("bundle task count = {}, handshake = {}", count, bundle.isHandshake());
       if (!bundle.isHandshake()) {
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
         final JPPFLocalContainer cont = (JPPFLocalContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
@@ -104,7 +113,7 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.setCurrentMessage(currentMessage);
-        cont.deserializeObjects(list, 1+count, node.getSerializationExecutor());
+        cont.deserializeObjects(list, 1 + count, node.getSerializationExecutor());
       } else {
         // skip null data provider
       }
@@ -113,8 +122,6 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
       log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
-    } finally {
-      currentMessage = null;
     }
     return list;
   }
@@ -137,7 +144,6 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
     message.setBundle(bundle);
     synchronized(channel.getLocalNodeWriteLock()) {
       if (debugEnabled) log.debug("wrote full results");
-      // wait until the message has been read by the server
       final AsyncNodeMessageHandler handler = channel.getServer().getMessageHandler();
       if (bundle.isHandshake()) handler.handshakeReceived(channel, message);
       else handler.resultsReceived(channel, message);
