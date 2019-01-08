@@ -107,13 +107,12 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = {}, handshake = {}", count, bundle.isHandshake());
       if (!bundle.isHandshake()) {
+        TaskThreadLocals.setRequestUuid(bundle.getUuid());
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
         final JPPFLocalContainer cont = (JPPFLocalContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
-        cont.getClassLoader().setRequestUuid(bundle.getUuid());
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
-        cont.setCurrentMessage(currentMessage);
-        cont.deserializeObjects(list, 1 + count, node.getSerializationExecutor());
+        cont.deserializeObjects(list, 1 + count, currentMessage, node.getSerializationExecutor());
       } else {
         // skip null data provider
       }
@@ -134,8 +133,8 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
     final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
     int submitCount = 0;
-    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, submitCount++)));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, submitCount++)));
+    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, bundle, submitCount++)));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
     final LocalNodeMessage message = (LocalNodeMessage) channel.newMessage();
     for (final Future<DataLocation> f: futureList) {
       final DataLocation location = f.get();

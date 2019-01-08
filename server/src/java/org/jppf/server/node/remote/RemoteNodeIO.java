@@ -86,13 +86,13 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
+        TaskThreadLocals.setRequestUuid(bundle.getUuid());
         final boolean clientAccess = !bundle.getParameter(FROM_PERSISTENCE, false);
         final JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getClassLoaderManager().getContainer(bundle.getUuidPath().getList(), clientAccess, (Object[]) null);
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
-        cont.getClassLoader().setRequestUuid(bundle.getUuid());
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
-        cont.deserializeObjects(list, 1+count, node.getSerializationExecutor());
+        cont.deserializeObjects(list, 1 + count, node.getSerializationExecutor());
       }
       else  getSocketWrapper().receiveBytes(0); // skip null data provider
       if (debugEnabled) log.debug("got all data");
@@ -125,8 +125,8 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
     int submitCount = 0;
-    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, submitCount++)));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, submitCount++)));
+    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, bundle, submitCount++)));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
     final OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
     int count = 0;
     for (final Future<DataLocation> f: futureList) {

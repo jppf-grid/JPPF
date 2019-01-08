@@ -55,18 +55,24 @@ public class ObjectSerializationTask implements Callable<DataLocation> {
    * The order in which this task was submitted, if any.
    */
   private final int submitOrder;
+  /**
+   * The task bundle the data to deserialize is a part of.
+   */
+  private final TaskBundle bundle;
 
   /**
    * Initialize this task with the specified data buffer.
    * @param object the object to serialize.
    * @param cont container used to serialize the object.
+   * @param bundle the task bundle the data to serialize is a part of.
    * @param submitOrder this task's submission order.
    */
-  public ObjectSerializationTask(final Object object, final JPPFContainer cont, final int submitOrder) {
+  public ObjectSerializationTask(final Object object, final JPPFContainer cont, final TaskBundle bundle, final int submitOrder) {
     this.object = object;
     this.ser = cont.getSerializer();
     this.contextCL = cont.getClassLoader();
     this.submitOrder = submitOrder;
+    this.bundle = bundle;
   }
 
   @Override
@@ -75,6 +81,7 @@ public class ObjectSerializationTask implements Callable<DataLocation> {
     final boolean isTask = object instanceof Task;
     final int p = isTask ? ((Task<?>) object).getPosition() : -1;
     try {
+      TaskThreadLocals.setRequestUuid(bundle.getUuid());
       Thread.currentThread().setContextClassLoader(contextCL);
       if (traceEnabled) log.trace("serializing {} at position={}, submitOrder={}, job={}", toString(object), p, submitOrder, toString(isTask ? ((Task<?>) object).getJob() : object));
       dl = IOHelper.serializeData(object, ser);

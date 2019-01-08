@@ -189,7 +189,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
       try {
         final long start = System.nanoTime();
         final DataProvider dataProvider = bundle.getJob().getDataProvider();
-        for (final Task<?> task : tasks) task.setDataProvider(dataProvider);
+        for (final Task<?> task : tasks) task.setDataProvider(dataProvider).setJob(bundle.getJob());
         executionManager.execute(bundle, tasks);
         bundle.resultsReceived(tasks);
         final double elapsed = System.nanoTime() - start;

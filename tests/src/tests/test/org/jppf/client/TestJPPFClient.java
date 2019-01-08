@@ -196,6 +196,11 @@ public class TestJPPFClient extends Setup1D1N {
       final String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
       for (final Task<?> task: results) {
         final Throwable t = task.getThrowable();
+        if (t != null) {
+          final String errorMsg = String.format("task result has an error:\n%s", ExceptionUtils.getStackTrace(t));
+          print(false, false, errorMsg);
+          fail(errorMsg);
+        }
         assertNull(t);
         assertEquals(msg, task.getResult());
       }

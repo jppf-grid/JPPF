@@ -113,15 +113,17 @@ public abstract class AbstractNioMessage extends AbstractNioMessageBase {
       }
       count += 4;
     }
-    if (currentObject == null) {
-      final DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-      currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
-    }
-    try {
-      if (!currentObject.read()) return false;
-    } catch(final Exception e) {
-      updateCounts(currentObject.getChannelCount(), READ);
-      throw e;
+    if (currentLength > 0) {
+      if (currentObject == null) {
+        final DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
+        currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel.getSocketChannel(), location);
+      }
+      try {
+        if (!currentObject.read()) return false;
+      } catch(final Exception e) {
+        updateCounts(currentObject.getChannelCount(), READ);
+        throw e;
+      }
     }
     count += currentLength;
     if (currentObject != null) updateCounts(currentObject.getChannelCount(), READ);

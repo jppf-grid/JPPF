@@ -171,6 +171,7 @@ public class NodeTaskWrapper implements Runnable {
       oldCl = Thread.currentThread().getContextClassLoader();
       handleTimeout();
       Thread.currentThread().setContextClassLoader(taskClassLoader);
+      TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
     } catch(final Throwable t) {
@@ -193,7 +194,7 @@ public class NodeTaskWrapper implements Runnable {
       }
       if (task.getThrowable() instanceof InterruptedException) task.setThrowable(null);
       cancelTimeoutAction();
-      taskEnded();
+      if (jobEntry != null) taskEnded();
     }
   }
 

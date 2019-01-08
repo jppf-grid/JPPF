@@ -28,6 +28,7 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.caching.*;
 import org.jppf.classloader.resource.ResourceCache;
 import org.jppf.node.connection.ConnectionReason;
+import org.jppf.node.protocol.TaskThreadLocals;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
@@ -66,11 +67,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * @exclude
    */
   protected List<String> uuidPath = new ArrayList<>();
-  /**
-   * Uuid of the original task bundle that triggered a resource loading request.
-   * @exclude
-   */
-  protected String requestUuid = null;
   /**
    * The cache handling resources temporarily stored to file.
    * @exclude
@@ -154,7 +150,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
       try {
         if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
         map.put(ResourceIdentifier.FILE_LOOKUP_ALLOWED, FILE_LOOKUP);
-        resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
+        resource = connection.loadResource(map, dynamic, TaskThreadLocals.getRequestUuid(), uuidPath);
         if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
       } catch(final IOException e) {
         if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
@@ -166,23 +162,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
       }
     }
     return resource;
-  }
-
-  /**
-   * Get the uuid for the original task bundle that triggered this resource request.
-   * @return the uuid as a string.
-   */
-  public String getRequestUuid() {
-    return requestUuid;
-  }
-
-  /**
-   * Set the uuid for the original task bundle that triggered this resource request.
-   * @param requestUuid the uuid as a string.
-   * @exclude
-   */
-  public void setRequestUuid(final String requestUuid) {
-    this.requestUuid = requestUuid;
   }
 
   @Override

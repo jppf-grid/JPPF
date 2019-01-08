@@ -23,7 +23,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
-import org.jppf.utils.*;
+import org.jppf.node.protocol.TaskThreadLocals;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -237,9 +238,9 @@ public abstract class AbstractClassLoaderManager<N extends JPPFNode> {
   public AbstractJPPFClassLoader resetClassLoader(final List<String> uuidPath, final Object...params) throws Exception {
     final JPPFContainer cont = getContainer(uuidPath);
     final AbstractJPPFClassLoader oldCL = cont.getClassLoader();
-    final String requestUuid = oldCL.getRequestUuid();
+    final String requestUuid = TaskThreadLocals.getRequestUuid();
     final AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath, params);
-    newCL.setRequestUuid(requestUuid);
+    TaskThreadLocals.setRequestUuid(requestUuid);
     cont.setClassLoader(newCL);
     oldCL.close();
     return newCL;

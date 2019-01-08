@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.node.protocol.TaskThreadLocals;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.IteratorEnumeration;
@@ -146,8 +147,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     final String resName = name.replace('.', '/') + ".class";
     final Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
     map.put(ResourceIdentifier.NAME, resName);
-    JPPFResourceWrapper resource = null;
-    resource = loadResource(map);
+    final JPPFResourceWrapper resource = loadResource(map);
     if (resource != null) b = resource.getDefinition();
     if ((b == null) || (b.length == 0)) {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
@@ -193,11 +193,11 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception {
-    if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", requestUuid));
+    if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", TaskThreadLocals.getRequestUuid()));
     final Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
     map.put(ResourceIdentifier.NAME, "callable");
     map.put(ResourceIdentifier.CALLABLE, callable);
-    final JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
+    final JPPFResourceWrapper resource = connection.loadResource(map, dynamic, TaskThreadLocals.getRequestUuid(), uuidPath);
     byte[] b = null;
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
     if (debugEnabled) log.debug(build(this, " remote definition for callable resource ", b==null ? "not " : "", "found"));

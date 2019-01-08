@@ -119,7 +119,7 @@ public interface JPPFSerialization {
           className = elts[elts.length - 1];
         }
       }
-      if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
+      if (debugEnabled) log.debug("found {} = ", prop.getName(), className);
       if (className != null) {
         if (debugEnabled) log.debug("serializationClass={}, compositeClasses={}, compositeMap={}", className, compositeClasses, compositeMap);
         try {

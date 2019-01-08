@@ -141,6 +141,7 @@ public class ServerTaskBundleClient {
         if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
         final ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
         if (dataLocation == null) {
+          if (debugEnabled) log.debug("got null task at index {} for {}", index, job);
           nullTasks.add(task);
           task.resultReceived(task.getInitialTask());
         } else {
@@ -223,6 +224,7 @@ public class ServerTaskBundleClient {
    */
   public void handleNullTasks() {
     if (!nullTasks.isEmpty()) {
+      if (debugEnabled) log.debug("received {} null tasks", nullTasks.size());
       resultReceived(nullTasks);
       nullTasks.clear();
     }

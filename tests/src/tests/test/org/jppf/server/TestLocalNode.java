@@ -76,13 +76,6 @@ public class TestLocalNode extends AbstractNonStandardSetup {
     super.testMultipleJobs();
   }
 
-  @Override
-  @Test(timeout = 10000)
-  public void testNotSerializableExceptionFromNode() throws Exception {
-    BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
-    super.testNotSerializableExceptionFromNode();
-  }
-
   /**
    * Test there there are 2 distinct connection pools, with 1 driver connection each.
    * @throws Exception if any error occurs.
@@ -112,6 +105,14 @@ public class TestLocalNode extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
+  }
+
+  @Override
+  //@Test
+  @Test(timeout = 10_000)
+  public void testNotSerializableExceptionFromNode() throws Exception {
+    BaseTestHelper.printToServers(client, "start of %s()", ReflectionUtils.getCurrentMethodName());
+    super.testNotSerializableExceptionFromNode();
   }
 
   @Override

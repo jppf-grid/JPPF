@@ -83,9 +83,10 @@ public class AsyncClientMessageHandler {
     if (clientBundle.isDone()) {
       if (debugEnabled) log.debug("client bundle done: {}", clientBundle);
       clientBundle.bundleEnded();
+    } else {
+      context.addEntry(clientBundle);
+      context.driver.getQueue().addBundle(clientBundle);
     }
-    context.addEntry(clientBundle);
-    context.driver.getQueue().addBundle(clientBundle);
   }
 
   /**

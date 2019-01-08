@@ -301,6 +301,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
     if (!(params[0] instanceof JPPFDistributedJob)) return null;
     final TaskBundle bundle = (TaskBundle) params[0];
     try {
+      TaskThreadLocals.setRequestUuid(bundle.getUuid());
       final List<String> uuidPath = bundle.getUuidPath().getList();
       final boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
       final AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);

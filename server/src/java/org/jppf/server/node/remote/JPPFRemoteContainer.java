@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.node.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -62,7 +63,6 @@ public class JPPFRemoteContainer extends JPPFContainer {
   public JPPFRemoteContainer(final AbstractCommonNode node, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader, final boolean clientAccess) throws Exception {
     super(node, uuidPath, classLoader, clientAccess);
     this.nodeConnection = (RemoteNodeConnection) node.getNodeConnection();
-    //init();
   }
 
   /**
@@ -83,8 +83,8 @@ public class JPPFRemoteContainer extends JPPFContainer {
       final InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
       for (int i = 0; i < count; i++) {
         final DataLocation dl = IOHelper.readData(is);
-        if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
-        completionService.submit(new ObjectDeserializationTask(this, dl, i));
+        if (traceEnabled) log.trace("i = {}, read data size = {}", i, (dl == null) ? -1 : dl.getSize());
+        completionService.submit(new ObjectDeserializationTask(this, (TaskBundle) list[0], dl, i));
       }
       Throwable t = null;
       int throwableCount = 0;
