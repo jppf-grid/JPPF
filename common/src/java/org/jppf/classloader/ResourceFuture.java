@@ -55,8 +55,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   /**
    * Initialize this future.
    */
-  public ResourceFuture()
-  {
+  public ResourceFuture() {
   }
 
   /**
@@ -69,12 +68,10 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * @see java.util.concurrent.Future#cancel(boolean)
    */
   @Override
-  public boolean cancel(final boolean mayInterruptIfRunning)
-  {
+  public boolean cancel(final boolean mayInterruptIfRunning) {
     cancelled.set(true);
     done.set(true);
-    synchronized(lock)
-    {
+    synchronized(lock) {
       lock.notifyAll();
     }
     return false;
@@ -88,10 +85,8 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * @see java.util.concurrent.Future#get()
    */
   @Override
-  public V get() throws InterruptedException, ExecutionException
-  {
-    synchronized(lock)
-    {
+  public V get() throws InterruptedException, ExecutionException {
+    synchronized(lock) {
       while (!isDone()) lock.wait();
     }
     return response;
@@ -109,8 +104,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-  {
+  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     throw new ExecutionException(new JPPFUnsupportedOperationException(getClass().getSimpleName() + ".get(long, TimeUnit) is not supported"));
   }
 
@@ -120,8 +114,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * @see java.util.concurrent.Future#isCancelled()
    */
   @Override
-  public boolean isCancelled()
-  {
+  public boolean isCancelled() {
     return cancelled.get();
   }
 
@@ -132,8 +125,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * @see java.util.concurrent.Future#isDone()
    */
   @Override
-  public boolean isDone()
-  {
+  public boolean isDone() {
     return done.get();
   }
 
@@ -141,10 +133,8 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * Set this future as done and store the result.
    * @param response the result to store.
    */
-  public void setDone(final V response)
-  {
-    synchronized(lock)
-    {
+  public void setDone(final V response) {
+    synchronized(lock) {
       done.set(true);
       this.response = response;
       lock.notifyAll();
@@ -155,8 +145,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * Get the throwable that may have been raised during the class loading request execution.
    * @return a <code>Throwable</code> object, or <code>null</code> if no throwable was raised.
    */
-  public Throwable getThrowable()
-  {
+  public Throwable getThrowable() {
     return throwable;
   }
 
@@ -164,8 +153,7 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * Set the throwable that may have been raised during the class loading request execution.
    * @param throwable a <code>Throwable</code> object, or <code>null</code> if no throwable was raised.
    */
-  public void setThrowable(final Throwable throwable)
-  {
+  public void setThrowable(final Throwable throwable) {
     this.throwable = throwable;
     cancel(true);
   }

@@ -59,7 +59,14 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   public JPPFResourceWrapper deserializeResource() throws Exception {
     requestStartTime = System.nanoTime();
     final DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
-    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, driver.getSerializer());
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader cl = currentThread.getContextClassLoader();
+    try {
+      currentThread.setContextClassLoader(getClass().getClassLoader());
+      resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, driver.getSerializer());
+    } finally {
+      currentThread.setContextClassLoader(cl);
+    }
     return resource;
   }
 

@@ -352,7 +352,7 @@ public final class StringUtils {
       sb.append("class loader hierarchy:\n");
       final Stack<String> stack = new Stack<>();
       while (cl != null) {
-        if ("org.jppf.classloader.AbstractJPPFClassLoader".equals(cl.getClass().getName())) stack.push(cl.toString());
+        if (cl.getClass().getName().startsWith("org.jppf.classloader.")) stack.push(cl.toString());
         else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));
         else  stack.push(cl.toString());
         cl = cl.getParent();

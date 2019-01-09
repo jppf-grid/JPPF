@@ -308,7 +308,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       List<byte[]> dataList = null;
       if (resource != null) dataList = (List<byte[]>) resource.getData(ResourceIdentifier.RESOURCE_LIST);
       final boolean found = (dataList != null) && !dataList.isEmpty();
-      if (debugEnabled) log.debug(build(this, "resource [", name, "] ", found ? "" : "not ", "found remotely"));
+      if (debugEnabled) log.debug("{} resource [{}] {}found remotely", this, name, found ? "" : "not ");
       if (found && resourceCache.isEnabled()) {
         resourceCache.registerResources(name, dataList);
         urlList = resourceCache.getResourcesURLs(name);
@@ -399,7 +399,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   private synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive){
-    if (debugEnabled) log.debug(build("looking up up resource [", name, "] in the URL classpath for ", this));
+    if (debugEnabled) log.debug("looking up resource [{}] in the URL classpath for {}", name, this);
     Class<?> c = findLoadedClass(name);
     if (c == null) {
       if (recursive && (getParent() instanceof AbstractJPPFClassLoader)) {
@@ -412,7 +412,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         }
       }
     }
-    if (debugEnabled) log.debug(build("resource [", name, "] ", c == null ? "not " : "", "found in the URL classpath for ", this));
+    if (debugEnabled) log.debug("resource [{}] {}found in the URL classpath for {}", name, (c == null) ? "not " : "", this);
     return c;
   }
 
@@ -440,7 +440,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   private static synchronized DelegationModel initDelegationModel() {
     final String s = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_DELEGATION);
     final DelegationModel model = "url".equalsIgnoreCase(s) ? DelegationModel.URL_FIRST : DelegationModel.PARENT_FIRST;
-    if (debugEnabled) log.debug(build("Using ", model, " class loader delegation model"));
+    if (debugEnabled) log.debug("Using {} class loader delegation model", model);
     return model;
   }
 
