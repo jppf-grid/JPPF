@@ -28,6 +28,7 @@ import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -166,6 +167,8 @@ public class AsyncClientMessageHandler {
     header.setParameter(BundleParameter.CONNECTION_UUID, context.getConnectionUuid());
     header.setParameter(BundleParameter.IS_PEER, true);
     header.setParameter(BundleParameter.NODE_UUID_PARAM, driver.getUuid());
+    final TypedProperties config = driver.getConfiguration();
+    if (config.containsProperty(JPPFProperties.NODE_MAX_JOBS)) header.setParameter(BundleParameter.NODE_MAX_JOBS, config.get(JPPFProperties.NODE_MAX_JOBS));
     final JMXServer jmxServer = driver.getInitializer().getJmxServer(context.isSecure());
     header.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
     final PeerAttributesHandler peerHandler = driver.getAsyncNodeNioServer().getPeerHandler();

@@ -31,7 +31,7 @@ import org.jppf.nio.StatelessNioContext;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.async.AsyncNodeNioServer;
 import org.jppf.server.protocol.ServerTaskBundleNode;
-import org.jppf.utils.Pair;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -134,9 +134,6 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     this.listener = server;
   }
 
-  /**
-   * @return the bundler used to schedule tasks for the corresponding node.
-   */
   @Override
   public Bundler<?> getBundler() {
     return bundler;
@@ -196,17 +193,14 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     if (update && managementInfo != null) managementInfo.setSystemInfo(systemInfo);
   }
 
-  /**
-   * @return the management information.
-   */
   @Override
   public JPPFManagementInfo getManagementInfo() {
     return managementInfo;
   }
 
   /**
-   *
-   * @param managementInfo the management information.
+   * Set the management information for the node.
+   * @param managementInfo a {@link JPPFManagementInfo} instance.
    */
   public void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
@@ -223,7 +217,6 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   }
 
   /**
-   *
    * @param onClose the {@code Runnable} called when node context is closed.
    */
   public void setOnClose(final Runnable onClose) {
@@ -238,8 +231,8 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   }
 
   /**
-   *
-   * @param jmxConnection the connection to the node's JMX server.
+   * Set the connection to the node's JMX server.
+   * @param jmxConnection a {@link JMXNodeConnectionWrapper} instance.
    */
   public void setJmxConnection(final JMXNodeConnectionWrapper jmxConnection) {
     this.jmxConnection = jmxConnection;
@@ -253,8 +246,8 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   }
 
   /**
-   *
-   * @param peerJmxConnection the connection to the peer driver's JMX server.
+   * Set the connection to the peer driver's JMX server.
+   * @param peerJmxConnection a {@link JMXDriverConnectionWrapper} instance.
    */
   public void setPeerJmxConnection(final JMXDriverConnectionWrapper peerJmxConnection) {
     this.peerJmxConnection = peerJmxConnection;
@@ -278,17 +271,14 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     }
   }
 
-  /**
-   * @return the execution status for the node.
-   */
   @Override
   public ExecutorStatus getExecutionStatus() {
     return executionStatus;
   }
 
   /**
-   *
-   * @param newStatus the execution status for the node.
+   * Set the execution status for the node.
+   * @param newStatus the execution status to set.
    */
   public void setExecutionStatus(final ExecutorStatus newStatus) {
     final ExecutorStatus oldStatus = this.executionStatus;
@@ -304,7 +294,6 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
   }
 
   /**
-   *
    * @param reservationTansition whether to remove any job reservation for this node.
    */
   public void setReservationTansition(final NodeReservationHandler.Transition reservationTansition) {
@@ -372,20 +361,12 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
     if (managementInfo != null) managementInfo.setIsActive(active);
   }
 
-  /**
-   * Add a execution status listener to this channel's list of listeners.
-   * @param listener the listener to add to the list.
-   */
   @Override
   public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
     executorChannelListeners.add(listener);
   }
 
-  /**
-   * Remove a execution status listener from this channel's list of listeners.
-   * @param listener the listener to remove from the list.
-   */
   @Override
   public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
@@ -440,5 +421,22 @@ public abstract class BaseNodeContext extends StatelessNioContext implements  Ex
    * @return a {@code true} when cancel was successful {@code false} otherwise.
    * @throws Exception if any error occurs.
    */
-  public abstract boolean cancelJob(final String jobId, final boolean requeue) throws Exception;
+  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
+    if (debugEnabled) log.debug("cancelling job uuid={} from {}, jmxConnection={}, peerJmxConnection={}", jobId, this, getJmxConnection(), getPeerJmxConnection());
+    if (isOffline()) return false;
+    JPPFVoidCallable cancelCallback = null;
+    if (!isPeer() && (getJmxConnection() != null) && getJmxConnection().isConnected()) cancelCallback = () -> getJmxConnection().cancelJob(jobId, requeue);
+    else if (isPeer() && (getPeerJmxConnection() != null) && getPeerJmxConnection().isConnected()) cancelCallback = () -> getPeerJmxConnection().cancelJob(jobId);
+    if (cancelCallback != null) {
+      try {
+        cancelCallback.call();
+      } catch (final Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
+        throw e;
+      }
+      return true;
+    }
+    return false;
+  }
 }

@@ -371,26 +371,6 @@ public class AsyncNodeContext extends BaseNodeContext {
     return new AsyncNodeContextFuture(this, nodeBundle);
   }
 
-  @Override
-  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
-    if (debugEnabled) log.debug("cancelling job uuid={} from {}, jmxConnection={}, peerJmxConnection={}", jobId, this, getJmxConnection(), getPeerJmxConnection());
-    if (isOffline()) return false;
-    JPPFVoidCallable cancelCallback = null;
-    if (!isPeer() && (getJmxConnection() != null) && getJmxConnection().isConnected()) cancelCallback = () -> getJmxConnection().cancelJob(jobId, requeue);
-    else if (isPeer() && (getPeerJmxConnection() != null) && getPeerJmxConnection().isConnected()) cancelCallback = () -> getPeerJmxConnection().cancelJob(jobId);
-    if (cancelCallback != null) {
-      try {
-        cancelCallback.call();
-      } catch (final Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.warn(ExceptionUtils.getMessage(e));
-        throw e;
-      }
-      return true;
-    }
-    return false;
-  }
-
   /**
    * Close and cleanup the resources used by the channel.
    */
