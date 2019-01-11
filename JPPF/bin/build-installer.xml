@@ -26,8 +26,8 @@
   <!-- ========================================================================= -->
 
   <target name="installer" depends="installer.check.izpack.present" if="izpack.present" description="">
-    <property name="jppf.web.dir" value="http://www.jppf.org/download/${version.number}"/>
-    <installer.package url="http://www.jppf.org/" />
+    <property name="jppf.web.dir" value="https://www.jppf.org/download/${version.number}"/>
+    <installer.package url="https://www.jppf.org/" />
     <installer.copy.files/>
   </target>
   
