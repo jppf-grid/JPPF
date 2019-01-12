@@ -102,19 +102,6 @@ public class StatsTransformer {
     snapshot = stats.getSnapshot(CLIENTS);
     map.put(NB_CLIENTS, snapshot.getLatest());
     map.put(MAX_CLIENTS, snapshot.getMax());
-    map.put(JOBS_TOTAL, stats.getSnapshot(JOB_TOTAL).getTotal());
-    snapshot = stats.getSnapshot(JOB_COUNT);
-    map.put(JOBS_LATEST, snapshot.getTotal());
-    map.put(JOBS_MAX, snapshot.getMax());
-    snapshot = stats.getSnapshot(JOB_TIME);
-    map.put(JOBS_LATEST_TIME,snapshot.getLatest());
-    map.put(JOBS_MIN_TIME, snapshot.getMin());
-    map.put(JOBS_MAX_TIME, snapshot.getMax());
-    map.put(JOBS_AVG_TIME, snapshot.getAvg());
-    snapshot = stats.getSnapshot(JOB_TASKS);
-    map.put(JOBS_MIN_TASKS, snapshot.getMin());
-    map.put(JOBS_MAX_TASKS, snapshot.getMax());
-    map.put(JOBS_AVG_TASKS, snapshot.getAvg());
     snapshot = stats.getSnapshot(NODE_CLASS_REQUESTS_TIME);
     map.put(NODE_TOTAL_CL_REQUEST_COUNT, (double) snapshot.getValueCount());
     map.put(NODE_AVG_CL_REQUEST_TIME, snapshot.getAvg());
@@ -137,6 +124,21 @@ public class StatsTransformer {
    * @param stats the data snapshot to map.
    */
   private static void formatDoubleStatsValues2(final Map<Fields, Double> map, final JPPFStatistics stats) {
+    map.put(JOBS_TOTAL, stats.getSnapshot(JOB_TOTAL).getTotal());
+    JPPFSnapshot snapshot = stats.getSnapshot(JOB_COUNT);
+    final double totalJobs = snapshot.getTotal();
+    map.put(JOBS_LATEST, totalJobs);
+    map.put(JOBS_MAX, snapshot.getMax());
+    snapshot = stats.getSnapshot(JOB_TIME);
+    map.put(JOBS_LATEST_TIME,snapshot.getLatest());
+    map.put(JOBS_MIN_TIME, snapshot.getMin());
+    map.put(JOBS_MAX_TIME, snapshot.getMax());
+    map.put(JOBS_AVG_TIME, snapshot.getAvg());
+    snapshot = stats.getSnapshot(JOB_TASKS);
+    map.put(JOBS_MIN_TASKS, snapshot.getMin());
+    map.put(JOBS_MAX_TASKS, snapshot.getMax());
+    map.put(JOBS_AVG_TASKS, snapshot.getAvg());
+
     double d = 0d;
     double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
     map.put(CLIENT_INBOUND_MB, d);

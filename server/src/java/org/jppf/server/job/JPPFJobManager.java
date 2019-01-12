@@ -137,6 +137,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       final ServerJobBroadcast broadcast = (ServerJobBroadcast) serverJob;
       submitEvent(JobEventType.JOB_DISPATCHED, broadcast.getParentJob(), channel);
     }
+    final JPPFStatistics stats = driver.getStatistics();
+    stats.addValue(JPPFStatisticsHelper.JOB_DISPATCH_TOTAL, 1);
+    stats.addValue(JPPFStatisticsHelper.JOB_DISPATCH_COUNT, 1);
+    stats.addValue(JPPFStatisticsHelper.JOB_DISPATCH_TASKS, nodeBundle.getTaskCount());
   }
 
   @Override
@@ -156,6 +160,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       final ServerJobBroadcast broadcast = (ServerJobBroadcast) serverJob;
       submitEvent(JobEventType.JOB_RETURNED, broadcast.getParentJob(), channel);
     }
+    final JPPFStatistics stats = driver.getStatistics();
+    stats.addValue(JPPFStatisticsHelper.JOB_DISPATCH_COUNT, -1);
+    stats.addValue(JPPFStatisticsHelper.JOB_DISPATCH_TIME, System.currentTimeMillis() - nodeBundle.getDispatchStartTime());
   }
 
   /**

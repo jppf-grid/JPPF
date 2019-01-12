@@ -186,6 +186,46 @@ public enum FieldsEnum implements Fields {
    */
   JOBS_AVG_TASKS,
   /**
+   * Total number of job dispatches.
+   */
+  JOB_DISPATCH_TOTAL,
+  /**
+   * Latest number of job dispatches present in the server.
+   */
+  JOB_DISPATCH_LATEST,
+  /**
+   * Maximum number of job dispatches present in the server.
+   */
+  JOB_DISPATCH_MAX,
+  /**
+   * Execution time of the latest job dispatch in the server.
+   */
+  JOB_DISPATCH_LATEST_TIME,
+  /**
+   * Minimum execution time of a job dispatch in the server.
+   */
+  JOB_DISPATCH_MIN_TIME,
+  /**
+   * Maximum execution time of a job dispatch in the server.
+   */
+  JOB_DISPATCH_MAX_TIME,
+  /**
+   * Average execution time of a job dispatch in the server.
+   */
+  JOB_DISPATCH_AVG_TIME,
+  /**
+   * Minimum number of tasks of a job dispatch in the server.
+   */
+  JOB_DISPATCH_MIN_TASKS,
+  /**
+   * Maximum number of tasks of a job dispatch in the server.
+   */
+  JOB_DISPATCH_MAX_TASKS,
+  /**
+   * Average number of tasks of a job dispatch in the server.
+   */
+  JOB_DISPATCH_AVG_TASKS,
+  /**
    * Total number of class loading requests from the nodes.
    */
   NODE_TOTAL_CL_REQUEST_COUNT,

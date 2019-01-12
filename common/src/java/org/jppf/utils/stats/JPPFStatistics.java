@@ -37,12 +37,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
   /**
    * A filter which accepts all snapshots.
    */
-  public static final Filter NOOP_FILTER = new Filter() {
-    @Override
-    public boolean accept(final JPPFSnapshot snapshot) {
-      return true;
-    }
-  };
+  public static final Filter NOOP_FILTER = (snapshot) -> true;
   /**
    * Contains all snapshots currently handled.
    */
