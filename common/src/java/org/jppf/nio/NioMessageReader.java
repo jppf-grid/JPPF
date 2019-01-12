@@ -67,14 +67,13 @@ public abstract class NioMessageReader<C extends StatelessNioContext> {
    * @throws Exception if any error occurs.
    */
   protected void doRead(final C context) throws Exception {
-    final StateTransitionManager<EmptyEnum, EmptyEnum> mgr = server.getTransitionManager();
     while (true) {
       final boolean b = context.readMessage();
       if (b) {
         final NioMessage message = context.getMessage();
         if (debugEnabled) log.debug("read message {} from {}", message, context);
         context.setMessage(null);
-        mgr.execute(new HandlingTask<>(context, message, createMessageHandler()));
+        NioHelper.getGlobalexecutor().execute(new HandlingTask<>(context, message, createMessageHandler()));
       } else if (context.byteCount <= 0L) break;
     }
   }

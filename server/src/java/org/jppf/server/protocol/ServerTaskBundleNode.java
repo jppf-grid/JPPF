@@ -65,15 +65,15 @@ public class ServerTaskBundleNode {
   /**
    * Job requeue indicator.
    */
-  private boolean requeued = false;
+  private boolean requeued;
   /**
    * Job cancel indicator.
    */
-  private boolean cancelled = false;
+  private boolean cancelled;
   /**
    * Job dispatch expiration indicator.
    */
-  private boolean expired = false;
+  private boolean expired;
   /**
    * The job this submission is for.
    */
@@ -81,11 +81,11 @@ public class ServerTaskBundleNode {
   /**
    * Channel to which is this bundle dispatched.
    */
-  private ExecutorChannel<?> channel = null;
+  private ExecutorChannel<?> channel;
   /**
    * The future from channel dispatch.
    */
-  private Future<?> future = null;
+  private Future<?> future;
   /**
    * The number of tasks in this node bundle.
    */
@@ -93,11 +93,15 @@ public class ServerTaskBundleNode {
   /**
    * The reason why the task results are reeived.
    */
-  private JobReturnReason jobReturnReason = null;
+  private JobReturnReason jobReturnReason;
   /**
    * Offline node indicator.
    */
-  private boolean offline = false;
+  private boolean offline;
+  /**
+   * The time at which this dispatch started.
+   */
+  private final long dispatchStartTime;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -118,6 +122,7 @@ public class ServerTaskBundleNode {
     this.taskBundle.setCurrentTaskCount(size);
     this.dataProvider = job.getDataProvider();
     this.taskCount = size;
+    this.dispatchStartTime = System.currentTimeMillis();
     this.taskBundle.setParameter("node.bundle.id", this.id);
     checkTaskCount();
   }
@@ -397,5 +402,12 @@ public class ServerTaskBundleNode {
    */
   public void setOffline(final boolean offline) {
     this.offline = offline;
+  }
+
+  /**
+   * @return the time at which this dispatch started.
+   */
+  public long getDispatchStartTime() {
+    return dispatchStartTime;
   }
 }

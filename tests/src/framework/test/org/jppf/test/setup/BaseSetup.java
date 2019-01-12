@@ -26,12 +26,11 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.log4j.Level;
 import org.jppf.client.*;
 import org.jppf.client.event.ConnectionPoolListener;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
 import org.jppf.utils.concurrent.*;
 import org.slf4j.*;
 
@@ -271,7 +270,7 @@ public class BaseSetup {
   }
 
   /**
-   * Generates a thread dump for each of the specified drivers.
+   * Generates a thread dump for each of the specified drivers, and for each of the nodes connected to them.
    * @param jmxConnections JMX connections to the drivers.
    * @throws Exception if any error occurs.
    */
@@ -285,6 +284,25 @@ public class BaseSetup {
         } catch (final Exception e) {
           log.error("failed to generate driver thread dump for {} : {}", jmx, ExceptionUtils.getStackTrace(e));
         }
+      }
+      try {
+        final Collection<JPPFManagementInfo> infos = jmx.nodesInformation();
+        final Map<String, JPPFManagementInfo> infoMap = new HashMap<>(infos.size());
+        for (final JPPFManagementInfo info: infos) infoMap.put(info.getUuid(), info);
+        final Map<String, Object> dumpsMap = jmx.getNodeForwarder().threadDump(NodeSelector.ALL_NODES);
+        for (final Map.Entry<String, Object> entry: dumpsMap.entrySet()) {
+          final String uuid = entry.getKey();
+          if (entry.getValue() instanceof Throwable) {
+            log.error("error getting thread dump for node {}", uuid, entry.getValue());
+          } else {
+            final ThreadDump dump = (ThreadDump) entry.getValue();
+            final JPPFManagementInfo info = infoMap.get(uuid);
+            final String text = TextThreadDumpWriter.printToString(dump, "node thread dump for " + (info == null ? uuid : info.getHost() + ":" + info.getPort()));
+            FileUtils.writeTextFile("node_thread_dump_" + (info == null ? uuid : info.getPort()) + ".log", text);
+          }
+        }
+      } catch (final Exception e) {
+        log.error("failed to generate the node thread dumps for driver {}", jmx, e);
       }
     }
   }

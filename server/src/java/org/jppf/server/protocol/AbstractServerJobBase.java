@@ -166,7 +166,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   protected boolean hasPending() {
     lock.lock();
     try {
-      for (ServerTaskBundleClient bundle : clientBundles) {
+      for (final ServerTaskBundleClient bundle: clientBundles) {
         if (bundle.getPendingTasksCount() > 0) return true;
       }
     } finally {

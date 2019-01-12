@@ -511,4 +511,16 @@ public final class FileUtils {
     if (is == null) return null;
     return new BufferedReader(new InputStreamReader(is));
   }
+
+  /**
+   * Get the first path in the provided array which exists in the file system.
+   * @param paths the array pf paths to check.
+   * @return the first existing path, or {@code null} if none exists.
+   */
+  public static String getFirstExistingFilePath(final String...paths) {
+    for (final String path: paths) {
+      if (new File(path).exists()) return path;
+    }
+    return null;
+  }
 }

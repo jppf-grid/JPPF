@@ -20,7 +20,7 @@ package test.org.jppf.test.setup;
 
 import static org.junit.Assert.*;
 
-import java.io.NotSerializableException;
+import java.io.*;
 import java.util.*;
 
 import org.jppf.JPPFTimeoutException;
@@ -31,7 +31,6 @@ import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
-import org.jppf.utils.Operator;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
 import org.junit.AfterClass;
@@ -77,11 +76,11 @@ public class AbstractNonStandardSetup extends BaseTest {
     driverCP.add("../server/classes");
     final String dir = "classes/tests/config" + (prefix == null ? "" : "/" + prefix);
     testConfig.driver.jppf = dir + "/driver.properties";
-    testConfig.driver.log4j = "classes/tests/config/log4j-driver.template.properties";
+    testConfig.driver.log4j = FileUtils.getFirstExistingFilePath(dir + "/log4j-driver.properties", dir + "/log4j-driver.template.properties", "classes/tests/config/log4j-driver.template.properties");
     testConfig.driver.classpath = driverCP;
     testConfig.driver.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-driver.properties");
     testConfig.node.jppf = dir + "/node.properties";
-    testConfig.node.log4j = "classes/tests/config/log4j-node.template.properties";
+    testConfig.node.log4j = FileUtils.getFirstExistingFilePath(dir + "/log4j-node.properties", dir + "/log4j-node.template.properties", "classes/tests/config/log4j-node.template.properties");
     testConfig.node.classpath = commonCP;
     testConfig.node.jvmOptions.add("-Djava.util.logging.configuration.file=classes/tests/config/logging-node1.properties");
     testConfig.clientConfig = dir + "/client.properties";

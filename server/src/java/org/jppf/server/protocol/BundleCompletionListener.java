@@ -65,8 +65,9 @@ public class BundleCompletionListener implements ServerTaskBundleClient.Completi
   @Override
   public void bundleEnded(final ServerTaskBundleClient bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (debugEnabled) log.debug("bundle ended: {}", bundle);
     final Runnable r = () -> {
-      if (debugEnabled) log.debug("bundle ended: {}", bundle);
+      if (debugEnabled) log.debug("handling bundle ended: {}", bundle);
       SubmissionStatus newStatus = null;
       serverJob.lock.lock();
       try {
