@@ -19,9 +19,7 @@
 package test.org.jppf.node;
 
 
-import static org.junit.Assert.*;
-
-import java.util.concurrent.Callable;
+import static org.junit.Assert.assertEquals;
 
 import javax.management.*;
 
@@ -82,12 +80,9 @@ public class TestNodeRestart extends BaseTest {
     print(false, false, ">>> getting JMX connection to the driver");
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     print(false, false, ">>> waiting for 1 connected node");
-    RetryUtils.runWithRetryTimeout(5000L, 500L, new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        if (driver.nbIdleNodes() != 1) throw new IllegalStateException("number of nodes should be 1");
-        return true;
-      }
+    RetryUtils.runWithRetryTimeout(5000L, 500L, () -> {
+      if (driver.nbIdleNodes() != 1) throw new IllegalStateException("number of nodes should be 1");
+      return true;
     });
     final MyNodeConnectionListener myListener = new MyNodeConnectionListener();
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myListener);
@@ -101,6 +96,7 @@ public class TestNodeRestart extends BaseTest {
       print(false, false, ">>> awaiting CONNECTED state for node");
       myListener.await();
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      print(false, false, ">>> submitting job '%s'", job.getName());
       client.submitJob(job);
       print(false, false, ">>> got job results");
       assertEquals(1, myListener.disconnectedCount);
@@ -112,20 +108,23 @@ public class TestNodeRestart extends BaseTest {
   /** */
   public class MyNodeConnectionListener implements NotificationListener {
     /** */
-    private String state = JPPFNodeConnectionNotifierMBean.DISCONNECTED;
+    private String state;
     /** */
     private int connectedCount, disconnectedCount;
 
     @Override
     public synchronized void handleNotification(final Notification notif, final Object handback) {
-      state = notif.getType();
-      if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(state)) {
-        connectedCount++;
-        print(false, false, ">>> received node connected notification, connectedCount=%d", connectedCount);
-        notify();
-      } else {
-        disconnectedCount++;
-        print(false, false, ">>> received node disconnected notification, disconnectedCount=%d", disconnectedCount);
+      try {
+        state = notif.getType();
+        if (JPPFNodeConnectionNotifierMBean.CONNECTED.equals(state)) {
+          connectedCount++;
+          print(false, false, ">>> received node connected notification, connectedCount=%d", connectedCount);
+        } else {
+          disconnectedCount++;
+          print(false, false, ">>> received node disconnected notification, disconnectedCount=%d", disconnectedCount);
+        }
+      } finally {
+        notifyAll();
       }
     }
 
