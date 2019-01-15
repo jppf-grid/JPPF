@@ -18,6 +18,8 @@
 
 package test.org.jppf.test.setup.common;
 
+import java.io.Serializable;
+
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -83,6 +85,10 @@ public class LifeCycleTask extends AbstractTask<String> {
    * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
    */
   protected String uuidFromNode;
+  /**
+   * Info on the job this itask is a part of.
+   */
+  protected JobInfo jobInfo;
 
   /**
    * Initialize this task.
@@ -125,6 +131,8 @@ public class LifeCycleTask extends AbstractTask<String> {
     final long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
     start *= ONE_MILLION;
+    final JPPFDistributedJob job = this.getJob();
+    if (job != null) jobInfo = new JobInfo(job);
     if (startNotification != null) fireNotification(startNotification, true);
     try {
       executedInNode = isInNode();
@@ -258,5 +266,36 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   public String getUuidFromNode() {
     return uuidFromNode;
+  }
+
+  /**
+   * @return info on the job this itask is a part of.
+   */
+  public JobInfo getJobInfo() {
+    return jobInfo;
+  }
+
+  /**
+   * Info on the job this itask is a part of.
+   */
+  public static class JobInfo implements Serializable {
+    /** */
+    public final String uuid;
+    /** */
+    public final String name;
+    /** */
+    public final int taskCount;
+    /** */
+    public final String jobClassName;
+
+    /**
+     * @param job .
+     */
+    public JobInfo(final JPPFDistributedJob job) {
+      this.uuid = job.getUuid();
+      this.name = job.getName();
+      this.taskCount = job.getTaskCount();
+      this.jobClassName = job.getClass().getName();
+    }
   }
 }

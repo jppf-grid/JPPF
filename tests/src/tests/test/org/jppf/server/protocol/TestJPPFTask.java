@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
@@ -363,64 +362,61 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
 
   /**
+   * Test that job information can be obtained from a task executing in a node.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testGetJobInNode() throws Exception {
+    final int nbTasks = 1;
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+    final List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    final LifeCycleTask task = (LifeCycleTask) results.get(0);
+    assertTrue(task.isExecutedInNode());
+    final LifeCycleTask.JobInfo jobInfo = task.getJobInfo();
+    assertNotNull(jobInfo);
+    assertEquals(job.getUuid(), jobInfo.uuid);
+    assertEquals(job.getName(), jobInfo.name);
+    assertEquals(JPPFTaskBundle.class.getName(), jobInfo.jobClassName);
+    assertEquals(nbTasks, jobInfo.taskCount);
+  }
+
+  /**
+   * Test that job information can be obtained from a task executing in a client local executor.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testGetJobInClient() throws Exception {
+    final boolean local = client.isLocalExecutionEnabled();
+    try {
+      client.setLocalExecutionEnabled(true);
+      final int nbTasks = 1;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+      job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
+      final List<Task<?>> results = client.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      final LifeCycleTask task = (LifeCycleTask) results.get(0);
+      assertFalse(task.isExecutedInNode());
+      final LifeCycleTask.JobInfo jobInfo = task.getJobInfo();
+      assertNotNull(jobInfo);
+      assertEquals(job.getUuid(), jobInfo.uuid);
+      assertEquals(job.getName(), jobInfo.name);
+      assertEquals(JPPFJob.class.getName(), jobInfo.jobClassName);
+      assertEquals(nbTasks, jobInfo.taskCount);
+    } finally {
+      client.setLocalExecutionEnabled(local);
+    }
+  }
+
+  /**
    * Submit a broadcast job that resets {@link ResubmittingTask#counter} to {@code null}.
    * @throws Exception if any errror occurs.
    */
   private static void resetNodeCOunter() throws Exception {
     print(false, false, "resetting ResubmittingTask.counter to null");
     client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentClassName() + ":resetCounter", true, false, 1, CounterResetTask.class));
-  }
-
-  /**
-   * A simple Task which calls its <code>compute()</code> method.
-   */
-  public static class MyComputeCallableTask extends AbstractTask<Object> {
-    /** */
-    private static final long serialVersionUID = 1L;
-    /**
-     * The class name for the callable to invoke.
-     */
-    private final String callableClassName;
-    /**
-     * The uuid of the node obtained via {@code Task.getNode().getUuid()}.
-     */
-    public String uuidFromNode = null, nodeUuid = null;
-
-    /** */
-    public MyComputeCallableTask() {
-      this.callableClassName = null;
-    }
-
-    /**
-     * @param callableClassName the class name for the callable to invoke.
-     */
-    public MyComputeCallableTask(final String callableClassName) {
-      this.callableClassName = callableClassName;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void run() {
-      try {
-        printOut("this task's class loader = %s", getClass().getClassLoader());
-        if (callableClassName != null) {
-          final Class<?> clazz = Class.forName(callableClassName);
-          final JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
-          final String s = compute(callable);
-          printOut("result of MyCallable.call() = %s", s);
-          setResult(s);
-        } else {
-          final boolean b = isInNode();
-          printOut("isInNode() = %b", b);
-          setResult(b);
-        }
-        nodeUuid = isInNode() ? getNode().getConfiguration().getString("jppf.node.uuid") : JPPFConfiguration.getProperties().getString("jppf.node.uuid");
-        if (isInNode()) uuidFromNode = getNode().getUuid();
-        printOut("this task's nodeUuid = %s, uuidFromNode = %s", nodeUuid, uuidFromNode);
-      } catch (final Exception e) {
-        setThrowable(e);
-      }
-    }
   }
 
   /**
@@ -517,43 +513,6 @@ public class TestJPPFTask extends Setup1D1N1C {
       fireNotification(getId() + "#1", true);
       fireNotification(getId() + "#2", false);
       fireNotification(getId() + "#3", true);
-    }
-  }
-
-  /**
-   * This task maintains a counter in the node and resubmits itself
-   * until the counter has reached a specified value.
-   */
-  public static class ResubmittingTask extends AbstractTask<Integer> {
-    /** */
-    private static final long serialVersionUID = 1L;
-    /**
-     * Maximum number of runs for this task = max resubmit + 1.
-     */
-    private final int nbRuns;
-    /** */
-    public static AtomicInteger counter;
-
-    /**
-     * Initialie this task.
-     * @param nbRuns the maximum number of runs for this task.
-     */
-    public ResubmittingTask(final int nbRuns) {
-      this.nbRuns = nbRuns;
-    }
-
-    @Override
-    public void run() {
-      if (counter == null) {
-        System.out.printf("ResubmittingTask: creating counter\n");
-        counter = new AtomicInteger(0);
-      }
-      final int n = counter.incrementAndGet();
-      System.out.printf("ResubmittingTask: counter = %d\n", n);
-      if (n < nbRuns) setResubmit(true);
-      else counter = null;
-      System.out.printf("ResubmittingTask: resubmit = %b\n", isResubmit());
-      setResult(n);
     }
   }
 
