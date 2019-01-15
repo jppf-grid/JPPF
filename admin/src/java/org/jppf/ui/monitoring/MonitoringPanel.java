@@ -185,7 +185,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener {
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-    table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth + 10);
+    //table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth + 10);
+    table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth);
     //table.getColumnModel().getColumn(0).setMaxWidth(300);
     tableModels.add(model);
     panel.add(table, "growx, pushx");

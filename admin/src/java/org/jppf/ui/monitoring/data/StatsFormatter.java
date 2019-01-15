@@ -38,7 +38,7 @@ public final class StatsFormatter {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Value of 1 megabyte.
    */
@@ -48,7 +48,7 @@ public final class StatsFormatter {
    */
   private static final Set<Fields> INT_FORMATTED = CollectionUtils.setOf(Fields.class, TOTAL_TASKS_EXECUTED, TOTAL_QUEUED, QUEUE_SIZE, MAX_QUEUE_SIZE, NB_NODES, MAX_NODES, NB_IDLE_NODES,
     NB_BUSY_NODES, NB_CLIENTS, MAX_CLIENTS, JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_MIN_TASKS, JOBS_MAX_TASKS, NODE_TOTAL_CL_REQUEST_COUNT, CLIENT_TOTAL_CL_REQUEST_COUNT, HEALTH_HEAP,
-    HEALTH_NON_HEAP, HEALTH_RAM, HEALTH_THREADS);
+    HEALTH_NON_HEAP, HEALTH_RAM, HEALTH_THREADS, JOB_DISPATCHES_TOTAL, JOB_DISPATCHES_LATEST, JOB_DISPATCHES_MAX, JOB_DISPATCHES_MIN_TASKS, JOB_DISPATCHES_MAX_TASKS);
   /**
    * The set of fields formated as int.
    */
@@ -144,7 +144,7 @@ public final class StatsFormatter {
     else if (DOUBLE_FORMATTED.contains(field)) strValue = formatDouble(value);
     else {
       strValue = formatDouble(value);
-      if (debugEnabled) log.debug("field {} is not part of a formatting set, formatting as double (value = {}))", field.getLocalizedName(), value);
+      if (traceEnabled) log.debug("field {} is not part of a formatting set, formatting as double (value = {}))", field.getLocalizedName(), value);
     }
     return strValue;
   }

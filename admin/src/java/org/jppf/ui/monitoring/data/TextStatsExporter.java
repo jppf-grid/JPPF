@@ -82,6 +82,8 @@ public class TextStatsExporter implements StatsExporter {
     sb.append(format(map, NODE_EXECUTION_FIELDS, "NodeExecutionTable.label"));
     sb.append(format(map, TRANSPORT_FIELDS, "NetworkOverheadTable.label"));
     sb.append(format(map, JOB_FIELDS, "JobTable.label"));
+    sb.append(format(map, JOB_DISPATCH_FIELDS, "JobDispatchTable.label"));
+    sb.append(format(map, TASK_DISTRIB_FIELDS, "TaskDistribTable.label"));
     sb.append(format(map, QUEUE_FIELDS, "QueueTable.label"));
     sb.append(format(map, CONNECTION_FIELDS, "ConnectionsTable.label"));
     sb.append(format(map, NODE_CL_REQUEST_TIME_FIELDS, "NodeClassLoadingRequestTable.label"));

@@ -68,6 +68,19 @@ public class StatsConstants {
    */
   public static final Fields[] JOB_FIELDS = { JOBS_TOTAL, JOBS_LATEST, JOBS_MAX, JOBS_LATEST_TIME, JOBS_MIN_TIME, JOBS_MAX_TIME, JOBS_AVG_TIME, JOBS_MIN_TASKS, JOBS_MAX_TASKS, JOBS_AVG_TASKS };
   /**
+   * List of stats properties related to job dispatching.
+   */
+  public static final Fields[] JOB_DISPATCH_FIELDS = {
+    JOB_DISPATCHES_TOTAL, JOB_DISPATCHES_LATEST, JOB_DISPATCHES_MAX, JOB_DISPATCHES_LATEST_TIME, JOB_DISPATCHES_MIN_TIME, JOB_DISPATCHES_MAX_TIME, JOB_DISPATCHES_AVG_TIME,
+    JOB_DISPATCHES_MIN_TASKS, JOB_DISPATCHES_MAX_TASKS, JOB_DISPATCHES_AVG_TASKS
+  };
+  /**
+   * List of stats properties related how the tasks are distributed.
+   */
+  public static final Fields[] TASK_DISTRIB_FIELDS = {
+    JOBS_MIN_TASKS, JOBS_MAX_TASKS, JOBS_AVG_TASKS, JOB_DISPATCHES_MIN_TASKS, JOB_DISPATCHES_MAX_TASKS, JOB_DISPATCHES_AVG_TASKS, DISPATCHES_PER_JOB_MIN, DISPATCHES_PER_JOB_MAX, DISPATCHES_PER_JOB_AVG
+  };
+  /**
    * List of stats properties related to class loading requests to the clients.
    */
   public static final Fields[] CLIENT_CL_REQUEST_TIME_FIELDS = { CLIENT_TOTAL_CL_REQUEST_COUNT, CLIENT_AVG_CL_REQUEST_TIME, CLIENT_MIN_CL_REQUEST_TIME, CLIENT_MAX_CL_REQUEST_TIME,
@@ -106,13 +119,15 @@ public class StatsConstants {
   /**
    * List of all fields displayed in the server stats view.
    */
-  public static final Fields[] ALL_FIELDS = CollectionUtils.concatArrays(EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
+  public static final Fields[] ALL_FIELDS = CollectionUtils.concatArrays(
+    EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, JOB_DISPATCH_FIELDS, TASK_DISTRIB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
     NODE_CL_REQUEST_TIME_FIELDS, INBOUND_NETWORK_TRAFFIC_FIELDS, OUTBOUND_NETWORK_TRAFFIC_FIELDS);
   /**
    * List of all fields available in the charts.
    * @since 5.0
    */
-  public static final Fields[] ALL_CHART_FIELDS = CollectionUtils.concatArrays(Fields.class, EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
+  public static final Fields[] ALL_CHART_FIELDS = CollectionUtils.concatArrays(Fields.class,
+    EXECUTION_FIELDS, NODE_EXECUTION_FIELDS, TRANSPORT_FIELDS, JOB_FIELDS, JOB_DISPATCH_FIELDS, TASK_DISTRIB_FIELDS, QUEUE_FIELDS, CONNECTION_FIELDS,
     NODE_CL_REQUEST_TIME_FIELDS, INBOUND_NETWORK_TRAFFIC_FIELDS, OUTBOUND_NETWORK_TRAFFIC_FIELDS, HEALTH_FIELDS);
   /**
    * Mapping of fields to their name.
@@ -150,6 +165,14 @@ public class StatsConstants {
    */
   public static final String JOB = "JobTable";
   /**
+   * Name of the jobs dispatching table.
+   */
+  public static final String JOB_DISPATCH = "JobDispatchTable";
+  /**
+   * Name of the tasks distribution table.
+   */
+  public static final String TASK_DISTRIB = "TaskDistribTable";
+  /**
    * Name of the node class loading requests table.
    */
   public static final String NODE_CL_REQUEST_TIME = "NodeClassLoadingRequestTable";
@@ -182,6 +205,8 @@ public class StatsConstants {
     map.put(CONNECTION, CONNECTION_FIELDS);
     map.put(QUEUE, QUEUE_FIELDS);
     map.put(JOB, JOB_FIELDS);
+    map.put(JOB_DISPATCH, JOB_DISPATCH_FIELDS);
+    map.put(TASK_DISTRIB, TASK_DISTRIB_FIELDS);
     map.put(NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_FIELDS);
     map.put(CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_FIELDS);
     map.put(INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_FIELDS);

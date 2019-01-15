@@ -86,6 +86,10 @@ public final class JPPFStatisticsHelper {
    */
   public static final String JOB_DISPATCH_COUNT = "job.dispatch.count";
   /**
+   * Job dispatches per job counters.
+   */
+  public static final String DISPATCH_PER_JOB_COUNT = "dispatch.per.job.count";
+  /**
    * Job dispatches times.
    */
   public static final String JOB_DISPATCH_TIME = "job.dispatch.time";
@@ -227,7 +231,7 @@ public final class JPPFStatisticsHelper {
     final JPPFStatistics statistics = new JPPFStatistics();
     new ServiceFinder().findProviders(JPPFFilteredStatisticsListener.class)
       .forEach(listener -> statistics.addListener(listener, listener.getFilter()));
-    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, JOB_DISPATCH_TIME, JOB_DISPATCH_TASKS, TASK_DISPATCH,
+    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, JOB_DISPATCH_TIME, JOB_DISPATCH_TASKS, DISPATCH_PER_JOB_COUNT, TASK_DISPATCH,
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, JOB_DISPATCH_COUNT, NODES, IDLE_NODES, CLIENTS);
     statistics.createSingleValueSnapshots(TASK_QUEUE_TOTAL, JOB_TOTAL, JOB_DISPATCH_TOTAL, NODE_IN_TRAFFIC, NODE_OUT_TRAFFIC, CLIENT_IN_TRAFFIC, CLIENT_OUT_TRAFFIC,

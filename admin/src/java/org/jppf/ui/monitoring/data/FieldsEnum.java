@@ -188,43 +188,55 @@ public enum FieldsEnum implements Fields {
   /**
    * Total number of job dispatches.
    */
-  JOB_DISPATCH_TOTAL,
+  JOB_DISPATCHES_TOTAL,
   /**
    * Latest number of job dispatches present in the server.
    */
-  JOB_DISPATCH_LATEST,
+  JOB_DISPATCHES_LATEST,
   /**
    * Maximum number of job dispatches present in the server.
    */
-  JOB_DISPATCH_MAX,
+  JOB_DISPATCHES_MAX,
   /**
    * Execution time of the latest job dispatch in the server.
    */
-  JOB_DISPATCH_LATEST_TIME,
+  JOB_DISPATCHES_LATEST_TIME,
   /**
    * Minimum execution time of a job dispatch in the server.
    */
-  JOB_DISPATCH_MIN_TIME,
+  JOB_DISPATCHES_MIN_TIME,
   /**
    * Maximum execution time of a job dispatch in the server.
    */
-  JOB_DISPATCH_MAX_TIME,
+  JOB_DISPATCHES_MAX_TIME,
   /**
    * Average execution time of a job dispatch in the server.
    */
-  JOB_DISPATCH_AVG_TIME,
+  JOB_DISPATCHES_AVG_TIME,
   /**
    * Minimum number of tasks of a job dispatch in the server.
    */
-  JOB_DISPATCH_MIN_TASKS,
+  JOB_DISPATCHES_MIN_TASKS,
   /**
    * Maximum number of tasks of a job dispatch in the server.
    */
-  JOB_DISPATCH_MAX_TASKS,
+  JOB_DISPATCHES_MAX_TASKS,
   /**
    * Average number of tasks of a job dispatch in the server.
    */
-  JOB_DISPATCH_AVG_TASKS,
+  JOB_DISPATCHES_AVG_TASKS,
+  /**
+   * Minimum number of dispatches per job.
+   */
+  DISPATCHES_PER_JOB_MIN,
+  /**
+   * Maximum number of dispatches per job.
+   */
+  DISPATCHES_PER_JOB_MAX,
+  /**
+   * Average number of dispatches per job.
+   */
+  DISPATCHES_PER_JOB_AVG,
   /**
    * Total number of class loading requests from the nodes.
    */

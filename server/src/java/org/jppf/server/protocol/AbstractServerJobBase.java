@@ -19,6 +19,7 @@
 package org.jppf.server.protocol;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
@@ -56,6 +57,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   protected final Map<Long, ServerTaskBundleNode> dispatchSet = new LinkedHashMap<>();
   /**
+   * Set of all nodes to which this job is dispatched.
+   */
+  protected final Map<String, Integer> channelSet = new HashMap<>();
+  /**
    * The requeue handler.
    */
   protected Runnable onRequeue = null;
@@ -63,6 +68,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * The data location of the data provider.
    */
   protected final DataLocation dataProvider;
+  /**
+   * Total number of dispatches in this job.
+   */
+  protected final AtomicInteger totalDispatches = new AtomicInteger(0);
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -136,7 +145,11 @@ public class AbstractServerJobBase extends AbstractServerJob {
     synchronized (dispatchSet) {
       empty = dispatchSet.isEmpty();
       dispatchSet.put(bundle.getId(), bundle);
+      final String uuid = bundle.getJob().getUuid();
+      final Integer n = channelSet.get(uuid);
+      channelSet.put(uuid, (n == null) ? 1 : n + 1);
     }
+    totalDispatches.incrementAndGet();
     if (debugEnabled) log.debug("added to dispatch set: {}", bundle);
     if (empty) {
       updateStatus(ServerJobStatus.NEW, ServerJobStatus.EXECUTING);
@@ -151,9 +164,15 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public void jobReturned(final ServerTaskBundleNode bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-
     synchronized (dispatchSet) {
       dispatchSet.remove(bundle.getId());
+      final String uuid = bundle.getJob().getUuid();
+      final Integer n = channelSet.get(uuid);
+      if (n != null) {
+        if (n > 1) channelSet.put(uuid, n - 1);
+        else channelSet.remove(uuid);
+      }
+      channelSet.put(uuid, (n == null) ? 1 : n + 1);
     }
     if (debugEnabled) log.debug("removed from dispatch set: {}", bundle);
     fireJobReturned(bundle.getChannel(), bundle);
@@ -190,8 +209,38 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public int getNbChannels() {
     synchronized (dispatchSet) {
+      return channelSet.size();
+    }
+  }
+
+  /**
+   * Get count of dispatches executed on the specified channel.
+   * @param uuid uuid of the channel to check.
+   * @return the number of dispatches to the channel.
+   */
+  public int getNbDispatches(final String uuid) {
+    final Integer n;
+    synchronized (dispatchSet) {
+      n = channelSet.get(uuid);
+    }
+    return (n == null) ? 0 : n;
+  }
+
+  /**
+   * Get count of dispatches being executed.
+   * @return the number of dipatches.
+   */
+  public int getNbDispatches() {
+    synchronized (dispatchSet) {
       return dispatchSet.size();
     }
+  }
+
+  /**
+   * @return the total number of dispatches.
+   */
+  public int getTotalDispatches() {
+    return totalDispatches.get();
   }
 
   /**

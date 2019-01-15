@@ -139,6 +139,24 @@ public class StatsTransformer {
     map.put(JOBS_MAX_TASKS, snapshot.getMax());
     map.put(JOBS_AVG_TASKS, snapshot.getAvg());
 
+    map.put(JOB_DISPATCHES_TOTAL, stats.getSnapshot(JOB_DISPATCH_TOTAL).getTotal());
+    snapshot = stats.getSnapshot(JOB_DISPATCH_COUNT);
+    map.put(JOB_DISPATCHES_LATEST, snapshot.getTotal());
+    map.put(JOB_DISPATCHES_MAX, snapshot.getMax());
+    snapshot = stats.getSnapshot(JOB_DISPATCH_TIME);
+    map.put(JOB_DISPATCHES_LATEST_TIME,snapshot.getLatest());
+    map.put(JOB_DISPATCHES_MIN_TIME, snapshot.getMin());
+    map.put(JOB_DISPATCHES_MAX_TIME, snapshot.getMax());
+    map.put(JOB_DISPATCHES_AVG_TIME, snapshot.getAvg());
+    snapshot = stats.getSnapshot(JOB_DISPATCH_TASKS);
+    map.put(JOB_DISPATCHES_MIN_TASKS, snapshot.getMin());
+    map.put(JOB_DISPATCHES_MAX_TASKS, snapshot.getMax());
+    map.put(JOB_DISPATCHES_AVG_TASKS, snapshot.getAvg());
+    snapshot = stats.getSnapshot(DISPATCH_PER_JOB_COUNT);
+    map.put(DISPATCHES_PER_JOB_MIN, snapshot.getMin());
+    map.put(DISPATCHES_PER_JOB_MAX, snapshot.getMax());
+    map.put(DISPATCHES_PER_JOB_AVG, snapshot.getAvg());
+
     double d = 0d;
     double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
     map.put(CLIENT_INBOUND_MB, d);

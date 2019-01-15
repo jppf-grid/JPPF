@@ -205,6 +205,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     final JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
+    stats.addValue(JPPFStatisticsHelper.DISPATCH_PER_JOB_COUNT, ((AbstractServerJobBase) serverJob).getTotalDispatches());
   }
 
   @Override
