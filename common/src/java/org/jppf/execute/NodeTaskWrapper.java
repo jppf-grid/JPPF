@@ -115,6 +115,7 @@ public class NodeTaskWrapper implements Runnable {
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
     this.jobEntry = jobEntry;
+    if (traceEnabled) log.trace("initialized {}", this);
   }
 
   /**
@@ -256,6 +257,7 @@ public class NodeTaskWrapper implements Runnable {
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);
     sb.append(", started=").append(started);
+    if (jobEntry != null) sb.append(", jobEntry=").append(jobEntry);
     sb.append(']');
     return sb.toString();
   }

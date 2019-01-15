@@ -115,9 +115,14 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
             jobEntry.submittedCount++;
           }
         }
-        if (debugEnabled) log.debug("submitting {} executable tasks of bundle {}", jobEntry.taskWrapperList.size(), bundle);
-        for (final NodeTaskWrapper taskWrapper: jobEntry.taskWrapperList) getExecutor().submit(taskWrapper, taskWrapper);
-        if (jobEntry.submittedCount <= 0) jobEnded(jobEntry);
+        if (!jobEntry.taskWrapperList.isEmpty()) {
+          if (debugEnabled) log.debug("submitting {} executable tasks of bundle {}", jobEntry.taskWrapperList.size(), bundle);
+          for (final NodeTaskWrapper taskWrapper: jobEntry.taskWrapperList) getExecutor().submit(taskWrapper, taskWrapper);
+          if (debugEnabled) log.debug("submited {} tasks", jobEntry.taskWrapperList.size());
+        } else {
+          if (debugEnabled) log.debug("there are no tasks to execute in bundle {}, ending job", bundle);
+          jobEnded(jobEntry);
+        }
       }
     }
   }
