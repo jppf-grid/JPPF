@@ -42,15 +42,15 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
   /**
    * Connection to the node's JMX server.
    */
-  private static JMXNodeConnectionWrapper nodeJmx = null;
+  private static JMXNodeConnectionWrapper nodeJmx;
   /**
    * Connection to the driver's JMX server.
    */
-  private static JMXDriverConnectionWrapper driverJmx = null;
+  private static JMXDriverConnectionWrapper driverJmx;
   /**
    * 
    */
-  private static JPPFNodeTaskMonitorMBean nodeMonitorProxy = null;
+  private static JPPFNodeTaskMonitorMBean taskMonitor;
 
   /**
    * Launches a driver and node and start the client.
@@ -68,7 +68,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       nodeJmx = null;
       throw new Exception("could not connect to the node's JMX server");
     }
-    nodeMonitorProxy = nodeJmx.getJPPFNodeTaskMonitorProxy();
+    taskMonitor = nodeJmx.getJPPFNodeTaskMonitorProxy();
   }
 
   /**
@@ -85,7 +85,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
         e = e2;
       } finally {
         nodeJmx = null;
-        nodeMonitorProxy = null;
+        taskMonitor = null;
       }
     }
     BaseSetup.cleanup();
@@ -98,25 +98,26 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    */
   @Test(timeout = 5000)
   public void testSnapshot() throws Exception {
+    print(false, false, "classpath: %s", System.getProperty("java.class.path"));
     final long duration = 100L;
     try {
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksExecuted());
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksInError());
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksSucessfull());
-      assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskCpuTime());
-      assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksExecuted());
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksInError());
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksSucessfull());
+      assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskCpuTime());
+      assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskElapsedTime());
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
       client.submitJob(job);
-      assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
-      assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
-      assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
-      Long n = nodeMonitorProxy.getTotalTaskCpuTime();
+      assertEquals(Integer.valueOf(2), taskMonitor.getTotalTasksExecuted());
+      assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
+      assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
+      Long n = taskMonitor.getTotalTaskCpuTime();
       assertTrue("cpu time is only " + n, n > 0L);
-      n = nodeMonitorProxy.getTotalTaskElapsedTime();
+      n = taskMonitor.getTotalTaskElapsedTime();
       assertTrue("elapsed time is only " + n, n >= duration - 1L);
     } finally {
-      nodeMonitorProxy.reset();
+      taskMonitor.reset();
       nodeJmx.resetTaskCounter();
     }
   }
@@ -132,19 +133,19 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
       client.submitJob(job);
-      assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
-      assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
-      assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
-      Long n = nodeMonitorProxy.getTotalTaskCpuTime();
+      assertEquals(Integer.valueOf(2), taskMonitor.getTotalTasksExecuted());
+      assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
+      assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
+      Long n = taskMonitor.getTotalTaskCpuTime();
       assertTrue("cpu time is only " + n, n > 0L);
-      n = nodeMonitorProxy.getTotalTaskElapsedTime();
+      n = taskMonitor.getTotalTaskElapsedTime();
       assertTrue("elapsed time is only " + n, n >= duration - 1L);
-      nodeMonitorProxy.reset();
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksExecuted());
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksInError());
-      assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksSucessfull());
-      assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskCpuTime());
-      assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
+      taskMonitor.reset();
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksExecuted());
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksInError());
+      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksSucessfull());
+      assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskCpuTime());
+      assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskElapsedTime());
     } finally {
       nodeJmx.resetTaskCounter();
     }
@@ -160,7 +161,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     final int nbTasks = 5;
     final NodeNotificationListener listener = new NodeNotificationListener();
     try {
-      nodeMonitorProxy.addNotificationListener(listener, null, null);
+      taskMonitor.addNotificationListener(listener, null, null);
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task " + nbTasks);
       final List<Task<?>> result = client.submitJob(job);
@@ -190,9 +191,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
           assertTrue("task " + i + " cpu time is only " + n, n > 0L);
         }
       }
-      nodeMonitorProxy.removeNotificationListener(listener);
+      taskMonitor.removeNotificationListener(listener);
     } finally {
-      nodeMonitorProxy.reset();
+      taskMonitor.reset();
       nodeJmx.resetTaskCounter();
     }
   }

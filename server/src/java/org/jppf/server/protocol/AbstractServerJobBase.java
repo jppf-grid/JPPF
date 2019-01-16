@@ -172,7 +172,6 @@ public class AbstractServerJobBase extends AbstractServerJob {
         if (n > 1) channelSet.put(uuid, n - 1);
         else channelSet.remove(uuid);
       }
-      channelSet.put(uuid, (n == null) ? 1 : n + 1);
     }
     if (debugEnabled) log.debug("removed from dispatch set: {}", bundle);
     fireJobReturned(bundle.getChannel(), bundle);

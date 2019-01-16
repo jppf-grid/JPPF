@@ -115,7 +115,20 @@ public class NodeTaskWrapper implements Runnable {
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
     this.jobEntry = jobEntry;
-    //if (traceEnabled) log.trace("initialized {}", this);
+    final Thread thread = Thread.currentThread();
+    final ClassLoader cl = thread.getContextClassLoader();
+    try {
+      TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
+      //thread.setContextClassLoader(taskClassLoader);
+      if (traceEnabled) {
+        log.trace("in constructor: contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader);
+        log.trace("initialized {}", this);
+      }
+    } catch(final Throwable e) {
+      log.error("error in constructor, contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader, e);
+    } finally {
+      thread.setContextClassLoader(cl);
+    }
   }
 
   /**
@@ -139,7 +152,7 @@ public class NodeTaskWrapper implements Runnable {
   }
 
   /**
-   * Set timeout indicator and cancel task when it implements <code>Future</code> interface.
+   * Set timeout indicator and cancel task when it implements {@code Future} interface.
    */
   synchronized void timeout() {
     this.timeout |= !this.cancelled;

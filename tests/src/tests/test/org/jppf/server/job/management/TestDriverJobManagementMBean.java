@@ -366,11 +366,13 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Test(timeout = TEST_TIMEOUT)
   public void testUpdateJobSLAAndMetadata() throws Exception {
     final int nbTasks = 2;
+    print(false, false, "getting jmx connection");
     final JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
     assertNotNull(driver);
     final LoadBalancingInformation lbInfo = driver.loadBalancerInformation();
     assertNotNull(lbInfo);
     try {
+      print(false, false, "changing driver load-balancer settings");
       driver.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
       final JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
       final JobSLA sla = job.getSLA();
@@ -378,14 +380,20 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       sla.setMaxNodes(1);
       sla.setExecutionPolicy(new Equal("jppf.node.uuid", false, "n1"));
       metadata.setParameter("node.uuid", "n1");
+      print(false, false, "getting job manager");
       final DriverJobManagementMBean jobManager = driver.getJobManager();
       assertNotNull(jobManager);
       final MyNotifListener listener = new MyNotifListener(job);
       jobManager.addNotificationListener(listener, null, null);
+      print(false, false, "submitting job");
       client.submitJob(job);
+      print(false, false, "awaiting JOB_DISPATCHED notifications");
       listener.await();
+      print(false, false, "removing notification listener");
       jobManager.removeNotificationListener(listener);
+      print(false, false, "awaiting job results");
       final List<Task<?>> results = job.awaitResults();
+      print(false, false, "checking results");
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       final List<String> nodeUuids = new ArrayList<>();
@@ -424,15 +432,18 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       final JobNotification notif = (JobNotification) notification;
       if (notif.getEventType() == JobEventType.JOB_DISPATCHED) {
         synchronized(this) {
-          count++;
-          if (count == 2) {
+          this.count++;
+          if (this.count == 2) {
+            print(false, false, "received 2nd JOB_DISPATCHED notification");
             notifyAll();
-          } else if (count == 1) {
+          } else if (this.count == 1) {
+            print(false, false, "received 1st JOB_DISPATCHED notification");
             job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
             job.getMetadata().setParameter("node.uuid", "n2");
             try {
               BaseSetup.getJobManagementProxy(client).updateJobs(JobSelector.ALL_JOBS, job.getSLA(), job.getMetadata());
-            } catch (final Exception e) {
+              print(false, false, "job SLA aénd metadata updated");
+            } catch (final Throwable e) {
               e.printStackTrace();
             }
           }
@@ -442,11 +453,12 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
 
     /** */
     public void await() {
+      final long start = System.currentTimeMillis();
       synchronized(this) {
         try {
-          while (count < 2) wait(10L);
+          while (this.count < 2) wait();
         } catch (final Exception e) {
-          e.printStackTrace();
+          print(false, false, "exception after %,d ms:\n%s", System.currentTimeMillis() - start, ExceptionUtils.getStackTrace(e));
         }
       }
     }
