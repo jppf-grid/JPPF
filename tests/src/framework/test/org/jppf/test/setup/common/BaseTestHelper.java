@@ -348,15 +348,12 @@ public class BaseTestHelper {
    * @return an array of strings to print out.
    */
   private static String[] createMessages(final boolean decorate, final String format, final Object...params) {
+    if (!decorate ) return new String[] { String.format(format, params) };
     final String fmt = String.format("%s %s %s", STARS, format, STARS);
     final String msg = String.format(fmt, params);
     final StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
     for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
-    String[] messages = { msg };
-    if (decorate) {
-      final String s = sb.append(' ').append(STARS).toString();
-      messages = new String[] { s, msg, s };
-    }
-    return messages;
+    final String s = sb.append(' ').append(STARS).toString();
+    return new String[] { s, msg, s };
   }
 }

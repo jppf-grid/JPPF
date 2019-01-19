@@ -247,7 +247,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
   }
 
   /**
-   * Check that the job did already got through the specified channel.
+   * Check that the job did not already get through the specified channel (collision avoidance) and that the SLA's max driver depth is not reached.
    * @param channel the node to check.
    * @param job the job to check against.
    * @return {@code true} if the check succeeds, {@code false} otherwise.
@@ -260,6 +260,10 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if ((index >= 0) && (index != uuidPath.size() - 1)) log.warn("uuid path contains this driver's uuid {}: uuidPath={}", driverUuid, uuidPath);
     if (uuidPath.contains(channel.getUuid())) {
       if (debugEnabled) log.debug("bundle uuid path already contains node {} : uuidPath={}, nodeUuid={}", channel, uuidPath, channel.getUuid());
+      return false;
+    }
+    if (channel.isPeer() && (uuidPath.size() - 1 >= job.getSLA().getMaxDriverDepth())) {
+      if (debugEnabled) log.debug("job [name={}, uuid={}, uuidPath={}] reached max driver depth of {}", job.getName(), job.getUuid(), uuidPath, job.getSLA().getMaxDriverDepth());
       return false;
     }
     return true;
@@ -410,7 +414,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
   }
 
   /**
-   * Keep only the nodes whose configuration has the lowest distance when compared to the desired configuration.
+   * Keep only the nodes whose configuration have the lowest distance when compared to the desired configuration.
    * @param job the job that specifies the desired node configuration.
    * @param channels the list of eligible channels.
    * @return one or more channels with the minimum computed score.

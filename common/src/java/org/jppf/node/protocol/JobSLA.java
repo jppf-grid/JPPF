@@ -44,16 +44,16 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * The priority of this job, used by the server to prioritize queued jobs.
    */
-  private int priority = 0;
+  private int priority;
   /**
    * Determines whether this job is initially suspended.
    * If it is, it will have to be resumed, using either the admin console or the JMX APIs.
    */
-  private boolean suspended = false;
+  private boolean suspended;
   /**
    * Specifies whether the job is a broadcast job.
    */
-  private boolean broadcastJob = false;
+  private boolean broadcastJob;
   /**
    * Determines whether the job should be canceled by the driver if the client gets disconnected.
    */
@@ -61,7 +61,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Get the name of the strategy used to return the results back to the client.
    */
-  private String resultsStrategy = null;
+  private String resultsStrategy;
   /**
    * The classpath associated with the job.
    */
@@ -73,7 +73,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * The number of times a dispatched task can expire before it is finally cancelled.
    */
-  private int maxDispatchExpirations = 0;
+  private int maxDispatchExpirations;
   /**
    * Maximum number of times a task can rsubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
    */
@@ -81,7 +81,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
    */
-  private boolean applyMaxResubmitsUponNodeError = false;
+  private boolean applyMaxResubmitsUponNodeError;
   /**
    * Whether remote class loading is enabled for the job.
    */
@@ -98,9 +98,14 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * Whether this job is persisted by the driver and behavior upon recovery.
    */
   private PersistenceSpec persistenceSpec = new PersistenceSpec();
+  /**
+   * In a multi server topology, an upper bound for how many drivers a job can be transfered to before being executed on a node.
+   */
+  private int maxDriverDepth = Integer.MAX_VALUE;
 
   /**
    * Default constructor.
+   * @exclude
    */
   public JobSLA() {
   }
@@ -116,7 +121,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the priority of this job.
    * @param priority the priority as an int.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setPriority(final int priority) {
     this.priority = priority;
@@ -134,7 +139,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the maximum number of nodes this job can run on.
    * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setMaxNodes(final int maxNodes) {
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
@@ -156,7 +161,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
    * @param maxNodeProvisioningGroups the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
    * Any value <= 0 will be ignored.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @since 5.1
    */
   public JobSLA setMaxNodeProvisioningGroups(final int maxNodeProvisioningGroups) {
@@ -175,7 +180,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Specify whether this job is initially suspended.
    * @param suspended true if the job is suspended, false otherwise.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setSuspended(final boolean suspended) {
     this.suspended = suspended;
@@ -193,7 +198,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Specify whether the job is a broadcast job.
    * @param broadcastJob true for a broadcast job, false otherwise.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setBroadcastJob(final boolean broadcastJob) {
     this.broadcastJob = broadcastJob;
@@ -211,7 +216,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Specify whether the job should be canceled by the driver if the client gets disconnected.
    * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect) {
     this.cancelUponClientDisconnect = cancelUponClientDisconnect;
@@ -230,7 +235,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the strategy used to return the results back to the client.
    * @param name the name of the strategy to use.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @exclude
    */
   public JobSLA setResultsStrategy(final String name) {
@@ -249,7 +254,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the class path associated with the job.
    * @param classpath an instance of {@link ClassPath}.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setClassPath(final ClassPath classpath) {
     if (classpath == null) throw new IllegalArgumentException("classpath cannot be null");
@@ -268,7 +273,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the expiration schedule for any subset of the job dispatched to a node.
    * @param schedule a {@link JPPFSchedule} instance.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setDispatchExpirationSchedule(final JPPFSchedule schedule) {
     this.dispatchExpirationSchedule = schedule;
@@ -286,7 +291,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the number of times a dispatched task can expire before it is finally cancelled.
    * @param max the number of expirations as an int.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setMaxDispatchExpirations(final int max) {
     this.maxDispatchExpirations = max;
@@ -305,7 +310,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the naximum number of times a task can resubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
    * @param maxResubmits the maximum number of resubmits; a value of 0 or less means tasks in the job cannot be resubmitted.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public JobSLA setMaxTaskResubmits(final int maxResubmits) {
     this.maxTaskResubmits = maxResubmits;
@@ -325,7 +330,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Specify whether the max resubmits limit for tasks should also be applied when tasks are resubmitted due to a node error.
    * @param applyMaxResubmitsUponNodeError {@code true} to specify that the max resubmits count is applied upon node errors, {@code false} otherwise.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @since 4.2
    */
   public JobSLA setApplyMaxResubmitsUponNodeError(final boolean applyMaxResubmitsUponNodeError) {
@@ -346,7 +351,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Specify whether remote class loading is enabled for the job.
    * @param enabled {@code true} to enable remote class loading, {@code false} to disable it.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @since 4.2
    */
   public JobSLA setRemoteClassLoadingEnabled(final boolean enabled) {
@@ -366,7 +371,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Set the global grid execution policy (which applies to the driver).
    * @param policy an {@link ExecutionPolicy} object.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @since 5.2
    */
   public JobSLA setGridExecutionPolicy(final ExecutionPolicy policy) {
@@ -388,7 +393,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * Set the configuration of the node(s) this job should be executed on,
    * forcing a restart of the node with appropriate configuration overrides if there is no such node.
    * @param nodeConfigurationSpec the desired configuration as a {@link JPPFNodeConfigSpec} object.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    * @since 5.2
    */
   public JobSLA setDesiredNodeConfiguration(final JPPFNodeConfigSpec nodeConfigurationSpec) {
@@ -416,6 +421,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
   /**
    * Create a copy of this job SLA.
    * @return a {@link JobSLA} instance.
+   * @exclude
    */
   public JobSLA copy() {
     final JobSLA sla = new JobSLA();
@@ -436,6 +442,29 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
     sla.setRemoteClassLoadingEnabled(remoteClassLoadingEnabled);
     sla.setResultsStrategy(resultsStrategy);
     sla.setSuspended(suspended);
+    sla.setMaxDriverDepth(maxDriverDepth);
     return sla;
+  }
+
+  /**
+   * Determine how many drivers a job can traverse before being executed on a node.
+   * By default, when {@link #setMaxDriverDepth(int)} has not yet been called, this method returns {@link Integer#MAX_VALUE}.
+   * @return the maximum driver depth.
+   * @since 6.1
+   */
+  public int getMaxDriverDepth() {
+    return maxDriverDepth;
+  }
+
+  /**
+   * Set how many drivers a job can traverse before being executed on a node.
+   * This setting effectively applies in multi-server topologies, when JPPF drivers can offload jobs to one another.
+   * @param maxDriverDepth the maximum driver depth to set. Values less than or equal to 0 are ignored. 
+   * @return this SLA, for method call chaining.
+   * @since 6.1
+   */
+  public JobSLA setMaxDriverDepth(final int maxDriverDepth) {
+    if (maxDriverDepth > 0) this.maxDriverDepth = maxDriverDepth;
+    return this;
   }
 }

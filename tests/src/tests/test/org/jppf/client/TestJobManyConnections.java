@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.*;
@@ -53,7 +54,7 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
 
   /**
    * Test job submission with pool size = 10 and getMachChannels() = 10.
-   * @throws Exception if any error occurs
+   * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
   public void testSubmitJobManyRemoteChannels() throws Exception {
@@ -65,6 +66,29 @@ public class TestJobManyConnections extends AbstractNonStandardSetup {
       final List<Task<?>> results = client.submitJob(job);
       BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking job %d results", i);
       testJobResults(nbTasks, results);
+    }
+  }
+
+  /**
+   * Test that a job with maxDriverDepth = 1 is only processed by a single driver (i.e. never sent to a peer).
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000)
+  public void testMaxDriverDepth() throws Exception {
+    final int nbTasks = 100;
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> creating job");
+    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+    job.getClientSLA().setExecutionPolicy(new Equal("jppf.server.port", 11101));
+    job.getSLA().setMaxDriverDepth(1);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> submitting job %s", job.getName());
+    final List<Task<?>> results = client.submitJob(job);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking results for job %s", job.getName());
+    testJobResults(nbTasks, results);
+    BaseTestHelper.printToAll(client, true, true, true, true, false, ">>> checking single node 'n1' for job %s", job.getName());
+    for (final Task<?> tsk: results) {
+      assertTrue(tsk instanceof LifeCycleTask);
+      final LifeCycleTask task = (LifeCycleTask) tsk;
+      assertEquals("n1", task.getUuidFromNode());
     }
   }
 

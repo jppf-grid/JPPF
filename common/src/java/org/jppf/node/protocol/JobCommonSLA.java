@@ -38,15 +38,15 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
   /**
    * The tasks execution policy.
    */
-  ExecutionPolicy executionPolicy = null;
+  ExecutionPolicy executionPolicy;
   /**
    * The job start schedule configuration.
    */
-  JPPFSchedule jobSchedule = null;
+  JPPFSchedule jobSchedule;
   /**
    * The job expiration schedule configuration.
    */
-  JPPFSchedule jobExpirationSchedule = null;
+  JPPFSchedule jobExpirationSchedule;
 
   /**
    * Default constructor.
@@ -66,7 +66,7 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
   /**
    * Set the tasks execution policy.
    * @param executionPolicy an <code>ExecutionPolicy</code> instance.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public T setExecutionPolicy(final ExecutionPolicy executionPolicy) {
     this.executionPolicy = executionPolicy;
@@ -84,7 +84,7 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
   /**
    * Set the job schedule.
    * @param jobSchedule a <code>JPPFSchedule</code> instance.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public T setJobSchedule(final JPPFSchedule jobSchedule) {
     this.jobSchedule = jobSchedule;
@@ -102,7 +102,7 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
   /**
    * Set the job expiration schedule configuration.
    * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
-   * @return this SLA, for mathod chaining.
+   * @return this SLA, for method call chaining.
    */
   public T setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
     this.jobExpirationSchedule = jobExpirationSchedule;
@@ -119,7 +119,6 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
     sla.setExecutionPolicy(executionPolicy);
     sla.setJobExpirationSchedule(jobExpirationSchedule);
     sla.setJobSchedule(jobSchedule);
-    //sla.setPriority(priority);
     return sla;
   }
 }
