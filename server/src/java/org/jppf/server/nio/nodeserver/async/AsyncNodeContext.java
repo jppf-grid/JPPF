@@ -428,4 +428,16 @@ public class AsyncNodeContext extends BaseNodeContext {
   public void setMaxJobs(final int maxJobs) {
     this.maxJobs.set(maxJobs);
   }
+
+  /**
+   * Get the number of dispatches to the node for the specified job.
+   * @param jobUuid the uuid of the job to check.
+   * @return the number of dispatches of the job.
+   */
+  public int getNbBundlesForJob(final String jobUuid) {
+    synchronized(jobToBundlesIds) {
+      final Collection<Long> bundleIds = jobToBundlesIds.getValues(jobUuid);
+      return (bundleIds == null) ? 0 : bundleIds.size();
+    }
+  }
 }

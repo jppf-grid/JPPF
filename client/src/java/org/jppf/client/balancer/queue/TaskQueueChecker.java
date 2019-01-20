@@ -321,6 +321,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
       try {
         updateBundler(job.getJob(), channel);
         size = channel.getBundler().getBundleSize();
+        if (job.getClientSLA().getMaxDispatchSize() < size) size = job.getClientSLA().getMaxDispatchSize();
       } catch (final Exception e) {
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
         size = bundlerFactory.getFallbackBundler().getBundleSize();

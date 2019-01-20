@@ -47,6 +47,14 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
    * The job expiration schedule configuration.
    */
   JPPFSchedule jobExpirationSchedule;
+  /**
+   * The maximum number of tasks allowed in a dispatch of the job.
+   */
+  int maxDispatchSize = Integer.MAX_VALUE;
+  /**
+   * Whether to allow multiple concurrent dispatches of the job to the same channel.
+   */
+  boolean allowMultipleDispatchesToSameChannel = true;
 
   /**
    * Default constructor.
@@ -120,5 +128,47 @@ public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
     sla.setJobExpirationSchedule(jobExpirationSchedule);
     sla.setJobSchedule(jobSchedule);
     return sla;
+  }
+
+  /**
+   * Get the maximum number of tasks allowed in a dispatch of the job.
+   * This value will override the one computed by the load-balancer when {@code maxDispatchSize < loadBalancerSize}.
+   * <p>By default, when {@link #setMaxDispatchSize(int)} has not yet been called, this method will return {@link Integer#MAX_VALUE}.
+   * @return the maximum number of of tasks allowed in a job dispatch.
+   * @since 6.1
+   */
+  public int getMaxDispatchSize() {
+    return maxDispatchSize;
+  }
+
+  /**
+   * Set the maximum number of tasks allowed in a dispatch of the job.
+   * @param maxDispatchSize the maximum dispatch size to set. Values less than or equal to 0 are ignored and have no effect.
+   * @return this SLA, for method call chaining.
+   * @since 6.1
+   */
+  public T setMaxDispatchSize(final int maxDispatchSize) {
+    if (maxDispatchSize > 0) this.maxDispatchSize = maxDispatchSize;
+    return (T) this;
+  }
+
+  /**
+   * Determine whether to allow multiple concurrent dispatches of the job to the same driver (client-side SLA) or to the same node (server-side SLA).
+   * @return {@code true} (the default) if multiple dispatches of the job can be sent to the same channel, {@code false} otherwise.
+   * @since 6.1
+   */
+  public boolean isAllowMultipleDispatchesToSameChannel() {
+    return allowMultipleDispatchesToSameChannel;
+  }
+
+  /**
+   * Specifiy whether to allow multiple concurrent dispatches of the job to the same driver (client-side SLA) or to the same node (server-side SLA).
+   * @param allowMultipleDispatchesToSameChannel {@code true} to allow multiple dispatches of the job to be sent to the same channel, {@code false} otherwise.
+   * @return this SLA, for method call chaining.
+   * @since 6.1
+   */
+  public T setAllowMultipleDispatchesToSameChannel(final boolean allowMultipleDispatchesToSameChannel) {
+    this.allowMultipleDispatchesToSameChannel = allowMultipleDispatchesToSameChannel;
+    return (T) this;
   }
 }

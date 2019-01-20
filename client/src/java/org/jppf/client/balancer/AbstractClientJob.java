@@ -80,35 +80,39 @@ public abstract class AbstractClientJob {
   /**
    * The universal unique id for this job.
    */
-  private String uuid = null;
+  private String uuid;
   /**
    * The user-defined display name for this job.
    */
-  private String name = null;
+  private String name;
   /**
    * The service level agreement between the job and the server.
    */
-  JobSLA sla = null;
+  JobSLA sla;
   /**
    * The service level agreement on the client side.
    */
-  private JobClientSLA clientSla = null;
+  private JobClientSLA clientSla;
   /**
    * The job metadata.
    */
-  private JobMetadata metadata = null;
+  private JobMetadata metadata;
   /**
    * Job expired indicator, determines whether the job is should be cancelled.
    */
-  private boolean jobExpired = false;
+  private boolean jobExpired;
   /**
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
-  private boolean pending = false;
+  private boolean pending;
   /**
    * Count of channels used by this job.
    */
-  private final AtomicInteger channelsCount = new AtomicInteger(0);
+  private final AtomicInteger dispatchCount = new AtomicInteger(0);
+  /**
+   * Counts the number of times this job is dispatched to each channel. 
+   */
+  private final Map<String, AtomicInteger> channelCounts = new HashMap<>();
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
@@ -356,7 +360,13 @@ public abstract class AbstractClientJob {
    * @param channel the channel to add.
    */
   public void addChannel(final ExecutorChannel<?> channel) {
-    channelsCount.incrementAndGet();
+    dispatchCount.incrementAndGet();
+    final String uuid = channel.getUuid();
+    synchronized(channelCounts) {
+      final AtomicInteger n = channelCounts.get(uuid);
+      if (n == null) channelCounts.put(uuid, new AtomicInteger(1));
+      else n.incrementAndGet();
+    }
   }
 
   /**
@@ -364,7 +374,37 @@ public abstract class AbstractClientJob {
    * @param channel the channel to add.
    */
   public void removeChannel(final ExecutorChannel<?> channel) {
-    channelsCount.decrementAndGet();
+    dispatchCount.decrementAndGet();
+    final String uuid = channel.getUuid();
+    synchronized(channelCounts) {
+      final AtomicInteger n = channelCounts.get(uuid);
+      if (n != null) {
+        final int count = n.decrementAndGet();
+        if (count <= 0) channelCounts.remove(uuid);
+      }
+    }
+  }
+
+  /**
+   * Get the number of times this job is dispatched to the specified channel.
+   * @param uuid the uuid of the channel to check.
+   * @return the number of dispatches of this job to the channel.
+   */
+  final int getChannelDispatchCount(final String uuid) {
+    synchronized(channelCounts) {
+      final AtomicInteger n = channelCounts.get(uuid);
+      return (n == null) ? 0 : n.get();
+    }
+  }
+
+  /**
+   * Get the number of channels this job is dispatched to.
+   * @return the number of dispatches of this job to the channel.
+   */
+  final int getChannelCount() {
+    synchronized(channelCounts) {
+      return channelCounts.size();
+    }
   }
 
   /**
@@ -376,8 +416,12 @@ public abstract class AbstractClientJob {
    */
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
     if (traceEnabled) log.trace(String.format("job '%s' : cancelled=%b, cancelling=%b, pending=%b, expired=%b, nb channels=%d, max channels=%d",
-      job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
-    if (isCancelling() || isCancelled() || isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
+      job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), dispatchCount.get(), clientSla.getMaxChannels()));
+    if (isCancelling() || isCancelled() || isPending() || isJobExpired() || (dispatchCount.get() >= clientSla.getMaxChannels())) return false;
+    if (clientSla.isAllowMultipleDispatchesToSameChannel()) {
+      final int n = getChannelDispatchCount(channel.getUuid());
+      if (n > 0) return false;
+    }
     final ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;
     if (policy != null) {
@@ -395,14 +439,17 @@ public abstract class AbstractClientJob {
    */
   private void preparePolicy(final ExecutionPolicy policy) {
     if (policy == null) return;
-    policy.setContext(sla, clientSla, metadata, channelsCount.get(), null);
+    policy.setContext(sla, clientSla, metadata, dispatchCount.get(), null);
   }
 
   /**
    * Clear the channels used to dispatch this job.
    */
   public void clearChannels() {
-    channelsCount.set(0);
+    dispatchCount.set(0);
+    synchronized(channelCounts) {
+      channelCounts.clear();
+    }
   }
 
   /**

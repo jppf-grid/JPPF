@@ -154,6 +154,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     try {
       updateBundler(selectedJob.getJob(), channel);
       size = channel.getBundler().getBundleSize();
+      if (selectedJob.getSLA().getMaxDispatchSize() < size) size = selectedJob.getSLA().getMaxDispatchSize();
     } catch (final Exception e) {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       size = bundlerFactory.getFallbackBundler().getBundleSize();
@@ -205,7 +206,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
           if (debugEnabled) log.debug("[currentNbJobs = {}] >= maxJobs = {}] for {}", channel.getCurrentNbJobs(), channel.getMaxJobs(), channel);
           continue;
         }
-        if (!checkUuidPath(channel, job)) continue;
+        if (!checkJobAgainstChannel(channel, job)) continue;
         if (job.getBroadcastUUID() != null && !job.getBroadcastUUID().equals(channel.getUuid())) continue;
         final JPPFSystemInformation info = channel.getSystemInformation();
         if (channel.isPeer() && !disptachtoPeersWithoutNode) {
@@ -252,7 +253,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @param job the job to check against.
    * @return {@code true} if the check succeeds, {@code false} otherwise.
    */
-  private boolean checkUuidPath(final BaseNodeContext channel, final ServerJob job) {
+  private boolean checkJobAgainstChannel(final BaseNodeContext channel, final ServerJob job) {
     final List<String> uuidPath = job.getJob().getUuidPath().getList();
     if (debugEnabled) log.debug("uuid path={}, node uuid={}", uuidPath, channel.getUuid());
     final String driverUuid = server.getDriver().getUuid();
@@ -265,6 +266,10 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     if (channel.isPeer() && (uuidPath.size() - 1 >= job.getSLA().getMaxDriverDepth())) {
       if (debugEnabled) log.debug("job [name={}, uuid={}, uuidPath={}] reached max driver depth of {}", job.getName(), job.getUuid(), uuidPath, job.getSLA().getMaxDriverDepth());
       return false;
+    }
+    if (!job.getSLA().isAllowMultipleDispatchesToSameChannel()) {
+      final int nbDispatches = ((AsyncNodeContext) channel).getNbBundlesForJob(job.getUuid());
+      if (nbDispatches > 0) return false;
     }
     return true;
   }
