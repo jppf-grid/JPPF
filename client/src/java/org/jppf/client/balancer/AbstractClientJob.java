@@ -418,7 +418,7 @@ public abstract class AbstractClientJob {
     if (traceEnabled) log.trace(String.format("job '%s' : cancelled=%b, cancelling=%b, pending=%b, expired=%b, nb channels=%d, max channels=%d",
       job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), dispatchCount.get(), clientSla.getMaxChannels()));
     if (isCancelling() || isCancelled() || isPending() || isJobExpired() || (dispatchCount.get() >= clientSla.getMaxChannels())) return false;
-    if (clientSla.isAllowMultipleDispatchesToSameChannel()) {
+    if (!clientSla.isAllowMultipleDispatchesToSameChannel()) {
       final int n = getChannelDispatchCount(channel.getUuid());
       if (n > 0) return false;
     }

@@ -163,17 +163,12 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     try {
       taskMonitor.addNotificationListener(listener, null, null);
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
-      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task " + nbTasks);
+      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_" + nbTasks);
       final List<Task<?>> result = client.submitJob(job);
       assertNull(listener.exception);
       assertEquals(nbTasks + 1, listener.notifs.size());
       assertEquals(1, listener.userObjects.size());
-      Collections.sort(listener.notifs, new Comparator<TaskInformation>() {
-        @Override
-        public int compare(final TaskInformation o1, final TaskInformation o2) {
-          return o1.getId().compareTo(o2.getId());
-        }
-      });
+      Collections.sort(listener.notifs, (o1, o2) -> o1.getId().compareTo(o2.getId()));
       for (int i=0; i<nbTasks; i++) {
         final Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);

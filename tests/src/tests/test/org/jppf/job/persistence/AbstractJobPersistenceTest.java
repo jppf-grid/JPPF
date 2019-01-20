@@ -305,6 +305,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       pool.setSize(2);
       print(false, false, "awaiting 2 connections");
       pool.awaitActiveConnections(Operator.EQUAL, 2);
+      
       final JPPFJob job = BaseTestHelper.createJob(method, true, false, nbTasks, LifeCycleTask.class, 100L);
       job.getSLA().setCancelUponClientDisconnect(false);
       job.getSLA().getPersistenceSpec().setPersistent(true).setAutoExecuteOnRestart(false).setDeleteOnCompletion(false);
@@ -313,6 +314,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
       final JobListener listener = new JobListenerAdapter() {
         @Override
         public void jobDispatched(final JobEvent event) {
+          print(false, false, "dispatched job '%s' to %s", event.getJob().getName(), event.getConnection());
           dispatchList.add(event.getConnection().getConnectionUuid());
         }
       };

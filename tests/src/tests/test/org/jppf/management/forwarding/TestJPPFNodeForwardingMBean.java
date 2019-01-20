@@ -410,7 +410,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
   /**
    * Execute the tests with the specified node selector.
    * @param selector the selector to apply.
-   * @param expectedNodes the set of nodes the selector is expected to resilve to.
+   * @param expectedNodes the set of nodes the selector is expected to resolve to.
    * @throws Exception if any error occurs.
    */
   private static void testGetDelegationModel(final NodeSelector selector, final String... expectedNodes) throws Exception {
