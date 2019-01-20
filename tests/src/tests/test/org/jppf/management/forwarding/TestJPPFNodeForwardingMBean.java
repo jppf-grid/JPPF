@@ -371,9 +371,12 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   private static void testCancelJob(final NodeSelector selector, final String... expectedNodes) throws Exception {
+    final String methodName = ReflectionUtils.getCurrentMethodName();
+    final String selectorClass = selector.getClass().getSimpleName();
+    BaseTestHelper.printToAll(client, false, true, true, true, true, ">>> start of %s(%s)", methodName, selectorClass);
     final int nbNodes = expectedNodes.length;
     final int nbTasks = 5 * nbNodes;
-    final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbTasks, LifeCycleTask.class, 5000L);
+    final JPPFJob job = BaseTestHelper.createJob(methodName + "-" + selectorClass, false, false, nbTasks, LifeCycleTask.class, 5000L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     final String uuid = job.getUuid();
     client.submitJob(job);

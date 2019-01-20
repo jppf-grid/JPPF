@@ -146,9 +146,11 @@ public class LifeCycleTask extends AbstractTask<String> {
       }
       if (isInNode()) uuidFromNode = getNode().getUuid();
       else uuidFromNode = "local_channel";
+      final long sleepStart = System.nanoTime();
       if (duration > 0L) Thread.sleep(duration);
+      final long sleepElapsed = (System.nanoTime() - sleepStart) / 1_000_000L;
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
-      displayTask("successful");
+      displayTask("successful - slept for " + sleepElapsed + " ms");
     } catch(final Exception e) {
       setThrowable(e);
     } finally {
@@ -173,7 +175,7 @@ public class LifeCycleTask extends AbstractTask<String> {
    * @param message a short message describing the life cycle status.
    */
   private void displayTask(final String message) {
-    log.info("displaying task " + this + " (" + message + ')');
+    log.info("displaying [{}] task {}", message, this);
   }
 
   /**

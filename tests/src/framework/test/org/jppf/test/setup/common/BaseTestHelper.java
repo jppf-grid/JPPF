@@ -131,7 +131,7 @@ public class BaseTestHelper {
     final Constructor<?> constructor = findConstructor(taskClass, nbArgs);
     // 0 padding of task number
     final int nbDigits = Integer.toString(nbTasks).length();
-    final String format = "%s-task %0" + nbDigits + "d";
+    final String format = "%s-task_%0" + nbDigits + "d";
     for (int i=1; i<=nbTasks; i++) {
       final Object o = constructor.newInstance(params);
       job.add(o).setId(String.format(format, job.getName(), i));

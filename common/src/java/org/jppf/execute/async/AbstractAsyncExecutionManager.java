@@ -188,7 +188,7 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
       taskWrapper.cancel(callOnCancel);
       future.cancel(taskWrapper.getTask().isInterruptible());
       taskWrapper.cancelTimeoutAction();
-      taskWrapper.taskEnded();
+      if (!taskWrapper.hasStarted()) taskWrapper.taskEnded();
     }
   }
 

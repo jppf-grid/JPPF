@@ -119,7 +119,6 @@ public class NodeTaskWrapper implements Runnable {
     final ClassLoader cl = thread.getContextClassLoader();
     try {
       TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
-      //thread.setContextClassLoader(taskClassLoader);
       if (traceEnabled) {
         log.trace("in constructor: contextClassLoader={}, taskClassLoader={}", Thread.currentThread().getContextClassLoader(), taskClassLoader);
         log.trace("initialized {}", this);
@@ -176,7 +175,7 @@ public class NodeTaskWrapper implements Runnable {
   @SuppressWarnings("unchecked")
   @Override
   public void run() {
-    if (traceEnabled) log.trace(toString());
+    if (traceEnabled) log.trace("running {}", this);
     started = true;
     final long id = Thread.currentThread().getId();
     final long startTime = System.nanoTime();
@@ -187,7 +186,10 @@ public class NodeTaskWrapper implements Runnable {
       Thread.currentThread().setContextClassLoader(taskClassLoader);
       TaskThreadLocals.setRequestUuid(task.getJob().getUuid());
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
-      if (!isCancelledOrTimedout()) task.run();
+      if (!isCancelledOrTimedout()) {
+        if (traceEnabled) log.trace("starting task id={}", task.getId());
+        task.run();
+      }
     } catch(final Throwable t) {
       task.setThrowable(t);
       if (t instanceof UnsatisfiedLinkError) task.setResult(ExceptionUtils.getStackTrace(t));
@@ -214,7 +216,7 @@ public class NodeTaskWrapper implements Runnable {
 
   /**
    * Get the task this wrapper executes within a try/catch block.
-   * @return the task as a <code>JPPFTask</code> instance.
+   * @return the task as a {@code Task} instance.
    */
   public Task<?> getTask() {
     return task;
@@ -222,7 +224,7 @@ public class NodeTaskWrapper implements Runnable {
 
   /**
    * Silently call onTimeout() methods;
-   * @return <code>true</code> when task timeout.
+   * @return {@code true} when task timeout.
    */
   private boolean silentTimeout() {
     if (timeout) task.onTimeout();
@@ -231,7 +233,7 @@ public class NodeTaskWrapper implements Runnable {
 
   /**
    * Silently call onCancel() methods;
-   * @return <code>true</code> when task was cancelled.
+   * @return {@code true} when task was cancelled.
    */
   private boolean silentCancel() {
     if (cancelled && callOnCancel) task.onCancel();
@@ -240,7 +242,7 @@ public class NodeTaskWrapper implements Runnable {
 
   /**
    * Determine whether this task was cancelled or timed out.
-   * @return <code>true</code> if the task was cancelled or timed out, <code>false</code> otherwise.
+   * @return {@code true} if the task was cancelled or timed out, {@code false} otherwise.
    */
   private boolean isCancelledOrTimedout() {
     return cancelled || timeout;
@@ -327,5 +329,12 @@ public class NodeTaskWrapper implements Runnable {
    */
   public void taskEnded() {
     if (ended.compareAndSet(false, true)) jobEntry.executionManager.taskEnded(this);
+  }
+
+  /**
+   * @return whether the task has started.
+   */
+  public boolean hasStarted() {
+    return started;
   }
 }
