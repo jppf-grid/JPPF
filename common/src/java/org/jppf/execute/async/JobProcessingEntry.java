@@ -30,11 +30,7 @@ import org.jppf.node.protocol.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JobProcessingEntry {
-  /**
-   * The bundle whose tasks are currently being executed.
-   */
-  public TaskBundle bundle;
+public class JobProcessingEntry extends JobPendingEntry {
   /**
    * The list of tasks to execute.
    */
@@ -47,10 +43,6 @@ public class JobProcessingEntry {
    * Holds the tasks submitted to the executor.
    */
   public List<NodeTaskWrapper> taskWrapperList;
-  /**
-   * Determines whether the current job has been cancelled.
-   */
-  public AtomicBoolean jobCancelled = new AtomicBoolean(false);
   /**
    * The class loader used to load the tasks and the classes they need from the client.
    */

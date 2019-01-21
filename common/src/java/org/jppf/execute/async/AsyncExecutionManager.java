@@ -135,4 +135,10 @@ public interface AsyncExecutionManager {
    * @param taskWrapper the task that finished its execution.
    */
   void taskEnded(NodeTaskWrapper taskWrapper);
+
+  /**
+   * Called when a task bundle s being received by the node, and before it is submitted to this execution manager.
+   * @param bundle the bundle to process.
+   */
+  void addPendignJobEntry(TaskBundle bundle);
 }

@@ -166,7 +166,7 @@ public class AsyncNodeContext extends BaseNodeContext {
     message.addLocation(IOHelper.serializeData(taskBundle, server.getDriver().getSerializer()));
     message.addLocation(bundle.getDataProvider());
     for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getInitialTask());
-    message.setBundle(bundle.getJob());
+    message.setBundle(taskBundle);
     return message;
   }
 

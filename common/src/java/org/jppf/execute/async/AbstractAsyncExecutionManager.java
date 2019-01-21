@@ -83,6 +83,14 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
    * List of listeners to this execution manager.
    */
   protected final List<ExecutionManagerListener> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * Map of the bundles being read from the server and not yet submitted to this execution manager.
+   */
+  protected final Map<String, JobPendingEntry> pendingEntries = new HashMap<>();
+  /**
+   * Mapping of job uuids to the ids of the pending bundles for each job.
+   */
+  protected final CollectionMap<String, Long> pendingBundleIds = new ArrayListHashMap<>();
 
   /**
    * Initialize this execution manager with the specified node.
@@ -100,8 +108,14 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
     if (debugEnabled) log.debug("executing {} tasks of bundle {}", taskList.size(), bundle);
     final JobProcessingEntry jobEntry = setup(bundle, taskList);
     jobEntry.executionManager = this;
+    final String bundleKey = bundle.getUuid() + bundle.getBundleId();
     synchronized(jobEntries) {
-      jobEntries.put(bundle.getUuid() + bundle.getBundleId(), jobEntry);
+      final JobPendingEntry pendingEntry = pendingEntries.remove(bundleKey);
+      if (pendingEntry != null) {
+        pendingBundleIds.removeValue(bundle.getUuid(), bundle.getBundleId());
+        jobEntry.jobCancelled.set(pendingEntry.jobCancelled.get());
+      }
+      jobEntries.put(bundleKey, jobEntry);
       jobBundleIds.putValue(bundle.getUuid(), bundle.getBundleId());
     }
     if (!jobEntry.jobCancelled.get()) {
@@ -124,6 +138,9 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
           jobEnded(jobEntry);
         }
       }
+    } else {
+      if (debugEnabled) log.debug("bundle was cancelled before its execution started, ending job {}", bundle);
+      jobEnded(jobEntry);
     }
   }
 
@@ -151,6 +168,17 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
   public void cancelJob(final String jobUuid, final boolean callOnCancel, final boolean requeue) {
     if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel={}, requeue={}, jobUuid={}", callOnCancel, requeue, jobUuid);
     synchronized(jobEntries) {
+      final Collection<Long> pendingIds = pendingBundleIds.getValues(jobUuid);
+      if (pendingIds != null) {
+        final List<Long> pendingIdList = new ArrayList<>(pendingIds);
+        for (final long bundleId: pendingIdList) {
+          final JobPendingEntry pendingEntry = pendingEntries.get(jobUuid + bundleId);
+          if (pendingEntry != null) {
+            if (debugEnabled) log.debug("setting cancelled status on pending entry with jobUuid={}, bundleId={}", jobUuid, bundleId);
+            pendingEntry.jobCancelled.set(true);
+          }
+        }
+      }
       final Collection<Long> bundleIds = jobBundleIds.getValues(jobUuid);
       if (debugEnabled) log.debug("cancelling {} bundles for jobUuid={}", (bundleIds == null) ? 0: bundleIds.size(), jobUuid);
       if (bundleIds == null) return;
@@ -347,6 +375,17 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
     if (debugEnabled) log.debug("sending notification to listeners for completion of {} tasks of job {}", tasks.size(), bundle);
     for (final ExecutionManagerListener listener: listeners) {
       if (listener != null) listener.bundleExecuted(bundle, tasks, t);
+    }
+  }
+
+  @Override
+  public void addPendignJobEntry(final TaskBundle bundle) {
+    if (debugEnabled) log.debug("adding pending entry for {}", bundle);
+    synchronized(jobEntries) {
+      final JobPendingEntry entry = new JobPendingEntry();
+      entry.bundle = bundle;
+      pendingEntries.put(bundle.getUuid() + bundle.getBundleId(), entry);
+      pendingBundleIds.putValue(bundle.getUuid(), bundle.getBundleId());
     }
   }
 }

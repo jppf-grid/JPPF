@@ -65,6 +65,7 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
     Object[] result = null;
     final TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ser);
+    node.getExecutionManager().addPendignJobEntry(bundle);
     node.setExecuting(true);
     if (debugEnabled) log.debug("got bundle " + bundle);
     result = deserializeObjects(bundle);
