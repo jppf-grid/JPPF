@@ -33,10 +33,6 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The maximum number of nodes this job can run on.
-   */
-  private int maxNodes = Integer.MAX_VALUE;
-  /**
    * The maximum number of groups of master/slave nodes the job can be executed on at any given time.
    * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
    */
@@ -108,6 +104,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * @exclude
    */
   public JobSLA() {
+    maxChannels = Integer.MAX_VALUE;
   }
 
   /**
@@ -133,7 +130,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * @return the number of nodes as an int value.
    */
   public int getMaxNodes() {
-    return maxNodes;
+    return maxChannels;
   }
 
   /**
@@ -142,7 +139,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
    * @return this SLA, for method call chaining.
    */
   public JobSLA setMaxNodes(final int maxNodes) {
-    this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
+    this.maxChannels = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
     return this;
   }
 
@@ -435,7 +432,7 @@ public class JobSLA extends JobCommonSLA<JobSLA> {
     sla.setGridExecutionPolicy(gridExecutionPolicy);
     sla.setMaxDispatchExpirations(maxDispatchExpirations);
     sla.setMaxNodeProvisioningGroups(maxNodeProvisioningGroups);
-    sla.setMaxNodes(maxNodes);
+    sla.setMaxNodes(maxChannels);
     sla.setMaxTaskResubmits(maxTaskResubmits);
     sla.setPersistenceSpec(persistenceSpec);
     sla.setPriority(priority);

@@ -30,11 +30,15 @@ import org.jppf.scheduling.JPPFSchedule;
  * @author Laurent Cohen
  */
 @SuppressWarnings("unchecked")
-public class JobCommonSLA<T extends JobCommonSLA<?>> implements Serializable {
+public class JobCommonSLA<T extends JobCommonSLA<T>> implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * The maximum number of nodes this job can run on.
+   */
+  int maxChannels;
   /**
    * The tasks execution policy.
    */

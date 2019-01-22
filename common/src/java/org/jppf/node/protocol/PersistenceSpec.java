@@ -33,11 +33,11 @@ public class PersistenceSpec implements Serializable {
   /**
    * Whether the job is persisted in the driver.
    */
-  private boolean persistent = false;
+  private boolean persistent;
   /**
    * Whether the driver should automatically execute the job after a restart.
    */
-  private boolean autoExecuteOnRestart = false;
+  private boolean autoExecuteOnRestart;
   /**
    * Whether the persisteed job should be deleted from the persistence store when it terminates.
    */

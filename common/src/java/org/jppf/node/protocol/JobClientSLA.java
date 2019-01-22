@@ -28,17 +28,13 @@ public class JobClientSLA extends JobCommonSLA<JobClientSLA> {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The maximum number of nodes this job can run on.
-   * The default value is set to <code>1</code> to preserve backward compatibility, by emulating the behavior of previous versions.
-   */
-  private int maxChannels = 1;
 
   /**
    * Default constructor.
    * @exclude
    */
   public JobClientSLA() {
+    maxChannels = 1;
   }
 
   /**
