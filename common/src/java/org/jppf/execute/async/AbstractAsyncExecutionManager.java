@@ -118,8 +118,8 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
       jobEntries.put(bundleKey, jobEntry);
       jobBundleIds.putValue(bundle.getUuid(), bundle.getBundleId());
     }
-    if (!jobEntry.jobCancelled.get()) {
-      synchronized(jobEntry.taskWrapperList) {
+    synchronized(jobEntry) {
+      if (!jobEntry.jobCancelled.get()) {
         if (debugEnabled) log.debug("wrapping up to {} executable tasks of bundle {}", taskList.size(), bundle);
         for (final Task<?> task : taskList) {
           if (!(task instanceof JPPFExceptionResult)) {
@@ -137,30 +137,21 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
           if (debugEnabled) log.debug("there are no tasks to execute in bundle {}, ending job", bundle);
           jobEnded(jobEntry);
         }
+      } else {
+        if (debugEnabled) log.debug("bundle was cancelled before its execution started, ending job {}", bundle);
+        jobEnded(jobEntry);
       }
-    } else {
-      if (debugEnabled) log.debug("bundle was cancelled before its execution started, ending job {}", bundle);
-      jobEnded(jobEntry);
     }
   }
 
   @Override
   public void cancelAllTasks(final boolean callOnCancel, final boolean requeue) {
     if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel={}, requeue={}", callOnCancel, requeue);
+    final Set<String> uuids = new HashSet<>();
     synchronized(jobEntries) {
-      for (final JobProcessingEntry jobEntry: jobEntries.values()) {
-        if (requeue) {
-          synchronized(jobEntry.bundle) {
-            jobEntry.bundle.setRequeue(true);
-            jobEntry.bundle.getSLA().setSuspended(true);
-          }
-        }
-        if (jobEntry.taskWrapperList != null) {
-          synchronized(jobEntry.taskWrapperList) {
-            for (final NodeTaskWrapper ntw: jobEntry.taskWrapperList) cancelTask(ntw, callOnCancel);
-          }
-        }
-      }
+      uuids.addAll(pendingBundleIds.keySet());
+      uuids.addAll(jobBundleIds.keySet());
+      for (final String uuid: uuids) cancelJob(uuid, callOnCancel, requeue);
     }
   }
 
@@ -186,16 +177,14 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
       for (final long bundleId: bundleIdList) {
         final JobProcessingEntry jobEntry = jobEntries.get(jobUuid + bundleId);
         if (jobEntry == null) continue;
-        jobEntry.jobCancelled.set(true);
-        if (debugEnabled) log.debug("cancelling {}", jobEntry.bundle);
-        if (requeue) {
-          synchronized(jobEntry.bundle) {
+        synchronized(jobEntry) {
+          jobEntry.jobCancelled.set(true);
+          if (debugEnabled) log.debug("cancelling {}", jobEntry.bundle);
+          if (requeue) {
             jobEntry.bundle.setRequeue(true);
             jobEntry.bundle.getSLA().setSuspended(true);
           }
-        }
-        if (jobEntry.taskWrapperList != null) {
-          synchronized(jobEntry.taskWrapperList) {
+          if (jobEntry.taskWrapperList != null) {
             for (final NodeTaskWrapper taskWrapper: jobEntry.taskWrapperList) cancelTask(taskWrapper, callOnCancel);
           }
         }
@@ -250,19 +239,22 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
       final TaskBundle bundle;
       final int n, submittedCount;
       final JobProcessingEntry jobEntry = taskWrapper.getJobEntry();
+      // so we can call jobEnded() from outside the synchronized block
+      boolean endJob = false;
       synchronized(jobEntry) {
         bundle = jobEntry.bundle;
         jobEntry.accumulatedElapsed.addAndGet(elapsedTime);
         n = jobEntry.resultCount.incrementAndGet();
         submittedCount = jobEntry.submittedCount;
+        final ExecutionInfo info = taskWrapper.getExecutionInfo();
+        final long cpuTime = (info == null) ? 0L : (info.cpuTime / 1_000_000L);
+        final Task<?> task = taskWrapper.getTask();
+        if (traceEnabled) log.trace("sending task ended notification for {}, bundle={}", taskWrapper, bundle);
+        taskNotificationDispatcher.fireTaskEnded(task, bundle.getUuid(), bundle.getName(), cpuTime, elapsedTime / 1_000_000L, task.getThrowable() != null);
+        if (traceEnabled) log.trace("resultCount={} for {}", n, taskWrapper);
+        if (n >= submittedCount) endJob = true;
       }
-      final ExecutionInfo info = taskWrapper.getExecutionInfo();
-      final long cpuTime = (info == null) ? 0L : (info.cpuTime / 1_000_000L);
-      final Task<?> task = taskWrapper.getTask();
-      if (traceEnabled) log.trace("sending task ended notification for {}, bundle={}", taskWrapper, bundle);
-      taskNotificationDispatcher.fireTaskEnded(task, bundle.getUuid(), bundle.getName(), cpuTime, elapsedTime / 1_000_000L, task.getThrowable() != null);
-      if (traceEnabled) log.trace("resultCount={} for {}", n, taskWrapper);
-      if (n >= submittedCount) jobEnded(jobEntry);
+      if (endJob) jobEnded(jobEntry);
     } catch (final RuntimeException e) {
       log.error("error in taskEnded() for {}", taskWrapper, e);
     }
@@ -273,15 +265,21 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
    * @param jobEntry the job to process.
    */
   private void jobEnded(final JobProcessingEntry jobEntry) {
-    final TaskBundle bundle = jobEntry.bundle;
-    final List<Task<?>> taskList = jobEntry.taskList;
+    TaskBundle bundle = null;
+    List<Task<?>> taskList = null;
+    Throwable t = null;
+    synchronized(jobEntry) {
+      bundle = jobEntry.bundle;
+      taskList = jobEntry.taskList;
+      t = jobEntry.t;
+      cleanup(jobEntry);
+    }
     if (debugEnabled) log.debug("processing completion of {} tasks of job {}", taskList.size(), bundle);
     synchronized(jobEntries) {
       jobEntries.remove(bundle.getUuid() + bundle.getBundleId());
       jobBundleIds.removeValue(bundle.getUuid(), bundle.getBundleId());
     }
-    cleanup(jobEntry);
-    fireJobFinished(bundle, taskList, jobEntry.t);
+    fireJobFinished(bundle, taskList, t);
   }
 
   @Override
@@ -341,18 +339,15 @@ public abstract class AbstractAsyncExecutionManager implements AsyncExecutionMan
   }
 
   @Override
-  public List<TaskBundle> getBundles(final String jobUuid) {
-    final List<TaskBundle> result = new ArrayList<>();
+  public int getNbBundles(final String jobUuid) {
+    int n = 0;
     synchronized(jobEntries) {
-      final Collection<Long> bundleIds = jobBundleIds.getValues(jobUuid);
-      if (bundleIds != null) {
-        for (final Long id: bundleIds) {
-          final JobProcessingEntry jobEntry = jobEntries.get(jobUuid + id);
-          if (jobEntry != null) result.add(jobEntry.bundle);
-        }
-      }
+      Collection<Long> bundleIds = jobBundleIds.getValues(jobUuid);
+      if (bundleIds != null) n += bundleIds.size();
+      bundleIds = pendingBundleIds.getValues(jobUuid);
+      if (bundleIds != null) n += bundleIds.size();
     }
-    return result;
+    return n;
   }
 
   @Override

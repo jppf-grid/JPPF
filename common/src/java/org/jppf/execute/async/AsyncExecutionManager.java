@@ -112,11 +112,11 @@ public interface AsyncExecutionManager {
   void triggerConfigChanged();
 
   /**
-   * Get a list of bundle with the specified job uuid currently being processed.
-   * @param jobUuid the uuid of the job for which to retrieve the bundles.
-   * @return a list of {@link TaskBundle} instances, possibly empty but never null.
+   * Get the number of bundles with the specified job uuid that are pending or being processed.
+   * @param jobUuid the uuid of the job for which to count the bundles.
+   * @return number of bundles.
    */
-  List<TaskBundle> getBundles(final String jobUuid);
+  int getNbBundles(final String jobUuid);
 
   /**
    * Register a listener with this execution manager.
