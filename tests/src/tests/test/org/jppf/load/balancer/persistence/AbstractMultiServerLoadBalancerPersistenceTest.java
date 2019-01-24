@@ -194,7 +194,7 @@ public abstract class AbstractMultiServerLoadBalancerPersistenceTest extends Abs
         final List<String> channels = mgt.listAllChannelsWithAlgorithm(algos[i]);
         assertNotNull(channels);
         if (i == 0) {
-          assertCompare(Operator.AT_LEAST, 3, channels.size());
+          assertCompare(Operator.AT_LEAST, 2, channels.size());
         } else {
           assertCompare(Operator.MORE_THAN, 0, channels.size());
           uuidToChannelID.put(i, channels.get(0));
