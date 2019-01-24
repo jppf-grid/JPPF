@@ -281,6 +281,7 @@ public class JPPFConnectionPool extends AbstractClientConnectionPool implements 
       .append(", driverPort=").append(driverPort)
       .append(", sslEnabled=").append(sslEnabled)
       .append(", heartbeatEnabled=").append(heartbeatEnabled)
+      .append(", maxJobs=").append(maxJobs)
       .append(']').toString();
   }
 }

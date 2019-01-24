@@ -401,9 +401,20 @@ public abstract class AbstractClientJob {
    * Get the number of channels this job is dispatched to.
    * @return the number of dispatches of this job to the channel.
    */
-  final int getChannelCount() {
+  int getChannelCount() {
     synchronized(channelCounts) {
       return channelCounts.size();
+    }
+  }
+
+  /**
+   * Check whether the job is already dispatched to the specfied channel.
+   * @param uuid the uuid of the channel to check.
+   * @return {@code true} f this job is already dispatched to the channel, {@code false} otherwise.
+   */
+  boolean hasChannel(final String uuid) {
+    synchronized(channelCounts) {
+      return channelCounts.containsKey(uuid);
     }
   }
 
@@ -415,9 +426,11 @@ public abstract class AbstractClientJob {
    * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
    */
   public boolean acceptsChannel(final ExecutorChannel<?> channel) {
-    if (traceEnabled) log.trace(String.format("job '%s' : cancelled=%b, cancelling=%b, pending=%b, expired=%b, nb channels=%d, max channels=%d",
-      job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), dispatchCount.get(), clientSla.getMaxChannels()));
-    if (isCancelling() || isCancelled() || isPending() || isJobExpired() || (dispatchCount.get() >= clientSla.getMaxChannels())) return false;
+    final int channelCount = getChannelCount();
+    if (traceEnabled) log.trace(String.format("job '%s' : cancelled=%b, cancelling=%b, pending=%b, expired=%b, nb dispatches=%d, nb channels=%d, max channels=%d",
+      job.getName(), isCancelled(), isCancelling(), isPending(), isJobExpired(), dispatchCount.get(), channelCount, clientSla.getMaxChannels()));
+    if (isCancelling() || isCancelled() || isPending() || isJobExpired()) return false;
+    if (!hasChannel(channel.getUuid()) && (channelCount >= clientSla.getMaxChannels())) return false;
     if (!clientSla.isAllowMultipleDispatchesToSameChannel()) {
       final int n = getChannelDispatchCount(channel.getUuid());
       if (n > 0) return false;

@@ -23,12 +23,15 @@ import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -56,7 +59,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   /**
    * The JPPF client to use.
    */
-  private JPPFClient jppfClient = null;
+  private JPPFClient jppfClient;
 
   /**
    * Simply test that a job does expires at a specified date.
@@ -300,6 +303,84 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   }
 
   /**
+   * Test that the size of a client-side dispatch does not exceed the maximum specified in the SLA.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=8000)
+  public void testMaxDispatchSizeClient() throws Exception {
+    try {
+      configure(true, true, 1);
+      jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      final int nbTasks = 100, maxDispatchSize = 6;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
+      job.getClientSLA().setMaxDispatchSize(maxDispatchSize);
+      final DispatchCounterJobListener listener = new DispatchCounterJobListener();
+      job.addJobListener(listener);
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      assertCompare(Operator.AT_MOST, maxDispatchSize, listener.maxDispatchSize);
+    } finally {
+      reset();
+    }
+  }
+
+  /**
+   * Test that a job with {@code allowMultipleDispatchesToSameChannel = true} is dispatched concurrently to the same channel.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=8000)
+  public void testAllowMultipleDispatchesToSameChannelClient() throws Exception {
+    try {
+      configure(true, false, 1);
+      jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+      pool.setMaxJobs(100);
+      print(false, false, "got pool %s", pool);
+      final int nbTasks = 50;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+      job.getClientSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(true);
+      final DispatchCounterJobListener listener = new DispatchCounterJobListener();
+      job.addJobListener(listener);
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      assertTrue(listener.multipleConcurrentDispatches);
+    } finally {
+      reset();
+    }
+  }
+
+  /**
+   * Test that a job with {@code allowMultipleDispatchesToSameChannel = false} isn't dispatched concurrently to the same channel.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=8000)
+  public void testPreventMultipleDispatchesToSameChannelClient() throws Exception {
+    try {
+      configure(true, false, 1);
+      jppfClient.setLoadBalancerSettings("manual", new TypedProperties().setInt("size", 15));
+      BaseSetup.checkDriverAndNodesInitialized(jppfClient, 1, 1);
+      final JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+      pool.setMaxJobs(100);
+      print(false, false, "got pool %s", pool);
+      final int nbTasks = 50;
+      final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+      job.getClientSLA().setMaxDispatchSize(6).setAllowMultipleDispatchesToSameChannel(false);
+      final DispatchCounterJobListener listener = new DispatchCounterJobListener();
+      job.addJobListener(listener);
+      final List<Task<?>> results = jppfClient.submitJob(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      assertFalse(listener.multipleConcurrentDispatches);
+    } finally {
+      reset();
+    }
+  }
+
+  /**
    * Configure the client.
    * @param remoteEnabled specifies whether remote execution is enabled.
    * @param localEnabled specifies whether local execution is enabled.
@@ -327,5 +408,57 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       jppfClient = null;
     }
     JPPFConfiguration.reset();
+  }
+
+  /**
+   * 
+   */
+  static class DispatchCounterJobListener extends JobListenerAdapter {
+    /**
+     * Dispatch counter.
+     */
+    final AtomicInteger dispatchCount = new AtomicInteger(0);
+    /**
+     * A multimap holding the positions of the tasks for each dispatch.
+     */
+    final CollectionMap<Integer, Integer> dispatchToPositions = new ArrayListHashMap<>();
+    /**
+     * 
+     */
+    final Map<Integer, Integer> positionsToDispatch = new HashMap<>();
+    /**
+     * 
+     */
+    boolean multipleConcurrentDispatches;
+    /**
+     * Holds the size of the largest dispatch for the job.
+     */
+    int maxDispatchSize;
+
+    @Override
+    public synchronized void jobDispatched(final JobEvent event) {
+      final int n = event.getJobTasks().size();
+      if  (n > maxDispatchSize) maxDispatchSize = n;
+      final int dispatchNumber = dispatchCount.incrementAndGet();
+      final List<Task<?>> tasks = event.getJobTasks();
+      for (final Task<?> task: tasks) {
+        dispatchToPositions.putValue(dispatchNumber, task.getPosition());
+        positionsToDispatch.put(task.getPosition(), dispatchNumber);
+      }
+      print(false, false, "job '%s' dispatch #%03d with %d tasks ==> got %d dispatches", event.getJob().getName(), dispatchNumber, tasks.size(), dispatchToPositions.keySet().size());
+      if (dispatchToPositions.keySet().size() > 1) multipleConcurrentDispatches = true;
+    }
+
+    @Override
+    public synchronized void jobReturned(final JobEvent event) {
+      int dispatchNumber = -1;
+      final List<Task<?>> tasks = event.getJobTasks();
+      for (final Task<?> task: tasks) {
+        if (dispatchNumber <= 0) dispatchNumber = positionsToDispatch.get(task.getPosition());
+        dispatchToPositions.removeValue(dispatchNumber, task.getPosition());
+        positionsToDispatch.remove(task.getPosition());
+      }
+      print(false, false, "job '%s' dispatch #%03d returned %d tasks ==> got %d dispatches", event.getJob().getName(), dispatchNumber, tasks.size(), dispatchToPositions.keySet().size());
+    }
   }
 }

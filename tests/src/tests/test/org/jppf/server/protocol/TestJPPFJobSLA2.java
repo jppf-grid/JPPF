@@ -31,7 +31,7 @@ import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.test.addons.mbeans.*;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -55,9 +55,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
     final JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     final LoadBalancingInformation lbInfo = jmx.loadBalancerInformation();
     try {
-      final Map<Object, Object> map = new HashMap<>();
-      map.put("size", "1");
-      jmx.changeLoadBalancerSettings("manual", map);
+      jmx.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
       final NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       final JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
