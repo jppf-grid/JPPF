@@ -202,9 +202,12 @@ public class AsyncClientContext extends StatelessNioContext {
     final List<String> entriesToRemove = new ArrayList<>(entryMap.size());
     entryMap.forEach((id, entry) -> {
       cancelJobOnClose(entry);
-      if (entry.getInitialBundleWrapper().getSLA().isCancelUponClientDisconnect()) {
-        entriesToRemove.add(id);
-        entry.initialBundleWrapper = null;
+      if (entry != null) {
+        final ServerTaskBundleClient bundle = entry.getInitialBundleWrapper();
+        if ((bundle != null) && (bundle.getSLA().isCancelUponClientDisconnect())) {
+          entriesToRemove.add(id);
+          entry.initialBundleWrapper = null;
+        }
       }
     });
     entriesToRemove.forEach(id -> entryMap.remove(id));
