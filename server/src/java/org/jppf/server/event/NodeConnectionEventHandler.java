@@ -19,7 +19,6 @@
 package org.jppf.server.event;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.management.*;
@@ -32,7 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeConnectionEventHandler {
+public class NodeConnectionEventHandler extends ServiceProviderHandler<NodeConnectionListener> {
   /**
    * Logger for this class.
    */
@@ -41,10 +40,6 @@ public class NodeConnectionEventHandler {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * The list of node connection listeners.
-   */
-  private final List<NodeConnectionListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * Keeps track of the number of connected nodes.
    */
@@ -57,23 +52,12 @@ public class NodeConnectionEventHandler {
    * Keeps track of the number of connected real (not peer) nodes.
    */
   private final AtomicInteger connectedRealNodes = new AtomicInteger(0);
-
+  
   /**
-   * Add a listener to the list of listeners.
-   * @param listener a {@link NodeConnectionListener} instance.
+   * Default constructor.
    */
-  public void addNodeConnectionListener(final NodeConnectionListener listener) {
-    if (listener == null) return;
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove a listener from the list of listeners.
-   * @param listener a {@link NodeConnectionListener} instance.
-   */
-  public void removeNodeConnectionListener(final NodeConnectionListener listener) {
-    if (listener == null) return;
-    listeners.remove(listener);
+  public NodeConnectionEventHandler() {
+    super(NodeConnectionListener.class);
   }
 
   /**
@@ -85,7 +69,7 @@ public class NodeConnectionEventHandler {
     if (info.isPeer()) connectedPeers.incrementAndGet();
     else connectedRealNodes.incrementAndGet();
     final NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (final NodeConnectionListener listener : listeners) listener.nodeConnected(event);
+    for (final NodeConnectionListener listener : providers) listener.nodeConnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
   }
 
@@ -98,7 +82,7 @@ public class NodeConnectionEventHandler {
     if (info.isPeer()) connectedPeers.decrementAndGet();
     else connectedRealNodes.decrementAndGet();
     final NodeConnectionEvent event = new NodeConnectionEvent(info);
-    for (final NodeConnectionListener listener : listeners) listener.nodeDisconnected(event);
+    for (final NodeConnectionListener listener : providers) listener.nodeDisconnected(event);
     JPPFNodeConnectionNotifier.getInstance().onNodeDisconnected(info);
   }
 
@@ -114,7 +98,7 @@ public class NodeConnectionEventHandler {
       list.add(listener);
       if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
     }
-    listeners.addAll(list);
+    providers.addAll(list);
   }
 
   /**

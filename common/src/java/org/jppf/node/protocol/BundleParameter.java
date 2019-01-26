@@ -155,5 +155,13 @@ public enum BundleParameter {
   /**
    * Id of the client-side bundle.
    */
-  CLIENT_BUNDLE_ID
+  CLIENT_BUNDLE_ID,
+  /**
+   * Type of notification emitted by a node.
+   */
+  NODE_NOTIFICATION_TYPE,
+  /**
+   * Whether a node accepts new jobs.
+   */
+  NODE_ACCEPTS_NEW_JOBS
 }

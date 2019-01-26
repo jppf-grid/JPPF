@@ -195,7 +195,7 @@ public class NodeRunner {
           if ((node == null) || node.getShuttingDown().get() || embeddedShutdown.get()) break;
         }
       }
-    } catch(final Exception e) {
+    } catch(final Throwable e) {
       log.error("error preventing node from running", e);
       e.printStackTrace();
     }
@@ -216,8 +216,10 @@ public class NodeRunner {
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     final String className = configuration.get(JPPFProperties.NODE_CLASS);
     final AbstractJPPFClassLoader loader = getJPPFClassLoader();
+    if (debugEnabled) log.debug("got node class loader {}", loader);
     final Class<?> clazz = loader.loadClass(className);
     final Constructor<?> c = clazz.getConstructor(String.class, TypedProperties.class, DriverConnectionInfo.class);
+    if (debugEnabled) log.debug("instantiating {}", className);
     final JPPFNode node = (JPPFNode) c.newInstance(uuid, configuration, currentConnectionInfo);
     node.setJPPFClassLoader(loader);
     node.setStartedFromMain(startedFromMain);

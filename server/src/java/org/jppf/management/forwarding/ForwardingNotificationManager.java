@@ -89,7 +89,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     this.forwarder = forwarder;
     this.selectionHelper = forwarder.getSelectionHelper();
     this.driver = forwarder.driver;
-    driver.getInitializer().getNodeConnectionEventHandler().addNodeConnectionListener(this);
+    driver.getInitializer().getNodeConnectionEventHandler().addProvider(this);
   }
 
   /**

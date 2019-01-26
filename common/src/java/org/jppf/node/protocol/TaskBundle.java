@@ -178,4 +178,11 @@ public interface TaskBundle extends JPPFDistributedJob, Metadata {
   default void setBundleId(Long id) {
     setParameter(BundleParameter.TASK_BUNDLE_ID, id);
   }
+
+  /**
+   * @return whether this is a notification bundle.
+   */
+  default boolean isNotification() {
+    return false;
+  }
 }

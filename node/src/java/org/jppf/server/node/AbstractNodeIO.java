@@ -154,7 +154,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    * @since 4.2
    */
   protected void postSendResults(final TaskBundle bundle) throws Exception {
-    if (!node.isOffline()) {
+    if (!node.isOffline() && !bundle.isNotification()) {
       if (debugEnabled) log.debug("resetting remoteClassLoadingDisabled to false");
       final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
       cont.getClassLoader().setRemoteClassLoadingDisabled(false);
@@ -175,6 +175,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
    * @param tasks the list of tasks after they have been executed.
    */
   protected void finalizeBundleData(final TaskBundle bundle, final List<Task<?>> tasks) {
+    if (bundle.isNotification()) return;
     final long elapsed = System.nanoTime() - bundle.getNodeExecutionTime();
     bundle.setNodeExecutionTime(elapsed);
     final Set<Integer> resubmitSet = new HashSet<>();

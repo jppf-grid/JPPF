@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver.async;
 import static org.jppf.node.protocol.BundleParameter.NODE_OFFLINE_OPEN_REQUEST;
 
 import org.jppf.nio.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.slf4j.*;
 
@@ -67,6 +67,8 @@ public class AsyncNodeMessageReader extends NioMessageReader<AsyncNodeContext> {
     if (debugEnabled) log.debug("read bundle {} from node {}", header, context);
     if (header.isHandshake() || header.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) {
       handler.handshakeReceived(context, msg);
+    } else if (header.isNotification()) {
+      handler.notificationReceived(context, (NotificationBundle) header);
     } else {
       handler.resultsReceived(context, msg);
     }

@@ -411,7 +411,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   void reset(final boolean stopJmx) {
     if (debugEnabled) log.debug("resetting with stopJmx=" + stopJmx);
     lifeCycleEventHandler.fireNodeEnding();
-    lifeCycleEventHandler.removeAllListeners();
+    lifeCycleEventHandler.removeAllProviders();
     setNodeAdmin(null);
     if (stopJmx) {
       try {

@@ -20,12 +20,12 @@ package org.jppf.node.event;
 
 import static org.jppf.node.event.NodeLifeCycleEventType.*;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -34,23 +34,15 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class LifeCycleEventHandler {
+public class LifeCycleEventHandler extends ServiceProviderHandler<NodeLifeCycleListener> {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(LifeCycleEventHandler.class);
   /**
-   * Determines whether debug-level logging is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The default node life cycle error handler, used when the life cycle listener implementation does not implement {@link NodeLifeCycleErrorHandler}.
    */
   private static final NodeLifeCycleErrorHandler DEFAULT_ERROR_HANDLER = new DefaultLifeCycleErrorHandler();
-  /**
-   * The list of listeners to this object's events.
-   */
-  private final List<NodeLifeCycleListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * The object that manages the job executions for the node.
@@ -62,32 +54,8 @@ public class LifeCycleEventHandler {
    * @param node an object representing the JPPF node.
    */
   public LifeCycleEventHandler(final Node node) {
+    super(NodeLifeCycleListener.class, ((JPPFNode) node).getClassLoader());
     this.node = node;
-  }
-
-  /**
-   * Add a listener to the list of listeners.
-   * @param listener the listener to add.
-   */
-  public void addNodeLifeCycleListener(final NodeLifeCycleListener listener) {
-    if (listener == null) return;
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove a listener from the list of listeners.
-   * @param listener the listener to remove.
-   */
-  public void removeNodeLifeCycleListener(final NodeLifeCycleListener listener) {
-    if (listener == null) return;
-    listeners.remove(listener);
-  }
-
-  /**
-   * Remove all listeners from the list of listeners.
-   */
-  public void removeAllListeners() {
-    listeners.clear();
   }
 
   /**
@@ -95,7 +63,7 @@ public class LifeCycleEventHandler {
    */
   public void fireNodeStarting() {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_STARTING);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.nodeStarting(event);
       } catch(final Throwable t) {
@@ -109,7 +77,7 @@ public class LifeCycleEventHandler {
    */
   public void fireNodeEnding() {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_ENDING);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.nodeEnding(event);
       } catch(final Throwable t) {
@@ -125,7 +93,7 @@ public class LifeCycleEventHandler {
    */
   public void fireJobHeaderLoaded(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl) {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_HEADER_LOADED, job, cl);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.jobHeaderLoaded(event);
       } catch(final Throwable t) {
@@ -143,7 +111,7 @@ public class LifeCycleEventHandler {
    */
   public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider) {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_STARTING, job, cl, tasks, dataProvider);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.jobStarting(event);
       } catch(final Throwable t) {
@@ -161,7 +129,7 @@ public class LifeCycleEventHandler {
    */
   public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider) {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_ENDING, job, cl, tasks, dataProvider);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.jobEnding(event);
       } catch(final Throwable t) {
@@ -175,27 +143,11 @@ public class LifeCycleEventHandler {
    */
   public void fireBeforeNextJob() {
     final NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, BEFORE_NEXT_JOB, null, null, null, null);
-    for (final NodeLifeCycleListener listener : listeners) {
+    for (final NodeLifeCycleListener listener : providers) {
       try {
         listener.beforeNextJob(event);
       } catch(final Throwable t) {
         handleError(listener, event, t);
-      }
-    }
-  }
-
-  /**
-   * Load all listener instances found in the class path via a service definition.
-   */
-  public void loadListeners() {
-    final Iterator<NodeLifeCycleListener> it = ServiceFinder.lookupProviders(NodeLifeCycleListener.class);
-    while (it.hasNext()) {
-      try {
-        final NodeLifeCycleListener listener = it.next();
-        addNodeLifeCycleListener(listener);
-        if (debugEnabled) log.debug("successfully added node life cycle listener " + listener.getClass().getName());
-      } catch(final Error e) {
-        log.error(e.getMessage(), e);
       }
     }
   }

@@ -19,7 +19,6 @@ package org.jppf.server.node;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -30,6 +29,7 @@ import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.SlaveNodeManager;
+import org.jppf.node.throttling.NodeThrottlingHandler;
 import org.jppf.persistence.JPPFDatasourceFactory;
 import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
@@ -52,10 +52,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Bundle set in the JobReader or JobWriter queue when an exception occurs.
-   */
-  private static final Pair<TaskBundle, List<Task<?>>> EXCEPTIONAL_BUNDLE = new Pair<>(null, null);
-  /**
    * The bundle currently processed in offline mode.
    */
   private Pair<TaskBundle, List<Task<?>>> currentBundle;
@@ -68,21 +64,29 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private final NodeConfigNotifier configNotifier = new NodeConfigNotifier();
   /**
-   * 
+   * Asynchronously receives new jobs.
    */
-  private final JobReader jobReader = new JobReader();
+  private JobReader jobReader;
   /**
-   * 
+   * Asynchronously sends job results and notification bundles.
    */
-  private final JobWriter jobWriter = new JobWriter();
+  private JobWriter jobWriter;
   /**
-   * 
+   * Whether the execution of the current is complete (offline node only).
    */
   private boolean executionComplete;
   /**
-   * 
+   * Synchronizes read and write of the current job and its results.
    */
   private final ThreadSynchronization offlineLock = new ThreadSynchronization();
+  /**
+   * 
+   */
+  NodeThrottlingHandler throttlingHandler;
+  /**
+   * The uuid path of the handshake bundle.
+   */
+  private List<String> handshakeUuidPath;
 
   /**
    * Default constructor.
@@ -91,11 +95,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public JPPFNode(final String uuid, final TypedProperties configuration) {
     super(uuid, configuration);
-    if (debugEnabled) log.debug("creating node with config=\n{}", configuration);
+    if (debugEnabled) log.debug("creating execution manager");
     executionManager = new AsyncNodeExecutionManager(this);
     executionManager.addExecutionManagerListener(this);
-    lifeCycleEventHandler = new LifeCycleEventHandler(this);
+    if (debugEnabled) log.debug("updating system information");
     updateSystemInformation();
+    if (debugEnabled) log.debug("creating slave nodes manager");
     slaveManager = new SlaveNodeManager(this);
   }
 
@@ -212,7 +217,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       executionManager.execute(bundle, taskList);
     } else {
       checkInitialBundle(bundle);
-      jobWriter.putJob(bundle, taskList);
+      getJobWriter().putJob(bundle, taskList);
       if (isMasterNode()) slaveManager.handleStartup();
     }
   }
@@ -227,6 +232,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     checkStopped();
     if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + (currentBundle == null ? ", bundle=" + bundle : ", currentBundle=" + currentBundle.first()));
     bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+    handshakeUuidPath = bundle.getUuidPath().getList();
     if (isOffline()) {
       bundle.setParameter(BundleParameter.NODE_OFFLINE, true);
       if (isSuspended()) bundle.setParameter(BundleParameter.CLOSE_COMMAND, true);
@@ -251,7 +257,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param taskList the tasks results.
    * @throws Exception if any error occurs.
    */
-  private void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
+  void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     checkStopped();
     currentBundle = null;
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
@@ -266,7 +272,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if ((taskList != null) && (!taskList.isEmpty())) {
       if (!isJmxEnabled()) setExecutedTaskCount(getExecutedTaskCount() + taskList.size());
     }
-    if (!bundle.isHandshake()) lifeCycleEventHandler.fireBeforeNextJob();
+    if (!bundle.isHandshake() && !bundle.isNotification()) lifeCycleEventHandler.fireBeforeNextJob();
   }
 
   /**
@@ -278,6 +284,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     checkStopped();
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
+    if (debugEnabled) log.debug("creating LifeCycleEventHandler");
+    try {
+      lifeCycleEventHandler = new LifeCycleEventHandler(this);
+    } catch (final Throwable e) {
+      log.error(e.getMessage(), e);
+    }
     try {
       if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) {
         final ClassLoader cl = getClass().getClassLoader();
@@ -302,12 +314,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     }
     initStartups();
     initDataChannel();
-    lifeCycleEventHandler.loadListeners();
+    lifeCycleEventHandler.loadProviders();
     lifeCycleEventHandler.fireNodeStarting();
     if (!isOffline()) {
-      ThreadUtils.startDaemonThread(jobReader, "JobReader");
-      ThreadUtils.startDaemonThread(jobWriter, "JobWriter");
+      ThreadUtils.startDaemonThread(jobReader = new JobReader(this), "JobReader");
+      ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
     }
+    throttlingHandler = new NodeThrottlingHandler(this).start();
     if (debugEnabled) log.debug("end node initialization");
   }
 
@@ -372,99 +385,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         executionComplete = true;
         offlineLock.wakeUp();
       } else {
-        jobWriter.putJob(bundle, tasks);
+        getJobWriter().putJob(bundle, tasks);
       }
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Read the jobs from the network connection and make them available in a queue.
-   */
-  private class JobReader extends ThreadSynchronization implements Runnable {
-    /**
-     * The queue of received jobs.
-     */
-    private BlockingQueue<Pair<TaskBundle, List<Task<?>>>> queue = new LinkedBlockingQueue<>();
-    /**
-     * 
-     */
-    private Exception lastException; 
-
-    @Override
-    public void run() {
-      while (!isStopped() && !JPPFNode.this.isStopped() && !shutdownRequestFlag.get()) {
-        try {
-          queue.offer(nodeIO.readJob());
-        } catch (final Exception e) {
-          lastException = e;
-          setStopped(true);
-          // to avoid being stuck in queue.take() when calling the nextJob() method
-          queue.offer(EXCEPTIONAL_BUNDLE);
-          break;
-        }
-      }
-    }
-
-    /**
-     * Get the next job from the queue, blocking if the queue is empty.
-     * @return a pairing of a job header and its tasks.
-     * @throws Exception if any error occurs.
-     */
-    private Pair<TaskBundle, List<Task<?>>> nextJob() throws Exception {
-      Pair<TaskBundle, List<Task<?>>> result = null;
-      if (lastException == null) result = queue.take();
-      if (lastException != null) {
-        queue.clear();
-        final Exception e = lastException;
-        lastException = null;
-        throw e;
-      }
-      return result;
-    }
-  }
-
-  /**
-   * Get job results from a queue and send them back to the driver.
-   */
-  private class JobWriter extends ThreadSynchronization implements Runnable {
-    /**
-     * The queue of received jobs.
-     */
-    private BlockingQueue<Pair<TaskBundle, List<Task<?>>>> queue = new LinkedBlockingQueue<>();
-    /**
-     * 
-     */
-    private Exception lastException; 
-
-    @Override
-    public void run() {
-      while (!isStopped() && !JPPFNode.this.isStopped()) {
-        try {
-          final Pair<TaskBundle, List<Task<?>>> pair = queue.take();
-          processResults(pair.first(), pair.second());
-        } catch (final Exception e) {
-          lastException = e;
-          setStopped(true);
-          break;
-        }
-      }
-    }
-
-    /**
-     * Put the next job results in the send queue.
-     * @param bundle the bundle that contains the tasks and header information.
-     * @param taskList the tasks results.
-     * @throws Exception if any error occurs.
-     */
-    private void putJob(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
-      if (lastException != null) {
-        final Exception e = lastException;
-        lastException = null;
-        throw e;
-      }
-      queue.offer(new Pair<>(bundle, taskList));
     }
   }
 
@@ -474,8 +398,23 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @Override
   public synchronized void stopNode() {
     if (debugEnabled) log.debug("stopping node");
-    if (jobReader != null) jobReader.queue.clear();
-    if (jobWriter != null) jobWriter.queue.clear();
+    if (jobReader != null) jobReader.close();
+    if (getJobWriter() != null) getJobWriter().close();
     super.stopNode();
+  }
+
+  /**
+   * @return the object which asynchronously sends job results and notification bundles.
+   * @exclude
+   */
+  public JobWriter getJobWriter() {
+    return jobWriter;
+  }
+
+  /**
+   * @return the uuid path of the handshake bundle.
+   */
+  public List<String> getHandshakeUuidPath() {
+    return handshakeUuidPath;
   }
 }

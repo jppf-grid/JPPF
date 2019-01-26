@@ -65,7 +65,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     node.setNodeAdmin(this);
     nodeState.setThreadPriority(node.getExecutionManager().getThreadsPriority());
     nodeState.setThreadPoolSize(node.getExecutionManager().getThreadPoolSize());
-    node.getLifeCycleEventHandler().addNodeLifeCycleListener(new NodeStatusNotifier(this));
+    node.getLifeCycleEventHandler().addProvider(new NodeStatusNotifier(this));
   }
 
   /**

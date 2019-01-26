@@ -292,4 +292,12 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
     if (systemInformation == null) return null;
     return systemInformation.getJppf().get(JPPFProperties.PROVISIONING_MASTER_UUID);
   }
+
+  /**
+   * @return the object responsible for this node's I/O.
+   * @exclude
+   */
+  public NodeIO getNodeIO() {
+    return nodeIO;
+  }
 }

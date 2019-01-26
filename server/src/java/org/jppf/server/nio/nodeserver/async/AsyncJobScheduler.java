@@ -190,14 +190,14 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
     final List<BaseNodeContext> toRemove = new LinkedList<>();
     final Iterator<BaseNodeContext> nodeIterator = idleChannels.iterator();
     while (nodeIterator.hasNext()) {
-      final BaseNodeContext channel = nodeIterator.next();
+      final AsyncNodeContext channel = (AsyncNodeContext) nodeIterator.next();
       synchronized(channel.getMonitor()) {
         if ((channel.getExecutionStatus() != ExecutorStatus.ACTIVE) || channel.isClosed() || !channel.isEnabled()) {
           if (debugEnabled) log.debug("channel is not opened: {}", channel);
           toRemove.add(channel);
           continue;
         }
-        if (!channel.isActive()) continue;
+        if (!channel.isActive() || !channel.isAcceptingNewJobs()) continue;
         if (channel.isPeer() && (server.nodeConnectionHandler.getConnectedRealNodes() >= peerLoadBalanceThreshold)) {
           if (debugEnabled) log.debug("this driver has {} nodes and the threshold is {}", server.nodeConnectionHandler.getConnectedNodes(), peerLoadBalanceThreshold);
           continue;
@@ -253,7 +253,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
    * @param job the job to check against.
    * @return {@code true} if the check succeeds, {@code false} otherwise.
    */
-  private boolean checkJobAgainstChannel(final BaseNodeContext channel, final ServerJob job) {
+  private boolean checkJobAgainstChannel(final AsyncNodeContext channel, final ServerJob job) {
     final List<String> uuidPath = job.getJob().getUuidPath().getList();
     if (debugEnabled) log.debug("uuid path={}, node uuid={}", uuidPath, channel.getUuid());
     final String driverUuid = server.getDriver().getUuid();
@@ -268,7 +268,7 @@ public class AsyncJobScheduler extends AbstractAsyncJobScheduler {
       return false;
     }
     if (!job.getSLA().isAllowMultipleDispatchesToSameChannel()) {
-      final int nbDispatches = ((AsyncNodeContext) channel).getNbBundlesForJob(job.getUuid());
+      final int nbDispatches = channel.getNbBundlesForJob(job.getUuid());
       if (nbDispatches > 0) return false;
     }
     return true;

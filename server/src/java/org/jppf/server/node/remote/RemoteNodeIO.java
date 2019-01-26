@@ -123,11 +123,13 @@ public class RemoteNodeIO extends AbstractNodeIO<AbstractRemoteNode> {
     if (socketWrapper == null) throw new SocketException("no connection to the server");
     final ExecutorService executor = node.getSerializationExecutor();
     finalizeBundleData(bundle, tasks);
-    final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
-    final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+    final List<Future<DataLocation>> futureList = new ArrayList<>((tasks == null) ? 1 : tasks.size() + 1);
+    final JPPFContainer cont = node.getContainer(bundle.isNotification() ? node.getHandshakeUuidPath() : bundle.getUuidPath().getList());
     int submitCount = 0;
     futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, bundle, submitCount++)));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
+    if (tasks != null) {
+      for (final Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
+    }
     final OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
     int count = 0;
     for (final Future<DataLocation> f: futureList) {

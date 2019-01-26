@@ -131,11 +131,13 @@ public class AsyncLocalNodeIO extends AbstractNodeIO<JPPFLocalNode> {
     if (debugEnabled) log.debug("writing {} results for {}", tasks.size(), bundle);
     final ExecutorService executor = node.getSerializationExecutor();
     finalizeBundleData(bundle, tasks);
-    final List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
-    final JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+    final List<Future<DataLocation>> futureList = new ArrayList<>((tasks == null) ? 1 : tasks.size() + 1);
+    final JPPFContainer cont = node.getContainer(bundle.isNotification() ? node.getHandshakeUuidPath() : bundle.getUuidPath().getList());
     int submitCount = 0;
     futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont, bundle, submitCount++)));
-    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
+    if (!bundle.isNotification()) {
+      for (final Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont, bundle, submitCount++)));
+    }
     final LocalNodeMessage message = (LocalNodeMessage) channel.newMessage();
     for (final Future<DataLocation> f: futureList) {
       final DataLocation location = f.get();

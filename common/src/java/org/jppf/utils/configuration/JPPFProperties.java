@@ -398,6 +398,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> NODE_CLASS = new StringProperty("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
   /** Maximum number of jobs that can be handled concurrently by a node. */
   public static final JPPFProperty<Integer> NODE_MAX_JOBS = new IntProperty("jppf.node.max.jobs", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
+  /** How often the node throttling mechanism will check, expressed as an interval in milliseconds. */
+  public static final JPPFProperty<Long> NODE_THROTTLING_CHECK_PERIOD = new LongProperty("jppf.node.throttling.check.period", 2000L, 1L, Long.MAX_VALUE);
   /** Default script language for scripted property values. */
   public static final JPPFProperty<String> SCRIPT_DEFAULT_LANGUAGE = new StringProperty("jppf.script.default.language", "javascript");
   /** Fully qualified name of a class implementing {@link org.jppf.node.connection.DriverConnectionStrategy DriverConnectionStrategy}. */

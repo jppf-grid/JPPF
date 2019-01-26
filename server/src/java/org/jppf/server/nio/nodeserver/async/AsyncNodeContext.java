@@ -77,6 +77,10 @@ public class AsyncNodeContext extends BaseNodeContext {
    * The maximum number of concurrent jobs for this channel.
    */
   private final AtomicInteger maxJobs = new AtomicInteger(0);
+  /**
+   * Whether the job is accepting new jobs.
+   */
+  private AtomicBoolean acceptingNewJobs = new AtomicBoolean(true);
 
   /**
    * @param server the server that handles this context.
@@ -439,5 +443,19 @@ public class AsyncNodeContext extends BaseNodeContext {
       final Collection<Long> bundleIds = jobToBundlesIds.getValues(jobUuid);
       return (bundleIds == null) ? 0 : bundleIds.size();
     }
+  }
+
+  /**
+   * @return whether the job is accepting new jobs.
+   */
+  public boolean isAcceptingNewJobs() {
+    return acceptingNewJobs.get();
+  }
+
+  /**
+   * @param acceptingNewJobs whether the job is accepting new jobs.
+   */
+  public void setAcceptingNewJobs(final boolean acceptingNewJobs) {
+    this.acceptingNewJobs.set(acceptingNewJobs);
   }
 }

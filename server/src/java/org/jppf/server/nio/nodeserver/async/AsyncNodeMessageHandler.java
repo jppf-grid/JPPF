@@ -42,7 +42,7 @@ import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
- * Performs periodic heartbeat echanges with the nodes and handles heartbeat failures detection.
+ * Handles messages received from and to send to the nodes.
  * @author Laurent Cohen
  */
 public class AsyncNodeMessageHandler {
@@ -89,7 +89,7 @@ public class AsyncNodeMessageHandler {
    * @param nodeBundle the task bundle to send.
    * @throws Exception if any error occurs.
    */
-  public void bundleSent(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle)  throws Exception {
+  void bundleSent(final AsyncNodeContext context, final ServerTaskBundleNode nodeBundle)  throws Exception {
     final JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
     final AsyncNodeNioServer server = context.getServer();
     if (schedule != null) {
@@ -171,7 +171,7 @@ public class AsyncNodeMessageHandler {
 
   /**
    * Called when job results are received from a node.
-   * @param context the channel that received the repsonse.
+   * @param context the channel that received the response.
    * @param message the received results.
    * @throws Exception if any error occurs.
    */
@@ -186,7 +186,6 @@ public class AsyncNodeMessageHandler {
    * @param context the channel from which to get the host information.
    * @return a representation of the host name/ip address pair.
    * @throws Exception if any error occurs.
-   * @since 5.0.2
    */
   private HostIP resolveHost(final AsyncNodeContext context) throws Exception {
     String host = getChannelHost(context);
@@ -250,7 +249,7 @@ public class AsyncNodeMessageHandler {
     if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
     context.addJobEntry(nodeBundle);
     process(received, context);
-    if (bundle.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
+    if (bundle.getParameter(CLOSE_COMMAND, false)) {
       context.cleanup();
       context.getServer().closeConnection(context);
     }
@@ -313,7 +312,7 @@ public class AsyncNodeMessageHandler {
       if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
       if (!nodeBundle.isExpired()) {
         Set<Integer> resubmitSet = null;
-        final int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
+        final int[] resubmitPositions = newBundle.getParameter(RESUBMIT_TASK_POSITIONS, null);
         if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
         if (resubmitPositions != null) {
           resubmitSet = new HashSet<>();
@@ -342,6 +341,22 @@ public class AsyncNodeMessageHandler {
       if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
     }
     return newBundle.isRequeue();
+  }
+
+  /**
+   * Called when a node sends a notification or alert.
+   * @param context the channel that sent the notification.
+   * @param notification the notification to process.
+   * @throws Exception if any error occurs.
+   */
+  void notificationReceived(final AsyncNodeContext context, final NotificationBundle notification)  throws Exception {
+    switch(notification.getNotificationType()) {
+      case THROTTLING:
+        final Boolean accepting = notification.getParameter(NODE_ACCEPTS_NEW_JOBS, true);
+        if (debugEnabled) log.debug("received notification that the node {} new jobs, node {}", accepting ? "accepts" : "does not accept", context);
+        context.setAcceptingNewJobs(accepting);
+        break;
+    }
   }
 
   /**
@@ -386,7 +401,7 @@ public class AsyncNodeMessageHandler {
    */
   private void updateMaxJobs(final AsyncNodeContext context, final TaskBundle bundle) {
     final int n = context.getMaxJobs();
-    final Integer newMaxJobs = bundle.getParameter(BundleParameter.NODE_MAX_JOBS);
+    final Integer newMaxJobs = bundle.getParameter(NODE_MAX_JOBS);
     int maxJobs = 0;
     if (n <= 0) {
       maxJobs = (newMaxJobs == null) ? driver.getConfiguration().get(JPPFProperties.NODE_MAX_JOBS) : newMaxJobs;
