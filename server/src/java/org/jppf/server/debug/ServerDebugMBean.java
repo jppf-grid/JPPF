@@ -131,9 +131,15 @@ public interface ServerDebugMBean extends Serializable {
 
   /**
    * Print the specified messages to the server's log.
-   * @param messages the messages ot print.
+   * @param messages the messages to print.
    */
   void log(String...messages);
+
+  /**
+   * Print the specified message to the server's log.
+   * @param message the message to print.
+   */
+  void log(String message);
 
   /**
    * Execute the specified script.

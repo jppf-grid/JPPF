@@ -126,7 +126,7 @@ public class TestDriverDiscovery extends AbstractNonStandardSetup {
       }
     }
     for (int i=0; i<2; i++) {
-      BaseTest.print(false, false, "checking server %d", (i + 1));
+      BaseTest.print(false, false, "checking server %d, results=%s", (i + 1), results[i]);
       final TypedProperties props = new TypedProperties();
       props.load(new StringReader(results[i]));
       assertEquals("localhost", props.getString("host"));

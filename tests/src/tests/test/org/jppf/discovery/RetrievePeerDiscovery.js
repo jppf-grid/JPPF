@@ -15,6 +15,7 @@ function retrieve() {
   var peerCount = 0;
   for (i=0; i<size; i++) {
     var channel = channels.get(i);
+    serverDebug.log("retrieving peer information for " + channel);
     if (channel.isPeer()) {
       peerCount++;
       if (peerCount > 1) return "ko: peerCount = " + peerCount;
@@ -24,6 +25,7 @@ function retrieve() {
       sb.append("channel.local.port=").append(port).append("\n");
     }
   }
+  if (peerCount < 1) return "ko: peerCount = " + peerCount;
   return sb.toString();
 }
 retrieve();

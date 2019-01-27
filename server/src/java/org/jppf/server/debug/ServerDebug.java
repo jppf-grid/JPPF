@@ -269,6 +269,11 @@ public class ServerDebug implements ServerDebugMBean {
   }
 
   @Override
+  public void log(final String message) {
+    if (message != null) log.info(message);
+  }
+
+  @Override
   public Object executeScript(final String language, final String script) throws JPPFScriptingException {
     try {
       final Map<String, Object> bindings = new HashMap<String, Object>() {{ put("serverDebug", ServerDebug.this); }};
