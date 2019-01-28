@@ -129,7 +129,9 @@
       <packageset dir="${admin}/src/java"/>
       <packageset dir="${jca-client}/src/java"/>
       <packageset dir="${jca-client}/src/j2eeclient"/>
+      <!--
       <packageset dir="${node-android}/events/src/main/java"/>
+      -->
       <packageset dir="${jmxremote}/src/java"/>
       <link href="https://docs.oracle.com/javase/8/docs/api/"/>
       <link href="https://docs.oracle.com/javaee/6/api/"/>
@@ -151,7 +153,9 @@
       <group title="Persistence" packages="org.jppf.persistence*:org.jppf.job.persistence*:org.jppf.load.balancer.persistence"/>
       <group title="Desktop admin console" packages="org.jppf.ui*"/>
       <group title="J2EE connector" packages="org.jppf.jca*"/>
+      <!--
       <group title="Android node" packages="org.jppf.android*"/>
+      -->
     </javadoc>
     <echo message="Javadoc generated in ${javadoc}"/>
   </target>
@@ -169,11 +173,6 @@
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${basedir}/src/java"/>
     </javac>
-  </target>
-
-  <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
-    <code.doc.tgz dir="javadoc" vname="6.0"/>
-    <code.doc.tgz dir="csdoc" vname="6.0"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -208,19 +207,6 @@
         <arg value="-fi"/>
         <arg value="html,php"/>
       </java>
-    </sequential>
-  </macrodef>
-
-  <macrodef name="code.doc.tgz">
-    <attribute name="dir"/>
-    <attribute name="vname"/>
-    <sequential>
-      <local name="filename"/>
-      <property name="filename" value="@{dir}-@{vname}"/>
-      <delete file="${docs}/${filename}.tar.gz" quiet="true"/>
-      <tar destfile="${docs}/${filename}.tar.gz" compression="gzip">
-        <tarfileset prefix="@{vname}" dir="${home}/@{dir}/@{vname}" includes="**/*.*, package-list"/>
-      </tar>
     </sequential>
   </macrodef>
 
