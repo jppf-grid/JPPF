@@ -116,6 +116,8 @@ public class AsyncNodeMessageHandler {
       context.setMaxJobs(1);
     } else {
       updateMaxJobs(context, bundle);
+      final Boolean acceptsNewJobs = bundle.getParameter(NODE_ACCEPTS_NEW_JOBS);
+      if (acceptsNewJobs != null) context.setAcceptingNewJobs(acceptsNewJobs);
       if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
     }
     if (debugEnabled) log.debug("read bundle for {}, bundle={}", context, bundle);

@@ -241,6 +241,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         bundle.setBundleId(currentBundle.first().getBundleId());
         bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.first().getUuid());
       }
+    } else {
+      if (!throttlingHandler.check()) bundle.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, false);
+      throttlingHandler.start();
     }
     if (isJmxEnabled()) setupBundleParameters(bundle);
     final Map<String, TypedProperties> defMap = bundle.getParameter(BundleParameter.DATASOURCE_DEFINITIONS, null);
@@ -320,7 +323,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       ThreadUtils.startDaemonThread(jobReader = new JobReader(this), "JobReader");
       ThreadUtils.startDaemonThread(jobWriter = new JobWriter(this), "JobWriter");
     }
-    throttlingHandler = new NodeThrottlingHandler(this).start();
+    throttlingHandler = new NodeThrottlingHandler(this);
     if (debugEnabled) log.debug("end node initialization");
   }
 
@@ -400,6 +403,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("stopping node");
     if (jobReader != null) jobReader.close();
     if (getJobWriter() != null) getJobWriter().close();
+    throttlingHandler.stop();
     super.stopNode();
   }
 

@@ -456,6 +456,7 @@ public class AsyncNodeContext extends BaseNodeContext {
    * @param acceptingNewJobs whether the job is accepting new jobs.
    */
   public void setAcceptingNewJobs(final boolean acceptingNewJobs) {
+    if (debugEnabled) log.debug("node is {}accepting new jobs: {}", acceptingNewJobs ? "" : "not ", this);
     this.acceptingNewJobs.set(acceptingNewJobs);
   }
 }

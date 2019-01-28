@@ -23,9 +23,22 @@ import org.jppf.utils.SystemUtils;
 import org.slf4j.*;
 
 /**
- * A throttling mechanism that causes a node to not accept jobs whenever heap usage reaches a specified threshold.
- * This mechanism can be deactivated by setting the node configuration property {@code jppf.node.throttling.memory.threshold.active = false} ({@code false} by default).
- * Similarly, the threshold can be set as a percentage of the maximum heap size with the node configuration property {@code jppf.node.throttling.memory.threshold = 87.5} (90% by default).
+ * A throttling mechanism that causes a node to not accept jobs whenever heap usage reaches a configured percentage of the maximum heap size. It can be configured with the following properties:<br>
+ * <ul>
+ * <li>it can be activated by setting the node configuration property {@code jppf.node.throttling.memory.threshold.active = true} ({@code false} by default)</li>
+ * <li>the threshold can be set as a percentage of the maximum heap size with the node configuration property {@code jppf.node.throttling.memory.threshold = 87.5} (90% by default)</li>
+ * <li>it can also call {@code System.gc()}, in an attempt to mitigate the high heap usage, after {@link #acceptsNewJobs(Node)} returns {@code false} a configured consecutive number of times.
+ * The corresponding configuration property is set as {@code jppf.node.throttling.memory.threshold.maxNbTimesFalse = 2} (3 by default)</li>
+ * </ul>
+ * <p>Example configuration:<br>
+ * <pre class="jppf_pre">
+ * <span style="color: green"># activate the throttling plugin</span>
+ * jppf.node.throttling.memory.threshold.active = true
+ * <span style="color: green"># % of maximum heap size that causes the node to refuse jobs</span>
+ * jppf.node.throttling.memory.threshold = 87.5
+ * <span style="color: green"># number of time the check returns false before invoking System.gc()</span>
+ * jppf.node.throttling.memory.threshold.maxNbTimesFalse = 5
+ * </pre>
  * @author Laurent Cohen
  * @since 6.1
  */
@@ -43,7 +56,7 @@ public class MemoryThresholdThrottling implements JPPFNodeThrottling {
    */
   private static final boolean traceEnabled = log.isTraceEnabled();
   /**
-   * 
+   * Used for logging purposes, the first time {@link #acceptsNewJobs(Node)} is called.
    */
   private boolean firstTime = true;
   /**
@@ -77,7 +90,7 @@ public class MemoryThresholdThrottling implements JPPFNodeThrottling {
         System.gc();
         nbTimesFalse = 0;
       }
-    }
+    } else nbTimesFalse = 0;
     
     return result;
   }

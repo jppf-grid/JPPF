@@ -28,7 +28,14 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
- * 
+ * This class loads and invokes all implementations of the {@link JPPFNodeThrottling} service found in the classpath.
+ * Invocation of the services is done at two points of the node's life cycle:
+ * <ol>
+ * <li>during the initial handshake with the driver</li>
+ * <li>at regular intervals via a specific timer</li>
+ * </ol>
+ * The duration of the interval between periodic checks is configurable with the following property expressing a time in milliseconds (default 2000 ms):<br>
+ * {@code jppf.node.throttling.check.period = 2000}
  * @author Laurent Cohen
  * @exclude
  */
@@ -66,6 +73,7 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
     super(JPPFNodeThrottling.class, node.getClassLoader());
     currentlyAccepts = true;
     this.node = node;
+    if (!node.isOffline()) loadProviders();
   }
 
   /**
@@ -74,7 +82,6 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
    */
   public NodeThrottlingHandler start() {
     if (!node.isOffline()) {
-      loadProviders();
       timer = new Timer("NodeThrottlingTimer", true);
       long period = node.getConfiguration().get(JPPFProperties.NODE_THROTTLING_CHECK_PERIOD);
       if (period <= 0L) period = JPPFProperties.NODE_THROTTLING_CHECK_PERIOD.getDefaultValue();
@@ -99,9 +106,38 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
   }
 
   /**
+   * 
+   * @return true if the node accepts new jobs, false otherwise.
+   */
+  public synchronized boolean check() {
+    new CheckTask(false).run();
+    return currentlyAccepts;
+  }
+
+  /**
    * A timer task called periodically that checks whther the node should accept new jobs.
    */
-  private class CheckTask extends TimerTask {
+  private final class CheckTask extends TimerTask {
+    /**
+     * Whether to send a notification to the driver.
+     */
+    private final boolean sendNotification;
+
+    /**
+     * Create this task.
+     */
+    private CheckTask() {
+      this(true);
+    }
+
+    /**
+     * Create this task.
+     * @param sendNotification whether to send a notification to the driver.
+     */
+    private CheckTask(final boolean sendNotification) {
+      this.sendNotification = sendNotification;
+    }
+
     @Override
     public void run() {
       if (providers.isEmpty()) return;
@@ -113,7 +149,7 @@ public class NodeThrottlingHandler extends ServiceProviderHandler<JPPFNodeThrott
         }
       }
       synchronized(NodeThrottlingHandler.this) {
-        if (newAccepts != currentlyAccepts) {
+        if (sendNotification && (newAccepts != currentlyAccepts)) {
           if (debugEnabled) log.debug("throttling state has changed to {}, sending notification", newAccepts);
           final NotificationBundle notif = new NotificationBundle(NotificationType.THROTTLING);
           notif.setParameter(BundleParameter.NODE_ACCEPTS_NEW_JOBS, newAccepts);
