@@ -119,7 +119,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * Test that a persisted job executes normally and is deleted from persistence after completion as configured.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  //@Test(timeout = 10000)
   public void testSimplePersistedJob() throws Exception {
     final int nbTasks = 10;
     final String method = ReflectionUtils.getCurrentMethodName();
@@ -177,7 +177,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * Test that a persisted job executes normally, can be cancelled and is deleted from persistence after completion as configured.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  //@Test(timeout = 10000)
   public void testSimplePersistedJobCancellation() throws Exception {
     final int nbTasks = 40;
     final String method = ReflectionUtils.getCurrentMethodName();
@@ -204,7 +204,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * The client should recover gracefully and provide the job results without intervention.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  //@Test(timeout = 15000)
   public void testJobAutoRecoveryOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
@@ -254,7 +254,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * The driver should resubmit the job for execution upon restart, and the client must be able to retrieve the job upon completion.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  //@Test(timeout = 15000)
   public void testJobAutoExecuteOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
@@ -306,7 +306,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * Test that a persisted job executes and is persisted normally when submittd over two connections to the same driver.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  //@Test(timeout = 10000)
   public void testJobSubmittedOnTwoChannels() throws Exception {
     final int nbTasks = 2 * 10;
     final String method = ReflectionUtils.getCurrentMethodName();
