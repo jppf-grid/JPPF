@@ -81,7 +81,6 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     NotifyingTaskListener listener = null;
     String listenerID = null;
     try {
-      configureLoadBalancer();
       listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       final String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
@@ -91,7 +90,6 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
     } finally {
       nodeForwarder.resetTaskCounter(selector);
-      resetLoadBalancer();
       driverJmx.unregisterForwardingNotificationListener(listenerID);
     }
   }
@@ -135,7 +133,6 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     NotifyingTaskListener listener = null;
     String listenerID = null;
     try {
-      configureLoadBalancer();
       listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       driverJmx.unregisterForwardingNotificationListener(listenerID);
@@ -146,7 +143,6 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       assertNull(listener.exception);
     } finally {
       nodeForwarder.resetTaskCounter(selector);
-      resetLoadBalancer();
     }
   }
 
