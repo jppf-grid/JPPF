@@ -17,7 +17,7 @@
  */
 
 /**
- * API for a pluggable throttling mechanism, allowing a node to specify when it accepts new jobs or no longer accepts them.
+ * API for a <a href="https://www.jppf.org/doc/@version@/index.php?title=Node_throttling">pluggable node throttling mechanism</a>, allowing a node to specify when it accepts new jobs or no longer accepts them.
  * <p>Found in: <b>jppf-node.jar</b>
  * @since 6.1
  */

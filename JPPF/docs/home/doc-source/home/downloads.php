@@ -12,7 +12,7 @@ $template{name="about-page-header" title="Downloads"}$
       $template{name="download-link" label="Maven Central" link="https://search.maven.org/#search|ga|1|g:org.jppf"}$
       $template{name="download-link" label="Releases on Github" link="https://github.com/jppf-grid/JPPF/tags"}$
       $template{name="download-link" label="Older releases on SF.net" link="https://sourceforge.net/projects/jppf-project/files/jppf-project"}$
-      $template{name="download-link" label="JPPF 6.1 alpha preview" link="downloads-unstable.php"}$
+      $template{name="download-link" label="JPPF 6.1 alpha 2 preview" link="downloads-unstable.php"}$
     </tr></table>
   </div>
   <br>

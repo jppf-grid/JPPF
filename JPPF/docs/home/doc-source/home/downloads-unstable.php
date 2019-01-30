@@ -1,7 +1,7 @@
 <?php
   $currentPage = "download-unstable";
-  $tag1 = "v_6_1_alpha";
-  $ver1 = "6.1-alpha";
+  $tag1 = "v_6_1_alpha_2";
+  $ver1 = "6.1-alpha-2";
   $base = "https://github.com/jppf-grid/JPPF/releases/download/" . $tag1 . "/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
@@ -64,10 +64,27 @@ $template{name="about-page-header" title="Downloads - unstable"}$
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/documentation.png" title="Documentation preview" heading="h3"}$
       <p>Doc preview for the major new features:
+      <!--
       <ul class="samplesList">
         <li><a href="/doc/6.1">JPPF 6.1 User Guide</a></li>
         <li><a href="/javadoc/6.1">JPPF 6.1 Javadoc</a></li>
       </ul>
+      -->
+
+      <table style="width: 100%"><tr>
+        <td valign="top">
+          <ul class="samplesList">
+            <li><a href="/doc/6.1">JPPF 6.1 User Guide</a></li>
+            <li><a href="/javadoc/6.1">JPPF 6.1 Javadoc</a></li>
+          </ul>
+        </td>
+        <td valign="top">
+          <ul class="samplesList">
+            <li><a href="/release_notes.php?version=6.1-alpha-2">Release notes</a></li>
+          </ul>
+        </td>
+      </tr></table>
+
     </div>
     <div style="height: 8px"></div>
     <div class="blockWithHighlightedTitle">

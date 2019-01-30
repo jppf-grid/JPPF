@@ -136,7 +136,7 @@
       </td>
       <td style="vertical-align: middle">
         <ul class="samplesList" style="margin-bottom: 0px; margin-left: 20px;">
-          <li><a href="downloads-unstable.php"><b>JPPF 6.1 alpha preview</b></a></li>
+          <li><a href="downloads-unstable.php"><b>JPPF 6.1 alpha 2 preview</b></a></li>
         </ul>
       </td>
     </tr></table>
