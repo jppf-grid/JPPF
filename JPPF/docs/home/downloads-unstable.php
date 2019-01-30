@@ -116,7 +116,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 6.1 alpha preview</h1>
+  <h1 align="center">Downloads - JPPF 6.1 alpha 2 preview</h1>
   <div class="blockWithHighlightedTitle" style="vertical-align: middle">
     <table style="padding: 2px"><tr>
       <td style="width: 20px"><img src="images/icons/folder-download.png"></td>
