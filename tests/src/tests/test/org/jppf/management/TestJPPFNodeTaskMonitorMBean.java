@@ -28,7 +28,11 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -48,9 +52,18 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
    */
   private static JMXDriverConnectionWrapper driverJmx;
   /**
-   * 
+   * Proxy to the node task monitor MBean.
    */
   private static JPPFNodeTaskMonitorMBean taskMonitor;
+
+  /** */
+  @Rule
+  public final TestWatcher testJPPFNodeTaskMonitorMBeanWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToAll(client, false, true, true, true, "***** start of method %s() *****", description.getMethodName());
+    }
+  };
 
   /**
    * Launches a driver and node and start the client.
@@ -107,9 +120,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskCpuTime());
       assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskElapsedTime());
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
-      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
+      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_2");
       client.submitJob(job);
-      assertEquals(Integer.valueOf(2), taskMonitor.getTotalTasksExecuted());
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> taskMonitor.getTotalTasksExecuted() == 2, 3000L, 250L, false));
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
       Long n = taskMonitor.getTotalTaskCpuTime();
@@ -131,9 +144,9 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     final long duration = 100L;
     try {
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
-      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
+      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_2");
       client.submitJob(job);
-      assertEquals(Integer.valueOf(2), taskMonitor.getTotalTasksExecuted());
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> taskMonitor.getTotalTasksExecuted() == 2, 3000L, 250L, false));
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), taskMonitor.getTotalTasksSucessfull());
       Long n = taskMonitor.getTotalTaskCpuTime();
@@ -141,7 +154,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       n = taskMonitor.getTotalTaskElapsedTime();
       assertTrue("elapsed time is only " + n, n >= duration - 1L);
       taskMonitor.reset();
-      assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksExecuted());
+      assertTrue(ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> taskMonitor.getTotalTasksExecuted() == 0, 3000L, 250L, false));
       assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksInError());
       assertEquals(Integer.valueOf(0), taskMonitor.getTotalTasksSucessfull());
       assertEquals(Long.valueOf(0L), taskMonitor.getTotalTaskCpuTime());
@@ -165,8 +178,8 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       final JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task_" + nbTasks);
       final List<Task<?>> result = client.submitJob(job);
+      assertTrue(ConcurrentUtils.awaitCondition(() -> listener.notifs.size() == nbTasks + 1, 3000L, 250L, false));
       assertNull(listener.exception);
-      assertEquals(nbTasks + 1, listener.notifs.size());
       assertEquals(1, listener.userObjects.size());
       Collections.sort(listener.notifs, (o1, o2) -> o1.getId().compareTo(o2.getId()));
       for (int i=0; i<nbTasks; i++) {
@@ -180,7 +193,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
           assertFalse(ti.hasError());
           n = ti.getCpuTime();
           assertTrue(n < 0L);
-          assertEquals("starting task " + task.getId(), listener.userObjects.get(0));
+          assertEquals(ErrorLifeCycleTask.ERROR_TASK_RESULT_PREFIX + task.getId(), listener.userObjects.get(0));
           ti = listener.notifs.get(i + 1);
           n = ti.getCpuTime();
           assertTrue("task " + i + " cpu time is only " + n, n > 0L);
@@ -216,13 +229,17 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
   }
 
   /**
-   * This class throws an {@link Error} in its <code>run()</code> method.
+   * This class throws an {@link Exception} in its {@code run()} method.
    */
   public static class ErrorLifeCycleTask extends LifeCycleTask {
     /**
      * Explicit serialVersionUID.
      */
     private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final String ERROR_TASK_RESULT_PREFIX = "starting task ";
     /**
      * if true, then raise an exception at the end of execution.
      */
@@ -241,7 +258,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     @Override
     public void run() {
       final long start = System.nanoTime();
-      fireNotification("starting task " + getId(), true);
+      fireNotification(ERROR_TASK_RESULT_PREFIX + getId(), true);
       fireNotification("non-JMX notification for " + getId(), false);
       final Random rand = new Random(start);
       while ((elapsed = System.nanoTime() - start) < duration * 1_000_000L) {
