@@ -7,9 +7,9 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
 ## How to get it
 
-**Direct download**: from the [nightly build](https://sourceforge.net/projects/jppf-project/files/jppf-project/nightly/), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
+**Direct download**: from the [latest release](https://github.com/jppf-grid/JPPF/releases/tag/v_6_1_alpha_2), look for JPPF-&lt;version&gt;-jmxremote-nio.zip
 
-**Maven**: currently in Maven Central repository at http://repo.maven.apache.org/maven2/org/jppf:
+**Maven Central**: [groupId: org.jppf, artifactId: jppf-jmxremote-nio](https://search.maven.org/search?q=g:org.jppf%20AND%20a:jppf-jmxremote-nio&core=gav)
 
 ~~~xml
 <dependency>
@@ -72,17 +72,17 @@ JMX service URLs are in the form `service:jmx:jppf://<host>:<port>`
 
 #### Authentication and authorization
 
-Authentication is provided as an instance of [JMXAuthenticator](https://docs.oracle.com/javase/7/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), passed on via the server environment property `jmx.remote.authenticator` (also the Java constant [JMXConnectorServer.AUTHENTICATOR](https://docs.oracle.com/javase/7/docs/api/javax/management/remote/JMXConnectorServer.html#AUTHENTICATOR)).
+Authentication is provided as an instance of [JMXAuthenticator](https://docs.oracle.com/javase/8/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), passed on via the server environment property `jmx.remote.authenticator` (also the Java constant [JMXConnectorServer.AUTHENTICATOR](https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnectorServer.html#AUTHENTICATOR)).
 
 On the client side, credentials are passed as a user-defined object via the connector environment property `jmx.remote.credentials` (also the Java constant
-[JMXConnector.CREDENTIALS](https://docs.oracle.com/javase/7/docs/api/javax/management/remote/JMXConnector.html#CREDENTIALS)).
+[JMXConnector.CREDENTIALS](https://docs.oracle.com/javase/8/docs/api/javax/management/remote/JMXConnector.html#CREDENTIALS)).
 
 Authorization or ACL is provided via the server-side environment property `jmx.remote.x.authorization.checker` (also the Java constant
-[JPPFJMXConnectorServer.AUTHORIZATION_CHECKER](https://www.jppf.org/javadoc/6.0/org/jppf/jmxremote/JPPFJMXConnectorServer.html#AUTHORIZATION_CHECKER)). The value can be either a `Class` object, representing an implementation
-of the interface [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html), or a string that contains the fully qualified name of the class.
+[JPPFJMXConnectorServer.AUTHORIZATION_CHECKER](https://www.jppf.org/javadoc/6.1/org/jppf/jmxremote/JPPFJMXConnectorServer.html#AUTHORIZATION_CHECKER)). The value can be either a `Class` object, representing an implementation
+of the interface [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.1/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html), or a string that contains the fully qualified name of the class.
 
-Authorization checks are performed against the [Subject](https://docs.oracle.com/javase/7/docs/api/index.html?javax/security/auth/Subject.html) created by the [JMXAuthenticator](https://docs.oracle.com/javase/7/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), if any is present. It is passed on to the [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html) via its [setSubject(Subject)](https://www.jppf.org/javadoc/6.0/org/jppf/jmxremote/JMXAuthorizationChecker.html#setSubject(javax.security.auth.Subject)) method.
+Authorization checks are performed against the [Subject](https://docs.oracle.com/javase/8/docs/api/index.html?javax/security/auth/Subject.html) created by the [JMXAuthenticator](https://docs.oracle.com/javase/8/docs/api/index.html?javax/management/remote/JMXAuthenticator.html), if any is present. It is passed on to the [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.1/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html) via its [setSubject(Subject)](https://www.jppf.org/javadoc/6.1/org/jppf/jmxremote/JMXAuthorizationChecker.html#setSubject(javax.security.auth.Subject)) method.
 
-Instead of implementing the [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html) interface, you may also extend the [JMXAuthorizationCheckerAdapter](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationCheckerAdapter.html) (allows everything) or [JMXAuthorizationDeniedAdapter](https://www.jppf.org/javadoc/6.0/index.html?org/jppf/jmxremote/JMXAuthorizationDeniedAdapter.html) (denies everything) class if you don't need to implement all the methods.
+Instead of implementing the [JMXAuthorizationChecker](https://www.jppf.org/javadoc/6.1/index.html?org/jppf/jmxremote/JMXAuthorizationChecker.html) interface, you may also extend the [JMXAuthorizationCheckerAdapter](https://www.jppf.org/javadoc/6.1/index.html?org/jppf/jmxremote/JMXAuthorizationCheckerAdapter.html) (allows everything) or [JMXAuthorizationDeniedAdapter](https://www.jppf.org/javadoc/6.1/index.html?org/jppf/jmxremote/JMXAuthorizationDeniedAdapter.html) (denies everything) class if you don't need to implement all the methods.
 
 Unit tests are found in the [test.org.jppf.jmxremote](../tests/src/tests/test/org/jppf/jmxremote) package of the [tests](../tests) module.
