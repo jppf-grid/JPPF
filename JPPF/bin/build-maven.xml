@@ -109,6 +109,7 @@
           <include name="*.jpg"/>
         </fileset>
       </copy>
+      <favicon dir="${maven.dist.javadoc}"/>
       <local name="javadoc.file"/>
       <property name="javadoc.file" value="${maven.dist}/${artifact.prefix}-javadoc.jar"/>
       <delete file="${javadoc.file}" quiet="true"/>
