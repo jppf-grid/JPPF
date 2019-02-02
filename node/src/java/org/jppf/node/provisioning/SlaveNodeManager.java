@@ -21,9 +21,12 @@ package org.jppf.node.provisioning;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.management.Notification;
 
 import org.apache.commons.io.FileUtils;
-import org.jppf.node.*;
+import org.jppf.node.Node;
 import org.jppf.process.*;
 import org.jppf.utils.*;
 import org.jppf.utils.concurrent.*;
@@ -100,6 +103,14 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * The JPPF node that holds this manager.
    */
   private final Node node;
+  /**
+   * The provision MBean implementation.
+   */
+  JPPFNodeProvisioning mbean;
+  /**
+   * Sequence number provider for the the provisioning notifications.
+   */
+  private final AtomicLong notificationSequence = new AtomicLong(0L);
 
   /**
    * Initialize this manager.
@@ -252,6 +263,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     }
     if (nbSlaves() <= 0) log.warn("received processStarted() for slave id = {}, but nbSlaves is zero", slave.getId());
     else if (debugEnabled) log.debug("received processStarted() for slave id = {}", slave.getId());
+    sendNotification(JPPFNodeProvisioningMBean.SLAVE_STARTED_NOTIFICATION_TYPE, slave);
   }
 
   @Override
@@ -260,6 +272,19 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     if (debugEnabled) log.debug("received processStopped() for slave id = {}, exitCode = {}", slave.getId(), slave.exitCode);
     if (slave.exitCode != 2) removeSlave(slave);
     else ThreadUtils.startDaemonThread(slave, slave.getName());
+    sendNotification(JPPFNodeProvisioningMBean.SLAVE_STOPPED_NOTIFICATION_TYPE, slave);
+  }
+
+  /**
+   * Send a notification that a slave node has started or stopped.
+   * @param type specifies whther the slave has started or stopped.
+   * @param launcher the slave node laucnher.
+   */
+  private void sendNotification(final String type, final SlaveNodeLauncher launcher) {
+    final Notification notification = new Notification(type, JPPFNodeProvisioningMBean.MBEAN_NAME, notificationSequence.incrementAndGet());
+    notification.setUserData(
+      new JPPFProvisioningInfo(node.getUuid(), launcher.getId(), (type == JPPFNodeProvisioningMBean.SLAVE_STARTED_NOTIFICATION_TYPE) ? -1 : launcher.exitCode, launcher.getLaunchCommand()));
+    mbean.sendNotification(notification);
   }
 
   /**

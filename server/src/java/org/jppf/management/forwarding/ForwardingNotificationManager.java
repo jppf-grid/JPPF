@@ -152,6 +152,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * @throws ListenerNotFoundException if the listener could not be found.
    */
   public void removeNotificationListener(final String listenerID) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug("removing notification listeners for listenerID = {}", listenerID);
     final NotificationListenerWrapper wrapper = forwardingHelper.removeListener(listenerID);
     if (wrapper == null) throw new ListenerNotFoundException("could not find listener with id=" + listenerID);
     removeNotificationListener(wrapper);
@@ -166,15 +167,12 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     if (debugEnabled) log.debug("removing notification listeners for {}", wrapper);
     final NodeSelector selector = wrapper.getSelector();
     final Set<BaseNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        lock.lock();
-        try {
-          for (BaseNodeContext node: nodes) removeNotificationListener(node, wrapper);
-        } finally {
-          lock.unlock();
-        }
+    final Runnable r = () -> {
+      lock.lock();
+      try {
+        for (BaseNodeContext node: nodes) removeNotificationListener(node, wrapper);
+      } finally {
+        lock.unlock();
       }
     };
     ThreadUtils.startThread(r, "removeNotificationListener(" + wrapper + ")");
@@ -229,17 +227,14 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     final String uuid = info.getUuid();
     final BaseNodeContext node = driver.getAsyncNodeNioServer().getConnection(uuid);
     if (node == null) return;
-    final Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        lock.lock();
-        try {
-          for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners()) {
-            if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
-          }
-        } finally {
-          lock.unlock();
+    final Runnable r = () -> {
+      lock.lock();
+      try {
+        for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners()) {
+          if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
         }
+      } finally {
+        lock.unlock();
       }
     };
     ThreadUtils.startThread(r, event.toString());

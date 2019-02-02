@@ -42,6 +42,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    */
   private static Logger log = LoggerFactory.getLogger(AbstractProcessLauncher.class);
   /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
    *
    */
   private static final Pattern JVM_OPTIONS_PATTERN = Pattern.compile("([^\"\\s]*\"[^\"]*\"[^\"\\s]*|[^\"\\s]*)\\s*");
@@ -50,22 +54,22 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    */
   private static final Pair<List<String>, List<String>> NO_OPTIONS = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
   /**
-   * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
+   * A reference to the JPPF subprocess, used to kill it when tis launcher exits.
    */
-  protected Process process = null;
+  protected Process process;
   /**
    * The server socket the node listens to.
    */
-  protected ServerSocket processServer = null;
+  protected ServerSocket processServer;
   /**
    * The port number the server socket listens to.
    */
-  protected int processPort = 0;
+  protected int processPort;
   /**
    * Wraps the socket accepted from the node process.
    * @since 5.0
    */
-  protected SlaveSocketWrapper slaveSocketWrapper = null;
+  protected SlaveSocketWrapper slaveSocketWrapper;
   /**
    * The registered listeners.
    */
@@ -95,7 +99,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         if (!s.isEmpty()) options.add(s);
       }
     }
-    log.debug("options={}", options);
+    if (debugEnabled) log.debug("options={}", options);
     final List<String> jvmOptions = new ArrayList<>();
     final List<String> cpElements = new ArrayList<>();
     int count = 0;
@@ -104,7 +108,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options.get(count++));
       else jvmOptions.add(option);
     }
-    log.debug("jvm options={}, cp elements={}", jvmOptions, cpElements);
+    if (debugEnabled) log.debug("jvm options={}, cp elements={}", jvmOptions, cpElements);
     return new Pair<>(jvmOptions, cpElements);
   }
 
@@ -165,6 +169,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         processServer = new ServerSocket(0);
         processPort = processServer.getLocalPort();
       }
+      if (debugEnabled) log.debug("starting with {}", processServer);
       slaveSocketWrapper = new SlaveSocketWrapper();
       ThreadUtils.startDaemonThread(slaveSocketWrapper, getName() + "ServerSocket");
     } catch(@SuppressWarnings("unused") final Exception e) {
@@ -180,13 +185,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * @return the created shutdown hook.
    */
   protected Thread createShutdownHook() {
-    final Runnable hook = new Runnable() {
-      @Override
-      public void run() {
-        tearDown();
-      }
-    };
-    final Thread hookThread = new Thread(hook, getName());
+    final Thread hookThread = new Thread(() -> tearDown(), getName());
     Runtime.getRuntime().addShutdownHook(hookThread);
     return hookThread;
   }
@@ -275,10 +274,12 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     public void run() {
       try {
         socketClient = new BootstrapSocketClient(processServer.accept());
+        if (log.isDebugEnabled()) log.debug("initialized {}", socketClient);
         final int n = socketClient.readInt();
         if (n == -1) throw new EOFException();
-      } catch(final Exception ioe) {
-        if (log.isDebugEnabled()) log.debug(getName(), ioe);
+        if (log.isDebugEnabled()) log.debug("received {}", n);
+      } catch(final Exception e) {
+        if (log.isDebugEnabled()) log.debug(getName(), e);
         close();
       }
     }
@@ -304,5 +305,12 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         socketClient = null;
       }
     }
+  }
+
+  /**
+   * @return a reference to the JPPF subprocess, used to kill it when tis launcher exits.
+   */
+  public Process getProcess() {
+    return process;
   }
 }

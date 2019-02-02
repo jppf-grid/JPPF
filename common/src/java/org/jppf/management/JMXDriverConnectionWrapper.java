@@ -333,7 +333,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
-   * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
+   * Unregister a previously registered forwarding notification listener.
    * @param listenerID the id of a listener previously registered with {@link #registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object)}.
    * @throws Exception if the listener with this id was not found or if any other error occurss.
    */
@@ -354,6 +354,32 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
       }
     }
     invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+  }
+
+  /**
+   * Uneregister all previously registered forwarding notification listener.
+   * @return a list of the ids of the listeners that were unregistered, if any. This list may be empty but never {@code null}. 
+   * @throws Exception if any error occurs.
+   */
+  public List<String> unregisterAllForwardingNotificationListeners() throws Exception {
+    final List<String> result = new ArrayList<>();
+    synchronized(forwardingListeners) {
+      final Map<String, ListenerWrapper> map = forwardingListeners.remove(getId());
+      if (map != null) {
+        for (final Map.Entry<String, ListenerWrapper> entry: map.entrySet()) {
+          final String listenerID = entry.getKey();
+          result.add(listenerID);
+          final ListenerWrapper wrapper = entry.getValue();
+          try {
+            removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
+          } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+          }
+          invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+        }
+      }
+    }
+    return result;
   }
 
   /**

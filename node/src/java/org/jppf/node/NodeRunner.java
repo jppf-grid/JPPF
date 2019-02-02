@@ -160,7 +160,7 @@ public class NodeRunner {
       HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(configuration), null,
         new Class<?>[] { TypedProperties.class}, configuration);
       if ((args != null) && (args.length > 0) && !"noLauncher".equals(args[0])) {
-        if (debugEnabled) log.debug("setting up connection with parent process");
+        if (debugEnabled) log.debug("setting up connection with parent process on port {}", args[0]);
         final int port = Integer.parseInt(args[0]);
         (launcherListener = new LauncherListener(port)).start();
       }

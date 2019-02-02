@@ -46,7 +46,6 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
   static final String SLAVE_LOCAL_CONFIG_PATH = SlaveNodeManager.SLAVE_LOCAL_CONFIG_DIR + "/" + SlaveNodeManager.SLAVE_LOCAL_CONFIG_FILE;
   /**
    * Id given to this process.
-   * @since 4.2.2
    */
   private final int id;
   /**
@@ -58,13 +57,17 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    */
   private final List<String> classpath;
   /**
-   *
+   * Whether the process is started.
    */
   private boolean started = false;
   /**
    * Captures the exit code of the slave node process.
    */
   int exitCode = -1;
+  /**
+   * The command line used to start the slave node process.
+   */
+  private List<String> launchCommand;
 
   /**
    * Initialize this process launcher.
@@ -99,8 +102,8 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
       end = onProcessExit(exitCode);
       fireProcessStopped(false);
       tearDown();
-    } catch (final Exception e) {
-      e.printStackTrace();
+    } catch (@SuppressWarnings("unused") final Exception e) {
+      //e.printStackTrace();
       fireProcessStopped(false);
     } finally {
       setStarted(false);
@@ -134,16 +137,16 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     jvmOptions.addAll(parsed.first());
     cpElements.addAll(parsed.second());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
-    final List<String> command = new ArrayList<>();
-    command.add(computeJavaExecPath(config));
-    command.add("-cp");
-    command.add(buildClasspath(cpElements));
-    for (String opt: jvmOptions) command.add(opt);
-    command.add("-Djppf.config=" + SLAVE_LOCAL_CONFIG_PATH);
-    command.add(MAIN_CLASS);
-    command.add("" + processPort);
-    if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, command);
-    final ProcessBuilder builder = new ProcessBuilder(command);
+    launchCommand = new ArrayList<>();
+    launchCommand.add(computeJavaExecPath(config));
+    launchCommand.add("-cp");
+    launchCommand.add(buildClasspath(cpElements));
+    for (String opt: jvmOptions) launchCommand.add(opt);
+    launchCommand.add("-Djppf.config=" + SLAVE_LOCAL_CONFIG_PATH);
+    launchCommand.add(MAIN_CLASS);
+    launchCommand.add("" + processPort);
+    if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, launchCommand);
+    final ProcessBuilder builder = new ProcessBuilder(launchCommand);
     builder.directory(slaveDir);
     builder.redirectOutput(new File(slaveDir, "system_out.log"));
     builder.redirectError(new File(slaveDir, "system_err.log"));
@@ -202,5 +205,12 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
   @Override
   public void setStopped(final boolean stopped) {
     this.stopped = stopped;
+  }
+
+  /**
+   * @return the command line used to start the slave node process.
+   */
+  public List<String> getLaunchCommand() {
+    return launchCommand;
   }
 }

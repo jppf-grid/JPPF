@@ -18,6 +18,8 @@
 
 package org.jppf.node.provisioning;
 
+import javax.management.*;
+
 import org.jppf.node.Node;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.TypedProperties;
@@ -28,11 +30,15 @@ import org.jppf.utils.TypedProperties;
  * @since 4.1
  * @exclude
  */
-public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
+public class JPPFNodeProvisioning extends NotificationBroadcasterSupport implements JPPFNodeProvisioningMBean {
   /**
    * The slave node manager, to which all operations are delegated.
    */
   private final SlaveNodeManager slaveManager;
+  /**
+   * Whether the node is actually a slave.
+   */
+  private final boolean master;
 
   /**
    * Initialize this MBean.
@@ -40,6 +46,8 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
    */
   public JPPFNodeProvisioning(final Node node) {
     slaveManager = ((JPPFNode) node).getSlaveManager();
+    slaveManager.mbean = this;
+    master = node.isMasterNode();
   }
 
   @Override
@@ -49,21 +57,36 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
 
   @Override
   public void provisionSlaveNodes(final int nbNodes) {
-    slaveManager.submitProvisioningRequest(nbNodes, true, null);
+    if (master) slaveManager.submitProvisioningRequest(nbNodes, true, null);
   }
 
   @Override
   public void provisionSlaveNodes(final int nbNodes, final boolean interruptIfRunning) {
-    slaveManager.submitProvisioningRequest(nbNodes, interruptIfRunning, null);
+    if (master) slaveManager.submitProvisioningRequest(nbNodes, interruptIfRunning, null);
   }
 
   @Override
   public void provisionSlaveNodes(final int nbNodes, final TypedProperties configOverrides) {
-    slaveManager.submitProvisioningRequest(nbNodes, true, configOverrides);
+    if (master) slaveManager.submitProvisioningRequest(nbNodes, true, configOverrides);
   }
 
   @Override
   public void provisionSlaveNodes(final int nbNodes, final boolean interruptIfRunning, final TypedProperties configOverrides) {
-    slaveManager.submitProvisioningRequest(nbNodes, interruptIfRunning, configOverrides);
+    if (master) slaveManager.submitProvisioningRequest(nbNodes, interruptIfRunning, configOverrides);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException {
+    if (master) super.removeNotificationListener(listener);
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException {
+    if (master) super.removeNotificationListener(listener, filter, handback);
+  }
+
+  @Override
+  public void sendNotification(final Notification notification) {
+    if (master) super.sendNotification(notification);
   }
 }

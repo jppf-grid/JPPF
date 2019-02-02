@@ -18,6 +18,10 @@
 
 package org.jppf.node.provisioning;
 
+import java.io.Serializable;
+
+import javax.management.NotificationEmitter;
+
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -25,11 +29,21 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  * @since 4.1
  */
-public interface JPPFNodeProvisioningMBean {
+public interface JPPFNodeProvisioningMBean extends Serializable, NotificationEmitter {
   /**
    * The object name of this MBean.
    */
   String MBEAN_NAME = "org.jppf:name=provisioning,type=node";
+  /**
+   * The type constant for notifications that a slave node has started.
+   * @since 6.1
+   */
+  String SLAVE_STARTED_NOTIFICATION_TYPE = "slave_started";
+  /**
+   * The type constant for notifications that a slave node has stopped.
+   * @since 6.1
+   */
+  String SLAVE_STOPPED_NOTIFICATION_TYPE = "slave_stopped";
 
   /**
    * Get the number of slave nodes started by this MBean.

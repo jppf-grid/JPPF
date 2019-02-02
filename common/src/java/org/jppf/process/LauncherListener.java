@@ -54,7 +54,7 @@ public class LauncherListener extends Thread {
    * @param port the port to listen to.
    */
   public LauncherListener(final int port) {
-    super("LauncherListener thread");
+    super("LauncherSocket-" + port);
     this.port = port;
   }
 
@@ -65,7 +65,7 @@ public class LauncherListener extends Thread {
    * @since 5.0
    */
   public LauncherListener(final int port, final LauncherListenerProtocolHandler actionHandler) {
-    super("LauncherListener thread");
+    super("LauncherSocket-" + port);
     this.port = port;
     this.actionHandler = actionHandler;
   }
@@ -75,13 +75,14 @@ public class LauncherListener extends Thread {
    */
   @Override
   public void run() {
+    if (debugEnabled) log.debug("starting ...");
     try (final Socket s = new Socket("localhost", port)) {
       final DataInputStream dis = new DataInputStream(s.getInputStream());
-      if (debugEnabled) log.debug("launcher listener initialized on port {}", port);
+      if (debugEnabled) log.debug("launcher listener initialized with {}", s);
       while (true) {
         final int n = dis.readInt();
         if (n == -1) throw new EOFException("eof");
-        if (debugEnabled) log.debug("received command code {} from controling process", ProcessCommands.getCommandName(n));
+        if (debugEnabled) log.debug("received command code {} from controlling process", ProcessCommands.getCommandName(n));
         final LauncherListenerProtocolHandler ah = getActionHandler();
         if (ah != null) ah.performAction(n);
       }
