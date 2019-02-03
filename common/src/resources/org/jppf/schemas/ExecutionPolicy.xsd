@@ -49,8 +49,10 @@
       <element name="Preference" type="jppf:OneOrMoreRulesType"/>
       <element name="IsInIPv4Subnet" type="jppf:SubnetRuleType"/>
       <element name="IsInIPv6Subnet" type="jppf:SubnetRuleType"/>
-      <element name="AcceptAll" type="ZeroOrOneRuleType"/>
-      <element name="RejectAll" type="ZeroOrOneRuleType"/>
+      <element name="AcceptAll" type="jppf:ZeroOrOneRuleType"/>
+      <element name="RejectAll" type="jppf:ZeroOrOneRuleType"/>
+      <element name="IsMasterNode" type="jppf:ZeroRuleType"/>
+      <element name="IsSlaveNode" type="jppf:ZeroRuleType"/>
       <element name="NodesMatching" type="jppf:GlobalType"/>
     </choice>
   </group>
@@ -61,6 +63,12 @@
       <group ref="jppf:Rule"/>
     </sequence>
   </complexType>
+
+  <simpleType name="ZeroRuleType">
+     <restriction base="string">
+       <length value="0" fixed="true"/>
+     </restriction>
+  </simpleType>
 
   <!-- Rule with a single optional other rule as argument -->
   <complexType name="ZeroOrOneRuleType">

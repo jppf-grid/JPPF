@@ -29,6 +29,7 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.*;
 import org.jppf.node.policy.ExecutionPolicy.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.junit.*;
 
@@ -57,7 +58,7 @@ public class TestExecutionPolicy extends BaseTest {
       .setString("string.1", "string1").setString("string.1a", "stri").setString("string.1b", "ng1")
       .setString("string.2", "string2").setString("string.3", "string3").setString("string.4a", "string4")
       .setString("string.4b", "stRIng4").setString("string.5", "string1-string2").setBoolean("boolean.1", true)
-      .setBoolean("boolean.2", false);
+      .setBoolean("boolean.2", false).set(JPPFProperties.PROVISIONING_MASTER, true).set(JPPFProperties.PROVISIONING_SLAVE, false);
     systemInfo.addProperties("test", test);
   }
 
@@ -289,6 +290,26 @@ public class TestExecutionPolicy extends BaseTest {
   public void testRejectAll() throws Exception {
     checkPolicy(new RejectAll(), false);
     checkPolicy(new RejectAll(new AcceptAll()), false);
+  }
+
+  /** @throws Exception if any error occurs. */
+  @Test(timeout=5000)
+  public void testIsMasterNode() throws Exception {
+    checkPolicy(new IsMasterNode(), true);
+    final String xml = "<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'><IsMasterNode></IsMasterNode></jppf:ExecutionPolicy>";
+    PolicyParser.validatePolicy(xml);
+    final ExecutionPolicy policy = PolicyParser.parsePolicy(xml);
+    assertTrue(policy instanceof IsMasterNode);
+  }
+
+  /** @throws Exception if any error occurs. */
+  @Test(timeout=5000)
+  public void testIsSlaveNode() throws Exception {
+    checkPolicy(new IsSlaveNode(), false);
+    final String xml = "<jppf:ExecutionPolicy xmlns:jppf='http://www.jppf.org/schemas/ExecutionPolicy.xsd'><IsSlaveNode></IsSlaveNode></jppf:ExecutionPolicy>";
+    PolicyParser.validatePolicy(xml);
+    final ExecutionPolicy policy = PolicyParser.parsePolicy(xml);
+    assertTrue(policy instanceof IsSlaveNode);
   }
 
   /**
