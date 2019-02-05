@@ -191,7 +191,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * The client should recover gracefully and provide the job results without intervention.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 20_000L)
   public void testJobAutoRecoveryOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
@@ -241,7 +241,7 @@ public abstract class AbstractJobPersistenceTest extends AbstractDatabaseSetup {
    * The driver should resubmit the job for execution upon restart, and the client must be able to retrieve the job upon completion.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout = 15000)
+  @Test(timeout = 25_000L)
   public void testJobAutoExecuteOnDriverRestart() throws Exception {
     final int nbTasks = 20;
     final String method = ReflectionUtils.getCurrentMethodName();
