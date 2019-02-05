@@ -160,23 +160,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   /**
-   * 
+   * Wait for the specified job to be removed from this queue.
    * @param serverJob the job to remove.
    */
   void awaitJobRemoved(final ServerJob serverJob) {
     if (debugEnabled) log.debug("awaiting removal of {}", serverJob);
     final String uuid = serverJob.getUuid();
-    while (jobMap.get(uuid) != null) {
-      try {
-        Condition cond = jobRemovalConditions.get(uuid);
+    try {
+      Condition cond = jobRemovalConditions.get(uuid);
+      while (jobMap.containsKey(uuid)) {
         if (cond == null) {
           cond = lock.newCondition();
           jobRemovalConditions.put(uuid, cond);
         }
         cond.await();
-      } catch(final InterruptedException e) {
-        log.error(e.getMessage(), e);
       }
+      if (debugEnabled) log.debug("finished waiting for removal of {}", serverJob);
+    } catch(final InterruptedException e) {
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -278,7 +279,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (jobMap.remove(uuid) != null) {
           scheduleManager.clearSchedules(serverJob.getUuid());
           jobManager.jobEnded(serverJob);
-        }
+        } else if (debugEnabled) log.debug("could not remove {}", serverJob);
         final Condition cond = jobRemovalConditions.remove(uuid);
         if (cond != null) cond.signalAll();
       }

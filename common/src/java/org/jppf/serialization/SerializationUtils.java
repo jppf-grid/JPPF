@@ -443,11 +443,13 @@ public final class SerializationUtils {
    */
   public static void readToBuf(final InputStream in, final byte[] buf, final int offset, final int len) throws IOException {
     for (int pos=offset, count=0; count<len; ) {
-      final int n = in.read(buf, pos, len - count);
+      final int remaining = len - count;
+      final int n = in.read(buf, pos, remaining);
       if (n > 0) {
         pos += n;
         count += n;
       }
+      else if ((n == 0) && (remaining > 0)) throw new EOFException("attempted to read " + remaining + "bytes but got zero");
       else if (n < 0) throw new EOFException("could only read " + count + " bytes out of " + len);
     }
   }

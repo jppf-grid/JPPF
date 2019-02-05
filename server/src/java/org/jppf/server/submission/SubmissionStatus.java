@@ -20,8 +20,7 @@ package org.jppf.server.submission;
 /**
  * The status of a submission.
  */
-public enum SubmissionStatus
-{
+public enum SubmissionStatus {
   /**
    * The job was just submitted.
    */
