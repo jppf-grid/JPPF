@@ -168,7 +168,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     final String uuid = serverJob.getUuid();
     try {
       Condition cond = jobRemovalConditions.get(uuid);
-      while (jobMap.containsKey(uuid)) {
+      ServerJob job = null;
+      while (((job = jobMap.get(uuid)) != null) && job.hasCompleted()) {
         if (cond == null) {
           cond = lock.newCondition();
           jobRemovalConditions.put(uuid, cond);

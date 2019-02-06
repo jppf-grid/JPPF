@@ -276,7 +276,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     try {
       final SubmissionStatus submissionStatus = getSubmissionStatus();
       if (debugEnabled) log.debug("submissionStatus={}, adding {} to {}", submissionStatus, bundle, this);
-      if ((submissionStatus == SubmissionStatus.COMPLETE) || (submissionStatus == SubmissionStatus.ENDED)) {
+      if (hasCompleted()) {
         throw new JPPFJobEndedException("Job " + submissionStatus);
       } else {
         clientBundles.add(bundle);
@@ -285,6 +285,20 @@ public class AbstractServerJobBase extends AbstractServerJob {
         fireJobUpdated(false);
         return true;
       }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * DFetermine whether this job is in COMPLETED or ENDED state.
+   * @return {@code true} if this job has completed, {@code false} otherwise.
+   */
+  public boolean hasCompleted() {
+    lock.lock();
+    try {
+      final SubmissionStatus submissionStatus = getSubmissionStatus();
+      return (submissionStatus == SubmissionStatus.COMPLETE) || (submissionStatus == SubmissionStatus.ENDED);
     } finally {
       lock.unlock();
     }

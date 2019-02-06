@@ -33,6 +33,7 @@ import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.jppf.utils.concurrent.*;
+import org.jppf.utils.concurrent.ConcurrentUtils.ConditionFalseOnException;
 import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.common.*;
@@ -43,9 +44,11 @@ import test.org.jppf.test.setup.common.*;
  */
 public class AbstractNonStandardSetup extends BaseTest {
   /** */
-  protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", false));
+  protected static final ExecutionPolicy PEER_POLICY = new Equal("jppf.peer.driver", true);
   /** */
-  protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(new Equal("jppf.peer.driver", true));
+  protected static final NodeSelector NON_PEER_SELECTOR = new ExecutionPolicySelector(PEER_POLICY.not());
+  /** */
+  protected static final NodeSelector PEER_SELECTOR = new ExecutionPolicySelector(PEER_POLICY);
   /** */
   protected static TestConfiguration testConfig = null;
 
@@ -359,13 +362,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         print(false, false, "$$ awaiting JMX connection for %s", jmx);
         timeout = maxWait - (System.currentTimeMillis() - start);
         if (timeout <= 0L) throw new JPPFTimeoutException("exceeded timeout of " + maxWait + " ms");
-        ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-          @Override
-          public boolean evaluate() {
-            final boolean b = jmx.isConnected();
-            return b;
-          }
-        }, timeout, 500L, true);
+        ConcurrentUtils.awaitCondition(() -> jmx.isConnected(), timeout, 500L, true);
         print(false, false, "$$ got JMX connection %s", jmx);
       }
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
@@ -385,7 +382,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         }
       }
     } finally {
-      BaseSetup.generateDriverThreadDump(jmxArray);
+      //BaseSetup.generateDriverThreadDump(jmxArray);
       for (final JMXDriverConnectionWrapper jmx: jmxArray) {
         if (jmx.isConnected()) jmx.close();
       }
@@ -416,16 +413,7 @@ public class AbstractNonStandardSetup extends BaseTest {
    */
   protected static void awaitNbIdleNodes(final JMXDriverConnectionWrapper jmx, final NodeSelector selector, final boolean includePeers,
     final ComparisonOperator operator, final int nbNodes, final long timeout) throws Exception {
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-        @Override
-        public boolean evaluate() {
-          try {
-            return operator.evaluate(jmx.nbIdleNodes(selector, includePeers), nbNodes);
-          } catch (@SuppressWarnings("unused") final Exception e) {
-            return false;
-          }
-        }
-      }, timeout, 500L, true);
+    ConcurrentUtils.awaitCondition((ConditionFalseOnException) () -> operator.evaluate(jmx.nbIdleNodes(selector, includePeers), nbNodes), timeout, 500L, true);
   }
 
   /**

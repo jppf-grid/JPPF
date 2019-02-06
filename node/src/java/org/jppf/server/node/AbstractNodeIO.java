@@ -74,7 +74,7 @@ public abstract class AbstractNodeIO<N extends AbstractCommonNode> implements No
       }
       return new Pair<>(currentBundle, taskList);
     } catch (final Exception|Error e) {
-      if (debugEnabled) log.debug("error in readTask:", e);
+      if (debugEnabled) log.debug("error in readJob():", e);
       throw e;
     }
   }

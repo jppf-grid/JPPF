@@ -129,11 +129,17 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
         try {
           awaitStatus();
           clientBundle = bundleQueue.take();
+          final long bundleId = clientBundle.getBundleId();
           final List<Task<?>> tasks = clientBundle.getTasksL();
           final JPPFJob newJob = createNewJob(clientBundle, tasks);
-          if (thisDebugEnabled) thisLog.debug("{} executing {} tasks of job {} with bundleId = {}", ChannelWrapperRemoteAsync.this, tasks.size(), newJob, clientBundle.getBundleId());
+          if (thisDebugEnabled) {
+            final int size = tasks.size();
+            final int[] positions = new int[size];
+            for (int i=0; i<size; i++) positions[i] = tasks.get(i).getPosition();
+            thisLog.debug("{} executing {} tasks of job {} with bundleId = {}, positions={}", ChannelWrapperRemoteAsync.this, size, newJob, bundleId, Arrays.toString(positions));
+          }
           final Collection<ClassLoader> loaders = registerClassLoaders(newJob);
-          final TaskBundle bundle = createBundle(newJob, clientBundle.getBundleId());
+          final TaskBundle bundle = createBundle(newJob, bundleId);
           bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           final ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
@@ -141,7 +147,7 @@ public class ChannelWrapperRemoteAsync extends AbstractChannelWrapperRemote {
           final long start = System.nanoTime();
           final RemoteResponse response = new RemoteResponse(clientBundle, 0, cl, ser, start);
           synchronized(response) {
-            if (response.currentCount < response.taskCount) responseMap.put(clientBundle.getBundleId(), response);
+            if (response.currentCount < response.taskCount) responseMap.put(bundleId, response);
             if (thisDebugEnabled) thisLog.debug("{} sending {}", ChannelWrapperRemoteAsync.this, clientBundle);
             final List<Task<?>> notSerializableTasks = channel.sendTasks(ser, cl, bundle, newJob);
             clientBundle.jobDispatched(ChannelWrapperRemoteAsync.this);
